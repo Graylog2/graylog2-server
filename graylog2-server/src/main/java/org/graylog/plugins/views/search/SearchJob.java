@@ -28,7 +28,9 @@ import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.rest.ExecutionInfo;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +48,7 @@ public class SearchJob implements ParameterProvider {
 
     private final Search search;
 
-    private Future<?> searchEngineTaskFuture;
+    private Map<String, Future<?>> queryExecutionFutures;
 
     private CompletableFuture<Void> resultFuture;
 
@@ -72,6 +74,7 @@ public class SearchJob implements ParameterProvider {
         this.search = search;
         this.searchJobIdentifier = new SearchJobIdentifier(id, search.id(), owner, executingNodeId);
         this.cancelAfterSeconds = cancelAfterSeconds != null ? cancelAfterSeconds : NO_CANCELLATION;
+        this.queryExecutionFutures = new HashMap<>();
     }
 
     @JsonIgnore //covered by @JsonUnwrapped
@@ -120,14 +123,14 @@ public class SearchJob implements ParameterProvider {
     }
 
     @JsonIgnore
-    public void setSearchEngineTaskFuture(final Future<?> searchEngineTaskFuture) {
-        this.searchEngineTaskFuture = searchEngineTaskFuture;
+    public void setQueryExecutionFuture(final String queryId, final Future<?> future) {
+        this.queryExecutionFutures.put(queryId, future);
     }
 
     public void cancel() {
-        if (this.searchEngineTaskFuture != null) {
-            this.searchEngineTaskFuture.cancel(true);
-        }
+        this.queryExecutionFutures.values().stream()
+                .filter(Objects::nonNull)
+                .forEach(f -> f.cancel(true));
     }
 
     @JsonProperty("results")
@@ -141,8 +144,8 @@ public class SearchJob implements ParameterProvider {
 
     @JsonProperty("execution")
     public ExecutionInfo execution() {
-        final boolean isDone = (resultFuture == null || resultFuture.isDone()) && (searchEngineTaskFuture == null || searchEngineTaskFuture.isDone());
-        final boolean isCancelled = (searchEngineTaskFuture != null && searchEngineTaskFuture.isCancelled()) || (resultFuture != null && resultFuture.isCancelled());
+        final boolean isDone = (resultFuture == null || resultFuture.isDone()) && (queryExecutionFutures.values().stream().allMatch(f -> f == null || f.isDone()));
+        final boolean isCancelled = (!queryExecutionFutures.isEmpty() && queryExecutionFutures.values().stream().allMatch(f -> f != null && f.isCancelled()) || (resultFuture != null && resultFuture.isCancelled()));
         return new ExecutionInfo(isDone, isCancelled, !errors.isEmpty());
     }
 

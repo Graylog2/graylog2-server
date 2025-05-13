@@ -19,8 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import EventDefinitionFormContainer
-  from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -35,13 +34,19 @@ const CreateEventDefinitionPage = () => {
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
   const { step } = useQuery();
 
-  const handleEventDefinitionChange = useCallback((eventDefinition) => {
-    if (eventDefinition.title !== eventDefinitionTitle) {
-      setEventDefinitionTitle(eventDefinition.title);
-    }
-  }, [eventDefinitionTitle]);
+  const handleEventDefinitionChange = useCallback(
+    (eventDefinition) => {
+      if (eventDefinition.title !== eventDefinitionTitle) {
+        setEventDefinitionTitle(eventDefinition.title);
+      }
+    },
+    [eventDefinitionTitle],
+  );
 
-  const pageTitle = useMemo(() => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'), [eventDefinitionTitle]);
+  const pageTitle = useMemo(
+    () => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'),
+    [eventDefinitionTitle],
+  );
 
   const goToOverview = useCallback(() => {
     navigate(Routes.ALERTS.DEFINITIONS.LIST);
@@ -57,26 +62,26 @@ const CreateEventDefinitionPage = () => {
     <DocumentTitle title={pageTitle}>
       <EventsPageNavigation />
 
-      <PageHeader title={pageTitle}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Event Definitions allow you to create Alerts from different Conditions and alert on them.
-        </span>
+      <PageHeader
+        title={pageTitle}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>Event Definitions allow you to create Alerts from different Conditions and alert on them.</span>
       </PageHeader>
 
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="create"
-                                        onEventDefinitionChange={handleEventDefinitionChange}
-                                        initialStep={step as string}
-                                        onSubmit={goToOverview}
-                                        onCancel={goToOverview} />
+          <EventDefinitionFormContainer
+            action="create"
+            onEventDefinitionChange={handleEventDefinitionChange}
+            initialStep={step as string}
+            onSubmit={goToOverview}
+            onCancel={goToOverview}
+          />
         </Col>
       </Row>
-
     </DocumentTitle>
   );
 };

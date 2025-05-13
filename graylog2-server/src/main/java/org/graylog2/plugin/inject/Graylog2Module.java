@@ -67,11 +67,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
+import java.util.Set;
 
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
 
     public static final String SYSTEM_REST_RESOURCES = "systemRestResources";
+    public static final String DB_ENTITIES = "dbEntities";
 
     protected void installTransport(
             MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
@@ -540,4 +542,13 @@ public abstract class Graylog2Module extends AbstractModule {
     protected Multibinder<StreamDeletionGuard> streamDeletionGuardBinder() {
         return Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
     }
+
+    protected Multibinder<Class<?>> dbEntitiesBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<>() {}, Names.named(DB_ENTITIES));
+    }
+
+    protected Set<Object> getConfigurationBeans() {
+        return Set.of();
+    }
+
 }

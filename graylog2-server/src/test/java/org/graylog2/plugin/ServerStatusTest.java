@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
@@ -45,7 +46,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class ServerStatusTest {
     @Rule
@@ -53,7 +53,8 @@ public class ServerStatusTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock private BaseConfiguration config;
+    @Mock
+    private GraylogNodeConfiguration config;
     @Mock private EventBus eventBus;
 
     private ServerStatus status;

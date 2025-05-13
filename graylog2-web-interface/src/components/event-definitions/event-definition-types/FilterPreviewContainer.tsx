@@ -30,7 +30,9 @@ import generateId from 'logic/generateId';
 import FilterPreview from './FilterPreview';
 
 const isPermittedToSeePreview = (currentUser, config) => {
-  const missingPermissions = config?.streams?.some((stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`));
+  const missingPermissions = config?.streams?.some(
+    (stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`),
+  );
 
   return !missingPermissions;
 };
@@ -41,9 +43,12 @@ type FilterPreviewContainerProps = {
   currentUser: any;
 };
 
-class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps, {
-  [key: string]: any;
-}> {
+class FilterPreviewContainer extends React.Component<
+  FilterPreviewContainerProps,
+  {
+    [key: string]: any;
+  }
+> {
   fetchSearch = debounce((config) => {
     const { currentUser } = this.props;
 
@@ -61,26 +66,29 @@ class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps
       .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
       .filter(formattedStreams.length === 0 ? null : Map({ type: 'or', filters: formattedStreams }))
       .filters(config.filters)
-      .searchTypes([{
-        id: searchTypeId,
-        type: 'messages',
-        limit: 10,
-        offset: 0,
-        filter: undefined,
-        filters: undefined,
-        name: undefined,
-        query: undefined,
-        timerange: undefined,
-        streams: [],
-        stream_categories: [],
-        sort: [],
-        decorators: [],
-      }]);
+      .searchTypes([
+        {
+          id: searchTypeId,
+          type: 'messages',
+          limit: 10,
+          offset: 0,
+          filter: undefined,
+          filters: undefined,
+          name: undefined,
+          query: undefined,
+          timerange: undefined,
+          streams: [],
+          stream_categories: [],
+          sort: [],
+          decorators: [],
+        },
+      ]);
 
     const query = queryBuilder.build();
 
-    const search = Search.create().toBuilder()
-      .parameters(config?.query_parameters?.filter((param) => (!param.embryonic)) || [])
+    const search = Search.create()
+      .toBuilder()
+      .parameters(config?.query_parameters?.filter((param) => !param.embryonic) || [])
       .queries([query])
       .build();
 
@@ -118,7 +126,12 @@ class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps
       search_within_ms: searchWithin,
     } = eventDefinition.config;
 
-    if (query !== prevQuery || queryParameters !== prevQueryParameters || !isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
+    if (
+      query !== prevQuery ||
+      queryParameters !== prevQueryParameters ||
+      !isEqual(streams, prevStreams) ||
+      searchWithin !== prevSearchWithin
+    ) {
       this.fetchSearch(eventDefinition.config);
     }
   }
@@ -137,18 +150,24 @@ class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps
     }
 
     return (
-      <FilterPreview isFetchingData={isLoading}
-                     displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
-                     searchResult={searchResult}
-                     errors={errors} />
+      <FilterPreview
+        isFetchingData={isLoading}
+        displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
+        searchResult={searchResult}
+        errors={errors}
+      />
     );
   }
 }
 
-export default connect(FilterPreviewContainer, {
-  filterPreview: FilterPreviewStore,
-  currentUser: CurrentUserStore,
-}, ({ currentUser, ...otherProps }) => ({
-  ...otherProps,
-  currentUser: currentUser.currentUser,
-}));
+export default connect(
+  FilterPreviewContainer,
+  {
+    filterPreview: FilterPreviewStore,
+    currentUser: CurrentUserStore,
+  },
+  ({ currentUser, ...otherProps }) => ({
+    ...otherProps,
+    currentUser: currentUser.currentUser,
+  }),
+);

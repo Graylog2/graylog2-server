@@ -37,9 +37,12 @@ type LoaderTabsProps = {
   inputs?: any;
 };
 
-class LoaderTabs extends React.Component<LoaderTabsProps, {
-  [key: string]: any;
-}> {
+class LoaderTabs extends React.Component<
+  LoaderTabsProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     tabs: ['recent', 'messageId'],
     index: undefined,
@@ -138,9 +141,11 @@ class LoaderTabs extends React.Component<LoaderTabsProps, {
 
       messageLoaders.push(
         <Tab key="recent" eventKey={this.TAB_KEYS.recent} title="Recent Message" style={{ marginBottom: 10 }}>
-          <RecentMessageLoader inputs={inputs}
-                               selectedInputId={selectedInputId}
-                               onMessageLoaded={this.onMessageLoaded} />
+          <RecentMessageLoader
+            inputs={inputs}
+            selectedInputId={selectedInputId}
+            onMessageLoaded={this.onMessageLoaded}
+          />
         </Tab>,
       );
     }
@@ -153,11 +158,13 @@ class LoaderTabs extends React.Component<LoaderTabsProps, {
           <div style={{ marginTop: 5, marginBottom: 15 }}>
             Please provide the id and index of the message that you want to load in this form:
           </div>
-          <MessageLoader messageId={messageId}
-                         index={index}
-                         onMessageLoaded={this.onMessageLoaded}
-                         hidden={false}
-                         hideText />
+          <MessageLoader
+            messageId={messageId}
+            index={index}
+            onMessageLoaded={this.onMessageLoaded}
+            hidden={false}
+            hideText
+          />
         </Tab>,
       );
     }
@@ -180,16 +187,12 @@ class LoaderTabs extends React.Component<LoaderTabsProps, {
   render() {
     const { streams, message } = this.state;
     const { customFieldActions, inputs } = this.props;
-    const displayMessage = message && inputs
-      ? (
+    const displayMessage =
+      message && inputs ? (
         <Col md={12}>
-          <MessageShow message={message}
-                       inputs={inputs}
-                       streams={streams}
-                       customFieldActions={customFieldActions} />
+          <MessageShow message={message} inputs={inputs} streams={streams} customFieldActions={customFieldActions} />
         </Col>
-      )
-      : null;
+      ) : null;
 
     return (
       <div>
@@ -202,8 +205,6 @@ class LoaderTabs extends React.Component<LoaderTabsProps, {
   }
 }
 
-export default connect(
-  LoaderTabs,
-  { inputs: InputsStore },
-  ({ inputs: { inputs } }) => ({ inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined }),
-);
+export default connect(LoaderTabs, { inputs: InputsStore }, ({ inputs: { inputs } }) => ({
+  inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined,
+}));

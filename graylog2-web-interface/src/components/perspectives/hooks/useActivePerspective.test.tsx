@@ -27,16 +27,15 @@ jest.mock('hooks/usePluginEntities');
 
 describe('useActivePerspective', () => {
   beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      perspectives: [defaultPerspective],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          perspectives: [defaultPerspective],
+        })[entityKey],
+    );
   });
 
-  const wrapper = ({ children }: React.PropsWithChildren) => (
-    <PerspectivesProvider>
-      {children}
-    </PerspectivesProvider>
-  );
+  const wrapper = ({ children }: React.PropsWithChildren) => <PerspectivesProvider>{children}</PerspectivesProvider>;
 
   it('should return active perspective', async () => {
     const { result } = renderHook(() => useActivePerspective(), { wrapper });
@@ -47,6 +46,8 @@ describe('useActivePerspective', () => {
   it('should throw error when being used outside of PerspectivesContext', async () => {
     const { result } = renderHook(() => useActivePerspective());
 
-    expect(result.error).toEqual(Error('useActivePerspective hook needs to be used inside PerspectivesContext.Provider'));
+    expect(result.error).toEqual(
+      Error('useActivePerspective hook needs to be used inside PerspectivesContext.Provider'),
+    );
   });
 });

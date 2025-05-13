@@ -24,13 +24,13 @@ import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
 
 type InternalState = {
-  interpolation: InterpolationMode,
-  axisType: AxisType,
+  interpolation: InterpolationMode;
+  axisType: AxisType;
 };
 
 export type AreaVisualizationConfigJSON = {
-  interpolation: InterpolationMode,
-  axis_type?: AxisType,
+  interpolation: InterpolationMode;
+  axis_type?: AxisType;
 };
 
 export default class AreaVisualizationConfig extends VisualizationConfig implements XYVisualization {
@@ -54,7 +54,10 @@ export default class AreaVisualizationConfig extends VisualizationConfig impleme
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
+  static create(
+    interpolation: InternalState['interpolation'],
+    axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE,
+  ) {
     return new AreaVisualizationConfig(interpolation, axisType);
   }
 

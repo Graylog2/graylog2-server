@@ -43,10 +43,12 @@ export const simpleEventDefinition = {
   },
   notifications: [],
   priority: 2,
-  storage: [{
-    streams: ['stream-id-2'],
-    type: 'persist-to-streams-v1',
-  }],
+  storage: [
+    {
+      streams: ['stream-id-2'],
+      type: 'persist-to-streams-v1',
+    },
+  ],
   title: 'Event Definition 1',
   _scope: 'DEFAULT',
 };

@@ -19,63 +19,28 @@ import { useState } from 'react';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import type { InputStates } from 'stores/inputs/InputStatesStore';
+import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
 import { useStore } from 'stores/connect';
+import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import type { Input } from 'components/messageloaders/Types';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
-import useInputSetupWizard from 'hooks/useInputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 type Props = {
-  input: Input
-}
+  input: Input;
+  openWizard: () => void;
+};
 
-const InputStateControl = ({ input } : Props) => {
+const InputStateControl = ({ input, openWizard }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
-  const { openWizard } = useInputSetupWizard();
-
-  const inputState = inputStates ? inputStates[input.id] : undefined;
-
-  const inputNodeIds = () => {
-    if (!inputState) {
-      return [];
-    }
-
-    return Object.keys(inputState);
-  };
-
-  const isInputRunning = () => {
-    const nodeIDs = inputNodeIds();
-
-    if (nodeIDs.length === 0) {
-      return false;
-    }
-
-    return nodeIDs.some((nodeID) => {
-      const nodeState = inputState[nodeID];
-
-      return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
-    });
-  };
-
-  const isInputinSetupMode = () => {
-    const nodeIDs = inputNodeIds();
-
-    if (nodeIDs.length === 0) {
-      return false;
-    }
-
-    return nodeIDs.some((nodeID) => {
-      const nodeState = inputState[nodeID];
-
-      return nodeState.state === 'SETUP';
-    });
-  };
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const startInput = () => {
     setIsLoading(true);
@@ -85,10 +50,9 @@ const InputStateControl = ({ input } : Props) => {
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(input)
-      .finally(() => {
-        setIsLoading(false);
-      });
+    InputStatesStore.start(input).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const stopInput = () => {
@@ -99,10 +63,9 @@ const InputStateControl = ({ input } : Props) => {
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(input)
-      .finally(() => {
-        setIsLoading(false);
-      });
+    InputStatesStore.stop(input).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const setupInput = () => {
@@ -111,18 +74,18 @@ const InputStateControl = ({ input } : Props) => {
       app_action_value: 'setup-input',
     });
 
-    openWizard(input.id);
+    openWizard();
   };
 
-  if (isInputinSetupMode()) {
+  if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
       <Button bsStyle="warning" onClick={setupInput}>
-        Setup Input
+        Set-up Input
       </Button>
     );
   }
 
-  if (isInputRunning()) {
+  if (isInputRunning(inputStates, input.id)) {
     return (
       <Button bsStyle="primary" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}

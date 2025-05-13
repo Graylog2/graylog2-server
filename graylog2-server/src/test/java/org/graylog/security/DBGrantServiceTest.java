@@ -23,6 +23,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -35,6 +36,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -48,18 +50,20 @@ public class DBGrantServiceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private DBGrantService dbService;
-    private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.dbService = new DBGrantService(mongodb.mongoConnection(), mapper, grnRegistry);
+        this.dbService = new DBGrantService(new MongoCollections(mapper, mongodb.mongoConnection()));
     }
 
     @Test
     @MongoDBFixtures("grants.json")
     public void test() {
-        assertThat(dbService.streamAll().collect(Collectors.toSet()).size()).isEqualTo(6);
+        try (Stream<GrantDTO> grantDTOStream = dbService.streamAll()) {
+            assertThat(grantDTOStream.collect(Collectors.toSet()).size()).isEqualTo(6);
+        }
     }
 
     @Test

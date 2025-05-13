@@ -20,14 +20,14 @@ import userEvent from '@testing-library/user-event';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { dataNodes } from 'fixtures/dataNodes';
 
 import CertificateProvisioning from './CertificateProvisioning';
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
@@ -61,12 +61,9 @@ describe('CertificateProvisioning', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/api/generate'),
-      undefined,
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/generate'), undefined, false),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('Started certificate provisioning successfully');
 
@@ -84,14 +81,13 @@ describe('CertificateProvisioning', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/api/generate'),
-      undefined,
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/generate'), undefined, false),
+    );
 
-    expect(UserNotification.error).toHaveBeenCalledWith('Starting certificate provisioning failed with error: Error: Error');
+    expect(UserNotification.error).toHaveBeenCalledWith(
+      'Starting certificate provisioning failed with error: Error: Error',
+    );
 
     await screen.findByRole('button', { name: /provision certificate and continue/i });
   });

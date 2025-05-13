@@ -24,16 +24,17 @@ const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverv
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
 const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
+const ClusterCertificateManagementPage = loadAsync(() => import('./ClusterCertificateManagementPage'));
+const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
-const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
 const DataNodePage = loadAsync(() => import('./DataNodePage'));
+const DataNodeUpgradePage = loadAsync(() => import('./DataNodeUpgradePage'));
 const DataNodesClusterManagementPage = loadAsync(() => import('./DataNodesClusterManagementPage'));
-const DataNodesClusterConfigurationPage = loadAsync(() => import('./DataNodesClusterConfigurationPage'));
 const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
@@ -63,6 +64,7 @@ const IndexSetTemplateCreatePage = loadAsync(() => import('./IndexSetTemplateCre
 const IndexSetTemplateEditPage = loadAsync(() => import('./IndexSetTemplateEditPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
+const InputDiagnosisPage = loadAsync(() => import('./InputDiagnosisPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
@@ -71,7 +73,6 @@ const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
 const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
-const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
@@ -121,16 +122,17 @@ export {
   AuthenticationOverviewPage,
   AuthenticatorsPage,
   AuthenticatorsEditPage,
+  ClusterCertificateManagementPage,
+  ClusterConfigurationPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
-  DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
-  DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
@@ -160,6 +162,7 @@ export {
   IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
+  InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoadingPage,
   LoggersPage,
@@ -168,7 +171,6 @@ export {
   LUTDataAdaptersPage,
   LUTTablesPage,
   NodeInputsPage,
-  NodesPage,
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,

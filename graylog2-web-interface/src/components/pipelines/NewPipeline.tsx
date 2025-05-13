@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 import useHistory from 'routing/useHistory';
 
 import PipelineDetails from './PipelineDetails';
@@ -45,9 +45,7 @@ const NewPipeline = ({ onChange }: Props) => {
   return (
     <Row>
       <Col md={6}>
-        <p>
-          Give a name and description to the new pipeline. You can add stages to it when you save the changes.
-        </p>
+        <p>Give a name and description to the new pipeline. You can add stages to it when you save the changes.</p>
         <PipelineDetails create onChange={_onChange} onCancel={_goBack} />
       </Col>
     </Row>

@@ -24,7 +24,9 @@ describe('TimeRangeDisplay', () => {
     const toggleShow = jest.fn();
     render(<TimeRangeDisplay toggleDropdownShow={toggleShow} timerange={{ type: 'relative', from: 300 }} />);
 
-    const timeRangeDisplay = screen.getByRole('button', { name: 'Search Time Range, Opens Time Range Selector On Click' });
+    const timeRangeDisplay = screen.getByRole('button', {
+      name: 'Search Time Range, Opens Time Range Selector On Click',
+    });
 
     fireEvent.click(timeRangeDisplay);
 

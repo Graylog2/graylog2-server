@@ -62,12 +62,7 @@ export default class Grantee implements GranteeInterface {
   static fromJSON(value: GranteeType): Grantee {
     const { id, title, type } = value;
 
-    return Grantee
-      .builder()
-      .id(id)
-      .title(title)
-      .type(type)
-      .build();
+    return Grantee.builder().id(id).title(title).type(type).build();
   }
 
   static builder(): Builder {

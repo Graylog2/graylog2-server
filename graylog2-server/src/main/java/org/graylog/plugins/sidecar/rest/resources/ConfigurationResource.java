@@ -46,6 +46,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -134,7 +135,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                                   allowableValues = "name,id,collector_id")
                                                         @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                        @DefaultValue("asc") @QueryParam("order") String order) {
+                                                        @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Configuration> configurations = this.configurationService.findPaginated(searchQuery, page, perPage, sort, order);
         final long total = this.configurationService.count();
@@ -274,9 +275,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (!config.tags().isEmpty()) {
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(config.tags(), os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (final var stream = sidecarService.findByTagsAndOS(config.tags(), os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(config).build();
@@ -332,9 +333,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(tags, os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (final var stream = sidecarService.findByTagsAndOS(tags, os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();

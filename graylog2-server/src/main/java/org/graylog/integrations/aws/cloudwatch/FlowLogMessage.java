@@ -21,8 +21,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-
 public class FlowLogMessage {
     private static final Logger LOG = LoggerFactory.getLogger(FlowLogMessage.class);
 
@@ -74,13 +72,11 @@ public class FlowLogMessage {
         this.logStatus = logStatus;
     }
 
-    @Nullable
     public static FlowLogMessage fromLogEvent(final KinesisLogEntry logEvent) {
         final String[] parts = logEvent.message().split(" ");
 
         if (parts.length != 14) {
-            LOG.warn("Received FlowLog message with not exactly 14 fields. Skipping. Message was: [{}]", logEvent.message());
-            return null;
+            throw new RuntimeException("Received FlowLog message with not exactly 14 fields. Skipping. Message was: [%s]".formatted(logEvent.message()));
         }
 
         return new FlowLogMessage(

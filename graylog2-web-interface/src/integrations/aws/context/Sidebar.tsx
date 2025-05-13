@@ -23,18 +23,12 @@ type SidebarProviderProps = {
   children: any;
 };
 
-export const SidebarProvider = ({
-  children,
-}: SidebarProviderProps) => {
+export const SidebarProvider = ({ children }: SidebarProviderProps) => {
   const [sidebar, setSidebar] = useState(<></>);
 
   const clearSidebar = () => {
     setSidebar(<></>);
   };
 
-  return (
-    <SidebarContext.Provider value={{ sidebar, clearSidebar, setSidebar }}>
-      {children}
-    </SidebarContext.Provider>
-  );
+  return <SidebarContext.Provider value={{ sidebar, clearSidebar, setSidebar }}>{children}</SidebarContext.Provider>;
 };

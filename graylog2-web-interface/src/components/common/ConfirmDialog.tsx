@@ -25,14 +25,14 @@ const StyledModal = styled(Modal)`
 `;
 
 type Props = {
-  show?: boolean,
-  onConfirm: (event) => void,
-  onCancel?: () => void,
-  title: string | React.ReactNode,
-  children: React.ReactNode,
-  btnConfirmDisabled?: boolean,
-  btnConfirmText?: React.ReactNode,
-  hideCancelButton?: boolean,
+  show?: boolean;
+  onConfirm: () => void;
+  onCancel?: () => void;
+  title: string | React.ReactNode;
+  children: React.ReactNode;
+  btnConfirmDisabled?: boolean;
+  btnConfirmText?: React.ReactNode;
+  hideCancelButton?: boolean;
 };
 
 /**
@@ -43,8 +43,7 @@ const ConfirmDialog = ({
   show = false,
   title,
   children,
-  onCancel = () => {
-  },
+  onCancel = () => {},
   onConfirm,
   btnConfirmDisabled = false,
   btnConfirmText = 'Confirm',
@@ -54,21 +53,21 @@ const ConfirmDialog = ({
 
   return (
     <StyledModal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body>
-        {children}
-      </Modal.Body>
+      <Modal.Body>{children}</Modal.Body>
 
       <Modal.Footer>
-        <ModalSubmit onCancel={onCancel}
-                     onSubmit={onConfirm}
-                     submitButtonType="button"
-                     disabledSubmit={btnConfirmDisabled}
-                     submitButtonText={btnConfirmText}
-                     displayCancel={!hideCancelButton as any} />
+        <ModalSubmit
+          onCancel={onCancel}
+          onSubmit={onConfirm}
+          submitButtonType="button"
+          disabledSubmit={btnConfirmDisabled}
+          submitButtonText={btnConfirmText}
+          displayCancel={!hideCancelButton as any}
+        />
       </Modal.Footer>
     </StyledModal>
   );

@@ -25,15 +25,16 @@ import OriginalNavigationLink from './NavigationLink';
 
 jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualifyUrl: jest.fn((path) => path) }));
 
-const NavigationLink = (props: React.ComponentProps<typeof OriginalNavigationLink>) => (props.topLevel
-  ? <OriginalNavigationLink {...props} />
-  : (
+const NavigationLink = (props: React.ComponentProps<typeof OriginalNavigationLink>) =>
+  props.topLevel ? (
+    <OriginalNavigationLink {...props} />
+  ) : (
     <Menu opened>
       <Menu.Dropdown>
         <OriginalNavigationLink {...props} />
       </Menu.Dropdown>
     </Menu>
-  ));
+  );
 
 describe('NavigationLink', () => {
   it('renders with simple props', async () => {

@@ -41,9 +41,7 @@ const event = {
     timerange_start: '2024-04-09T14:29:36.644Z',
     timerange_end: '2024-04-09T14:29:39.644Z',
     query: '',
-    streams: [
-      '000000000000000000000001',
-    ],
+    streams: ['000000000000000000000001'],
     filters: [],
   },
 };
@@ -57,8 +55,7 @@ describe('EventsTableRow', () => {
     render(
       <table>
         <tbody>
-          <EventsTableRow event={event}
-                          fields={Immutable.OrderedSet(['name'])} />
+          <EventsTableRow event={event} fields={Immutable.OrderedSet(['name'])} />
         </tbody>
       </table>,
     );
@@ -70,8 +67,7 @@ describe('EventsTableRow', () => {
     render(
       <table>
         <tbody>
-          <EventsTableRow event={event}
-                          fields={Immutable.OrderedSet(['name'])} />
+          <EventsTableRow event={event} fields={Immutable.OrderedSet(['name'])} />
         </tbody>
       </table>,
     );
@@ -87,8 +83,7 @@ describe('EventsTableRow', () => {
     render(
       <table>
         <tbody>
-          <EventsTableRow event={event}
-                          fields={Immutable.OrderedSet(['name'])} />
+          <EventsTableRow event={event} fields={Immutable.OrderedSet(['name'])} />
         </tbody>
       </table>,
     );

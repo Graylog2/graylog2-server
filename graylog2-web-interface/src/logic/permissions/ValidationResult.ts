@@ -20,27 +20,27 @@ import type { $PropertyType } from 'utility-types';
 import type { GRN } from './types';
 
 type Errors = {
-  selectedGranteeCapabilities: Immutable.List<string>,
+  selectedGranteeCapabilities: Immutable.List<string>;
 };
 
 type ErrorContext = {
-  selectedGranteeCapabilities: Immutable.List<GRN>,
+  selectedGranteeCapabilities: Immutable.List<GRN>;
 };
 
 type InternalState = {
-  errors: Errors,
-  errorContext: ErrorContext,
-  failed: boolean,
+  errors: Errors;
+  errorContext: ErrorContext;
+  failed: boolean;
 };
 
 export type ValidationResultJSON = {
   errors: {
-    selected_grantee_capabilities: string[],
-  },
+    selected_grantee_capabilities: string[];
+  };
   error_context: {
-    selected_grantee_capabilities: string[],
-  },
-  failed: boolean,
+    selected_grantee_capabilities: string[];
+  };
+  failed: boolean;
 };
 
 export default class ValidationResult {
@@ -71,18 +71,16 @@ export default class ValidationResult {
   }
 
   toBuilder() {
-    const {
-      errors,
-      errorContext,
-      failed,
-    } = this._value;
+    const { errors, errorContext, failed } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      errors,
-      errorContext,
-      failed,
-    }));
+    return new Builder(
+      Immutable.Map({
+        errors,
+        errorContext,
+        failed,
+      }),
+    );
   }
 
   static create(

@@ -16,7 +16,6 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
@@ -26,6 +25,7 @@ import type {
   IndexSetFieldTypeProfileJson,
   IndexSetFieldTypeProfile,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -33,64 +33,69 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-export const keyFn = (searchParams: SearchParams) => (['indexSetFieldTypeProfiles', searchParams]);
+export const keyFn = (searchParams: SearchParams) => ['indexSetFieldTypeProfiles', searchParams];
 
 export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
   const indexSetFieldTypeUrl = qualifyUrl('/system/indices/index_sets/profiles/paginated');
-  const url = PaginationURL(
-    indexSetFieldTypeUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { filters: FiltersForQueryParams(searchParams.filters), sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(indexSetFieldTypeUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    filters: FiltersForQueryParams(searchParams.filters),
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
-  return fetch('GET', url).then(
-    ({ elements, total, attributes }) => ({
-      list: elements.map((profile: IndexSetFieldTypeProfileJson) => ({
-        id: profile.id,
-        name: profile.name,
-        description: profile.description,
-        customFieldMappings: profile.custom_field_mappings,
-        indexSetIds: profile.index_set_ids,
-      })),
-      pagination: { total },
-      attributes: [...attributes, {
+  return fetch('GET', url).then(({ elements, total, attributes }) => ({
+    list: elements.map((profile: IndexSetFieldTypeProfileJson) => ({
+      id: profile.id,
+      name: profile.name,
+      description: profile.description,
+      customFieldMappings: profile.custom_field_mappings,
+      indexSetIds: profile.index_set_ids,
+    })),
+    pagination: { total },
+    attributes: [
+      ...attributes,
+      {
         id: 'index_set_ids',
         searchable: false,
         sortable: false,
         title: 'Used in',
         type: 'STRING',
-      }],
-    }));
+      },
+    ],
+  }));
 };
 
-const useProfiles = (searchParams: SearchParams, { enabled }): {
+const useProfiles = (
+  searchParams: SearchParams,
+  { enabled },
+): {
   data: {
-    list: Readonly<Array<IndexSetFieldTypeProfile>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
-  isLoading: boolean,
-  refetch: () => void,
+    list: Readonly<Array<IndexSetFieldTypeProfile>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  isLoading: boolean;
+  refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery(
     keyFn(searchParams),
-    () => fetchIndexSetFieldTypeProfiles(searchParams),
+    () =>
+      defaultOnError(
+        fetchIndexSetFieldTypeProfiles(searchParams),
+        'Loading index field type profiles failed with status',
+        'Could not load index field type profiles',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index field type profiles failed with status: ${errorThrown}`,
-          'Could not load index field type profiles');
-      },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useProfiles;

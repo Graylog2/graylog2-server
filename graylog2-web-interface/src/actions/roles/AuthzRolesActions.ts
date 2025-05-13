@@ -23,32 +23,31 @@ import { singletonActions } from 'logic/singleton';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 
 export type UserContext = {
-  id: string,
-  username: string,
+  id: string;
+  username: string;
 };
 
 export type RoleContext = {
-  users: { [key: string]: UserContext[] },
+  users: { [key: string]: UserContext[] };
 };
 
 export type PaginatedRoles = PaginatedList<Role> & {
-  context: RoleContext,
+  context: RoleContext;
 };
 export type PaginatedUsers = PaginatedList<UserOverview>;
 
 export type ActionsType = {
-  load: (roleId: string) => Promise<Role>,
-  delete: (roleId: string, roleName: string) => Promise<void>,
-  addMembers: (roleId: string, usernames: Immutable.Set<string>) => Promise<Role>,
-  removeMember: (roleId: string, username: string) => Promise<Role>,
-  loadUsersForRole: (roleId: string, roleName: string, pagination: Pagination) => Promise<PaginatedUsers>,
-  loadRolesForUser: (username: string, pagination: Pagination) => Promise<PaginatedRoles>,
-  loadRolesPaginated: (pagination: Pagination) => Promise<PaginatedRoles>,
+  load: (roleId: string) => Promise<Role>;
+  delete: (roleId: string, roleName: string) => Promise<void>;
+  addMembers: (roleId: string, usernames: Immutable.Set<string>) => Promise<Role>;
+  removeMember: (roleId: string, username: string) => Promise<Role>;
+  loadUsersForRole: (roleId: string, roleName: string, pagination: Pagination) => Promise<PaginatedUsers>;
+  loadRolesForUser: (username: string, pagination: Pagination) => Promise<PaginatedRoles>;
+  loadRolesPaginated: (pagination: Pagination) => Promise<PaginatedRoles>;
 };
 
-const AuthzRolesActions = singletonActions(
-  'AuthzRoles',
-  () => Reflux.createActions<ActionsType>({
+const AuthzRolesActions = singletonActions('AuthzRoles', () =>
+  Reflux.createActions<ActionsType>({
     load: { asyncResult: true },
     delete: { asyncResult: true },
     addMembers: { asyncResult: true },

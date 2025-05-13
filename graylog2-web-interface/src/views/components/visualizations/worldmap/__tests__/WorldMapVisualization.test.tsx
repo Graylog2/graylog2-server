@@ -91,11 +91,11 @@ describe('WorldMapVisualization', () => {
 
   it('calls render completion callback after first render', () => {
     const renderCompletionCallback = jest.fn();
-    const wrapper = mount((
+    const wrapper = mount(
       <RenderCompletionCallback.Provider value={renderCompletionCallback}>
         <WorldMapVisualization {...defaultProps} editing />
-      </RenderCompletionCallback.Provider>
-    ));
+      </RenderCompletionCallback.Provider>,
+    );
 
     const { onRenderComplete } = wrapper.find('map-visualization').props() as MapVisualizationProps;
 
@@ -106,7 +106,10 @@ describe('WorldMapVisualization', () => {
 
   it('renders Map component with correct data, when a metric is defined', () => {
     const series = new Series('count()');
-    const configWithMetric = AggregationWidgetConfig.builder().series([series]).visualization(WorldMapVisualization.type).build();
+    const configWithMetric = AggregationWidgetConfig.builder()
+      .series([series])
+      .visualization(WorldMapVisualization.type)
+      .build();
     const data: Record<string, Rows> = {
       chart: [
         {
@@ -121,17 +124,14 @@ describe('WorldMapVisualization', () => {
         },
       ],
     };
-    const mapData = [{
-      keys: [{}, {}],
-      name: 'count()',
-      values: { '37.751,-97.822': 25, '35.69,139.69': 6 },
-    }];
-    const wrapper = mount((
-      <WorldMapVisualization {...defaultProps}
-                             config={configWithMetric}
-                             data={data}
-                             editing />
-    ));
+    const mapData = [
+      {
+        keys: [{}, {}],
+        name: 'count()',
+        values: { '37.751,-97.822': 25, '35.69,139.69': 6 },
+      },
+    ];
+    const wrapper = mount(<WorldMapVisualization {...defaultProps} config={configWithMetric} data={data} editing />);
     const mapVisualization = wrapper.find('map-visualization');
 
     expect(mapVisualization).toHaveProp('data', mapData);
@@ -145,17 +145,14 @@ describe('WorldMapVisualization', () => {
         { key: ['35.69,139.69'], values: [], source: 'leaf' },
       ],
     };
-    const mapData = [{
-      keys: [{}, {}],
-      name: 'No metric defined',
-      values: { '37.751,-97.822': null, '35.69,139.69': null },
-    }];
-    const wrapper = mount((
-      <WorldMapVisualization {...defaultProps}
-                             config={configWithoutMetric}
-                             data={data}
-                             editing />
-    ));
+    const mapData = [
+      {
+        keys: [{}, {}],
+        name: 'No metric defined',
+        values: { '37.751,-97.822': null, '35.69,139.69': null },
+      },
+    ];
+    const wrapper = mount(<WorldMapVisualization {...defaultProps} config={configWithoutMetric} data={data} editing />);
     const mapVisualization = wrapper.find('map-visualization');
 
     expect(mapVisualization).toHaveProp('data', mapData);

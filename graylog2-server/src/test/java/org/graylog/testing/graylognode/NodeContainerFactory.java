@@ -26,10 +26,10 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.utility.MountableFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +38,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -165,7 +166,7 @@ public class NodeContainerFactory {
         config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
             final Path originalPath = fileCopyBaseDir.resolve(filename);
             final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
-            container.addFileSystemBind(originalPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+            container.addFileSystemBind(originalPath.toString(), containerPath, BindMode.READ_ONLY);
         });
 
         addEnabledFeatureFlagsToContainerEnv(config, container);
@@ -193,7 +194,11 @@ public class NodeContainerFactory {
         if(indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
             // To be able to search for data we need the index ranges to be computed. Since this is an async
             // background job, we need to wait until they have been created.
-            waitAllStrategy.withStrategy(waitForIndexRangesStrategy());
+            final var baseUrl = Optional.ofNullable(env.get("GRAYLOG_HTTP_PUBLISH_URI"))
+                    .map(URI::create)
+                    .map(URI::getPath)
+                    .orElse("");
+            waitAllStrategy.withStrategy(waitForIndexRangesStrategy(baseUrl));
         }
 
         return waitAllStrategy;
@@ -203,10 +208,10 @@ public class NodeContainerFactory {
         return !env.getOrDefault(ENV_GRAYLOG_ELASTICSEARCH_HOSTS, "").isBlank();
     }
 
-    private static HttpWaitStrategy waitForIndexRangesStrategy() {
+    private static HttpWaitStrategy waitForIndexRangesStrategy(String urlPrefix) {
         return new HttpWaitStrategy()
                 .forPort(API_PORT)
-                .forPath("/api/system/indices/ranges")
+                .forPath(urlPrefix + "/api/system/indices/ranges")
                 .withMethod("GET")
                 .withBasicCredentials("admin", "admin")
                 .forResponsePredicate(body -> {

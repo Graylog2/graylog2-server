@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing `unkown format` issue in widgets when using gradiant highlighting."
+
+issues = ["20876"]
+pulls = ["20882"]

@@ -22,26 +22,30 @@ import { Link } from 'components/common/router';
 import { Badge } from 'components/bootstrap';
 
 type Props = {
-  title: string,
-  id: string,
-  isDefault: boolean,
-  isEnabled: boolean,
-}
+  title: string;
+  id: string;
+  isDefault: boolean;
+  isEnabled: boolean;
+};
 
-const DisabledTitle = styled.span(({ theme }) => css`
-  color: ${theme.colors.global.textSecondary};
-`);
+const DisabledTitle = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textSecondary};
+  `,
+);
 
-const StyledBadge = styled(Badge)(({ theme }) => css`
-  margin-left: ${theme.spacings.xs};
-`);
+const StyledBadge = styled(Badge)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xs};
+  `,
+);
 
 const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
   if (!isEnabled) {
     return (
       <>
         <DisabledTitle>{title} (disabled)</DisabledTitle>
-        {isDefault && (<StyledBadge>Default</StyledBadge>)}
+        {isDefault && <StyledBadge>Default</StyledBadge>}
       </>
     );
   }
@@ -49,7 +53,7 @@ const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
   return (
     <Link to={Routes.SYSTEM.INDICES.TEMPLATES.view(id)}>
       <span>{title}</span>
-      {isDefault && (<StyledBadge>Default</StyledBadge>)}
+      {isDefault && <StyledBadge>Default</StyledBadge>}
     </Link>
   );
 };

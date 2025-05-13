@@ -22,13 +22,13 @@ import VisualizationConfig from './VisualizationConfig';
 export type TrendPreference = 'LOWER' | 'NEUTRAL' | 'HIGHER';
 
 type InternalState = {
-  trend: boolean,
-  trendPreference: TrendPreference,
+  trend: boolean;
+  trendPreference: TrendPreference;
 };
 
 export type NumberVisualizationConfigJSON = {
-  trend: boolean,
-  trend_preference: TrendPreference,
+  trend: boolean;
+  trend_preference: TrendPreference;
 };
 
 export default class NumberVisualizationConfig extends VisualizationConfig {

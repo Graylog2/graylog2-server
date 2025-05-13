@@ -16,7 +16,7 @@
  */
 package org.graylog2.plugin;
 
-import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.configuration.PluginPathConfiguration;
 
-public class PluginLoaderConfig extends PathConfiguration {
+public class PluginLoaderConfig extends PluginPathConfiguration {
 }

@@ -31,9 +31,7 @@ type LegacyNotificationDetailsProps = {
 
 type LegacyTypes = { [key: string]: LegacyEventNotification };
 
-const LegacyNotificationDetails = ({
-  notification,
-}: LegacyNotificationDetailsProps) => {
+const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsProps) => {
   const [legacyTypes, setLegacyTypes] = useState<LegacyTypes>();
   const configurationValues = notification.config.configuration;
   const callbackType = notification.config.callback_type;
@@ -44,31 +42,38 @@ const LegacyNotificationDetails = ({
   }, []);
 
   if (!legacyTypes) {
-    return <p><Spinner text="Loading legacy notification information..." /></p>;
+    return (
+      <p>
+        <Spinner text="Loading legacy notification information..." />
+      </p>
+    );
   }
 
   return (
     <>
       {!typeData && (
         <Alert bsStyle="danger" className={notificationStyles.legacyNotificationAlert}>
-          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>,
-          please ensure the plugin is installed.
+          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>, please
+          ensure the plugin is installed.
         </Alert>
       )}
-      {typeData && Object.entries(typeData.configuration).map(([key, value]) => {
-        if (key === 'body' || key === 'script_args') {
-          return (
-            <ReadOnlyFormGroup label={value.human_name}
-                               value={(
-                                 <Well bsSize="small" className={emailStyles.bodyPreview}>
-                                   {configurationValues[key] || <em>Empty body</em>}
-                                 </Well>
-                               )} />
-          );
-        }
+      {typeData &&
+        Object.entries(typeData.configuration).map(([key, value]) => {
+          if (key === 'body' || key === 'script_args') {
+            return (
+              <ReadOnlyFormGroup
+                label={value.human_name}
+                value={
+                  <Well bsSize="small" className={emailStyles.bodyPreview}>
+                    {configurationValues[key] || <em>Empty body</em>}
+                  </Well>
+                }
+              />
+            );
+          }
 
-        return <ReadOnlyFormGroup label={value.human_name} value={configurationValues[key]} />;
-      })}
+          return <ReadOnlyFormGroup label={value.human_name} value={configurationValues[key]} />;
+        })}
     </>
   );
 };

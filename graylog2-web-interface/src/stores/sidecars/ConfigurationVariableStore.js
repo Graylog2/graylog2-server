@@ -22,9 +22,8 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const ConfigurationVariableActions = singletonActions(
-  'core.ConfigurationVariable',
-  () => Reflux.createActions({
+export const ConfigurationVariableActions = singletonActions('core.ConfigurationVariable', () =>
+  Reflux.createActions({
     all: { asyncResult: true },
     save: { asyncResult: true },
     delete: { asyncResult: true },
@@ -33,22 +32,20 @@ export const ConfigurationVariableActions = singletonActions(
   }),
 );
 
-export const ConfigurationVariableStore = singletonStore(
-  'core.ConfigurationVariable',
-  () => Reflux.createStore({
+export const ConfigurationVariableStore = singletonStore('core.ConfigurationVariable', () =>
+  Reflux.createStore({
     listenables: [ConfigurationVariableActions],
     sourceUrl: '/sidecar/configuration_variables',
 
     all() {
       const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
-      promise
-        .catch(
-          (error) => {
-            UserNotification.error(`Fetching configuration variables failed with status: ${error}`,
-              'Could not retrieve configuration variables');
-          },
+      promise.catch((error) => {
+        UserNotification.error(
+          `Fetching configuration variables failed with status: ${error}`,
+          'Could not retrieve configuration variables',
         );
+      });
 
       ConfigurationVariableActions.all.promise(promise);
     },
@@ -76,13 +73,17 @@ export const ConfigurationVariableStore = singletonStore(
 
       const promise = fetch(method, url, request);
 
-      promise
-        .then(() => {
+      promise.then(
+        () => {
           UserNotification.success(`Configuration variable "${configurationVariable.name}" successfully ${action}`);
-        }, (error) => {
-          UserNotification.error(`Saving variable "${configurationVariable.name}" failed with status: ${error.message}`,
-            'Could not save variable');
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Saving variable "${configurationVariable.name}" failed with status: ${error.message}`,
+            'Could not save variable',
+          );
+        },
+      );
 
       ConfigurationVariableActions.save.promise(promise);
     },
@@ -91,11 +92,9 @@ export const ConfigurationVariableStore = singletonStore(
       const url = URLUtils.qualifyUrl(`${this.sourceUrl}/${configurationVariable.id}/configurations`);
       const promise = fetch('GET', url);
 
-      promise.catch(
-        (error) => {
-          UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);
-        },
-      );
+      promise.catch((error) => {
+        UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);
+      });
 
       ConfigurationVariableActions.getConfigurations.promise(promise);
     },
@@ -104,19 +103,23 @@ export const ConfigurationVariableStore = singletonStore(
       const url = URLUtils.qualifyUrl(`${this.sourceUrl}/${configurationVariable.id}`);
       const promise = fetch('DELETE', url);
 
-      promise
-        .then(() => {
+      promise.then(
+        () => {
           UserNotification.success(`Configuration variable "${configurationVariable.name}" successfully deleted`);
-        }, (error) => {
-          UserNotification.error(`Deleting variable "${configurationVariable.name}" failed with status: ${error.message}`,
-            'Could not delete variable');
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Deleting variable "${configurationVariable.name}" failed with status: ${error.message}`,
+            'Could not delete variable',
+          );
+        },
+      );
 
       ConfigurationVariableActions.delete.promise(promise);
     },
 
     validate(configurationVariable) {
-    // set minimum api defaults for faster validation feedback
+      // set minimum api defaults for faster validation feedback
       const payload = {
         id: ' ',
         name: ' ',
@@ -127,15 +130,14 @@ export const ConfigurationVariableStore = singletonStore(
 
       const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/validate`), payload);
 
-      promise.catch(
-        (error) => {
-          UserNotification.error(`Validating variable "${configurationVariable.name}" failed with status: ${error.message}`,
-            'Could not validate variable');
-        },
-      );
+      promise.catch((error) => {
+        UserNotification.error(
+          `Validating variable "${configurationVariable.name}" failed with status: ${error.message}`,
+          'Could not validate variable',
+        );
+      });
 
       ConfigurationVariableActions.validate.promise(promise);
     },
-
   }),
 );

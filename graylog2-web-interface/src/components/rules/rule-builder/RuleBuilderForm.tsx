@@ -23,8 +23,8 @@ import type { RuleBuilderRule } from './types';
 import PipelinesUsingRule from '../PipelinesUsingRule';
 
 type Props = {
-  rule: RuleBuilderRule,
-  onChange: (rule: RuleBuilderRule) => void,
+  rule: RuleBuilderRule;
+  onChange: (rule: RuleBuilderRule) => void;
 };
 
 const RuleBuilderForm = ({ rule, onChange }: Props) => {
@@ -40,23 +40,27 @@ const RuleBuilderForm = ({ rule, onChange }: Props) => {
     <fieldset>
       <Row>
         <Col xs={6}>
-          <Input type="text"
-                 id="title"
-                 label="Title"
-                 value={rule.title}
-                 onChange={handleTitleChange}
-                 autoFocus
-                 required
-                 help="Rule title." />
+          <Input
+            type="text"
+            id="title"
+            label="Title"
+            value={rule.title}
+            onChange={handleTitleChange}
+            autoFocus
+            required
+            help="Rule title."
+          />
         </Col>
         <Col xs={6}>
-          <Input type="textarea"
-                 id="description"
-                 label="Description"
-                 value={rule.description}
-                 onChange={handleDescriptionChange}
-                 rows={1}
-                 help="Rule description (optional)." />
+          <Input
+            type="textarea"
+            id="description"
+            label="Description"
+            value={rule.description}
+            onChange={handleDescriptionChange}
+            rows={1}
+            help="Rule description (optional)."
+          />
         </Col>
       </Row>
 

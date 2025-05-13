@@ -29,6 +29,7 @@ import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -59,13 +60,21 @@ public class IndicesDirectoryController {
             directoryReadableValidator.validate(dataTargetDir.toUri().toString(), dataTargetDir);
             final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataTargetDir);
             final Version currentVersion = Version.fromString(opensearchVersion);
+
+            final List<String> compatibilityWarnings = new ArrayList<>();
+
+            if (info.nodes().isEmpty() || info.nodes().stream().allMatch(n -> n.indices().isEmpty())) {
+                compatibilityWarnings.add("Your configured opensearch_data_location directory " + dataTargetDir.toAbsolutePath() + " doesn't contain any indices! Do you want to continue without migrating existing data?");
+            }
+
             final List<String> compatibilityErrors = info.nodes().stream()
                     .filter(node -> !isNodeCompatible(node, currentVersion))
                     .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))
                     .toList();
-            return new CompatibilityResult(hostname, opensearchVersion, info, compatibilityErrors);
+
+            return new CompatibilityResult(hostname, opensearchVersion, info, compatibilityErrors, compatibilityWarnings);
         } catch (Exception e) {
-            return new CompatibilityResult(hostname, opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()));
+            return new CompatibilityResult(hostname, opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()), Collections.emptyList());
         }
     }
 

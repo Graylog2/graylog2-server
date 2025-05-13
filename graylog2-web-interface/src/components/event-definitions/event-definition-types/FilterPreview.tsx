@@ -30,87 +30,97 @@ type FilterPreviewProps = {
 };
 
 type Message = {
-  timestamp: string,
-  message: string,
-}
-
-class FilterPreview extends React.Component<FilterPreviewProps, {
-  [key: string]: any;
-}> {
-  static defaultProps = {
-    searchResult: {},
-    errors: [],
-    isFetchingData: false,
-    displayPreview: false,
+  index: string;
+  message: {
+    timestamp: string;
+    _id: string;
+    message: string;
   };
+};
 
-  renderMessages = (messages) => messages.map(({ index, message }) => (
+const Messages = ({ messages }: { messages: Array<Message> }) =>
+  messages.map(({ index, message }) => (
     <tr key={`${index}-${message._id}`}>
       <td>{message.timestamp}</td>
       <td>{message.message}</td>
     </tr>
   ));
 
-  renderSearchResult = (searchResult: { messages?: Array<Message> } = {}) => {
-    if (!searchResult.messages || searchResult.messages.length === 0) {
-      return <p>Could not find any messages with the current search criteria.</p>;
-    }
+const SearchResult = ({
+  searchResult,
+  isFetchingData,
+}: {
+  isFetchingData: boolean;
+  searchResult: { messages?: Array<Message> };
+}) => {
+  if (isFetchingData) return <Spinner text="Loading filter preview..." />;
 
-    return (
-      <Table striped condensed bordered>
-        <thead>
-          <tr>
-            <th>Timestamp</th>
-            <th>Message</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.renderMessages(searchResult.messages)}
-        </tbody>
-      </Table>
-    );
-  };
-
-  render() {
-    const { isFetchingData, searchResult, errors, displayPreview } = this.props;
-
-    const renderedResults = isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult);
-
-    return (
-      <>
-        <HelpPanel collapsible
-                   defaultExpanded={!displayPreview}
-                   title="How many Events will Filter & Aggregation create?">
-          <p>
-            The Filter & Aggregation Condition will generate different number of Events, depending on how it is
-            configured:
-          </p>
-          <ul>
-            <li><b>Filter:</b>&emsp;One Event per message matching the filter</li>
-            <li>
-              <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies
-              the condition
-            </li>
-            <li>
-              <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies
-              the condition
-            </li>
-          </ul>
-        </HelpPanel>
-
-        {displayPreview && (
-          <Panel className={styles.filterPreview} bsStyle="default">
-            <Panel.Heading>
-              <Panel.Title>Filter Preview</Panel.Title>
-            </Panel.Heading>
-            <Panel.Body>
-              {errors.length > 0 ? <p className="text-danger">{errors[0].description}</p> : renderedResults}
-            </Panel.Body>
-          </Panel>
-        )}
-      </>
-    );
+  if (!searchResult.messages || searchResult.messages.length === 0) {
+    return <p>Could not find any messages with the current search criteria.</p>;
   }
-}
+
+  return (
+    <Table striped condensed bordered>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        <Messages messages={searchResult.messages} />
+      </tbody>
+    </Table>
+  );
+};
+
+const FilterPreview = ({
+  searchResult = {},
+  displayPreview = false,
+  errors = [],
+  isFetchingData = false,
+}: FilterPreviewProps) => {
+  const hasError = errors?.length > 0;
+
+  return (
+    <>
+      <HelpPanel
+        collapsible
+        defaultExpanded={!displayPreview}
+        title="How many Events will Filter & Aggregation create?">
+        <p>
+          The Filter & Aggregation Condition will generate different number of Events, depending on how it is
+          configured:
+        </p>
+        <ul>
+          <li>
+            <b>Filter:</b>&emsp;One Event per message matching the filter
+          </li>
+          <li>
+            <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies the condition
+          </li>
+          <li>
+            <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies the condition
+          </li>
+        </ul>
+      </HelpPanel>
+
+      {displayPreview && (
+        <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
+          <Panel.Heading>
+            <Panel.Title>Filter Preview</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            {hasError ? (
+              <p>{errors[0].description}</p>
+            ) : (
+              <SearchResult isFetchingData={isFetchingData} searchResult={searchResult} />
+            )}
+          </Panel.Body>
+        </Panel>
+      )}
+    </>
+  );
+};
 
 export default FilterPreview;

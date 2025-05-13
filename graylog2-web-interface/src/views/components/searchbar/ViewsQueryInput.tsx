@@ -32,10 +32,18 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 
-const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'>) => {
+const useCompleter = ({
+  streams,
+  timeRange,
+  completerFactory,
+  view,
+}: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'>) => {
   const { userTimezone } = useUserDateTime();
   const completers = usePluginEntities('views.completers');
-  const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
+  const { data: queryFields } = useFieldTypes(
+    streams,
+    isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange,
+  );
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
   const fieldTypes = useMemo(() => {
     const queryFieldsByName = Object.fromEntries((queryFields ?? []).map((field) => [field.name, field]));
@@ -44,12 +52,14 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
     return { all: allFieldsByName, query: queryFieldsByName };
   }, [allFields, queryFields]);
 
-  return useMemo(() => completerFactory?.(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
-    [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
+  return useMemo(
+    () => completerFactory?.(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
+    [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view],
+  );
 };
 
 type Props = {
-  commands?: Array<Command>,
+  commands?: Array<Command>;
   completerFactory?: (
     completers: Array<Completer>,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
@@ -57,51 +67,72 @@ type Props = {
     fieldTypes: FieldTypes,
     userTimezone: string,
     view: View | undefined,
-  ) => AutoCompleter,
-  disableExecution?: boolean,
-  error?: QueryValidationState,
-  inputId?: string
-  isValidating: boolean,
-  name: string,
-  onBlur?: (query: string) => void,
-  onChange: (changeEvent: { target: { value: string, name: string } }) => Promise<string>,
-  onExecute: (query: string) => void,
-  placeholder?: string,
-  streams?: Array<string> | undefined,
-  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
-  validate: () => Promise<FormikErrors<{}>>,
-  value: string,
-  view?: View
-  warning?: QueryValidationState,
-}
+  ) => AutoCompleter;
+  disableExecution?: boolean;
+  error?: QueryValidationState;
+  inputId?: string;
+  isValidating: boolean;
+  name: string;
+  onBlur?: (query: string) => void;
+  onChange: (changeEvent: { target: { value: string; name: string } }) => Promise<string>;
+  onExecute: (query: string) => void;
+  placeholder?: string;
+  streams?: Array<string> | undefined;
+  timeRange?: TimeRange | NoTimeRangeOverride | undefined;
+  validate: () => Promise<FormikErrors<{}>>;
+  value: string;
+  view?: View;
+  warning?: QueryValidationState;
+};
 
-const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
+const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) =>
+  new SearchBarAutoCompletions(...args);
 
-const ViewsQueryInput = forwardRef<Editor, Props>(({
-  value, timeRange, streams, name, onChange, error,
-  isValidating, disableExecution, validate, onExecute,
-  commands, view, warning, placeholder, onBlur, inputId,
-  completerFactory = defaultCompleterFactory,
-}, ref) => {
-  const completer = useCompleter({ streams, timeRange, completerFactory, view });
+const ViewsQueryInput = forwardRef<Editor, Props>(
+  (
+    {
+      value,
+      timeRange,
+      streams,
+      name,
+      onChange,
+      error,
+      isValidating,
+      disableExecution,
+      validate,
+      onExecute,
+      commands,
+      view,
+      warning,
+      placeholder,
+      onBlur,
+      inputId,
+      completerFactory = defaultCompleterFactory,
+    },
+    ref,
+  ) => {
+    const completer = useCompleter({ streams, timeRange, completerFactory, view });
 
-  return (
-    <AsyncQueryInput value={value}
-                     onBlur={onBlur}
-                     inputId={inputId}
-                     completer={completer}
-                     ref={ref}
-                     name={name}
-                     onChange={onChange}
-                     placeholder={placeholder}
-                     error={error}
-                     isValidating={isValidating}
-                     warning={warning}
-                     disableExecution={disableExecution}
-                     validate={validate}
-                     onExecute={onExecute}
-                     commands={commands} />
-  );
-});
+    return (
+      <AsyncQueryInput
+        value={value}
+        onBlur={onBlur}
+        inputId={inputId}
+        completer={completer}
+        ref={ref}
+        name={name}
+        onChange={onChange}
+        placeholder={placeholder}
+        error={error}
+        isValidating={isValidating}
+        warning={warning}
+        disableExecution={disableExecution}
+        validate={validate}
+        onExecute={onExecute}
+        commands={commands}
+      />
+    );
+  },
+);
 
 export default ViewsQueryInput;

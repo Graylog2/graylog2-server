@@ -17,19 +17,22 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
-
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.LocationAwareEvalException;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.time.Duration;
 
 public class FunctionExpression extends BaseExpression {
+    private static final RateLimitedLog RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(FunctionExpression.class, 1, Duration.ofSeconds(60));
+
     private final FunctionArgs args;
     private final Function<?> function;
     private final FunctionDescriptor descriptor;
@@ -60,6 +63,10 @@ public class FunctionExpression extends BaseExpression {
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
         try {
+            if (Boolean.TRUE.equals(function.descriptor().deprecated())) {
+                final Rule rule = context.getRule();
+                RATE_LIMITED_LOG.warn("Using deprecated function {} in rule {}", function.descriptor().name(), rule == null ? "[unknown]" : rule.name());
+            }
             return descriptor.returnType().cast(function.evaluate(args, context));
         } catch (LocationAwareEvalException laee) {
             // the exception already has a location from the input source, simply propagate it.
@@ -90,6 +97,6 @@ public class FunctionExpression extends BaseExpression {
 
     @Override
     public Iterable<Expression> children() {
-        return args.getArgs().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        return args.getArgs().values().stream().toList();
     }
 }

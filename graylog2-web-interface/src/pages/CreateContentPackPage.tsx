@@ -28,10 +28,13 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
+import useProductName from 'brand-customization/useProductName';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const CreateContentPackPage = () => {
+  const productName = useProductName();
   const history = useHistory();
-  const { entityIndex } = useStore<{ entityIndex: string | undefined }>(CatalogStore);
+  const { entityIndex } = useStore(CatalogStore);
   const [contentPackState, setContentPackState] = useState({
     contentPack: ContentPack.builder().build(),
     appliedParameter: {},
@@ -43,7 +46,11 @@ const CreateContentPackPage = () => {
     CatalogActions.showEntityIndex();
   }, []);
 
-  const _onStateChanged = (newState: { contentPack: unknown, selectedEntities: unknown, appliedParameter: unknown }) => {
+  const _onStateChanged = (newState: {
+    contentPack: unknown;
+    selectedEntities: unknown;
+    appliedParameter: unknown;
+  }) => {
     setContentPackState((cur) => ({
       ...cur,
       contentPack: newState.contentPack || cur.contentPack,
@@ -55,32 +62,33 @@ const CreateContentPackPage = () => {
   const _onSave = () => {
     const { contentPack } = contentPackState;
 
-    ContentPacksActions.create.triggerPromise(contentPack.toJSON())
-      .then(
-        () => {
-          UserNotification.success('Content pack imported successfully', 'Success!');
-          history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
-        },
-        (response) => {
-          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your '
-            + 'Graylog logs for more information.';
-          const title = 'Could not import content pack';
-          let smallMessage = '';
+    ContentPacksActions.create.triggerPromise(contentPack.toJSON()).then(
+      () => {
+        UserNotification.success('Content pack imported successfully', 'Success!');
+        history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+      },
+      (response) => {
+        const message =
+          'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
+          `${productName} server logs for more information.`;
+        const title = 'Could not import content pack';
+        let smallMessage = '';
 
-          if (response.additional && response.additional.body && response.additional.body.message) {
-            smallMessage = `<br /><small>${response.additional.body.message}</small>`;
-          }
+        if (response.additional && response.additional.body && response.additional.body.message) {
+          smallMessage = `<br /><small>${response.additional.body.message}</small>`;
+        }
 
-          UserNotification.error(message + smallMessage, title);
-        },
-      );
+        UserNotification.error(message + smallMessage, title);
+      },
+    );
   };
 
-  const _getEntities = (selectedEntities: unknown) => {
+  const _getEntities = (selectedEntities) => {
     const { contentPack } = contentPackState;
 
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
-      const newContentPack = contentPack.toBuilder()
+      const newContentPack = contentPack
+        .toBuilder()
         /* Mark entities from server */
         .entities(result.entities.map((e) => Entity.fromJSON(e, true, contentPack.parameters)))
         .build();
@@ -93,26 +101,30 @@ const CreateContentPackPage = () => {
   return (
     <DocumentTitle title="Content packs">
       <span>
-        <PageHeader title="Create content packs"
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                        <Button bsStyle="info">Content Packs</Button>
-                      </LinkContainer>
-                    )}>
+        <PageHeader
+          title="Create content packs"
+          topActions={
+            <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+              <Button bsStyle="info">Content Packs</Button>
+            </LinkContainer>
+          }>
           <span>
-            Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+            Content packs accelerate the set up process for a specific data source. A content pack can include
+            inputs/extractors, streams, and dashboards.
             <br />
-            Find more content packs in {' '} <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
+            <MarketplaceLink prefix="Find more content packs in" />
           </span>
         </PageHeader>
-        <ContentPackEdit contentPack={contentPackState.contentPack}
-                         onGetEntities={_getEntities}
-                         onStateChange={_onStateChanged}
-                         fetchedEntities={contentPackState.fetchedEntities}
-                         selectedEntities={contentPackState.selectedEntities}
-                         appliedParameter={contentPackState.appliedParameter}
-                         entityIndex={entityIndex}
-                         onSave={_onSave} />
+        <ContentPackEdit
+          contentPack={contentPackState.contentPack}
+          onGetEntities={_getEntities}
+          onStateChange={_onStateChanged}
+          fetchedEntities={contentPackState.fetchedEntities}
+          selectedEntities={contentPackState.selectedEntities}
+          appliedParameter={contentPackState.appliedParameter}
+          entityIndex={entityIndex}
+          onSave={_onSave}
+        />
       </span>
     </DocumentTitle>
   );

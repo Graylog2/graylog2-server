@@ -29,9 +29,7 @@ type FieldProps = { interactive: boolean } & React.ComponentProps<typeof Origina
 const Field = ({ children, interactive, ...props }: FieldProps) => (
   <InteractiveContext.Provider value={interactive}>
     <TestStoreProvider>
-      <OriginalField {...props}>
-        {children}
-      </OriginalField>
+      <OriginalField {...props}>{children}</OriginalField>
     </TestStoreProvider>
   </InteractiveContext.Provider>
 );
@@ -41,14 +39,11 @@ describe('Field', () => {
 
   describe('handles value action menu depending on interactive context', () => {
     it('does not show value actions if interactive context is `false`', async () => {
-      render((
-        <Field name="foo"
-               interactive={false}
-               queryId="someQueryId"
-               type={FieldType.Unknown}>
+      render(
+        <Field name="foo" interactive={false} queryId="someQueryId" type={FieldType.Unknown}>
           Foo
-        </Field>
-      ));
+        </Field>,
+      );
 
       const title = await screen.findByText('Foo');
       fireEvent.click(title);
@@ -57,14 +52,11 @@ describe('Field', () => {
     });
 
     it('shows value actions if interactive context is `true`', async () => {
-      render((
-        <Field name="foo"
-               interactive
-               queryId="someQueryId"
-               type={FieldType.Unknown}>
+      render(
+        <Field name="foo" interactive queryId="someQueryId" type={FieldType.Unknown}>
           Foo
-        </Field>
-      ));
+        </Field>,
+      );
 
       const title = await screen.findByText('Foo');
       fireEvent.click(title);

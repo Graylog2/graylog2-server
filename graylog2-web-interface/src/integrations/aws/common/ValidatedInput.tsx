@@ -26,7 +26,9 @@ const Label = ({ label, error }) => {
     return (
       <ErrorContainer>
         {label}
-        <Error><Icon name="warning" /> {error}</Error>
+        <Error>
+          <Icon name="warning" /> {error}
+        </Error>
       </ErrorContainer>
     );
   }
@@ -77,18 +79,20 @@ const ValidatedInput = ({
   };
 
   return (
-    <Input {...restProps}
-           required={required}
-           id={id}
-           type={type}
-           onChange={onChange}
-           onBlur={checkValidity}
-           className={className}
-           bsStyle={(error && dirty && 'error') || undefined}
-           defaultValue={(type !== 'select' && value) || undefined}
-           value={(type === 'select' && value) || undefined}
-           label={<Label label={label} error={error} />}
-           help={help} />
+    <Input
+      {...restProps}
+      required={required}
+      id={id}
+      type={type}
+      onChange={onChange}
+      onBlur={checkValidity}
+      className={className}
+      bsStyle={(error && dirty && 'error') || undefined}
+      defaultValue={(type !== 'select' && value) || undefined}
+      value={(type === 'select' && value) || undefined}
+      label={<Label label={label} error={error} />}
+      help={help}
+    />
   );
 };
 

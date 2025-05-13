@@ -18,10 +18,8 @@ import React from 'react';
 
 import { ListGroupItem } from 'components/bootstrap';
 
-const ControlledTableListItem = ({ className, children }: { className?: string, children: React.ReactNode }) => (
-  <ListGroupItem className={className}>
-    {children}
-  </ListGroupItem>
+const ControlledTableListItem = ({ className, children }: { className?: string; children: React.ReactNode }) => (
+  <ListGroupItem className={className}>{children}</ListGroupItem>
 );
 
 export default ControlledTableListItem;

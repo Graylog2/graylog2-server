@@ -144,9 +144,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -209,9 +207,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "target_user_name"
-                ],
+                "fields": ["target_user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -245,9 +241,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -281,9 +275,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -317,9 +309,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -353,9 +343,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -363,9 +351,7 @@
             "column_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_outcome"
-                ],
+                "fields": ["event_outcome"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -425,9 +411,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "gim_event_type"
-                ],
+                "fields": ["gim_event_type"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -490,9 +474,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -526,9 +508,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "source_user_name"
-                ],
+                "fields": ["source_user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -584,9 +564,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 59976,
                   "rollup": true,
                   "source": "row-leaf"
@@ -611,9 +589,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 59071,
                   "rollup": true,
                   "source": "row-leaf"
@@ -635,14 +611,10 @@
           "id": "4ec800c1-7f5c-46c3-bbb6-73d63af302b7",
           "rows": [
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9981,
                   "rollup": true,
                   "source": "row-leaf"
@@ -651,14 +623,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9911,
                   "rollup": true,
                   "source": "row-leaf"
@@ -667,14 +635,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "abritt"
-              ],
+              "key": ["abritt"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9836,
                   "rollup": true,
                   "source": "row-leaf"
@@ -683,14 +647,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tlott"
-              ],
+              "key": ["tlott"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9760,
                   "rollup": true,
                   "source": "row-leaf"
@@ -699,14 +659,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "workstationusers"
-              ],
+              "key": ["workstationusers"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9676,
                   "rollup": true,
                   "source": "row-leaf"
@@ -715,14 +671,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "serverusers"
-              ],
+              "key": ["serverusers"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9654,
                   "rollup": true,
                   "source": "row-leaf"
@@ -731,14 +683,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hkline"
-              ],
+              "key": ["hkline"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9194,
                   "rollup": true,
                   "source": "row-leaf"
@@ -747,14 +695,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfarley"
-              ],
+              "key": ["tfarley"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9097,
                   "rollup": true,
                   "source": "row-leaf"
@@ -763,14 +707,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "administrators"
-              ],
+              "key": ["administrators"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 3769,
                   "rollup": true,
                   "source": "row-leaf"
@@ -779,14 +719,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jgross"
-              ],
+              "key": ["jgross"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1832,
                   "rollup": true,
                   "source": "row-leaf"
@@ -795,14 +731,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ppadilla"
-              ],
+              "key": ["ppadilla"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1807,
                   "rollup": true,
                   "source": "row-leaf"
@@ -811,14 +743,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "rferry"
-              ],
+              "key": ["rferry"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1802,
                   "rollup": true,
                   "source": "row-leaf"
@@ -827,14 +755,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "zsims"
-              ],
+              "key": ["zsims"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1800,
                   "rollup": true,
                   "source": "row-leaf"
@@ -843,14 +767,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ewilkes"
-              ],
+              "key": ["ewilkes"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1794,
                   "rollup": true,
                   "source": "row-leaf"
@@ -859,14 +779,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmcknight"
-              ],
+              "key": ["cmcknight"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1786,
                   "rollup": true,
                   "source": "row-leaf"
@@ -878,9 +794,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 197592,
                   "rollup": true,
                   "source": "row-inner"
@@ -902,14 +816,10 @@
           "id": "ba849865-e780-4b8a-befa-45d57e6daf81",
           "rows": [
             {
-              "key": [
-                "DC01.acme.local"
-              ],
+              "key": ["DC01.acme.local"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10449,
                   "rollup": true,
                   "source": "row-leaf"
@@ -918,14 +828,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DC02.acme.local"
-              ],
+              "key": ["DC02.acme.local"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10398,
                   "rollup": true,
                   "source": "row-leaf"
@@ -934,14 +840,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DC03.acme.local"
-              ],
+              "key": ["DC03.acme.local"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10353,
                   "rollup": true,
                   "source": "row-leaf"
@@ -950,14 +852,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmcknight-dkstp"
-              ],
+              "key": ["cmcknight-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 138,
                   "rollup": true,
                   "source": "row-leaf"
@@ -966,14 +864,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "sheath-dkstp"
-              ],
+              "key": ["sheath-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 129,
                   "rollup": true,
                   "source": "row-leaf"
@@ -982,14 +876,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "zsims-dkstp"
-              ],
+              "key": ["zsims-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 123,
                   "rollup": true,
                   "source": "row-leaf"
@@ -998,14 +888,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "erhodes-dkstp"
-              ],
+              "key": ["erhodes-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 122,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1014,14 +900,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ecantrell-dkstp"
-              ],
+              "key": ["ecantrell-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 121,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1030,14 +912,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ewilkes-dkstp"
-              ],
+              "key": ["ewilkes-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 116,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1046,14 +924,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hkline-dkstp"
-              ],
+              "key": ["hkline-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 115,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1062,14 +936,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "adelarosa-dkstp"
-              ],
+              "key": ["adelarosa-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 114,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1078,14 +948,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jdawson-dkstp"
-              ],
+              "key": ["jdawson-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 113,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1094,14 +960,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "glynn-dkstp"
-              ],
+              "key": ["glynn-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 112,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1110,14 +972,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jford-dkstp"
-              ],
+              "key": ["jford-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 111,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1126,14 +984,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "sfowler-dkstp"
-              ],
+              "key": ["sfowler-dkstp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 111,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1145,9 +999,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 34969,
                   "rollup": true,
                   "source": "row-inner"
@@ -1172,9 +1024,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 61893,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1196,14 +1046,10 @@
           "id": "92ae66d3-01ee-4212-bafc-64e0556f758c",
           "rows": [
             {
-              "key": [
-                "windows"
-              ],
+              "key": ["windows"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 34969,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1215,9 +1061,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 34969,
                   "rollup": true,
                   "source": "row-inner"
@@ -1239,14 +1083,10 @@
           "id": "365f7227-b00d-4ec8-8ac3-a6ecff90d9a2",
           "rows": [
             {
-              "key": [
-                "administrator"
-              ],
+              "key": ["administrator"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6374,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1255,14 +1095,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "s_jdawson"
-              ],
+              "key": ["s_jdawson"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 5764,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1271,14 +1107,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "s_dmiranda"
-              ],
+              "key": ["s_dmiranda"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 5762,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1287,14 +1119,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "s_jduffield"
-              ],
+              "key": ["s_jduffield"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 5729,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1303,14 +1131,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "s_kpearson"
-              ],
+              "key": ["s_kpearson"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 5681,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1319,14 +1143,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "s_jgross"
-              ],
+              "key": ["s_jgross"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 5659,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1338,9 +1158,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 34969,
                   "rollup": true,
                   "source": "row-inner"
@@ -1362,24 +1180,16 @@
           "id": "5c481eb4-22ed-4293-8f76-b7e1dff34463",
           "rows": [
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 4540,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 121,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1388,24 +1198,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "abritt"
-              ],
+              "key": ["abritt"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 4558,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 101,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1414,24 +1216,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hkline"
-              ],
+              "key": ["hkline"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 4534,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 107,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1440,24 +1234,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfarley"
-              ],
+              "key": ["tfarley"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 4527,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 102,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1466,24 +1252,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 4514,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 97,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1492,24 +1270,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tlott"
-              ],
+              "key": ["tlott"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 4408,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 65,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1518,24 +1288,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "amcarthur-dkstp$"
-              ],
+              "key": ["amcarthur-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 801,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 5,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1544,24 +1306,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jford-dkstp$"
-              ],
+              "key": ["jford-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 791,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 9,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1570,24 +1324,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbates-dkstp$"
-              ],
+              "key": ["lbates-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 790,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 10,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1596,24 +1342,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ecantrell-dkstp$"
-              ],
+              "key": ["ecantrell-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 778,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 9,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1622,24 +1360,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "kpearson-dkstp$"
-              ],
+              "key": ["kpearson-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 768,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 18,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1648,24 +1378,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "asheppard-dkstp$"
-              ],
+              "key": ["asheppard-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 763,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 15,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1674,24 +1396,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "zsims-dkstp$"
-              ],
+              "key": ["zsims-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 772,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 6,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1700,24 +1414,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hguerra-dkstp$"
-              ],
+              "key": ["hguerra-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 763,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 12,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1726,24 +1432,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jnorris-dkstp$"
-              ],
+              "key": ["jnorris-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 763,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 12,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1765,14 +1463,10 @@
           "id": "50f93c36-27d0-4597-8a97-c54d2a0afb9e",
           "rows": [
             {
-              "key": [
-                "cn=tbuckner,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=tbuckner,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 506,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1781,14 +1475,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=dbenitez,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=dbenitez,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 503,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1797,14 +1487,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=amcarthur,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=amcarthur,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 501,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1813,14 +1499,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=jgross,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=jgross,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 495,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1829,14 +1511,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=ecantrell,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=ecantrell,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 486,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1845,14 +1523,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=glynn,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=glynn,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 484,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1861,14 +1535,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=tlott,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=tlott,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 483,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1877,14 +1547,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=lbusby,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=lbusby,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 478,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1893,14 +1559,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=ppadilla,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=ppadilla,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 472,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1909,14 +1571,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=cmustafa,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=cmustafa,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 468,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1925,14 +1583,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=dmiranda,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=dmiranda,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 468,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1941,14 +1595,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=erhodes,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=erhodes,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 468,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1957,14 +1607,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=hkline,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=hkline,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 467,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1973,14 +1619,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=rwu,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=rwu,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 467,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1989,14 +1631,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cn=jduffield,ou=users,ou=group policy ou,dc=acme,dc=internal"
-              ],
+              "key": ["cn=jduffield,ou=users,ou=group policy ou,dc=acme,dc=internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 466,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2008,9 +1646,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17078,
                   "rollup": true,
                   "source": "row-inner"
@@ -2035,9 +1671,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2822,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2059,14 +1693,10 @@
           "id": "203d3836-e66a-44d4-afdb-ba84fa42a14c",
           "rows": [
             {
-              "key": [
-                "group member added"
-              ],
+              "key": ["group member added"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 8199,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2075,14 +1705,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "group member removed"
-              ],
+              "key": ["group member removed"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 8114,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2091,14 +1717,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "group properties modified"
-              ],
+              "key": ["group properties modified"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6786,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2107,14 +1729,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "administrative password reset"
-              ],
+              "key": ["administrative password reset"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 3818,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2123,14 +1741,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "password change"
-              ],
+              "key": ["password change"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 3649,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2139,14 +1753,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "account modified"
-              ],
+              "key": ["account modified"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 3638,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2155,14 +1765,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "account renamed"
-              ],
+              "key": ["account renamed"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 765,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2174,9 +1780,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 34969,
                   "rollup": true,
                   "source": "row-inner"
@@ -2201,9 +1805,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2893,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2228,9 +1830,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 62869,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2252,14 +1852,10 @@
           "id": "93f0da96-11e3-4e81-9269-f0e7fd1151d5",
           "rows": [
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 23,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2268,14 +1864,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hguerra"
-              ],
+              "key": ["hguerra"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 22,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2284,14 +1876,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mcottrell"
-              ],
+              "key": ["mcottrell"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 21,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2300,14 +1888,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "kpearson"
-              ],
+              "key": ["kpearson"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 19,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2316,14 +1900,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 19,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2332,14 +1912,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "asheppard"
-              ],
+              "key": ["asheppard"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2348,14 +1924,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jdawson"
-              ],
+              "key": ["jdawson"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2364,14 +1936,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jduffield"
-              ],
+              "key": ["jduffield"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2380,14 +1948,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jgross"
-              ],
+              "key": ["jgross"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2396,14 +1960,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "dmiranda"
-              ],
+              "key": ["dmiranda"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2412,14 +1972,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "gsadler"
-              ],
+              "key": ["gsadler"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2428,14 +1984,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "glynn"
-              ],
+              "key": ["glynn"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2444,14 +1996,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "abritt"
-              ],
+              "key": ["abritt"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 15,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2460,14 +2008,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "adelarosa"
-              ],
+              "key": ["adelarosa"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 15,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2476,14 +2020,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmcknight"
-              ],
+              "key": ["cmcknight"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 15,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2495,9 +2035,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 532,
                   "rollup": true,
                   "source": "row-inner"
@@ -2519,14 +2057,10 @@
           "id": "0599f94e-96a2-48cd-9ebc-2f69e033c656",
           "rows": [
             {
-              "key": [
-                "workstationusers"
-              ],
+              "key": ["workstationusers"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9676,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2535,14 +2069,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "serverusers"
-              ],
+              "key": ["serverusers"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 9654,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2551,14 +2081,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "administrators"
-              ],
+              "key": ["administrators"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 3769,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2567,14 +2093,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbates"
-              ],
+              "key": ["lbates"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 362,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2583,14 +2105,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfarley"
-              ],
+              "key": ["tfarley"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 360,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2599,14 +2117,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 347,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2615,14 +2129,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 344,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2631,14 +2141,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "rferry"
-              ],
+              "key": ["rferry"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 339,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2647,14 +2153,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfry"
-              ],
+              "key": ["tfry"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 337,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2663,14 +2165,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmcknight"
-              ],
+              "key": ["cmcknight"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 335,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2679,14 +2177,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tlott"
-              ],
+              "key": ["tlott"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 335,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2695,14 +2189,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ecantrell"
-              ],
+              "key": ["ecantrell"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 332,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2711,14 +2201,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hkline"
-              ],
+              "key": ["hkline"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 332,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2727,14 +2213,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jdawson"
-              ],
+              "key": ["jdawson"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 331,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2743,14 +2225,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "adelarosa"
-              ],
+              "key": ["adelarosa"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 325,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2762,9 +2240,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 34969,
                   "rollup": true,
                   "source": "row-inner"

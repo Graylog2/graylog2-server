@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Collection of custom ESLint rules.",
   "main": "./lib/index.js",
+  "packageManager": "yarn@1.22.22",
   "exports": "./lib/index.js",
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0"

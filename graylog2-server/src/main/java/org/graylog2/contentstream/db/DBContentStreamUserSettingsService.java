@@ -16,42 +16,41 @@
  */
 package org.graylog2.contentstream.db;
 
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
 import java.util.Optional;
 
-import static org.graylog2.telemetry.user.db.TelemetryUserSettingsDto.FIELD_USER_ID;
+import static org.graylog2.contentstream.db.ContentStreamUserSettings.FIELD_USER_ID;
 
 public class DBContentStreamUserSettingsService {
 
     public static final String COLLECTION_NAME = "content_stream_user_settings";
 
-    private final JacksonDBCollection<ContentStreamUserSettings, ObjectId> db;
+    private final MongoCollection<ContentStreamUserSettings> collection;
 
     @Inject
-    public DBContentStreamUserSettingsService(MongoConnection mongoConnection,
-                                              MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                ContentStreamUserSettings.class,
-                ObjectId.class,
-                mapper.get());
+    public DBContentStreamUserSettingsService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, ContentStreamUserSettings.class);
     }
 
     public Optional<ContentStreamUserSettings> findByUserId(String userId) {
-        return Optional.ofNullable(db.findOne(DBQuery.is(FIELD_USER_ID, userId)));
+        return Optional.ofNullable(collection.find(Filters.eq(FIELD_USER_ID, userId)).first());
     }
 
     public void save(ContentStreamUserSettings dto) {
-        db.save(dto);
+        if (dto.id() == null) {
+            collection.insertOne(dto);
+        } else {
+            collection.replaceOne(MongoUtils.idEq(dto.id()), dto, new ReplaceOptions().upsert(true));
+        }
     }
 
     public void delete(String userId) {
-        db.remove(DBQuery.is(FIELD_USER_ID, userId));
+        collection.deleteMany(Filters.eq(FIELD_USER_ID, userId));
     }
 }

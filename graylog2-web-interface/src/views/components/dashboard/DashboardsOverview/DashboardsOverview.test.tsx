@@ -16,15 +16,13 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
 
+import { useQueryParam } from 'routing/QueryParams';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
-import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
-import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DashboardsOverview from './DashboardsOverview';
 
@@ -43,8 +41,8 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
@@ -54,17 +52,18 @@ const loadDashboardsResponse = (count = 1) => {
   if (count > 0) {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < count; i++) {
-      const simpleView = (): View => View.builder()
-        .type('DASHBOARD')
-        .id(`search-id-${i}`)
-        .title(`search-title-${i}`)
-        .description('desc')
-        .owner('Bob')
-        .createdAt(new Date())
-        .requires({})
-        .search(Search.builder().id('search.id').build())
-        .favorite(true)
-        .build();
+      const simpleView = (): View =>
+        View.builder()
+          .type('DASHBOARD')
+          .id(`search-id-${i}`)
+          .title(`search-title-${i}`)
+          .description('desc')
+          .owner('Bob')
+          .createdAt(new Date())
+          .requires({})
+          .search(Search.builder().id('search.id').build())
+          .favorite(true)
+          .build();
       dashboards.push(simpleView());
     }
   }
@@ -98,15 +97,14 @@ const loadDashboardsResponse = (count = 1) => {
 
 describe('DashboardsOverview', () => {
   const SUT = () => (
-    <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <DefaultQueryParamProvider>
       <DashboardsOverview />
-    </QueryParamProvider>
+    </DefaultQueryParamProvider>
   );
 
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(0));
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+    asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });
 
   it('should render empty', async () => {

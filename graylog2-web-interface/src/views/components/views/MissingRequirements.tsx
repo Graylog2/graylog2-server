@@ -24,8 +24,8 @@ import type View from 'views/logic/views/View';
 import useHistory from 'routing/useHistory';
 
 type Props = {
-  view: View,
-  missingRequirements: Requirements,
+  view: View;
+  missingRequirements: Requirements;
 };
 
 const MissingRequirements = ({ view, missingRequirements }: Props) => {
@@ -34,8 +34,11 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
   return (
     <Row className="content">
       <Col md={6} mdOffset={3} className={fixup.bootstrapHeading}>
-        <h1>{capitalize(view.type)}: <em>{view.title}</em></h1>
-        <p>Unfortunately executing this {view.type?.toLowerCase()} is not possible. It uses the following capabilities
+        <h1>
+          {capitalize(view.type)}: <em>{view.title}</em>
+        </h1>
+        <p>
+          Unfortunately executing this {view.type?.toLowerCase()} is not possible. It uses the following capabilities
           which are not available:
         </p>
 
@@ -43,9 +46,8 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
           {Object.entries(missingRequirements).map(([require, plugin]: [string, PluginMetadata]) => (
             <li key={require}>
               <strong>{require}</strong> - included in
-              <a href={plugin.url}
-                 target="_blank"
-                 rel="noopener noreferrer">{plugin.name}
+              <a href={plugin.url} target="_blank" rel="noopener noreferrer">
+                {plugin.name}
               </a>
             </li>
           ))}
@@ -53,7 +55,9 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
       </Col>
 
       <Col md={1} mdOffset={8}>
-        <Button bsStyle="success" onClick={() => history.goBack()}>Back</Button>
+        <Button bsStyle="success" onClick={() => history.goBack()}>
+          Back
+        </Button>
       </Col>
     </Row>
   );

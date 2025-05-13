@@ -21,10 +21,11 @@ import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { Collector } from 'components/sidecars/types';
 
 import CollectorList from './CollectorList';
 
-const validateCollector = (collector) => CollectorsActions.validate(collector);
+const validateCollector = (collector: Collector) => CollectorsActions.validate(collector);
 
 const loadCollectors = () => {
   CollectorsActions.list({});
@@ -35,9 +36,12 @@ type CollectorListContainerProps = {
   sendTelemetry?: (...args: any[]) => void;
 };
 
-class CollectorListContainer extends React.Component<CollectorListContainerProps, {
-  [key: string]: any;
-}> {
+class CollectorListContainer extends React.Component<
+  CollectorListContainerProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     collectors: undefined,
     sendTelemetry: () => {},
@@ -47,7 +51,7 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     loadCollectors();
   }
 
-  handleClone = (collector, name, callback) => {
+  handleClone = (collector: string, name: string, callback: () => void) => {
     const { sendTelemetry } = this.props;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_CLONED, {
@@ -55,10 +59,9 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
       app_section: 'configuration',
     });
 
-    CollectorsActions.copy(collector, name)
-      .then(() => {
-        callback();
-      });
+    CollectorsActions.copy(collector, name).then(() => {
+      callback();
+    });
   };
 
   handleDelete = async (collector) => {
@@ -72,7 +75,7 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     await CollectorsActions.delete(collector);
   };
 
-  handlePageChange = (page, pageSize) => {
+  handlePageChange = (page: number, pageSize: number) => {
     const { query } = this.props.collectors;
 
     CollectorsActions.list({ query: query, page: page, pageSize: pageSize });
@@ -92,15 +95,17 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     }
 
     return (
-      <CollectorList collectors={collectors.paginatedCollectors}
-                     pagination={collectors.pagination}
-                     query={collectors.query}
-                     total={collectors.total}
-                     onPageChange={this.handlePageChange}
-                     onQueryChange={this.handleQueryChange}
-                     onClone={this.handleClone}
-                     onDelete={this.handleDelete}
-                     validateCollector={validateCollector} />
+      <CollectorList
+        collectors={collectors.paginatedCollectors}
+        pagination={collectors.pagination}
+        query={collectors.query}
+        total={collectors.total}
+        onPageChange={this.handlePageChange}
+        onQueryChange={this.handleQueryChange}
+        onClone={this.handleClone}
+        onDelete={this.handleDelete}
+        validateCollector={validateCollector}
+      />
     );
   }
 }

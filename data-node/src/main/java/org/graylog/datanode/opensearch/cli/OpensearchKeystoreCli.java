@@ -16,23 +16,27 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
-import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
-
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class OpensearchKeystoreCli extends AbstractOpensearchCli {
 
-    OpensearchKeystoreCli(OpensearchConfiguration config) {
-        super(config, "opensearch-keystore");
+    public static final String KEYSTORE_BIN_NAME = "opensearch-keystore";
+
+    public OpensearchKeystoreCli(Path binDir, CliEnv env) {
+        super(binDir.resolve(KEYSTORE_BIN_NAME), env);
     }
 
     /**
      * Create a new opensearch keystore. This command expects that there is no keystore. If there is a keystore,
      * it will respond YES to override existing.
+     *
      * @return STDOUT/STDERR of the execution as one String
      */
     public String create() {
-        return runWithStdin(Collections.singletonList("Y"),"create");
+        return runWithStdin(Collections.singletonList("Y"), "create");
     }
 
     /**
@@ -40,6 +44,20 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
      * in the command line history). So we have to work around that and provide the value in STDIN.
      */
     public void add(String key, String secretValue) {
-        runWithStdin(Collections.singletonList(secretValue), "add", key);
+        runWithStdin(List.of(secretValue), "add", "-x", key); // -x allows input from stdin, bypassing the prompt
+    }
+
+    /**
+     * Add secrets to the store. The command is interactive, it will ask for the secret value (to avoid recording the value
+     * in the command line history). So we have to work around that and provide the value in STDIN.
+     */
+    public void addFile(String key, Path file) {
+        runWithStdin(List.of(), "add-file", key, file.toAbsolutePath().toString()); // -x allows input from stdin, bypassing the prompt
+    }
+
+    public List<String> list() {
+        final String rawResponse = runWithStdin(Collections.emptyList(), "list");
+        final String[] items = rawResponse.split("\n");
+        return Arrays.asList(items);
     }
 }

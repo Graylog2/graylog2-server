@@ -29,35 +29,43 @@ const generateStyles = () => css<{ backgroundImage: string }>`
   }
 `;
 
-const ErrorMessage = styled.div(({ theme }) => css`
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
+const ErrorMessage = styled.div(
+  ({ theme }) => css`
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
 
-  dt {
-    font-size: ${theme.fonts.size.body};
-    font-weight: normal;
-    overflow: auto;
-  }
+    dt {
+      font-size: ${theme.fonts.size.body};
+      font-weight: normal;
+      overflow: auto;
+    }
 
-  p {
-    font-size: inherit;
-  }
-`);
+    p {
+      font-size: inherit;
+    }
+  `,
+);
 
 type Props = {
-  backgroundImage?: string,
-  children?: React.ReactNode,
-  displayPageLayout?: boolean
-  description: React.ReactNode,
-  title: string,
+  backgroundImage?: string;
+  children?: React.ReactNode;
+  displayPageLayout?: boolean;
+  description: React.ReactNode;
+  title: string;
 };
 
 const ErrorPageStyles = createGlobalStyle`
     ${generateStyles()}
 `;
 
-const ErrorPage = ({ children, title, description, backgroundImage = NotFoundBackgroundImage, displayPageLayout = true }: Props) => {
+const ErrorPage = ({
+  children,
+  title,
+  description,
+  backgroundImage = NotFoundBackgroundImage,
+  displayPageLayout = true,
+}: Props) => {
   const PageLayoutComponent = displayPageLayout ? PageContentLayout : React.Fragment;
 
   return (
@@ -66,11 +74,7 @@ const ErrorPage = ({ children, title, description, backgroundImage = NotFoundBac
         <ErrorPageStyles backgroundImage={backgroundImage} />
         <ErrorJumbotron title={title}>
           {description}
-          {children && (
-          <ErrorMessage>
-            {children}
-          </ErrorMessage>
-          )}
+          {children && <ErrorMessage>{children}</ErrorMessage>}
         </ErrorJumbotron>
       </PageLayoutComponent>
     </DocumentTitle>

@@ -37,24 +37,28 @@ const BulkActions = () => {
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      fetch(
-        'POST',
-        qualifyUrl(VIEWS_BULK_DELETE_API_ROUTE),
-        { entity_ids: selectedEntities },
-      ).then(({ failures }) => {
-        if (failures?.length) {
-          const notDeletedSavedSearchIds = failures.map(({ entity_id }) => entity_id);
-          setSelectedEntities(notDeletedSavedSearchIds);
-          UserNotification.error(`${notDeletedSavedSearchIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
-        } else {
-          setSelectedEntities([]);
-          UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
-        }
-      }).catch((error) => {
-        UserNotification.error(`An error occurred while deleting saved searches. ${error}`);
-      }).finally(() => {
-        queryClient.invalidateQueries(['saved-searches', 'overview']);
-      });
+      fetch('POST', qualifyUrl(VIEWS_BULK_DELETE_API_ROUTE), { entity_ids: selectedEntities })
+        .then(({ failures }) => {
+          if (failures?.length) {
+            const notDeletedSavedSearchIds = failures.map(({ entity_id }) => entity_id);
+            setSelectedEntities(notDeletedSavedSearchIds);
+            UserNotification.error(
+              `${notDeletedSavedSearchIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`,
+            );
+          } else {
+            setSelectedEntities([]);
+            UserNotification.success(
+              `${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`,
+              'Success',
+            );
+          }
+        })
+        .catch((error) => {
+          UserNotification.error(`An error occurred while deleting saved searches. ${error}`);
+        })
+        .finally(() => {
+          queryClient.invalidateQueries(['saved-searches', 'overview']);
+        });
     }
   }, [descriptor, queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities]);
 

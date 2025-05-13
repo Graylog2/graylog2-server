@@ -47,21 +47,22 @@ export const HelpPanel = ({
   title = '',
   defaultExpanded = false,
 }: HelpPanelProps) => {
-  const defaultHeader = <h3><IconHeader name="info" />{title}</h3>;
+  const defaultHeader = (
+    <h3>
+      <IconHeader name="info" />
+      {title}
+    </h3>
+  );
 
   return (
-    <Panel defaultExpanded={defaultExpanded}
-           className={`${styles.helpPanel} ${className}`}
-           bsStyle={bsStyle}>
+    <Panel defaultExpanded={defaultExpanded} className={`${styles.helpPanel} ${className}`} bsStyle={bsStyle}>
       <Panel.Heading>
-        <Panel.Title toggle={collapsible}>
-          {header || defaultHeader}
-        </Panel.Title>
+        <Panel.Title toggle={collapsible}>{header || defaultHeader}</Panel.Title>
       </Panel.Heading>
-      <ConditionalCollapse condition={collapsible} wrapper={(wrapChild) => <Panel.Collapse>{wrapChild}</Panel.Collapse>}>
-        <Panel.Body>
-          {children}
-        </Panel.Body>
+      <ConditionalCollapse
+        condition={collapsible}
+        wrapper={(wrapChild) => <Panel.Collapse>{wrapChild}</Panel.Collapse>}>
+        <Panel.Body>{children}</Panel.Body>
       </ConditionalCollapse>
     </Panel>
   );

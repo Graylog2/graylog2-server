@@ -20,29 +20,30 @@ import chroma from 'chroma-js';
 
 import { Col, Jumbotron, Row } from 'components/bootstrap';
 
-const H1 = styled.h1(({ theme }) => css`
-  font-size: ${theme.fonts.size.extraLarge};
-  margin-bottom: 15px;
-`);
+const H1 = styled.h1(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.extraLarge};
+    margin-bottom: 15px;
+  `,
+);
 
 const ContainerRow = styled(Row)`
   height: 82vh;
 `;
 
-const StyledErrorJumbotron = styled(Jumbotron)(({ theme }) => css`
-  background-color: ${chroma(theme.colors.global.contentBackground).alpha(0.8).css()};
-  text-align: center;
-`);
+const StyledErrorJumbotron = styled(Jumbotron)(
+  ({ theme }) => css`
+    background-color: ${chroma(theme.colors.global.contentBackground).alpha(0.8).css()};
+    text-align: center;
+  `,
+);
 
 type ErrorJumbotronProps = {
   children: React.ReactNode;
   title: string;
 };
 
-const ErrorJumbotron = ({
-  children,
-  title,
-}: ErrorJumbotronProps) => (
+const ErrorJumbotron = ({ children, title }: ErrorJumbotronProps) => (
   <ContainerRow>
     <Col mdOffset={2} md={8}>
       <StyledErrorJumbotron>

@@ -34,9 +34,12 @@ describe('useSaveViewFormControls', () => {
       id: 'example-plugin-component',
     };
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.saveViewForm': [() => saveViewFromControl],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.saveViewForm': [() => saveViewFromControl],
+        })[entityKey],
+    );
 
     const { result } = renderHook(() => useSaveViewFormControls());
 

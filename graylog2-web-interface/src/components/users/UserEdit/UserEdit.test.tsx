@@ -33,10 +33,7 @@ describe('<UserEdit />', () => {
     jest.clearAllMocks();
   });
 
-  const user = adminUser.toBuilder()
-    .readOnly(false)
-    .external(false)
-    .build();
+  const user = adminUser.toBuilder().readOnly(false).external(false).build();
 
   it('should display loading indicator, if no user is provided', async () => {
     render(<UserEdit user={undefined} />);
@@ -49,10 +46,7 @@ describe('<UserEdit />', () => {
   });
 
   it('should not allow editing a readOnly user', () => {
-    const readOnlyUser = user.toBuilder()
-      .readOnly(true)
-      .fullName('Full name')
-      .build();
+    const readOnlyUser = user.toBuilder().readOnly(true).fullName('Full name').build();
     render(<UserEdit user={readOnlyUser} />);
 
     expect(screen.getByText(`The selected user ${readOnlyUser.fullName} can't be edited.`)).toBeInTheDocument();

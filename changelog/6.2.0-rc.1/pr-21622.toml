@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Don't add search role if node_roles are user-defined in datanode.conf"
+
+issues = ["graylog-plugin-enterprise#9704"]
+pulls = ["21622"]

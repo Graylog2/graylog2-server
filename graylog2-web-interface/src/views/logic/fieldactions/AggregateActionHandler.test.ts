@@ -37,26 +37,42 @@ describe('AggregateActionHandler', () => {
   const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
   it('uses field type when generating widget', async () => {
-    await dispatch(AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: {} }));
-
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({
-        rowPivots: [
-          Pivot.createValues(['foo']),
-        ],
+    await dispatch(
+      AggregateActionHandler({
+        queryId: 'queryId',
+        field: 'foo',
+        type: new FieldType('keyword', [], []),
+        contexts: {},
       }),
-    }));
+    );
+
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          rowPivots: [Pivot.createValues(['foo'])],
+        }),
+      }),
+    );
   });
 
   it('uses filter from widget', async () => {
     const filter = 'author: "Vanth"';
     const origWidget = Widget.builder().filter(filter).build();
 
-    await dispatch(AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: { widget: origWidget } }));
+    await dispatch(
+      AggregateActionHandler({
+        queryId: 'queryId',
+        field: 'foo',
+        type: new FieldType('keyword', [], []),
+        contexts: { widget: origWidget },
+      }),
+    );
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      filter,
-    }));
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter,
+      }),
+    );
   });
 
   it('duplicates query/timerange/streams/filter of original widget', async () => {
@@ -67,18 +83,22 @@ describe('AggregateActionHandler', () => {
       .timerange({ type: 'relative', range: 3600 })
       .build();
 
-    await dispatch(AggregateActionHandler({
-      queryId: 'queryId',
-      field: 'foo',
-      type: new FieldType('keyword', [], []),
-      contexts: { widget: origWidget },
-    }));
+    await dispatch(
+      AggregateActionHandler({
+        queryId: 'queryId',
+        field: 'foo',
+        type: new FieldType('keyword', [], []),
+        contexts: { widget: origWidget },
+      }),
+    );
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      filter: 'author: "Vanth"',
-      query: createElasticsearchQueryString('foo:42'),
-      streams: ['stream1', 'stream23'],
-      timerange: { type: 'relative', range: 3600 },
-    }));
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter: 'author: "Vanth"',
+        query: createElasticsearchQueryString('foo:42'),
+        streams: ['stream1', 'stream23'],
+        timerange: { type: 'relative', range: 3600 },
+      }),
+    );
   });
 });

@@ -77,11 +77,19 @@ class MaxmindAdapterDocumentation extends React.Component {
 
         <h3 style={{ marginBottom: 10 }}>City database fields</h3>
 
-        <p>In addition to the fields provided by the country database, the city database also includes the following fields:</p>
+        <p>
+          In addition to the fields provided by the country database, the city database also includes the following
+          fields:
+        </p>
 
         <pre>{cityFields}</pre>
 
-        <p>For a complete documentation of the fields, please see MaxMind's <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">developer documentation</a></p>
+        <p>
+          For a complete documentation of the fields, please see MaxMind's{' '}
+          <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">
+            developer documentation
+          </a>
+        </p>
       </div>
     );
   }

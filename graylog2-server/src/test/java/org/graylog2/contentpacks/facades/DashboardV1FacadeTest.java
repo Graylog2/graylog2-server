@@ -111,7 +111,7 @@ public class DashboardV1FacadeTest {
         searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
         final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
         ViewFacadeTest.TestViewService viewService = new ViewFacadeTest.TestViewService(null, mongoCollections);
-        ViewFacadeTest.TestViewSummaryService viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, mongoCollections);
+        ViewFacadeTest.TestViewSummaryService viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoCollections);
         UserService userService = mock(UserService.class);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
                 mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));

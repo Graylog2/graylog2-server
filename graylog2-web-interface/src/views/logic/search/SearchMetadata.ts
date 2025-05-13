@@ -26,27 +26,33 @@ type QueryMetadataMap = Immutable.Map<string, QueryMetadata>;
 type ParameterMap = Immutable.Map<string, Parameter>;
 
 type State = {
-  queryMetadata: QueryMetadataMap,
-  declaredParameters: ParameterMap,
-  used: Immutable.Set<Parameter>,
-  undeclared: Immutable.Set<string>,
+  queryMetadata: QueryMetadataMap;
+  declaredParameters: ParameterMap;
+  used: Immutable.Set<Parameter>;
+  undeclared: Immutable.Set<string>;
 };
 
 export type SearchMetadataJson = {
-  query_metadata: { [key: string]: QueryMetadataJson },
-  declared_parameters: { [key: string]: ParameterJson },
+  query_metadata: { [key: string]: QueryMetadataJson };
+  declared_parameters: { [key: string]: ParameterJson };
 };
 
 export default class SearchMetadata {
   _value: State;
 
   constructor(queryMetadata: QueryMetadataMap, declaredParameters: ParameterMap) {
-    const allUsedParameterNames: Array<string> = queryMetadata.valueSeq()
+    const allUsedParameterNames: Array<string> = queryMetadata
+      .valueSeq()
       .reduce((acc: Array<string>, meta: QueryMetadata) => [...acc, ...meta.usedParameterNames.toJS()], []);
     const declaredParameterNames: Array<string> = declaredParameters.keySeq().toJS();
-    const used = Immutable.Set(allUsedParameterNames.filter((parameterName) => declaredParameterNames.includes(parameterName))
-      .map((parameterName: string) => declaredParameters.get(parameterName)));
-    const undeclared = Immutable.Set(allUsedParameterNames.filter((parameterName) => !declaredParameterNames.includes(parameterName)));
+    const used = Immutable.Set(
+      allUsedParameterNames
+        .filter((parameterName) => declaredParameterNames.includes(parameterName))
+        .map((parameterName: string) => declaredParameters.get(parameterName)),
+    );
+    const undeclared = Immutable.Set(
+      allUsedParameterNames.filter((parameterName) => !declaredParameterNames.includes(parameterName)),
+    );
 
     this._value = { queryMetadata, declaredParameters, used, undeclared };
   }
@@ -74,9 +80,11 @@ export default class SearchMetadata {
   static fromJSON(value: SearchMetadataJson) {
     const { query_metadata, declared_parameters } = value;
     const queryMetadata = Immutable.Map(query_metadata)
-      .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata)).toMap();
+      .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata))
+      .toMap();
     const declaredParameters = Immutable.Map(declared_parameters)
-      .map((parameter: ParameterJson) => Parameter.fromJSON(parameter)).toMap();
+      .map((parameter: ParameterJson) => Parameter.fromJSON(parameter))
+      .toMap();
 
     return new SearchMetadata(queryMetadata, declaredParameters);
   }

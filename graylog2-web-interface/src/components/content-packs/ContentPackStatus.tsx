@@ -34,7 +34,7 @@ const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
     margin-left: 4px;
     background-color: ${statuses[status]};
     color: ${theme.utils.readableColor(statuses[status])};
-`;
+  `;
 });
 
 type ContentPackStatusProps = {
@@ -42,21 +42,14 @@ type ContentPackStatusProps = {
   contentPackId?: string;
 };
 
-const ContentPackStatus = ({
-  contentPackId,
-  states = [],
-}: ContentPackStatusProps) => {
+const ContentPackStatus = ({ contentPackId, states = [] }: ContentPackStatusProps) => {
   const badges = states.map((state) => (
     <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(contentPackId)}>
       <StatusBadge status={state}>{state}</StatusBadge>
     </Link>
   ));
 
-  return (
-    <span>
-      {badges}
-    </span>
-  );
+  return <span>{badges}</span>;
 };
 
 export default ContentPackStatus;

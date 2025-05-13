@@ -12,20 +12,22 @@ const Example = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setAnimationStartCount((cur) => cur + 1);
-    }, 10000)
-      
+    }, 10000);
+
     return () => {
       clearInterval(interval);
-    } 
+    };
   }, [animationStartCount]);
-  
+
   return (
     <Button>
       A button
-      {!!animationStartCount && <ProgressAnimation $animationDuration={10000} key={`animation-${animationStartCount}`} $increase={false} />}
+      {!!animationStartCount && (
+        <ProgressAnimation $animationDuration={10000} key={`animation-${animationStartCount}`} $increase={false} />
+      )}
     </Button>
-  )
-}
+  );
+};
 
-<Example />
+<Example />;
 ```

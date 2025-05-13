@@ -16,33 +16,34 @@
  */
 package org.graylog.events.notifications;
 
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import jakarta.inject.Inject;
 import org.graylog.events.event.EventDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class DBNotificationGracePeriodService extends PaginatedDbService<EventNotificationStatus> {
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+
+public class DBNotificationGracePeriodService {
     private static final String NOTIFICATION_STATUS_COLLECTION_NAME = "event_notification_status";
 
-    private JobSchedulerClock clock;
+    private final JobSchedulerClock clock;
+    private final MongoCollection<EventNotificationStatus> collection;
+    private final MongoUtils<EventNotificationStatus> mongoUtils;
 
     @Inject
-    public DBNotificationGracePeriodService(MongoConnection mongoConnection,
-                                            MongoJackObjectMapperProvider mapper,
+    public DBNotificationGracePeriodService(MongoCollections mongoCollections,
                                             JobSchedulerClock clock) {
-        super(mongoConnection, mapper, EventNotificationStatus.class, NOTIFICATION_STATUS_COLLECTION_NAME);
+        collection = mongoCollections.collection(NOTIFICATION_STATUS_COLLECTION_NAME, EventNotificationStatus.class);
+        mongoUtils = mongoCollections.utils(collection);
         this.clock = clock;
 
     }
@@ -55,28 +56,22 @@ public class DBNotificationGracePeriodService extends PaginatedDbService<EventNo
     }
 
     public List<EventNotificationStatus> getAllStatuses() {
-        List<EventNotificationStatus> result = new ArrayList<>();
-        try (DBCursor<EventNotificationStatus> eventNotificationStatuses = db.find()) {
-            for (EventNotificationStatus status : eventNotificationStatuses) {
-                result.add(status);
-            }
-        }
-        return result;
+        return collection.find().into(new ArrayList<>());
     }
 
     public int deleteStatus(String statusId) {
-        final ObjectId id = new ObjectId(statusId);
-        return db.removeById(id).getN();
+        return mongoUtils.deleteById(statusId) ? 1 : 0;
     }
 
     private Optional<EventNotificationStatus> getNotificationStatus(String notificationId, String definitionId, String key) {
         if (notificationId == null || definitionId == null || key == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(db.findOne(DBQuery.and(
-                DBQuery.is(EventNotificationStatus.FIELD_NOTIFICATION_ID, notificationId),
-                DBQuery.is(EventNotificationStatus.FIELD_EVENT_DEFINITION_ID, definitionId),
-                DBQuery.is(EventNotificationStatus.FIELD_EVENT_KEY, key))));
+
+        return Optional.ofNullable(collection.find(and(
+                eq(EventNotificationStatus.FIELD_NOTIFICATION_ID, notificationId),
+                eq(EventNotificationStatus.FIELD_EVENT_DEFINITION_ID, definitionId),
+                eq(EventNotificationStatus.FIELD_EVENT_KEY, key))).first());
     }
 
     public void updateTriggerStatus(String notificationId, EventDto eventDto, long grace) {
@@ -112,6 +107,6 @@ public class DBNotificationGracePeriodService extends PaginatedDbService<EventNo
                 .eventDefinitionId(eventDto.eventDefinitionId())
                 .build();
 
-        db.save(status);
+        mongoUtils.save(status);
     }
 }

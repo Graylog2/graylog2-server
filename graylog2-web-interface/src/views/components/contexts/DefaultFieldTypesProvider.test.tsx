@@ -19,7 +19,6 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import asMock from 'helpers/mocking/AsMock';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -28,9 +27,10 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import useAppDispatch from 'stores/useAppDispatch';
-import executeSearch from 'views/logic/slices/executeJobResult';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import executeSearchJobResult from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import type { FieldTypes } from './FieldTypesContext';
 import FieldTypesContext from './FieldTypesContext';
@@ -44,15 +44,13 @@ const refetch = () => {};
 
 describe('DefaultFieldTypesProvider', () => {
   const renderSUT = (consume: (value: FieldTypes) => React.ReactNode = jest.fn()) => {
-    render((
+    render(
       <TestStoreProvider>
         <DefaultFieldTypesProvider>
-          <FieldTypesContext.Consumer>
-            {consume}
-          </FieldTypesContext.Consumer>
+          <FieldTypesContext.Consumer>{consume}</FieldTypesContext.Consumer>
         </DefaultFieldTypesProvider>
-      </TestStoreProvider>
-    ));
+      </TestStoreProvider>,
+    );
 
     return consume;
   };
@@ -65,22 +63,30 @@ describe('DefaultFieldTypesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith({ all: Immutable.List(), queryFields: Immutable.Map({ foobar: Immutable.List() }) });
+    expect(consume).toHaveBeenCalledWith({
+      all: Immutable.List(),
+      currentQuery: Immutable.List(),
+    });
   });
 
   it('provides field types of field types store', () => {
-    asMock(useCurrentQuery).mockReturnValue(Query.builder()
-      .id('queryId')
-      .filter(filtersForQuery(['dummyStream']))
-      .build());
+    const fields = simpleFields();
 
-    asMock(useFieldTypes).mockImplementation((streams) => (streams.length === 0
-      ? { data: simpleFields().toArray(), refetch }
-      : { data: simpleQueryFields('foo').get('foo').toArray(), refetch }));
+    asMock(useCurrentQuery).mockReturnValue(
+      Query.builder()
+        .id('queryId')
+        .filter(filtersForQuery(['dummyStream']))
+        .build(),
+    );
+    const queryFields = simpleQueryFields('foo').get('foo');
+
+    asMock(useFieldTypes).mockImplementation((streams) =>
+      streams.length === 0 ? { data: fields.toArray(), refetch } : { data: queryFields.toArray(), refetch },
+    );
 
     const consume = renderSUT();
 
-    const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
+    const fieldTypes = { all: fields, currentQuery: queryFields };
 
     expect(consume).toHaveBeenCalledWith(fieldTypes);
   });
@@ -89,17 +95,25 @@ describe('DefaultFieldTypesProvider', () => {
     asMock(useCurrentQuery).mockReturnValue(Query.builder().id('foobar').build());
     const refetchMock = jest.fn();
 
-    asMock(useFieldTypes).mockImplementation((streams) => (streams.length === 0
-      ? { data: simpleFields().toArray(), refetch: refetchMock }
-      : { data: simpleQueryFields('foo').get('foo').toArray(), refetch: refetchMock }));
+    asMock(useFieldTypes).mockImplementation((streams) =>
+      streams.length === 0
+        ? { data: simpleFields().toArray(), refetch: refetchMock }
+        : { data: simpleQueryFields('foo').get('foo').toArray(), refetch: refetchMock },
+    );
 
     const TriggerRefresh = () => {
-      const dispatch = useAppDispatch();
+      const dispatch = useViewsDispatch();
 
-      return <button type="button" onClick={() => dispatch(execute())}>Refresh search</button>;
+      return (
+        <button type="button" onClick={() => dispatch(executeActiveQuery())}>
+          Refresh search
+        </button>
+      );
     };
 
-    asMock(executeSearch).mockResolvedValue({ result: { result: { id: generateId() } } } as SearchExecutionResult);
+    asMock(executeSearchJobResult).mockResolvedValue({
+      result: { result: { id: generateId() } },
+    } as SearchExecutionResult);
 
     const consume = () => <TriggerRefresh />;
 

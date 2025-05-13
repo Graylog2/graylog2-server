@@ -118,11 +118,11 @@ public class ConfigurationStateUpdater {
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work
     @Subscribe
     public void handleRuleChanges(RulesChangedEvent event) {
-        event.deletedRuleIds().forEach(id -> {
-            log.debug("Invalidated rule {}", id);
-            pipelineMetricRegistry.removeRuleMetrics(id);
+        event.deletedRules().forEach(ref -> {
+            log.debug("Invalidated rule {}", ref.id());
+            pipelineMetricRegistry.removeRuleMetrics(ref.id());
         });
-        event.updatedRuleIds().forEach(id -> log.debug("Refreshing rule {}", id));
+        event.updatedRules().forEach(ref -> log.debug("Refreshing rule {}", ref.id()));
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
     }
 

@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -25,6 +26,9 @@ import withTelemetry from 'logic/telemetry/withTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withLocation from 'routing/withLocation';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 
 const getNotificationPlugin = (type: string) => {
   if (type === undefined) {
@@ -34,12 +38,12 @@ const getNotificationPlugin = (type: string) => {
   return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type);
 };
 
-const formattedEventNotificationTypes = () => PluginStore.exports('eventNotificationTypes')
-  .map((type) => ({ label: type.displayName, value: type.type }));
+const formattedEventNotificationTypes = () =>
+  PluginStore.exports('eventNotificationTypes').map((type) => ({ label: type.displayName, value: type.type }));
 
 type EventNotificationFormProps = {
   action?: 'create' | 'edit';
-  notification: any;
+  notification: EventNotification;
   validation: any;
   testResult: {
     isLoading?: boolean;
@@ -56,59 +60,54 @@ type EventNotificationFormProps = {
   location: any;
 };
 
-class EventNotificationForm extends React.Component<EventNotificationFormProps, {
-  [key: string]: any;
-}> {
-  static defaultProps = {
-    action: 'edit',
-    formId: undefined,
-  };
+const EventNotificationForm = ({
+  action = 'edit',
+  embedded,
+  formId = undefined,
+  notification,
+  onCancel,
+  validation,
+  testResult,
+  onSubmit,
+  sendTelemetry,
+  location,
+  onChange,
+  onTest,
+}: EventNotificationFormProps) => {
+  const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isSubmitEnabled: true,
-    };
-  }
-
-  setIsSubmitEnabled = (enabled) => {
-    this.setState({ isSubmitEnabled: enabled });
-  };
-
-  handleSubmit = (event) => {
-    const { notification, onSubmit, sendTelemetry, action, location } = this.props;
-
+  const handleSubmit = (event) => {
     sendTelemetry(
       action === 'create'
         ? TELEMETRY_EVENT_TYPE.NOTIFICATIONS.CREATE_CLICKED
-        : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED, {
+        : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED,
+      {
         app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'event-notification',
         app_action_value: `${action}-button`,
-      });
+      },
+    );
 
     event.preventDefault();
 
     onSubmit(notification);
   };
 
-  handleChange = (event) => {
+  const handleChange = (event) => {
     const { name } = event.target;
-    const { onChange } = this.props;
 
     onChange(name, getValueFromInput(event.target));
   };
 
-  handleConfigChange = (nextConfig) => {
-    const { onChange } = this.props;
-
+  const handleConfigChange = (nextConfig) => {
     onChange('config', nextConfig);
   };
 
-  handleTypeChange = (nextType) => {
-    const { sendTelemetry, location } = this.props;
+  const handleEntityShareChange = (entityShare: EntitySharePayload) => {
+    onChange('share_request', entityShare);
+  };
 
+  const handleTypeChange = (nextType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_TYPE_SELECTED, {
       app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-definition-notifications',
@@ -119,12 +118,10 @@ class EventNotificationForm extends React.Component<EventNotificationFormProps, 
     const notificationPlugin = getNotificationPlugin(nextType);
     const defaultConfig = notificationPlugin?.defaultConfig || {};
 
-    this.handleConfigChange({ ...defaultConfig, type: nextType });
+    handleConfigChange({ ...defaultConfig, type: nextType });
   };
 
-  handleTestTrigger = () => {
-    const { notification, onTest, sendTelemetry, location } = this.props;
-
+  const handleTestTrigger = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EXECUTE_TEST_CLICKED, {
       app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-notification',
@@ -134,93 +131,106 @@ class EventNotificationForm extends React.Component<EventNotificationFormProps, 
     onTest(notification);
   };
 
-  render() {
-    const { action, embedded, formId, notification, onCancel, validation, testResult } = this.props;
-    const { isSubmitEnabled } = this.state;
-
-    const notificationPlugin = getNotificationPlugin(notification.config.type);
-    const notificationFormComponent = notificationPlugin?.formComponent
-      ? React.createElement(notificationPlugin.formComponent, {
+  const notificationPlugin = getNotificationPlugin(notification.config.type);
+  const notificationFormComponent = notificationPlugin?.formComponent
+    ? React.createElement(notificationPlugin.formComponent, {
         config: notification.config,
-        onChange: this.handleConfigChange,
+        onChange: handleConfigChange,
         validation: validation,
-        setIsSubmitEnabled: this.setIsSubmitEnabled,
+        setIsSubmitEnabled: setIsSubmitEnabled,
       })
-      : null;
+    : null;
 
-    const testButtonText = testResult.isLoading ? <Spinner text="Testing..." /> : 'Execute Test Notification';
+  const isNew = action === 'create';
+  const testButtonText = testResult.isLoading ? <Spinner text="Testing..." /> : 'Execute Test Notification';
 
-    return (
-      <Row>
-        <Col lg={8}>
-          <form onSubmit={this.handleSubmit} id={formId}>
-            <Input id="notification-title"
-                   name="title"
-                   label="Title"
-                   type="text"
-                   bsStyle={validation.errors.title ? 'error' : null}
-                   help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
-                   value={notification.title}
-                   onChange={this.handleChange}
-                   required
-                   autoFocus />
+  return (
+    <Row>
+      <Col lg={8}>
+        <form onSubmit={handleSubmit} id={formId}>
+          <Input
+            id="notification-title"
+            name="title"
+            label="Title"
+            type="text"
+            bsStyle={validation.errors.title ? 'error' : null}
+            help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
+            value={notification.title}
+            onChange={handleChange}
+            required
+            autoFocus
+          />
 
-            <Input id="notification-description"
-                   name="description"
-                   label={<span>Description <small className="text-muted">(Optional)</small></span>}
-                   type="textarea"
-                   help="Longer description for this Notification."
-                   value={notification.description}
-                   onChange={this.handleChange}
-                   rows={2} />
+          <Input
+            id="notification-description"
+            name="description"
+            label={
+              <span>
+                Description <small className="text-muted">(Optional)</small>
+              </span>
+            }
+            type="textarea"
+            help="Longer description for this Notification."
+            value={notification.description}
+            onChange={handleChange}
+            rows={2}
+          />
 
-            <FormGroup controlId="notification-type" validationState={validation.errors.config ? 'error' : null}>
-              <ControlLabel>Notification Type</ControlLabel>
-              <Select id="notification-type"
-                      options={formattedEventNotificationTypes()}
-                      value={notification.config.type}
-                      onChange={this.handleTypeChange}
-                      clearable={false}
-                      required />
-              <HelpBlock>
-                {get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}
-              </HelpBlock>
+          <FormGroup controlId="notification-type" validationState={validation.errors.config ? 'error' : null}>
+            <ControlLabel>Notification Type</ControlLabel>
+            <Select
+              id="notification-type"
+              options={formattedEventNotificationTypes()}
+              value={notification.config.type}
+              onChange={handleTypeChange}
+              clearable={false}
+              required
+            />
+            <HelpBlock>{get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}</HelpBlock>
+          </FormGroup>
+
+          {notificationFormComponent}
+
+          {notificationFormComponent && (
+            <FormGroup>
+              <ControlLabel>
+                Test Notification <small className="text-muted">(Optional)</small>
+              </ControlLabel>
+              <FormControl.Static>
+                <Button bsStyle="info" bsSize="small" disabled={testResult.isLoading} onClick={handleTestTrigger}>
+                  {testButtonText}
+                </Button>
+              </FormControl.Static>
+              {testResult.message && (
+                <Alert
+                  bsStyle={testResult.error ? 'danger' : 'success'}
+                  title={testResult.error ? 'Error: ' : 'Success: '}>
+                  {testResult.message}
+                </Alert>
+              )}
+              <HelpBlock>Execute this Notification with a test Alert.</HelpBlock>
             </FormGroup>
+          )}
+          {isNew && (
+            <EntityCreateShareFormGroup
+              description="Search for a User or Team to add as collaborator on this notification."
+              entityType="notification"
+              entityTitle=""
+              onSetEntityShare={handleEntityShareChange}
+            />
+          )}
 
-            {notificationFormComponent}
-
-            {notificationFormComponent && (
-              <FormGroup>
-                <ControlLabel>Test Notification <small className="text-muted">(Optional)</small></ControlLabel>
-                <FormControl.Static>
-                  <Button bsStyle="info"
-                          bsSize="small"
-                          disabled={testResult.isLoading}
-                          onClick={this.handleTestTrigger}>
-                    {testButtonText}
-                  </Button>
-                </FormControl.Static>
-                {testResult.message && (
-                  <Alert bsStyle={testResult.error ? 'danger' : 'success'} title={testResult.error ? 'Error: ' : 'Success: '}>
-                    {testResult.message}
-                  </Alert>
-                )}
-                <HelpBlock>
-                  Execute this Notification with a test Alert.
-                </HelpBlock>
-              </FormGroup>
-            )}
-
-            {!embedded && (
-              <FormSubmit disabledSubmit={!isSubmitEnabled}
-                          submitButtonText={`${action === 'create' ? 'Create' : 'Update'} notification`}
-                          onCancel={onCancel} />
-            )}
-          </form>
-        </Col>
-      </Row>
-    );
-  }
-}
+          {!embedded && (
+            <FormSubmit
+              disabledSubmit={!isSubmitEnabled}
+              submitButtonText={`${isNew ? 'Create' : 'Update'} notification`}
+              onCancel={onCancel}
+            />
+          )}
+        </form>
+      </Col>
+    </Row>
+  );
+};
 
 export default withLocation(withTelemetry(EventNotificationForm));

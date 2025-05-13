@@ -15,12 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
+import AppConfig from 'util/AppConfig';
+import useThemes from 'theme/hooks/useThemes';
+import useCustomLogo from 'brand-customization/useCustomLogo';
+import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
@@ -28,7 +33,7 @@ const LogoContainer = styled.div`
   width: auto;
   margin: auto;
   margin-bottom: 1.5rem;
-  
+
   svg {
     width: 100%;
     height: 75px;
@@ -41,20 +46,22 @@ const Background = styled.div`
   width: 100%;
 `;
 
-const BackgroundText = styled.div`
-  z-index: -1;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  vertical-align: middle;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  padding: 0 30px;
-  background-image: url(${backgroundImage});
-  background-position: center;
-  background-size: cover;
-`;
+const BackgroundText = styled.div<{ $backgroundImage: string }>(
+  ({ $backgroundImage }) => css`
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    vertical-align: middle;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 0 30px;
+    background-image: url(${$backgroundImage});
+    background-position: center;
+    background-size: cover;
+  `,
+);
 
 const NotificationsContainer = styled.div`
   position: absolute;
@@ -78,49 +85,90 @@ const TextContainer = styled.div`
   height: auto;
 `;
 
-const WelcomeMessage = styled.strong(({ theme }) => css`
-  display: block;
-  font-size: ${theme.fonts.size.extraLarge};
-  font-weight: 800;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-`);
+const WelcomeMessage = styled.strong(
+  ({ theme }) => css`
+    display: block;
+    font-size: ${theme.fonts.size.extraLarge};
+    font-weight: 800;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  `,
+);
 
-const Claim = styled.h1(({ theme }) => css`
-  color: #fcfcfc;
-  text-transform: uppercase;
-  font-size: ${theme.fonts.size.huge};
-  line-height: 1;
-  font-weight: 600;
-`);
-const Highlight = styled.span(({ theme }) => css`
-  color: ${theme.colors.brand.primary};
-`);
+const Claim = styled.h1(
+  ({ theme }) => css`
+    color: #fcfcfc;
+    text-transform: uppercase;
+    font-size: ${theme.fonts.size.huge};
+    line-height: 1;
+    font-weight: 600;
+  `,
+);
+const Highlight = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.brand.primary};
+  `,
+);
 
-type Props = {
-  children: React.ReactNode,
+const CustomLogo = styled.div`
+  svg {
+    width: 100%;
+    height: 200px;
+  }
+`;
+
+const CustomizableLogo = () => {
+  const { colorScheme } = useThemes('dark', false);
+  const customLogo = useCustomLogo(colorScheme);
+
+  return customLogo ? (
+    <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
+  ) : (
+    <>
+      <LogoContainer>
+        <Logo color="#ffffff" />
+      </LogoContainer>
+      <Claim>
+        Data. Insights. <Highlight>Answers.</Highlight>
+      </Claim>
+    </>
+  );
 };
 
-const LoginChrome = ({ children }: Props) => (
-  <LoginContainer>
-    <LoginBox>
-      <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
-      {children}
-    </LoginBox>
-    <Background>
-      <NotificationsContainer>
-        <PublicNotifications readFromConfig />
-      </NotificationsContainer>
-      <BackgroundText>
-        <TextContainer>
-          <LogoContainer>
-            <Logo color="#ffffff" />
-          </LogoContainer>
-          <Claim>Data. Insights. <Highlight>Answers.</Highlight></Claim>
-        </TextContainer>
-      </BackgroundText>
-    </Background>
-  </LoginContainer>
-);
+type Props = {
+  children: React.ReactNode;
+};
+
+const svgDataUrl = (content: string) => `data:image/svg+xml;utf-8,${encodeURIComponent(content)}`;
+const useLoginBackground = () =>
+  useMemo(
+    () =>
+      AppConfig.branding()?.login?.background ? svgDataUrl(AppConfig.branding()?.login?.background) : backgroundImage,
+    [],
+  );
+
+const LoginChrome = ({ children }: Props) => {
+  const productName = useProductName();
+  const loginBackground = useLoginBackground();
+
+  return (
+    <LoginContainer>
+      <LoginBox>
+        <WelcomeMessage>Welcome to {productName}</WelcomeMessage>
+        {children}
+      </LoginBox>
+      <Background>
+        <NotificationsContainer>
+          <PublicNotifications readFromConfig />
+        </NotificationsContainer>
+        <BackgroundText $backgroundImage={loginBackground}>
+          <TextContainer>
+            <CustomizableLogo />
+          </TextContainer>
+        </BackgroundText>
+      </Background>
+    </LoginContainer>
+  );
+};
 
 export default LoginChrome;

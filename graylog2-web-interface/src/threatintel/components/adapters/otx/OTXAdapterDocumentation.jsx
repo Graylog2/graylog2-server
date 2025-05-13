@@ -26,8 +26,9 @@ class OTXAdapterDocumentation extends React.Component {
     return (
       <div>
         <p style={style}>
-          The AlienVault OTX data adapter uses the <ExternalLink href="https://otx.alienvault.com/api">OTX API</ExternalLink> to
-          lookup indicators for the given key.
+          The AlienVault OTX data adapter uses the{' '}
+          <ExternalLink href="https://otx.alienvault.com/api">OTX API</ExternalLink> to lookup indicators for the given
+          key.
         </p>
 
         <h3 style={style}>Configuration</h3>
@@ -47,16 +48,17 @@ class OTXAdapterDocumentation extends React.Component {
 
         <p style={style}>
           The OTX API key is used to authenticate API requests. Requests also work if you don't enter an API key, but
-          you will most probably get a smaller request limit. <strong>If you use this data adapter for production traffic,
-            please register for an OTX account and get an API key.
-                                                              </strong>
+          you will most probably get a smaller request limit.{' '}
+          <strong>
+            If you use this data adapter for production traffic, please register for an OTX account and get an API key.
+          </strong>
         </p>
 
         <h5 style={style}>OTX API URL</h5>
 
         <p style={style}>
-          HTTP URL of the OTX API server. The default setting of <code>https://otx.alienvault.com</code> should not be changed
-          except if you want to run some tests with a custom server.
+          HTTP URL of the OTX API server. The default setting of <code>https://otx.alienvault.com</code> should not be
+          changed except if you want to run some tests with a custom server.
         </p>
 
         <h5 style={style}>HTTP User-Agent</h5>
@@ -69,22 +71,22 @@ class OTXAdapterDocumentation extends React.Component {
         <h5 style={style}>HTTP Connection Timeout</h5>
 
         <p style={style}>
-          The HTTP connection timeout in milliseconds for the OTX API request. If you set this to a high value and
-          the OTX API connection is slow, processing performance can be affected.
+          The HTTP connection timeout in milliseconds for the OTX API request. If you set this to a high value and the
+          OTX API connection is slow, processing performance can be affected.
         </p>
 
         <h5 style={style}>HTTP Write Timeout</h5>
 
         <p style={style}>
-          The HTTP write timeout in milliseconds for the OTX API request. If you set this to a high value and
-          the OTX API connection is slow, processing performance can be affected.
+          The HTTP write timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX
+          API connection is slow, processing performance can be affected.
         </p>
 
         <h5 style={style}>HTTP Read Timeout</h5>
 
         <p style={style}>
-          The HTTP read timeout in milliseconds for the OTX API request. If you set this to a high value and
-          the OTX API connection is slow, processing performance can be affected.
+          The HTTP read timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX API
+          connection is slow, processing performance can be affected.
         </p>
       </div>
     );

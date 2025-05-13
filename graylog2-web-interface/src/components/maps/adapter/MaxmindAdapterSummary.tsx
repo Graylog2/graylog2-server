@@ -22,9 +22,12 @@ type MaxmindAdapterSummaryProps = {
   dataAdapter: any;
 };
 
-class MaxmindAdapterSummary extends React.Component<MaxmindAdapterSummaryProps, {
-  [key: string]: any;
-}> {
+class MaxmindAdapterSummary extends React.Component<
+  MaxmindAdapterSummaryProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     const { config } = this.props.dataAdapter;
     const databaseTypes = {
@@ -42,7 +45,9 @@ class MaxmindAdapterSummary extends React.Component<MaxmindAdapterSummaryProps, 
         <dt>Database type</dt>
         <dd>{databaseTypes[config.database_type]}</dd>
         <dt>Check interval</dt>
-        <dd><TimeUnit value={config.check_interval} unit={config.check_interval_unit} /></dd>
+        <dd>
+          <TimeUnit value={config.check_interval} unit={config.check_interval_unit} />
+        </dd>
       </dl>
     );
   }

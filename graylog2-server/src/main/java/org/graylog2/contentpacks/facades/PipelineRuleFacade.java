@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -39,8 +40,6 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
@@ -118,7 +117,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
 
     @Override
     public void delete(RuleDao nativeEntity) {
-        ruleService.delete(nativeEntity.id());
+        ruleService.delete(nativeEntity);
     }
 
     @Override

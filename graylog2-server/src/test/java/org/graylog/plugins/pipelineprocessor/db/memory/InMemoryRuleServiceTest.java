@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
-import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -24,6 +23,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,10 +65,9 @@ public class InMemoryRuleServiceTest {
             fail("The rule should be found");
             loaded = null;
         }
-        assertThat(loaded).isNotNull();
-        assertThat(loaded).isEqualTo(savedRule);
+        assertThat(loaded).isNotNull().isEqualTo(savedRule);
 
-        service.delete(loaded.id());
+        service.delete(loaded);
         try {
             service.load(loaded.id());
             fail("Deleted rules should not be found anymore");
@@ -113,7 +113,7 @@ public class InMemoryRuleServiceTest {
             fail("Updating an existing rule should be possible");
         }
 
-        service.delete(saved.id());
+        service.delete(saved);
         try {
             service.save(rule);
         } catch (IllegalArgumentException e) {
@@ -132,6 +132,6 @@ public class InMemoryRuleServiceTest {
 
         assertThat(service.loadAll()).containsExactlyInAnyOrder(rule1, rule2, rule3, rule4);
 
-        assertThat(service.loadNamed(ImmutableList.of("test3", "test2"))).containsExactlyInAnyOrder(rule2, rule3);
+        assertThat(service.loadNamed(List.of("test3", "test2"))).containsExactlyInAnyOrder(rule2, rule3);
     }
 }

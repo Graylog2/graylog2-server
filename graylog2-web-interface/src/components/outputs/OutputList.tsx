@@ -33,23 +33,28 @@ type OutputListProps = {
   types: any;
 };
 
-class OutputList extends React.Component<OutputListProps, {
-  [key: string]: any;
-}> {
+class OutputList extends React.Component<
+  OutputListProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     streamId: '',
     outputs: [],
   };
 
   _formatOutput = (output) => (
-    <Output key={output.id}
-            output={output}
-            streamId={this.props.streamId}
-            removeOutputFromStream={this.props.onRemove}
-            removeOutputGlobally={this.props.onTerminate}
-            onUpdate={this.props.onUpdate}
-            getTypeDefinition={this.props.getTypeDefinition}
-            types={this.props.types} />
+    <Output
+      key={output.id}
+      output={output}
+      streamId={this.props.streamId}
+      removeOutputFromStream={this.props.onRemove}
+      removeOutputGlobally={this.props.onTerminate}
+      onUpdate={this.props.onUpdate}
+      getTypeDefinition={this.props.getTypeDefinition}
+      types={this.props.types}
+    />
   );
 
   render() {
@@ -61,9 +66,7 @@ class OutputList extends React.Component<OutputListProps, {
       return (
         <Row className="content">
           <Col md={12}>
-            <NoEntitiesExist>
-              No outputs configured.
-            </NoEntitiesExist>
+            <NoEntitiesExist>No outputs configured.</NoEntitiesExist>
           </Col>
         </Row>
       );

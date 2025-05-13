@@ -14,7 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const iterateConfirmationHooks = async <Args extends Array<any>>(hooks: Array<(...args: Args) => Promise<boolean | null>>, ...args: Args) => {
+const iterateConfirmationHooks = async <Args extends Array<any>>(
+  hooks: Array<(...args: Args) => Promise<boolean | null>>,
+  ...args: Args
+) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const hook of hooks) {
     try {

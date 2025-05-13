@@ -19,25 +19,30 @@ package org.graylog.testing.completebackend.apis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import io.restassured.path.json.JsonPath;
-import io.restassured.specification.RequestSpecification;
+import io.restassured.response.ValidatableResponse;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 
@@ -58,15 +63,22 @@ public class Search implements GraylogRestApi {
 
 
     public Search waitForMessages(String... messages) {
-        waitFor(() -> searchAllMessages().containsAll(Arrays.asList(messages)), "Timed out waiting for message to be present");
+        return waitForMessages(Arrays.asList(messages));
+    }
+
+    public Search waitForMessages(Collection<String> messages) {
+        waitFor(() -> searchAllMessages().containsAll(messages), "Timed out waiting for messages to be present");
+        return this;
+    }
+
+    public Search waitForMessages(Collection<String> messages, TimeRange timeRange, Set<String> streams) {
+        waitFor(() -> searchAllMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", Duration.ofSeconds(300));
         return this;
     }
 
     private boolean captureMessage(String message) {
         return searchAllMessages().contains(message);
     }
-
-
 
     private boolean captureMessages(Consumer<List<String>> messagesCaptor) {
         List<String> messages = searchAllMessages();
@@ -92,14 +104,18 @@ public class Search implements GraylogRestApi {
      * @return all messages' "message" field as List<String>
      */
     public List<String> searchAllMessages() {
-        return searchAllMessagesInTimeRange(allMessagesTimeRange());
+        return searchAllMessagesInTimeRange(RelativeRange.allTime());
     }
 
     public List<String> searchAllMessagesInTimeRange(TimeRange timeRange) {
+        return searchAllMessages(timeRange, Set.of());
+    }
+
+    public List<String> searchAllMessages(TimeRange timeRange, Set<String> streams) {
         String queryId = "query-id";
         String messageListId = "message-list-id";
 
-        String body = allMessagesJson(queryId, messageListId, timeRange);
+        String body = allMessagesJson(queryId, messageListId, timeRange, streams);
 
         final JsonPath response = given()
                 .spec(api.requestSpecification())
@@ -119,8 +135,8 @@ public class Search implements GraylogRestApi {
         return response.getList(allMessagesJsonPath(queryId, messageListId), String.class);
     }
 
-    private String allMessagesJson(String queryId, String messageListId, TimeRange timeRange) {
-        MessageList messageList = MessageList.builder().id(messageListId).build();
+    private String allMessagesJson(String queryId, String messageListId, TimeRange timeRange, Set<String> streams) {
+        MessageList messageList = MessageList.builder().streams(streams).id(messageListId).build();
         QueryDTO q = QueryDTO.builder()
                 .id(queryId)
                 .query(ElasticsearchQueryString.of(""))
@@ -140,16 +156,51 @@ public class Search implements GraylogRestApi {
         return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
     }
 
-
-    public AbsoluteRange allMessagesTimeRange() {
-        return AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z");
-    }
-
     public String toJsonString(Object s) {
         try {
             return new ObjectMapperProvider().get().writeValueAsString(s);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize Search", e);
         }
+    }
+
+    public ValidatableResponse executePivot(Pivot pivot) {
+        return executePivot(pivot, "source:pivot-fixtures");
+    }
+
+    public ValidatableResponse executePivot(Pivot pivot, String queryString) {
+        return executePivot(pivot, queryString, Set.of());
+    }
+
+    public ValidatableResponse executePivot(Pivot pivot, String queryString, Set<String> streams) {
+        final var pivotName = "pivotaggregation";
+        final var pivotPath = "results.query1.search_types." + pivotName;
+        final Pivot pivotWithId = pivot.toBuilder()
+                .id(pivotName)
+                .build();
+
+        final SearchDTO search = SearchDTO.builder()
+                .queries(QueryDTO.builder()
+                        .timerange(RelativeRange.allTime())
+                        .id("query1")
+                        .query(ElasticsearchQueryString.of(queryString))
+                        .filter(StreamFilter.anyIdOf(streams.toArray(new String[0])))
+                        .searchTypes(Set.of(pivotWithId))
+                        .build())
+                .build();
+
+        return given()
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
+                .when()
+                .body(toJsonString(search))
+                .post("/views/search/sync")
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("execution.done", equalTo(true))
+                .rootPath(pivotPath);
     }
 }

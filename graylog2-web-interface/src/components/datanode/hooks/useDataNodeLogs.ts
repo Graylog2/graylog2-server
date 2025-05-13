@@ -17,44 +17,51 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
+import { defaultOnError } from 'util/conditional/onError';
 
-const fetchDataNodeLogsStdout = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stdout`));
-const fetchDataNodeLogsStderr = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stderr`));
+const fetchDataNodeLogsStdout = async (hostname: string) =>
+  fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stdout`));
+const fetchDataNodeLogsStderr = async (hostname: string) =>
+  fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stderr`));
 
-const useDataNodeLogs = (hostname: string, enabled: boolean) : {
-  stdout: string[],
-  stderr: string[],
+const useDataNodeLogs = (
+  hostname: string,
+  enabled: boolean,
+): {
+  stdout: string[];
+  stderr: string[];
 } => {
   const { data: stdout } = useQuery(
     ['datanode_stdout_logs'],
-    () => fetchDataNodeLogsStdout(hostname),
+    () =>
+      defaultOnError(
+        fetchDataNodeLogsStdout(hostname),
+        'Loading Data Node stdout logs failed with status',
+        'Could not load Data Node stdout logs',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Node stdout logs failed with status: ${errorThrown}`,
-          'Could not load Data Node stdout logs');
-      },
       enabled,
     },
   );
 
   const { data: stderr } = useQuery(
     ['datanode_stderr_logs'],
-    () => fetchDataNodeLogsStderr(hostname),
+    () =>
+      defaultOnError(
+        fetchDataNodeLogsStderr(hostname),
+        'Loading Data Node stderr logs failed with status',
+        'Could not load Data Node stderr logs',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Node stderr logs failed with status: ${errorThrown}`,
-          'Could not load Data Node stderr logs');
-      },
       enabled,
     },
   );
 
-  return ({
+  return {
     stdout,
     stderr,
-  });
+  };
 };
 
 export default useDataNodeLogs;

@@ -15,47 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-
-import AbsoluteDatePicker from './AbsoluteDatePicker';
-import AbsoluteTimeInput from './AbsoluteTimeInput';
+import DateTimePicker from 'views/components/searchbar/time-range-filter/time-range-picker/DateTimePicker';
 
 type Props = {
-  startDate?: Date,
-  range: 'to' | 'from',
-  timeRange: AbsoluteTimeRange,
+  startDate?: Date;
+  range: 'to' | 'from';
+  timeRange: AbsoluteTimeRange;
 };
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
-
-const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
+const AbsoluteCalendar = ({ startDate = undefined, timeRange, range }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => {
-      const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+      const _onChange = (newValue: string) => onChange({ target: { name, value: newValue } });
       const dateTime = error ? timeRange[range] : value || timeRange[range];
 
-      return (
-        <>
-          <AbsoluteDatePicker onChange={_onChange}
-                              startDate={startDate}
-                              dateTime={dateTime} />
-
-          <AbsoluteTimeInput onChange={_onChange}
-                             range={range}
-                             dateTime={dateTime} />
-
-          <ErrorMessage>{error}</ErrorMessage>
-        </>
-      );
+      return <DateTimePicker error={error} onChange={_onChange} value={dateTime} range={range} startDate={startDate} />;
     }}
   </Field>
 );

@@ -21,14 +21,22 @@ import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Assertions;
 import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
-import org.graylog.events.search.MoreSearch;
+import org.graylog.events.processor.EventProcessorException;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -41,23 +49,40 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 public class PivotAggregationSearchTest {
+    private static final List<UsedSearchFilter> SEARCH_FILTERS = List.of(InlineQueryStringSearchFilter.builder().title("title").description("desc").queryString("host:localhost").build());
+    private static final String QUERY = "source:foo";
+    private static final String TEST_USER = "test";
+    private static final long WINDOW_LENGTH = 30000;
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -68,15 +93,16 @@ public class PivotAggregationSearchTest {
     @Mock
     private EventDefinition eventDefinition;
     @Mock
-    private MoreSearch moreSearch;
-    @Mock
     private NotificationService notificationService;
+    @Mock
+    private StreamService streamService;
+    @Mock
+    private SearchNormalization searchNormalization;
 
     private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
-        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
         final SeriesSpec seriesCard = Cardinality.builder().id("abc123").field("source").build();
@@ -89,30 +115,12 @@ public class PivotAggregationSearchTest {
                 .searchWithinMs(WINDOW_LENGTH)
                 .executeEveryMs(WINDOW_LENGTH)
                 .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .streams(Collections.emptySet())
-                .timerange(timerange)
-                .batchSize(500)
-                .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-                config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
-                Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
-        );
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(config, buildParameters(timerange));
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
-                .id("test")
+                .id(TEST_USER)
                 .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
@@ -176,7 +184,6 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithoutGroupBy() throws Exception {
-        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
         final SeriesSpec seriesCountNoField = Count.builder().id("abc123").build();
@@ -187,32 +194,13 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesCountNoField, seriesCard))
                 .conditions(null)
-                .searchWithinMs(30000)
-                .executeEveryMs(30000)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
                 .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .streams(Collections.emptySet())
-                .timerange(timerange)
-                .batchSize(500)
-                .build();
-
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-                config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
-                Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
-        );
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(config, buildParameters(timerange));
 
         final PivotResult pivotResult = PivotResult.builder()
-                .id("test")
+                .id(TEST_USER)
                 .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
@@ -261,37 +249,23 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount))
                 .conditions(null)
-                .searchWithinMs(30000)
-                .executeEveryMs(30000)
-                .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .streams(Collections.emptySet())
-                .timerange(timerange)
-                .batchSize(500)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
                 config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
+                buildParameters(timerange),
                 List.of(Pivot.builder()
                         .id("risk-asset-1")
                         .rowGroups(Values.builder().limit(10).field("Field").build())
                         .rollup(false)
                         .series(Count.builder().build())
-                        .build()),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
+                        .build())
         );
 
         final PivotResult pivotResult = PivotResult.builder()
-                .id("test")
+                .id(TEST_USER)
                 .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
@@ -322,7 +296,6 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithNullValues() throws Exception {
-        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
         final SeriesSpec seriesAvg = Average.builder().id("abc123").field("some_field").build();
@@ -335,29 +308,10 @@ public class PivotAggregationSearchTest {
                 .searchWithinMs(WINDOW_LENGTH)
                 .executeEveryMs(WINDOW_LENGTH)
                 .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .streams(Collections.emptySet())
-                .timerange(timerange)
-                .batchSize(500)
-                .build();
-
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-                config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
-                Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
-        );
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(config, buildParameters(timerange));
 
         final PivotResult pivotResult = PivotResult.builder()
-                .id("test")
+                .id(TEST_USER)
                 .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
@@ -396,12 +350,11 @@ public class PivotAggregationSearchTest {
         final long processingWindowSize = Duration.standardSeconds(60).getMillis();
         final long processingHopSize = Duration.standardSeconds(60).getMillis();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final DateTime from = now;
         final DateTime to = now.plusMillis((int) processingWindowSize);
-        TimeRange timeRange = AbsoluteRange.create(from, to);
+        TimeRange timeRange = AbsoluteRange.create(now, to);
         final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSize, processingHopSize);
 
-        assertThat(rangeBucket.ranges()).containsExactly(DateRange.create(from, to));
+        assertThat(rangeBucket.ranges()).containsExactly(DateRange.create(now, to));
     }
 
     @Test
@@ -409,16 +362,15 @@ public class PivotAggregationSearchTest {
         final long processingWindowSize = Duration.standardSeconds(60).getMillis();
         final long processingHopSize = Duration.standardSeconds(60).getMillis();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final DateTime from = now;
         // We are 3 full processingWindows behind
         final DateTime to = now.plusMillis((int) processingWindowSize * 3);
-        TimeRange timeRange = AbsoluteRange.create(from, to);
+        TimeRange timeRange = AbsoluteRange.create(now, to);
         final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSize, processingHopSize);
 
         assertThat(rangeBucket.ranges()).containsExactly(
-                DateRange.create(from.plusMillis((int) (processingWindowSize * 0)), from.plusMillis((int) (processingWindowSize * 1))),
-                DateRange.create(from.plusMillis((int) (processingWindowSize * 1)), from.plusMillis((int) (processingWindowSize * 2))),
-                DateRange.create(from.plusMillis((int) (processingWindowSize * 2)), from.plusMillis((int) (processingWindowSize * 3)))
+                DateRange.create(now.plusMillis((int) (processingWindowSize * 0)), now.plusMillis((int) (processingWindowSize * 1))),
+                DateRange.create(now.plusMillis((int) (processingWindowSize * 1)), now.plusMillis((int) (processingWindowSize * 2))),
+                DateRange.create(now.plusMillis((int) (processingWindowSize * 2)), now.plusMillis((int) (processingWindowSize * 3)))
         );
     }
 
@@ -427,13 +379,12 @@ public class PivotAggregationSearchTest {
         final long processingWindowSize = Duration.standardSeconds(3600).getMillis();
         final long processingHopSize = Duration.standardSeconds(60).getMillis();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final DateTime from = now;
         final DateTime to = now.plusMillis((int) processingWindowSize);
-        TimeRange timeRange = AbsoluteRange.create(from, to);
+        TimeRange timeRange = AbsoluteRange.create(now, to);
         final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSize, processingHopSize);
 
         assertThat(rangeBucket.ranges()).containsExactly(
-                DateRange.create(from, to)
+                DateRange.create(now, to)
         );
     }
 
@@ -442,24 +393,22 @@ public class PivotAggregationSearchTest {
         final int processingWindowSizeSec = 120;
         final int processingHopSizeSec = 60;
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final DateTime from = now;
         // We are 3 full processingWindows behind
         final DateTime to = now.plusSeconds(processingWindowSizeSec * 3);
-        TimeRange timeRange = AbsoluteRange.create(from, to);
+        TimeRange timeRange = AbsoluteRange.create(now, to);
         final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSizeSec * 1000, processingHopSizeSec * 1000);
 
         assertThat(rangeBucket.ranges()).containsExactly(
-                DateRange.create(from.plusSeconds(processingHopSizeSec * 0), from.plusSeconds(processingWindowSizeSec)),
-                DateRange.create(from.plusSeconds(processingHopSizeSec * 1), from.plusSeconds(processingHopSizeSec * 1).plusSeconds(processingWindowSizeSec)),
-                DateRange.create(from.plusSeconds(processingHopSizeSec * 2), from.plusSeconds(processingHopSizeSec * 2).plusSeconds(processingWindowSizeSec)),
-                DateRange.create(from.plusSeconds(processingHopSizeSec * 3), from.plusSeconds(processingHopSizeSec * 3).plusSeconds(processingWindowSizeSec)),
-                DateRange.create(from.plusSeconds(processingHopSizeSec * 4), to)
+                DateRange.create(now.plusSeconds(processingHopSizeSec * 0), now.plusSeconds(processingWindowSizeSec)),
+                DateRange.create(now.plusSeconds(processingHopSizeSec * 1), now.plusSeconds(processingHopSizeSec * 1).plusSeconds(processingWindowSizeSec)),
+                DateRange.create(now.plusSeconds(processingHopSizeSec * 2), now.plusSeconds(processingHopSizeSec * 2).plusSeconds(processingWindowSizeSec)),
+                DateRange.create(now.plusSeconds(processingHopSizeSec * 3), now.plusSeconds(processingHopSizeSec * 3).plusSeconds(processingWindowSizeSec)),
+                DateRange.create(now.plusSeconds(processingHopSizeSec * 4), to)
         );
     }
 
     @Test
     public void testQueryParameterSubstitution() {
-        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         var seriesCount = Count.builder().field("source").build();
         var seriesCard = Cardinality.builder().field("source").build();
@@ -470,27 +419,17 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesCard))
                 .conditions(null)
+                .filters(SEARCH_FILTERS)
                 .searchWithinMs(WINDOW_LENGTH)
                 .executeEveryMs(WINDOW_LENGTH)
                 .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .streams(Collections.emptySet())
-                .timerange(timerange)
-                .batchSize(500)
-                .build();
+        final AggregationEventProcessorParameters parameters = buildParameters(timerange);
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
                 config,
                 parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
                 Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
                 new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
-                notificationService,
                 new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
                     if (queryString.equals("source:$secret$") && parameterProvider.getParameter("secret").isPresent()) {
                         return PositionTrackingQuery.of("source:example.org");
@@ -501,48 +440,37 @@ public class PivotAggregationSearchTest {
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThat(query.query().queryString()).isEqualTo("source:example.org");
+        Assertions.assertThat(query.filters().size()).isEqualTo(1);
     }
 
     @Test
     public void testAdditionalSearchTypes() {
-        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         var seriesCount = Count.builder().field("source").build();
         var seriesCard = Cardinality.builder().field("source").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
-                .query("source:foo")
+                .query(QUERY)
                 .queryParameters(ImmutableSet.of())
                 .streams(Collections.emptySet())
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesCard))
                 .conditions(null)
+                .filters(SEARCH_FILTERS)
                 .searchWithinMs(WINDOW_LENGTH)
                 .executeEveryMs(WINDOW_LENGTH)
                 .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .streams(Collections.emptySet())
-                .timerange(timerange)
-                .batchSize(500)
-                .build();
+        final AggregationEventProcessorParameters parameters = buildParameters(timerange);
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
                 config,
                 parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
                 List.of(Pivot.builder()
                         .id("risk-asset-1")
                         .rowGroups(Values.builder().limit(10).field("Field").build())
                         .rollup(false)
                         .series(Count.builder().build())
                         .build()),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of())
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThatCollection(query.searchTypes()).contains(
@@ -552,6 +480,111 @@ public class PivotAggregationSearchTest {
                         .rollup(false)
                         .series(Count.builder().build())
                         .build());
+        Assertions.assertThat(query.filters().size()).isEqualTo(1);
+    }
 
+
+    @Test
+    public void testPrepareSearch() throws EventProcessorException {
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
+        var seriesCount = Count.builder().field("source").build();
+        var seriesCard = Cardinality.builder().field("source").build();
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query(QUERY)
+                .queryParameters(ImmutableSet.of())
+                .streams(Collections.emptySet())
+                .groupBy(Collections.emptyList())
+                .series(ImmutableList.of(seriesCount, seriesCard))
+                .conditions(null)
+                .filters(SEARCH_FILTERS)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
+                .build();
+        final AggregationEventProcessorParameters parameters = buildParameters(timerange);
+
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
+                config,
+                parameters,
+                List.of(Pivot.builder()
+                        .id("risk-asset-1")
+                        .rowGroups(Values.builder().limit(10).field("Field").build())
+                        .rollup(false)
+                        .series(Count.builder().build())
+                        .build()),
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of())
+        );
+        when(searchNormalization.postValidation(isA(Query.class), isA(ParameterProvider.class))).thenAnswer(invocation -> {
+            return invocation.getArgument(0); // Return same query received.
+        });
+        final SearchJob job = new SearchJob("job", mock(Search.class), TEST_USER, "test-node-id");
+        final QueryResult queryResult = QueryResult.builder()
+                .searchTypes(Collections.singletonMap("searchType", mock(SearchType.Result.class)))
+                .query(mock(Query.class))
+                .build();
+        job.addQueryResultFuture(TEST_USER, CompletableFuture.completedFuture(queryResult));
+        job.seal();
+        when(searchJobService.create(any(), eq(TEST_USER), eq(0))).thenReturn(job);
+        when(queryEngine.execute(any(), anySet(), any())).thenReturn(job).thenReturn(job);
+        pivotAggregationSearch.getSearchJob(parameters,
+                new AggregationSearch.User(TEST_USER, DateTimeZone.UTC), WINDOW_LENGTH, WINDOW_LENGTH);
+        Mockito.verify(searchNormalization, times(1)).postValidation(isA(Query.class), any());
+        Mockito.verify(queryEngine, times(1)).execute(isA(SearchJob.class), argThat(Set::isEmpty), eq(DateTimeZone.UTC));
+    }
+
+    private static AggregationEventProcessorParameters buildParameters(AbsoluteRange timerange) {
+        return AggregationEventProcessorParameters.builder()
+                .streams(Collections.emptySet())
+                .timerange(timerange)
+                .batchSize(500)
+                .build();
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters
+    ) {
+        return createPivotAggregationSearch(config, parameters, Collections.emptyList(), permittedStreams);
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            List<SearchType> additionalSearchTypes
+    ) {
+        return createPivotAggregationSearch(config, parameters, additionalSearchTypes, permittedStreams);
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            List<SearchType> additionalSearchTypes,
+            PermittedStreams permittedStreams
+    ) {
+        return createPivotAggregationSearch(config, parameters, additionalSearchTypes, permittedStreams, new QueryStringDecorators(Optional.empty()));
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            List<SearchType> additionalSearchTypes,
+            PermittedStreams permittedStreams,
+            QueryStringDecorators queryStringDecorators
+    ) {
+        return new PivotAggregationSearch(
+                config,
+                parameters,
+                new AggregationSearch.User(TEST_USER, DateTimeZone.UTC),
+                eventDefinition,
+                additionalSearchTypes,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                permittedStreams,
+                notificationService,
+                queryStringDecorators,
+                streamService,
+                searchNormalization,
+                false
+        );
     }
 }

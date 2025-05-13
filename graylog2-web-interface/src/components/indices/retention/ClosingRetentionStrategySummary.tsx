@@ -23,19 +23,16 @@ type ClosingRetentionStrategySummaryProps = {
   rotationStrategyClass?: string;
 };
 
-const ClosingRetentionStrategySummary = ({
-  config,
-  rotationStrategyClass,
-}: ClosingRetentionStrategySummaryProps) => (
+const ClosingRetentionStrategySummary = ({ config, rotationStrategyClass }: ClosingRetentionStrategySummaryProps) => (
   <div>
     <dl>
       <dt>Index retention strategy:</dt>
       <dd>Close</dd>
       {rotationStrategyClass !== TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && (
-      <>
-        <dt>Max number of indices:</dt>
-        <dd>{config.max_number_of_indices}</dd>
-      </>
+        <>
+          <dt>Max number of indices:</dt>
+          <dd>{config.max_number_of_indices}</dd>
+        </>
       )}
     </dl>
   </div>

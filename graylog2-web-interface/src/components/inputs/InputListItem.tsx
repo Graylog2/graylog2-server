@@ -22,7 +22,7 @@ import { useStore } from 'stores/connect';
 import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
 import { isPermitted } from 'util/PermissionsMixin';
-import { DropdownButton, MenuItem, Col, Button } from 'components/bootstrap';
+import { DropdownButton, MenuItem, Col, Button, DeleteMenuItem } from 'components/bootstrap';
 import { ConfirmDialog, EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
 import Routes from 'routing/Routes';
@@ -37,35 +37,51 @@ import {
 } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import type { InputStates } from 'stores/inputs/InputStatesStore';
+import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useFeature from 'hooks/useFeature';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 type Props = {
-  input: Input,
+  input: Input;
   currentNode: {
     node?: {
-      cluster_id: string,
-      hostname: string,
-      is_leader: boolean,
-      is_master:boolean,
-      last_seen: string,
-      node_id: string,
-      short_node_id: string
-      transport_address: string,
-  }
-},
-  permissions: Array<string>,
-}
+      cluster_id: string;
+      hostname: string;
+      is_leader: boolean;
+      is_master: boolean;
+      last_seen: string;
+      node_id: string;
+      short_node_id: string;
+      transport_address: string;
+    };
+  };
+  permissions: Array<string>;
+};
 
 const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
+  const [showWizard, setShowWizard] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { inputTypes, inputDescriptions } = useStore(InputTypesStore);
+  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
+  const openWizard = () => {
+    setShowWizard(true);
+  };
+
+  const closeWizard = () => {
+    setShowWizard(false);
+  };
 
   const deleteInput = () => {
     setShowConfirmDeleteDialog(true);
@@ -95,9 +111,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       app_action_value: 'input-enter-setup',
     });
 
-    const { attributes: configuration, ...inputData } = input;
-
-    InputsActions.update(input.id, { ...inputData, configuration, setup_mode: true });
+    InputStatesStore.setup(input);
   };
 
   const exitInputSetupMode = () => {
@@ -106,9 +120,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       app_action_value: 'input-exit-setup',
     });
 
-    const { attributes: configuration, ...inputData } = input;
-
-    InputsActions.update(input.id, { ...inputData, configuration, setup_mode: false });
+    InputStatesStore.stop(input);
   };
 
   const handleConfirmDelete = () => {
@@ -133,34 +145,37 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const titleSuffix = (
     <span>
       {input.name}
-      &nbsp;
-      ({input.id})
-        &nbsp;
+      &nbsp; ({input.id}) &nbsp;
       <InputStateBadge input={input} />
     </span>
   );
 
   const actions = [];
 
-  const queryField = (input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
+  const queryField =
+    input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput'
+      ? 'gl2_forwarder_input'
+      : 'gl2_source_input';
 
   if (isPermitted(permissions, ['searches:relative'])) {
     actions.push(
-      <LinkContainer key={`received-messages-${input.id}`}
-                     to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
-        <Button onClick={() => {
-          sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
-            app_pathname: getPathnameWithoutId(pathname),
-            app_action_value: 'show-received-messages',
-          });
-        }}>
+      <LinkContainer
+        key={`received-messages-${input.id}`}
+        to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
+        <Button
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
+              app_pathname: getPathnameWithoutId(pathname),
+              app_action_value: 'show-received-messages',
+            });
+          }}>
           Show received messages
         </Button>
       </LinkContainer>,
     );
   }
 
-  if (isPermitted(permissions, [`inputs:edit:${input.id}`])) {
+  if (isPermitted(permissions, [`inputs:edit:${input.id}`, `input_types:create:${input.type}`])) {
     if (!AppConfig.isCloud()) {
       let extractorRoute;
 
@@ -172,73 +187,98 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
 
       actions.push(
         <LinkContainer key={`manage-extractors-${input.id}`} to={extractorRoute}>
-          <Button onClick={() => {
-            sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
-              app_pathname: getPathnameWithoutId(pathname),
-              app_action_value: 'manage-extractors',
-            });
-          }}>
+          <Button
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
+                app_pathname: getPathnameWithoutId(pathname),
+                app_action_value: 'manage-extractors',
+              });
+            }}>
             Manage extractors
           </Button>
         </LinkContainer>,
       );
     }
 
-    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} />);
+    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />);
   }
 
   actions.push(
-    <DropdownButton key={`more-actions-${input.id}`}
-                    title="More actions"
-                    id={`more-actions-dropdown-${input.id}`}
-                    pullRight>
-      <IfPermitted permissions={`inputs:edit:${input.id}`}>
-        <MenuItem key={`edit-input-${input.id}`}
-                  onSelect={editInput}
-                  disabled={definition === undefined}>
+    <DropdownButton
+      key={`more-actions-${input.id}`}
+      title="More actions"
+      id={`more-actions-dropdown-${input.id}`}
+      pullRight>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+        <MenuItem key={`edit-input-${input.id}`} onSelect={editInput} disabled={definition === undefined}>
           Edit input
         </MenuItem>
-        {input.setup_mode ? (
-          <MenuItem key={`remove-setup-mode-${input.id}`}
-                    onSelect={exitInputSetupMode}
-                    disabled={definition === undefined}>
-            Exit Setup mode
-          </MenuItem>
-        ) : (
-          <MenuItem key={`setup-mode-${input.id}`}
-                    onSelect={enterInputSetupMode}
-                    disabled={definition === undefined}>
-            Enter Setup mode
-          </MenuItem>
-        )}
 
+        <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
+          <MenuItem
+            key={`input-diagnosis-${input.id}`}
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DIAGNOSIS_CLICKED, {
+                app_pathname: getPathnameWithoutId(pathname),
+                app_action_value: 'input-diagnosis',
+              });
+            }}>
+            Input Diagnosis
+          </MenuItem>
+        </LinkContainer>
+
+        {inputSetupFeatureFlagIsEnabled &&
+          (isInputInSetupMode(inputStates, input.id) ? (
+            <MenuItem
+              key={`remove-setup-mode-${input.id}`}
+              onSelect={exitInputSetupMode}
+              disabled={definition === undefined}>
+              Exit Setup mode
+            </MenuItem>
+          ) : (
+            !isInputRunning(inputStates, input.id) && (
+              <MenuItem
+                key={`setup-mode-${input.id}`}
+                onSelect={enterInputSetupMode}
+                disabled={definition === undefined}>
+                Enter Setup mode
+              </MenuItem>
+            )
+          ))}
       </IfPermitted>
 
-      {input.global && (
+      {input.global && input.node && (
         <LinkContainer to={Routes.filtered_metrics(input.node, input.id)}>
-          <MenuItem key={`show-metrics-${input.id}`}
-                    onClick={() => {
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
-                        app_pathname: getPathnameWithoutId(pathname),
-                        app_action_value: 'show-metrics',
-                      });
-                    }}>
+          <MenuItem
+            key={`show-metrics-${input.id}`}
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
+                app_pathname: getPathnameWithoutId(pathname),
+                app_action_value: 'show-metrics',
+              });
+            }}>
             Show metrics
           </MenuItem>
         </LinkContainer>
       )}
 
-      <IfPermitted permissions={`inputs:edit:${input.id}`}>
-        <MenuItem key={`add-static-field-${input.id}`} onSelect={() => { setShowStaticFieldForm(true); }}>Add static
-          field
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+        <MenuItem
+          key={`add-static-field-${input.id}`}
+          onSelect={() => {
+            setShowStaticFieldForm(true);
+          }}>
+          Add static field
         </MenuItem>
       </IfPermitted>
 
-      <IfPermitted permissions="inputs:terminate">
+      <IfPermitted permissions={['inputs:terminate', `input_types:create:${input.type}`]}>
         <MenuItem key={`divider-${input.id}`} divider />
       </IfPermitted>
-      <IfPermitted permissions="inputs:terminate">
-        <MenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>Delete input</MenuItem>
+      <IfPermitted permissions={['inputs:terminate', `input_types:create:${input.type}`]}>
+        <DeleteMenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>
+          Delete input
+        </DeleteMenuItem>
       </IfPermitted>
     </DropdownButton>,
   );
@@ -248,21 +288,19 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
 
     return (
       <span>
-        On node{' '}<LinkToNode nodeId={input.node} />
+        On node <LinkToNode nodeId={input.node} />
       </span>
     );
   };
 
   const additionalContent = (
     <div>
+      {inputSetupFeatureFlagIsEnabled && showWizard && (
+        <InputSetupWizard input={input} show={showWizard} onClose={closeWizard} />
+      )}
       <Col md={8}>
-        <ConfigurationWell id={input.id}
-                           configuration={input.attributes}
-                           typeDefinition={definition || {}} />
-        {showStaticFieldForm && (
-        <StaticFieldForm input={input}
-                         setShowModal={setShowStaticFieldForm} />
-        )}
+        <ConfigurationWell id={input.id} configuration={input.attributes} typeDefinition={definition} />
+        {showStaticFieldForm && <StaticFieldForm input={input} setShowModal={setShowStaticFieldForm} />}
 
         <InputStaticFields input={input} />
       </Col>
@@ -270,35 +308,36 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         <InputThroughput input={input} />
       </Col>
       {definition && showConfigurationForm && (
-      <InputForm setShowModal={setShowConfigurationForm}
-                 key={`edit-form-input-${input.id}`}
-                 globalValue={input.global}
-                 nodeValue={input.node}
-                 configFields={definition.requested_configuration}
-                 title={`Editing Input ${input.title}`}
-                 titleValue={input.title}
-                 typeName={input.type}
-                 includeTitleField
-                 handleSubmit={updateInput}
-                 submitButtonText="Update input"
-                 values={input.attributes} />
+        <InputForm
+          setShowModal={setShowConfigurationForm}
+          key={`edit-form-input-${input.id}`}
+          globalValue={input.global}
+          nodeValue={input.node}
+          configFields={definition.requested_configuration}
+          title={`Editing Input ${input.title}`}
+          titleValue={input.title}
+          typeName={input.type}
+          includeTitleField
+          handleSubmit={updateInput}
+          submitButtonText="Update input"
+          values={input.attributes}
+        />
       )}
     </div>
   );
 
   return (
     <>
-      <EntityListItem key={`entry-list-${input.id}`}
-                      title={input.title}
-                      titleSuffix={titleSuffix}
-                      description={subtitle()}
-                      actions={actions}
-                      contentRow={additionalContent} />
+      <EntityListItem
+        key={`entry-list-${input.id}`}
+        title={input.title}
+        titleSuffix={titleSuffix}
+        description={subtitle()}
+        actions={actions}
+        contentRow={additionalContent}
+      />
       {showConfirmDeleteDialog && (
-        <ConfirmDialog title="Deleting Input"
-                       show
-                       onConfirm={handleConfirmDelete}
-                       onCancel={cancelDelete}>
+        <ConfirmDialog title="Deleting Input" show onConfirm={handleConfirmDelete} onCancel={cancelDelete}>
           Do you really want to delete input {input.title}?
         </ConfirmDialog>
       )}

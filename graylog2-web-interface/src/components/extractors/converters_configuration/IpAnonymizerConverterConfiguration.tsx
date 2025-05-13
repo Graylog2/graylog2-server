@@ -25,9 +25,12 @@ type IpAnonymizerConverterConfigurationProps = {
   onChange: (...args: any[]) => void;
 };
 
-class IpAnonymizerConverterConfiguration extends React.Component<IpAnonymizerConverterConfigurationProps, {
-  [key: string]: any;
-}> {
+class IpAnonymizerConverterConfiguration extends React.Component<
+  IpAnonymizerConverterConfigurationProps,
+  {
+    [key: string]: any;
+  }
+> {
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
@@ -47,12 +50,14 @@ class IpAnonymizerConverterConfiguration extends React.Component<IpAnonymizerCon
   render() {
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               id={`enable-${this.props.type}-converter`}
-               label="Anonymize IPv4 addresses by replacing last octet"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          id={`enable-${this.props.type}-converter`}
+          label="Anonymize IPv4 addresses by replacing last octet"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
       </div>
     );
   }

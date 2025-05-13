@@ -20,11 +20,12 @@ import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import { SystemStore } from 'stores/system/SystemStore';
+import useProductName from 'brand-customization/useProductName';
 
 type SystemStoreState = {
   system: {
-    version?: string,
-    hostname?: string,
+    version?: string;
+    hostname?: string;
   };
 };
 
@@ -34,12 +35,13 @@ type Jvm = {
 
 type Props = {
   system?: {
-    version?: string,
-    hostname?: string,
-  },
+    version?: string;
+    hostname?: string;
+  };
 };
 
-const StandardFooter = ({ system }: Props) => {
+const StandardFooter = ({ system = undefined }: Props) => {
+  const productName = useProductName();
   const [jvm, setJvm] = useState<Jvm | undefined>();
 
   useEffect(() => {
@@ -58,13 +60,15 @@ const StandardFooter = ({ system }: Props) => {
 
   if (!(system && jvm)) {
     return (
-      <>Graylog {getFullVersion()}</>
+      <>
+        {productName} {getFullVersion()}
+      </>
     );
   }
 
   return (
     <>
-      Graylog {system.version} on {system.hostname} ({jvm.info})
+      {productName} {system.version} on {system.hostname} ({jvm.info})
     </>
   );
 };

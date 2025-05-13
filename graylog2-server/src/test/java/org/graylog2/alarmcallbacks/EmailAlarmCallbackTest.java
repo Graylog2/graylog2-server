@@ -27,6 +27,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,20 +44,21 @@ public class EmailAlarmCallbackTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private AlertSender alertSender = mock(AlertSender.class);
-    private NotificationService notificationService = mock(NotificationService.class);
+    private final AlertSender alertSender = mock(AlertSender.class);
+    private final NotificationService notificationService = mock(NotificationService.class);
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-    private EmailRecipients.Factory emailRecipientsFactory = mock(EmailRecipients.Factory.class);
-    private UserService userService = mock(UserService.class);
-    private EmailConfiguration emailConfiguration = mock(EmailConfiguration.class);
-    private org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
+    private final EmailRecipients.Factory emailRecipientsFactory = mock(EmailRecipients.Factory.class);
+    private final UserService userService = mock(UserService.class);
+    private final EmailConfiguration emailConfiguration = mock(EmailConfiguration.class);
+    private final org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
+    private final CustomizationConfig customizationConfig = mock(CustomizationConfig.class);
 
     private EmailAlarmCallback alarmCallback;
 
     @Before
     public void setUp() throws Exception {
         alarmCallback = new EmailAlarmCallback(alertSender, notificationService, nodeId, emailRecipientsFactory,
-                userService, emailConfiguration, graylogConfig);
+                userService, emailConfiguration, graylogConfig, customizationConfig);
     }
 
     @Test

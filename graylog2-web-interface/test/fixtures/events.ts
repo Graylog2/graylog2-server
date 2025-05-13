@@ -19,9 +19,7 @@
 export const events = [
   {
     id: '01HV0YS4GHDMT30E3EMWQVQNK9',
-    streams: [
-      '000000000000000000000001',
-    ],
+    streams: ['000000000000000000000001'],
     timestamp: '2024-04-09T08:14:49.445Z',
     message: 'Test Event 1',
     alert: false,
@@ -35,9 +33,7 @@ export const events = [
       timerange_start: '2024-04-09T08:14:46.644Z',
       timerange_end: '2024-04-09T08:14:49.644Z',
       query: '',
-      streams: [
-        '000000000000000000000001',
-      ],
+      streams: ['000000000000000000000001'],
       filters: [],
     },
     status: 'NEW',
@@ -53,9 +49,7 @@ export const events = [
   },
   {
     id: '01HV0YS4GH0VC7DV6A2VGN1VJ0',
-    streams: [
-      '000000000000000000000001',
-    ],
+    streams: ['000000000000000000000001'],
     timestamp: '2024-04-09T08:14:49.416Z',
     message: 'Test Event 2',
     alert: false,
@@ -66,9 +60,7 @@ export const events = [
       timerange_start: '2024-04-09T08:14:46.644Z',
       timerange_end: '2024-04-09T08:14:49.644Z',
       query: '',
-      streams: [
-        '000000000000000000000001',
-      ],
+      streams: ['000000000000000000000001'],
       filters: [],
     },
     status: 'NEW',

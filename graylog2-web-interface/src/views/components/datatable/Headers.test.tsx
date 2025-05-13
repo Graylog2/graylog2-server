@@ -33,23 +33,18 @@ jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
 
 const onSortChange = jest.fn();
-const seriesWithName = (fn: string, name: string) => Series.forFunction(fn)
-  .toBuilder()
-  .config(SeriesConfig.empty()
-    .toBuilder()
-    .name(name)
-    .build())
-  .build();
+const seriesWithName = (fn: string, name: string) =>
+  Series.forFunction(fn).toBuilder().config(SeriesConfig.empty().toBuilder().name(name).build()).build();
 
 describe('Headers', () => {
   type RenderHeadersProps = {
-    columnPivots?: Array<Pivot>,
-    rowPivots?: Array<Pivot>,
-    series?: Array<Series>,
-    rollup?: boolean,
-    actualColumnPivotFields?: Array<Array<string>>,
-    fields?: Array<FieldTypeMapping>,
-    sortConfigMap?: OrderedMap<string, SortConfig>
+    columnPivots?: Array<Pivot>;
+    rowPivots?: Array<Pivot>;
+    series?: Array<Series>;
+    rollup?: boolean;
+    actualColumnPivotFields?: Array<Array<string>>;
+    fields?: Array<FieldTypeMapping>;
+    sortConfigMap?: OrderedMap<string, SortConfig>;
   };
 
   const RenderHeaders = ({
@@ -63,27 +58,26 @@ describe('Headers', () => {
   }: RenderHeadersProps) => (
     <table>
       <thead>
-        <Headers columnPivots={columnPivots}
-                 rowPivots={rowPivots}
-                 series={series}
-                 borderedHeader={false}
-                 rollup={rollup}
-                 actualColumnPivotFields={actualColumnPivotFields}
-                 fields={Immutable.List(fields)}
-                 setLoadingState={() => {}}
-                 sortConfigMap={sortConfigMap}
-                 onSortChange={onSortChange}
-                 onSetColumnsWidth={() => {}}
-                 togglePin={() => {}} />
+        <Headers
+          columnPivots={columnPivots}
+          rowPivots={rowPivots}
+          series={series}
+          borderedHeader={false}
+          rollup={rollup}
+          actualColumnPivotFields={actualColumnPivotFields}
+          fields={Immutable.List(fields)}
+          setLoadingState={() => {}}
+          sortConfigMap={sortConfigMap}
+          onSortChange={onSortChange}
+          onSetColumnsWidth={() => {}}
+          togglePin={() => {}}
+        />
       </thead>
     </table>
   );
 
   it('renders a header for every series', () => {
-    const wrapper = mount(<RenderHeaders series={[
-      Series.forFunction('count()'),
-      Series.forFunction('avg(foo)'),
-    ]} />);
+    const wrapper = mount(<RenderHeaders series={[Series.forFunction('count()'), Series.forFunction('avg(foo)')]} />);
 
     expect(wrapper).not.toBeEmptyRender();
 
@@ -108,15 +102,10 @@ describe('Headers', () => {
     };
 
     it('for non-renamed series', () => {
-      const series = [
-        Series.forFunction('count()'),
-        Series.forFunction('avg(foo)'),
-        Series.forFunction('min(foo)'),
-      ];
-      const wrapper = mount((
-        <RenderHeaders series={series}
-                       fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />
-      ));
+      const series = [Series.forFunction('count()'), Series.forFunction('avg(foo)'), Series.forFunction('min(foo)')];
+      const wrapper = mount(
+        <RenderHeaders series={series} fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />,
+      );
 
       expectCorrectTypes(wrapper);
     });
@@ -127,24 +116,17 @@ describe('Headers', () => {
         seriesWithName('avg(foo)', 'Average Foness'),
         seriesWithName('min(foo)', 'Minimal Fooness'),
       ];
-      const wrapper = mount((
-        <RenderHeaders series={series}
-                       fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />
-      ));
+      const wrapper = mount(
+        <RenderHeaders series={series} fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />,
+      );
 
       expectCorrectTypes(wrapper);
     });
 
     it('renders with `null` fields', () => {
-      const series = [
-        seriesWithName('foo', 'Total Count'),
-        seriesWithName('avg(foo)', 'Average Foness'),
-      ];
+      const series = [seriesWithName('foo', 'Total Count'), seriesWithName('avg(foo)', 'Average Foness')];
 
-      const wrapper = mount((
-        <RenderHeaders series={series}
-                       fields={null} />
-      ));
+      const wrapper = mount(<RenderHeaders series={series} fields={null} />);
 
       expect(wrapper).toExist();
     });
@@ -156,14 +138,17 @@ describe('Headers', () => {
       seriesWithName('avg(foo)', 'Average Foness'),
       seriesWithName('bar', 'Bar'),
     ];
-    const mountWrapper = () => mount((
-      <RenderHeaders series={series}
-                     fields={null}
-                     sortConfigMap={OrderedMap({
-                       foo: new SortConfig('pivot', 'foo', Direction.Ascending),
-                       bar: new SortConfig('pivot', 'bar', Direction.Descending),
-                     })} />
-    ));
+    const mountWrapper = () =>
+      mount(
+        <RenderHeaders
+          series={series}
+          fields={null}
+          sortConfigMap={OrderedMap({
+            foo: new SortConfig('pivot', 'foo', Direction.Ascending),
+            bar: new SortConfig('pivot', 'bar', Direction.Descending),
+          })}
+        />,
+      );
 
     it('active ascend', () => {
       const wrapper = mountWrapper();

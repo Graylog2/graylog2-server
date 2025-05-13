@@ -18,7 +18,12 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Col } from 'components/bootstrap';
-import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
+import type {
+  MigrationActions,
+  StepArgs,
+  MigrationStateItem,
+  MigrationStepComponentProps,
+} from 'components/datanode/Types';
 import { IN_PLACE_MIGRATION_STEPS, MIGRATION_STATE } from 'components/datanode/Constants';
 import Welcome from 'components/datanode/migrations/in-place/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/common/CertificatesProvisioning';
@@ -45,13 +50,25 @@ const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponent
       case MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
       case MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key:
-        return <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key:
-        return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <CertificatesProvisioning
+            currentStep={currentStep}
+            onTriggerStep={onStepComplete}
+            hideActions={hideActions}
+          />
+        );
       case MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key:
-        return <JournalDowntimeWarning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <JournalDowntimeWarning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key:
-        return <StopMessageProcessing currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <StopMessageProcessing currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.RESTART_GRAYLOG.key:
         return <RestartGraylog currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
       default:
@@ -63,9 +80,11 @@ const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponent
     <Col>
       <StyledTitle>In-Place migration</StyledTitle>
       <p>Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.</p>
-      <MigrationStepsPanel currentStep={currentStep}
-                           sortedMigrationSteps={IN_PLACE_MIGRATION_STEPS}
-                           renderStepComponent={renderStepComponent} />
+      <MigrationStepsPanel
+        currentStep={currentStep}
+        sortedMigrationSteps={IN_PLACE_MIGRATION_STEPS}
+        renderStepComponent={renderStepComponent}
+      />
     </Col>
   );
 };

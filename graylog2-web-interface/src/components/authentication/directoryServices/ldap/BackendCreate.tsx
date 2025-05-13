@@ -34,8 +34,8 @@ export const HELP = {
   // server config help
   systemUserDn: (
     <span>
-      The username for the initial connection to the LDAP server, e.g. <code>cn=admin,dc=example,dc=com</code>,
-      this might be optional depending on your LDAP server.
+      The username for the initial connection to the LDAP server, e.g. <code>cn=admin,dc=example,dc=com</code>, this
+      might be optional depending on your LDAP server.
     </span>
   ),
   systemUserPassword: 'The password for the initial connection to the LDAP server.',
@@ -47,28 +47,31 @@ export const HELP = {
   ),
   userSearchPattern: (
     <span>
-      For example <code className="text-nowrap">{'(&(uid={0})(objectClass=inetOrgPerson))'}</code>.{' '}
-      The string <code>{'{0}'}</code> will be replaced by the entered username.
+      For example <code className="text-nowrap">{'(&(uid={0})(objectClass=inetOrgPerson))'}</code>. The string{' '}
+      <code>{'{0}'}</code> will be replaced by the entered username.
     </span>
   ),
   userNameAttribute: (
     <span>
-      Which LDAP attribute to use for the username of the user in Graylog, e.g <code>uid</code>.<br />
+      Which LDAP attribute to use for the username of the synchronized user, e.g <code>uid</code>.<br />
       Try to load a test user in the sidebar section <i>User Login Test</i>, if you are unsure which attribute to use.
     </span>
   ),
   userFullNameAttribute: (
     <span>
-      Which LDAP attribute to use for the full name of a synchronized Graylog user, e.g. <code>cn</code>.<br />
+      Which LDAP attribute to use for the full name of a synchronized user, e.g. <code>cn</code>.<br />
     </span>
   ),
   userUniqueIdAttribute: (
     <span>
-      Which LDAP attribute to use for the ID of a synchronized Graylog user, e.g. <code>entryUUID</code>.<br />
+      Which LDAP attribute to use for the ID of a synchronized user, e.g. <code>entryUUID</code>.<br />
     </span>
   ),
   defaultRoles: (
-    <span>The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the Graylog web interface</span>
+    <span>
+      The default roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the web
+      interface
+    </span>
   ),
   emailAttributes: (
     <span>
@@ -92,20 +95,20 @@ const INITIAL_VALUES: Partial<WizardFormValues> = {
 
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const {
-    help: groupSyncHelp = {},
-    initialValues: initialGroupSyncValues = {},
-  } = enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
+  const { help: groupSyncHelp = {}, initialValues: initialGroupSyncValues = {} } =
+    enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
   const help = { ...HELP, ...groupSyncHelp };
   const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
 
   return (
     <DocumentTitle title="Create LDAP Authentication Service">
       <WizardPageHeader />
-      <BackendWizard onSubmit={handleCreate}
-                     help={help}
-                     authBackendMeta={AUTH_BACKEND_META}
-                     initialValues={initialValues} />
+      <BackendWizard
+        onSubmit={handleCreate}
+        help={help}
+        authBackendMeta={AUTH_BACKEND_META}
+        initialValues={initialValues}
+      />
     </DocumentTitle>
   );
 };

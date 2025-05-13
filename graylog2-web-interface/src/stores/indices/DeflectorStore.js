@@ -21,17 +21,15 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const DeflectorActions = singletonActions(
-  'core.Deflector',
-  () => Reflux.createActions({
+export const DeflectorActions = singletonActions('core.Deflector', () =>
+  Reflux.createActions({
     cycle: { asyncResult: true },
     list: { asyncResult: true },
   }),
 );
 
-export const DeflectorStore = singletonStore(
-  'core.Deflector',
-  () => Reflux.createStore({
+export const DeflectorStore = singletonStore('core.Deflector', () =>
+  Reflux.createStore({
     listenables: [DeflectorActions],
     deflector: {
       info: undefined,

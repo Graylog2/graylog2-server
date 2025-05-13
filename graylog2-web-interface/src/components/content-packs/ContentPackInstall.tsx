@@ -28,9 +28,12 @@ type ContentPackInstallProps = {
   onInstall?: (...args: any[]) => void;
 };
 
-class ContentPackInstall extends React.Component<ContentPackInstallProps, {
-  [key: string]: any;
-}> {
+class ContentPackInstall extends React.Component<
+  ContentPackInstallProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     onInstall: () => {},
   };
@@ -67,15 +70,16 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, {
     }
   };
 
-  _convertedParameters = () => Object.keys(this.state.parameterInput).reduce((result, paramName) => {
-    const newResult = result;
-    const paramType = this.props.contentPack.parameters.find((parameter) => parameter.name === paramName).type;
-    const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
+  _convertedParameters = () =>
+    Object.keys(this.state.parameterInput).reduce((result, paramName) => {
+      const newResult = result;
+      const paramType = this.props.contentPack.parameters.find((parameter) => parameter.name === paramName).type;
+      const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
 
-    newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
+      newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
 
-    return newResult;
-  }, {});
+      return newResult;
+    }, {});
 
   _getValue = (name, value) => {
     const newParameterInput = this.state.parameterInput;
@@ -111,19 +115,23 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, {
     const error = this.state.errorMessages[parameter.name];
 
     return (
-      <Input name={parameter.name}
-             id={parameter.name}
-             key={parameter.name}
-             type="text"
-             maxLength={250}
-             value={this.state.parameterInput[parameter.name] || ''}
-             onChange={(e) => { this._getValue(parameter.name, e.target.value); }}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-7"
-             label={parameter.title}
-             help={error || parameter.description}
-             bsStyle={error ? 'error' : undefined}
-             required />
+      <Input
+        name={parameter.name}
+        id={parameter.name}
+        key={parameter.name}
+        type="text"
+        maxLength={250}
+        value={this.state.parameterInput[parameter.name] || ''}
+        onChange={(e) => {
+          this._getValue(parameter.name, e.target.value);
+        }}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-7"
+        label={parameter.title}
+        help={error || parameter.description}
+        bsStyle={error ? 'error' : undefined}
+        required
+      />
     );
   }
 
@@ -138,28 +146,29 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, {
             <h2>Install comment</h2>
             <br />
             <br />
-            <Input name="comment"
-                   id="comment"
-                   type="text"
-                   maxLength={512}
-                   value={this.state.comment}
-                   onChange={this._getComment}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-7"
-                   label="Comment" />
+            <Input
+              name="comment"
+              id="comment"
+              type="text"
+              maxLength={512}
+              value={this.state.comment}
+              onChange={this._getComment}
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-7"
+              label="Comment"
+            />
           </Col>
         </Row>
-        {parameterInput.length > 0
-      && (
-      <Row>
-        <Col smOffset={1} sm={10}>
-          <h2>Configure Parameter</h2>
-          <br />
-          <br />
-          {parameterInput}
-        </Col>
-      </Row>
-      )}
+        {parameterInput.length > 0 && (
+          <Row>
+            <Col smOffset={1} sm={10}>
+              <h2>Configure Parameter</h2>
+              <br />
+              <br />
+              {parameterInput}
+            </Col>
+          </Row>
+        )}
         <Row>
           <Col smOffset={1} sm={10}>
             <ContentPackEntitiesList contentPack={contentPack} readOnly />

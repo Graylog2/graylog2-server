@@ -17,40 +17,35 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Variable;
+import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
-import org.mongojack.DBQuery;
-
-import jakarta.inject.Inject;
+import org.graylog2.rest.models.SortOrder;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.StreamSupport;
 
-public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
+public class PaginatedStreamService {
+
     private static final String COLLECTION_NAME = "streams";
     private static final List<String> STRING_FIELDS = List.of("title", "description", "index_set_title");
-    private final MongoCollection<Document> collection;
+    private final MongoCollection<StreamDTO> collection;
 
     @Inject
-    public PaginatedStreamService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, StreamDTO.class, COLLECTION_NAME);
-        this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+    public PaginatedStreamService(MongoCollections mongoCollections) {
+        this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
     }
 
     public long count() {
-        return db.count();
+        return collection.countDocuments();
     }
 
     public PaginatedList<StreamDTO> findPaginated(Bson dbQuery, //query executed on DB level
@@ -58,8 +53,7 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                                                   int page,
                                                   int perPage,
                                                   String sortField,
-                                                  String order) {
-
+                                                  SortOrder order) {
 
         var pipelineBuilder = ImmutableList.<Bson>builder()
                 .add(Aggregates.match(dbQuery));
@@ -77,23 +71,25 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
 
         if (isStringField(sortField)) {
             pipelineBuilder.add(Aggregates.set(new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))))
-                    .add(Aggregates.sort(getSortBuilder(order, "lower" + sortField)))
+                    .add(Aggregates.sort(order.toBsonSort("lower" + sortField)))
                     .add(Aggregates.unset("lower" + sortField));
         } else {
-            pipelineBuilder.add(Aggregates.sort(getSortBuilder(order, sortField)));
+            pipelineBuilder.add(Aggregates.sort(order.toBsonSort(sortField)));
         }
 
-        final AggregateIterable<Document> result = collection.aggregate(pipelineBuilder.build());
+        if (sortField.equals("index_set_title")) {
+            pipelineBuilder.add(Aggregates.unset("index_set_title"));
+        }
 
-        final List<StreamDTO> streamsList = StreamSupport.stream(result.spliterator(), false)
-                .map(StreamDTO::fromDocument)
-                .filter(predicate)
-                .toList();
+        final List<StreamDTO> streamsList;
+        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()))) {
+            streamsList = results.filter(predicate).toList();
+        }
 
-        final long grandTotal = db.find(DBQuery.empty()).toArray()
-                .stream()
-                .filter(predicate)
-                .count();
+        final long grandTotal;
+        try (final var stream = MongoUtils.stream(collection.find())) {
+            grandTotal = stream.filter(predicate).count();
+        }
 
         final List<StreamDTO> paginatedStreams = perPage > 0
                 ? streamsList.stream()
@@ -103,7 +99,6 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
-
     }
 
     private boolean isStringField(String sortField) {

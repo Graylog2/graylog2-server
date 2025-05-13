@@ -29,15 +29,18 @@ import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import StepTitleWarning from './StepTitleWarning';
 
 type Props = {
-  formRefs: Record<typeof SERVER_CONFIG_KEY | typeof USER_SYNC_KEY | typeof GROUP_SYNC_KEY, React.Ref<FormikProps<WizardFormValues>>>,
-  excludedFields: { [inputName: string]: boolean },
-  handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
-  invalidStepKeys: Array<StepKey>,
-  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
-  roles: Immutable.List<Role>,
-  setActiveStepKey: (stepKey: string) => void,
-  submitAllError: React.ReactNode | null | undefined,
+  formRefs: Record<
+    typeof SERVER_CONFIG_KEY | typeof USER_SYNC_KEY | typeof GROUP_SYNC_KEY,
+    React.Ref<FormikProps<WizardFormValues>>
+  >;
+  excludedFields: { [inputName: string]: boolean };
+  handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>;
+  help: { [inputName: string]: React.ReactElement | string | null | undefined };
+  invalidStepKeys: Array<StepKey>;
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload;
+  roles: Immutable.List<Role>;
+  setActiveStepKey: (stepKey: string) => void;
+  submitAllError: React.ReactNode | null | undefined;
 };
 
 const wizardSteps = ({
@@ -60,12 +63,14 @@ const wizardSteps = ({
       </>
     ),
     component: (
-      <ServerConfigStep formRef={formRefs[SERVER_CONFIG_KEY]}
-                        help={help}
-                        onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
-                        onSubmitAll={handleSubmitAll}
-                        submitAllError={submitAllError}
-                        validateOnMount={invalidStepKeys.includes(SERVER_CONFIG_KEY)} />
+      <ServerConfigStep
+        formRef={formRefs[SERVER_CONFIG_KEY]}
+        help={help}
+        onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
+        onSubmitAll={handleSubmitAll}
+        submitAllError={submitAllError}
+        validateOnMount={invalidStepKeys.includes(SERVER_CONFIG_KEY)}
+      />
     ),
   },
   {
@@ -77,14 +82,16 @@ const wizardSteps = ({
       </>
     ),
     component: (
-      <UserSyncStep formRef={formRefs[USER_SYNC_KEY]}
-                    help={help}
-                    excludedFields={excludedFields}
-                    onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
-                    onSubmitAll={handleSubmitAll}
-                    roles={roles}
-                    submitAllError={submitAllError}
-                    validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)} />
+      <UserSyncStep
+        formRef={formRefs[USER_SYNC_KEY]}
+        help={help}
+        excludedFields={excludedFields}
+        onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
+        onSubmitAll={handleSubmitAll}
+        roles={roles}
+        submitAllError={submitAllError}
+        validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)}
+      />
     ),
   },
   {
@@ -96,14 +103,16 @@ const wizardSteps = ({
       </>
     ),
     component: (
-      <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
-                     help={help}
-                     excludedFields={excludedFields}
-                     onSubmitAll={handleSubmitAll}
-                     prepareSubmitPayload={prepareSubmitPayload}
-                     roles={roles}
-                     submitAllError={submitAllError}
-                     validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)} />
+      <GroupSyncStep
+        formRef={formRefs[GROUP_SYNC_KEY]}
+        help={help}
+        excludedFields={excludedFields}
+        onSubmitAll={handleSubmitAll}
+        prepareSubmitPayload={prepareSubmitPayload}
+        roles={roles}
+        submitAllError={submitAllError}
+        validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)}
+      />
     ),
   },
 ];

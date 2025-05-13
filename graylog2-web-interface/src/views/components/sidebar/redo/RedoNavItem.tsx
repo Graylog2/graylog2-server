@@ -17,8 +17,8 @@
 import React, { useCallback } from 'react';
 
 import NavItem from 'views/components/sidebar/NavItem';
-import useAppDispatch from 'stores/useAppDispatch';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { redo } from 'views/logic/slices/undoRedoActions';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -33,8 +33,8 @@ const TITLE = 'Redo';
 
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const viewType = useViewType();
-  const dispatch = useAppDispatch();
-  const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
+  const dispatch = useViewsDispatch();
+  const { isRedoAvailable } = useViewsSelector(selectUndoRedoAvailability);
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
 
@@ -54,12 +54,14 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   });
 
   return (
-    <NavItem disabled={!isRedoAvailable}
-             onClick={onClick}
-             icon="redo"
-             title={TITLE}
-             ariaLabel={TITLE}
-             sidebarIsPinned={sidebarIsPinned} />
+    <NavItem
+      disabled={!isRedoAvailable}
+      onClick={onClick}
+      icon="redo"
+      title={TITLE}
+      ariaLabel={TITLE}
+      sidebarIsPinned={sidebarIsPinned}
+    />
   );
 };
 

@@ -23,7 +23,7 @@ import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
 const defaultPreferences = {
@@ -45,12 +45,7 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
     preferences = { ...preferences, ...localStoragePreferences };
   }
 
-  const {
-    enableSmartSearch,
-    updateUnfocussed,
-    searchSidebarIsPinned,
-    dashboardSidebarIsPinned,
-  } = preferences;
+  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned } = preferences;
 
   return (
     <SectionComponent title="Preferences">

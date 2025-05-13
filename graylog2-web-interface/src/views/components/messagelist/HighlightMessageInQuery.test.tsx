@@ -26,7 +26,9 @@ import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 jest.mock('routing/useQuery');
 
-const HighlightMessageInQuery = _HighlightMessageInQuery as React.ComponentType<React.ComponentProps<typeof _HighlightMessageInQuery> & { query?: any }>;
+const HighlightMessageInQuery = _HighlightMessageInQuery as React.ComponentType<
+  React.ComponentProps<typeof _HighlightMessageInQuery> & { query?: any }
+>;
 
 describe('HighlightMessageInQuery', () => {
   const TestComponent = () => (

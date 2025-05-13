@@ -19,24 +19,18 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 
 export const CreateMessageCount = () => {
-  const series = Series.forFunction('count()')
-    .toBuilder()
-    .config(new SeriesConfig('Message Count'))
-    .build();
+  const series = Series.forFunction('count()').toBuilder().config(new SeriesConfig('Message Count')).build();
 
   return AggregationWidget.builder()
     .newId()
-    .config(AggregationWidgetConfig.builder()
-      .series([series])
-      .visualization(NumberVisualization.type)
-      .build())
+    .config(AggregationWidgetConfig.builder().series([series]).visualization(NumberVisualization.type).build())
     .build();
 };
 
-const AddMessageCountActionHandler = () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessageCount()));
+const AddMessageCountActionHandler = () => (dispatch: ViewsDispatch) => dispatch(addWidget(CreateMessageCount()));
 
 export default AddMessageCountActionHandler;

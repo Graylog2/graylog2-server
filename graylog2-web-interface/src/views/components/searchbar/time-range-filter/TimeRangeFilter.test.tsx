@@ -54,7 +54,6 @@ describe('TimeRangeFilter', () => {
 
     const button = await screen.findByRole('button', {
       name: /open time range selector/i,
-      hidden: true,
     });
 
     fireEvent.click(button);
@@ -97,10 +96,12 @@ describe('TimeRangeFilter', () => {
     await waitFor(() => expect(submitButton).toBeEnabled());
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith({
-      from: 1800,
-      type: 'relative',
-    }));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith({
+        from: 1800,
+        type: 'relative',
+      }),
+    );
   });
 
   it('shows "No Override" if no time range is provided', async () => {
@@ -141,7 +142,14 @@ describe('TimeRangeFilter', () => {
   });
 
   it('allows hiding the dropdown button for quick-selecting presets', async () => {
-    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
+    render(
+      <SUTTimeRangeFilter
+        onChange={() => {}}
+        value={defaultTimeRange}
+        validTypes={['relative']}
+        showPresetDropdown={false}
+      />,
+    );
 
     await screen.findByText(/5 minutes ago/);
 

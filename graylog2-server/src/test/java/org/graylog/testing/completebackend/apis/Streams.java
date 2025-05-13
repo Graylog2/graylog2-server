@@ -95,13 +95,23 @@ public final class Streams implements GraylogRestApi {
     }
 
     public void deleteStream(String streamId) {
-        waitForStreamRouterRefresh(() -> given()
+        final var streamRules = api.streams().getStream(streamId)
+                .extract().body().jsonPath().getList("rules");
+        if (streamRules.isEmpty()) {
+            doDeleteStream(streamId);
+        } else {
+            waitForStreamRouterRefresh(() -> doDeleteStream(streamId));
+        }
+    }
+
+    private ValidatableResponse doDeleteStream(String streamId) {
+        return given()
                 .spec(api.requestSpecification())
                 .when()
                 .delete("/streams/" + streamId)
                 .then()
                 .log().ifError()
-                .statusCode(204));
+                .statusCode(204);
     }
 
     public ValidatableResponse getStream(String streamId) {
@@ -144,7 +154,7 @@ public final class Streams implements GraylogRestApi {
             RetryerBuilder.<String>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
                     .withStopStrategy(StopStrategies.stopAfterDelay(10, TimeUnit.SECONDS))
-                    .retryIfResult(r -> r.equals(existingEngineFingerprint))
+                    .retryIfResult(r -> r != null && r.equals(existingEngineFingerprint))
                     .build()
                     .call(this::getStreamRouterEngineFingerprint);
         } catch (ExecutionException | RetryException e) {

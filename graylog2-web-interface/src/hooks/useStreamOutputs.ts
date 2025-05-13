@@ -17,11 +17,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { Output } from 'stores/outputs/OutputsStore';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = (streamId: string) => [...KEY_PREFIX, streamId];
@@ -33,37 +33,41 @@ export const fetchStreamOutputs = (streamId: string) => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useStreamOutputs = (streamId: string, { enabled }: Options = { enabled: true }): {
+const useStreamOutputs = (
+  streamId: string,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    outputs: Array<Output>,
-    total: number,
-  }
-  refetch: () => void,
-  isInitialLoading: boolean,
-  isError: boolean,
+    outputs: Array<Output>;
+    total: number;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
+  isError: boolean;
 } => {
   const { data, refetch, isInitialLoading, isError } = useQuery(
     keyFn(streamId),
-    () => fetchStreamOutputs(streamId),
+    () =>
+      defaultOnError(
+        fetchStreamOutputs(streamId),
+        'Loading stream outputs failed with status',
+        'Could not load stream outputs',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream outputs failed with status: ${errorThrown}`,
-          'Could not load stream outputs');
-      },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
     isError,
-  });
+  };
 };
 
 export default useStreamOutputs;

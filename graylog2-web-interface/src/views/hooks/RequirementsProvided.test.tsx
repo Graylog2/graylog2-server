@@ -42,7 +42,7 @@ const retry = () => Promise.resolve();
 
 describe('RequirementsProvided', () => {
   const plugin: PluginMetadata = {
-    name: 'Pandora\'s Box',
+    name: "Pandora's Box",
     url: 'https://www.graylog.org',
   };
 
@@ -83,12 +83,7 @@ describe('RequirementsProvided', () => {
     const view = View.create()
       .toBuilder()
       .createdAt(new Date('2019-05-29T11:24:51.555Z'))
-      .search(
-        Search.create()
-          .toBuilder()
-          .id('5cee6c03675ef9df8b0a7bb0')
-          .build(),
-      )
+      .search(Search.create().toBuilder().id('5cee6c03675ef9df8b0a7bb0').build())
       .requires({
         parameters: plugin,
         timetravel: plugin,

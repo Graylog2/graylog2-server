@@ -26,10 +26,10 @@ import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 type Props = {
-  owners: GranteesList,
+  owners: GranteesList;
 };
 
-const TitleWithLink = ({ title, entityId }: { title: string, entityId: string }) => {
+const TitleWithLink = ({ title, entityId }: { title: string; entityId: string }) => {
   const entityRoute = useShowRouteFromGRN(entityId);
 
   return <Link to={entityRoute}>{title}</Link>;
@@ -40,8 +40,8 @@ const assertUnreachable = (type: 'error'): never => {
 };
 
 type OwnerTitleProps = {
-  owner: Grantee
-}
+  owner: Grantee;
+};
 
 const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
   const currentUser = useCurrentUser();
@@ -67,16 +67,18 @@ const OwnersCell = ({ owners }: Props) => {
 
   return (
     <td className="limited">
-      {sortedOwners.map((owner, index) => {
-        const isLast = index >= owners.size - 1;
+      {sortedOwners
+        .map((owner, index) => {
+          const isLast = index >= owners.size - 1;
 
-        return (
-          <React.Fragment key={owner.id}>
-            <OwnerTitle owner={owner} />
-            {!isLast && ', '}
-          </React.Fragment>
-        );
-      }).toArray()}
+          return (
+            <React.Fragment key={owner.id}>
+              <OwnerTitle owner={owner} />
+              {!isLast && ', '}
+            </React.Fragment>
+          );
+        })
+        .toArray()}
     </td>
   );
 };

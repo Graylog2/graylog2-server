@@ -34,8 +34,8 @@ const Headline = styled.h2`
 `;
 
 type Props = {
-  children: React.ReactNode,
-  title?: string
+  children: React.ReactNode;
+  title?: string;
 };
 
 /**

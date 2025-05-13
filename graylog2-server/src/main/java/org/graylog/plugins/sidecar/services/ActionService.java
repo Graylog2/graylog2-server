@@ -16,38 +16,32 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.ReturnDocument;
+import jakarta.inject.Inject;
 import org.graylog.plugins.sidecar.rest.models.CollectorAction;
 import org.graylog.plugins.sidecar.rest.models.CollectorActions;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class ActionService {
     private static final String COLLECTION_NAME = "sidecar_collector_actions";
-    private final JacksonDBCollection<CollectorActions, ObjectId> dbCollection;
 
+    private final MongoCollection<CollectorActions> collection;
     private final EtagService etagService;
 
     @Inject
-    public ActionService(MongoConnection mongoConnection,
-                         MongoJackObjectMapperProvider mapper,
+    public ActionService(MongoCollections mongoCollections,
                          EtagService etagService) {
         this.etagService = etagService;
-        dbCollection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                CollectorActions.class,
-                ObjectId.class,
-                mapper.get());
+        collection = mongoCollections.collection(COLLECTION_NAME, CollectorActions.class);
     }
 
     public CollectorActions fromRequest(String sidecarId, List<CollectorAction> actions) {
@@ -75,23 +69,20 @@ public class ActionService {
     }
 
     public CollectorActions saveAction(CollectorActions collectorActions) {
-        final CollectorActions actions = dbCollection.findAndModify(
-                DBQuery.is("sidecar_id", collectorActions.sidecarId()),
-                new BasicDBObject(),
-                new BasicDBObject(),
-                false,
+        final var actions = collection.findOneAndReplace(
+                eq("sidecar_id", collectorActions.sidecarId()),
                 collectorActions,
-                true,
-                true);
+                new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true)
+        );
         etagService.invalidateRegistration(collectorActions.sidecarId());
         return actions;
     }
 
     public CollectorActions findActionBySidecar(String sidecarId, boolean remove) {
         if (remove) {
-            return dbCollection.findAndRemove(DBQuery.is("sidecar_id", sidecarId));
+            return collection.findOneAndDelete(eq("sidecar_id", sidecarId));
         } else {
-            return dbCollection.findOne(DBQuery.is("sidecar_id", sidecarId));
+            return collection.find(eq("sidecar_id", sidecarId)).first();
         }
     }
 }

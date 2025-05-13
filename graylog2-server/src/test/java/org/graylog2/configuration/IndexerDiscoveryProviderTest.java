@@ -30,7 +30,9 @@ import org.mockito.Mockito;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +42,6 @@ import static org.mockito.Mockito.when;
 
 class IndexerDiscoveryProviderTest {
 
-    public static final GraylogCertificateProvisioner NOOP_CERT_PROVISIONER = () -> {};
 
     @Test
     void testAutomaticDiscovery() {
@@ -50,7 +51,7 @@ class IndexerDiscoveryProviderTest {
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
                 nodes("http://localhost:9200", "http://other:9201"),
-                NOOP_CERT_PROVISIONER
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -59,6 +60,29 @@ class IndexerDiscoveryProviderTest {
                 .contains("http://localhost:9200", "http://other:9201");
     }
 
+    @Test
+    void testListeners() {
+        final IndexerDiscoveryListener listener1 = Mockito.mock(IndexerDiscoveryListener.class);
+        final IndexerDiscoveryListener listener2 = Mockito.mock(IndexerDiscoveryListener.class);
+
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                10,
+                Duration.milliseconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes(),
+                new HashSet<>(List.of(listener1, listener2))
+        );
+
+        Assertions.assertThatThrownBy(provider::get)
+                .hasMessageContaining("Unable to retrieve Datanode connection");
+
+        Mockito.verify(listener1, Mockito.times(1)).beforeIndexerDiscovery();
+        Mockito.verify(listener1, Mockito.times(10)).onDiscoveryRetry();
+        Mockito.verify(listener2, Mockito.times(1)).beforeIndexerDiscovery();
+        Mockito.verify(listener2, Mockito.times(10)).onDiscoveryRetry();
+
+    }
 
     @Test
     void testAutomaticDiscoveryOneUnconfigured() {
@@ -68,7 +92,7 @@ class IndexerDiscoveryProviderTest {
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
                 nodes("http://localhost:9200", ""), // the second node is not configured yet, has no transport address
-                NOOP_CERT_PROVISIONER
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -86,7 +110,7 @@ class IndexerDiscoveryProviderTest {
                 Duration.seconds(1),
                 preflightConfig(null),
                 nodes(),
-                NOOP_CERT_PROVISIONER
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -103,7 +127,7 @@ class IndexerDiscoveryProviderTest {
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.SKIPPED),
                 nodes(),
-                NOOP_CERT_PROVISIONER
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -120,7 +144,7 @@ class IndexerDiscoveryProviderTest {
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED), // preflight correctly finished
                 nodes(), // but still no nodes discovered
-                NOOP_CERT_PROVISIONER
+                Collections.emptySet()
         );
 
         Assertions.assertThatThrownBy(provider::get)
@@ -131,13 +155,26 @@ class IndexerDiscoveryProviderTest {
     @Test
     void testProvisioningWillBeTriggered() {
         final GraylogCertificateProvisioner provisioner = Mockito.mock(GraylogCertificateProvisioner.class);
+        final org.graylog2.configuration.IndexerDiscoveryListener indexerDiscoveryListener = new IndexerDiscoveryListener() {
+
+            @Override
+            public void beforeIndexerDiscovery() {
+
+            }
+
+            @Override
+            public void onDiscoveryRetry() {
+                provisioner.runProvisioning();
+            }
+        };
+
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(),
                 10,
                 Duration.milliseconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
                 nodes(),
-                provisioner
+                Collections.singleton(indexerDiscoveryListener)
         );
 
         Assertions.assertThatThrownBy(provider::get)

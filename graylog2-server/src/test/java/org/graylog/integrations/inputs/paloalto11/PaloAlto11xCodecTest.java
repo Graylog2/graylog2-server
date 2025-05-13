@@ -109,7 +109,7 @@ public class PaloAlto11xCodecTest {
 
     // WHENs
     private void whenDecodeIsCalled() {
-        out = cut.decode(in);
+        out = cut.decodeSafe(in).get();
     }
 
     private void thenOutputMessageContainsExpectedFields(boolean shouldContainFullMessage) {

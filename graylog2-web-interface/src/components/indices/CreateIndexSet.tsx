@@ -32,22 +32,15 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  showSelectTemplateModal: boolean,
-  setShowSelectTemplateModal: (value: boolean) => void
-}
+  showSelectTemplateModal: boolean;
+  setShowSelectTemplateModal: (value: boolean) => void;
+};
 
-const CreateIndexSet = ({
-  showSelectTemplateModal,
-  setShowSelectTemplateModal,
-}: Props) => {
+const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }: Props) => {
   const isCloud = AppConfig.isCloud();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const {
-    retentionStrategies,
-    rotationStrategies,
-    retentionStrategiesContext,
-  } = useStore(IndicesConfigurationStore);
+  const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useStore(IndicesConfigurationStore);
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -76,16 +69,21 @@ const CreateIndexSet = ({
 
   return (
     <>
-      <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                                 rotationStrategies={rotationStrategies}
-                                 retentionStrategies={retentionStrategies}
-                                 submitButtonText="Create index set"
-                                 submitLoadingText="Creating index set..."
-                                 create
-                                 cancelLink={Routes.SYSTEM.INDICES.LIST}
-                                 onUpdate={_saveConfiguration} />
+      <IndexSetConfigurationForm
+        retentionStrategiesContext={retentionStrategiesContext}
+        rotationStrategies={rotationStrategies}
+        retentionStrategies={retentionStrategies}
+        submitButtonText="Create index set"
+        submitLoadingText="Creating index set..."
+        create
+        cancelLink={Routes.SYSTEM.INDICES.LIST}
+        onUpdate={_saveConfiguration}
+      />
       {!isCloud && showSelectTemplateModal && (
-        <SelectIndexSetTemplateModal show={showSelectTemplateModal} hideModal={() => setShowSelectTemplateModal(false)} />
+        <SelectIndexSetTemplateModal
+          show={showSelectTemplateModal}
+          hideModal={() => setShowSelectTemplateModal(false)}
+        />
       )}
     </>
   );

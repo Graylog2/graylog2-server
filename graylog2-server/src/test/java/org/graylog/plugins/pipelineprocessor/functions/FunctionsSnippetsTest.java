@@ -132,6 +132,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.MultiGrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
@@ -393,6 +394,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 grokPatternService,
                 Executors.newScheduledThreadPool(1));
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
+        functions.put(MultiGrokMatch.NAME, new MultiGrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
         functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
@@ -900,6 +902,20 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(grokMap.get("packets"))
                 .withFailMessage("The \"packets\" field should be null")
                 .isNull();
+    }
+
+
+    @Test
+    void multiGrok() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.hasField("abc_message")).isTrue();
+        assertThat(message.hasField("abc_ip")).isTrue();
+        assertThat(message.hasField("abc2_message")).isFalse();
+        assertThat(message.hasField("abc2_ip")).isFalse();
+        assertThat(message.getField("123_ip")).isEqualTo("192.168.0.2");
     }
 
     @Test

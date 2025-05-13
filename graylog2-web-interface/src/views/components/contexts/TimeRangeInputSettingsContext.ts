@@ -19,19 +19,20 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 type TimeRangeInputSettings = {
-  showDropdownButton: boolean,
-  showPresetsButton: boolean,
-  showAddToQuickListButton: boolean,
-  ignoreLimitDurationInTimeRangeDropdown: boolean
-}
+  showDropdownButton: boolean;
+  showPresetsButton: boolean;
+  showAddToQuickListButton: boolean;
+};
 
 const defaultValue = {
   showDropdownButton: true,
   showPresetsButton: true,
   showAddToQuickListButton: true,
-  ignoreLimitDurationInTimeRangeDropdown: false,
 };
 
 const TimeRangeInputSettingsContext = React.createContext<TimeRangeInputSettings>(defaultValue);
 
-export default singleton('views.components.contexts.TimeRangeInputSettingsContext', () => TimeRangeInputSettingsContext);
+export default singleton(
+  'views.components.contexts.TimeRangeInputSettingsContext',
+  () => TimeRangeInputSettingsContext,
+);

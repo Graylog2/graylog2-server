@@ -16,10 +16,11 @@
  */
 package org.graylog.security.certutil.csr;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.security.certutil.CaKeystore;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -27,8 +28,6 @@ import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog2.cluster.certificates.CertificateSigningRequest;
 import org.graylog2.indexer.security.SecurityAdapter;
-import org.graylog2.plugin.certificates.RenewalPolicy;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -38,33 +37,52 @@ import java.util.List;
 
 public class ClientCertGenerator {
     private final CaKeystore caKeystore;
-    private final ClusterConfigService clusterConfigService;
     private final SecurityAdapter securityAdapter;
 
     @Inject
     public ClientCertGenerator(CaKeystore caKeystore,
-                               final ClusterConfigService clusterConfigService,
                                final SecurityAdapter securityAdapter) {
         this.caKeystore = caKeystore;
-        this.clusterConfigService = clusterConfigService;
         this.securityAdapter = securityAdapter;
     }
 
     public ClientCert generateClientCert(final String principal,
                                          final String role,
-                                         final char[] privateKeyPassword) throws ClientCertGenerationException {
+                                         final char[] privateKeyPassword,
+                                         Duration certificateLifetime) throws ClientCertGenerationException {
+
         try {
-            var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
-            final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(principal).isCA(false).validity(Duration.ofDays(10 * 365)));
-            final KeyStore keystore = keyPair.toKeystore(CertConstants.DATANODE_KEY_ALIAS, privateKeyPassword);
+            final String alias = createKeyAlias();
+            final KeyPair keyPair = CertificateGenerator.generate(getCertRequest(principal, certificateLifetime));
+            final KeyStore keystore = keyPair.toKeystore(alias, privateKeyPassword);
             final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, privateKeyPassword);
-            var csr = CsrGenerator.generateCSR(keystoreInformation, CertConstants.DATANODE_KEY_ALIAS, principal, List.of(principal));
-            final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), renewalPolicy);
+            var csr = CsrGenerator.generateCSR(keystoreInformation, alias, principal, List.of(principal));
+            final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), certificateLifetime);
             securityAdapter.addUserToRoleMapping(role, principal);
-            return new ClientCert(principal, role, serializeAsPEM(certChain.caCertificates().iterator().next()), serializeAsPEM(keyPair.privateKey()), serializeAsPEM(certChain.signedCertificate()));
+            return toClientCert(principal, role, certChain, keyPair);
         } catch (Exception e) {
             throw new ClientCertGenerationException("Failed to generate client certificate: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+     * not dependent on a specific alias, we can generate a random alphabetic sequence.
+     */
+    private static String createKeyAlias() {
+        return RandomStringUtils.randomAlphabetic(10);
+    }
+
+    private static CertRequest getCertRequest(String principal, Duration certificateLifetime) {
+        return CertRequest.selfSigned(principal).isCA(false).validity(certificateLifetime);
+    }
+
+    @Nonnull
+    private ClientCert toClientCert(String principal, String role, CertificateChain certChain, KeyPair keyPair) throws IOException {
+        final String caCertificate = serializeAsPEM(certChain.caCertificates().iterator().next());
+        final String privateKey = serializeAsPEM(keyPair.privateKey());
+        final String certificate = serializeAsPEM(certChain.signedCertificate());
+        return new ClientCert(principal, role, caCertificate, privateKey, certificate);
     }
 
     public void removeCertFor(final String role, final String principal) throws IOException {

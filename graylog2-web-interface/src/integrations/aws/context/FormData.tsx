@@ -24,10 +24,7 @@ type FormDataProviderProps = {
   initialFormData?: any;
 };
 
-export const FormDataProvider = ({
-  initialFormData = {},
-  children,
-}: FormDataProviderProps) => {
+export const FormDataProvider = ({ initialFormData = {}, children }: FormDataProviderProps) => {
   const [formData, updateState] = useState(initialFormData);
 
   const setFormData = (id, fieldData) => {
@@ -48,11 +45,7 @@ export const FormDataProvider = ({
     }
   };
 
-  return (
-    <FormDataContext.Provider value={{ formData, setFormData, clearField }}>
-      {children}
-    </FormDataContext.Provider>
-  );
+  return <FormDataContext.Provider value={{ formData, setFormData, clearField }}>{children}</FormDataContext.Provider>;
 };
 
 export default FormDataProvider;

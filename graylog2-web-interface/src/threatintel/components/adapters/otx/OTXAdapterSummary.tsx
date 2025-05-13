@@ -30,9 +30,12 @@ type OTXAdapterSummaryProps = {
   };
 };
 
-class OTXAdapterSummary extends React.Component<OTXAdapterSummaryProps, {
-  [key: string]: any;
-}> {
+class OTXAdapterSummary extends React.Component<
+  OTXAdapterSummaryProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     const { config } = this.props.dataAdapter;
 

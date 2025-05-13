@@ -34,9 +34,12 @@ type GrokExtractorConfigurationProps = {
   onExtractorPreviewLoad: (...args: any[]) => void;
 };
 
-class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurationProps, {
-  [key: string]: any;
-}> {
+class GrokExtractorConfiguration extends React.Component<
+  GrokExtractorConfigurationProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     exampleMessage: undefined,
   };
@@ -101,7 +104,9 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
 
     promise.then((result) => {
       if (result.error_message != null) {
-        UserNotification.error(`We were not able to run the grok extraction because of the following error: ${result.error_message}`);
+        UserNotification.error(
+          `We were not able to run the grok extraction because of the following error: ${result.error_message}`,
+        );
 
         return;
       }
@@ -116,10 +121,14 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
 
       result.matches.forEach((match) => {
         matches.push(<dt key={`${match.name}-name`}>{match.name}</dt>);
-        matches.push(<dd key={`${match.name}-value`}><samp>{match.match}</samp></dd>);
+        matches.push(
+          <dd key={`${match.name}-value`}>
+            <samp>{match.match}</samp>
+          </dd>,
+        );
       });
 
-      const preview = (matches.length === 0 ? '' : <dl>{matches}</dl>);
+      const preview = matches.length === 0 ? '' : <dl>{matches}</dl>;
 
       onExtractorPreviewLoad(preview);
     });
@@ -140,23 +149,27 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
 
     return (
       <div>
-        <Input type="checkbox"
-               id="named_captures_only"
-               label="Named captures only"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked={configuration.named_captures_only}
-               onChange={this._onChange('named_captures_only')}
-               help="Only put the explicitly named captures into the message." />
+        <Input
+          type="checkbox"
+          id="named_captures_only"
+          label="Named captures only"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked={configuration.named_captures_only}
+          onChange={this._onChange('named_captures_only')}
+          help="Only put the explicitly named captures into the message."
+        />
 
         <Row>
           <Col mdOffset={1} md={1}>
             <ControlLabel className="col-md-offset-2">Grok pattern</ControlLabel>
           </Col>
           <Col md={10}>
-            <GrokPatternInput onPatternChange={this._onPatternChange}
-                              pattern={configuration.grok_pattern || ''}
-                              patterns={patterns}
-                              className={Style.grokInput} />
+            <GrokPatternInput
+              onPatternChange={this._onPatternChange}
+              pattern={configuration.grok_pattern || ''}
+              patterns={patterns}
+              className={Style.grokInput}
+            />
           </Col>
         </Row>
         <Row>

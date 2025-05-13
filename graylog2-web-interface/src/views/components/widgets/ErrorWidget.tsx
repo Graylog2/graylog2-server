@@ -22,12 +22,12 @@ import { Icon, Center } from 'components/common';
 import styles from './MessageWidgets.css';
 
 type WidgetError = {
-  description: string,
+  description: string;
 };
 
 type Props = {
-  errors: Array<WidgetError>,
-  title?: string,
+  errors: Array<WidgetError>;
+  title?: string;
 };
 
 const Description = styled.div`
@@ -46,7 +46,10 @@ const Row = styled.div`
   }
 `;
 
-const ErrorWidget = ({ errors, title = 'While retrieving data for this widget, the following error(s) occurred:' }: Props) => (
+const ErrorWidget = ({
+  errors,
+  title = 'While retrieving data for this widget, the following error(s) occurred:',
+}: Props) => (
   <Center>
     <Icon name="warning" size="3x" className={styles.iconMargin} />
     <Description>
@@ -54,7 +57,11 @@ const ErrorWidget = ({ errors, title = 'While retrieving data for this widget, t
         <strong>{title}</strong>
       </Row>
       <ErrorList>
-        {errors.map((e) => <Row as="li" key={e.description}>{e.description}</Row>)}
+        {errors.map((e) => (
+          <Row as="li" key={e.description}>
+            {e.description}
+          </Row>
+        ))}
       </ErrorList>
     </Description>
   </Center>

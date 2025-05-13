@@ -18,17 +18,14 @@ import * as React from 'react';
 import { Spoiler as MantineSpoiler } from '@mantine/core';
 
 type Props = React.PropsWithChildren<{
-  maxHeight: number,
-  className?: string,
-  showLabel?: string,
-  hideLabel?: string,
-}>
+  maxHeight: number;
+  className?: string;
+  showLabel?: string;
+  hideLabel?: string;
+}>;
 
 const Spoiler = ({ maxHeight, children, className, showLabel = 'Show more', hideLabel = 'Hide' }: Props) => (
-  <MantineSpoiler maxHeight={maxHeight}
-                  showLabel={showLabel}
-                  hideLabel={hideLabel}
-                  className={className}>
+  <MantineSpoiler maxHeight={maxHeight} showLabel={showLabel} hideLabel={hideLabel} className={className}>
     {children}
   </MantineSpoiler>
 );

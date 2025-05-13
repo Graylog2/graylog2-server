@@ -21,31 +21,28 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
 import { FieldTypes } from '../fieldtypes/FieldType';
 
-const ChartActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
-  field,
-  contexts: { widget: origWidget = Widget.empty() },
-}) => (dispatch: AppDispatch) => {
-  const series = isFunction(field) ? Series.forFunction(field) : Series.forFunction(`avg(${field})`);
-  const config = AggregationWidgetConfig.builder()
-    .rowPivots([pivotForField(TIMESTAMP_FIELD, FieldTypes.DATE())])
-    .series([series])
-    .visualization('line')
-    .rollup(true)
-    .build();
-  const widgetBuilder = AggregationWidget.builder()
-    .newId()
-    .config(config);
+const ChartActionHandler: ThunkActionHandler<{ widget?: Widget }> =
+  ({ field, contexts: { widget: origWidget = Widget.empty() } }) =>
+  (dispatch: ViewsDispatch) => {
+    const series = isFunction(field) ? Series.forFunction(field) : Series.forFunction(`avg(${field})`);
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([pivotForField(TIMESTAMP_FIELD, FieldTypes.DATE())])
+      .series([series])
+      .visualization('line')
+      .rollup(true)
+      .build();
+    const widgetBuilder = AggregationWidget.builder().newId().config(config);
 
-  const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
+    const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
 
-  return dispatch(addWidget(widget));
-};
+    return dispatch(addWidget(widget));
+  };
 
 export default ChartActionHandler;

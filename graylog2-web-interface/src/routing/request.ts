@@ -27,8 +27,10 @@ const request = (method: Methods, path: string, body: any, query: Query, headers
   const pathWithQueryParameters = Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query)}` : path;
   const builder = new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body);
 
-  const builderWithHeaders = Object.entries(headers)
-    .reduce((prev, [key, value]) => prev.setHeader(key, value), builder);
+  const builderWithHeaders = Object.entries(headers).reduce(
+    (prev, [key, value]) => prev.setHeader(key, value),
+    builder,
+  );
 
   return builderWithHeaders.build();
 };

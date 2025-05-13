@@ -38,7 +38,7 @@ export interface OktaBackendConfig extends SharedBackendConfig {
 export interface OidcBackendConfig extends SharedBackendConfig {
   baseUrl?: string;
 
-  claims?: { [key: string]: string },
+  claims?: { [key: string]: string };
 }
 
 export type BackendConfig = OktaBackendConfig | OidcBackendConfig;
@@ -65,37 +65,44 @@ export interface OidcBackendConfigJson extends SharedBackendConfigJson {
   claims: { [key: string]: string };
 }
 
-export type BackendConfigJson = OktaBackendConfigJson | OidcBackendConfigJson
+export type BackendConfigJson = OktaBackendConfigJson | OidcBackendConfigJson;
 
 export interface TeamSyncConfig {
-  teamSelectionType?: 'all' | 'include' | 'exclude',
+  teamSelectionType?: 'all' | 'include' | 'exclude';
 
-  teamSelection?: Immutable.Set<string>,
+  teamSelection?: Immutable.Set<string>;
 
   oktaApiToken?: { is_set: boolean };
 
-  synchronizeGroups?: boolean
+  synchronizeGroups?: boolean;
 
-  groupsClaim?: boolean
+  groupsClaim?: boolean;
 }
 
 export interface OktaTeamSyncConfigJson {
-  id?: string,
+  id?: string;
 
-  auth_service_backend_id: string,
+  auth_service_backend_id: string;
 
-  selection_type: string,
+  selection_type: string;
 
-  selection: Array<string>,
+  selection: Array<string>;
 
-  default_roles: Array<string>,
+  default_roles: Array<string>;
 
   config: {
-    type: string,
-    okta_api_token: (string | { keep_value: true } | { delete_value: true } | {
-      set_value: string | undefined
-    }) | undefined,
-  },
+    type: string;
+    okta_api_token:
+      | (
+          | string
+          | { keep_value: true }
+          | { delete_value: true }
+          | {
+              set_value: string | undefined;
+            }
+        )
+      | undefined;
+  };
 }
 
 export interface SharedBackendProps {

@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoException;
@@ -37,8 +36,6 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoEntity;
-import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -55,16 +52,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class MongoUtils<T extends MongoEntity> {
     private final MongoCollection<T> collection;
-    private final ObjectMapper objectMapper;
-    private final CustomJacksonCodecRegistry codecRegistry;
 
-    public MongoUtils(MongoCollection<T> delegate, ObjectMapper objectMapper) {
+    public MongoUtils(MongoCollection<T> delegate) {
         this.collection = delegate;
-        this.objectMapper = objectMapper;
-
-        codecRegistry = new CustomJacksonCodecRegistry(
-                objectMapper,
-                collection.getCodecRegistry());
     }
 
     /**
@@ -254,7 +244,7 @@ public class MongoUtils<T extends MongoEntity> {
      * Saves an entity by either inserting or replacing the document.
      * <p>
      * This method exists to avoid the repeated implementation of this functionality during migration from the old
-     * Mongojack API.
+     * MongoJack API.
      * <p>
      * <b> For new code, prefer implementing a separate "create" and "update" path instead.</b>
      *
@@ -273,24 +263,4 @@ public class MongoUtils<T extends MongoEntity> {
             return orig;
         }
     }
-
-    /**
-     * Utility method to help moving away from the deprecated MongoJack Bson objects, like
-     * {@link org.mongojack.DBQuery.Query}. These objects require initialization before they can be used as regular
-     * {@link org.bson.conversions.Bson} objects with the MongoDB driver.
-     * <p>
-     * The {@link org.mongojack.JacksonMongoCollection} would usually take care of that, but because we cannot use it,
-     * and instead use a regular {@link org.mongojack.MongoCollection}, we have to use this method.
-     *
-     * @deprecated This method is only meant as an interim solution. Rewrite your deprecated MongoJack objects so that
-     * you don't have to use it.
-     */
-    @Deprecated
-    public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
-        mongoJackBsonObject.initialize(
-                objectMapper,
-                objectMapper.constructType(collection.getDocumentClass()),
-                codecRegistry);
-    }
-
 }

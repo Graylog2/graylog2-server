@@ -25,6 +25,8 @@ import { adminUser } from 'fixtures/users';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
 import EventDefinitionEntry from './EventDefinitionEntry';
 
@@ -33,23 +35,16 @@ const exampleEventDefinition = {
   id: 'event-definition-id',
 };
 
-type entityScope = {
-  is_mutable: boolean;
-};
-
-type getPermissionsByScopeReturnType = {
-  loadingScopePermissions: boolean;
-  scopePermissions: entityScope;
-};
-
-const exampleEntityScopeMutable: getPermissionsByScopeReturnType = {
+const exampleEntityScopeMutable: PermissionsByScopeReturnType = {
   loadingScopePermissions: false,
   scopePermissions: { is_mutable: true },
+  checkPermissions: (_inEntity: Partial<GenericEntityType>) => true,
 };
 
-const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = {
+const exampleEntityScopeImmutable: PermissionsByScopeReturnType = {
   loadingScopePermissions: false,
   scopePermissions: { is_mutable: false },
+  checkPermissions: (_inEntity: Partial<GenericEntityType>) => false,
 };
 
 const currentUser = adminUser.toBuilder().permissions(Immutable.List([])).build();
@@ -63,12 +58,14 @@ describe('EventDefinitionEntry', () => {
     exampleEventDefinition._scope = scope;
 
     return (
-      <EventDefinitionEntry onDelete={() => { }}
-                            onCopy={() => { }}
-                            onDisable={() => { }}
-                            onEnable={() => { }}
-                            context={{ scheduler: {} }}
-                            eventDefinition={exampleEventDefinition} />
+      <EventDefinitionEntry
+        onDelete={() => {}}
+        onCopy={() => {}}
+        onDisable={() => {}}
+        onEnable={() => {}}
+        context={{ scheduler: {} }}
+        eventDefinition={exampleEventDefinition}
+      />
     );
   };
 
@@ -77,7 +74,8 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('allows sharing for owners', async () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List(['entity:own:grn::::event_definition:event-definition-id']))
       .build();
     asMock(useCurrentUser).mockReturnValue(user);
@@ -102,7 +100,8 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('does not allow sharing for viewer', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List(['entity:view:grn::::event_definition:event-definition-id']))
       .build();
     asMock(useCurrentUser).mockReturnValue(user);

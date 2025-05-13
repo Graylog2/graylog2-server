@@ -22,17 +22,18 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 export type SaveStreamPipelinesConnectionProps = {
-  pipelineIds: Array<string>,
-  streamId: string,
+  pipelineIds: Array<string>;
+  streamId: string;
 };
 
-const saveStreamPipelinesConnection = ({ pipelineIds, streamId }: SaveStreamPipelinesConnectionProps) => fetch('POST', qualifyUrl(ApiRoutes.ConnectionsController.to_stream().url), {
-  pipeline_ids: pipelineIds,
-  stream_id: streamId,
-});
+const saveStreamPipelinesConnection = ({ pipelineIds, streamId }: SaveStreamPipelinesConnectionProps) =>
+  fetch('POST', qualifyUrl(ApiRoutes.ConnectionsController.to_stream().url), {
+    pipeline_ids: pipelineIds,
+    stream_id: streamId,
+  });
 
 const useStreamPipelinesConnectionMutation = (): {
-    onSaveStreamPipelinesConnection: (steamPipelinesConnectionProps: SaveStreamPipelinesConnectionProps) => Promise<void>,
+  onSaveStreamPipelinesConnection: (steamPipelinesConnectionProps: SaveStreamPipelinesConnectionProps) => Promise<void>;
 } => {
   const queryClient = useQueryClient();
 
@@ -40,12 +41,16 @@ const useStreamPipelinesConnectionMutation = (): {
     onSuccess: () => {
       queryClient.invalidateQueries(['stream', 'pipelines', 'connections']);
 
-      UserNotification.success('Saving stream pipelines connection was successful.',
-        'Saving stream pipeline connection.');
+      UserNotification.success(
+        'Saving stream pipelines connection was successful.',
+        'Saving stream pipeline connection.',
+      );
     },
     onError: (errorThrown) => {
-      UserNotification.error(`Saving stream pipelines connection failed with status: ${errorThrown}`,
-        'Saving stream pipeline connection.');
+      UserNotification.error(
+        `Saving stream pipelines connection failed with status: ${errorThrown}`,
+        'Saving stream pipeline connection.',
+      );
     },
   });
 

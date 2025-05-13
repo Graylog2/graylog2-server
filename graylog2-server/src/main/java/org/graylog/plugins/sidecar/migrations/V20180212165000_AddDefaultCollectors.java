@@ -57,7 +57,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class V20180212165000_AddDefaultCollectors extends Migration {
     public static final String BEATS_PREAMBEL = """
-            # Needed for Graylog
+            # Required settings
             fields_under_root: true
             fields.collector_node_id: ${sidecar.nodeName}
             fields.gl2_source_collector: ${sidecar.nodeId}
@@ -118,26 +118,54 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     private void ensureFilebeatCollectorsAndConfig() {
 
-        StringBuilder filebeatConfigBuilder = new StringBuilder(f("""
-                        %s
-                        output.logstash:
-                           hosts: ["${user.graylog_host}:5044"]
-                        path:
-                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
-                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+        final var commonConfig = f("""
+                %s
+                output.logstash:
+                   hosts: ["${user.graylog_host}:5044"]
+                path:
+                   data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
+                   logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
 
-                        filebeat.inputs:
-                        """,
-                BEATS_PREAMBEL));
+                filebeat.inputs:
+
+                - type: filestream
+                  id: snort-filestream
+                  enabled: true
+                  paths:
+                    - /var/log/snort/alert_json.txt
+                    - /var/log/snort/appid-output.json
+                  parsers:
+                    - ndjson:
+                        target: "snort3"
+                        add_error_key: true
+                        overwrite_keys: true
+                  fields:
+                    event_source_product: snort3
+
+                - type: filestream
+                  id: zeek-filestream
+                  enabled: true
+                  paths:
+                    - /opt/zeek/logs/current
+                  parsers:
+                    - ndjson:
+                        target: "zeek"
+                        add_error_key: true
+                        overwrite_keys: true
+                  fields:
+                    event_source_product: zeek
+                """, BEATS_PREAMBEL);
 
         String apacheConfigType = """
+
                 - type: filestream
                   id: apache-filestream
                   enabled: true
                   %s
                   fields_under_root: true
                   fields:
-                      event_source_product: apache_httpd""";
+                      event_source_product: apache_httpd
+                """;
 
         ensureCollector(
                 "filebeat",
@@ -146,46 +174,13 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "/usr/lib/graylog-sidecar/filebeat",
                 "-c  %s",
                 "test config -c %s",
-                filebeatConfigBuilder
-                        .append("""
-
-                                - type: filestream
-                                  id: snort-filestream
-                                  enabled: true
-                                  paths:
-                                    - /var/log/snort/alert_json.txt
-                                    - /var/log/snort/appid-output.json
-                                  parsers:
-                                    - ndjson:
-                                        target: "snort3"
-                                        add_error_key: true
-                                        overwrite_keys: true
-                                  fields:
-                                    event_source_product: snort3
-                                """)
-                        .append("""
-
-                                - type: filestream
-                                  id: zeek-filestream
-                                  enabled: true
-                                  paths:
-                                    - /opt/zeek/logs/current
-                                  parsers:
-                                    - ndjson:
-                                        target: "zeek"
-                                        add_error_key: true
-                                        overwrite_keys: true
-                                  fields:
-                                    event_source_product: zeek
-                                """)
-                        .append(f(apacheConfigType, """
-                                paths:
-                                  - /var/log/apache2/access.log
-                                  - /var/log/apache2/error.log
-                                  - /var/log/httpd/access_log
-                                  - /var/log/httpd/error_log
-                                """))
-                        .toString()
+                commonConfig + f(apacheConfigType, """
+                        paths:
+                          - /var/log/apache2/access.log
+                          - /var/log/apache2/error.log
+                          - /var/log/httpd/access_log
+                          - /var/log/httpd/error_log"""
+                )
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-linux-default", collector));
 
         ensureCollector(
@@ -195,13 +190,10 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "/usr/share/filebeat/bin/filebeat",
                 "-c  %s",
                 "test config -c %s",
-                filebeatConfigBuilder
-                        .append(f(apacheConfigType, """
-                                paths:
-                                  - /var/log/httpd-access.log
-                                  - /var/log/httpd-error.log
-                                """))
-                        .toString()
+                commonConfig + f(apacheConfigType, """
+                        paths:
+                          - /var/log/httpd-access.log
+                          - /var/log/httpd-error.log""")
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-freebsd-default", collector));
 
         ensureCollector(
@@ -211,13 +203,10 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "/usr/share/filebeat/bin/filebeat",
                 "-c  %s",
                 "test config -c %s",
-                filebeatConfigBuilder
-                        .append(f(apacheConfigType, """
-                                paths:
-                                  - /etc/httpd/log/access_log
-                                  - /etc/httpd/log/error_log
-                                """))
-                        .toString()
+                commonConfig + f(apacheConfigType, """
+                        paths:
+                          - /etc/httpd/log/access_log
+                          - /etc/httpd/log/error_log""")
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-darwin-default", collector));
 
         ensureCollector(
@@ -431,7 +420,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         \tPort 12201
                         \tOutputType  GELF_TCP
                         \t<Exec>
-                        \t  # These fields are needed for Graylog
+                        \t  # These fields are needed for ingestion
                         \t  $gl2_source_collector = '${sidecar.nodeId}';
                         \t  $collector_node_id = '${sidecar.nodeName}';
                         \t</Exec>
@@ -515,7 +504,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         \tPort 12201
                         \tOutputType  GELF_TCP
                         \t<Exec>
-                        \t  # These fields are needed for Graylog
+                        \t  # These fields are needed for ingestion
                         \t  $gl2_source_collector = '${sidecar.nodeId}';
                         \t  $collector_node_id = '${sidecar.nodeName}';
                         \t</Exec>

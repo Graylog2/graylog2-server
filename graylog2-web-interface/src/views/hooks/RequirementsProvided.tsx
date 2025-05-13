@@ -21,9 +21,10 @@ import MissingRequirements from 'views/components/views/MissingRequirements';
 import type { ViewHook, ViewHookArguments } from 'views/logic/hooks/ViewHook';
 import type { Requirements } from 'views/logic/views/View';
 
-const _missingRequirements = (requirements: Requirements, requirementsProvided: string | string[]): Requirements => Object.entries(requirements)
-  .filter(([require]) => !requirementsProvided.includes(require))
-  .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+const _missingRequirements = (requirements: Requirements, requirementsProvided: string | string[]): Requirements =>
+  Object.entries(requirements)
+    .filter(([require]) => !requirementsProvided.includes(require))
+    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
 const RequirementsProvided: ViewHook = async ({ view, executionState }: ViewHookArguments) => {
   const providedRequirements = PluginStore.exports('views.requires.provided');

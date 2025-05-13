@@ -1,0 +1,4 @@
+type = "a"
+message = "Add input for OpenTelemetry logs."
+
+pulls = ["21536"]

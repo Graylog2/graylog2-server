@@ -22,16 +22,14 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const EnterpriseActions = singletonActions(
-  'core.Enterprise',
-  () => Reflux.createActions({
+export const EnterpriseActions = singletonActions('core.Enterprise', () =>
+  Reflux.createActions({
     getLicenseInfo: { asyncResult: true },
   }),
 );
 
-export const EnterpriseStore = singletonStore(
-  'core.Enterprise',
-  () => Reflux.createStore({
+export const EnterpriseStore = singletonStore('core.Enterprise', () =>
+  Reflux.createStore({
     listenables: [EnterpriseActions],
     sourceUrl: '/enterprise/license',
     licenseStatus: undefined,

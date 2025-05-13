@@ -69,7 +69,11 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
      * @return true if a document was deleted, false otherwise.
      */
     public boolean deleteById(String id) {
-        return deleteById(new ObjectId(id));
+        return deleteById(new ObjectId(id), true);
+    }
+
+    public boolean deleteById(String id, boolean checkMutability) {
+        return deleteById(new ObjectId(id), checkMutability);
     }
 
     /**
@@ -78,11 +82,13 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
      * @param id the document's id.
      * @return true if a document was deleted, false otherwise.
      */
-    public boolean deleteById(ObjectId id) {
+    public boolean deleteById(ObjectId id, boolean checkMutability) {
         final T entity = Optional.ofNullable(collection.find(idEq(id)).first())
                 .orElseThrow(() -> new IllegalArgumentException("Entity not found"));
         ensureDeletability(entity);
-        ensureMutability(entity);
+        if (checkMutability) {
+            ensureMutability(entity);
+        }
         return collection.deleteOne(idEq(id)).getDeletedCount() > 0;
     }
 
@@ -95,6 +101,20 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
     public final long forceDelete(String id) {
         // Intentionally omit ensure mutability check.
         return collection.deleteOne(idEq(id)).getDeletedCount();
+    }
+
+    /**
+     * Updates an existing entity without checking for mutability. Do not call this method for API requests for the user
+     * interface.
+     *
+     * @param entity ScopedEntity to be updated
+     * @return the newly updated entity
+     */
+    public T forceUpdate(T entity) {
+        Objects.requireNonNull(entity.id());
+        ensureValidScope(entity);
+        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity);
+        return entity;
     }
 
     public final boolean isMutable(T scopedEntity) {

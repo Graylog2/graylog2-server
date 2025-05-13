@@ -19,7 +19,7 @@ package org.graylog.plugins.views.startpage.lastOpened;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
@@ -59,8 +59,11 @@ public class LastOpenedService {
     public void create(final LastOpenedForUserDTO lastOpenedItems) {
         try {
             db.insertOne(lastOpenedItems);
-        } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a last opened collection, collection with this id already exists : " + lastOpenedItems.id());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new IllegalStateException("Unable to create record of last opened items. Record with this id already exists : " + lastOpenedItems.id());
+            }
+            throw e;
         }
     }
 

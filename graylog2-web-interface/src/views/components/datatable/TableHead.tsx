@@ -18,13 +18,15 @@ import styled, { css } from 'styled-components';
 
 import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
-const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
-  color: ${theme.colors.global.textDefault};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-`);
+const TableHead = styled.thead(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
+    color: ${theme.colors.global.textDefault};
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  `,
+);
 
 export default TableHead;

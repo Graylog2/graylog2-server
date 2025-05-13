@@ -19,6 +19,7 @@ package org.graylog2.indexer.fieldtypes;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class IndexFieldTypesServiceTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), objectMapperProvider);
+        this.dbService = new IndexFieldTypesService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
     }
 
     @After

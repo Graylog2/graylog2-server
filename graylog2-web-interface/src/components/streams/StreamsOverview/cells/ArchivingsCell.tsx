@@ -24,14 +24,16 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
 
 type Props = {
-  stream: Stream,
-  indexSets: Array<IndexSet>,
-}
+  stream: Stream;
+  indexSets: Array<IndexSet>;
+};
 
-const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-  width: fit-content;
-`);
+const Wrapper = styled.div<{ $enabled: boolean }>(
+  ({ theme, $enabled }) => css`
+    color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
+    width: fit-content;
+  `,
+);
 
 const ArchivingsCell = ({ stream, indexSets }: Props) => {
   if (stream.is_default || !stream.is_editable) {
@@ -40,7 +42,9 @@ const ArchivingsCell = ({ stream, indexSets }: Props) => {
 
   const indexSet = indexSets.find((is) => is.id === stream.index_set_id);
 
-  const archivingEnabled = (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) || indexSet?.data_tiering?.archive_before_deletion;
+  const archivingEnabled =
+    (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) ||
+    indexSet?.data_tiering?.archive_before_deletion;
 
   return (
     <Tooltip withArrow position="right" label={`Archiving is ${archivingEnabled ? 'enabled' : 'disabled'}`}>

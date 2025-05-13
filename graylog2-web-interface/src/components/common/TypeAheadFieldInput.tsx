@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import $ from 'jquery';
 import 'typeahead.js';
@@ -59,9 +58,7 @@ type TypeAheadFieldInputProps = {
  * Component that renders an input offering auto-completion for message fields.
  * Fields are loaded from the Graylog server in the background.
  */
-class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
-  [key: string]: any;
-}> {
+class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps> {
   static defaultProps = {
     valueLink: undefined,
     autoFocus: false,
@@ -69,6 +66,9 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
     onChange: () => {},
     onBlur: () => {},
     error: undefined,
+    type: undefined,
+    name: undefined,
+    defaultValue: undefined,
   };
 
   private fieldInput: Input;
@@ -78,33 +78,29 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
       const { autoFocus, valueLink, onChange } = this.props;
       const fieldInput = $(this.fieldInput.getInputDOMNode());
 
-      fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url))
-        .then(
-          (data) => {
-            // @ts-ignore
-            fieldInput.typeahead(
-              {
-                hint: true,
-                highlight: true,
-                minLength: 1,
-              },
-              {
-                name: 'fields',
-                displayKey: 'value',
-                source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
-              },
-            );
-
-            if (autoFocus) {
-              fieldInput.focus();
-              // @ts-ignore
-              fieldInput.typeahead('close');
-            }
+      fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url)).then((data) => {
+        // @ts-ignore
+        fieldInput.typeahead(
+          {
+            hint: true,
+            highlight: true,
+            minLength: 1,
+          },
+          {
+            name: 'fields',
+            displayKey: 'value',
+            source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
           },
         );
 
-      // eslint-disable-next-line react/no-find-dom-node
-      const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
+        if (autoFocus) {
+          fieldInput.focus();
+          // @ts-ignore
+          fieldInput.typeahead('close');
+        }
+      });
+
+      const fieldFormGroup = this.fieldInput.getInputDOMNode();
 
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
         if (onChange) {
@@ -125,8 +121,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
       // @ts-ignore
       fieldInput.typeahead('destroy');
 
-      // eslint-disable-next-line react/no-find-dom-node
-      const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
+      const fieldFormGroup = this.fieldInput.getInputDOMNode();
 
       $(fieldFormGroup).off('typeahead:change typeahead:selected');
     }
@@ -149,14 +144,18 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
 
     return (
       <Container>
-        <Input id={id}
-               ref={(fieldInput) => { this.fieldInput = fieldInput; }}
-               label={label}
-               onBlur={onBlur}
-               error={error}
-               wrapperClassName="typeahead-wrapper"
-               defaultValue={valueLink ? valueLink.value : null}
-               {...this._getFilteredProps()} />
+        <Input
+          id={id}
+          ref={(fieldInput) => {
+            this.fieldInput = fieldInput;
+          }}
+          label={label}
+          onBlur={onBlur}
+          error={error}
+          wrapperClassName="typeahead-wrapper"
+          defaultValue={valueLink ? valueLink.value : null}
+          {...this._getFilteredProps()}
+        />
       </Container>
     );
   }

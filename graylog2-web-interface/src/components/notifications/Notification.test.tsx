@@ -26,7 +26,8 @@ import Notification from './Notification';
 
 const notificationMessageFixture = {
   title: 'There is a node without any running inputs\n\n',
-  description: '\n<span>\nThere is a node without any running inputs. This means that you are not receiving any messages from this\nnode at this point in time. This is most probably an indication of an error or misconfiguration.\n         You can click <a href="/system/inputs" target="_blank" rel="noreferrer">here</a> to solve this.\n</span>\n',
+  description:
+    '\n<span>\nThere is a node without any running inputs. This means that you are not receiving any messages from this\nnode at this point in time. This is most probably an indication of an error or misconfiguration.\n         You can click <a href="/system/inputs" target="_blank" rel="noreferrer">here</a> to solve this.\n</span>\n',
 };
 const notificationFixture = {
   severity: 'urgent',
@@ -37,17 +38,17 @@ const notificationFixture = {
 };
 
 jest.mock('stores/notifications/NotificationsStore', () => ({
-  NotificationsStore: MockStore(
-    ['getInitialState', jest.fn(() => ({
+  NotificationsStore: MockStore([
+    'getInitialState',
+    jest.fn(() => ({
       messages: {},
-    }))],
-  ),
+    })),
+  ]),
   NotificationsActions: {
     getInitialState: jest.fn(),
     getHtmlMessage: jest.fn(() => Promise.resolve(notificationMessageFixture)),
   },
-}
-));
+}));
 
 describe('<Notification>', () => {
   afterEach(() => {
@@ -60,7 +61,13 @@ describe('<Notification>', () => {
 
     await screen.findByText(/loading\.\.\./i);
 
-    await waitFor(() => expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(notificationFixture.type, notificationFixture.key, NotificationsFactory.getValuesForNotification(notificationFixture)));
+    await waitFor(() =>
+      expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(
+        notificationFixture.type,
+        notificationFixture.key,
+        NotificationsFactory.getValuesForNotification(notificationFixture),
+      ),
+    );
   });
 
   test('should render notification message', async () => {

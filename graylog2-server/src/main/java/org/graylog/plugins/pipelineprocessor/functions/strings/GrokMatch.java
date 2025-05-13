@@ -19,14 +19,13 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 import com.google.common.collect.ForwardingMap;
 import io.krakens.grok.api.Grok;
 import io.krakens.grok.api.Match;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.grok.GrokPatternRegistry;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 
@@ -63,8 +62,12 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
 
         final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern, onlyNamedCaptures);
 
-        final Match match = grok.match(value);
-        return new GrokResult(match.captureFlattened());
+        try {
+            final Match match = grok.match(value);
+            return new GrokResult(match.captureFlattened());
+        } catch (StackOverflowError e) {
+            throw new IllegalStateException("Stack overflow during grok pattern matching");
+        }
     }
 
     @Override

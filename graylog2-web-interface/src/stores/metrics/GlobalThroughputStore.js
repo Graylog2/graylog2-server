@@ -20,9 +20,8 @@ import { singletonStore } from 'logic/singleton';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 // eslint-disable-next-line import/prefer-default-export
-export const GlobalThroughputStore = singletonStore(
-  'core.GlobalThroughput',
-  () => Reflux.createStore({
+export const GlobalThroughputStore = singletonStore('core.GlobalThroughput', () =>
+  Reflux.createStore({
     listenables: [],
     throughput: {
       input: 0,

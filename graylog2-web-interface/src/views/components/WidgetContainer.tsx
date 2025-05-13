@@ -26,39 +26,35 @@ const Container = styled.div`
 `;
 
 type Props = React.PropsWithChildren<{
-  isFocused: boolean,
-  className?: string,
-  style?: React.CSSProperties,
-}>
+  isFocused: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+}>;
 
-const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({
-  children,
-  className,
-  isFocused,
-  style = {},
-  ...rest
-}: Props, ref) => {
-  let containerStyle = {
-    ...style,
-    transition: 'none',
-  };
-
-  if (isFocused) {
-    containerStyle = {
-      ...containerStyle,
-      height: '100%',
-      width: '100%',
-      zIndex: 3,
-      top: 0,
-      left: 0,
+const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(
+  ({ children, className, isFocused, style = {}, ...rest }: Props, ref) => {
+    let containerStyle = {
+      ...style,
+      transition: 'none',
     };
-  }
 
-  return (
-    <Container className={className} style={containerStyle} ref={ref} {...rest}>
-      {children}
-    </Container>
-  );
-});
+    if (isFocused) {
+      containerStyle = {
+        ...containerStyle,
+        height: '100%',
+        width: '100%',
+        zIndex: 3,
+        top: 0,
+        left: 0,
+      };
+    }
+
+    return (
+      <Container className={className} style={containerStyle} ref={ref} {...rest}>
+        {children}
+      </Container>
+    );
+  },
+);
 
 export default WidgetContainer;

@@ -27,7 +27,7 @@ import { DocumentTitle, Spinner } from 'components/common';
 import type View from 'views/logic/views/View';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -36,34 +36,32 @@ import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
 
 type Props = React.PropsWithChildren<{
-  isNew: boolean,
-  view: Promise<View>,
-  loadNewView?: (history: HistoryFunction) => unknown,
-  loadView?: (history: HistoryFunction, viewId: string) => unknown,
-  executionState?: SearchExecutionState,
-  searchResult?: SearchExecutionResult,
-  forceSideBarPinned?: boolean,
+  isNew: boolean;
+  view: Promise<View>;
+  loadNewView?: (history: HistoryFunction) => unknown;
+  loadView?: (history: HistoryFunction, viewId: string) => unknown;
+  executionState?: SearchExecutionState;
+  searchResult?: SearchExecutionResult;
+  forceSideBarPinned?: boolean;
+  skipNoStreamsCheck?: boolean;
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   const title = useViewTitle();
 
-  return (
-    <DocumentTitle title={title}>
-      {children}
-    </DocumentTitle>
-  );
+  return <DocumentTitle title={title}>{children}</DocumentTitle>;
 };
 
 const SearchPage = ({
-  children,
+  children = undefined,
   isNew,
   view: viewPromise,
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState = SearchExecutionState.empty(),
-  searchResult,
+  searchResult = undefined,
   forceSideBarPinned = false,
+  skipNoStreamsCheck = false,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -82,26 +80,31 @@ const SearchPage = ({
 
   const { view, executionState } = result;
 
-  return view
-    ? (
-      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery} result={searchResult}>
-        <SearchPageTitle>
-          <DashboardPageContextProvider>
-            <NewViewLoaderContext.Provider value={loadNewView}>
-              <ViewLoaderContext.Provider value={loadView}>
-                <SearchPageAutoRefreshProvider>
-                  {children}
-                  <IfUserHasAccessToAnyStream>
-                    <Search forceSideBarPinned={forceSideBarPinned} />
-                  </IfUserHasAccessToAnyStream>
-                </SearchPageAutoRefreshProvider>
-              </ViewLoaderContext.Provider>
-            </NewViewLoaderContext.Provider>
-          </DashboardPageContextProvider>
-        </SearchPageTitle>
-      </PluggableStoreProvider>
-    )
-    : <Spinner />;
+  return view ? (
+    <ViewsStoreProvider
+      view={view}
+      executionState={executionState}
+      isNew={isNew}
+      initialQuery={initialQuery}
+      result={searchResult}>
+      <SearchPageTitle>
+        <DashboardPageContextProvider>
+          <NewViewLoaderContext.Provider value={loadNewView}>
+            <ViewLoaderContext.Provider value={loadView}>
+              <SearchPageAutoRefreshProvider>
+                {children}
+                <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
+                  <Search forceSideBarPinned={forceSideBarPinned} />
+                </IfUserHasAccessToAnyStream>
+              </SearchPageAutoRefreshProvider>
+            </ViewLoaderContext.Provider>
+          </NewViewLoaderContext.Provider>
+        </DashboardPageContextProvider>
+      </SearchPageTitle>
+    </ViewsStoreProvider>
+  ) : (
+    <Spinner />
+  );
 };
 
 export default React.memo(SearchPage);

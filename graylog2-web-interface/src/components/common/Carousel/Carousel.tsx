@@ -43,10 +43,10 @@ const useCarouselRef = (carouselId: string) => {
  */
 
 type Props = {
-  children: React.ReactNode,
-  className?: string
-  containerRef?: React.Ref<HTMLDivElement>
-  carouselId: string
+  children: React.ReactNode;
+  className?: string;
+  containerRef?: React.Ref<HTMLDivElement>;
+  carouselId: string;
 };
 
 const StyledDiv = styled.div`

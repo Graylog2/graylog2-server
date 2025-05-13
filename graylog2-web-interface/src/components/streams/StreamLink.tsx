@@ -21,9 +21,9 @@ import Routes from 'routing/Routes';
 
 type Props = {
   stream: {
-    id: string,
-    title: string,
-  },
+    id: string;
+    title: string;
+  };
 };
 
 const StreamLink = ({ stream }: Props) => {

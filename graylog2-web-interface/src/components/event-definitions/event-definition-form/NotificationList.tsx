@@ -35,9 +35,12 @@ type NotificationListProps = {
   onRemoveNotificationClick: (...args: any[]) => void;
 };
 
-class NotificationList extends React.Component<NotificationListProps, {
-  [key: string]: any;
-}> {
+class NotificationList extends React.Component<
+  NotificationListProps,
+  {
+    [key: string]: any;
+  }
+> {
   handleRemoveClick = (notificationId) => () => {
     const { onRemoveNotificationClick } = this.props;
 
@@ -49,7 +52,9 @@ class NotificationList extends React.Component<NotificationListProps, {
     if (notification.missing) {
       return (
         <tr>
-          <td colSpan={2}>Could not find information for Notification <em>{notification.title}</em></td>
+          <td colSpan={2}>
+            Could not find information for Notification <em>{notification.title}</em>
+          </td>
           <td className="actions">
             <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
               Delete
@@ -77,11 +82,13 @@ class NotificationList extends React.Component<NotificationListProps, {
   render() {
     const { eventDefinition, notifications, onAddNotificationClick } = this.props;
 
-    const definitionNotifications = eventDefinition.notifications
-      .map((edn) => notifications.find((n) => n.id === edn.notification_id) || {
-        title: edn.notification_id,
-        missing: true,
-      });
+    const definitionNotifications = eventDefinition.notifications.map(
+      (edn) =>
+        notifications.find((n) => n.id === edn.notification_id) || {
+          title: edn.notification_id,
+          missing: true,
+        },
+    );
     const addNotificationButton = (
       <Button bsStyle="success" onClick={onAddNotificationClick}>
         Add notification
@@ -91,9 +98,7 @@ class NotificationList extends React.Component<NotificationListProps, {
     if (definitionNotifications.length === 0) {
       return (
         <>
-          <p>
-            This Event is not configured to trigger any Notifications yet.
-          </p>
+          <p>This Event is not configured to trigger any Notifications yet.</p>
           {addNotificationButton}
         </>
       );
@@ -101,13 +106,15 @@ class NotificationList extends React.Component<NotificationListProps, {
 
     return (
       <>
-        <DataTable id="event-definition-notifications"
-                   className="table-striped table-hover"
-                   headers={['Notification', 'Type', 'Actions']}
-                   sortByKey="title"
-                   rows={definitionNotifications}
-                   dataRowFormatter={this.notificationFormatter}
-                   filterKeys={[]} />
+        <DataTable
+          id="event-definition-notifications"
+          className="table-striped table-hover"
+          headers={['Notification', 'Type', 'Actions']}
+          sortByKey="title"
+          rows={definitionNotifications}
+          dataRowFormatter={this.notificationFormatter}
+          filterKeys={[]}
+        />
         {addNotificationButton}
       </>
     );

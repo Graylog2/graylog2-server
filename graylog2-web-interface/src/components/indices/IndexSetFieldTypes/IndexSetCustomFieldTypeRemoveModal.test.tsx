@@ -24,25 +24,26 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import useIndexProfileWithMappingsByField
-  from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
+import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 
 const mockOnClosed = jest.fn();
-const renderIndexSetCustomFieldTypeRemoveModal = () => render(
-  <TestStoreProvider>
-    <IndexSetCustomFieldTypeRemoveModal indexSetIds={['111']} show onClose={mockOnClosed} fields={['field']} />
-  </TestStoreProvider>,
-);
+const renderIndexSetCustomFieldTypeRemoveModal = () =>
+  render(
+    <TestStoreProvider>
+      <IndexSetCustomFieldTypeRemoveModal indexSetIds={['111']} show onClose={mockOnClosed} fields={['field']} />
+    </TestStoreProvider>,
+  );
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
     list: jest.fn(),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: '111', title: 'index set title' },
-    ],
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [{ id: '111', title: 'index set title' }],
+    }),
+  ]),
 }));
 
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
@@ -82,7 +83,6 @@ describe('IndexSetFieldTypesList', () => {
 
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
-        hidden: true,
       });
       fireEvent.click(submit);
 
@@ -99,7 +99,6 @@ describe('IndexSetFieldTypesList', () => {
       const checkbox = await screen.findByText(/rotate affected indices after change/i);
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
-        hidden: true,
       });
       fireEvent.click(checkbox);
       fireEvent.click(submit);

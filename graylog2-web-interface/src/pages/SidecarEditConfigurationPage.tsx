@@ -30,9 +30,7 @@ type SidecarEditConfigurationPageProps = {
   params: any;
 };
 
-const SidecarEditConfigurationPage = ({
-  params,
-}: SidecarEditConfigurationPageProps) => {
+const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPageProps) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [configurationSidecars, setConfigurationSidecars] = useState<ConfigurationSidecarsResponse>(null);
   const history = useHistory();
@@ -45,8 +43,9 @@ const SidecarEditConfigurationPage = ({
         (_configuration) => {
           setConfiguration(_configuration);
 
-          CollectorConfigurationsActions.getConfigurationSidecars(configurationId)
-            .then((_configurationSidecars) => setConfigurationSidecars(_configurationSidecars));
+          CollectorConfigurationsActions.getConfigurationSidecars(configurationId).then((_configurationSidecars) =>
+            setConfigurationSidecars(_configurationSidecars),
+          );
         },
         (error) => {
           if (error.status === 404) {
@@ -68,17 +67,15 @@ const SidecarEditConfigurationPage = ({
   return (
     <DocumentTitle title="Collector Configuration">
       <SidecarsPageNavigation />
-      <PageHeader title="Collector Configuration"
-                  documentationLink={{
-                    title: 'Sidecar documentation',
-                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                  }}>
-        <span>
-          Some words about collector configurations.
-        </span>
+      <PageHeader
+        title="Collector Configuration"
+        documentationLink={{
+          title: 'Sidecar documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>Some words about collector configurations.</span>
       </PageHeader>
-      <ConfigurationForm configuration={configuration}
-                         configurationSidecars={configurationSidecars} />
+      <ConfigurationForm configuration={configuration} configurationSidecars={configurationSidecars} />
     </DocumentTitle>
   );
 };

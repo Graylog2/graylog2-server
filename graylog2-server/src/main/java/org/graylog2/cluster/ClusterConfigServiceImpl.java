@@ -20,29 +20,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
-import com.mongodb.DBCollection;
+import com.google.common.primitives.Ints;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReplaceOptions;
+import jakarta.inject.Inject;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
-import org.graylog2.security.SafeClasses;
 import org.graylog2.security.UnsafeClassLoadingAttemptException;
-import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.utilities.AutoValueUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Set;
 
@@ -53,7 +51,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     @VisibleForTesting
     static final String COLLECTION_NAME = "cluster_config";
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceImpl.class);
-    private final JacksonDBCollection<ClusterConfig, String> dbCollection;
+    private final MongoCollection<ClusterConfig> collection;
     private final NodeId nodeId;
     private final ObjectMapper objectMapper;
     private final RestrictedChainingClassLoader chainingClassLoader;
@@ -65,39 +63,21 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
                                     final NodeId nodeId,
                                     final RestrictedChainingClassLoader chainingClassLoader,
                                     final ClusterEventBus clusterEventBus) {
-        this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterConfig.class, String.class, mapperProvider.get()),
-                nodeId, mapperProvider.get(), chainingClassLoader, clusterEventBus);
-    }
-
-    @Deprecated
-    public ClusterConfigServiceImpl(final MongoJackObjectMapperProvider mapperProvider,
-                                    final MongoConnection mongoConnection,
-                                    final NodeId nodeId,
-                                    final ChainingClassLoader chainingClassLoader,
-                                    final ClusterEventBus clusterEventBus) {
-        this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterConfig.class, String.class, mapperProvider.get()),
-                nodeId, mapperProvider.get(), new RestrictedChainingClassLoader(chainingClassLoader, SafeClasses.allGraylogInternal()), clusterEventBus);
-    }
-
-    private ClusterConfigServiceImpl(final JacksonDBCollection<ClusterConfig, String> dbCollection,
-                                     final NodeId nodeId,
-                                     final ObjectMapper objectMapper,
-                                     final RestrictedChainingClassLoader chainingClassLoader,
-                                     final EventBus clusterEventBus) {
         this.nodeId = checkNotNull(nodeId);
-        this.dbCollection = checkNotNull(dbCollection);
-        this.objectMapper = checkNotNull(objectMapper);
+        this.collection = prepareCollection(mongoConnection, mapperProvider);
+        this.objectMapper = checkNotNull(mapperProvider.get());
         this.chainingClassLoader = chainingClassLoader;
         this.clusterEventBus = checkNotNull(clusterEventBus);
     }
 
     @VisibleForTesting
-    static DBCollection prepareCollection(final MongoConnection mongoConnection) {
-        DBCollection coll = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
-        coll.createIndex(DBSort.asc("type"), "unique_type", true);
-        coll.setWriteConcern(WriteConcern.JOURNALED);
-
-        return coll;
+    static MongoCollection<ClusterConfig> prepareCollection(final MongoConnection mongoConnection,
+                                                            MongoJackObjectMapperProvider mapperProvider) {
+        final MongoCollection<ClusterConfig> collection =
+                new MongoCollections(mapperProvider, mongoConnection).collection(COLLECTION_NAME, ClusterConfig.class)
+                        .withWriteConcern(WriteConcern.JOURNALED);
+        collection.createIndex(Indexes.ascending("type"), new IndexOptions().name("unique_type").unique(true));
+        return collection;
     }
 
     @Override
@@ -128,7 +108,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     private ClusterConfig findClusterConfig(String key) {
-        return dbCollection.findOne(DBQuery.is("type", key));
+        return collection.find(Filters.eq("type", key)).first();
     }
 
     @Override
@@ -166,7 +146,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
 
         ClusterConfig clusterConfig = ClusterConfig.create(key, payload, nodeId.getNodeId());
 
-        dbCollection.update(DBQuery.is("type", key), clusterConfig, true, false, WriteConcern.JOURNALED);
+        collection.replaceOne(Filters.eq("type", key), clusterConfig, new ReplaceOptions().upsert(true));
 
         ClusterConfigChangedEvent event = ClusterConfigChangedEvent.create(
                 DateTime.now(DateTimeZone.UTC), nodeId.getNodeId(), key);
@@ -176,27 +156,24 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     @Override
     public <T> int remove(Class<T> type) {
         final String canonicalName = type.getCanonicalName();
-        final WriteResult<ClusterConfig, String> result = dbCollection.remove(DBQuery.is("type", canonicalName));
-        return result.getN();
+        return Ints.saturatedCast(collection.deleteMany(Filters.eq("type", canonicalName)).getDeletedCount());
     }
 
     @Override
     public Set<Class<?>> list() {
         final ImmutableSet.Builder<Class<?>> classes = ImmutableSet.builder();
 
-        try (DBCursor<ClusterConfig> clusterConfigs = dbCollection.find()) {
-            for (ClusterConfig clusterConfig : clusterConfigs) {
-                final String type = clusterConfig.type();
-                try {
-                    final Class<?> cls = chainingClassLoader.loadClassSafely(type);
-                    classes.add(cls);
-                } catch (ClassNotFoundException e) {
-                    LOG.debug("Couldn't find configuration class \"{}\"", type, e);
-                } catch (UnsafeClassLoadingAttemptException e) {
-                    LOG.warn("Couldn't load class <{}>.", type, e);
-                }
+        collection.find().forEach(clusterConfig -> {
+            final String type = clusterConfig.type();
+            try {
+                final Class<?> cls = chainingClassLoader.loadClassSafely(type);
+                classes.add(cls);
+            } catch (ClassNotFoundException e) {
+                LOG.debug("Couldn't find configuration class \"{}\"", type, e);
+            } catch (UnsafeClassLoadingAttemptException e) {
+                LOG.warn("Couldn't load class <{}>.", type, e);
             }
-        }
+        });
 
         return classes.build();
     }

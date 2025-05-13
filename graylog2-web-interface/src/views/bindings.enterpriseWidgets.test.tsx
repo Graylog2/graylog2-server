@@ -37,7 +37,7 @@ jest.mock('stores/decorators/DecoratorsStore', () => ({
 describe('Views bindings enterprise widgets', () => {
   const { enterpriseWidgets } = bindings;
   type WidgetConfig = {
-    needsControlledHeight: (widget?: Widget) => boolean,
+    needsControlledHeight: (widget?: Widget) => boolean;
   };
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 

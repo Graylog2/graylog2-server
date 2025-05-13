@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { TimeUnit } from 'components/common';
+import type { TimeUnit as TimeUnitString } from 'components/common/types';
 
 type DnsAdapterSummaryProps = {
   dataAdapter: {
@@ -25,15 +26,13 @@ type DnsAdapterSummaryProps = {
       request_timeout: number;
       server_ips: string;
       cache_ttl_override_enabled: boolean;
-      cache_ttl_override: string;
-      cache_ttl_override_unit: string;
+      cache_ttl_override: number;
+      cache_ttl_override_unit: TimeUnitString;
     };
   };
 };
 
-const DnsAdapterSummary = ({
-  dataAdapter,
-}: DnsAdapterSummaryProps) => {
+const DnsAdapterSummary = ({ dataAdapter }: DnsAdapterSummaryProps) => {
   const { config } = dataAdapter;
 
   // Allows enum > display label translation.
@@ -58,7 +57,11 @@ const DnsAdapterSummary = ({
 
       <dt>Cache TTL Override</dt>
       <dd>
-        {!config.cache_ttl_override_enabled ? 'n/a' : <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} />}
+        {!config.cache_ttl_override_enabled ? (
+          'n/a'
+        ) : (
+          <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} />
+        )}
       </dd>
     </dl>
   );

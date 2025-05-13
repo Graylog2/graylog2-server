@@ -28,9 +28,12 @@ type CommonFieldValueProviderSummaryProps = {
   children: React.ReactElement;
 };
 
-class CommonFieldValueProviderSummary extends React.Component<CommonFieldValueProviderSummaryProps, {
-  [key: string]: any;
-}> {
+class CommonFieldValueProviderSummary extends React.Component<
+  CommonFieldValueProviderSummaryProps,
+  {
+    [key: string]: any;
+  }
+> {
   state = {
     displayDetails: false,
   };
@@ -50,7 +53,8 @@ class CommonFieldValueProviderSummary extends React.Component<CommonFieldValuePr
         <dt>{fieldName}</dt>
         <dd>
           <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-            <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />&nbsp;
+            <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
+            &nbsp;
             {displayDetails ? 'Less details' : 'More details'}
           </Button>
           {displayDetails && (

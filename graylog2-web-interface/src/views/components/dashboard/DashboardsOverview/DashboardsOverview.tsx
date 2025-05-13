@@ -27,27 +27,32 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import BulkActions from './BulkActions';
 
 type Props = {
-  isEvidenceModal?: boolean,
+  isEvidenceModal?: boolean;
 };
 
 const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
   const customColumnRenderers = useColumnRenderers();
 
-  const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />
-  ), [isEvidenceModal]);
+  const renderDashboardActions = useCallback(
+    (dashboard: View) => <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />,
+    [isEvidenceModal],
+  );
 
   return (
-    <PaginatedEntityTable<View> humanName="dashboards"
-                                columnsOrder={COLUMNS_ORDER}
-                                queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                                entityActions={renderDashboardActions}
-                                tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
-                                fetchEntities={fetchDashboards}
-                                keyFn={keyFn}
-                                entityAttributesAreCamelCase
-                                bulkSelection={{ actions: <BulkActions /> }}
-                                columnRenderers={customColumnRenderers} />
+    <PaginatedEntityTable<View>
+      humanName="dashboards"
+      columnsOrder={COLUMNS_ORDER}
+      queryHelpComponent={
+        <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
+      }
+      entityActions={renderDashboardActions}
+      tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
+      fetchEntities={fetchDashboards}
+      keyFn={keyFn}
+      entityAttributesAreCamelCase
+      bulkSelection={{ actions: <BulkActions /> }}
+      columnRenderers={customColumnRenderers}
+    />
   );
 };
 

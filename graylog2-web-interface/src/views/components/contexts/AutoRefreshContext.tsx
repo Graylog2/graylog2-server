@@ -19,16 +19,16 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 export type RefreshConfig = {
-  interval: number,
-  enabled: boolean
-}
+  interval: number;
+  enabled: boolean;
+};
 
 export type AutoRefreshContextType = {
-  refreshConfig: RefreshConfig | null,
-  startAutoRefresh: (interval: number) => void
-  stopAutoRefresh: () => void,
-  restartAutoRefresh: () => void,
-  animationId: string,
+  refreshConfig: RefreshConfig | null;
+  startAutoRefresh: (interval: number) => void;
+  stopAutoRefresh: () => void;
+  restartAutoRefresh: () => void;
+  animationId: string;
 };
 
 const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);

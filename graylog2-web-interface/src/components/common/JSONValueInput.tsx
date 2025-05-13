@@ -50,9 +50,12 @@ type JSONValueInputProps = {
   wrapperClassName?: string;
 };
 
-class JSONValueInput extends React.Component<JSONValueInputProps, {
-  [key: string]: any;
-}> {
+class JSONValueInput extends React.Component<
+  JSONValueInputProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     value: '',
     valueType: 'STRING',
@@ -95,17 +98,28 @@ class JSONValueInput extends React.Component<JSONValueInputProps, {
   };
 
   render() {
-    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>);
+    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => (
+      <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>
+        {o.label}
+      </MenuItem>
+    ));
 
     return (
       <FormGroup validationState={this.props.validationState}>
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
-            <FormControl type="text" onChange={this._onUpdate} onBlur={this.props.onBlur} value={this.state.value} required={this.props.required} />
-            <DropdownButton id="input-dropdown-addon"
-                            bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-                            title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
+            <FormControl
+              type="text"
+              onChange={this._onUpdate}
+              onBlur={this.props.onBlur}
+              value={this.state.value}
+              required={this.props.required}
+            />
+            <DropdownButton
+              id="input-dropdown-addon"
+              bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
+              title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>

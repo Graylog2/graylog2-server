@@ -23,13 +23,16 @@ import 'components/content-packs/ContentPackDetails.css';
 import ContentPackInstallEntityList from './ContentPackInstallEntityList';
 
 type ContentPackInstallViewProps = {
-  install: any;
+  install: {
+    comment: string;
+    created_at: string;
+    created_by: string;
+    entities: any[];
+  };
 };
 
-const ContentPackInstallView = (props: ContentPackInstallViewProps) => {
-  const { comment } = props.install;
-  const createdAt = props.install.created_at;
-  const createdBy = props.install.created_by;
+const ContentPackInstallView = ({ install }: ContentPackInstallViewProps) => {
+  const { comment, created_at: createdAt, created_by: createdBy, entities } = install;
 
   return (
     <div>
@@ -42,13 +45,15 @@ const ContentPackInstallView = (props: ContentPackInstallViewProps) => {
             <dt>Installed by:</dt>
             <dd>{createdBy}&nbsp;</dd>
             <dt>Installed at:</dt>
-            <dd><Timestamp dateTime={createdAt} /></dd>
+            <dd>
+              <Timestamp dateTime={createdAt} />
+            </dd>
           </dl>
         </Col>
       </Row>
       <Row>
         <Col smOffset={1} sm={10}>
-          <ContentPackInstallEntityList entities={props.install.entities} />
+          <ContentPackInstallEntityList entities={entities} />
         </Col>
       </Row>
     </div>

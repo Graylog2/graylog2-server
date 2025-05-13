@@ -138,7 +138,7 @@ describe('PublicNotifications', () => {
   });
 
   it('should render from AppConfig when no plugins are configured', () => {
-    asMock(usePluginEntities).mockImplementation(() => ([]));
+    asMock(usePluginEntities).mockImplementation(() => []);
 
     render(<PublicNotifications readFromConfig />);
 

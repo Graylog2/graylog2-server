@@ -21,33 +21,28 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
-import org.graylog2.security.SafeClasses;
 import org.graylog2.security.UnsafeClassLoadingAttemptException;
-import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.utilities.AutoValueUtils;
-import org.mongojack.DBCursor;
-import org.mongojack.DBSort;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClusterEventPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventPeriodical.class);
@@ -55,7 +50,7 @@ public class ClusterEventPeriodical extends Periodical {
     @VisibleForTesting
     static final String COLLECTION_NAME = "cluster_events";
 
-    private final JacksonDBCollection<ClusterEvent, String> dbCollection;
+    private final MongoCollection<ClusterEvent> collection;
     private final NodeId nodeId;
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
@@ -68,52 +63,28 @@ public class ClusterEventPeriodical extends Periodical {
                                   final RestrictedChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
                                   final ClusterEventBus clusterEventBus) {
-        this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterEvent.class, String.class, mapperProvider.get()),
-                nodeId, mapperProvider.get(), chainingClassLoader, serverEventBus, clusterEventBus);
-    }
-
-    @Deprecated
-    public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
-                                  final MongoConnection mongoConnection,
-                                  final NodeId nodeId,
-                                  final ChainingClassLoader chainingClassLoader,
-                                  final EventBus serverEventBus,
-                                  final ClusterEventBus clusterEventBus) {
-        this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterEvent.class, String.class,
-                        mapperProvider.get()), nodeId, mapperProvider.get(),
-                new RestrictedChainingClassLoader(chainingClassLoader, SafeClasses.allGraylogInternal()),
-                serverEventBus, clusterEventBus);
-    }
-
-    private ClusterEventPeriodical(final JacksonDBCollection<ClusterEvent, String> dbCollection,
-                                   final NodeId nodeId,
-                                   final ObjectMapper objectMapper,
-                                   final RestrictedChainingClassLoader chainingClassLoader,
-                                   final EventBus serverEventBus,
-                                   final ClusterEventBus clusterEventBus) {
-        this.nodeId = checkNotNull(nodeId);
-        this.dbCollection = checkNotNull(dbCollection);
-        this.objectMapper = checkNotNull(objectMapper);
+        this.nodeId = nodeId;
+        this.objectMapper = mapperProvider.get();
         this.chainingClassLoader = chainingClassLoader;
-        this.serverEventBus = checkNotNull(serverEventBus);
+        this.serverEventBus = serverEventBus;
+        this.collection = prepareCollection(mongoConnection, mapperProvider);
 
-        checkNotNull(clusterEventBus).registerClusterEventSubscriber(this);
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     @VisibleForTesting
-    static DBCollection prepareCollection(final MongoConnection mongoConnection) {
-        final DB db = mongoConnection.getDatabase();
+    static MongoCollection<ClusterEvent> prepareCollection(final MongoConnection mongoConnection,
+                                                           final MongoJackObjectMapperProvider mapperProvider) {
+        final var collection = new MongoCollections(mapperProvider, mongoConnection)
+                .collection(COLLECTION_NAME, ClusterEvent.class)
+                .withWriteConcern(WriteConcern.JOURNALED);
 
-        DBCollection coll = db.getCollection(COLLECTION_NAME);
+        collection.createIndex(Indexes.ascending(
+                "timestamp",
+                "producer",
+                "consumers"));
 
-        coll.createIndex(DBSort
-                .asc("timestamp")
-                .asc("producer")
-                .asc("consumers"));
-
-        coll.setWriteConcern(WriteConcern.JOURNALED);
-
-        return coll;
+        return collection;
     }
 
     @Override
@@ -159,24 +130,26 @@ public class ClusterEventPeriodical extends Periodical {
     @Override
     public void doRun() {
         LOG.debug("Opening MongoDB cursor on \"{}\"", COLLECTION_NAME);
-        try (DBCursor<ClusterEvent> cursor = eventCursor(nodeId)) {
+        try {
+            final FindIterable<ClusterEvent> eventsIterable = eventsIterable(nodeId);
             if (LOG.isTraceEnabled()) {
-                LOG.trace("MongoDB query plan: {}", cursor.explain());
+                LOG.trace("MongoDB query plan: {}", eventsIterable.explain());
             }
 
-            while (cursor.hasNext()) {
-                ClusterEvent clusterEvent = cursor.next();
-                LOG.trace("Processing cluster event: {}", clusterEvent);
+            try (final var stream = MongoUtils.stream(eventsIterable)) {
+                stream.forEach(clusterEvent -> {
+                    LOG.trace("Processing cluster event: {}", clusterEvent);
 
-                Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
-                if (payload != null) {
-                    serverEventBus.post(payload);
-                } else {
-                    LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
-                    LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
-                }
+                    Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
+                    if (payload != null) {
+                        serverEventBus.post(payload);
+                    } else {
+                        LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
+                        LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+                    }
 
-                updateConsumers(clusterEvent.id(), nodeId);
+                    updateConsumers(clusterEvent.id(), nodeId);
+                });
             }
         } catch (Exception e) {
             LOG.warn("Error while reading cluster events from MongoDB, retrying.", e);
@@ -194,7 +167,7 @@ public class ClusterEventPeriodical extends Periodical {
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, Collections.singleton(nodeId.getNodeId()), event);
 
         try {
-            final String id = dbCollection.save(clusterEvent, WriteConcern.JOURNALED).getSavedId();
+            final String id = MongoUtils.insertedIdAsString(collection.insertOne(clusterEvent));
             // We are handling a locally generated event, so we can speed up processing by posting it to the local event
             // bus immediately. Due to having added the local node id to its list of consumers, it will not be picked up
             // by the db cursor again, avoiding double processing of the event. See #11263 for details.
@@ -205,17 +178,13 @@ public class ClusterEventPeriodical extends Periodical {
         }
     }
 
-    private DBCursor<ClusterEvent> eventCursor(NodeId nodeId) {
-        // Resorting to ugly MongoDB Java Client because of https://github.com/devbliss/mongojack/issues/88
-        final BasicDBList consumersList = new BasicDBList();
-        consumersList.add(nodeId.getNodeId());
-        final DBObject query = new BasicDBObject("consumers", new BasicDBObject("$nin", consumersList));
-
-        return dbCollection.find(query).sort(DBSort.asc("timestamp"));
+    private FindIterable<ClusterEvent> eventsIterable(NodeId nodeId) {
+        return collection.find(Filters.nin("consumers", nodeId.getNodeId()))
+                .sort(Sorts.ascending("timestamp"));
     }
 
     private void updateConsumers(final String eventId, final NodeId nodeId) {
-        dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.getNodeId()));
+        collection.updateOne(MongoUtils.idEq(eventId), Updates.addToSet("consumers", nodeId.getNodeId()));
     }
 
     private Object extractPayload(Object payload, String eventClass) {

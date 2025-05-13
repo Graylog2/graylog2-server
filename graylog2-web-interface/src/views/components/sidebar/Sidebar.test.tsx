@@ -74,17 +74,19 @@ describe('<Sidebar />', () => {
   const searchTypes = { 'search-type-id': { total: 12345, type: 'generic' } };
   const queryResult = new QueryResult({ execution_stats: executionStats, query, errors, search_types: searchTypes });
 
-  const openDescriptionSection = async () => fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+  const openDescriptionSection = async () =>
+    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
 
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
-  const renderSidebar = () => render(
-    <TestStoreProvider>
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    </TestStoreProvider>,
-  );
+  const renderSidebar = () =>
+    render(
+      <TestStoreProvider>
+        <Sidebar results={queryResult} title="Sidebar Title">
+          <TestComponent />
+        </Sidebar>
+      </TestStoreProvider>,
+    );
 
   useViewsPlugin();
 
@@ -100,7 +102,9 @@ describe('<Sidebar />', () => {
 
     await openDescriptionSection();
 
-    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:27'));
+    await screen.findAllByText(
+      (_content, node) => node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:27',
+    );
   });
 
   it('should render summary and description of a view', async () => {
@@ -179,8 +183,8 @@ describe('<Sidebar />', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: /description/i }));
 
-    await screen.findByText((_content, node) => (node.textContent === 'Effective time rangeVaries per widget'));
-    await screen.findByText((_content, node) => (node.textContent === 'Total resultsVaries per widget'));
+    await screen.findByText((_content, node) => node.textContent === 'Effective time rangeVaries per widget');
+    await screen.findByText((_content, node) => node.textContent === 'Total resultsVaries per widget');
   });
 
   it('should render the effective search execution time range for dashboards with global override', async () => {
@@ -227,7 +231,7 @@ describe('<Sidebar />', () => {
 
     await screen.findByText('Execution');
 
-    fireEvent.click(await screen.findByText('Query Title'));
+    fireEvent.click(await screen.findByText('Sidebar Title'));
 
     expect(screen.queryByText('Execution')).toBeNull();
   });

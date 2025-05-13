@@ -23,20 +23,16 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 
 type Props = {
-  roleId: $PropertyType<Role, 'id'>,
+  roleId: $PropertyType<Role, 'id'>;
 };
 
 const RoleActionLinks = ({ roleId }: Props) => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHZROLES.show(roleId)}>
-      <Button bsStyle="success">
-        View Details
-      </Button>
+      <Button bsStyle="success">View Details</Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(roleId)}>
-      <Button bsStyle="success">
-        Edit Role
-      </Button>
+      <Button bsStyle="success">Edit Role</Button>
     </LinkContainer>
   </ButtonToolbar>
 );

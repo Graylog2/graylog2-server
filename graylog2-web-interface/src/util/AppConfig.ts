@@ -22,15 +22,46 @@ declare global {
   const IS_CLOUD: boolean | undefined;
 }
 
+export type BrandingResource = { enabled?: boolean; url?: string | undefined };
+export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
+
+export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
+
+export type Branding = {
+  product_name?: string;
+  favicon?: string;
+  logo?: {
+    light: string;
+    dark: string;
+  };
+  login?: {
+    background?: string;
+  };
+  welcome?: {
+    news?: { enabled: boolean; feed?: string };
+    releases?: { enabled: boolean };
+  };
+  navigation?: {
+    home?: { icon: string };
+    user_menu?: { icon: string };
+    scratchpad?: { icon: string };
+    help?: { icon: string };
+  };
+  help_url?: string;
+  footer?: { enabled: boolean };
+  resources?: BrandingResources;
+};
+
 export type AppConfigs = {
-  gl2ServerUrl: string,
-  gl2AppPathPrefix: string,
-  rootTimeZone: string,
-  isCloud: boolean,
-  pluginUISettings: { [key: string]: {} },
-  featureFlags: { [key: string]: string },
-  telemetry: { api_key: string, host: string, enabled: boolean },
-  contentStream: { refresh_interval: string, rss_url: string },
+  gl2ServerUrl: string;
+  gl2AppPathPrefix: string;
+  rootTimeZone: string;
+  isCloud: boolean;
+  pluginUISettings: { [key: string]: {} };
+  featureFlags: { [key: string]: string };
+  telemetry: { api_key: string; host: string; enabled: boolean };
+  contentStream: { refresh_interval: string; rss_url: string };
+  branding: Branding | undefined;
 };
 
 declare global {
@@ -41,10 +72,12 @@ declare global {
 
 const appConfig = (): AppConfigs => (window.appConfig || {}) as AppConfigs;
 
-const getEnabledFeatures = () => Immutable.Map(appConfig().featureFlags)
-  .filter((value) => value.trim().toLowerCase() === 'on')
-  .keySeq().toList()
-  .filter((s) => typeof s === 'string');
+const getEnabledFeatures = () =>
+  Immutable.Map(appConfig().featureFlags)
+    .filter((value) => value.trim().toLowerCase() === 'on')
+    .keySeq()
+    .toList()
+    .filter((s) => typeof s === 'string');
 
 const AppConfig = {
   contentStream() {
@@ -62,13 +95,11 @@ const AppConfig = {
   gl2DevMode() {
     // The DEVELOPMENT variable will be set by webpack via the DefinePlugin.
 
-    return typeof (DEVELOPMENT) !== 'undefined' && DEVELOPMENT;
+    return typeof DEVELOPMENT !== 'undefined' && DEVELOPMENT;
   },
 
   isFeatureEnabled(feature: string) {
-    return this.features && this.features
-      .map((s) => s.trim().toLowerCase())
-      .includes(feature.toLowerCase());
+    return this.features && this.features.map((s) => s.trim().toLowerCase()).includes(feature.toLowerCase());
   },
 
   rootTimeZone() {
@@ -97,10 +128,13 @@ const AppConfig = {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
-  pluginUISettings(key: string) : any {
+  pluginUISettings(key: string): any {
     return appConfig()?.pluginUISettings?.[key] ?? {};
   },
 
+  branding(): Branding | undefined {
+    return appConfig()?.branding;
+  },
 };
 
 export default AppConfig;

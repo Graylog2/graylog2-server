@@ -78,6 +78,7 @@ public class ScopedEntityMongoUtilsTest {
         assertThatThrownBy(() -> scopedEntityMongoUtils.deleteById(id))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(scopedEntityMongoUtils.forceDelete(id)).isEqualTo(1L);
+        assertThat(scopedEntityMongoUtils.forceUpdate(updated)).isEqualTo(updated);
     }
 
     @Test

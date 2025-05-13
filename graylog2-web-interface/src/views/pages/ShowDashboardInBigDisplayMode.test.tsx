@@ -26,13 +26,19 @@ import { asMock } from 'helpers/mocking';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useQuery from 'routing/useQuery';
 
-const mockView = createSearch({ queryId: 'somequery' }).toBuilder()
+const mockView = createSearch({ queryId: 'somequery' })
+  .toBuilder()
   .type(View.Type.Dashboard)
   .id('view-id')
   .title('view title')
   .build();
 
-jest.mock('views/pages/ShowViewPage', () => ({ children }: React.PropsWithChildren<{}>) => children);
+jest.mock(
+  'views/pages/ShowViewPage',
+  () =>
+    ({ children }: React.PropsWithChildren<{}>) =>
+      children,
+);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 jest.mock('views/hooks/useAutoRefresh');

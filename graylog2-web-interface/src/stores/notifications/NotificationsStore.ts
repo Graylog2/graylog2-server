@@ -22,51 +22,49 @@ import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 export type NotificationType = {
-  severity: string,
-  type: string,
-  key?: string,
-  timestamp: string,
-  node_id: string,
+  severity: string;
+  type: string;
+  key?: string;
+  timestamp: string;
+  node_id: string;
   details?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
 };
 
 export type NotificationMessage = {
-  title: string,
-  description: string,
+  title: string;
+  description: string;
 };
 
 type NotificationsStoreType = {
-  notifications: Array<NotificationType>,
-  total: number,
-  messages:{
-    [key: string]: NotificationMessage,
-  },
+  notifications: Array<NotificationType>;
+  total: number;
+  messages: {
+    [key: string]: NotificationMessage;
+  };
 };
 
-type NotificationMessageOptions ={
+type NotificationMessageOptions = {
   values?: {
-    [key: string]: string,
-  }
-}
+    [key: string]: string;
+  };
+};
 type NotificationsActionType = {
-  delete: (type: string, key: string) => Promise<unknown>,
-  list: () => Promise<unknown>,
-  getHtmlMessage: (type: string, key: string, options: NotificationMessageOptions) => Promise<unknown>,
-}
-export const NotificationsActions = singletonActions(
-  'core.Notifications',
-  () => Reflux.createActions<NotificationsActionType>({
+  delete: (type: string, key: string) => Promise<unknown>;
+  list: () => Promise<unknown>;
+  getHtmlMessage: (type: string, key: string, options: NotificationMessageOptions) => Promise<unknown>;
+};
+export const NotificationsActions = singletonActions('core.Notifications', () =>
+  Reflux.createActions<NotificationsActionType>({
     delete: { asyncResult: true },
     list: { asyncResult: true },
     getHtmlMessage: { asyncResult: true },
   }),
 );
 
-export const NotificationsStore = singletonStore(
-  'core.Notifications',
-  () => Reflux.createStore<NotificationsStoreType>({
+export const NotificationsStore = singletonStore('core.Notifications', () =>
+  Reflux.createStore<NotificationsStoreType>({
     listenables: [NotificationsActions],
     notifications: undefined,
     total: undefined,
@@ -93,8 +91,7 @@ export const NotificationsStore = singletonStore(
 
     list() {
       const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
-      const promise = this.promises.list || fetchPeriodically('GET', url)
-        .finally(() => delete this.promises.list);
+      const promise = this.promises.list || fetchPeriodically('GET', url).finally(() => delete this.promises.list);
 
       this.promises.list = promise;
 

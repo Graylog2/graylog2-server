@@ -40,9 +40,12 @@ type DataAdapterFormProps = {
   history: any;
 };
 
-class DataAdapterForm extends React.Component<DataAdapterFormProps, {
-  [key: string]: any;
-}> {
+class DataAdapterForm extends React.Component<
+  DataAdapterFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   validationCheckTimer = undefined;
 
   _input = undefined;
@@ -260,8 +263,10 @@ class DataAdapterForm extends React.Component<DataAdapterFormProps, {
       return (
         <div>
           <span>{defaultText}</span>
-        &nbsp;
-          <span><b>{validationErrors[fieldName][0]}</b></span>
+          &nbsp;
+          <span>
+            <b>{validationErrors[fieldName][0]}</b>
+          </span>
         </div>
       );
     }
@@ -273,7 +278,11 @@ class DataAdapterForm extends React.Component<DataAdapterFormProps, {
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
 
-    return <TagName>{title} <small>({typeName})</small></TagName>;
+    return (
+      <TagName>
+        {title} <small>({typeName})</small>
+      </TagName>
+    );
   };
 
   render() {
@@ -315,75 +324,83 @@ class DataAdapterForm extends React.Component<DataAdapterFormProps, {
     if (documentationComponent) {
       formRowWidth = 6;
 
-      documentationColumn = (
-        <Col lg={formRowWidth}>
-          {documentationComponent}
-        </Col>
-      );
+      documentationColumn = <Col lg={formRowWidth}>{documentationComponent}</Col>;
     }
 
     return (
       <>
-        <p>
-          {this._renderTitle(title, pluginDisplayName, create)}
-        </p>
+        <p>{this._renderTitle(title, pluginDisplayName, create)}</p>
         <Row>
           <Col lg={formRowWidth}>
             <form className="form form-horizontal" onSubmit={this._save}>
               <fieldset>
-                <Input type="text"
-                       id="title"
-                       name="title"
-                       label="Title"
-                       autoFocus
-                       required
-                       onChange={this._onChange}
-                       help="A short title for this data adapter."
-                       value={dataAdapter.title}
-                       labelClassName="col-sm-3"
-                       ref={(ref) => { this._input = ref; }}
-                       wrapperClassName="col-sm-9" />
+                <Input
+                  type="text"
+                  id="title"
+                  name="title"
+                  label="Title"
+                  autoFocus
+                  required
+                  onChange={this._onChange}
+                  help="A short title for this data adapter."
+                  value={dataAdapter.title}
+                  labelClassName="col-sm-3"
+                  ref={(ref) => {
+                    this._input = ref;
+                  }}
+                  wrapperClassName="col-sm-9"
+                />
 
-                <Input type="text"
-                       id="description"
-                       name="description"
-                       label="Description"
-                       onChange={this._onChange}
-                       help="Data adapter description."
-                       value={dataAdapter.description}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9" />
+                <Input
+                  type="text"
+                  id="description"
+                  name="description"
+                  label="Description"
+                  onChange={this._onChange}
+                  help="Data adapter description."
+                  value={dataAdapter.description}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                />
 
-                <Input type="text"
-                       id="name"
-                       name="name"
-                       label="Name"
-                       required
-                       onChange={this._onChange}
-                       help={this._validationMessage('name',
-                         'The name that is being used to refer to this data adapter. Must be unique.')}
-                       value={dataAdapter.name}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       bsStyle={this._validationState('name')} />
+                <Input
+                  type="text"
+                  id="name"
+                  name="name"
+                  label="Name"
+                  required
+                  onChange={this._onChange}
+                  help={this._validationMessage(
+                    'name',
+                    'The name that is being used to refer to this data adapter. Must be unique.',
+                  )}
+                  value={dataAdapter.name}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                  bsStyle={this._validationState('name')}
+                />
 
-                <TimeUnitInput label="Custom Error TTL"
-                               help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
-                               update={this.updateCustomErrorTTL}
-                               value={dataAdapter.custom_error_ttl}
-                               unit={dataAdapter.custom_error_ttl_unit || 'MINUTES'}
-                               units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
-                               enabled={dataAdapter.custom_error_ttl_enabled}
-                               labelClassName="col-sm-3"
-                               wrapperClassName="col-sm-9" />
+                <TimeUnitInput
+                  label="Custom Error TTL"
+                  help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
+                  update={this.updateCustomErrorTTL}
+                  value={dataAdapter.custom_error_ttl}
+                  unit={dataAdapter.custom_error_ttl_unit || 'MINUTES'}
+                  units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
+                  enabled={dataAdapter.custom_error_ttl_enabled}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                />
               </fieldset>
               {configFieldSet}
               <fieldset>
                 <Row>
                   <Col mdOffset={3} md={9}>
-                    <FormSubmit submitButtonText={create ? 'Create adapter' : 'Update adapter'}
-                                disabledSubmit={isFormDisabled}
-                                onCancel={onCancel} />
+                    <FormSubmit
+                      submitButtonText={create ? 'Create adapter' : 'Update adapter'}
+                      disabledSubmit={isFormDisabled}
+                      onCancel={onCancel}
+                    />
                   </Col>
                 </Row>
               </fieldset>

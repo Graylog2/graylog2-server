@@ -24,16 +24,17 @@ type StyledBootstrapInputAddonProps = {
   className?: string;
 };
 
-const StyledBootstrapInputAddon = ({
-  className,
-  ...rest
-}: StyledBootstrapInputAddonProps) => <BootstrapInputGroup.Addon bsClass={className} {...rest} />;
+const StyledBootstrapInputAddon = ({ className, ...rest }: StyledBootstrapInputAddonProps) => (
+  <BootstrapInputGroup.Addon bsClass={className} {...rest} />
+);
 
-export const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
-  color: ${theme.colors.input.color};
-  background-color: ${theme.colors.input.background};
-  border-color: ${theme.colors.input.border};
-`);
+export const StyledAddon = styled(StyledBootstrapInputAddon)(
+  ({ theme }) => css`
+    color: ${theme.colors.input.color};
+    background-color: ${theme.colors.input.background};
+    border-color: ${theme.colors.input.border};
+  `,
+);
 
 type AddonProps = {
   bsClass?: string;
@@ -41,11 +42,9 @@ type AddonProps = {
   children: React.ReactNode;
 };
 
-const Addon = ({
-  bsClass = 'input-group-addon',
-  className,
-  ...addonProps
-}: AddonProps) => <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
+const Addon = ({ bsClass = 'input-group-addon', className, ...addonProps }: AddonProps) => (
+  <StyledAddon className={classNames(bsClass, className)} {...addonProps} />
+);
 
 type ButtonProps = {
   bsClass?: string;
@@ -53,11 +52,9 @@ type ButtonProps = {
   children: React.ReactNode;
 };
 
-const Button = ({
-  bsClass = 'input-group-btn',
-  className,
-  ...addonProps
-}: ButtonProps) => <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
+const Button = ({ bsClass = 'input-group-btn', className, ...addonProps }: ButtonProps) => (
+  <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />
+);
 
 type InputGroupProps = React.ComponentProps<typeof BootstrapInputGroup> & {
   bsClass?: string;
@@ -65,11 +62,9 @@ type InputGroupProps = React.ComponentProps<typeof BootstrapInputGroup> & {
   children: React.ReactNode;
 };
 
-const InputGroup = ({
-  bsClass = 'input-group',
-  className,
-  ...restProps
-}: InputGroupProps) => <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />;
+const InputGroup = ({ bsClass = 'input-group', className, ...restProps }: InputGroupProps) => (
+  <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />
+);
 
 InputGroup.Addon = Addon;
 InputGroup.Button = Button;

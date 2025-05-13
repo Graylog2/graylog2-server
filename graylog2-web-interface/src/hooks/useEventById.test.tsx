@@ -39,19 +39,17 @@ const queryClient = new QueryClient({
     },
   },
 });
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -79,9 +77,12 @@ describe('useEventById', () => {
     const { waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await suppressConsole(async () => {
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Loading event or alert failed with status: Error: Error',
-        'Could not load event or alert'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Loading event or alert failed with status: Error: Error',
+          'Could not load event or alert',
+        ),
+      );
     });
   });
 });

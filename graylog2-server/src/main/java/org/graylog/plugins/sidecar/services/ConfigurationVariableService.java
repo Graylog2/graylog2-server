@@ -16,38 +16,46 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.mongodb.BasicDBObject;
-import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
-import org.mongojack.DBQuery;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
+import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.mongodb.client.model.Filters.eq;
+import static org.graylog.plugins.sidecar.rest.models.ConfigurationVariable.FIELD_NAME;
 
 @Singleton
-public class ConfigurationVariableService extends PaginatedDbService<ConfigurationVariable> {
+public class ConfigurationVariableService {
     private static final String COLLECTION_NAME = "sidecar_configuration_variables";
 
+    private final MongoCollection<ConfigurationVariable> collection;
+    private final MongoUtils<ConfigurationVariable> mongoUtils;
+
     @Inject
-    public ConfigurationVariableService(MongoConnection mongoConnection,
-                                        MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, ConfigurationVariable.class, COLLECTION_NAME);
-        db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
+    public ConfigurationVariableService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, ConfigurationVariable.class);
+        mongoUtils = mongoCollections.utils(collection);
+
+        collection.createIndex(Indexes.ascending(FIELD_NAME), new IndexOptions().unique(true));
     }
 
     public List<ConfigurationVariable> all() {
-        try (final Stream<ConfigurationVariable> configurationVariableStream =
-                     streamQueryWithSort(DBQuery.empty(), getSortBuilder("asc", "name"))) {
-            return configurationVariableStream.collect(Collectors.toList());
-        }
+        return collection.find().sort(Sorts.ascending(FIELD_NAME)).into(new ArrayList<>());
     }
 
     public ConfigurationVariable fromRequest(ConfigurationVariable request) {
@@ -66,32 +74,36 @@ public class ConfigurationVariableService extends PaginatedDbService<Configurati
     }
 
     public ConfigurationVariable find(String id) {
-        return db.findOne(DBQuery.is("_id", id));
+        return mongoUtils.getById(id).orElse(null);
     }
 
     public ConfigurationVariable findByName(String name) {
-        return db.findOne(DBQuery.is("name", name));
+        return collection.find(eq(FIELD_NAME, name)).first();
     }
 
     public boolean hasConflict(ConfigurationVariable variable) {
-        final DBQuery.Query query;
+        final Bson filter;
 
         if (isNullOrEmpty(variable.id())) {
-            query = DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name());
+            filter = eq(FIELD_NAME, variable.name());
         } else {
             // updating an existing variable, don't match against itself
-            query = DBQuery.and(
-                    DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name()),
-                    DBQuery.notEquals("_id", variable.id()
-                    )
+            filter = Filters.and(
+                    eq(FIELD_NAME, variable.name()),
+                    Filters.ne("_id", new ObjectId(variable.id()))
             );
         }
-        return db.getCount(query) > 0;
+
+        return collection.countDocuments(filter) > 0;
     }
 
-    @Override
     public ConfigurationVariable save(ConfigurationVariable configurationVariable) {
-        return db.findAndModify(DBQuery.is("_id", configurationVariable.id()), new BasicDBObject(),
-                new BasicDBObject(), false, configurationVariable, true, true);
+        return collection.findOneAndReplace(MongoUtils.idEq(Objects.requireNonNull(configurationVariable.id())),
+                configurationVariable,
+                new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true));
+    }
+
+    public int delete(String id) {
+        return mongoUtils.deleteById(id) ? 1 : 0;
     }
 }

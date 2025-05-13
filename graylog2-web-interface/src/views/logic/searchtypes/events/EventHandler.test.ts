@@ -22,7 +22,7 @@ import EventHandler from './EventHandler';
 
 const formatTimestamp = (timezone: string) => (timestamp: string) => moment(timestamp).tz(timezone).toISOString(true);
 
-const groupByTimestamp = ((es: Event[]) => groupBy(es, (e) => e.timestamp));
+const groupByTimestamp = (es: Event[]) => groupBy(es, (e) => e.timestamp);
 
 describe('EventHandler convert', () => {
   const event: Event = {

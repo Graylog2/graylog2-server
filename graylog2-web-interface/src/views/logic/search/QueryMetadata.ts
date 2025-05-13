@@ -18,11 +18,11 @@
 import * as Immutable from 'immutable';
 
 type State = {
-  usedParameterNames: Immutable.Set<string>,
+  usedParameterNames: Immutable.Set<string>;
 };
 
 export type QueryMetadataJson = {
-  used_parameters_names: Array<string>,
+  used_parameters_names: Array<string>;
 };
 
 export default class QueryMetadata {

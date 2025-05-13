@@ -18,6 +18,7 @@ package org.graylog2.indexer.cluster;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -35,6 +36,8 @@ public interface ClusterAdapter {
     Optional<HealthStatus> health();
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
+
+    ClusterShardAllocation clusterShardAllocation();
 
     Set<NodeDiskUsageStats> diskUsageStats();
 

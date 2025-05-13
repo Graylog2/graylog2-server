@@ -76,7 +76,10 @@ public class DBEventProcessorServiceTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void loadPersisted() {
-        final List<EventDefinitionDto> dtos = dbService.streamAll().collect(Collectors.toList());
+        final List<EventDefinitionDto> dtos;
+        try (var stream = dbService.streamAll()) {
+            dtos = stream.collect(Collectors.toList());
+        }
 
         assertThat(dtos).hasSize(1);
 

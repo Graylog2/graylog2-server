@@ -22,7 +22,11 @@ import ErrorPage from 'components/errors/ErrorPage';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 
-const createErrorMessageString = (errorDetails: string | null | undefined, pageDetails: string, errorMessage: string) => {
+const createErrorMessageString = (
+  errorDetails: string | null | undefined,
+  pageDetails: string,
+  errorMessage: string,
+) => {
   const defaultText = `${pageDetails}\n${errorMessage}`;
 
   if (errorDetails) {
@@ -33,14 +37,20 @@ const createErrorMessageString = (errorDetails: string | null | undefined, pageD
 };
 
 type Props = {
-  description?: React.ReactNode,
-  error: FetchError,
-  errorDetails?: string,
-  location: Location,
-  title?: string,
+  description?: React.ReactNode;
+  error: FetchError;
+  errorDetails?: string;
+  location: Location;
+  title?: string;
 };
 
-const UnauthorizedErrorPage = ({ error, errorDetails, title = 'Missing Permissions', description, location: { pathname } }: Props) => {
+const UnauthorizedErrorPage = ({
+  error,
+  errorDetails,
+  title = 'Missing Permissions',
+  description,
+  location: { pathname },
+}: Props) => {
   const errorMessage = error?.message ?? JSON.stringify(error);
   const pageDetails = `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`;
   const defaultDescription = (
@@ -57,22 +67,16 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title = 'Missing Permissio
         <dd>
           <pre className="content">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="content_copy" />}
-                               bsSize="sm"
-                               text={errorMessageString}
-                               buttonTitle="Copy error details to clipboard" />
+              <ClipboardButton
+                title={<Icon name="content_copy" />}
+                bsSize="sm"
+                text={errorMessageString}
+                buttonTitle="Copy error details to clipboard"
+              />
             </div>
-            {errorDetails && (
-              <p>
-                {errorDetails}
-              </p>
-            )}
-            <p>
-              {pageDetails}
-            </p>
-            <p>
-              {errorMessage}
-            </p>
+            {errorDetails && <p>{errorDetails}</p>}
+            <p>{pageDetails}</p>
+            <p>{errorMessage}</p>
           </pre>
         </dd>
       </dl>

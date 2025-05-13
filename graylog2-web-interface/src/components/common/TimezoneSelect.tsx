@@ -21,7 +21,10 @@ import type { SelectInstance } from 'react-select';
 
 import Select from 'components/common/Select';
 
-type TimezoneSelectProps = Omit<React.ComponentProps<typeof Select>, 'inputId' | 'onChange' | 'placeholder' | 'options' | 'optionRenderer'> & {
+type TimezoneSelectProps = Omit<
+  React.ComponentProps<typeof Select>,
+  'inputId' | 'onChange' | 'placeholder' | 'options' | 'optionRenderer'
+> & {
   /**
    * Function that will be called when the selected timezone changes. The
    * function will receive the new time zone identifier as argument. See
@@ -40,9 +43,12 @@ type TimezoneSelectProps = Omit<React.ComponentProps<typeof Select>, 'inputId' |
  * the `Select` input behaves. Check the `Select` documentation for more
  * information.
  */
-class TimezoneSelect extends React.Component<TimezoneSelectProps, {
-  [key: string]: any;
-}> {
+class TimezoneSelect extends React.Component<
+  TimezoneSelectProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     onChange: () => {},
   };
@@ -59,8 +65,8 @@ class TimezoneSelect extends React.Component<TimezoneSelectProps, {
     // Group time zones by area
     moment.tz.names().forEach((timezone) => {
       const splitted = timezone.split('/');
-      const area = (splitted.length > 1 ? splitted[0] : this._UNCLASSIFIED_AREA);
-      const location = (splitted.length > 1 ? splitted[1] : splitted[0]);
+      const area = splitted.length > 1 ? splitted[0] : this._UNCLASSIFIED_AREA;
+      const location = splitted.length > 1 ? splitted[1] : splitted[0];
 
       if (!timezones[area]) {
         timezones[area] = [];
@@ -80,7 +86,7 @@ class TimezoneSelect extends React.Component<TimezoneSelectProps, {
         // Now add a label per timezone in the area
         const effectiveTimezones = uniq(timezones[area]).sort();
         const timezoneLabels = effectiveTimezones.map((location) => {
-          const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
+          const timezone = area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`;
 
           return { value: timezone, label: location.replace('_', ' ') };
         });
@@ -93,10 +99,18 @@ class TimezoneSelect extends React.Component<TimezoneSelectProps, {
 
   _renderOption = (option) => {
     if (!option.disabled) {
-      return <span key={option.value} title={option.value}>&nbsp; {option.label}</span>;
+      return (
+        <span key={option.value} title={option.value}>
+          &nbsp; {option.label}
+        </span>
+      );
     }
 
-    return <span key={option.value} title={option.value}>{option.label}</span>;
+    return (
+      <span key={option.value} title={option.value}>
+        {option.label}
+      </span>
+    );
   };
 
   private timezone: SelectInstance<unknown, boolean>;
@@ -106,13 +120,17 @@ class TimezoneSelect extends React.Component<TimezoneSelectProps, {
     const { onChange, ...otherProps } = this.props;
 
     return (
-      <Select ref={(timezone) => { this.timezone = timezone; }}
-              {...otherProps}
-              inputId="timezone-select"
-              onChange={onChange}
-              placeholder="Pick a time zone"
-              options={timezones}
-              optionRenderer={this._renderOption} />
+      <Select
+        ref={(timezone) => {
+          this.timezone = timezone;
+        }}
+        {...otherProps}
+        inputId="timezone-select"
+        onChange={onChange}
+        placeholder="Pick a time zone"
+        options={timezones}
+        optionRenderer={this._renderOption}
+      />
     );
   }
 }

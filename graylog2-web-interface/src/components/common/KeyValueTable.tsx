@@ -48,9 +48,12 @@ type KeyValueTableProps = {
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
  * provides inputs to create, edit and delete key-value pairs.
  */
-class KeyValueTable extends React.Component<KeyValueTableProps, {
-  [key: string]: any;
-}> {
+class KeyValueTable extends React.Component<
+  KeyValueTableProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     headers: ['Name', 'Value', 'Actions'],
     editable: false,
@@ -115,34 +118,45 @@ class KeyValueTable extends React.Component<KeyValueTableProps, {
           customStyle.width = 75;
         }
 
-        return <th key={header} style={customStyle}>{header}</th>;
+        return (
+          <th key={header} style={customStyle}>
+            {header}
+          </th>
+        );
       })}
     </tr>
   );
 
-  _formattedRows = (pairs) => Object.keys(pairs).sort().map((key) => {
-    let actionsColumn;
+  _formattedRows = (pairs) =>
+    Object.keys(pairs)
+      .sort()
+      .map((key) => {
+        let actionsColumn;
 
-    if (this.props.editable) {
-      const actions = [];
+        if (this.props.editable) {
+          const actions = [];
 
-      actions.push(
-        <Button key={`delete-${key}`} bsStyle="danger" bsSize={this.props.actionsSize} onClick={this._deleteRow(key)}>
-          Delete
-        </Button>,
-      );
+          actions.push(
+            <Button
+              key={`delete-${key}`}
+              bsStyle="danger"
+              bsSize={this.props.actionsSize}
+              onClick={this._deleteRow(key)}>
+              Delete
+            </Button>,
+          );
 
-      actionsColumn = <td>{actions}</td>;
-    }
+          actionsColumn = <td>{actions}</td>;
+        }
 
-    return (
-      <tr key={key}>
-        <td>{key}</td>
-        <td>{pairs[key]}</td>
-        {actionsColumn}
-      </tr>
-    );
-  });
+        return (
+          <tr key={key}>
+            <td>{key}</td>
+            <td>{pairs[key]}</td>
+            {actionsColumn}
+          </tr>
+        );
+      });
 
   _newRow = () => {
     if (!this.props.editable) {
@@ -155,28 +169,34 @@ class KeyValueTable extends React.Component<KeyValueTableProps, {
       <tr>
         <td>
           <StyledDiv>
-            <Input type="text"
-                   name="newKey"
-                   id="newKey"
-                   data-testid="newKey"
-                   placeholder={this.props.headers[0]}
-                   value={this.state.newKey}
-                   onChange={this._bindValue} />
+            <Input
+              type="text"
+              name="newKey"
+              id="newKey"
+              data-testid="newKey"
+              placeholder={this.props.headers[0]}
+              value={this.state.newKey}
+              onChange={this._bindValue}
+            />
           </StyledDiv>
         </td>
         <td>
           <StyledDiv>
-            <Input type="text"
-                   name="newValue"
-                   id="newValue"
-                   data-testid="newValue"
-                   placeholder={this.props.headers[1]}
-                   value={this.state.newValue}
-                   onChange={this._bindValue} />
+            <Input
+              type="text"
+              name="newValue"
+              id="newValue"
+              data-testid="newValue"
+              placeholder={this.props.headers[1]}
+              value={this.state.newValue}
+              onChange={this._bindValue}
+            />
           </StyledDiv>
         </td>
         <td>
-          <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
+          <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>
+            Add
+          </Button>
         </td>
       </tr>
     );

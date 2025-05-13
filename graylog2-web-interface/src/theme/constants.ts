@@ -28,10 +28,14 @@ const ROOT_FONT_SIZE = 16; // This value is also being maintained as @font-size-
 const LEGACY_COLOR_SCHEME_LIGHT = 'teint';
 const LEGACY_COLOR_SCHEME_DARK = 'noir';
 const DEFAULT_THEME_MODE: ColorScheme = prefersDarkMode ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
-const LEGACY_DEFAULT_THEME_MODE: LegacyColorScheme = prefersDarkMode ? LEGACY_COLOR_SCHEME_DARK : LEGACY_COLOR_SCHEME_LIGHT;
+const LEGACY_DEFAULT_THEME_MODE: LegacyColorScheme = prefersDarkMode
+  ? LEGACY_COLOR_SCHEME_DARK
+  : LEGACY_COLOR_SCHEME_LIGHT;
 const COLOR_SCHEMES: Array<ColorScheme> = [COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK];
 const INPUT_BORDER_RADIUS = 0;
 const NAV_ITEM_HEIGHT = '50px';
+
+const NAV_LOGO_HEIGHT = '30px';
 
 export {
   DEFAULT_THEME_MODE,
@@ -45,4 +49,5 @@ export {
   COLOR_SCHEMES,
   INPUT_BORDER_RADIUS,
   NAV_ITEM_HEIGHT,
+  NAV_LOGO_HEIGHT,
 };

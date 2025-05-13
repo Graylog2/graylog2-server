@@ -20,35 +20,35 @@ import { Field, useFormikContext } from 'formik';
 import { Input } from 'components/bootstrap';
 
 type BaseProps = {
-  autoComplete?: string,
-  addonAfter?: React.ReactElement | string,
-  bsSize?: 'large' | 'small' | 'xsmall',
-  buttonAfter?: React.ReactElement | string,
-  children?: React.ReactElement,
-  disabled?: boolean,
-  error?: React.ReactElement | string,
-  formGroupClassName?: string,
-  help?: React.ReactElement | string,
-  id: string,
-  label?: React.ReactElement | string,
-  labelClassName?: string,
-  maxLength?: number,
-  min?: number,
-  max?: number,
-  minLength?: number,
-  name: string,
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  placeholder?: string,
-  required?: boolean,
-  type?: string,
-  validate?: (arg: string) => string | undefined | null,
-  wrapperClassName?: string,
-  autoFocus?: boolean,
+  autoComplete?: string;
+  addonAfter?: React.ReactElement | string;
+  bsSize?: 'large' | 'small' | 'xsmall';
+  buttonAfter?: React.ReactElement | string;
+  children?: React.ReactElement;
+  disabled?: boolean;
+  error?: React.ReactElement | string;
+  formGroupClassName?: string;
+  help?: React.ReactElement | string;
+  id: string;
+  label?: React.ReactElement | string;
+  labelClassName?: string;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  name: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
+  validate?: (arg: string) => string | undefined | null;
+  wrapperClassName?: string;
+  autoFocus?: boolean;
 };
 
 type TextareaProps = BaseProps & {
-  type: 'textarea',
-  rows?: number
+  type: 'textarea';
+  rows?: number;
 };
 type Props = BaseProps | TextareaProps;
 
@@ -57,7 +57,19 @@ const checkboxProps = (value) => ({ checked: value ?? false });
 const inputProps = (value) => ({ value: value ?? '' });
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ children, disabled = false, required = false, autoFocus = false, name, type = 'text', help, validate = () => undefined, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
+const FormikInput = ({
+  children,
+  disabled = false,
+  required = false,
+  autoFocus = false,
+  name,
+  type = 'text',
+  help,
+  validate = () => undefined,
+  onChange: propagateOnChange,
+  error: errorProp,
+  ...rest
+}: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (
@@ -76,17 +88,18 @@ const FormikInput = ({ children, disabled = false, required = false, autoFocus =
         };
 
         return (
-          <Input {...rest}
-                 disabled={disabled}
-                 required={required}
-                 autoFocus={autoFocus}
-                 {...typeSpecificProps}
-                 onBlur={onBlur}
-                 help={help}
-                 id={name}
-                 error={error}
-                 onChange={_handleChange}
-                 type={type}>
+          <Input
+            {...rest}
+            disabled={disabled}
+            required={required}
+            autoFocus={autoFocus}
+            {...typeSpecificProps}
+            onBlur={onBlur}
+            help={help}
+            id={name}
+            error={error}
+            onChange={_handleChange}
+            type={type}>
             {children}
           </Input>
         );

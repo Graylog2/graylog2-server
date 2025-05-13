@@ -38,7 +38,13 @@ const HighlightingRules = ({ rules = [] }: { rules?: Array<HighlightingRule> }) 
   return (
     <TestStoreProvider view={view}>
       <HighlightingRulesProvider>
-        <OriginalHighlightingRules />
+        <OriginalHighlightingRules
+          description=""
+          onUpdateRules={() => Promise.resolve()}
+          onCreateRule={() => Promise.resolve()}
+          onUpdateRule={() => Promise.resolve()}
+          onDeleteRule={() => Promise.resolve()}
+        />
       </HighlightingRulesProvider>
     </TestStoreProvider>
   );

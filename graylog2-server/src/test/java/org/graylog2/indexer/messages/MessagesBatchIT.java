@@ -66,7 +66,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testIfLargeBatchesGetSplitUpOnCircuitBreakerExceptions() throws Exception {
+    public void testIfLargeBatchesGetSplitUpOnCircuitBreakerExceptions() {
         // This test assumes that ES is running with only 256MB heap size.
         // This will trigger the circuit breaker when we are trying to index large batches
         final int MESSAGECOUNT = 50;

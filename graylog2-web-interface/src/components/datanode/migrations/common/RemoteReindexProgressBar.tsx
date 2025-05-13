@@ -26,10 +26,12 @@ const MainProgressBar = styled(ProgressBar)`
   margin-bottom: 0;
 `;
 
-const TaskProgressBar = styled(ProgressBar)(({ theme }) => `
+const TaskProgressBar = styled(ProgressBar)(
+  ({ theme }) => `
   margin-top: ${theme.spacings.sm};
   margin-bottom: ${theme.spacings.sm};
-`);
+`,
+);
 
 const displayStatus = (status: MigrationStatus): string => {
   switch (status) {
@@ -46,7 +48,7 @@ const displayStatus = (status: MigrationStatus): string => {
 
 type Props = {
   migrationStatus: RemoteReindexMigration;
-}
+};
 
 const RemoteReindexProgressBar = ({ migrationStatus }: Props) => {
   const [showTasks, setShowTasks] = useState<boolean>(false);
@@ -57,25 +59,34 @@ const RemoteReindexProgressBar = ({ migrationStatus }: Props) => {
 
   return (
     <>
-      <MainProgressBar bars={[{
-        animated: true,
-        value: progress,
-        bsStyle: 'info',
-        label: `${status} ${progress}%`,
-      }]} />
+      <MainProgressBar
+        bars={[
+          {
+            animated: true,
+            value: progress,
+            bsStyle: 'info',
+            label: `${status} ${progress}%`,
+          },
+        ]}
+      />
       {Object.keys(tasks_progress).length > 0 && (
         <>
           <Button bsStyle="link" bsSize="xs" onClick={() => setShowTasks(!showTasks)}>
             {showTasks ? 'Hide tasks' : 'Show tasks'}
           </Button>
-          {showTasks && Object.keys(tasks_progress).map((task) => (
-            <TaskProgressBar bars={[{
-              animated: false,
-              value: tasks_progress[task] || 0,
-              bsStyle: 'info',
-              label: `${task} ${tasks_progress[task] || 0}%`,
-            }]} />
-          ))}
+          {showTasks &&
+            Object.keys(tasks_progress).map((task) => (
+              <TaskProgressBar
+                bars={[
+                  {
+                    animated: false,
+                    value: tasks_progress[task] || 0,
+                    bsStyle: 'info',
+                    label: `${task} ${tasks_progress[task] || 0}%`,
+                  },
+                ]}
+              />
+            ))}
         </>
       )}
     </>

@@ -34,7 +34,11 @@ const LegacyNotificationFormContainer = (props: LegacyNotificationFormContainerP
   const { allLegacyTypes } = useStore(EventNotificationsStore);
 
   if (!allLegacyTypes) {
-    return <p><Spinner text="Loading legacy notification information..." /></p>;
+    return (
+      <p>
+        <Spinner text="Loading legacy notification information..." />
+      </p>
+    );
   }
 
   return <LegacyNotificationForm {...props} legacyTypes={allLegacyTypes} />;

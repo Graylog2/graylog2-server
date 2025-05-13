@@ -21,8 +21,8 @@ import PublicNotifications from 'components/common/PublicNotifications';
 import GlobalAppNotifications from './GlobalAppNotifications';
 
 type Props = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
 const WithGlobalNotifications = ({ children }: Props) => (
   <>

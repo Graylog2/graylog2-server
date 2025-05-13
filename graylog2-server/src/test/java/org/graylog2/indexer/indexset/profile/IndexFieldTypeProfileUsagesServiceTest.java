@@ -18,7 +18,10 @@ package org.graylog2.indexer.indexset.profile;
 
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -57,11 +60,14 @@ public class IndexFieldTypeProfileUsagesServiceTest {
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        final MongoIndexSetService mongoIndexSetService = new MongoIndexSetService(mongoConnection,
-                objectMapperProvider,
+        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+        final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
+
+        final MongoIndexSetService mongoIndexSetService = new MongoIndexSetService(mongoCollections,
                 mock(StreamService.class),
                 mock(ClusterConfigService.class),
-                mock(ClusterEventBus.class)
+                mock(ClusterEventBus.class),
+                entityScopeService
         );
         mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000001", PROFILE1_ID));
         mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000011", PROFILE1_ID));
@@ -96,7 +102,9 @@ public class IndexFieldTypeProfileUsagesServiceTest {
 
     private IndexSetConfig createIndexSetConfigForTest(final String id, final String profileId) {
         return IndexSetConfig.create(
-                id, "title", "description",
+                id,
+                null,
+                "title", "description",
                 true,
                 true, "prefix_" + id, null, null,
                 1, 0,

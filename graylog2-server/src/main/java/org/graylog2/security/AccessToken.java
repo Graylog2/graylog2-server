@@ -23,7 +23,11 @@ import org.joda.time.DateTime;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface AccessToken extends Persisted {
+    DateTime getCreatedAt();
+
     DateTime getLastAccess();
+
+    DateTime getExpiresAt();
 
     String getUserName();
 

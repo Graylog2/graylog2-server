@@ -14,11 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type {
-  LookupTable,
-  LookupTableCache,
-  LookupTableAdapter,
-} from 'logic/lookup-tables/types';
+import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 export const createLookupTable = (index = 1, overrides = {}): LookupTable => ({
   id: `lookup-table-id-${index}`,

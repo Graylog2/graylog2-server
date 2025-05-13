@@ -18,12 +18,14 @@ package org.graylog.plugins.map.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @JsonAutoDetect
@@ -51,8 +53,19 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("asn_db_path")
     public abstract String asnDbPath();
 
+    /**
+     * @deprecated Use {@link #pullFromCloud()} instead.
+     */
+    @Deprecated(since = "6.3.0")
     @JsonProperty("use_s3")
     public abstract boolean useS3();
+
+    @JsonProperty("pull_from_cloud")
+    public abstract Optional<CloudStorageType> pullFromCloud();
+
+    @JsonProperty("gcs_project_id")
+    @Nullable
+    public abstract String gcsProjectId();
 
     @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT)
     @Nullable
@@ -68,6 +81,16 @@ public abstract class GeoIpResolverConfig {
         return Duration.ofMillis(refreshIntervalUnit().toMillis(refreshInterval()));
     }
 
+    @JsonIgnore
+    public boolean isGcsCloud() {
+        return pullFromCloud().map(CloudStorageType.GCS::equals).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isS3Cloud() {
+        return pullFromCloud().map(CloudStorageType.S3::equals).orElse(false);
+    }
+
     @JsonCreator
     public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
                                              @JsonProperty("enforce_graylog_schema") boolean enforceGraylogSchema,
@@ -76,7 +99,9 @@ public abstract class GeoIpResolverConfig {
                                              @JsonProperty("asn_db_path") String asnDbPath,
                                              @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT) TimeUnit refreshIntervalUnit,
                                              @JsonProperty(FIELD_REFRESH_INTERVAL) Long refreshInterval,
-                                             @JsonProperty("use_s3") boolean useS3) {
+                                             @JsonProperty("use_s3") boolean useS3,
+                                             @JsonProperty("pull_from_cloud") Optional<CloudStorageType> pullFromCloud,
+                                             @JsonProperty("gcs_project_id") String gcsProjectId) {
         return builder()
                 .enabled(cityEnabled)
                 .enforceGraylogSchema(enforceGraylogSchema)
@@ -86,6 +111,8 @@ public abstract class GeoIpResolverConfig {
                 .refreshIntervalUnit(refreshIntervalUnit == null ? DEFAULT_INTERVAL_UNIT : refreshIntervalUnit)
                 .refreshInterval(refreshInterval == null ? DEFAULT_INTERVAL : refreshInterval)
                 .useS3(useS3)
+                .pullFromCloud(pullFromCloud)
+                .gcsProjectId(gcsProjectId)
                 .build();
     }
 
@@ -99,6 +126,7 @@ public abstract class GeoIpResolverConfig {
                 .refreshIntervalUnit(DEFAULT_INTERVAL_UNIT)
                 .refreshInterval(DEFAULT_INTERVAL)
                 .useS3(false)
+                .pullFromCloud(Optional.empty())
                 .build();
     }
 
@@ -124,7 +152,15 @@ public abstract class GeoIpResolverConfig {
 
         public abstract Builder refreshInterval(Long interval);
 
+        /**
+         * @deprecated Use {@link #pullFromCloud()} instead.
+         */
+        @Deprecated
         public abstract Builder useS3(boolean useS3);
+
+        public abstract Builder pullFromCloud(Optional<CloudStorageType> pullFromCloud);
+
+        public abstract Builder gcsProjectId(String gcsProjectId);
 
         public abstract GeoIpResolverConfig build();
     }

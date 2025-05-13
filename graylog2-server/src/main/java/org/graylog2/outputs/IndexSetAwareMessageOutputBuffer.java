@@ -98,13 +98,19 @@ public class IndexSetAwareMessageOutputBuffer {
      */
     public void appendAndFlush(FilteredMessage filteredMessage, Consumer<List<FilteredMessage>> flusher) {
         List<FilteredMessage> flushBatch = null;
+
+        // for optimization, only calculate batch size in bytes, if we are actually restricting by size in bytes
+        long estimatedSize = 0L;
+        if (maxBufferSizeBytes != 0L) {
+            estimatedSize = estimateOsBulkRequestSize(filteredMessage.message(), objectMapper);
+        }
+
         synchronized (this) {
             // See class the class documentation for the reasoning behind the bufferLength calculation.
             buffer.add(filteredMessage);
             bufferLength += Math.max(filteredMessage.message().getIndexSets().size(), 1);
-            // for optimization, only calculate batch size in bytes, if we are actually restricting by size in bytes
-            if (maxBufferSizeBytes != 0L) {
-                bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message(), objectMapper);
+            if (estimatedSize > 0L) {
+                bufferSizeBytes += estimatedSize;
             }
 
             if ((maxBufferSizeBytes != 0L && bufferSizeBytes >= maxBufferSizeBytes) ||

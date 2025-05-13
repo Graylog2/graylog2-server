@@ -26,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
@@ -34,6 +35,7 @@ import org.graylog.grn.GRNTypesModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
+import org.graylog.plugins.datanode.DataNodeModule;
 import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
@@ -53,15 +55,14 @@ import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
-import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bindings.DbEntitiesModule;
 import org.graylog2.bindings.ElasticsearchModule;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
 import org.graylog2.bindings.MessageOutputBindings;
-import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
@@ -76,7 +77,6 @@ import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
@@ -102,12 +102,12 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.ClusterConfigValidatorModule;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.VersionAwareStorageModule;
+import org.graylog2.storage.versionprobe.VersionProbeModule;
 import org.graylog2.streams.StreamsModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -135,7 +135,6 @@ public class Server extends ServerBootstrap {
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private final ElasticsearchClientConfiguration elasticsearchClientConfiguration = new ElasticsearchClientConfiguration();
     private final EmailConfiguration emailConfiguration = new EmailConfiguration();
-    private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
@@ -167,12 +166,13 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
+    protected @Nonnull List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new VersionAwareStorageModule(configuration),
+                new VersionProbeModule(),
                 new ConfigurationModule(configuration),
-                new MongoDBModule(),
+                new DbEntitiesModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new ElasticsearchModule(),
                 new PersistenceServicesBindings(),
@@ -185,11 +185,9 @@ public class Server extends ServerBootstrap {
                 new RotationStrategyBindings(elasticsearchConfiguration),
                 new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader),
                 new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
-                new AuditBindings(),
                 new AlertConditionBindings(),
                 new IndexerBindings(),
                 new MigrationsModule(),
@@ -215,7 +213,8 @@ public class Server extends ServerBootstrap {
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
-                new TelemetryModule()
+                new TelemetryModule(),
+                new DataNodeModule()
         );
 
         modules.add(new FieldTypeManagementModule());
@@ -224,13 +223,12 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
+    protected @Nonnull List<Object> getNodeCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 httpConfiguration,
                 elasticsearchConfiguration,
                 elasticsearchClientConfiguration,
                 emailConfiguration,
-                mongoDbConfiguration,
                 versionCheckConfiguration,
                 kafkaJournalConfiguration,
                 nettyTransportConfiguration,

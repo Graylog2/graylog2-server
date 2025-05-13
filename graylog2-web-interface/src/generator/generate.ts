@@ -40,7 +40,6 @@ const writeFile = (filename: string, content: string) => {
 const apis = parse(srcDir);
 const [apiFiles, summary] = emit(apis);
 
-Object.entries(apiFiles)
-  .forEach(([filename, content]) => writeFile(filename, content));
+Object.entries(apiFiles).forEach(([filename, content]) => writeFile(filename, content));
 
 writeFile('index', summary);

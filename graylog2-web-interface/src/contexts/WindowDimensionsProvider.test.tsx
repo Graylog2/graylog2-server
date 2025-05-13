@@ -25,9 +25,7 @@ const renderSUT = () => {
 
   render(
     <WindowDimensionsContextProvider>
-      <WindowDimensionsContext.Consumer>
-        {consume}
-      </WindowDimensionsContext.Consumer>
+      <WindowDimensionsContext.Consumer>{consume}</WindowDimensionsContext.Consumer>
     </WindowDimensionsContextProvider>,
   );
 
@@ -35,7 +33,8 @@ const renderSUT = () => {
 };
 
 describe('WindowDimensionsProvider', () => {
-  const setWindowProperty = (propertyName, value) => Object.defineProperty(window, propertyName, { writable: true, configurable: true, value });
+  const setWindowProperty = (propertyName, value) =>
+    Object.defineProperty(window, propertyName, { writable: true, configurable: true, value });
   const setWindowWith = (width) => setWindowProperty('innerWidth', width);
   const setWindowHeight = (height) => setWindowProperty('innerHeight', height);
 

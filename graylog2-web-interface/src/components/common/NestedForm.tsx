@@ -26,21 +26,26 @@ import { useCallback } from 'react';
 
 const NestedForm = ({ children }: React.PropsWithChildren) => {
   const { handleSubmit, handleReset } = useFormikContext();
-  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleSubmit(e);
-  }, [handleSubmit]);
+  const onSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleSubmit(e);
+    },
+    [handleSubmit],
+  );
 
-  const onReset = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleReset(e);
-  }, [handleReset]);
+  const onReset = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleReset(e);
+    },
+    [handleReset],
+  );
 
   return (
-    <form onSubmitCapture={onSubmit}
-          onResetCapture={onReset}>
+    <form onSubmitCapture={onSubmit} onResetCapture={onReset}>
       {children}
     </form>
   );

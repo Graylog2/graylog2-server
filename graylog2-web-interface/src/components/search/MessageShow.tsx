@@ -33,9 +33,12 @@ type MessageShowProps = Omit<React.ComponentProps<typeof MessageDetail>, 'render
   nodes?: any;
 };
 
-class MessageShow extends React.Component<MessageShowProps, {
-  [key: string]: any;
-}> {
+class MessageShow extends React.Component<
+  MessageShowProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     inputs: undefined,
     nodes: undefined,
@@ -66,11 +69,13 @@ class MessageShow extends React.Component<MessageShowProps, {
     return (
       <Row className="content">
         <Col md={12}>
-          <MessageDetail {...this.props}
-                         message={message}
-                         inputs={inputs}
-                         streams={streams}
-                         renderForDisplay={this.renderForDisplay} />
+          <MessageDetail
+            {...this.props}
+            message={message}
+            inputs={inputs}
+            streams={streams}
+            renderForDisplay={this.renderForDisplay}
+          />
         </Col>
       </Row>
     );

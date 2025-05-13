@@ -24,18 +24,14 @@ const StyledWrapper = styled.div`
 `;
 
 type Props = React.PropsWithChildren<{
-  id: string,
-}>
+  id: string;
+}>;
 
 const ExpandedRowToggleWrapper = ({ id, children }: Props) => {
   const { toggleSection } = useExpandedSections();
   const _toggleSection = () => toggleSection(id, 'overriddenProfile');
 
-  return (
-    <StyledWrapper onClick={_toggleSection}>
-      {children}
-    </StyledWrapper>
-  );
+  return <StyledWrapper onClick={_toggleSection}>{children}</StyledWrapper>;
 };
 
 export default ExpandedRowToggleWrapper;

@@ -19,28 +19,25 @@ package org.graylog2.grok;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.result.UpdateResult;
 import io.krakens.grok.api.exception.GrokException;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,59 +56,46 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
     private static final Logger log = LoggerFactory.getLogger(MongoDbGrokPatternService.class);
     public static final int MAX_DISPLAYED_CONFLICTS = 10;
 
-    private final JacksonDBCollection<GrokPattern, ObjectId> dbCollection;
     private final ClusterEventBus clusterBus;
+    private final MongoCollection<GrokPattern> collection;
+    private final MongoUtils<GrokPattern> mongoUtils;
 
     @Inject
-    protected MongoDbGrokPatternService(MongoConnection mongoConnection,
-                                        MongoJackObjectMapperProvider mapper,
+    protected MongoDbGrokPatternService(MongoCollections mongoCollections,
                                         ClusterEventBus clusterBus) {
-
-        this.dbCollection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                GrokPattern.class,
-                ObjectId.class,
-                mapper.get());
         this.clusterBus = clusterBus;
-
-        createIndex(mongoConnection);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, GrokPattern.class);
+        this.mongoUtils = mongoCollections.utils(collection);
+        createIndex();
     }
 
-    private static void createIndex(MongoConnection mongoConnection) {
+    private void createIndex() {
         final IndexOptions indexOptions = new IndexOptions()
                 .name(INDEX_NAME)
                 .unique(true);
-        mongoConnection.getMongoDatabase()
-                .getCollection(COLLECTION_NAME)
-                .createIndex(Indexes.ascending("name"), indexOptions);
+        collection.createIndex(Indexes.ascending("name"), indexOptions);
     }
 
     @Override
     public GrokPattern load(String patternId) throws NotFoundException {
-        final GrokPattern pattern = dbCollection.findOneById(new ObjectId(patternId));
-        if (pattern == null) {
-            throw new NotFoundException("Couldn't find Grok pattern with ID " + patternId);
-        }
-        return pattern;
+        return mongoUtils.getById(patternId).orElseThrow(() ->
+                new NotFoundException("Couldn't find Grok pattern with ID " + patternId));
     }
 
     @Override
     public Optional<GrokPattern> loadByName(String name) {
-        final GrokPattern pattern = dbCollection.findOne(DBQuery.is("name", name));
+        final GrokPattern pattern = collection.find(Filters.eq("name", name)).first();
         return Optional.ofNullable(pattern);
     }
 
     @Override
     public Set<GrokPattern> bulkLoad(Collection<String> patternIds) {
-        final DBCursor<GrokPattern> dbCursor = dbCollection.find(DBQuery.in("_id", patternIds));
-        return ImmutableSet.copyOf((Iterator<GrokPattern>) dbCursor);
+        return ImmutableSet.copyOf(collection.find(MongoUtils.stringIdsIn(patternIds)));
     }
 
     @Override
     public Set<GrokPattern> loadAll() {
-        try (DBCursor<GrokPattern> grokPatterns = dbCollection.find()) {
-            return ImmutableSet.copyOf((Iterator<GrokPattern>) grokPatterns);
-        }
+        return ImmutableSet.copyOf(collection.find());
     }
 
     @Override
@@ -128,8 +112,7 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
             throw new ValidationException("Grok pattern " + pattern.name() + " already exists");
         }
 
-        final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
-        final GrokPattern savedGrokPattern = result.getSavedObject();
+        final GrokPattern savedGrokPattern = mongoUtils.save(pattern);
 
         clusterBus.post(GrokPatternsUpdatedEvent.create(ImmutableSet.of(savedGrokPattern.name())));
 
@@ -149,8 +132,8 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
         if (pattern.id() == null) {
             throw new ValidationException("Invalid pattern " + pattern);
         }
-        WriteResult<GrokPattern, ObjectId> result = dbCollection.update(DBQuery.is("_id", new ObjectId(pattern.id())), pattern);
-        if (result.isUpdateOfExisting()) {
+        final UpdateResult result = collection.replaceOne(MongoUtils.idEq(pattern.id()), pattern);
+        if (result.getMatchedCount() > 0) {
             clusterBus.post(GrokPatternsUpdatedEvent.create(ImmutableSet.of(pattern.name())));
             return pattern;
         }
@@ -192,8 +175,8 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
                         return newPattern;
                     }
                 })
-                .map(dbCollection::save)
-                .map(WriteResult::getSavedObject).collect(Collectors.toList());
+                .map(mongoUtils::save)
+                .collect(Collectors.toList());
 
         clusterBus.post(GrokPatternsUpdatedEvent.create(newPatternsByName.keySet()));
 
@@ -210,13 +193,12 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
             return 0;
         }
 
-        final ObjectId id = new ObjectId(patternId);
-        final String name = grokPattern.name();
+        if (mongoUtils.deleteById(patternId)) {
+            clusterBus.post(GrokPatternsDeletedEvent.create(ImmutableSet.of(grokPattern.name())));
+            return 1;
+        }
 
-        final int deletedPatterns = dbCollection.removeById(id).getN();
-        clusterBus.post(GrokPatternsDeletedEvent.create(ImmutableSet.of(name)));
-
-        return deletedPatterns;
+        return 0;
     }
 
     @Override
@@ -226,9 +208,9 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
                 .map(GrokPattern::name)
                 .collect(Collectors.toSet());
 
-        final int deletedPatterns = dbCollection.remove(DBQuery.empty()).getN();
+        final long deletedPatterns = collection.deleteMany(Filters.empty()).getDeletedCount();
         clusterBus.post(GrokPatternsDeletedEvent.create(patternNames));
 
-        return deletedPatterns;
+        return Ints.saturatedCast(deletedPatterns);
     }
 }

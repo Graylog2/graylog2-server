@@ -50,7 +50,7 @@ public class CloudWatchFlowLogCodecTest {
         final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
         final KinesisLogEntry logEvent = KinesisLogEntry.create("a-stream", "log-group", "log-stream",
                                                                 timestamp, flowLogMessage);
-        final Message message = codec.decodeLogData(logEvent);
+        final Message message = codec.decodeLogData(logEvent).get();
         Assert.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
         Assert.assertEquals("log-stream", message.getField(AbstractKinesisCodec.FIELD_LOG_STREAM));
         Assert.assertEquals("a-stream", message.getField(AbstractKinesisCodec.FIELD_KINESIS_STREAM));

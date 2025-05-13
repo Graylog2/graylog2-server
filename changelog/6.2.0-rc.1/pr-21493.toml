@@ -1,0 +1,4 @@
+type = "c"
+message = "Upgraded MongoJack dependency to `5.0.2`. This might require changes to third-party plugins. Please check Graylog upgrade notes."
+
+pulls = ["21493"]

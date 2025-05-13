@@ -20,7 +20,11 @@ import get from 'lodash/get';
 
 import { Icon } from 'components/common';
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/bootstrap';
-import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
+import {
+  emptyBooleanExpressionConfig,
+  emptyGroupExpressionConfig,
+  replaceBooleanExpressionOperatorInGroup,
+} from 'logic/alerts/AggregationExpressionConfig';
 
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';
@@ -43,12 +47,15 @@ type AggregationConditionExpressionProps = {
   expression: any;
   parent?: any;
   level?: number;
-  renderLabel?: boolean // Internal use only;
+  renderLabel?: boolean; // Internal use only;
 };
 
-class AggregationConditionExpression extends React.Component<AggregationConditionExpressionProps, {
-  [key: string]: any;
-}> {
+class AggregationConditionExpression extends React.Component<
+  AggregationConditionExpressionProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     level: 0,
     parent: undefined,
@@ -73,7 +80,7 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
 
     const { expression } = this.props;
 
-    return (expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&');
+    return expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&';
   };
 
   // eslint-disable-next-line class-methods-use-this
@@ -102,7 +109,11 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
     const prevOperator = this.getBooleanOperator(parent, defaultOperator);
     const groupOperator = prevOperator === '&&' ? '||' : '&&';
     const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
-    const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
+    const nextExpression = emptyBooleanExpressionConfig({
+      operator: prevOperator,
+      left: expression,
+      right: groupExpression,
+    });
 
     onChange({ conditions: nextExpression });
   };
@@ -132,7 +143,7 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
         nextUpdate = null;
       } else {
         // Otherwise replace the current tree with the still existing branch
-        nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
+        nextUpdate = expression[branch === 'left' ? 'right' : 'left'];
       }
     } else if (branch === 'child' && update.expr === 'group') {
       // Avoid that a group's child is another group. Groups should at least have one expression
@@ -169,15 +180,19 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
         expressionComponent = <NumberExpression {...this.props} renderLabel={renderLabel ?? true} />;
         break;
       case 'group':
-        expressionComponent = <GroupExpression {...this.props} level={level ?? 0} onChildChange={this.handleChildChange} parent={parent} />;
+        expressionComponent = (
+          <GroupExpression {...this.props} level={level ?? 0} onChildChange={this.handleChildChange} parent={parent} />
+        );
         break;
       case '&&':
       case '||':
         expressionComponent = (
-          <BooleanExpression {...this.props}
-                             level={level ?? 0}
-                             onChildChange={this.handleChildChange}
-                             parent={parent} />
+          <BooleanExpression
+            {...this.props}
+            level={level ?? 0}
+            onChildChange={this.handleChildChange}
+            parent={parent}
+          />
         );
 
         break;
@@ -189,14 +204,26 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
       default:
         expressionComponent = (
           <>
-            <ComparisonExpression {...this.props} level={level ?? 0} renderLabel={renderLabel ?? true} onChildChange={this.handleChildChange} parent={parent} />
+            <ComparisonExpression
+              {...this.props}
+              level={level ?? 0}
+              renderLabel={renderLabel ?? true}
+              onChildChange={this.handleChildChange}
+              parent={parent}
+            />
             <Col md={2}>
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
-                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression"><Icon name="remove" /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression"><Icon name="add" /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddGroup}>Add Group</Button>
+                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression">
+                      <Icon name="remove" />
+                    </Button>
+                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression">
+                      <Icon name="add" />
+                    </Button>
+                    <Button bsSize="sm" onClick={this.handleAddGroup}>
+                      Add Group
+                    </Button>
                   </ButtonToolbar>
                 </div>
               </FormGroup>
@@ -208,9 +235,11 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
     if (!parent && expression.expr !== 'group') {
       return (
         <>
-          <BooleanOperatorSelector initialText="Messages must meet"
-                                   operator={this.getEffectiveGlobalGroupOperator()}
-                                   onOperatorChange={this.handleOperatorChange} />
+          <BooleanOperatorSelector
+            initialText="Messages must meet"
+            operator={this.getEffectiveGlobalGroupOperator()}
+            onOperatorChange={this.handleOperatorChange}
+          />
           <Clearfix />
           {expressionComponent}
         </>

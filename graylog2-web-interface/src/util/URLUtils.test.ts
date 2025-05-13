@@ -20,14 +20,14 @@ import AppConfig from 'util/AppConfig';
 
 jest.mock('util/AppConfig');
 
-const oldLocation = window.location;
+const oldLocation = window.location.pathname;
 
 // eslint-disable-next-line compat/compat
-const mockLocation = (url: string): Location => new URL(url) as unknown as Location;
+const mockLocation = (url: string): string & Location => new URL(url) as unknown as string & Location;
 
 describe('qualifyUrl', () => {
   afterEach(() => {
-    window.location = oldLocation;
+    window.location.pathname = oldLocation;
   });
 
   it('qualifies url with hostname/scheme from current location if server url is relative', () => {
@@ -53,14 +53,12 @@ describe('qualifyUrl', () => {
   });
 
   describe('currentPathnameWithoutPrefix', () => {
-    const setLocation = (pathname: string) => Object.defineProperty(window, 'location', {
-      value: {
-        pathname,
-      },
-      writable: true,
-    });
+    const setLocation = (pathname: string) => {
+      window.location.pathname = pathname;
+    };
 
-    const mockPathPrefix = (pathPrefix: string | undefined | null) => asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
+    const mockPathPrefix = (pathPrefix: string | undefined | null) =>
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
 
     it('returns current path when prefix is undefined/null/empty/single slash', () => {
       const pathname = '/welcome';
@@ -88,6 +86,15 @@ describe('qualifyUrl', () => {
       setLocation(`/foo${pathname}`);
 
       mockPathPrefix('/foo');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
+
+    it('returns current path when prefix is defined and ends with `/`', () => {
+      const pathname = '/welcome';
+      setLocation(`/foo${pathname}`);
+
+      mockPathPrefix('/foo/');
 
       expect(currentPathnameWithoutPrefix()).toBe(pathname);
     });

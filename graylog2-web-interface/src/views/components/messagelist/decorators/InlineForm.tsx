@@ -19,20 +19,20 @@ import * as React from 'react';
 import { Button } from 'components/bootstrap';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
   // eslint-disable-next-line react/require-default-props
-  disabled?: boolean,
-  onCancel: () => void,
-  onSubmitForm: (arg: any) => void,
+  disabled?: boolean;
+  onCancel: () => void;
+  onSubmitForm: (arg: any) => void;
 };
 
-const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> => React.forwardRef<HTMLFormElement, Props>(
-  ({ children, disabled, onCancel, onSubmitForm }: Props, ref) => {
+const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> =>
+  React.forwardRef<HTMLFormElement, Props>(({ children, disabled, onCancel, onSubmitForm }: Props, ref) => {
     const onSubmit = (event) => {
       event.stopPropagation();
       const { target: formDOMNode } = event;
 
-      if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())) {
+      if (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) {
         event.preventDefault();
 
         return;
@@ -48,11 +48,14 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
     return (
       <form onSubmit={onSubmit} ref={ref}>
         {children}
-        <Button type="submit" bsStyle="success" disabled={disabled}>{submitTitle}</Button>{' '}
-        <Button type="button" disabled={disabled} onClick={onCancel}>Cancel</Button>
+        <Button type="submit" bsStyle="success" disabled={disabled}>
+          {submitTitle}
+        </Button>{' '}
+        <Button type="button" disabled={disabled} onClick={onCancel}>
+          Cancel
+        </Button>
       </form>
     );
-  },
-);
+  });
 
 export default InlineForm;

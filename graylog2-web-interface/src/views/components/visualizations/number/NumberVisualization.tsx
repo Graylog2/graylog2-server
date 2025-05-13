@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -27,14 +27,20 @@ import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizat
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import ElementDimensions from 'components/common/ElementDimensions';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
-import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
+import Trend from './Trend';
 
-const Container = styled.div<{ $height: number }>(({ $height }) => css`
-  height: ${$height}px;
-  width: 100%;
-`);
+const Container = styled.div<{ $height: number }>(
+  ({ $height }) => css`
+    height: ${$height}px;
+    width: 100%;
+  `,
+);
 
 const GridContainer = styled(Container)`
   display: grid;
@@ -82,15 +88,16 @@ const _extractValueAndField = (rows: Rows) => {
 const _extractFirstSeriesName = (config) => {
   const { series = [] } = config;
 
-  return series.length === 0
-    ? undefined
-    : series[0].function;
+  return series.length === 0 ? undefined : series[0].function;
 };
 
 const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
   const targetRef = useRef();
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  const widgetUnits = useWidgetUnits(config);
   const onRenderComplete = useContext(RenderCompletionCallback);
-  const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
+  const visualizationConfig =
+    (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
 
@@ -99,6 +106,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const trendRows = data.trend;
   const { value } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);
+  const unit = useMemo(() => {
+    if (!unitFeatureEnabled) return undefined;
+
+    const fieldNameKey = parseSeries(field).field;
+
+    return widgetUnits.getFieldUnit(fieldNameKey);
+  }, [field, unitFeatureEnabled, widgetUnits]);
 
   if (!field || (value !== 0 && !value)) {
     return <>N/A</>;
@@ -112,10 +126,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} center>
             <CustomHighlighting field={field} value={value}>
-              <Value field={field}
-                     type={fieldTypeFor(field, fields)}
-                     value={value}
-                     render={DecoratedValue} />
+              <Value
+                field={field}
+                type={fieldTypeFor(field, fields)}
+                value={value}
+                render={DecoratedValue}
+                unit={unit}
+              />
             </CustomHighlighting>
           </AutoFontSizer>
         )}
@@ -124,10 +141,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         <TrendBox>
           {({ height, width }) => (
             <AutoFontSizer height={height} width={width} target={targetRef}>
-              <Trend ref={targetRef}
-                     current={value}
-                     previous={previousValue}
-                     trendPreference={visualizationConfig.trendPreference} />
+              <Trend
+                ref={targetRef}
+                current={value}
+                previous={previousValue}
+                trendPreference={visualizationConfig.trendPreference}
+                unit={unit}
+              />
             </AutoFontSizer>
           )}
         </TrendBox>

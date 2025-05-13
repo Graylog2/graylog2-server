@@ -23,9 +23,12 @@ type RenderCompletionObserverProps = {
   children: React.ReactElement | React.ReactElement[];
 };
 
-class RenderCompletionObserver extends React.Component<RenderCompletionObserverProps, {
-  [key: string]: any;
-}> {
+class RenderCompletionObserver extends React.Component<
+  RenderCompletionObserverProps,
+  {
+    [key: string]: any;
+  }
+> {
   _renderComplete = false;
 
   _handleRenderComplete = () => {

@@ -28,10 +28,7 @@ type KinesisSetupStepsProps = {
   onError: (...args: any[]) => void;
 };
 
-const KinesisSetupSteps = ({
-  onSuccess,
-  onError,
-}: KinesisSetupStepsProps) => {
+const KinesisSetupSteps = ({ onSuccess, onError }: KinesisSetupStepsProps) => {
   const { formData } = useContext(FormDataContext);
   const [streamArn, setStreamArn] = useState(null);
   const [roleArn, setRoleArn] = useState(null);

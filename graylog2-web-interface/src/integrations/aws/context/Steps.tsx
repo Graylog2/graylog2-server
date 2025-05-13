@@ -23,9 +23,7 @@ type StepsProviderProps = {
   children: any;
 };
 
-export const StepsProvider = ({
-  children,
-}: StepsProviderProps) => {
+export const StepsProvider = ({ children }: StepsProviderProps) => {
   const [currentStep, setCurrentStep] = useState('authorize');
   const [enabledSteps, enableStep] = useState(['authorize']);
   const [availableSteps, setAvailableStep] = useState([]);
@@ -43,15 +41,16 @@ export const StepsProvider = ({
   };
 
   return (
-    <StepsContext.Provider value={{
-      availableSteps,
-      currentStep,
-      enabledSteps,
-      isDisabledStep,
-      setAvailableStep,
-      setCurrentStep,
-      setEnabledStep,
-    }}>
+    <StepsContext.Provider
+      value={{
+        availableSteps,
+        currentStep,
+        enabledSteps,
+        isDisabledStep,
+        setAvailableStep,
+        setCurrentStep,
+        setEnabledStep,
+      }}>
       {children}
     </StepsContext.Provider>
   );

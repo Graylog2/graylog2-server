@@ -33,18 +33,18 @@ const CreateIndexSetTemplateButton = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    sendTelemetry(
-      TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_OPENED,
-      {
-        app_pathname: telemetryPathName,
-        app_action_value: 'select-index-set-template-opened',
-      });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_OPENED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'select-index-set-template-opened',
+    });
 
     navigate(Routes.SYSTEM.INDICES.TEMPLATES.CREATE);
   };
 
   return (
-    <Button bsStyle="success" onClick={handleClick}>Create template</Button>
+    <Button bsStyle="success" onClick={handleClick}>
+      Create template
+    </Button>
   );
 };
 

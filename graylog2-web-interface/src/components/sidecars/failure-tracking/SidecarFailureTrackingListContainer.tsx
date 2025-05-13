@@ -27,13 +27,13 @@ import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 import type { Collector, SidecarListResponse } from '../types';
 
 type SidecarsArgs = {
-  page?: number,
-  pageSize?: number,
-  query?: string,
-  sortField?: string,
-  order?: string,
-  onlyActive?: boolean,
-}
+  page?: number;
+  pageSize?: number;
+  query?: string;
+  sortField?: string;
+  order?: string;
+  onlyActive?: boolean;
+};
 
 const PAGE_SIZES = [25];
 
@@ -68,7 +68,7 @@ const fetchSidecars = (options: SidecarsArgs, callback: (data: SidecarListRespon
 
 const SidecarFailureTrackingListContainer = () => {
   const { page, pageSize, resetPage } = usePaginationQueryParameter(PAGE_SIZES);
-  const [sidecarData, setSidecarData] = useState<SidecarListResponse|null>(null);
+  const [sidecarData, setSidecarData] = useState<SidecarListResponse | null>(null);
   const [collectors, setCollectors] = useState<Collector[]>([]);
 
   useEffect(() => {
@@ -96,11 +96,16 @@ const SidecarFailureTrackingListContainer = () => {
   };
 
   const handleQueryChange = (_query: string = '', callback = () => {}) => {
-    fetchSidecars({ ...previousSidecarArgs, query: _query }, setSidecarData).then(resetPage).finally(callback);
+    fetchSidecars({ ...previousSidecarArgs, query: _query }, setSidecarData)
+      .then(resetPage)
+      .finally(callback);
   };
 
   const handleSortChange = (sortField: string) => {
-    fetchSidecars({ ...previousSidecarArgs, sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' }, setSidecarData).then(resetPage);
+    fetchSidecars(
+      { ...previousSidecarArgs, sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' },
+      setSidecarData,
+    ).then(resetPage);
   };
 
   const toggleShowInactive = () => {
@@ -114,16 +119,18 @@ const SidecarFailureTrackingListContainer = () => {
   }
 
   return (
-    <SidecarFailureTrackingList sidecars={sidecarData.sidecars}
-                                collectors={collectors}
-                                pagination={sidecarData.pagination}
-                                query={sidecarData.query}
-                                onlyActive={sidecarData.only_active}
-                                sort={{ field: sidecarData.sort, order: sidecarData.order }}
-                                onPageChange={handlePageChange}
-                                onQueryChange={handleQueryChange}
-                                onSortChange={handleSortChange}
-                                toggleShowInactive={toggleShowInactive} />
+    <SidecarFailureTrackingList
+      sidecars={sidecarData.sidecars}
+      collectors={collectors}
+      pagination={sidecarData.pagination}
+      query={sidecarData.query}
+      onlyActive={sidecarData.only_active}
+      sort={{ field: sidecarData.sort, order: sidecarData.order }}
+      onPageChange={handlePageChange}
+      onQueryChange={handleQueryChange}
+      onSortChange={handleSortChange}
+      toggleShowInactive={toggleShowInactive}
+    />
   );
 };
 

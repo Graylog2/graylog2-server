@@ -20,63 +20,65 @@ import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 const arrowSize = 10;
-const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
-  &.in {
-    opacity: 1;
-    filter: drop-shadow(0 0 3px ${theme.colors.variant.lighter.default});
-  }
-
-  &.top {
-    .tooltip-arrow {
-      border-top-color: ${theme.colors.global.contentBackground};
-      border-width: ${arrowSize}px ${arrowSize}px 0;
-      margin-left: -${arrowSize}px;
-      bottom: -${arrowSize / 2}px;
+const StyledTooltip = styled(BootstrapTooltip)(
+  ({ theme }) => css`
+    &.in {
+      opacity: 1;
+      filter: drop-shadow(0 0 3px ${theme.colors.variant.lighter.default});
     }
-  }
-  
-  &.right {
-    .tooltip-arrow {
-      border-right-color: ${theme.colors.global.contentBackground};
-      border-width: ${arrowSize}px ${arrowSize}px ${arrowSize}px 0;
-      margin-top: -${arrowSize}px;
-      left: -${arrowSize / 2}px;
-    }
-  }
 
-  &.bottom {
-    .tooltip-arrow {
-      border-bottom-color: ${theme.colors.global.contentBackground};
-      border-width: 0 ${arrowSize}px ${arrowSize}px;
-      margin-left: -${arrowSize}px;
-      top: -${arrowSize / 2}px;
-    }
-  }
-  
-  &.left {
-    .tooltip-arrow {
-      border-left-color: ${theme.colors.global.contentBackground};
-      border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
-      margin-top: -${arrowSize}px;
-      right: -${arrowSize / 2}px;
-    }
-  }
-  
-  .tooltip-inner {
-    color: ${theme.colors.global.textDefault};
-    background-color: ${theme.colors.global.contentBackground};
-    max-width: 300px;
-    opacity: 1;
-
-    .datapoint-info {
-      text-align: left;
-
-      .date {
-        color: ${theme.colors.variant.darkest.default};
+    &.top {
+      .tooltip-arrow {
+        border-top-color: ${theme.colors.global.contentBackground};
+        border-width: ${arrowSize}px ${arrowSize}px 0;
+        margin-left: -${arrowSize}px;
+        bottom: -${arrowSize / 2}px;
       }
     }
-  }
-`);
+
+    &.right {
+      .tooltip-arrow {
+        border-right-color: ${theme.colors.global.contentBackground};
+        border-width: ${arrowSize}px ${arrowSize}px ${arrowSize}px 0;
+        margin-top: -${arrowSize}px;
+        left: -${arrowSize / 2}px;
+      }
+    }
+
+    &.bottom {
+      .tooltip-arrow {
+        border-bottom-color: ${theme.colors.global.contentBackground};
+        border-width: 0 ${arrowSize}px ${arrowSize}px;
+        margin-left: -${arrowSize}px;
+        top: -${arrowSize / 2}px;
+      }
+    }
+
+    &.left {
+      .tooltip-arrow {
+        border-left-color: ${theme.colors.global.contentBackground};
+        border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
+        margin-top: -${arrowSize}px;
+        right: -${arrowSize / 2}px;
+      }
+    }
+
+    .tooltip-inner {
+      color: ${theme.colors.global.textDefault};
+      background-color: ${theme.colors.global.contentBackground};
+      max-width: 300px;
+      opacity: 1;
+
+      .datapoint-info {
+        text-align: left;
+
+        .date {
+          color: ${theme.colors.variant.darkest.default};
+        }
+      }
+    }
+  `,
+);
 
 type TooltipProps = {
   className?: string;
@@ -121,13 +123,14 @@ const Tooltip = ({
   arrowOffsetLeft,
   show = true,
 }: TooltipProps) => (
-  <StyledTooltip className={`${className} ${show ? 'in' : ''}`}
-                 id={id}
-                 placement={placement}
-                 positionTop={positionTop}
-                 positionLeft={positionLeft}
-                 arrowOffsetTop={arrowOffsetTop}
-                 arrowOffsetLeft={arrowOffsetLeft}>
+  <StyledTooltip
+    className={`${className} ${show ? 'in' : ''}`}
+    id={id}
+    placement={placement}
+    positionTop={positionTop}
+    positionLeft={positionLeft}
+    arrowOffsetTop={arrowOffsetTop}
+    arrowOffsetLeft={arrowOffsetLeft}>
     {children}
   </StyledTooltip>
 );

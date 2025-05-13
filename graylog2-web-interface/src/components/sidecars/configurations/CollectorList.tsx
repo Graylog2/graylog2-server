@@ -26,38 +26,35 @@ import CollectorRow from './CollectorRow';
 import style from './CollectorList.css';
 
 type CollectorListProps = {
-  collectors: Array<Collector>,
+  collectors: Array<Collector>;
   pagination: {
-    page: number,
-    pageSize: number,
-    total: number,
-  },
-  query: string,
-  total: number,
-  onClone: (...args: any[]) => void,
-  onDelete: (...args: any[]) => void,
-  onPageChange: (...args: any[]) => void,
-  onQueryChange: (...args: any[]) => void,
-  validateCollector: (...args: any[]) => void,
-}
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+  query: string;
+  total: number;
+  onClone: (collector: string, name: string, callback: () => void) => void;
+  onDelete: (collector: Collector) => void;
+  onPageChange: (page: number, pageSize: number) => void;
+  onQueryChange: () => void;
+  validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>;
+};
+
+const headerCellFormatter = (header: React.ReactNode) => {
+  const className = header === 'Actions' ? style.actionsColumn : '';
+
+  return <th className={className}>{header}</th>;
+};
 
 class CollectorList extends React.Component<CollectorListProps> {
-  headerCellFormatter(header) {
-    const className = (header === 'Actions' ? style.actionsColumn : '');
-
-    return <th className={className}>{header}</th>;
-  }
-
-  collectorFormatter(collector) {
+  collectorFormatter = (collector: Collector) => {
     const { onClone, onDelete, validateCollector } = this.props;
 
     return (
-      <CollectorRow collector={collector}
-                    onClone={onClone}
-                    onDelete={onDelete}
-                    validateCollector={validateCollector} />
+      <CollectorRow collector={collector} onClone={onClone} onDelete={onDelete} validateCollector={validateCollector} />
     );
-  }
+  };
 
   render() {
     const { collectors, pagination, query, total, onPageChange, onQueryChange } = this.props;
@@ -70,43 +67,52 @@ class CollectorList extends React.Component<CollectorListProps> {
           <Col md={12}>
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR}>
-                <Button bsStyle="success" bsSize="small">Create Log Collector</Button>
+                <Button bsStyle="success" bsSize="small">
+                  Create Log Collector
+                </Button>
               </LinkContainer>
             </div>
-            <h2>Log Collectors <small>{total} total</small></h2>
+            <h2>
+              Log Collectors <small>{total} total</small>
+            </h2>
           </Col>
           <Col md={12}>
-            <p>Manage Log Collectors that you can configure and supervise through Graylog Sidecar and Graylog Web Interface.</p>
+            <p>Manage Log Collectors that you can configure and supervise through sidecars and the web interface.</p>
           </Col>
         </Row>
 
         <Row className={`row-sm ${style.collectorRow}`}>
           <Col md={12}>
-            <SearchForm query={query}
-                        onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        placeholder="Find collectors"
-                        wrapperClass={style.inline}
-                        topMargin={0}
-                        useLoadingState />
+            <SearchForm
+              query={query}
+              onSearch={onQueryChange}
+              onReset={onQueryChange}
+              placeholder="Find collectors"
+              wrapperClass={style.inline}
+              topMargin={0}
+              useLoadingState
+            />
 
-            <PaginatedList activePage={pagination.page}
-                           pageSize={pagination.pageSize}
-                           pageSizes={[10, 25]}
-                           totalItems={pagination.total}
-                           onChange={onPageChange}
-                           useQueryParameter={false}>
+            <PaginatedList
+              activePage={pagination.page}
+              pageSize={pagination.pageSize}
+              pageSizes={[10, 25]}
+              totalItems={pagination.total}
+              onChange={onPageChange}
+              useQueryParameter={false}>
               <div className={style.collectorTable}>
-                <DataTable id="collector-list"
-                           className="table-hover"
-                           headers={headers}
-                           headerCellFormatter={this.headerCellFormatter}
-                           rows={collectors}
-                           dataRowFormatter={this.collectorFormatter}
-                           noDataText="There are no log collectors to display, why don't you create one?"
-                           filterLabel=""
-                           filterKeys={[]}
-                           useResponsiveTable={false} />
+                <DataTable
+                  id="collector-list"
+                  className="table-hover"
+                  headers={headers}
+                  headerCellFormatter={headerCellFormatter}
+                  rows={collectors}
+                  dataRowFormatter={this.collectorFormatter}
+                  noDataText="There are no log collectors to display, why don't you create one?"
+                  filterLabel=""
+                  filterKeys={[]}
+                  useResponsiveTable={false}
+                />
               </div>
             </PaginatedList>
           </Col>

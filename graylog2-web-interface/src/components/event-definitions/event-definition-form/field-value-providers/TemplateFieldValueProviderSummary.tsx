@@ -21,9 +21,12 @@ import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
 type TemplateFieldValueProviderSummaryProps = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
-class TemplateFieldValueProviderSummary extends React.Component<TemplateFieldValueProviderSummaryProps, {
-  [key: string]: any;
-}> {
+class TemplateFieldValueProviderSummary extends React.Component<
+  TemplateFieldValueProviderSummaryProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     const { config } = this.props;
 

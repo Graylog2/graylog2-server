@@ -29,7 +29,7 @@ import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "CloudWatchRawLog";
@@ -42,9 +42,8 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
+    public Optional<Message> decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
         try {
             final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, SOURCE);
             Message result = messageFactory.createMessage(
@@ -56,7 +55,7 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
             result.addField(FIELD_LOG_GROUP, logEvent.logGroup());
             result.addField(FIELD_LOG_STREAM, logEvent.logStream());
 
-            return result;
+            return Optional.of(result);
         } catch (Exception e) {
             throw new RuntimeException("Could not deserialize AWS FlowLog record.", e);
         }

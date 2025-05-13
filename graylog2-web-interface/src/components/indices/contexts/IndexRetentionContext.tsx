@@ -18,11 +18,8 @@ import * as React from 'react';
 import { useContext } from 'react';
 
 export type IndexRetentionContextType = {
-  useMaxNumberOfIndices: [
-    number | undefined,
-    React.Dispatch<React.SetStateAction<number>>
-  ]
-}
+  useMaxNumberOfIndices: [number | undefined, React.Dispatch<React.SetStateAction<number>>];
+};
 
 const IndexRetentionContext = React.createContext<IndexRetentionContextType | null>(null);
 

@@ -42,83 +42,103 @@ const DragHandle = styled.div`
 `;
 
 type ListItemProps = {
-  item: { id: string, title: string },
-  draggableProps: DraggableProps,
-  dragHandleProps: DragHandleProps,
-  className: string,
-  onChange: (columnName: string) => void,
-  onRemove: () => void,
-  selectedColumns: Array<string>,
-  testIdPrefix: string,
-}
-
-const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
-  className,
-  dragHandleProps,
-  draggableProps,
-  item,
-  onRemove,
-  testIdPrefix,
-}: ListItemProps, ref) => (
-  <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
-    <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-      <Icon name="drag_indicator" />
-    </DragHandle>
-    <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
-    <div>
-      <IconButton name="delete" title={`Remove ${item.title} column`} onClick={onRemove} />
-    </div>
-  </ListItemContainer>
-));
-
-type Props = {
-  onChange: (newSelectedColumns: Array<string>) => void,
-  displayOverlayInPortal?: boolean,
-  selectedColumns: Array<string>,
-  columnTitle: (column: string) => string,
-  testPrefix?: string,
+  item: { id: string; title: string };
+  draggableProps: DraggableProps;
+  dragHandleProps: DragHandleProps;
+  className: string;
+  onChange: (columnName: string) => void;
+  onRemove: () => void;
+  selectedColumns: Array<string>;
+  testIdPrefix: string;
 };
 
-const SelectedColumnsList = ({ testPrefix, selectedColumns, onChange, displayOverlayInPortal = false, columnTitle }: Props) => {
-  const columnsForList = useMemo(() => selectedColumns?.map((column) => ({ id: column, title: columnTitle(column) })), [columnTitle, selectedColumns]);
+const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
+  ({ className, dragHandleProps, draggableProps, item, onRemove, testIdPrefix }: ListItemProps, ref) => (
+    <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
+      <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
+        <Icon name="drag_indicator" />
+      </DragHandle>
+      <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
+      <div>
+        <IconButton name="delete" title={`Remove ${item.title} column`} onClick={onRemove} />
+      </div>
+    </ListItemContainer>
+  ),
+);
 
-  const onChangeColumn = useCallback((columnIndex: number, newFieldName: string) => {
-    const newColumns = [...selectedColumns];
-    newColumns[columnIndex] = newFieldName;
+type Props = {
+  onChange: (newSelectedColumns: Array<string>) => void;
+  displayOverlayInPortal?: boolean;
+  selectedColumns: Array<string>;
+  columnTitle: (column: string) => string;
+  testPrefix?: string;
+};
 
-    onChange(newColumns);
-  }, [onChange, selectedColumns]);
+const SelectedColumnsList = ({
+  testPrefix,
+  selectedColumns,
+  onChange,
+  displayOverlayInPortal = false,
+  columnTitle,
+}: Props) => {
+  const columnsForList = useMemo(
+    () => selectedColumns?.map((column) => ({ id: column, title: columnTitle(column) })),
+    [columnTitle, selectedColumns],
+  );
 
-  const onRemoveColumn = useCallback((removedFieldName: string) => {
-    const newColumns = selectedColumns.filter((columnName) => columnName !== removedFieldName);
-    onChange(newColumns);
-  }, [onChange, selectedColumns]);
+  const onChangeColumn = useCallback(
+    (columnIndex: number, newFieldName: string) => {
+      const newColumns = [...selectedColumns];
+      newColumns[columnIndex] = newFieldName;
 
-  const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-    <ListItem onChange={(newFieldName) => onChangeColumn(index, newFieldName)}
-              onRemove={() => onRemoveColumn(item.id)}
-              selectedColumns={selectedColumns ?? []}
-              item={item}
-              testIdPrefix={`${testPrefix}-column-${index}`}
-              dragHandleProps={dragHandleProps}
-              draggableProps={draggableProps}
-              className={className}
-              ref={ref} />
-  ), [selectedColumns, testPrefix, onChangeColumn, onRemoveColumn]);
+      onChange(newColumns);
+    },
+    [onChange, selectedColumns],
+  );
 
-  const onSortChange = useCallback((newColumnsList: Array<{ id: string, title: string }>) => {
-    onChange(newColumnsList.map(({ id }) => id));
-  }, [onChange]);
+  const onRemoveColumn = useCallback(
+    (removedFieldName: string) => {
+      const newColumns = selectedColumns.filter((columnName) => columnName !== removedFieldName);
+      onChange(newColumns);
+    },
+    [onChange, selectedColumns],
+  );
+
+  const SortableListItem = useCallback(
+    ({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+      <ListItem
+        onChange={(newFieldName) => onChangeColumn(index, newFieldName)}
+        onRemove={() => onRemoveColumn(item.id)}
+        selectedColumns={selectedColumns ?? []}
+        item={item}
+        testIdPrefix={`${testPrefix}-column-${index}`}
+        dragHandleProps={dragHandleProps}
+        draggableProps={draggableProps}
+        className={className}
+        ref={ref}
+      />
+    ),
+    [selectedColumns, testPrefix, onChangeColumn, onRemoveColumn],
+  );
+
+  const onSortChange = useCallback(
+    (newColumnsList: Array<{ id: string; title: string }>) => {
+      onChange(newColumnsList.map(({ id }) => id));
+    },
+    [onChange],
+  );
 
   if (!selectedColumns?.length) {
     return null;
   }
 
   return (
-    <SortableList items={columnsForList}
-                  onMoveItem={onSortChange}
-                  customListItemRender={SortableListItem}
-                  displayOverlayInPortal={displayOverlayInPortal} />
+    <SortableList
+      items={columnsForList}
+      onMoveItem={onSortChange}
+      customListItemRender={SortableListItem}
+      displayOverlayInPortal={displayOverlayInPortal}
+    />
   );
 };
 

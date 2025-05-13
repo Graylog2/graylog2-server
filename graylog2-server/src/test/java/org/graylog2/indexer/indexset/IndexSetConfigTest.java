@@ -341,6 +341,7 @@ public class IndexSetConfigTest {
                                               final String fieldTypeProfile) {
         return IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
+                null,
                 "Test Index",
                 "Test Index",
                 true,

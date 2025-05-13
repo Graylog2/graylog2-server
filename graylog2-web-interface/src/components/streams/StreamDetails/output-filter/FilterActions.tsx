@@ -22,9 +22,9 @@ import FilterDeleteButton from 'components/streams/StreamDetails/output-filter/F
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type Props = {
-  filterRule: StreamOutputFilterRule,
-  destinationType: string,
-}
+  filterRule: StreamOutputFilterRule;
+  destinationType: string;
+};
 const ActionWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -33,9 +33,7 @@ const ActionWrapper = styled.div`
 
 const FilterActions = ({ filterRule, destinationType }: Props) => (
   <ActionWrapper>
-    <FilterRuleEditButton filterRule={filterRule}
-                          destinationType={destinationType}
-                          streamId={filterRule.stream_id} />
+    <FilterRuleEditButton filterRule={filterRule} destinationType={destinationType} streamId={filterRule.stream_id} />
     <FilterDeleteButton streamId={filterRule.stream_id} filterOutputRule={filterRule} />
   </ActionWrapper>
 );

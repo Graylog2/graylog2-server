@@ -18,27 +18,33 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { StreamOutputs } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 
-const addStreamOutput = async ({ streamId, outputs }: { streamId: string, outputs: { outputs: Array<string>}}) => StreamOutputs.add(streamId, outputs);
-const removeStreamOutput = async ({ streamId, outputId }: { streamId: string, outputId: string}) => StreamOutputs.remove(streamId, outputId);
+const addStreamOutput = async ({ streamId, outputs }: { streamId: string; outputs: { outputs: Array<string> } }) =>
+  StreamOutputs.add(streamId, outputs);
+const removeStreamOutput = async ({ streamId, outputId }: { streamId: string; outputId: string }) =>
+  StreamOutputs.remove(streamId, outputId);
 
 const useStreamOutputMutation = () => {
   const addMutation = useMutation(addStreamOutput, {
     onError: (errorThrown) => {
-      UserNotification.error(`Adding output to stream failed with status: ${errorThrown}`,
-        'Could not add output to stream');
+      UserNotification.error(
+        `Adding output to stream failed with status: ${errorThrown}`,
+        'Could not add output to stream',
+      );
     },
     onSuccess: () => {
       UserNotification.success('Output has been successfully added to Stream.', 'Success!');
     },
-
   });
 
   const removeMutation = useMutation(removeStreamOutput, {
     onError: (errorThrown) => {
-      UserNotification.error(`Deleting output from stream failed with status: ${errorThrown}`,
-        'Could not delete output from stream');
+      UserNotification.error(
+        `Deleting output from stream failed with status: ${errorThrown}`,
+        'Could not delete output from stream',
+      );
     },
     onSuccess: () => {
       UserNotification.success('Output has been successfully removed from stream.', 'Success!');

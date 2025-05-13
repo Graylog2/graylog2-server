@@ -16,68 +16,82 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.ReturnDocument;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog.plugins.sidecar.template.directives.IndentTemplateDirective;
 import org.graylog.plugins.sidecar.template.loader.MongoDbTemplateLoader;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.regex;
+import static com.mongodb.client.model.Indexes.ascending;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static org.graylog2.database.utils.MongoUtils.idEq;
 
 @Singleton
-public class ConfigurationService extends PaginatedDbService<Configuration> {
+public class ConfigurationService {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationService.class);
     private final freemarker.template.Configuration templateConfiguration;
     private final ConfigurationVariableService configurationVariableService;
 
     private static final String COLLECTION_NAME = "sidecar_configurations";
     private final Provider<freemarker.template.Configuration> templateConfigurationProvider;
+    private final MongoCollection<Configuration> collection;
+    private final MongoPaginationHelper<Configuration> paginationHelper;
+    private final MongoUtils<Configuration> mongoUtils;
 
     @Inject
-    public ConfigurationService(MongoConnection mongoConnection,
-                                MongoJackObjectMapperProvider mapper,
+    public ConfigurationService(MongoCollections mongoCollections,
                                 ConfigurationVariableService configurationVariableService,
                                 Provider<freemarker.template.Configuration> templateConfigurationProvider) {
-        super(mongoConnection, mapper, Configuration.class, COLLECTION_NAME);
         this.templateConfigurationProvider = templateConfigurationProvider;
-        this.templateConfiguration = createTemplateConfiguration(new MongoDbTemplateLoader(db));
         this.configurationVariableService = configurationVariableService;
 
-        db.createIndex(new BasicDBObject(Configuration.FIELD_ID, 1));
-        db.createIndex(new BasicDBObject(Configuration.FIELD_COLLECTOR_ID, 1));
-        db.createIndex(new BasicDBObject(Configuration.FIELD_TAGS, 1));
+        collection = mongoCollections.collection(COLLECTION_NAME, Configuration.class);
+        paginationHelper = mongoCollections.paginationHelper(collection);
+        mongoUtils = mongoCollections.utils(collection);
+
+        templateConfiguration = createTemplateConfiguration(new MongoDbTemplateLoader(mongoUtils));
+
+        collection.createIndex(ascending(Configuration.FIELD_ID));
+        collection.createIndex(ascending(Configuration.FIELD_COLLECTOR_ID));
+        collection.createIndex(ascending(Configuration.FIELD_TAGS));
     }
 
     private freemarker.template.Configuration createTemplateConfiguration(TemplateLoader templateLoader) {
@@ -93,58 +107,59 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
     }
 
     public Configuration find(String id) {
-        return db.findOne(DBQuery.is("_id", id));
+        return mongoUtils.getById(id).orElse(null);
     }
 
     public Configuration findByName(String name) {
-        return db.findOne(DBQuery.is(Configuration.FIELD_NAME, name));
+        return collection.find(eq(Configuration.FIELD_NAME, name)).first();
     }
 
     public long count() {
-        return db.count();
+        return collection.countDocuments();
     }
 
     public List<Configuration> all() {
-        try (final Stream<Configuration> collectorConfigurationStream = streamAll()) {
-            return collectorConfigurationStream.collect(Collectors.toList());
-        }
+        return collection.find().into(new ArrayList<>());
     }
 
-    public PaginatedList<Configuration> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
-    }
-
-    public List<Configuration> findByQuery(DBQuery.Query query) {
-        try (final Stream<Configuration> collectorConfigurationStream = streamQuery(query)) {
-            return collectorConfigurationStream.collect(Collectors.toList());
-        }
+    public PaginatedList<Configuration> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField,
+                                                      SortOrder order) {
+        return paginationHelper
+                .filter(searchQuery.toBson())
+                .sort(order.toBsonSort(sortField))
+                .perPage(perPage)
+                .page(page);
     }
 
     public List<Configuration> findByConfigurationVariable(ConfigurationVariable configurationVariable) {
-        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(configurationVariable.fullName())));
-        return findByQuery(query);
+        final var filter = regex(
+                Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(configurationVariable.fullName())));
+        return collection.find(filter).into(new ArrayList<>());
     }
 
     public List<Configuration> findByTags(Set<String> tags) {
-        return findByQuery(DBQuery.in(Configuration.FIELD_TAGS, tags));
+        return collection.find(in(Configuration.FIELD_TAGS, tags)).into(new ArrayList<>());
     }
 
     public void replaceVariableNames(String oldName, String newName) {
-        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(oldName)));
-        List<Configuration> configurations = findByQuery(query);
-        for (Configuration config : configurations) {
-            final String newTemplate = config.template().replace(oldName, newName);
-            db.findAndModify(DBQuery.is("_id", config.id()), new BasicDBObject(),
-                    new BasicDBObject(), false, config.toBuilder().template(newTemplate).build(), true, true);
-        }
+        final var filter = regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(oldName)));
+        collection.find(filter).forEach(config -> {
+                    final String newTemplate = config.template().replace(oldName, newName);
+                    collection.replaceOne(
+                            idEq(Objects.requireNonNull(config.id())),
+                            config.toBuilder().template(newTemplate).build(),
+                            new ReplaceOptions().upsert(true)
+                    );
+                }
+        );
     }
 
-    @Override
     public Configuration save(Configuration configuration) {
-        return db.findAndModify(DBQuery.is("_id", configuration.id()), new BasicDBObject(),
-                new BasicDBObject(), false, configuration, true, true);
+        return collection.findOneAndReplace(
+                idEq(Objects.requireNonNull(configuration.id())),
+                configuration,
+                new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true)
+        );
     }
 
     public Configuration copyConfiguration(String id, String name) {
@@ -234,5 +249,13 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
 
         final String template = writer.toString();
         return template.endsWith("\n") ? template : template + "\n";
+    }
+
+    public Optional<Configuration> get(String id) {
+        return mongoUtils.getById(id);
+    }
+
+    public int delete(String id) {
+        return mongoUtils.deleteById(id) ? 1 : 0;
     }
 }

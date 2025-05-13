@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
@@ -37,9 +37,12 @@ type ConfigurationRowProps = {
   sendTelemetry?: (...args: any[]) => void;
 };
 
-class ConfigurationRow extends React.Component<ConfigurationRowProps, {
-  [key: string]: any;
-}> {
+class ConfigurationRow extends React.Component<
+  ConfigurationRowProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     collector: {},
     sendTelemetry: () => {},
@@ -82,28 +85,36 @@ class ConfigurationRow extends React.Component<ConfigurationRowProps, {
     return (
       <tr>
         <td className={styles.name}>{configuration.name}</td>
-        <td className={styles.color}><ColorLabel color={configuration.color} size="small" /></td>
+        <td className={styles.color}>
+          <ColorLabel color={configuration.color} size="small" />
+        </td>
         <td>
-          <CollectorIndicator collector={collector.name || 'Unknown collector'}
-                              operatingSystem={collector.node_operating_system} />
+          <CollectorIndicator
+            collector={collector.name || 'Unknown collector'}
+            operatingSystem={collector.node_operating_system}
+          />
         </td>
         <td className={styles.actions}>
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
-              <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">Edit</Button>
+              <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">
+                Edit
+              </Button>
             </LinkContainer>
             <MoreActions>
               <MenuItem onSelect={() => this.openModal()}>Clone</MenuItem>
 
               <MenuItem divider />
-              <MenuItem onSelect={this._handleDelete} variant="danger">Delete</MenuItem>
+              <DeleteMenuItem onSelect={this._handleDelete} />
             </MoreActions>
             {showModal && (
-            <CopyConfigurationModal configuration={configuration}
-                                    onClose={this.closeModal}
-                                    showModal={showModal}
-                                    validateConfiguration={validateConfiguration}
-                                    copyConfiguration={onCopy} />
+              <CopyConfigurationModal
+                configuration={configuration}
+                onClose={this.closeModal}
+                showModal={showModal}
+                validateConfiguration={validateConfiguration}
+                copyConfiguration={onCopy}
+              />
             )}
           </ButtonToolbar>
         </td>

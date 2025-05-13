@@ -26,4 +26,9 @@ export { default as NumberField } from './NumberField';
 export { default as TextField } from './TextField';
 export { default as TitleField } from './TitleField';
 
-export type { ConfigurationFormData, ConfigurationFieldValue, ConfigurationField, ConfigurationFieldWithEncryption } from './types';
+export type {
+  ConfigurationFormData,
+  ConfigurationFieldValue,
+  ConfigurationField,
+  ConfigurationFieldWithEncryption,
+} from './types';

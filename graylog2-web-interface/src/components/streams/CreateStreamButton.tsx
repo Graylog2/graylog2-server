@@ -24,17 +24,25 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 type Props = {
-  bsSize?: BsSize,
-  bsStyle?: StyleProps,
-  buttonText?: string,
-  className?: string,
-  indexSets: Array<IndexSet>
-  onCreate: (values: Partial<Stream>) => Promise<void>
-}
+  bsSize?: BsSize;
+  bsStyle?: StyleProps;
+  buttonText?: string;
+  className?: string;
+  indexSets: Array<IndexSet>;
+  onCreate: (values: Partial<Stream> & EntityShare) => Promise<void>;
+};
 
-const CreateStreamButton = ({ bsSize, bsStyle, buttonText = 'Create stream', className, indexSets, onCreate }: Props) => {
+const CreateStreamButton = ({
+  bsSize = 'md',
+  bsStyle = 'default',
+  buttonText = 'Create stream',
+  className = '',
+  indexSets,
+  onCreate,
+}: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
@@ -48,19 +56,19 @@ const CreateStreamButton = ({ bsSize, bsStyle, buttonText = 'Create stream', cla
 
   return (
     <>
-      <Button bsSize={bsSize}
-              bsStyle={bsStyle}
-              className={className}
-              onClick={toggleCreateModal}>
+      <Button bsSize={bsSize} bsStyle={bsStyle} className={className} onClick={toggleCreateModal}>
         {buttonText}
       </Button>
       {showCreateModal && (
-        <StreamModal title="Create stream"
-                     submitButtonText="Create stream"
-                     submitLoadingText="Creating stream..."
-                     indexSets={indexSets}
-                     onSubmit={onCreate}
-                     onClose={toggleCreateModal} />
+        <StreamModal
+          title="Create stream"
+          submitButtonText="Create stream"
+          submitLoadingText="Creating stream..."
+          indexSets={indexSets}
+          onSubmit={onCreate}
+          onClose={toggleCreateModal}
+          isNew
+        />
       )}
     </>
   );

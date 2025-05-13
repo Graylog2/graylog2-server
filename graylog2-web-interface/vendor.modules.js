@@ -17,9 +17,10 @@
 module.exports = [
   '@emotion/react',
   '@mantine/core',
+  '@mantine/notifications',
+  '@reduxjs/toolkit',
   '@tanstack/react-query',
   'chroma-js',
-  'create-react-class',
   'formik',
   'jquery',
   'leaflet',

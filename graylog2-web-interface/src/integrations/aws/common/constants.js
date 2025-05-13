@@ -27,8 +27,4 @@ const AWS_AUTH_TYPES = {
   keysecret: 'Key & Secret',
 };
 
-export {
-  AWS_AUTH_TYPES,
-  KINESIS_LOG_TYPES,
-  DEFAULT_KINESIS_LOG_TYPE,
-};
+export { AWS_AUTH_TYPES, KINESIS_LOG_TYPES, DEFAULT_KINESIS_LOG_TYPE };

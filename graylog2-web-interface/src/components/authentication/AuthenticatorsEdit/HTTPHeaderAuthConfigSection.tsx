@@ -30,9 +30,12 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useProductName from 'brand-customization/useProductName';
 
 const HTTPHeaderAuthConfigSection = () => {
   const [submitError, setSubmitError] = useState<string | undefined>();
+  const productName = useProductName();
+
   const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined | void>();
   const sectionTitle = 'Trusted Header Authentication';
   const history = useHistory();
@@ -48,11 +51,13 @@ const HTTPHeaderAuthConfigSection = () => {
 
     setSubmitError(undefined);
 
-    return HTTPHeaderAuthConfigDomain.update(data).then(() => {
-      history.push(Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW);
-    }).catch((error) => {
-      setSubmitError(error.additional?.res?.text);
-    });
+    return HTTPHeaderAuthConfigDomain.update(data)
+      .then(() => {
+        history.push(Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW);
+      })
+      .catch((error) => {
+        setSubmitError(error.additional?.res?.text);
+      });
   };
 
   useEffect(() => {
@@ -70,29 +75,29 @@ const HTTPHeaderAuthConfigSection = () => {
   return (
     <SectionComponent title={sectionTitle}>
       <p>This authenticator enables you to login a user, based on a HTTP header without further interaction.</p>
-      <Formik onSubmit={_onSubmit}
-              initialValues={loadedConfig.toJSON()}>
+      <Formik onSubmit={_onSubmit} initialValues={loadedConfig.toJSON()}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <Input id="enable-http-header-auth"
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9"
-                   label="Enabled">
-              <FormikFormGroup label="Enable single sign-on via HTTP header"
-                               name="enabled"
-                               formGroupClassName="form-group no-bm"
-                               wrapperClassName="col-xs-12"
-                               type="checkbox" />
+            <Input id="enable-http-header-auth" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Enabled">
+              <FormikFormGroup
+                label="Enable single sign-on via HTTP header"
+                name="enabled"
+                formGroupClassName="form-group no-bm"
+                wrapperClassName="col-xs-12"
+                type="checkbox"
+              />
             </Input>
-            <FormikFormGroup label="Username header"
-                             name="username_header"
-                             required
-                             help="HTTP header containing the implicitly trusted name of the Graylog user. (The header match is ignoring case sensitivity)" />
+            <FormikFormGroup
+              label="Username header"
+              name="username_header"
+              required
+              help="HTTP header containing the implicitly trusted name of the user. (The header match is ignoring case sensitivity)"
+            />
             <Row>
               <Col mdOffset={3} md={9}>
                 <Alert bsStyle="info">
-                  Please configure the <code>trusted_proxies</code> setting in the Graylog
-                  server configuration file.
+                  Please configure the <code>trusted_proxies</code> setting in the {productName} server configuration
+                  file.
                 </Alert>
               </Col>
             </Row>
@@ -100,10 +105,7 @@ const HTTPHeaderAuthConfigSection = () => {
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid}
-                          title="Update Config"
-                          type="submit">
+                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Update Config" type="submit">
                     Update Config
                   </Button>
                 </div>

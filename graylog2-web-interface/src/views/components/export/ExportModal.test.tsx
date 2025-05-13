@@ -17,15 +17,15 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import selectEvent from 'react-select-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import type { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap, ViewType } from 'views/logic/views/View';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -33,18 +33,20 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import {
   messagesWidget,
-  stateWithOneWidget, viewWithMultipleWidgets,
+  stateWithOneWidget,
+  viewWithMultipleWidgets,
   viewWithOneWidget,
   viewWithoutWidget,
 } from 'views/components/export/Fixtures';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
 import startDownload from 'views/components/export/startDownload';
+import type { QueryString } from 'views/logic/queries/types';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -57,12 +59,14 @@ jest.mock('util/MessagesExportUtils', () => ({
 const pluginExports: PluginRegistration = {
   exports: {
     enterpriseWidgets: [createWidget('messages')],
-    'views.export.formats': [{
-      type: 'csv',
-      displayName: () => 'CSV',
-      mimeType: 'text/csv',
-      fileExtension: 'csv',
-    }],
+    'views.export.formats': [
+      {
+        type: 'csv',
+        displayName: () => 'CSV',
+        mimeType: 'text/csv',
+        fileExtension: 'csv',
+      },
+    ],
   },
 };
 
@@ -74,10 +78,9 @@ jest.mock('./startDownload');
 describe('ExportModal', () => {
   // Prepare expected payload
 
-  const triggerFormSubmit = () => {
-    const submitButton = screen.getByRole('button', {
+  const triggerFormSubmit = async () => {
+    const submitButton = await screen.findByRole('button', {
       name: /start download/i,
-      hidden: true,
     });
 
     fireEvent.click(submitButton);
@@ -100,44 +103,55 @@ describe('ExportModal', () => {
   });
 
   type SimpleExportModalProps = {
-    viewType?: ViewType,
+    viewType?: ViewType;
   } & Partial<ExportModalProps>;
 
-  const SimpleExportModal = ({ viewType = View.Type.Search, closeModal = () => {}, view = viewWithoutWidget(View.Type.Search), ...props }: SimpleExportModalProps) => (
+  const SimpleExportModal = ({
+    viewType = View.Type.Search,
+    closeModal = () => {},
+    view = viewWithoutWidget(View.Type.Search),
+    ...props
+  }: SimpleExportModalProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-        <ExportModal view={view ?? viewWithoutWidget(viewType)} closeModal={closeModal} {...props as ExportModalProps} />
-      </FieldTypesContext.Provider>
+      <TestFieldTypesContextProvider>
+        <ExportModal
+          view={view ?? viewWithoutWidget(viewType)}
+          closeModal={closeModal}
+          {...(props as ExportModalProps)}
+        />
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
   it('should provide current execution state on export', async () => {
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
-    const effectiveTimeRange: AbsoluteTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
-    const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
+    const effectiveTimeRange: AbsoluteTimeRange = {
+      type: 'absolute',
+      from: '2020-01-01T12:18:17.827Z',
+      to: '2020-01-01T12:23:17.827Z',
+    };
+    const globalQuery: QueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
     const globalOverride = new GlobalOverride(effectiveTimeRange, globalQuery);
     const executionState = new SearchExecutionState(parameterBindings, globalOverride);
 
     asMock(useSearchExecutionState).mockReturnValue(executionState);
     const expectedPayload = {
       ...payload,
-      fields_in_order: [
-        'timestamp',
-        'source',
-        'message',
-      ],
+      fields_in_order: ['timestamp', 'source', 'message'],
       execution_state: executionState,
     };
     render(<SimpleExportModal />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
-    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledWith(
-      expectedPayload,
-      'search-id',
-      'text/csv',
-      'Untitled-Search-search-result.csv',
-    ));
+    await waitFor(() =>
+      expect(exportSearchMessages).toHaveBeenCalledWith(
+        expectedPayload,
+        'search-id',
+        'text/csv',
+        'Untitled-Search-search-result.csv',
+      ),
+    );
   });
 
   it('should show loading indicator after starting download', async () => {
@@ -146,7 +160,7 @@ describe('ExportModal', () => {
 
     expect(getAllByText('Start Download')).toHaveLength(2);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await findByText('Downloading...');
   });
@@ -155,7 +169,7 @@ describe('ExportModal', () => {
     const closeModalStub = jest.fn();
     render(<SimpleExportModal closeModal={closeModalStub} />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() => expect(closeModalStub).toHaveBeenCalledTimes(1));
   });
@@ -164,27 +178,22 @@ describe('ExportModal', () => {
     const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, false, [], []);
     const widgetWithoutMessageRow = messagesWidget().toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
-      'query-id-1': stateWithOneWidget(messagesWidget()).toBuilder()
+      'query-id-1': stateWithOneWidget(messagesWidget())
+        .toBuilder()
         .widgets(Immutable.List([widgetWithoutMessageRow]))
         .build(),
     });
-    const view = viewWithoutWidget(View.Type.Search)
-      .toBuilder()
-      .state(viewStateMap)
-      .build();
+    const view = viewWithoutWidget(View.Type.Search).toBuilder().state(viewStateMap).build();
     render(<SimpleExportModal view={view} />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
     expect(exportSearchTypeMessages).toHaveBeenCalledWith(
       {
         ...payload,
-        fields_in_order: [
-          'level',
-          'http_method',
-        ],
+        fields_in_order: ['level', 'http_method'],
       },
       'search-id',
       'search-type-id-1',
@@ -195,27 +204,28 @@ describe('ExportModal', () => {
 
   it('initial fields should keep order when there are more than 8 fields in widget config', async () => {
     const fieldList = [
-      'timestamp', 'source', 'gl2_processing_timestamp', 'streams', 'gl2_accounted_message_size', 'controller', 'ingest_time', 'gl2_receive_timestamp', 'user_id',
+      'timestamp',
+      'source',
+      'gl2_processing_timestamp',
+      'streams',
+      'gl2_accounted_message_size',
+      'controller',
+      'ingest_time',
+      'gl2_receive_timestamp',
+      'user_id',
     ];
-    const widgetConfig = new MessagesWidgetConfig(
-      fieldList,
-      false,
-      false,
-      [],
-      []);
+    const widgetConfig = new MessagesWidgetConfig(fieldList, false, false, [], []);
     const widgetWithoutMessageRow = messagesWidget().toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
-      'query-id-1': stateWithOneWidget(messagesWidget()).toBuilder()
+      'query-id-1': stateWithOneWidget(messagesWidget())
+        .toBuilder()
         .widgets(Immutable.List([widgetWithoutMessageRow]))
         .build(),
     });
-    const view = viewWithoutWidget(View.Type.Search)
-      .toBuilder()
-      .state(viewStateMap)
-      .build();
+    const view = viewWithoutWidget(View.Type.Search).toBuilder().state(viewStateMap).build();
     render(<SimpleExportModal view={view} />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
@@ -250,18 +260,14 @@ describe('ExportModal', () => {
     it('should export all messages with default fields when no widget exists', async () => {
       render(<SearchExportModal />);
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
 
       await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchMessages).toHaveBeenCalledWith(
         {
           ...payload,
-          fields_in_order: [
-            'timestamp',
-            'source',
-            'message',
-          ],
+          fields_in_order: ['timestamp', 'source', 'message'],
         },
         'search-id',
         'text/csv',
@@ -283,7 +289,7 @@ describe('ExportModal', () => {
     it('should export messages related to preselected widget', async () => {
       render(<SearchExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(
@@ -296,7 +302,9 @@ describe('ExportModal', () => {
     });
 
     it('show widget selection if more than one exists', async () => {
-      const { getByLabelText, getByText } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
+      const { getByLabelText, getByText } = render(
+        <SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} />,
+      );
 
       const select = getByLabelText('Select message table');
 
@@ -309,7 +317,9 @@ describe('ExportModal', () => {
     });
 
     it('preselect widget on direct export', () => {
-      const { queryByText, getByText } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
+      const { queryByText, getByText } = render(
+        <SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />,
+      );
 
       // should not show widget selection but settings form
       expect(getByText(/Define the fields for your file./)).not.toBeNull();
@@ -322,7 +332,7 @@ describe('ExportModal', () => {
     it('should export widget messages on direct export', async () => {
       render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(
@@ -357,7 +367,9 @@ describe('ExportModal', () => {
     });
 
     it('show widget selection if more than one exists', async () => {
-      const { getByText, getByLabelText } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
+      const { getByText, getByLabelText } = render(
+        <DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />,
+      );
       const select = getByLabelText('Select message table');
 
       expect(getByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
@@ -372,7 +384,11 @@ describe('ExportModal', () => {
       const secondViewState: ViewState = ViewState.builder()
         .widgets(Immutable.List([messagesWidget('widget-id-2')]))
         .widgetMapping(Immutable.Map({ 'widget-id-2': Immutable.Set(['search-type-id-2']) }))
-        .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }) }))
+        .titles(
+          Immutable.Map<TitleType, Immutable.Map<string, string>>({
+            widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }),
+          }),
+        )
         .build();
 
       const complexView = viewWithoutWidget(View.Type.Dashboard)
@@ -390,7 +406,9 @@ describe('ExportModal', () => {
     });
 
     it('preselect widget on direct widget export', () => {
-      const { queryByText, getByText } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} directExportWidgetId="widget-id-1" />);
+      const { queryByText, getByText } = render(
+        <DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} directExportWidgetId="widget-id-1" />,
+      );
 
       // should not show widget selection but settings form
       expect(getByText(/Define the fields for your file./)).not.toBeNull();
@@ -401,9 +419,11 @@ describe('ExportModal', () => {
     });
 
     it('should export widget messages on direct export', async () => {
-      render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
+      render(
+        <DashboardExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />,
+      );
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(

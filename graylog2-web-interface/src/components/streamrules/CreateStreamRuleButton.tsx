@@ -31,24 +31,35 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import StreamRuleModal from './StreamRuleModal';
 
 type Props = {
-  bsSize?: BsSize,
-  bsStyle?: StyleProps,
-  buttonText?: string,
-  className?: string,
-  disabled?: boolean,
-  streamId?: string
-}
+  bsSize?: BsSize;
+  bsStyle?: StyleProps;
+  buttonText?: string;
+  className?: string;
+  disabled?: boolean;
+  streamId?: string;
+};
 
-const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText = 'Create Rule', className, disabled = false, streamId }: Props) => {
+const CreateStreamRuleButton = ({
+  bsSize,
+  bsStyle,
+  buttonText = 'Create Rule',
+  className,
+  disabled = false,
+  streamId,
+}: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
   const sendTelemetry = useSendTelemetry();
 
-  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(streamId, streamRule, () => {
-    UserNotification.success('Stream rule was created successfully.', 'Success');
-    queryClient.invalidateQueries(['stream', streamId]);
-  }), [streamId, queryClient]);
+  const onSaveStreamRule = useCallback(
+    (_streamRuleId: string, streamRule: StreamRule) =>
+      StreamRulesStore.create(streamId, streamRule, () => {
+        UserNotification.success('Stream rule was created successfully.', 'Success');
+        queryClient.invalidateQueries(['stream', streamId]);
+      }),
+    [streamId, queryClient],
+  );
 
   const onCreateStreamRule = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_INTAKE_CREATE_RULE_OPENED, {
@@ -60,22 +71,18 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText = 'Create Rule', c
 
   return (
     <IfPermitted permissions={`streams:edit:${streamId}`}>
-      <Button bsSize={bsSize}
-              bsStyle={bsStyle}
-              disabled={disabled}
-              className={className}
-              onClick={onCreateStreamRule}>
+      <Button bsSize={bsSize} bsStyle={bsStyle} disabled={disabled} className={className} onClick={onCreateStreamRule}>
         {buttonText}
       </Button>
       {showCreateModal && (
-        <StreamRuleModal onClose={toggleCreateModal}
-                         title="New Stream Rule"
-                         submitButtonText="Create Rule"
-                         submitLoadingText="Creating Rule..."
-                         onSubmit={onSaveStreamRule} />
-
+        <StreamRuleModal
+          onClose={toggleCreateModal}
+          title="New Stream Rule"
+          submitButtonText="Create Rule"
+          submitLoadingText="Creating Rule..."
+          onSubmit={onSaveStreamRule}
+        />
       )}
-
     </IfPermitted>
   );
 };

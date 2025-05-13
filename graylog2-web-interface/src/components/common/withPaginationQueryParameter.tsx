@@ -27,10 +27,14 @@ export type PaginationProps = {
   paginationQueryParameter: PaginationQueryParameterResult;
 };
 
-const withPaginationQueryParameter = <Props extends PaginationProps>(Component: React.ComponentType<Props>, obj?: PaginationQueryParameterObject) => (function WrappedComponent(props: Omit<Props, keyof PaginationProps>) {
-  const result = usePaginationQueryParameter(obj?.pageSizes);
+const withPaginationQueryParameter = <Props extends PaginationProps>(
+  Component: React.ComponentType<Props>,
+  obj?: PaginationQueryParameterObject,
+) =>
+  function WrappedComponent(props: Omit<Props, keyof PaginationProps>) {
+    const result = usePaginationQueryParameter(obj?.pageSizes);
 
-  return <Component {...props as Props} paginationQueryParameter={result} />;
-});
+    return <Component {...(props as Props)} paginationQueryParameter={result} />;
+  };
 
 export default withPaginationQueryParameter;

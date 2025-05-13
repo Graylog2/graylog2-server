@@ -20,13 +20,27 @@ import React from 'react';
 import Routes from 'routing/Routes';
 import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
 import useParams from 'routing/useParams';
+import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
-const LinkToReplaySearch = ({ isEvent = false, id }: { id?: string, isEvent?: boolean }) => {
-  const { definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
-  const searchLink = isEvent ? Routes.ALERTS.replay_search(id) : Routes.ALERTS.DEFINITIONS.replay_search(id || definitionId);
+type Props = {
+  id?: string;
+  isEvent?: boolean;
+  onClick?: () => void;
+  isMenuitem?: boolean;
+};
+const LinkToReplaySearch = ({ isEvent = false, id = undefined, onClick = undefined, isMenuitem = false }: Props) => {
+  const { definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const searchLink = isEvent
+    ? Routes.ALERTS.replay_search(id)
+    : Routes.ALERTS.DEFINITIONS.replay_search(id || definitionId);
 
   return (
-    <ReplaySearchButtonComponent searchLink={searchLink}>Replay search</ReplaySearchButtonComponent>
+    <ReplaySearchButtonComponent
+      searchLink={searchLink}
+      onClick={onClick}
+      component={isMenuitem ? MenuItem : undefined}>
+      Replay search
+    </ReplaySearchButtonComponent>
   );
 };
 

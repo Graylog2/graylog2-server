@@ -34,7 +34,11 @@ const LegacyNotificationSummaryContainer = (props: LegacyNotificationSummaryCont
   }, []);
 
   if (!allLegacyTypes) {
-    return <p><Spinner text="Loading legacy notification information..." /></p>;
+    return (
+      <p>
+        <Spinner text="Loading legacy notification information..." />
+      </p>
+    );
   }
 
   return <LegacyNotificationSummary {...props} legacyTypes={allLegacyTypes} />;

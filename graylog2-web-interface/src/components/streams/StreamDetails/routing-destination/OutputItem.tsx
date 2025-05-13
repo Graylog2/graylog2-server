@@ -22,31 +22,42 @@ import type { ConfigurationFormData } from 'components/configurationforms';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 import EditOutputButton from 'components/streams/StreamDetails/routing-destination/EditOutputButton';
 import RemoveOutputButton from 'components/streams/StreamDetails/routing-destination/RemoveOutputButton';
+import { IfPermitted } from 'components/common';
 
 type Props = {
-  output: Output,
-  streamId: string,
-  isLoadingOutputTypes: boolean,
-  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void,
-  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration,
+  output: Output;
+  streamId: string;
+  isLoadingOutputTypes: boolean;
+  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void;
+  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration;
 };
 
-const ActionButtonsWrap = styled.span(({ theme }) => css`
-  margin-right: ${theme.spacings.xs};
-  float: right;
-`);
+const ActionButtonsWrap = styled.span(
+  ({ theme }) => css`
+    margin-right: ${theme.spacings.xs};
+    float: right;
+  `,
+);
 
 const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
   <tr>
-    <td>{output.title} <small>{`(Type: ${output.type})`}</small> </td>
+    <td>
+      {output.title} <small>{`(Type: ${output.type})`}</small>{' '}
+    </td>
     {}
     <td>
       <ActionButtonsWrap className="align-right">
-        <EditOutputButton disabled={isLoadingOutputTypes}
-                          output={output}
-                          onUpdate={onUpdate}
-                          getTypeDefinition={getTypeDefinition} />
-        <RemoveOutputButton output={output} streamId={streamId} />
+        <IfPermitted permissions="stream_outputs:create">
+          <EditOutputButton
+            disabled={isLoadingOutputTypes}
+            output={output}
+            onUpdate={onUpdate}
+            getTypeDefinition={getTypeDefinition}
+          />
+        </IfPermitted>
+        <IfPermitted permissions="stream_outputs:delete">
+          <RemoveOutputButton output={output} streamId={streamId} />
+        </IfPermitted>
       </ActionButtonsWrap>
     </td>
   </tr>

@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -103,7 +104,8 @@ class V20230601104500_AddSourcesPageV2Test {
         var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         var mongoConnection = mongodb.mongoConnection();
         ContentPackPersistenceService contentPackPersistenceService = new ContentPackPersistenceService(mapperProvider, mongoConnection, streamService);
-        ContentPackInstallationPersistenceService contentPackInstallationPersistenceService = new ContentPackInstallationPersistenceService(mapperProvider, mongoConnection);
+        ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
+                new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
         ContentPackService contentPackService = new TestContentPackService();
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
                 contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService);

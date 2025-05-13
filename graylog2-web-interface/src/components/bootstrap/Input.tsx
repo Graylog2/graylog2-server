@@ -27,13 +27,17 @@ import FormGroup from './FormGroup';
 import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
 
-type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onBlur'>, 'value'> & {
+type InputProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement> &
+    Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onBlur'>,
+  'value'
+> & {
   id?: string;
   type?: string;
   name?: string;
   label?: React.ReactElement | string;
   labelClassName?: string;
-  bsSize?: BsSize,
+  bsSize?: BsSize;
   bsStyle?: 'success' | 'warning' | 'error';
   formGroupClassName?: string;
   inputDescClassName?: string;
@@ -54,9 +58,12 @@ type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.
  * code is adapted to the new API.
  *
  */
-class Input extends React.Component<InputProps, {
-  [key: string]: any;
-}> {
+class Input extends React.Component<
+  InputProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     type: undefined,
     label: '',
@@ -100,7 +107,12 @@ class Input extends React.Component<InputProps, {
   getChecked = () => this.getInputDOMNode().checked;
 
   _renderFormControl = (componentClass, controlProps, children?) => (
-    <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...controlProps}>
+    <FormControl
+      inputRef={(ref) => {
+        this.input = ref;
+      }}
+      componentClass={componentClass}
+      {...controlProps}>
       {children}
     </FormControl>
   );
@@ -146,21 +158,33 @@ class Input extends React.Component<InputProps, {
   };
 
   _renderCheckboxGroup = (controlProps) => {
-    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } =
+      this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
           {buttonAfter ? (
             <InputGroup>
-              <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+              <Checkbox
+                inputRef={(ref) => {
+                  this.input = ref;
+                }}
+                {...controlProps}>
+                {label}
+              </Checkbox>
               {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
             </InputGroup>
           ) : (
-            <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+            <Checkbox
+              inputRef={(ref) => {
+                this.input = ref;
+              }}
+              {...controlProps}>
+              {label}
+            </Checkbox>
           )}
           <InputDescription error={error} help={help} className={inputDescClassName} />
-
         </InputWrapper>
       </FormGroup>
     );
@@ -172,7 +196,13 @@ class Input extends React.Component<InputProps, {
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
-          <Radio inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Radio>
+          <Radio
+            inputRef={(ref) => {
+              this.input = ref;
+            }}
+            {...controlProps}>
+            {label}
+          </Radio>
           <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
@@ -188,8 +218,15 @@ class Input extends React.Component<InputProps, {
       name,
       // The following props need to be extracted even if they are not used
       // so they are not passed as controll props to the input
-      bsStyle, formGroupClassName, wrapperClassName, labelClassName, inputDescClassName,
-      error, help, addonAfter, buttonAfter,
+      bsStyle,
+      formGroupClassName,
+      wrapperClassName,
+      labelClassName,
+      inputDescClassName,
+      error,
+      help,
+      addonAfter,
+      buttonAfter,
       ...controlProps
     } = this.props;
 

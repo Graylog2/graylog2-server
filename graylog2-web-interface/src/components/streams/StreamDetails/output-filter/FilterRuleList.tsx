@@ -30,89 +30,117 @@ import FilterActions from './FilterActions';
 
 const TABLE_HEADERS = ['Title', 'Status', ''];
 
-export const StyledSectionComponent = styled(SectionComponent)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
+export const StyledSectionComponent = styled(SectionComponent)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
 
-  &.content {
-    background-color: ${theme.colors.table.row.backgroundHover};
-    padding: ${theme.spacings.sm} ${theme.spacings.xxs};
-  }
+    &.content {
+      background-color: ${theme.colors.table.row.backgroundHover};
+      padding: ${theme.spacings.sm} ${theme.spacings.xxs};
+    }
 
-  &.row {
-    margin: 0  ${theme.spacings.xxs} ${theme.spacings.sm};
-  }
+    &.row {
+      margin: 0 ${theme.spacings.xxs} ${theme.spacings.sm};
+    }
 
-  h2 {
-    font-size: ${theme.fonts.size.h3};
-  }
+    h2 {
+      font-size: ${theme.fonts.size.h3};
+    }
 
-  .table > tbody > tr > td {
-    vertical-align: middle;
-  }
+    .table > tbody > tr > td {
+      vertical-align: middle;
+    }
 
-  .table > tbody > tr {
-    background-color: transparent;
-   }
+    .table > tbody > tr {
+      background-color: transparent;
+    }
 
-  .table > thead > tr > th {
-    border-bottom-color: ${theme.utils.colorLevel(theme.colors.variant.default, -5)};
-    border-bottom-width: 1px;
-  }
+    .table > thead > tr > th {
+      border-bottom-color: ${theme.utils.colorLevel(theme.colors.variant.default, -5)};
+      border-bottom-width: 1px;
+    }
 
-  .table.striped > tbody > tr:nth-of-type(even) {
-    background-color: ${theme.colors.table.row.backgroundStriped};
-  }
-`);
-const StyledText = styled(Text)(({ theme }) => css`
-  color: ${theme.colors.gray[50]};
-`);
-type Props = {
-  streamId: string,
-  destinationType: string,
-  paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
-  onPaginationChange: (newPage: number, newPerPage: number) => void,
-};
-const _headerCellFormatter = (header: string) => (<th>{header}</th>);
-const buildFilterItem = (destinationType: string) => (filter: StreamOutputFilterRule) => (
-  <tr key={filter.id}>
-    <td>
-      {filter.title}
-      <StyledText>{filter.description}</StyledText>
-    </td>
-    <td><FilterStatusCell filterOutputRule={filter} /></td>
-    <td><FilterActions filterRule={filter} destinationType={destinationType} /></td>
-  </tr>
+    .table.striped > tbody > tr:nth-of-type(even) {
+      background-color: ${theme.colors.table.row.backgroundStriped};
+    }
+  `,
 );
+const StyledText = styled(Text)(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[50]};
+  `,
+);
+type Props = {
+  streamId: string;
+  destinationType: string;
+  paginatedFilters: PaginatedListType<StreamOutputFilterRule>;
+  onPaginationChange: (newPage: number, newPerPage: number) => void;
+  requiredPermissions: Array<string>;
+};
+const _headerCellFormatter = (header: string) => <th>{header}</th>;
+const buildFilterItem =
+  (destinationType: string, requiredPermissions: Array<string>) => (filter: StreamOutputFilterRule) => (
+    <tr key={filter.id}>
+      <td>
+        {filter.title}
+        <StyledText>{filter.description}</StyledText>
+      </td>
+      <td>
+        <FilterStatusCell filterOutputRule={filter} />
+      </td>
+      <td>
+        <IfPermitted permissions={requiredPermissions}>
+          <FilterActions filterRule={filter} destinationType={destinationType} />
+        </IfPermitted>
+      </td>
+    </tr>
+  );
 
-const FilterRulesList = ({ streamId, destinationType, paginatedFilters, onPaginationChange }: Props) => {
-  const { list: filters, pagination: { total } } = paginatedFilters;
+const FilterRulesList = ({
+  streamId,
+  destinationType,
+  paginatedFilters,
+  onPaginationChange,
+  requiredPermissions,
+}: Props) => {
+  const {
+    list: filters,
+    pagination: { total },
+  } = paginatedFilters;
 
   return (
-    <StyledSectionComponent title="Filter Rules"
-                            headerActions={(
-                              <IfPermitted permissions="">
-                                <FilterRuleEditButton filterRule={{ stream_id: streamId }}
-                                                      destinationType={destinationType}
-                                                      streamId={streamId} />
-                              </IfPermitted>
-             )}>
+    <StyledSectionComponent
+      title="Filter Rules"
+      headerActions={
+        <IfPermitted permissions={requiredPermissions}>
+          <FilterRuleEditButton
+            filterRule={{ stream_id: streamId }}
+            destinationType={destinationType}
+            streamId={streamId}
+          />
+        </IfPermitted>
+      }>
       <Alert bsStyle="default">
-        Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Warehouse'}.
+        Messages which meet the criteria of the following filter rule(s) will not be routed to the{' '}
+        {destinationType === 'indexer' ? 'Index Set' : 'Data Lake'}.
       </Alert>
-      <PaginatedList totalItems={total}
-                     pageSize={DEFAULT_PAGE_SIZES[0]}
-                     onChange={onPaginationChange}
-                     useQueryParameter={false}
-                     showPageSizeSelect={false}>
-        <DataTable id="filter-list"
-                   className="striped"
-                   rowClassName="no-bm"
-                   headers={TABLE_HEADERS}
-                   headerCellFormatter={_headerCellFormatter}
-                   sortByKey="title"
-                   noDataText={<NoSearchResult>No filter have been found.</NoSearchResult>}
-                   rows={filters.toJS()}
-                   dataRowFormatter={buildFilterItem(destinationType)} />
+      <PaginatedList
+        totalItems={total}
+        pageSize={DEFAULT_PAGE_SIZES[0]}
+        onChange={onPaginationChange}
+        useQueryParameter={false}
+        showPageSizeSelect={false}>
+        <DataTable
+          id="filter-list"
+          className="striped"
+          rowClassName="no-bm"
+          headers={TABLE_HEADERS}
+          headerCellFormatter={_headerCellFormatter}
+          sortByKey="title"
+          noDataText={<NoSearchResult>No filter have been found.</NoSearchResult>}
+          rows={filters.toJS()}
+          dataRowFormatter={buildFilterItem(destinationType, requiredPermissions)}
+        />
       </PaginatedList>
     </StyledSectionComponent>
   );

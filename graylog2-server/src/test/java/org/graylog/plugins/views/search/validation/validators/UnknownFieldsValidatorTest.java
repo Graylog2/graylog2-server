@@ -84,6 +84,16 @@ class UnknownFieldsValidatorTest {
     }
 
     @Test
+    void testDoesNotIdentifyParameterFieldAsUnknownField() {
+        final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
+                Set.of("some_normal_field"),
+                List.of(ParsedTerm.create("$param_representing_field$", "GET"), //param can be used for field name
+                        ParsedTerm.create("_exists_", "$param_representing_field$")) //...even in exists query
+        );
+        assertTrue(unknownFields.isEmpty());
+    }
+
+    @Test
     void testIdentifiesUnknownField() {
         final ParsedTerm unknownField = ParsedTerm.create("strange_field", "!!!");
         final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(

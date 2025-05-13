@@ -51,11 +51,20 @@ const FORMS_VALIDATION = {
   [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
-const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: string | null | undefined }) => (
+const SubmitAllError = ({ error, backendId }: { error: FetchError; backendId: string | null | undefined }) => (
   <Row>
     <Col xs={9} xsOffset={3}>
-      <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }} title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}>
-        {error?.message && <>{error.message}<br /><br /></>}
+      <Alert
+        bsStyle="danger"
+        style={{ wordBreak: 'break-word' }}
+        title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}>
+        {error?.message && (
+          <>
+            {error.message}
+            <br />
+            <br />
+          </>
+        )}
         {error?.additional?.res?.text}
       </Alert>
     </Col>
@@ -63,12 +72,18 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: st
 );
 
 const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
-  const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
+  const backendErrorStrings = mapValues(
+    backendErrors,
+    (errorArray) => `Server validation error: ${errorArray.join(' ')}`,
+  );
 
   return mapKeys(backendErrorStrings, (_value, key) => camelCase(key));
 };
 
-export const _passwordPayload = (backendId: string | null | undefined, systemUserPassword: string | null | undefined) => {
+export const _passwordPayload = (
+  backendId: string | null | undefined,
+  systemUserPassword: string | null | undefined,
+) => {
   const _formatPayload = (password) => {
     if (!password) {
       return undefined;
@@ -94,52 +109,51 @@ export const _passwordPayload = (backendId: string | null | undefined, systemUse
   return _formatPayload(systemUserPassword);
 };
 
-const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues: WizardFormValues): WizardSubmitPayload => {
-  // We need to ensure that we are using the actual form values
-  // It is possible to provide already updated form values, so we do not need to get them twice
-  const formValues = overrideFormValues ?? getUpdatedFormsValues();
-  const {
-    defaultRoles = '',
-    description,
-    serverHost,
-    serverPort,
-    systemUserDn,
-    systemUserPassword,
-    title,
-    transportSecurity,
-    userUniqueIdAttribute,
-    userFullNameAttribute,
-    userNameAttribute,
-    emailAttributes,
-    userSearchBase,
-    userSearchPattern,
-    verifyCertificates,
-  } = formValues;
-  const {
-    serviceType,
-    backendId,
-  } = stepsState.authBackendMeta;
+const _prepareSubmitPayload =
+  (stepsState, getUpdatedFormsValues) =>
+  (overrideFormValues: WizardFormValues): WizardSubmitPayload => {
+    // We need to ensure that we are using the actual form values
+    // It is possible to provide already updated form values, so we do not need to get them twice
+    const formValues = overrideFormValues ?? getUpdatedFormsValues();
+    const {
+      defaultRoles = '',
+      description,
+      serverHost,
+      serverPort,
+      systemUserDn,
+      systemUserPassword,
+      title,
+      transportSecurity,
+      userUniqueIdAttribute,
+      userFullNameAttribute,
+      userNameAttribute,
+      emailAttributes,
+      userSearchBase,
+      userSearchPattern,
+      verifyCertificates,
+    } = formValues;
+    const { serviceType, backendId } = stepsState.authBackendMeta;
 
-  return {
-    title,
-    description,
-    default_roles: defaultRoles.split(','),
-    config: {
-      servers: [{ host: serverHost, port: serverPort }],
-      system_user_dn: systemUserDn,
-      system_user_password: _passwordPayload(backendId, systemUserPassword),
-      transport_security: transportSecurity,
-      type: serviceType,
-      email_attributes: emailAttributes,
-      user_full_name_attribute: userFullNameAttribute,
-      user_name_attribute: userNameAttribute,
-      user_search_base: userSearchBase,
-      user_search_pattern: userSearchPattern,
-      user_unique_id_attribute: userUniqueIdAttribute,
-      verify_certificates: verifyCertificates,
-    },
+    return {
+      title,
+      description,
+      default_roles: defaultRoles.split(','),
+      config: {
+        servers: [{ host: serverHost, port: serverPort }],
+        system_user_dn: systemUserDn,
+        system_user_password: _passwordPayload(backendId, systemUserPassword),
+        transport_security: transportSecurity,
+        type: serviceType,
+        email_attributes: emailAttributes,
+        user_full_name_attribute: userFullNameAttribute,
+        user_name_attribute: userNameAttribute,
+        user_search_base: userSearchBase,
+        user_search_pattern: userSearchPattern,
+        user_unique_id_attribute: userUniqueIdAttribute,
+        verify_certificates: verifyCertificates,
+      },
+    };
   };
-};
 
 const _getInvalidStepKeys = (formValues, newBackendValidationErrors, excludedFields): StepKey[] => {
   const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
@@ -191,20 +205,25 @@ const _onSubmitAll = (
   setSubmitAllError(null);
 
   const payload = getSubmitPayload(formValues);
-  const _submit = () => onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, shouldUpdateGroupSync).then(() => {
-    history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
-  }).catch((error) => {
-    if (typeof error?.additional?.body?.errors === 'object') {
-      const backendValidationErrors = _formatBackendValidationErrors(error.additional.body.errors);
-      validateSteps(formValues, backendValidationErrors);
-    } else {
-      setSubmitAllError(error);
-    }
-  });
+  const _submit = () =>
+    onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, shouldUpdateGroupSync)
+      .then(() => {
+        history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
+      })
+      .catch((error) => {
+        if (typeof error?.additional?.body?.errors === 'object') {
+          const backendValidationErrors = _formatBackendValidationErrors(error.additional.body.errors);
+          validateSteps(formValues, backendValidationErrors);
+        } else {
+          setSubmitAllError(error);
+        }
+      });
 
   if (stepsState.authBackendMeta.backendGroupSyncIsActive && !formValues.synchronizeGroups) {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to remove the group synchronization config for this authentication service?')) {
+    if (
+      // eslint-disable-next-line no-alert
+      window.confirm('Do you really want to remove the group synchronization config for this authentication service?')
+    ) {
       return _submit();
     }
 
@@ -223,12 +242,17 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 };
 
 type Props = {
-  authBackendMeta: AuthBackendMeta,
-  initialStepKey?: $PropertyType<StepType, 'key'>
-  initialValues: WizardFormValues,
-  excludedFields?: { [inputName: string]: boolean }
-  help?: { [inputName: string]: React.ReactElement | string | null | undefined }
-  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
+  authBackendMeta: AuthBackendMeta;
+  initialStepKey?: $PropertyType<StepType, 'key'>;
+  initialValues: WizardFormValues;
+  excludedFields?: { [inputName: string]: boolean };
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined };
+  onSubmit: (
+    WizardSubmitPayload,
+    WizardFormValues,
+    serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>,
+    shouldUpdateGroupSync?: boolean,
+  ) => Promise<LoadBackendResponse>;
 };
 
 const _loadRoles = (setPaginatedRoles) => {
@@ -237,7 +261,14 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSubmit, authBackendMeta, help, excludedFields = {} }: Props) => {
+const BackendWizard = ({
+  initialValues,
+  initialStepKey = SERVER_CONFIG_KEY,
+  onSubmit,
+  authBackendMeta,
+  help,
+  excludedFields = {},
+}: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
@@ -278,14 +309,12 @@ const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSu
   };
 
   const _validateSteps = (formValues: WizardFormValues, newBackendValidationErrors): Array<StepKey> => {
-    const invalidStepKeys = _getInvalidStepKeys(
-      formValues,
-      newBackendValidationErrors,
-      excludedFields,
-    );
+    const invalidStepKeys = _getInvalidStepKeys(formValues, newBackendValidationErrors, excludedFields);
 
     if (invalidStepKeys.length >= 1) {
-      const nextStepKey = invalidStepKeys.includes(stepsState.activeStepKey) ? stepsState.activeStepKey : invalidStepKeys[0];
+      const nextStepKey = invalidStepKeys.includes(stepsState.activeStepKey)
+        ? stepsState.activeStepKey
+        : invalidStepKeys[0];
 
       setStepsState({
         ...stepsState,
@@ -318,16 +347,17 @@ const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSu
     });
   };
 
-  const _handleSubmitAll = (shouldUpdateGroupSync?: boolean) => _onSubmitAll(
-    stepsState,
-    setSubmitAllError,
-    onSubmit,
-    _getUpdatedFormsValues,
-    _getSubmitPayload,
-    _validateSteps,
-    shouldUpdateGroupSync,
-    history,
-  );
+  const _handleSubmitAll = (shouldUpdateGroupSync?: boolean) =>
+    _onSubmitAll(
+      stepsState,
+      setSubmitAllError,
+      onSubmit,
+      _getUpdatedFormsValues,
+      _getSubmitPayload,
+      _validateSteps,
+      shouldUpdateGroupSync,
+      history,
+    );
 
   const steps = wizardSteps({
     formRefs,
@@ -342,25 +372,24 @@ const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSu
   });
 
   const wizard = (
-    <Wizard activeStep={stepsState.activeStepKey}
-            hidePreviousNextButtons
-            horizontal
-            justified
-            onStepChange={_setActiveStepKey}
-            steps={steps}>
+    <Wizard
+      activeStep={stepsState.activeStepKey}
+      hidePreviousNextButtons
+      horizontal
+      justified
+      onStepChange={_setActiveStepKey}
+      steps={steps}>
       <Sidebar prepareSubmitPayload={_getSubmitPayload} />
     </Wizard>
   );
 
   return (
     <BackendWizardContext.Provider value={wizardContextValue}>
-      {MatchingGroupsProvider
-        ? (
-          <MatchingGroupsProvider prepareSubmitPayload={_getSubmitPayload}>
-            {wizard}
-          </MatchingGroupsProvider>
-        )
-        : wizard}
+      {MatchingGroupsProvider ? (
+        <MatchingGroupsProvider prepareSubmitPayload={_getSubmitPayload}>{wizard}</MatchingGroupsProvider>
+      ) : (
+        wizard
+      )}
     </BackendWizardContext.Provider>
   );
 };

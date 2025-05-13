@@ -34,9 +34,7 @@ type EventNotificationDetailsProps = {
   notification: EventNotification;
 };
 
-const EventNotificationDetails = ({
-  notification,
-}: EventNotificationDetailsProps) => {
+const EventNotificationDetails = ({ notification }: EventNotificationDetailsProps) => {
   const notificationPlugin = _getNotificationPlugin(notification.config.type);
   const DetailsComponent = notificationPlugin?.detailsComponent;
 
@@ -45,7 +43,11 @@ const EventNotificationDetails = ({
       <ReadOnlyFormGroup label="Title" value={notification.title} />
       <ReadOnlyFormGroup label="Description" value={notification.description} />
       <ReadOnlyFormGroup label="Notification Type" value={notification.config.type} />
-      {DetailsComponent ? <DetailsComponent notification={notification} /> : <Alert bsStyle="danger">Notification type not supported</Alert>}
+      {DetailsComponent ? (
+        <DetailsComponent notification={notification} />
+      ) : (
+        <Alert bsStyle="danger">Notification type not supported</Alert>
+      )}
     </SectionComponent>
   );
 };

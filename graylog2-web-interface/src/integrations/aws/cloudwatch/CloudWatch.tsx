@@ -19,14 +19,13 @@ import { useNavigate } from 'react-router-dom';
 
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
-import { getValueFromInput } from 'util/FormsUtils.js';
+import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import StepAuthorize from 'integrations/aws/StepAuthorize';
 import { StepsContext } from 'integrations/aws/context/Steps';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
-// import useHistory from 'routing/useHistory';
 
 import StepKinesis from './StepKinesis';
 import StepHealthCheck from './StepHealthCheck';
@@ -38,18 +37,9 @@ type CloudWatchProps = {
   onSubmit?: (...args: any[]) => void;
 };
 
-const CloudWatch = ({
-  externalInputSubmit = false,
-  onSubmit,
-}: CloudWatchProps) => {
-  const {
-    availableSteps,
-    currentStep,
-    isDisabledStep,
-    setAvailableStep,
-    setCurrentStep,
-    setEnabledStep,
-  } = useContext(StepsContext);
+const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: CloudWatchProps) => {
+  const { availableSteps, currentStep, isDisabledStep, setAvailableStep, setCurrentStep, setEnabledStep } =
+    useContext(StepsContext);
   const { setFormData } = useContext(FormDataContext);
   const { availableStreams } = useContext(ApiContext);
   const { sidebar, clearSidebar } = useContext(SidebarContext);
@@ -108,35 +98,52 @@ const CloudWatch = ({
       {
         key: 'authorize',
         title: 'AWS Kinesis Authorize',
-        component: (<StepAuthorize onSubmit={handleSubmit}
-                                   onChange={handleFieldUpdate}
-                                   sidebarComponent={<SidebarPermissions />} />),
+        component: (
+          <StepAuthorize
+            onSubmit={handleSubmit}
+            onChange={handleFieldUpdate}
+            sidebarComponent={<SidebarPermissions />}
+          />
+        ),
         disabled: isDisabledStep('authorize'),
       },
       {
         key: 'kinesis-setup',
         title: 'AWS Kinesis Setup',
-        component: (<StepKinesis onSubmit={handleSubmit}
-                                 onChange={handleFieldUpdate}
-                                 hasStreams={availableStreams.length > 0} />),
+        component: (
+          <StepKinesis onSubmit={handleSubmit} onChange={handleFieldUpdate} hasStreams={availableStreams.length > 0} />
+        ),
         disabled: isDisabledStep('kinesis-setup'),
       },
       {
         key: 'health-check',
         title: 'AWS CloudWatch Health Check',
-        component: (<StepHealthCheck onSubmit={handleSubmit} onChange={handleFieldUpdate} />),
+        component: <StepHealthCheck onSubmit={handleSubmit} onChange={handleFieldUpdate} />,
         disabled: isDisabledStep('health-check'),
       },
       {
         key: 'review',
         title: 'AWS Kinesis Review',
-        component: (<StepReview onSubmit={handleSubmit}
-                                onEditClick={handleEditClick}
-                                externalInputSubmit={externalInputSubmit} />),
+        component: (
+          <StepReview onSubmit={handleSubmit} onEditClick={handleEditClick} externalInputSubmit={externalInputSubmit} />
+        ),
         disabled: isDisabledStep('review'),
       },
     ];
-  }, [isDisabledStep, availableStreams.length, externalInputSubmit, setCurrentStep, dirty, setFormData, clearSidebar, availableSteps, currentStep, setEnabledStep, onSubmit, navigate]);
+  }, [
+    isDisabledStep,
+    availableStreams.length,
+    externalInputSubmit,
+    setCurrentStep,
+    dirty,
+    setFormData,
+    clearSidebar,
+    availableSteps,
+    currentStep,
+    setEnabledStep,
+    onSubmit,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (availableSteps.length === 0) {
@@ -147,12 +154,13 @@ const CloudWatch = ({
   return (
     <>
       {dirty && !lastStep && <ConfirmLeaveDialog question="Are you sure? Your new Input will not be created." />}
-      <Wizard steps={wizardSteps}
-              activeStep={currentStep}
-              onStepChange={handleStepChange}
-              horizontal
-              justified
-              hidePreviousNextButtons>
+      <Wizard
+        steps={wizardSteps}
+        activeStep={currentStep}
+        onStepChange={handleStepChange}
+        horizontal
+        justified
+        hidePreviousNextButtons>
         {sidebar}
       </Wizard>
     </>

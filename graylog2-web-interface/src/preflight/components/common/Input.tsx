@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { Input as MantineInput } from '@mantine/core';
 
-const Input = (props: React.ComponentProps<typeof MantineInput>) => (
-  <MantineInput {...props} />
-);
+const Input = (props: React.ComponentProps<typeof MantineInput>) => <MantineInput {...props} />;
 
 Input.Error = MantineInput.Error;
 Input.Label = MantineInput.Label;

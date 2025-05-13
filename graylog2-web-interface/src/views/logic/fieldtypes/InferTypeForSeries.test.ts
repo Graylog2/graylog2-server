@@ -24,16 +24,17 @@ describe('InferTypeForSeries', () => {
   it.each`
     func              | expectedType          | field
     ${'card'}         | ${FieldTypes.LONG()}  | ${'foo'}
-    ${'count'}        | ${FieldTypes.LONG()}  | ${'foo'} 
-    ${'stddev'}       | ${FieldTypes.FLOAT()} | ${'foo'} 
-    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo'} 
-    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo-bar'} 
-    ${'sumofsquares'} | ${FieldTypes.FLOAT()} | ${'foo'} 
+    ${'count'}        | ${FieldTypes.LONG()}  | ${'foo'}
+    ${'stddev'}       | ${FieldTypes.FLOAT()} | ${'foo'}
+    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo'}
+    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo-bar'}
+    ${'sumofsquares'} | ${FieldTypes.FLOAT()} | ${'foo'}
   `('returns expected type for constant type function "$func($field)"', ({ func, expectedType, field }) => {
     const functionName = `${func}(${field})`;
 
-    expect(inferTypeForSeries(Series.forFunction(functionName), []))
-      .toEqual(FieldTypeMapping.create(functionName, expectedType));
+    expect(inferTypeForSeries(Series.forFunction(functionName), [])).toEqual(
+      FieldTypeMapping.create(functionName, expectedType),
+    );
   });
 
   it.each`
@@ -50,17 +51,20 @@ describe('InferTypeForSeries', () => {
 
     const functionName = `${func}(${fieldName})`;
 
-    expect(inferTypeForSeries(Series.forFunction(functionName), types))
-      .toEqual(FieldTypeMapping.create(functionName, fieldType));
+    expect(inferTypeForSeries(Series.forFunction(functionName), types)).toEqual(
+      FieldTypeMapping.create(functionName, fieldType),
+    );
   });
 
   it('returns unknown if field type is not present', () => {
-    expect(inferTypeForSeries(Series.forFunction('avg(foo)'), []))
-      .toEqual(FieldTypeMapping.create('avg(foo)', FieldType.Unknown));
+    expect(inferTypeForSeries(Series.forFunction('avg(foo)'), [])).toEqual(
+      FieldTypeMapping.create('avg(foo)', FieldType.Unknown),
+    );
   });
 
   it('returns unknown if field types are `undefined`', () => {
-    expect(inferTypeForSeries(Series.forFunction('avg(foo)'), undefined))
-      .toEqual(FieldTypeMapping.create('avg(foo)', FieldType.Unknown));
+    expect(inferTypeForSeries(Series.forFunction('avg(foo)'), undefined)).toEqual(
+      FieldTypeMapping.create('avg(foo)', FieldType.Unknown),
+    );
   });
 });

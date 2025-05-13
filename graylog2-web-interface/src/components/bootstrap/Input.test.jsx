@@ -37,7 +37,13 @@ describe('Input', () => {
   });
 
   it('renders a checkbox addon after the input if addonAfter is passed', () => {
-    const wrapper = mount(<Input id="inputWithCheckboxAddon" type="text" addonAfter={<input id="addonCheckbox" type="checkbox" aria-label="..." />} />);
+    const wrapper = mount(
+      <Input
+        id="inputWithCheckboxAddon"
+        type="text"
+        addonAfter={<input id="addonCheckbox" type="checkbox" aria-label="..." />}
+      />,
+    );
 
     expect(wrapper.find('input#addonCheckbox')).toExist();
   });
@@ -49,9 +55,7 @@ describe('Input', () => {
   });
 
   it('renders input w/ `name` attribute w/ setting prop', () => {
-    const wrapper = mount(
-      <Input id="inputWithoutNameProp" name="inputWithNameProp" type="text" />,
-    );
+    const wrapper = mount(<Input id="inputWithoutNameProp" name="inputWithNameProp" type="text" />);
 
     expect(wrapper.find('input[name="inputWithNameProp"]')).toExist();
   });
@@ -71,6 +75,8 @@ describe('Input', () => {
   it('renders input w/ provided help and error', () => {
     const wrapper = mount(<Input id="inputWithHelp" type="text" help="The help text" error="The error message" />);
 
-    expect(wrapper.find({ help: 'The help text', error: 'The error message' }).find('InputDescription').length).toEqual(1);
+    expect(wrapper.find({ help: 'The help text', error: 'The error message' }).find('InputDescription').length).toEqual(
+      1,
+    );
   });
 });

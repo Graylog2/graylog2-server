@@ -30,9 +30,7 @@ type PagerDutyNotificationDetailsProps = {
   };
 };
 
-const PagerDutyNotificationDetails = ({
-  notification,
-}: PagerDutyNotificationDetailsProps) => (
+const PagerDutyNotificationDetails = ({ notification }: PagerDutyNotificationDetailsProps) => (
   <>
     <ReadOnlyFormGroup label="Routing Key" value={notification.config?.routing_key} />
     <ReadOnlyFormGroup label="Custom Incident" value={notification.config?.custom_incident} />

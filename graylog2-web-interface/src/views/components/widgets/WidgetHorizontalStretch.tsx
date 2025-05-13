@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -26,26 +26,26 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const StyledIconButton = styled(IconButton)<{ $stretched: boolean }>(({ $stretched }) => css`
+const StyledIconButton = styled(IconButton)`
   span {
     position: relative;
-    left: ${$stretched ? '-1px' : 0};
+    left: -1px;
   }
-`);
+`;
 
 type PositionType = {
-  col: number,
-  row: number,
-  height: number,
-  width: number,
+  col: number;
+  row: number;
+  height: number;
+  width: number;
 };
 
 type Props = {
-  onStretch: (args: { id: string } & PositionType) => void,
-  position: PositionType,
-  widgetId: string,
-  widgetType: string,
-}
+  onStretch: (args: { id: string } & PositionType) => void;
+  position: PositionType;
+  widgetId: string;
+  widgetType: string;
+};
 
 const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: Props) => {
   const sendTelemetry = useSendTelemetry();
@@ -56,7 +56,11 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     const { defaultWidth } = widgetDefinition(widgetType);
 
     onStretch({
-      id: widgetId, col, row, height, width: width === Infinity ? defaultWidth : Infinity,
+      id: widgetId,
+      col,
+      row,
+      height,
+      width: width === Infinity ? defaultWidth : Infinity,
     });
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_HORIZONTAL_STRETCH, {
@@ -72,16 +76,10 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
 
   const { width } = position;
   const stretched = width === Infinity;
-  const icon = stretched ? 'compress' : 'width';
+  const icon = stretched ? 'compress' : 'expand';
   const title = stretched ? 'Compress width' : 'Stretch width';
 
-  return (
-    <StyledIconButton onClick={onClick}
-                      name={icon}
-                      title={title}
-                      $stretched={stretched}
-                      rotation={stretched ? 90 : undefined} />
-  );
+  return <StyledIconButton onClick={onClick} name={icon} title={title} rotation={90} />;
 };
 
 export default WidgetHorizontalStretch;

@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup.db;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -37,6 +38,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
@@ -94,22 +96,25 @@ public class DBLookupTableService {
         clusterEventBus.post(LookupTablesUpdated.create(tables));
     }
 
-    public Collection<LookupTableDto> findAll() {
-        return stream(collection.find()).toList();
+    @MustBeClosed
+    public Stream<LookupTableDto> streamAll() {
+        return stream(collection.find());
     }
 
     public PaginatedList<LookupTableDto> findPaginated(Bson query, Bson sort, int page, int perPage) {
         return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
-    public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
+    @MustBeClosed
+    public Stream<LookupTableDto> streamByCacheIds(Collection<String> cacheIds) {
         Bson query = in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
-        return stream(collection.find(query)).toList();
+        return stream(collection.find(query));
     }
 
-    public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
+    @MustBeClosed
+    public Stream<LookupTableDto> streamByDataAdapterIds(Collection<String> dataAdapterIds) {
         Bson query = in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()));
-        return stream(collection.find(query)).toList();
+        return stream(collection.find(query));
     }
 
     public void deleteAndPostEvent(String idOrName) {

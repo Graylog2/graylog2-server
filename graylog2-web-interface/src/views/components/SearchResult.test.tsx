@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { act } from 'react-dom/test-utils';
+import * as React from 'react';
+import { act } from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
@@ -41,20 +41,18 @@ describe('SearchResult', () => {
   });
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
-  const SimpleSearchResult = ({
-    fieldTypes = initialFieldTypes,
-  }: SimpleSearchResultProps) => (
+  const SimpleSearchResult = ({ fieldTypes = initialFieldTypes }: SimpleSearchResultProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <SearchResult />
     </FieldTypesContext.Provider>
   );
 
   it('should show spinner with undefined fields', () => {
-    const { getByText } = render(
-      <SearchResult />,
-    );
+    const { getByText } = render(<SearchResult />);
 
-    act(() => { jest.advanceTimersByTime(200); });
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
 
     expect(getByText('Loading...')).not.toBeNull();
   });
@@ -63,7 +61,9 @@ describe('SearchResult', () => {
     asMock(useIsLoading).mockReturnValue(true);
     const { getByText } = render(<SimpleSearchResult />);
 
-    act(() => { jest.advanceTimersByTime(500); });
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
 
     expect(getByText('Updating search results...')).not.toBeNull();
   });

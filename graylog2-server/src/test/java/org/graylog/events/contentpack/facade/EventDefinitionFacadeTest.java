@@ -345,7 +345,10 @@ public class EventDefinitionFacadeTest {
     @Test
     @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void delete() {
-        long countBefore = eventDefinitionService.streamAll().count();
+        long countBefore;
+        try (var stream = eventDefinitionService.streamAll()) {
+            countBefore = stream.count();
+        }
         assertThat(countBefore).isEqualTo(1);
 
         final Optional<EventDefinitionDto> eventDefinitionDto = eventDefinitionService.get(
@@ -353,7 +356,10 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto).isPresent();
         facade.delete(eventDefinitionDto.get());
 
-        long countAfter = eventDefinitionService.streamAll().count();
+        long countAfter;
+        try (var stream = eventDefinitionService.streamAll()) {
+            countAfter = stream.count();
+        }
         assertThat(countAfter).isEqualTo(0);
     }
 

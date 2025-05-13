@@ -32,31 +32,38 @@ type PagerDutyNotificationSummaryProps = {
   definitionNotification: any;
 };
 
-function PagerDutyNotificationSummary({
-  notification,
-  ...restProps
-}: PagerDutyNotificationSummaryProps) {
+function PagerDutyNotificationSummary({ notification, ...restProps }: PagerDutyNotificationSummaryProps) {
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
         <td>Routing Key</td>
-        <td><code>{notification?.config?.routing_key}</code></td>
+        <td>
+          <code>{notification?.config?.routing_key}</code>
+        </td>
       </tr>
       <tr>
         <td>Use Custom Incident Key</td>
-        <td><code>{notification?.config?.custom_incident ? 'Yes' : 'No'}</code></td>
+        <td>
+          <code>{notification?.config?.custom_incident ? 'Yes' : 'No'}</code>
+        </td>
       </tr>
       <tr>
         <td>Incident Key Prefix</td>
-        <td><code>{notification?.config?.key_prefix}</code></td>
+        <td>
+          <code>{notification?.config?.key_prefix}</code>
+        </td>
       </tr>
       <tr>
         <td>Client Name</td>
-        <td><code>{notification?.config?.client_name}</code></td>
+        <td>
+          <code>{notification?.config?.client_name}</code>
+        </td>
       </tr>
       <tr>
         <td>Client URL</td>
-        <td><code>{notification?.config?.client_url}</code></td>
+        <td>
+          <code>{notification?.config?.client_url}</code>
+        </td>
       </tr>
     </CommonNotificationSummary>
   );

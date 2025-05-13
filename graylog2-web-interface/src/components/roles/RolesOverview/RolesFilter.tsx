@@ -24,7 +24,7 @@ import type { Pagination } from 'stores/PaginationTypes';
 import RolesQueryHelper from '../RolesQueryHelper';
 
 type Props = {
-  onSearch: (query: $PropertyType<Pagination, 'query'>) => void,
+  onSearch: (query: $PropertyType<Pagination, 'query'>) => void;
 };
 
 const Container = styled.div`
@@ -33,10 +33,12 @@ const Container = styled.div`
 
 const RolesFilter = ({ onSearch }: Props) => (
   <Container>
-    <SearchForm onSearch={onSearch}
-                onReset={() => onSearch('')}
-                queryHelpComponent={<RolesQueryHelper />}
-                topMargin={0} />
+    <SearchForm
+      onSearch={onSearch}
+      onReset={() => onSearch('')}
+      queryHelpComponent={<RolesQueryHelper />}
+      topMargin={0}
+    />
   </Container>
 );
 

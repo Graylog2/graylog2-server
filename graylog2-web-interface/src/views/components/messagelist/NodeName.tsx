@@ -31,25 +31,21 @@ const BreakWord = styled.span`
 `;
 
 type NodeTitleProps = {
-  shortNodeId: string,
-  hostname: string
-}
+  shortNodeId: string;
+  hostname: string;
+};
 
 const NodeTitle = ({ shortNodeId, hostname }: NodeTitleProps) => (
   <>
     <Icon name="lan" />
     &nbsp;
-    <BreakWord>
-      {shortNodeId}
-    </BreakWord>&nbsp;/&nbsp;
-    <BreakWord>
-      {hostname}
-    </BreakWord>
+    <BreakWord>{shortNodeId}</BreakWord>&nbsp;/&nbsp;
+    <BreakWord>{hostname}</BreakWord>
   </>
 );
 
 type Props = {
-  nodeId: NodeId,
+  nodeId: NodeId;
 };
 
 const NodeName = ({ nodeId }: Props) => {

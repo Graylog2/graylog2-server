@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import Spinner from 'components/common/Spinner';
 

@@ -51,7 +51,7 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
         this(Path.of(localConfiguration.getOpensearchDistributionRoot()), OpensearchArchitecture.fromOperatingSystem());
     }
 
-    OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture) {
+    public OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture) {
         this.distribution = Suppliers.memoize(() -> detectInDirectory(opensearchDistributionRoot, architecture));
     }
 

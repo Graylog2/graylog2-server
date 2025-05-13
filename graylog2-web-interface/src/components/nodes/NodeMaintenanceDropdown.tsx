@@ -27,9 +27,12 @@ type NodeMaintenanceDropdownProps = {
   node: any;
 };
 
-class NodeMaintenanceDropdown extends React.Component<NodeMaintenanceDropdownProps, {
-  [key: string]: any;
-}> {
+class NodeMaintenanceDropdown extends React.Component<
+  NodeMaintenanceDropdownProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     const { node } = this.props;
     const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();

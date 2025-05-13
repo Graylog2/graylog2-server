@@ -18,10 +18,7 @@ import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import AppConfig from '../AppConfig';
 
-function filterValueActions(
-  items: Array<ActionDefinition>,
-  toExclude: Array<string>,
-): Array<ActionDefinition> {
+function filterValueActions(items: Array<ActionDefinition>, toExclude: Array<string>): Array<ActionDefinition> {
   return items.filter((item) => !toExclude.includes(item.type));
 }
 
