@@ -20,20 +20,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.apache.commons.collections4.ListUtils;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
 import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
 import org.graylog.shaded.opensearch2.org.apache.http.entity.StringEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.indexer.security.SecurityRole;
+import org.graylog2.indexer.security.PrincipalRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * see: https://opensearch.org/docs/latest/security/access-control/api/
@@ -66,8 +72,7 @@ public class SecurityAdapterOS implements SecurityAdapter {
     public MappingResponse addUserToRoleMapping(final String role, final String user) {
         final var mapping = getMappingForRole(role);
         if (!mapping.users().contains(user)) {
-            final List<String> users = new ArrayList<>();
-            users.addAll(mapping.users());
+            final List<String> users = new ArrayList<>(mapping.users());
             users.add(user);
             return setUserToRoleMapping(role, new Mapping(mapping.backendRoles(), mapping.hosts(), users));
         } else {
@@ -100,6 +105,28 @@ public class SecurityAdapterOS implements SecurityAdapter {
             roles.add(new SecurityRole(roleName, description));
         }
         return roles;
+    }
+
+    @Override
+    public List<PrincipalRoles> getPrincipals() {
+        final JsonNode response = jsonApi.perform(securityApiRequest("GET", "rolesmapping/"), "Unable to retrieve roles mapping");
+        final Map<String, List<String>> principalToRoles = parseRoles(response);
+        return principalToRoles.entrySet().stream().map(entry -> new PrincipalRoles(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(PrincipalRoles::principal))
+                .collect(Collectors.toList());
+    }
+
+    private static Map<String, List<String>> parseRoles(JsonNode response) {
+
+        final Iterator<Map.Entry<String, JsonNode>> elements = response.fields();
+        Map<String, List<String>> usersToRoles = new LinkedHashMap<>();
+        while (elements.hasNext()) {
+            final Map.Entry<String, JsonNode> roleNode = elements.next();
+            final String roleName = roleNode.getKey();
+            final JsonNode users = roleNode.getValue().get("users");
+            users.elements().forEachRemaining(userNode -> usersToRoles.compute(userNode.asText(), (user, roles) -> roles == null ? Collections.singletonList(roleName) : ListUtils.union(roles, Collections.singletonList(roleName))));
+        }
+        return usersToRoles;
     }
 
     private MappingResponse setUserToRoleMapping(final String role, final Mapping mapping) {

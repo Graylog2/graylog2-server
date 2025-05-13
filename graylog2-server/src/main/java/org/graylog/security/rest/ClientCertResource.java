@@ -40,6 +40,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.indexer.security.SecurityRole;
+import org.graylog2.indexer.security.PrincipalRoles;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -72,6 +73,15 @@ public class ClientCertResource extends RestResource {
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
     public List<SecurityRole> getRoles() {
         return securityAdapter.getRoles();
+    }
+
+    @GET
+    @ApiOperation(value = "Returns all known principals and their roles")
+    @Path("principals")
+    @NoAuditEvent("This does not change any data")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
+    public List<PrincipalRoles> getPrincipals() {
+        return securityAdapter.getPrincipals();
     }
 
     @POST
