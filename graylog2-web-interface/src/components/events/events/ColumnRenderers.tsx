@@ -24,7 +24,6 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
-import AppConfig from 'util/AppConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
