@@ -50,6 +50,7 @@ type Props = {
   entityId?: string;
   entityTypeTitle?: string | null | undefined;
   onSetEntityShare: (payload: EntitySharePayload) => void;
+  dependenciesGRN?: Array<GRN>;
 };
 
 const _renderGranteesSelectOption = ({
@@ -76,6 +77,7 @@ const EntityCreateShareFormGroup = ({
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',
+  dependenciesGRN = null,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
@@ -84,8 +86,8 @@ const EntityCreateShareFormGroup = ({
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityType, entityTitle, entityGRN]);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { prepare_request: dependenciesGRN });
+  }, [entityType, entityTitle, entityGRN, dependenciesGRN]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
