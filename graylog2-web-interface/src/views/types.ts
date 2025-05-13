@@ -522,7 +522,7 @@ export type SearchDataSource = {
   useCondition: () => boolean;
 };
 
-const LICENSE_SUBJECTS = {
+type LICENSE_SUBJECTS = {
   enterprise: '/license/enterprise',
   archive: '/license/enterprise/archive',
   auditlog: '/license/enterprise/auditlog',
@@ -534,9 +534,9 @@ const LICENSE_SUBJECTS = {
   report: '/license/enterprise/report',
   security: '/license/security',
   anomaly: '/license/anomaly',
-} as const;
+};
 
-type LicenseSubject = (typeof LICENSE_SUBJECTS)[keyof typeof LICENSE_SUBJECTS];
+type LicenseSubject = (LICENSE_SUBJECTS)[keyof LICENSE_SUBJECTS];
 
 export type LicenseCheck = (subject: LicenseSubject) => {
   data: {

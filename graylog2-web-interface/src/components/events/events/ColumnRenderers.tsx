@@ -119,6 +119,16 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event; }) =>
     <em>No time range</em>
   );
 
+const ValidSecurityLicense = () => {
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
+
+  return validSecurityLicense;
+};
+
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
   T,
   M
@@ -167,23 +177,15 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
-        const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
-        const {
-          data: { valid: validSecurityLicense },
-        } = pluggableLicenseCheck[0]('/license/security');
-
-        return (
-          <>
-            {validSecurityLicense ? (
-              <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
-            ) : (
-              <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
-            )}
-          </>
-        );
-      },
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
+        <>
+          {ValidSecurityLicense ? (
+            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+          ) : (
+            <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+          )}
+        </>
+      ),
       width: 0.3,
     },
     timerange_start: {
