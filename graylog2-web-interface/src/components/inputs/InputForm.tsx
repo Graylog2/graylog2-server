@@ -43,7 +43,7 @@ type Props = {
 };
 
 const InputForm = ({
-  globalValue = undefined,
+  globalValue = false,
   configFields,
   nodeValue = undefined,
   titleValue = undefined,
@@ -138,10 +138,3 @@ const InputForm = ({
 };
 
 export default InputForm;
-
-InputForm.defaultProps = {
-  globalValue: false,
-  nodeValue: undefined,
-  titleValue: undefined,
-  values: undefined,
-};
