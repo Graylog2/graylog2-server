@@ -115,13 +115,14 @@ const DashboardPropertiesModal = ({
           onChange={_onChange}
           value={updatedDashboard.description}
         />
-        <EntityCreateShareFormGroup
-          description="Search for a User or Team to add as collaborator on this dashboard."
-          entityType="dashboard"
-          entityTitle=""
-          entityId={dashboardId}
-          onSetEntityShare={(payload) => setSharePayload(payload)}
-        />
+        {dashboardId !== view.id && (
+          <EntityCreateShareFormGroup
+            description="Search for a User or Team to add as collaborator on this dashboard."
+            entityType="dashboard"
+            entityTitle=""
+            onSetEntityShare={(payload) => setSharePayload(payload)}
+          />
+        )}
         {pluggableFormComponents?.map(({ component: Component, id }) => Component && <Component key={id} />)}
       </>
     </BootstrapModalForm>
