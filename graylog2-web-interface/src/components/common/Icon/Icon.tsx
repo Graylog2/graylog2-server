@@ -29,6 +29,11 @@ const sizeMap = {
   '3x': '3.45em',
   '4x': '4.60em',
   '5x': '5.75em',
+  '6x': '6.90em',
+  '7x': '8.05em',
+  '8x': '9.20em',
+  '9x': '10.35em',
+  '10x': '11.50em',
 };
 
 const spinAnimation = keyframes`
@@ -95,19 +100,19 @@ type Props = {
 const Icon = ({
   name,
   type = 'solid',
-  size,
-  className,
+  size = undefined,
+  className = undefined,
   rotation = 0,
   spin = false,
-  flip,
-  style,
+  flip = undefined,
+  style = undefined,
   'data-testid': testId,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  onFocus,
-  tabIndex,
-  title,
+  onClick = undefined,
+  onMouseEnter = undefined,
+  onMouseLeave = undefined,
+  onFocus = undefined,
+  tabIndex = undefined,
+  title = undefined,
 }: Props) => (
   <StyledSpan
     className={`material-symbols-rounded ${className ?? ''}`}

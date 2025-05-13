@@ -17,7 +17,7 @@
 
 import type { MaterialSymbol as IconName } from 'material-symbols';
 
-export type SizeProp = 'xs' | 'sm' | 'lg' | 'xl' | '2x' | '3x' | '4x' | '5x';
+export type SizeProp = 'xs' | 'sm' | 'lg' | 'xl' | '2x' | '3x' | '4x' | '5x' | '6x' | '7x' | '8x' | '9x' | '10x';
 export type RotateProp = 0 | 90 | 180 | 270;
 export type FlipProp = 'horizontal' | 'vertical' | 'both';
 export type IconType = 'regular' | 'solid';
