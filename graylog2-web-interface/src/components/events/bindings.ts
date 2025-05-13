@@ -18,14 +18,23 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const ALERTS_TITLE = 'Alerts & Events';
+const EVENT_PROCEDURES_TITLE = 'Event Procedures';
 const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
 const NOTIFICATIONS_TITLE = 'Notifications';
+
+const hasEventProceduresPlugin = () => {
+  const pluggableEventProcedures = usePluginEntities('eventProcedures');
+
+  return pluggableEventProcedures[0]?.EventProcedures;
+}
 
 const eventsBindings: PluginExports = {
   'alerts.pageNavigation': [
     { description: ALERTS_TITLE, path: Routes.ALERTS.LIST },
+    hasEventProceduresPlugin && { description: EVENT_PROCEDURES_TITLE, path: Routes.ALERTS.EVENT_PROCEDURES.LIST('procedures') },
     { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
     { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
   ],

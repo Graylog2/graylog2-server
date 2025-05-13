@@ -113,6 +113,7 @@ import {
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
   ClusterCertificateManagementPage,
+  PluggableEventProceduresPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -216,6 +217,10 @@ const AppRouter = () => {
               path: RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId'),
               element: <ShowEventNotificationPage />,
             },
+            {
+              path: RoutePaths.ALERTS.EVENT_PROCEDURES.LIST(':viewType'),
+              element: <PluggableEventProceduresPage />,
+            },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
             { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
@@ -303,10 +308,10 @@ const AppRouter = () => {
             },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&
-              enableDataNodeMigration && {
-                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
-                element: <DataNodesMigrationPage />,
-              },
+            enableDataNodeMigration && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+              element: <DataNodesMigrationPage />,
+            },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
