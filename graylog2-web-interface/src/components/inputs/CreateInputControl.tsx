@@ -20,9 +20,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { useStore } from 'stores/connect';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import { InputTypesActions, InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { InputTypesActions } from 'stores/inputs/InputTypesStore';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -32,6 +31,7 @@ import { Col, Row, Button } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { InputForm } from 'components/inputs';
 import type { ConfiguredInput } from 'components/messageloaders/Types';
+import useInputTypes from 'components/inputs/useInputTypes';
 
 const StyledForm = styled.form`
   display: flex;
@@ -52,7 +52,7 @@ const CreateInputControl = () => {
   const [customInputConfiguration, setCustomInputConfiguration] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const { inputTypes } = useStore(InputTypesStore);
+  const inputTypes = useInputTypes();
 
   const resetFields = () => {
     setSelectedInput(undefined);
@@ -90,9 +90,9 @@ const CreateInputControl = () => {
       event_details: { value: selected },
     });
 
-    InputTypesActions.get
-      .triggerPromise(selected)
-      .then((inputDefinition: InputDescription) => setSelectedInputDefinition(inputDefinition));
+    InputTypesActions.get(selected).then((inputDefinition: InputDescription) =>
+      setSelectedInputDefinition(inputDefinition),
+    );
   };
 
   const onCustomInputClose = () => {
@@ -157,7 +157,6 @@ const CreateInputControl = () => {
                   </span>
                 }
                 submitButtonText="Launch Input"
-                helpBlock="Select a name of your new input that describes it."
                 typeName={selectedInput}
                 handleSubmit={createInput}
               />
