@@ -50,7 +50,7 @@ export type Branding = {
   help_url?: string;
   footer?: { enabled: boolean };
   resources?: BrandingResources;
-  investigation_reporting_by_ai: { enabled: boolean };
+  investigation_reporting_by_ai?: { enabled: boolean };
 };
 
 export type AppConfigs = {
