@@ -158,7 +158,7 @@ class EntityDependencyResolverTest {
     }
 
     @Test
-    @DisplayName("Try resolve with a broken dependency")
+    @DisplayName("Try resolve with an event procedure dependency")
     void resolveEventProcedureDependency() {
         when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
         final EntityDescriptor definitionDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_DEFINITION_V1).id(ModelId.of("54e3deadbeefdeadbeefafff")).build();
