@@ -38,111 +38,111 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
     webhook_url: '',
     /* eslint-disable no-template-curly-in-string */
     adaptive_card:
-      '{\n' +
-      '  "type": "message",\n' +
-      '  "attachments": [\n' +
-      '    {\n' +
-      '      "contentType": "application/vnd.microsoft.card.adaptive",\n' +
-      '      "content": {\n' +
-      '        "type": "AdaptiveCard",\n' +
-      '        "version": "1.5",\n' +
-      '        "msTeams": { "width": "full" },\n' +
-      '        "body": [\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "size": "Large",\n' +
-      '            "weight": "Bolder",\n' +
-      '            "text": "${event_definition_title} triggered",\n' +
-      '            "style": "heading",\n' +
-      '            "fontType": "Default"\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "${event_definition_description}",\n' +
-      '            "wrap": true\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "Event Details",\n' +
-      '            "wrap": true\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "FactSet",\n' +
-      '            "facts": [\n' +
-      '              {\n' +
-      '                "title": "Type",\n' +
-      '                "value": "${event_definition_type}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Timestamp",\n' +
-      '                "value": "${event.timestamp_processing}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Message",\n' +
-      '                "value": "${event.message}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Source",\n' +
-      '                "value": "${event.source}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Key",\n' +
-      '                "value": "${event.key}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Priority",\n' +
-      '                "value": "${event.priority}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Alert",\n' +
-      '                "value": "${event.alert}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Timerange Start",\n' +
-      '                "value": "${event.timerange_start}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Timerange End",\n' +
-      '                "value": "${event.timerange_end}"\n' +
-      '              }\n' +
-      '            ]\n' +
-      '          }${if event.fields},\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "Event Fields",\n' +
-      '            "weight": "bolder",\n' +
-      '            "size": "medium"\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "FactSet",\n' +
-      '            "facts": [${foreach event.fields field}\n' +
-      '              { "title": "${field.key}", "value": "${field.value}" }${if last_field}${else},${end}${end}\n' +
-      '            ]\n' +
-      '          }${end}${if backlog},\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "Backlog",\n' +
-      '            "weight": "bolder",\n' +
-      '            "size": "medium"\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "FactSet",\n' +
-      '            "facts": [${foreach backlog message}\n' +
-      '              { "title": "Message", "value": "${message.message}" }${if last_message}${else},${end}${end}\n' +
-      '            ]\n' +
-      '          }${end}\n' +
-      '        ],\n' +
-      '        "actions": [{\n' +
-      '          "type": "Action.OpenUrl",\n' +
-      '          "title": "Replay Search",\n' +
-      '          "url": "${http_external_uri}alerts/${event.id}/replay-search"\n' +
-      '        }],\n' +
-      '        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",\n' +
-      '        "rtl": false\n' +
-      '      }\n' +
-      '    }\n' +
-      '  ]\n' +
-      '}',
+      '{\n'
+      + '  "type": "message",\n'
+      + '  "attachments": [\n'
+      + '    {\n'
+      + '      "contentType": "application/vnd.microsoft.card.adaptive",\n'
+      + '      "content": {\n'
+      + '        "type": "AdaptiveCard",\n'
+      + '        "version": "1.5",\n'
+      + '        "msTeams": { "width": "full" },\n'
+      + '        "body": [\n'
+      + '          {\n'
+      + '            "type": "TextBlock",\n'
+      + '            "size": "Large",\n'
+      + '            "weight": "Bolder",\n'
+      + '            "text": "${event_definition_title} triggered",\n'
+      + '            "style": "heading",\n'
+      + '            "fontType": "Default"\n'
+      + '          },\n'
+      + '          {\n'
+      + '            "type": "TextBlock",\n'
+      + '            "text": "${event_definition_description}",\n'
+      + '            "wrap": true\n'
+      + '          },\n'
+      + '          {\n'
+      + '            "type": "TextBlock",\n'
+      + '            "text": "Event Details",\n'
+      + '            "wrap": true\n'
+      + '          },\n'
+      + '          {\n'
+      + '            "type": "FactSet",\n'
+      + '            "facts": [\n'
+      + '              {\n'
+      + '                "title": "Type",\n'
+      + '                "value": "${event_definition_type}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Timestamp",\n'
+      + '                "value": "${event.timestamp_processing}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Message",\n'
+      + '                "value": "${event.message}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Source",\n'
+      + '                "value": "${event.source}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Key",\n'
+      + '                "value": "${event.key}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Priority",\n'
+      + '                "value": "${event.priority}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Alert",\n'
+      + '                "value": "${event.alert}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Timerange Start",\n'
+      + '                "value": "${event.timerange_start}"\n'
+      + '              },\n'
+      + '              {\n'
+      + '                "title": "Timerange End",\n'
+      + '                "value": "${event.timerange_end}"\n'
+      + '              }\n'
+      + '            ]\n'
+      + '          }${if event.fields},\n'
+      + '          {\n'
+      + '            "type": "TextBlock",\n'
+      + '            "text": "Event Fields",\n'
+      + '            "weight": "bolder",\n'
+      + '            "size": "medium"\n'
+      + '          },\n'
+      + '          {\n'
+      + '            "type": "FactSet",\n'
+      + '            "facts": [${foreach event.fields field}\n'
+      + '              { "title": "${field.key}", "value": "${field.value}" }${if last_field}${else},${end}${end}\n'
+      + '            ]\n'
+      + '          }${end}${if backlog},\n'
+      + '          {\n'
+      + '            "type": "TextBlock",\n'
+      + '            "text": "Backlog",\n'
+      + '            "weight": "bolder",\n'
+      + '            "size": "medium"\n'
+      + '          },\n'
+      + '          {\n'
+      + '            "type": "FactSet",\n'
+      + '            "facts": [${foreach backlog message}\n'
+      + '              { "title": "Message", "value": "${message.message}" }${if last_message}${else},${end}${end}\n'
+      + '            ]\n'
+      + '          }${end}\n'
+      + '        ],\n'
+      + '        "actions": [{\n'
+      + '          "type": "Action.OpenUrl",\n'
+      + '          "title": "Replay Search",\n'
+      + '          "url": "${http_external_uri}alerts/${event.id}/replay-search"\n'
+      + '        }],\n'
+      + '        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",\n'
+      + '        "rtl": false\n'
+      + '      }\n'
+      + '    }\n'
+      + '  ]\n'
+      + '}',
     /* eslint-enable no-template-curly-in-string */
     backlog_size: 0,
     time_zone: 'UTC',
