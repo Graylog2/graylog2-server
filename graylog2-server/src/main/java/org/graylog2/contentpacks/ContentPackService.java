@@ -64,7 +64,6 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.parameters.Parameter;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.users.UserService;
@@ -118,11 +117,7 @@ public class ContentPackService {
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
                                                       String username) {
-        User user = userService.load(username);
-        if (user == null) {
-            throw new IllegalArgumentException("Unknown user <" + username + ">");
-        }
-        return UserContext.runAs(user.getId(), () -> {
+        return UserContext.runAs(username, userService, () -> {
             final UserContext userContext;
             try {
                 userContext = new UserContext.Factory(userService).create();
