@@ -72,7 +72,7 @@ const EventNotificationForm = ({
   sendTelemetry,
   location,
   onChange,
-  onTest
+  onTest,
 }: EventNotificationFormProps) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
 
@@ -134,11 +134,11 @@ const EventNotificationForm = ({
   const notificationPlugin = getNotificationPlugin(notification.config.type);
   const notificationFormComponent = notificationPlugin?.formComponent
     ? React.createElement(notificationPlugin.formComponent, {
-      config: notification.config,
-      onChange: handleConfigChange,
-      validation: validation,
-      setIsSubmitEnabled: setIsSubmitEnabled,
-    })
+        config: notification.config,
+        onChange: handleConfigChange,
+        validation: validation,
+        setIsSubmitEnabled: setIsSubmitEnabled,
+      })
     : null;
 
   const isNew = action === 'create';
@@ -166,7 +166,7 @@ const EventNotificationForm = ({
             name="description"
             label={
               <span>
-                      Description <small className="text-muted">(Optional)</small>
+                Description <small className="text-muted">(Optional)</small>
               </span>
             }
             type="textarea"
@@ -194,47 +194,43 @@ const EventNotificationForm = ({
           {notificationFormComponent && (
             <FormGroup>
               <ControlLabel>
-                                Test Notification <small className="text-muted">(Optional)</small>
+                Test Notification <small className="text-muted">(Optional)</small>
               </ControlLabel>
               <FormControl.Static>
-                <Button
-                    bsStyle="info"
-                    bsSize="small"
-                    disabled={testResult.isLoading}
-                    onClick={handleTestTrigger}>
-                    {testButtonText}
-                  </Button>
-                </FormControl.Static>
-                {testResult.message && (
-                  <Alert
-                    bsStyle={testResult.error ? 'danger' : 'success'}
-                    title={testResult.error ? 'Error: ' : 'Success: '}>
-                    {testResult.message}
-                  </Alert>
-                )}
-                <HelpBlock>Execute this Notification with a test Alert.</HelpBlock>
-              </FormGroup>
-            )}
-            {isNew && (
-              <EntityCreateShareFormGroup
-                description='Search for a User or Team to add as collaborator on this notification.'
-                entityType='notification'
-                entityTitle=''
-                onSetEntityShare={handleEntityShareChange}
-              />
-            )}
+                <Button bsStyle="info" bsSize="small" disabled={testResult.isLoading} onClick={handleTestTrigger}>
+                  {testButtonText}
+                </Button>
+              </FormControl.Static>
+              {testResult.message && (
+                <Alert
+                  bsStyle={testResult.error ? 'danger' : 'success'}
+                  title={testResult.error ? 'Error: ' : 'Success: '}>
+                  {testResult.message}
+                </Alert>
+              )}
+              <HelpBlock>Execute this Notification with a test Alert.</HelpBlock>
+            </FormGroup>
+          )}
+          {isNew && (
+            <EntityCreateShareFormGroup
+              description="Search for a User or Team to add as collaborator on this notification."
+              entityType="notification"
+              entityTitle=""
+              onSetEntityShare={handleEntityShareChange}
+            />
+          )}
 
-            {!embedded && (
-              <FormSubmit
-                disabledSubmit={!isSubmitEnabled}
-                submitButtonText={`${isNew ? 'Create' : 'Update'} notification`}
-                onCancel={onCancel}
-              />
-            )}
-          </form>
-        </Col>
-      </Row>
-    );
-}
+          {!embedded && (
+            <FormSubmit
+              disabledSubmit={!isSubmitEnabled}
+              submitButtonText={`${isNew ? 'Create' : 'Update'} notification`}
+              onCancel={onCancel}
+            />
+          )}
+        </form>
+      </Col>
+    </Row>
+  );
+};
 
 export default withLocation(withTelemetry(EventNotificationForm));
