@@ -14,18 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Icon } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 
 import style from './PluginList.css';
 
-const ENTERPRISE_PLUGINS = {
-  'graylog-plugin-enterprise': 'Graylog Plugin Enterprise',
-};
-
 const PluginList = () => {
+  const productName = useProductName();
+  const ENTERPRISE_PLUGINS = useMemo(
+    () => ({
+      'graylog-plugin-enterprise': `${productName} Plugin Enterprise`,
+    }),
+    [productName],
+  );
+
   const _formatPlugin = (pluginName: string) => {
     const plugin = PluginStore.get().filter((p) => p.metadata.name === pluginName)[0];
 
@@ -42,7 +47,7 @@ const PluginList = () => {
 
   return (
     <>
-      <p>This is the status of Graylog Enterprise modules in this cluster:</p>
+      <p>This is the status of {productName} Enterprise modules in this cluster:</p>
       <ul className={style.enterprisePlugins}>{enterprisePluginList}</ul>
     </>
   );
