@@ -26,6 +26,7 @@ import { asMock } from 'helpers/mocking';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePluginEntities from 'hooks/usePluginEntities';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
@@ -68,8 +69,8 @@ jest.mock('stores/connect', () => ({
   default: jest.fn(
     (
       Component: React.ComponentType<React.ComponentProps<any>>,
-      stores: { [key: string]: any },
-      _mapProps: (args: { [key: string]: any }) => any,
+      stores: { [key: string]: any; },
+      _mapProps: (args: { [key: string]: any; }) => any,
     ) => {
       const storeProps = Object.fromEntries(
         Object.entries(stores).map(([key, store]) => [key, store.getInitialState()]),
@@ -192,8 +193,8 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
     <Component
       {...props}
       streams={[{ id: 'stream-id', title: 'stream-title' }]}
-      sendTelemetry={() => {}}
-      onChange={() => {}}
+      sendTelemetry={() => { }}
+      onChange={() => { }}
       currentUser={mockDefaultUser}
       validation={{ errors: {} }}
     />
@@ -205,6 +206,7 @@ jest.mock('routing/useLocation');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('hooks/useScopePermissions');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/usePluginEntities');
 
 jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({
   id: 'security',
@@ -228,6 +230,15 @@ describe('EventDefinitionFormContainer', () => {
       configFromLocalStorage: undefined,
     }));
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeMutable);
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.eventProcedureSummary': [],
+          'licenseCheck': [
+            (_license: string) => ({ data: { valid: false } }),
+          ],
+        })[entityKey],
+    );
   });
 
   it('should render Event Details form enabled', async () => {
