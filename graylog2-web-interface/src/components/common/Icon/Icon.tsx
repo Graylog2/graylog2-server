@@ -29,11 +29,7 @@ const sizeMap = {
   '3x': '3.45em',
   '4x': '4.60em',
   '5x': '5.75em',
-  '6x': '6.90em',
-  '7x': '8.05em',
-  '8x': '9.20em',
-  '9x': '10.35em',
-  '10x': '11.50em',
+  'huge': '10.35em',
 };
 
 const spinAnimation = keyframes`
