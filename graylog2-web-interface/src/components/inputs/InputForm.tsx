@@ -49,7 +49,7 @@ const InputForm = ({
   titleValue = undefined,
   title,
   typeName,
-  includeTitleField = false,
+  includeTitleField = undefined,
   handleSubmit,
   values = undefined,
   setShowModal,
