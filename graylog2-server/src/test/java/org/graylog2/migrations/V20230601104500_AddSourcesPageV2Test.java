@@ -111,7 +111,6 @@ class V20230601104500_AddSourcesPageV2Test {
         ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
         ContentPackService contentPackService = new TestContentPackService();
-        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
                 contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService, configuration);
     }
