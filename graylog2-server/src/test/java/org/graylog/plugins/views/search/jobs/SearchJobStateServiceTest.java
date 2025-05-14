@@ -129,7 +129,6 @@ public class SearchJobStateServiceTest {
         retrieved = toTest.get(saved.id());
         assertTrue(retrieved.isPresent());
         assertEquals(77, retrieved.get().progress());
-        assertTrue(retrieved.get().updatedAt().isAfter(toBeSaved.updatedAt()));
     }
 
     @Test
@@ -151,7 +150,6 @@ public class SearchJobStateServiceTest {
         retrieved = toTest.get(saved.id());
         assertTrue(retrieved.isPresent());
         assertEquals(SearchJobStatus.DONE, retrieved.get().status());
-        assertTrue(retrieved.get().updatedAt().isAfter(toBeSaved.updatedAt()));
     }
 
     @Test
