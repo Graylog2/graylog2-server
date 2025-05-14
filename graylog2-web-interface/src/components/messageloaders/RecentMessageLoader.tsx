@@ -99,7 +99,7 @@ type Props = {
   selectedInputId?: string;
 };
 
-const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
+const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInputId = undefined }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 

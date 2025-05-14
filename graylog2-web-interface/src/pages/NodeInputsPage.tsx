@@ -27,13 +27,10 @@ import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
 
-import useCurrentUser from '../hooks/useCurrentUser';
-
 const NodeInputsPage = () => {
   const productName = useProductName();
   const { nodeId } = useParams();
 
-  const currentUser = useCurrentUser();
   const { nodes } = useStore(NodesStore);
   const node = nodes?.[nodeId];
 
@@ -66,7 +63,7 @@ const NodeInputsPage = () => {
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} node={node} />
+        <InputsList node={node} />
       </div>
     </DocumentTitle>
   );
