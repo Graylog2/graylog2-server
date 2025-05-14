@@ -42,7 +42,7 @@ import mockHistory from 'helpers/mocking/mockHistory';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
-import { createEntityShareState }  from 'fixtures/entityShareState';
+import { createEntityShareState } from 'fixtures/entityShareState';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import SearchActionsMenu from './SearchActionsMenu';
@@ -63,7 +63,6 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
     getInitialState: jest.fn(),
   },
 }));
-
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {

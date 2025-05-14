@@ -126,7 +126,7 @@ public class MoreSearch {
 
         final var effectiveTimeRange = AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
         if (affectedIndices == null || affectedIndices.isEmpty()) {
-            return Histogram.empty(effectiveTimeRange);
+            return Histogram.empty();
         }
         return moreSearchAdapter.eventHistogram(queryString, effectiveTimeRange, affectedIndices, eventStreams,
                 filterString, forbiddenSourceStreams, timeZone, parameters.filter().extraFilters());
@@ -264,7 +264,7 @@ public class MoreSearch {
     }
 
     public record Histogram(EventsBuckets buckets) {
-        public static Histogram empty(AbsoluteRange effectiveTimeRange) {
+        public static Histogram empty() {
             return new Histogram(new EventsBuckets(List.of(), List.of()));
         }
 

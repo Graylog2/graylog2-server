@@ -59,10 +59,25 @@ public class EventsSearchService {
         return new EventsFilterBuilder(parameters).build();
     }
 
+    private Set<String> allowedEventStreams(Subject subject) {
+        final var eventStreams = Set.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
+            return eventStreams;
+        }
+
+        return eventStreams.stream()
+                .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                .collect(Collectors.toSet());
+    }
+
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
+        final var eventStreams = allowedEventStreams(subject);
+        if(eventStreams.isEmpty()) {
+            return EventsSearchResult.empty();
+        }
+
         final var filter = buildFilter(parameters);
 
-        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
@@ -94,9 +109,12 @@ public class EventsSearchService {
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
-        final var filter = buildFilter(parameters);
+        final var eventStreams = allowedEventStreams(subject);
+        if(eventStreams.isEmpty()) {
+            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
+        }
 
-        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        final var filter = buildFilter(parameters);
         final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);

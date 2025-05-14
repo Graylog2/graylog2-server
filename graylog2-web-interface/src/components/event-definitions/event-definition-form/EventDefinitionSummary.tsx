@@ -43,7 +43,7 @@ import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
   eventDefinition: EventDefinition & {
-    share_request?: EntitySharePayload,
+    share_request?: EntitySharePayload;
   };
   notifications: Array<EventNotification>;
   validation?: {

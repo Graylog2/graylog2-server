@@ -32,9 +32,15 @@ import useParams from 'routing/useParams';
 
 const ExtractorsPage = () => {
   const params = useParams<{ inputId: string; nodeId: string }>();
-  const node = useStore(NodesStore, (nodes) =>
-    params.nodeId ? nodes.nodes?.[params.nodeId] : Object.values(nodes.nodes).filter((_node) => _node.is_leader)[0],
-  );
+  const node = useStore(NodesStore, (nodes) => {
+    if (!nodes?.nodes) {
+      return undefined;
+    }
+
+    return params.nodeId
+      ? nodes.nodes?.[params.nodeId]
+      : Object.values(nodes.nodes).filter((_node) => _node.is_leader)[0];
+  });
   const { data: input } = useQuery(['input', params.inputId], () => InputsActions.get(params.inputId));
 
   useEffect(() => {
