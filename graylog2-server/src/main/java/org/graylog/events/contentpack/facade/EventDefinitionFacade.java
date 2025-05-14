@@ -34,6 +34,7 @@ import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
@@ -222,7 +223,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     @Override
-    public Optional<List<String>> getCreatePermissions(Entity entity) {
-        return Optional.of(List.of(RestPermissions.EVENT_DEFINITIONS_CREATE));
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(RestPermissions.EVENT_DEFINITIONS_CREATE)));
     }
 }

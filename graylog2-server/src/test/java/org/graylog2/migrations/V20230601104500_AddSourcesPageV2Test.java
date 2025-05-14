@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -69,6 +70,9 @@ class V20230601104500_AddSourcesPageV2Test {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private Configuration configuration;
+
     private V20230601104500_AddSourcesPageV2 migration;
 
     static class TestContentPackService extends ContentPackService {
@@ -107,8 +111,9 @@ class V20230601104500_AddSourcesPageV2Test {
         ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
         ContentPackService contentPackService = new TestContentPackService();
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
-                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService);
+                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService, configuration);
     }
 
     @Test
