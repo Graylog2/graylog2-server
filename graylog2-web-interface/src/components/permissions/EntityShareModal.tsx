@@ -88,7 +88,7 @@ const EntityShareModal = ({
       app_pathname: entityType,
     });
 
-    EntityShareDomain.update(entityTitle, entityType, entityGRN, payload).then(() => {
+    EntityShareDomain.update(entityType, entityTitle, entityGRN, payload).then(() => {
       setDisableSubmit(true);
       onClose();
     });
