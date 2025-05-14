@@ -72,7 +72,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {"prepare_request": null});
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId);
     });
   });
 
@@ -113,6 +113,7 @@ describe('EntityCreateShareFormGroup', () => {
         selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
           [everyone.id]: viewer.id,
         }),
+        prepare_request: null,
       });
     });
     await waitFor(() => {

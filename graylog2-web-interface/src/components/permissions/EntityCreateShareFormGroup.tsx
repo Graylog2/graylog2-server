@@ -88,7 +88,7 @@ const EntityCreateShareFormGroup = ({
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityType, entityTitle, entityGRN, dependenciesGRN]);
+  }, [entityType, entityTitle, entityGRN]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
@@ -102,10 +102,9 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
-      prepare_request: dependenciesGRN,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { ...payload, prepare_request: dependenciesGRN }).then((response) => {
       onSetEntityShare(payload);
       resetSelection();
       setDisableSubmit(false);
@@ -119,12 +118,13 @@ const EntityCreateShareFormGroup = ({
 
     setDisableSubmit(true);
 
+    const prepare_request = isEmpty(newSelectedGranteeCapabilities) ? null: dependenciesGRN;
+
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
-      prepare_request: isEmpty(newSelectedGranteeCapabilities) ? null: dependenciesGRN ,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
+    return EntityShareDomain.prepare(entityType, entityTitle, null, { ...payload, prepare_request }).then((response) => {
       onSetEntityShare(payload);
       setDisableSubmit(false);
 
