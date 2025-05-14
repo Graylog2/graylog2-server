@@ -75,6 +75,7 @@ type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
   embryonic?: boolean;
 };
 const LOOKUP_PERMISSIONS = ['lookuptables:read'];
+const STREAM_PERMISSIONS = ['streams:read'];
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
@@ -121,6 +122,11 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const userCanViewLookupTables = useCallback(
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
+    [currentUser.permissions],
+  );
+
+  const isStreamRequired = useCallback(
+    () => !isPermitted(currentUser.permissions, STREAM_PERMISSIONS),
     [currentUser.permissions],
   );
 
@@ -538,11 +544,12 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         <>
           <FormGroup controlId="filter-streams">
             <ControlLabel>
-              Streams <small className="text-muted">(Optional)</small>
+              Streams{!isStreamRequired() && <small className="text-muted"> (Optional)</small>}
             </ControlLabel>
             <MultiSelect
               id="filter-streams"
               matchProp="label"
+              required={isStreamRequired()}
               onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
               options={formattedStreams}
               value={defaultTo(eventDefinition.config.streams, []).join(',')}
