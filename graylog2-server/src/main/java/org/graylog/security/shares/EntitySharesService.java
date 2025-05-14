@@ -42,6 +42,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -80,8 +81,7 @@ public class EntitySharesService {
 
     /**
      * Prepares the sharing operation by running some checks and returning available capabilities and grantees
-     * as well as active shares and information about missing dependencies.
-     *
+     * as well as active shares and information about missing dependencies for a specific entity.
      * @param ownedEntity    the entity that should be shared and is owned by the sharing user
      * @param request        sharing request
      * @param sharingUser    the sharing user
@@ -112,9 +112,44 @@ public class EntitySharesService {
     }
 
     /**
+     * Checks for missing permissions on multiple entities.
+     *
+     * @param selectedCapabilities check these capabilities
+     * @param entityGRNs           check these entities
+     * @param sharingUser          the sharing user
+     * @return eligible grantees and missing permissions on dependencies
+     */
+    public EntityShareResponse prepareShare(ImmutableMap<GRN, Capability> selectedCapabilities, List<String> entityGRNs, User sharingUser) {
+        requireNonNull(selectedCapabilities, "selectedCapabilities cannot be null");
+        requireNonNull(entityGRNs, "dependentEntityGRNs cannot be null");
+        requireNonNull(sharingUser, "sharingUser cannot be null");
+
+        final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
+        EntityShareRequest shareRequest = EntityShareRequest.create(selectedCapabilities);
+        Map<GRN, Collection<EntityDescriptor>> missingPermissions = new HashMap<>();
+        Set<Grantee> modifiableGrantees = new HashSet<>();
+        entityGRNs.forEach(entity -> {
+            final GRN entityGRN = grnRegistry.parse(entity);
+            missingPermissions.putAll(missingPermissions(shareRequest.grantees(), entityGRNs, sharingUserGRN));
+            modifiableGrantees.addAll(getModifiableGrantees(sharingUser, entityGRN));
+        });
+
+        return EntityShareResponse.builder()
+                .entity(null)
+                .sharingUser(sharingUserGRN)
+                .availableGrantees(modifiableGrantees)
+                .availableCapabilities(getAvailableCapabilities())
+                .activeShares(ImmutableSet.of())
+                .selectedGranteeCapabilities(selectedCapabilities)
+                .missingPermissionsOnDependencies(missingPermissions)
+                .validationResult(new ValidationResult())
+                .build();
+    }
+
+    /**
      * Prepares the sharing operation by running some checks and returning available capabilities and grantees.
-     * This method is used for generic sharing operations where the entity is not known yet. The return type is the same
-     * as for the specific entity sharing operation, but active shares and dependencies are always null.
+     * This method is used for generic sharing operations where the entity is not known yet - active shares and
+     * dependencies are always null.
      */
     public EntityShareResponse prepareShare(User sharingUser) {
         requireNonNull(sharingUser, "sharingUser cannot be null");
@@ -136,30 +171,36 @@ public class EntitySharesService {
     /**
      * Similar to generic prepare without a specific entity; but also checks for missing permissions on specified
      * dependent entities.
-     *
-     * @param dependentEntityGRNs check permissions on these entities
+     * @param entityGRNs check permissions on these entities
      * @param sharingUser         the sharing user
      * @return eligible grantees and missing permissions on dependencies
      */
-    public EntityShareResponse prepareShare(List<String> dependentEntityGRNs, User sharingUser) {
-        requireNonNull(dependentEntityGRNs, "entityGRNs cannot be null");
+    public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
+        requireNonNull(entityGRNs, "entityGRNs cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
         final EntityShareResponse response = prepareShare(sharingUser);
-        final ImmutableSet<EntityDescriptor> entities = dependentEntityGRNs.stream()
+
+        return response.toBuilder()
+                .missingPermissionsOnDependencies(missingPermissions(
+                        response.availableGrantees().stream().map(Grantee::grn).collect(Collectors.toSet()),
+                        entityGRNs, response.sharingUser()))
+                .build();
+    }
+
+    private Map<GRN, Collection<EntityDescriptor>> missingPermissions(Set<GRN> selectedGrantees, List<String> entityGRNs, GRN sharingUserGRN) {
+        final ImmutableSet<EntityDescriptor> entities = entityGRNs.stream()
                 .map(grn -> EntityDescriptor.create(grnRegistry.parse(grn), grn, Set.of()))
                 .collect(ImmutableSet.toImmutableSet());
 
         final ImmutableMultimap<GRN, EntityDescriptor> deniedEntities =
-                entityDependencyPermissionChecker.check(response.sharingUser(), entities,
-                        response.availableGrantees().stream().map(Grantee::grn).collect(Collectors.toSet()));
+                entityDependencyPermissionChecker.check(sharingUserGRN, entities, selectedGrantees);
 
         Map<GRN, Collection<EntityDescriptor>> missingPermissions = new HashMap<>();
         deniedEntities.keySet().forEach(grantee -> {
             final ImmutableSet<EntityDescriptor> missing = deniedEntities.get(grantee).stream().collect(ImmutableSet.toImmutableSet());
             missingPermissions.put(grantee, missing);
         });
-
-        return response.toBuilder().missingPermissionsOnDependencies(missingPermissions).build();
+        return missingPermissions;
     }
 
     private Set<Grantee> getModifiableGrantees(User sharingUser, GRN ownedEntity) {
