@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 public class SecurityTestUtils {
 
+    // static holder for the current SecurityContext
     private static ShiroSecurityContext securityContext;
 
     public static ShiroSecurityContext getSecurityContext() {
@@ -55,6 +56,17 @@ public class SecurityTestUtils {
         SecurityTestUtils.securityContext = securityContext;
     }
 
+    /**
+     * Creates a ShiroSecurityContext.
+     * In the Context, a test realm is created with a role with the given name which has the given (wildcard) permissions.
+     * The user with the given name is created and assigned the role.
+     *
+     * After this, the user is authenticated and set as the current principal in the ShiroSecurityContext.
+     *
+     * @param username    user name
+     * @param rolename    role name
+     * @param permissions wildcard permissions
+     */
     public static void setupSecurityContext(String username, String rolename, Set<String> permissions) {
         String password = "test_password";
 
@@ -74,6 +86,9 @@ public class SecurityTestUtils {
         SecurityTestUtils.setSecurityContext(new ShiroSecurityContext(subject, token, true, null, new MultivaluedHashMap<>()));
     }
 
+    /**
+     * Removes all security related information from the thread context.
+     */
     public static void clearSecurityContext() {
         ThreadContext.unbindSubject();
         ThreadContext.unbindSecurityManager();
@@ -82,6 +97,16 @@ public class SecurityTestUtils {
     }
 
 
+    /**
+     * Injects a security manager in RestResource instances.
+     * This modifies the passed in instance to use the current SecurityContext from this holder.
+     * Additionally, an interceptor is added to all instance methods that performs the required checks for @RequiresAuthentication
+     * and @RequiresPermissions.
+     *
+     * @param resource instance object extending RestResource
+     * @param clazz    class of the object
+     * @return modified instance object with SecurityManager and method checks
+     */
     public static <T extends RestResource> T injectSecurityManager(T resource, Class<T> clazz) {
         try {
             Field securityContextField = RestResource.class.getDeclaredField("securityContext");
@@ -98,6 +123,9 @@ public class SecurityTestUtils {
         }
     }
 
+    /**
+     *
+     */
     static class PermissionInterceptor implements Answer<Object> {
 
         @Override
@@ -133,8 +161,10 @@ public class SecurityTestUtils {
         }
     }
 
+    /**
+     * Simple Shiro Realm to hold user/role information
+     */
     static class TestRealm extends SimpleAccountRealm {
-
 
         public void addRole(String roleName, Set<String> permissions) {
             SimpleRole role = new SimpleRole(roleName, permissions.stream().map(WildcardPermission::new).collect(Collectors.toSet()));

@@ -97,8 +97,8 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
-import org.graylog2.security.AuthorizationExtension;
 import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -135,7 +135,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({MockitoExtension.class, AuthorizationExtension.class})
+@ExtendWith({MockitoExtension.class, WithAuthorizationExtension.class})
 public class ContentPackServiceTest {
     private final String TEST_USER = "test_user";
 

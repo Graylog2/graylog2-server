@@ -32,9 +32,8 @@ import org.graylog2.rest.models.system.contentpacks.responses.ContentPackList;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackRevisions;
-import org.graylog2.security.AuthorizationExtension;
-import org.graylog2.security.SecurityTestUtils;
 import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
@@ -55,7 +54,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(AuthorizationExtension.class)
+@ExtendWith(WithAuthorizationExtension.class)
 public class ContentPackResourceTest {
 
     private static final String CONTENT_PACK = "" +
@@ -97,7 +96,6 @@ public class ContentPackResourceTest {
                 contentPackService,
                 contentPackPersistenceService,
                 contentPackInstallationPersistenceService);
-        contentPackResource = SecurityTestUtils.injectSecurityManager(contentPackResource, PermittedTestResource.class);
     }
 
     @Test
