@@ -87,9 +87,7 @@ public class EntitySharesService {
      * @param sharingUser    the sharing user
      * @return the response
      */
-    public EntityShareResponse prepareShare(GRN ownedEntity,
-                                            EntityShareRequest request,
-                                            User sharingUser) {
+    public EntityShareResponse prepareShare(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
@@ -113,7 +111,6 @@ public class EntitySharesService {
 
     /**
      * Checks for missing permissions on multiple entities.
-     *
      * @param selectedCapabilities check these capabilities
      * @param entityGRNs           check these entities
      * @param sharingUser          the sharing user
@@ -126,13 +123,12 @@ public class EntitySharesService {
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         EntityShareRequest shareRequest = EntityShareRequest.create(selectedCapabilities);
-        Map<GRN, Collection<EntityDescriptor>> missingPermissions = new HashMap<>();
+        Map<GRN, Collection<EntityDescriptor>> missingPermissions = missingPermissions(shareRequest.grantees(), entityGRNs, sharingUserGRN);
+
         Set<Grantee> modifiableGrantees = new HashSet<>();
-        entityGRNs.forEach(entity -> {
-            final GRN entityGRN = grnRegistry.parse(entity);
-            missingPermissions.putAll(missingPermissions(shareRequest.grantees(), entityGRNs, sharingUserGRN));
-            modifiableGrantees.addAll(getModifiableGrantees(sharingUser, entityGRN));
-        });
+        entityGRNs.forEach(entity ->
+                modifiableGrantees.addAll(getModifiableGrantees(sharingUser, grnRegistry.parse(entity)))
+        );
 
         return EntityShareResponse.builder()
                 .entity(null)
@@ -372,14 +368,6 @@ public class EntitySharesService {
                 removedOwners.stream().map(Objects::toString).collect(Collectors.toSet()));
 
         return validationResult;
-    }
-
-    /**
-     * Return all existing grants for the given entity
-     */
-    public Map<GRN, Capability> getGrants(GRN ownedEntity) {
-        return grantService.getForTarget(ownedEntity).stream()
-                .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability));
     }
 
     private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, EntityShareRequest shareRequest) {
