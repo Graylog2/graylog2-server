@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type { $PropertyType } from 'utility-types';
+import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -86,7 +87,7 @@ const EntityCreateShareFormGroup = ({
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { prepare_request: dependenciesGRN });
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
   }, [entityType, entityTitle, entityGRN, dependenciesGRN]);
 
   const resetSelection = () => {
@@ -101,6 +102,7 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
+      prepare_request: dependenciesGRN,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
@@ -119,6 +121,7 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
+      prepare_request: isEmpty(newSelectedGranteeCapabilities) ? null: dependenciesGRN ,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
