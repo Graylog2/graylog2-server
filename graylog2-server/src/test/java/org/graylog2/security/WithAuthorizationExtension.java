@@ -23,6 +23,8 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.Set;
 
 public class WithAuthorizationExtension implements BeforeEachCallback, AfterEachCallback, BeforeTestExecutionCallback {
@@ -64,13 +66,14 @@ public class WithAuthorizationExtension implements BeforeEachCallback, AfterEach
             context.getTestClass().ifPresent(testClass -> {
                 for (var field : testClass.getDeclaredFields()) {
                     if (RestResource.class.isAssignableFrom(field.getType())) {
-                        field.setAccessible(true);
                         try {
-                            RestResource resource = (RestResource) field.get(testInstance);
+                            VarHandle handle = MethodHandles.privateLookupIn(testClass, MethodHandles.lookup())
+                                    .findVarHandle(testClass, field.getName(), field.getType());
+                            RestResource resource = (RestResource) handle.get(testInstance);
                             if (resource != null) {
-                                field.set(testInstance, SecurityTestUtils.injectSecurityManager(resource, field.getType().asSubclass(RestResource.class)));
+                                handle.set(testInstance, SecurityTestUtils.injectSecurityManager(resource, field.getType().asSubclass(RestResource.class)));
                             }
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalAccessException | NoSuchFieldException e) {
                             throw new RuntimeException("Failed to access or modify the RestResource field", e);
                         }
                     }

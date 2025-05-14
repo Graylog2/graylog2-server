@@ -19,6 +19,7 @@ package org.graylog2.security;
 
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.SecurityContext;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.SimpleAccount;
@@ -39,7 +40,8 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,10 +111,9 @@ public class SecurityTestUtils {
      */
     public static <T extends RestResource> T injectSecurityManager(T resource, Class<T> clazz) {
         try {
-            Field securityContextField = RestResource.class.getDeclaredField("securityContext");
-            securityContextField.setAccessible(true);
-            securityContextField.set(resource, SecurityTestUtils.getSecurityContext());
-
+            VarHandle handle = MethodHandles.privateLookupIn(RestResource.class, MethodHandles.lookup())
+                    .findVarHandle(RestResource.class, "securityContext", SecurityContext.class);
+            handle.set(resource, SecurityTestUtils.getSecurityContext());
             return Mockito.mock(clazz, Mockito.withSettings()
                     .spiedInstance(resource)
                     .defaultAnswer(new PermissionInterceptor())
