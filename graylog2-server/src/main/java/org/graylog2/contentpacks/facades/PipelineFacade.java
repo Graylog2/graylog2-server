@@ -24,6 +24,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -33,8 +34,10 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.MissingNativeEntityException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -54,10 +57,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -340,5 +342,10 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 .map(Optional::get)
                 .map(RuleDao::id)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(PipelineRestPermissions.PIPELINE_CREATE)));
     }
 }

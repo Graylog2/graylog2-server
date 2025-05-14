@@ -29,6 +29,7 @@ import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apache.shiro.authz.annotation.Logical;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
 import org.graylog2.Configuration;
@@ -167,12 +168,24 @@ public class ContentPackService {
                 final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
 
                 facade.getCreatePermissions(entity)
-                        .flatMap(permissions ->
-                                permissions.stream()
+                        .flatMap(permissions -> {
+                            if (permissions.operator().equals(Logical.AND)) {
+                                return permissions.permissions().stream()
                                         .filter(p -> !userContext.isPermitted(p))
                                         .peek(p -> LOG.warn("Missing permission <{}>", p))
-                                        .findFirst()
-                        ).ifPresent(p -> {
+                                        .findFirst();
+                            } else {
+                                if (permissions.permissions().stream()
+                                        .anyMatch(userContext::isPermitted)) {
+                                    return Optional.empty();
+                                } else {
+                                    return permissions.permissions().stream()
+                                            .filter(p -> !userContext.isPermitted(p))
+                                            .peek(p -> LOG.warn("Missing OR permission <{}>", p))
+                                            .findFirst();
+                                }
+                            }
+                        }).ifPresent(p -> {
                             throw new IllegalArgumentException("Missing permissions");
                         });
 

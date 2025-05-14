@@ -23,10 +23,13 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
+import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -42,8 +45,7 @@ import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -202,5 +204,10 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
         }
 
         return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(SidecarRestPermissions.CONFIGURATIONS_CREATE)));
     }
 }

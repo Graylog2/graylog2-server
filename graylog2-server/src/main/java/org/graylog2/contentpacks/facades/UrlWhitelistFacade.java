@@ -19,7 +19,9 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
@@ -31,11 +33,11 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Version;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.graylog2.system.urlwhitelist.WhitelistEntry;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -117,5 +119,10 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
 
     private String createTitle(WhitelistEntry entry) {
         return entry.title() + " [" + entry.value() + "]";
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(RestPermissions.URL_WHITELIST_WRITE)));
     }
 }

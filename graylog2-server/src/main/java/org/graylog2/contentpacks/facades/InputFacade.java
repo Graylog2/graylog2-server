@@ -30,6 +30,7 @@ import com.google.common.primitives.Ints;
 import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -630,11 +631,13 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public Optional<List<String>> getCreatePermissions(Entity entity) {
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
         if (entity instanceof EntityV1 entityV1) {
             final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
             String type = inputEntity.type().asString();
-            return Optional.of(List.of(RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + type));
+            return Optional.of(new EntityPermissions(
+                    List.of(RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + type
+                    )));
         } else {
             return Optional.empty();
         }

@@ -19,9 +19,12 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
+import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -36,8 +39,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -163,5 +165,10 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         }
 
         return Optional.of(exportNativeEntity(collector, entityDescriptorIds));
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(SidecarRestPermissions.COLLECTORS_CREATE)));
     }
 }

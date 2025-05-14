@@ -23,8 +23,10 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -40,11 +42,11 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -222,5 +224,10 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         });
 
         return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(RestPermissions.INPUTS_CREATE)));
     }
 }

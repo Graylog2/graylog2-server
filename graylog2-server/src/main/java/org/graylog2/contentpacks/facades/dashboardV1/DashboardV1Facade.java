@@ -20,12 +20,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.contentpacks.facades.ViewFacade;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
@@ -36,10 +38,10 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -117,5 +119,10 @@ public class DashboardV1Facade extends ViewFacade {
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final ViewEntity viewEntity = entityConverter.convert(dashboardEntity, parameters);
         return resolveViewEntity(entity, viewEntity, parameters, entities);
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(RestPermissions.DASHBOARDS_CREATE)));
     }
 }

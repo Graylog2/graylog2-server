@@ -20,8 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -41,12 +43,12 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -193,5 +195,10 @@ public class OutputFacade implements EntityFacade<Output> {
             LOG.debug("Couldn't find output {}", entityDescriptor, e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.of(new EntityPermissions(List.of(RestPermissions.OUTPUTS_CREATE)));
     }
 }

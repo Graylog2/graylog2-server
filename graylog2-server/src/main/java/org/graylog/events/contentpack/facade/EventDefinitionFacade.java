@@ -47,10 +47,12 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -217,5 +219,10 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public boolean usesScopedEntities() {
         return true;
+    }
+
+    @Override
+    public Optional<List<String>> getCreatePermissions(Entity entity) {
+        return Optional.of(List.of(RestPermissions.EVENT_DEFINITIONS_CREATE));
     }
 }

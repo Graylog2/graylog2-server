@@ -21,6 +21,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -29,7 +30,6 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -147,7 +147,7 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
         return false;
     }
 
-    default Optional<List<String>> getCreatePermissions(Entity entity) {
+    default Optional<EntityPermissions> getCreatePermissions(Entity entity) {
         return Optional.empty();
     }
 
