@@ -43,6 +43,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -187,7 +188,7 @@ public class EventDefinitionHandlerTest {
                 .build();
 
         final var existingEvent = eventDefinitionService.save(newDto);
-        final var duplicated = handler.duplicate(mock(EntitySharesService.class), existingEvent, Optional.empty());
+        final var duplicated = handler.duplicate(mock(EntitySharesService.class), existingEvent, mock(User.class));
         final var saved = eventDefinitionService.get(duplicated.id()).get();
 
         assertThat(saved.title()).startsWith("COPY-");

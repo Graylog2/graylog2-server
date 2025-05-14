@@ -99,11 +99,12 @@ public class EventDefinitionHandler {
      * The new copy will be disabled by default and will have the {@link DefaultEntityScope}.
      * Also the title will be prefixed with the string "COPY-".
      *
+     * @param entitySharesService the entity shares service. Passing this as a parameter to avoid circular dependency.
      * @param eventDefinition the event definition to copy
      * @param user            the user who copied this eventDefinition. If empty, no ownership will be registered.
      * @return the newly created event definition
      */
-    public EventDefinitionDto duplicate(EntitySharesService entitySharesService, EventDefinitionDto eventDefinition, Optional<User> user) {
+    public EventDefinitionDto duplicate(EntitySharesService entitySharesService, EventDefinitionDto eventDefinition, User user) {
         var copy = eventDefinition.toBuilder()
                 .id(null)
                 .title("COPY-" + eventDefinition.title())
@@ -112,8 +113,8 @@ public class EventDefinitionHandler {
                 .state(EventDefinition.State.DISABLED)
                 .build();
 
-        EventDefinitionDto copyDto = createWithoutSchedule(copy, user);
-        user.ifPresent(theUser -> entitySharesService.cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), theUser));
+        EventDefinitionDto copyDto = createWithoutSchedule(copy, Optional.of(user));
+        entitySharesService.cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), user);
 
         return copyDto;
     }
