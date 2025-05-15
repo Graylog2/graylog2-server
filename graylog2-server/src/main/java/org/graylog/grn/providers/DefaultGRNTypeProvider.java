@@ -14,20 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.shares;
+package org.graylog.grn.providers;
 
-import com.google.common.collect.ImmutableCollection;
-import jakarta.annotation.Nonnull;
-import org.graylog.grn.GRN;
-import org.graylog.security.GrantDTO;
+import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypeProvider;
 
-public interface AdditionalGrantsResolver {
-    /**
-     * Return additional grants based on the specified primary entity.
-     *
-     * @param primaryEntity The primary entity
-     * @return A collection of related grants; or empty collection, if there are none.
-     */
-    @Nonnull
-    ImmutableCollection<GrantDTO> additionalGrants(GRN primaryEntity);
+import java.util.Set;
+
+import static org.graylog.grn.GRNTypes.builtinTypes;
+
+/**
+ * Default provider for GRN types
+ */
+public class DefaultGRNTypeProvider implements GRNTypeProvider {
+    @Override
+    public Set<GRNType> getTypes() {
+        return builtinTypes();
+    }
 }

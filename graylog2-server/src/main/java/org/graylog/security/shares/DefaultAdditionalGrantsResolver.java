@@ -16,15 +16,16 @@
  */
 package org.graylog.security.shares;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
+import jakarta.annotation.Nonnull;
 import org.graylog.grn.GRN;
 import org.graylog.security.GrantDTO;
 
-import java.util.Collection;
-import java.util.Optional;
-
 public class DefaultAdditionalGrantsResolver implements AdditionalGrantsResolver {
+    @Nonnull
     @Override
-    public Optional<Collection<GrantDTO>> additionalGrants(GRN primaryEntity) {
-        return Optional.empty();
+    public ImmutableCollection<GrantDTO> additionalGrants(GRN primaryEntity) {
+        return ImmutableList.of();
     }
 }

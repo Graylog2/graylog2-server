@@ -94,11 +94,8 @@ class EntitySharesServiceTest {
                 dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
                 grnRegistry, granteeService, serverEventBus, new HashSet<>());
 
-        // TODO this is needed to initialize the CAPABILITIES field
         new BuiltinCapabilities();
     }
-
-    // TODO Test more EntitySharesService functionality
 
     @DisplayName("Validates we cannot remove the last owner")
     @Test
@@ -115,8 +112,7 @@ class EntitySharesServiceTest {
         lenient().when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
         final User user = createMockUser("hans");
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isTrue();
             assertThat(validationResult.getErrors()).isNotEmpty();
@@ -143,8 +139,7 @@ class EntitySharesServiceTest {
         lenient().when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
         final User user = createMockUser("hans");
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
         });
@@ -162,8 +157,7 @@ class EntitySharesServiceTest {
         when(granteeService.getAvailableGrantees(user)).thenReturn(allGranteesSet);
         lenient().when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isTrue();
             assertThat(validationResult.getErrors()).isNotEmpty();
@@ -180,8 +174,7 @@ class EntitySharesServiceTest {
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(horst, Capability.OWN));
 
         final User user = createMockUser("hans");
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
             assertThat(validationResult.getErrors()).isEmpty();
@@ -196,8 +189,7 @@ class EntitySharesServiceTest {
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(horst, Capability.MANAGE));
 
         final User user = createMockUser("hans");
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
             assertThat(validationResult.getErrors()).isEmpty();
@@ -211,8 +203,7 @@ class EntitySharesServiceTest {
         final EntityShareRequest shareRequest = EntityShareRequest.create(null);
 
         final User user = createMockUser("hans");
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
             assertThat(validationResult.getErrors()).isEmpty();
@@ -226,8 +217,7 @@ class EntitySharesServiceTest {
         final EntityShareRequest shareRequest = EntityShareRequest.create(null);
 
         final User user = createMockUser("hans");
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
             assertThat(activeShares).isEmpty();
         });
@@ -246,8 +236,7 @@ class EntitySharesServiceTest {
         when(granteeService.getAvailableGrantees(user)).thenReturn(allGranteesSet);
         when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
-        final Subject subject = mock(Subject.class);
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user);
         assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
             assertThat(activeShares).hasSize(1);
             assertThat(activeShares.iterator().next().grantee()).isEqualTo(janeGRN);

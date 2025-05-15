@@ -16,22 +16,24 @@
  */
 package org.graylog.grn;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog2.plugin.database.users.User;
-
-import jakarta.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * The global {@link GRN} registry.
+ * {@link GRNType} registry.
  */
 @Singleton
 public class GRNRegistry {
@@ -40,17 +42,20 @@ public class GRNRegistry {
 
     private final ConcurrentMap<String, GRNType> REGISTRY = new ConcurrentHashMap<>();
 
-    // Don't allow direct instantiation
-    private GRNRegistry() {
+    @Inject
+    public GRNRegistry(Set<GRNTypeProvider> providers) {
+        Set<GRNType> providedTypes = providers.stream()
+                .flatMap(provider -> provider.getTypes().stream())
+                .collect(Collectors.toSet());
+        providedTypes.forEach(this::registerType);
     }
 
     /**
      * Returns an empty registry.
-     *
      * @return the registry
      */
     public static GRNRegistry createEmpty() {
-        return new GRNRegistry();
+        return new GRNRegistry(Set.of());
     }
 
     /**
@@ -69,10 +74,8 @@ public class GRNRegistry {
      * @return the registry
      */
     public static GRNRegistry createWithTypes(Collection<GRNType> types) {
-        final GRNRegistry grnRegistry = new GRNRegistry();
-
+        final GRNRegistry grnRegistry = new GRNRegistry(Set.of());
         types.forEach(grnRegistry::registerType);
-
         return grnRegistry;
     }
 
@@ -159,7 +162,7 @@ public class GRNRegistry {
     /**
      * Registers the given GRN type.
      *
-     * @param type the typt to register
+     * @param type the type to register
      * @throws IllegalStateException when given type is already registered
      */
     public void registerType(GRNType type) {

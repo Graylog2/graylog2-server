@@ -16,11 +16,13 @@
  */
 package org.graylog.grn;
 
+import com.google.inject.multibindings.Multibinder;
+import org.graylog.grn.providers.DefaultGRNTypeProvider;
 import org.graylog2.plugin.PluginModule;
 
 public class GRNModule extends PluginModule {
     @Override
     protected void configure() {
-        bind(GRNRegistry.class).toInstance(GRNRegistry.createWithBuiltinTypes());
+        Multibinder.newSetBinder(binder(), GRNTypeProvider.class).addBinding().to(DefaultGRNTypeProvider.class);
     }
 }

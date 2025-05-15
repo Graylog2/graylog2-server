@@ -41,12 +41,10 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,22 +82,16 @@ public class EntitySharesService {
 
     /**
      * Prepares the sharing operation by running some checks and returning available capabilities and grantees
-     * as well as active shares and information about missing dependencies.
-     *
+     * as well as active shares and information about missing dependencies for a specific entity.
      * @param ownedEntity    the entity that should be shared and is owned by the sharing user
      * @param request        sharing request
      * @param sharingUser    the sharing user
-     * @param sharingSubject the sharing subject
      * @return the response
      */
-    public EntityShareResponse prepareShare(GRN ownedEntity,
-                                            EntityShareRequest request,
-                                            User sharingUser,
-                                            Subject sharingSubject) {
+    public EntityShareResponse prepareShare(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser, ownedEntity);
@@ -171,7 +163,7 @@ public class EntitySharesService {
 
     public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         final EntityShareResponse result = updateOnlyEntityShares(ownedEntity, request, sharingUser);
-        resolveImplicitGrants(ownedEntity, request, sharingUser);
+        resolveImplicitGrants(ownedEntity, sharingUser);
         return result;
     }
 
@@ -222,7 +214,7 @@ public class EntitySharesService {
         }
 
         // Update capabilities of existing grants (for a grantee)
-        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach(g -> {
+        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
             final Capability newCapability = selectedGranteeCapabilities.get(g.grantee());
             if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
@@ -232,7 +224,7 @@ public class EntitySharesService {
                         .build());
                 updateEventBuilder.addUpdates(g.grantee(), newCapability, g.capability());
             }
-        });
+        }));
 
         // Create newly added grants
         // TODO Create multiple entries with one db query
@@ -270,21 +262,15 @@ public class EntitySharesService {
      * Applies the share request to dependent entities, that we want to keep in sync.
      *
      * @param ownedEntity the parent entity
-     * @param request     sharing request
      * @param sharingUser the sharing user
      */
-    private void resolveImplicitGrants(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
-        List<GrantDTO> grantDtos = new ArrayList<>();
-        additionalGrantsResolvers.stream()
-                .map(resolver -> resolver.additionalGrants(ownedEntity))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(grantDtos::addAll);
+    private void resolveImplicitGrants(GRN ownedEntity, User sharingUser) {
+        List<GrantDTO> grantDtos = additionalGrantsResolvers.stream()
+                .flatMap(resolver -> resolver.additionalGrants(ownedEntity).stream())
+                .toList();
+        Map<GRN, Capability> capabilities = grantDtos.stream()
+                .collect(Collectors.toUnmodifiableMap(GrantDTO::grantee, GrantDTO::capability));
 
-        Map<GRN, Capability> capabilities = new HashMap<>();
-        grantDtos.forEach(dto -> {
-            capabilities.put(dto.grantee(), dto.capability());
-        });
         grantDtos.forEach(dto ->
                 updateOnlyEntityShares(dto.target(), EntityShareRequest.create(capabilities), sharingUser));
     }
