@@ -3,7 +3,9 @@ Upgrading to Graylog 6.3.x
 
 ## Breaking Changes
 
-- tbd
+- By introducing a report creator role in Enterprise, we change from the functionality in the 
+previous version that allowed every user to create reports to a more restrictive approach that a 
+user needs the report creator role from now on to create reports.
 
 ## Configuration File Changes
 
