@@ -129,6 +129,7 @@ class V20230601104500_AddSourcesPageV2Test {
     void freshInstallInstallsNewSourcesPage() {
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();
@@ -144,6 +145,7 @@ class V20230601104500_AddSourcesPageV2Test {
         previousMigrationHasRun();
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();
