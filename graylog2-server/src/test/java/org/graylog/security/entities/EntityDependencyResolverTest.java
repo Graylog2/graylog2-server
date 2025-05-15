@@ -156,4 +156,17 @@ class EntityDependencyResolverTest {
             assertThat(descriptor.owners().asList().get(0).grn().toString()).isEqualTo("grn::::user:jane");
         });
     }
+
+    @Test
+    @DisplayName("Try resolve with an event procedure dependency")
+    void resolveEventProcedureDependency() {
+        when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
+        final EntityDescriptor definitionDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_DEFINITION_V1).id(ModelId.of("54e3deadbeefdeadbeefafff")).build();
+        final EntityDescriptor procedureDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_PROCEDURE_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
+        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(definitionDescriptor, procedureDescriptor));
+
+        final GRN definitionGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
+        final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(definitionGrn);
+        assertThat(missingDependencies).hasSize(0);
+    }
 }

@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useStore } from 'stores/connect';
+import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 
-import AppConfig from 'util/AppConfig';
+const useInputTypes = () => {
+  const { inputTypes } = useStore(InputTypesStore);
 
-export const DEFAULT_PRODUCT_NAME = 'Graylog';
+  return inputTypes;
+};
 
-const useProductName = () => AppConfig.branding?.()?.product_name ?? DEFAULT_PRODUCT_NAME;
-
-export default useProductName;
+export default useInputTypes;

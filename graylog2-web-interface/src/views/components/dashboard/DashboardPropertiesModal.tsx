@@ -35,11 +35,19 @@ type Props = {
   dashboardId?: string;
 };
 
-const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle, submitButtonText, dashboardId = null }: Props) => {
+const DashboardPropertiesModal = ({
+  onClose,
+  onSave,
+  show,
+  view,
+  title: modalTitle,
+  submitButtonText,
+  dashboardId = null,
+}: Props) => {
   const [updatedDashboard, setUpdatedDashboard] = useState(view);
   const [sharePayload, setSharePayload] = useState(null);
   const pluggableFormComponents = useSaveViewFormControls();
-  
+
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     let value = FormsUtils.getValueFromInput(event.target);
@@ -107,13 +115,14 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
           onChange={_onChange}
           value={updatedDashboard.description}
         />
-        <EntityCreateShareFormGroup
-          description='Search for a User or Team to add as collaborator on this dashboard.'
-          entityType='dashboard'
-          entityTitle=''
-          entityId={dashboardId}
-          onSetEntityShare={(payload) => setSharePayload(payload)}
-        />
+        {dashboardId !== view.id && (
+          <EntityCreateShareFormGroup
+            description="Search for a User or Team to add as collaborator on this dashboard."
+            entityType="dashboard"
+            entityTitle=""
+            onSetEntityShare={(payload) => setSharePayload(payload)}
+          />
+        )}
         {pluggableFormComponents?.map(({ component: Component, id }) => Component && <Component key={id} />)}
       </>
     </BootstrapModalForm>

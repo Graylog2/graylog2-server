@@ -17,6 +17,7 @@
 import NumberUtils from 'util/NumberUtils';
 
 import createEvent from './CreateEvent';
+import { isValidURL } from './URLUtils';
 
 export const getValueFromInput = (input) => {
   switch (input.type) {
@@ -56,6 +57,12 @@ export const validateValue = (fieldValue, conditionType, conditionValue) => {
       break;
     case 'max':
       if (fieldValue > Number(conditionValue)) return `Must be smaller than ${conditionValue}.`;
+      break;
+    case 'url':
+      if (fieldValue) {
+        if (conditionValue && !isValidURL(fieldValue)) return 'Must be a URL.';
+        if (!conditionValue && isValidURL(fieldValue)) return 'Must not be a URL.';
+      }
       break;
     default:
       return undefined;
