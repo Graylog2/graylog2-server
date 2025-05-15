@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import AppConfig from 'util/AppConfig';
 
-import useFeaturesCustomization from 'brand-customization/useFeaturesCustomization';
+const useFeaturesCustomization = () => ({
+  aiInvestigationReport: AppConfig?.branding?.()?.features?.ai_investigation_report,
+});
 
-const useInvestigationReportingByAICustomization = () => {
-  const { aiInvestigationReport } = useFeaturesCustomization();
-
-  return {
-    enabled: aiInvestigationReport?.enabled !== false,
-  };
-};
-
-export default useInvestigationReportingByAICustomization;
+export default useFeaturesCustomization;
