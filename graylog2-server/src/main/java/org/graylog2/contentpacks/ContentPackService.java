@@ -29,6 +29,7 @@ import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.authz.annotation.Logical;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
@@ -49,6 +50,7 @@ import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackV1;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.LegacyContentPack;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -167,27 +169,7 @@ public class ContentPackService {
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
                 final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
 
-                facade.getCreatePermissions(entity)
-                        .flatMap(permissions -> {
-                            if (permissions.operator().equals(Logical.AND)) {
-                                return permissions.permissions().stream()
-                                        .filter(p -> !userContext.isPermitted(p))
-                                        .peek(p -> LOG.warn("Missing permission <{}>", p))
-                                        .findFirst();
-                            } else {
-                                if (permissions.permissions().stream()
-                                        .anyMatch(userContext::isPermitted)) {
-                                    return Optional.empty();
-                                } else {
-                                    return permissions.permissions().stream()
-                                            .filter(p -> !userContext.isPermitted(p))
-                                            .peek(p -> LOG.warn("Missing OR permission <{}>", p))
-                                            .findFirst();
-                                }
-                            }
-                        }).ifPresent(p -> {
-                            throw new IllegalArgumentException("Missing permissions");
-                        });
+                facade.getCreatePermissions(entity).ifPresent(p -> checkPermissions(p, userContext));
 
                 if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
                     final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
@@ -595,4 +577,17 @@ public class ContentPackService {
             throw new MissingParametersException(missingParameters);
         }
     }
+
+    private void checkPermissions(EntityPermissions permissions, UserContext userContext) {
+        boolean permitted = (permissions.operator().equals(Logical.AND)) ?
+                permissions.permissions().stream().allMatch(userContext::isPermitted) :
+                permissions.permissions().stream().anyMatch(userContext::isPermitted);
+        if (!permitted) {
+            permissions.permissions().stream()
+                    .filter(p -> !userContext.isPermitted(p))
+                    .forEach(p -> LOG.error("Missing permission <{}> (Logical {})", p, permissions.operator()));
+            throw new ForbiddenException("Missing permissions");
+        }
+    }
+
 }

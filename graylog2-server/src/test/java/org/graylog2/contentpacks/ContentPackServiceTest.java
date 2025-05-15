@@ -40,6 +40,7 @@ import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
@@ -102,6 +103,7 @@ import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -263,7 +265,7 @@ public class ContentPackServiceTest {
     }
 
     @Test
-    @WithAuthorization(permissions = {"*"})
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, RestPermissions.EVENT_DEFINITIONS_CREATE})
     public void installContentPackWithSystemStreamDependencies() throws Exception {
         ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
         ContentPackV1 contentPack = ContentPackV1.builder()
