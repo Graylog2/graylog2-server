@@ -34,8 +34,11 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog.security.UserContext;
+import org.graylog.security.UserContextMissingException;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroSecurityContext;
+import org.graylog2.shared.users.UserService;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -123,6 +126,26 @@ public class SecurityTestUtils {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Convenience method to obtain a Graylog UserContext.
+     * This method should be called either in methods annotated with @WithAuthorization or after setting up the security
+     * context manually using setupSecurityContext().
+     * If UserContext.getUser is used, the userService must return a valid user for the generated user
+     * in this SecurityContext.
+     *
+     * @param userService userService implementing/mocking getUser, if needed
+     * @return Graylog UserContext
+     */
+    public static UserContext getUserContext(UserService userService) {
+        try {
+            return new UserContext.Factory(userService).create();
+        } catch (UserContextMissingException e) {
+            throw new RuntimeException("SecurityContext missing. Please set up a security context with setupSecurityContext() " +
+                    "or by using the @WithAuthorization annotation", e);
+        }
+    }
+
 
     /**
      *

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
@@ -52,9 +51,11 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.security.UserContext;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
@@ -99,6 +100,7 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.security.SecurityTestUtils;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -348,23 +350,9 @@ public class ContentPackServiceTest {
                 .id(ModelId.of("dead-beef"))
                 .build();
 
-        Input input = mock(Input.class);
-        GELFUDPInput gelfUDPInput = mock(GELFUDPInput.class);
-        when(messageInputFactory.create(any(), any())).thenReturn(gelfUDPInput);
-        when(inputService.find(any())).thenReturn(input);
-        when(input.getId()).thenReturn("id1");
-        when(input.getTitle()).thenReturn("myGelfUDP");
-
-        ArgumentCaptor<ContentPackInstallation> captor = ArgumentCaptor.forClass(ContentPackInstallation.class);
-        when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
-
-        when(configuration.isCloud()).thenReturn(false);
-        when(mockUser.getId()).thenReturn(TEST_USER);
-        when(mockUser.getName()).thenReturn(TEST_USER);
-        when(userService.load(TEST_USER)).thenReturn(mockUser);
-        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
-        assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER))
-                .isInstanceOf(ForbiddenException.class);
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", userContext))
+                .isInstanceOf(ContentPackException.class);
     }
 
     @Test
