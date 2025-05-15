@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Provider;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
@@ -70,6 +71,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class EventDefinitionHandlerTest {
     public final Set<EntityScope> ENTITY_SCOPES = Set.of(new DefaultEntityScope(), new TestEntityScope());
@@ -87,6 +89,9 @@ public class EventDefinitionHandlerTest {
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
+
+    @Mock
+    Provider<EntitySharesService> entitySharesServiceProvider;
 
     private EventDefinitionHandler handler;
     private JobSchedulerTestClock clock;
@@ -114,7 +119,7 @@ public class EventDefinitionHandlerTest {
         this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
-        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
+        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock);
     }
 
     @Test
@@ -170,6 +175,8 @@ public class EventDefinitionHandlerTest {
 
     @Test
     public void duplicate() {
+        EntitySharesService entitySharesService = mock(EntitySharesService.class);
+        when(entitySharesServiceProvider.get()).thenReturn(entitySharesService);
         final EventDefinitionDto newDto = EventDefinitionDto.builder()
                 .title("Test")
                 .description("A test event definition")
@@ -188,7 +195,7 @@ public class EventDefinitionHandlerTest {
                 .build();
 
         final var existingEvent = eventDefinitionService.save(newDto);
-        final var duplicated = handler.duplicate(mock(EntitySharesService.class), existingEvent, mock(User.class));
+        final var duplicated = handler.duplicate(existingEvent, mock(User.class));
         final var saved = eventDefinitionService.get(duplicated.id()).get();
 
         assertThat(saved.title()).startsWith("COPY-");

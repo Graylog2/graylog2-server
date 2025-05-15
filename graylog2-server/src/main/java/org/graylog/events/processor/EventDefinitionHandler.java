@@ -18,6 +18,7 @@ package org.graylog.events.processor;
 
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.bson.conversions.Bson;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
@@ -58,16 +59,22 @@ public class EventDefinitionHandler {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
+
+    // Provider to avoid circular dependency
+    private final Provider<EntitySharesService> entitySharesServiceProvider;
+
     private final JobSchedulerClock clock;
 
     @Inject
     public EventDefinitionHandler(DBEventDefinitionService eventDefinitionService,
                                   DBJobDefinitionService jobDefinitionService,
                                   DBJobTriggerService jobTriggerService,
+                                  Provider<EntitySharesService> entitySharesServiceProvider,
                                   JobSchedulerClock clock) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
+        this.entitySharesServiceProvider = entitySharesServiceProvider;
         this.clock = clock;
     }
 
@@ -99,12 +106,11 @@ public class EventDefinitionHandler {
      * The new copy will be disabled by default and will have the {@link DefaultEntityScope}.
      * Also the title will be prefixed with the string "COPY-".
      *
-     * @param entitySharesService the entity shares service. Passing this as a parameter to avoid circular dependency.
      * @param eventDefinition the event definition to copy
      * @param user            the user who copied this eventDefinition. If empty, no ownership will be registered.
      * @return the newly created event definition
      */
-    public EventDefinitionDto duplicate(EntitySharesService entitySharesService, EventDefinitionDto eventDefinition, User user) {
+    public EventDefinitionDto duplicate(EventDefinitionDto eventDefinition, User user) {
         var copy = eventDefinition.toBuilder()
                 .id(null)
                 .title("COPY-" + eventDefinition.title())
@@ -114,7 +120,7 @@ public class EventDefinitionHandler {
                 .build();
 
         EventDefinitionDto copyDto = createWithoutSchedule(copy, Optional.of(user));
-        entitySharesService.cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), user);
+        entitySharesServiceProvider.get().cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), user);
 
         return copyDto;
     }
