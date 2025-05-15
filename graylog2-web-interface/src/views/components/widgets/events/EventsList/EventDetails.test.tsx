@@ -50,6 +50,7 @@ describe('EventDetails', () => {
           'views.components.eventActions': [],
           eventDefinitionTypes: [],
           perspectives: [defaultPerspective],
+          'views.components.eventProcedureSummary': [],
         })[entityKey],
     );
 
@@ -60,7 +61,7 @@ describe('EventDetails', () => {
       data: mockEventData.event,
       isLoading: false,
       isFetched: true,
-      refetch: () => {},
+      refetch: () => { },
     }));
   });
 

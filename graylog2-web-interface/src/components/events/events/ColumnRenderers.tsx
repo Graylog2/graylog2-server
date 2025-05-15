@@ -24,7 +24,6 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
-import AppConfig from 'util/AppConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
@@ -45,7 +44,7 @@ const EventDefinitionRenderer = ({
   return <EventDefinitionLink id={eventDefinitionId} title={title} />;
 };
 
-const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
+const EventDefinitionTypeRenderer = ({ type }: { type: string; }) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const plugin = useMemo(() => {
     if (!type) {
@@ -58,10 +57,10 @@ const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
   return <>{(plugin && plugin.displayName) || type}</>;
 };
 
-const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) =>
+const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string; }; }) =>
   isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFields fields={fields} />;
 
-const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string> }) =>
+const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string>; }) =>
   isEmpty(groupByFields) ? <em>No group-by fields on this Event.</em> : <EventFields fields={groupByFields} />;
 
 const RemediationStepRenderer = ({
@@ -81,7 +80,7 @@ const RemediationStepRenderer = ({
   );
 };
 
-const EventProcedureRenderer = ({ eventId, eventProcedureId }: { eventId: string; eventProcedureId: string }) => {
+const EventProcedureRenderer = ({ eventId, eventProcedureId }: { eventId: string; eventProcedureId: string; }) => {
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
 
   return (
@@ -101,7 +100,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export const MessageRenderer = ({ message, eventId }: { message: string; eventId: string }) => {
+export const MessageRenderer = ({ message, eventId }: { message: string; eventId: string; }) => {
   const { toggleSection } = useExpandedSections();
 
   const toggleExtraSection = () => toggleSection(eventId, 'restFieldsExpandedSection');
@@ -109,7 +108,7 @@ export const MessageRenderer = ({ message, eventId }: { message: string; eventId
   return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
-const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
+const TimeRangeRenderer = ({ eventData }: { eventData: Event; }) =>
   eventData.timerange_start && eventData.timerange_end ? (
     <div>
       <Timestamp dateTime={new Date(eventData.timerange_start)} />
@@ -119,6 +118,16 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
   ) : (
     <em>No time range</em>
   );
+
+const ValidSecurityLicense = () => {
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
+
+  return validSecurityLicense;
+};
 
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
   T,
@@ -168,19 +177,15 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
-        const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
-
-        return (
-          <>
-            {isEventProceduresEnabled ? (
-              <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
-            ) : (
-              <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
-            )}
-          </>
-        );
-      },
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
+        <>
+          {ValidSecurityLicense ? (
+            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+          ) : (
+            <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+          )}
+        </>
+      ),
       width: 0.3,
     },
     timerange_start: {
