@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
@@ -133,6 +134,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -329,6 +331,40 @@ public class ContentPackServiceTest {
         when(configuration.isCloud()).thenReturn(true);
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
         assertThat(captor.getValue().entities()).isEmpty();
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void installContentPackWithMissingPermissionFails() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestGelfUDPEntity());
+        ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        Input input = mock(Input.class);
+        GELFUDPInput gelfUDPInput = mock(GELFUDPInput.class);
+        when(messageInputFactory.create(any(), any())).thenReturn(gelfUDPInput);
+        when(inputService.find(any())).thenReturn(input);
+        when(input.getId()).thenReturn("id1");
+        when(input.getTitle()).thenReturn("myGelfUDP");
+
+        ArgumentCaptor<ContentPackInstallation> captor = ArgumentCaptor.forClass(ContentPackInstallation.class);
+        when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
+
+        when(configuration.isCloud()).thenReturn(false);
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+        assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER))
+                .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
