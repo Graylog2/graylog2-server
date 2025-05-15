@@ -23,6 +23,8 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
@@ -40,20 +42,21 @@ public class NaturalDateParser {
     private final ZoneId zoneId;
     private final DateTimeZone dateTimeZone;
     private final Locale locale;
+    private final Clock clock;
 
     public NaturalDateParser() {
-        this("Etc/UTC", Locale.getDefault());
+        this("Etc/UTC", Locale.getDefault(), Clock.systemDefaultZone());
     }
 
     public NaturalDateParser(final Locale locale) {
-        this("Etc/UTC", locale);
+        this("Etc/UTC", locale, Clock.systemDefaultZone());
     }
 
     public NaturalDateParser(final String timeZone) throws IllegalArgumentException {
-        this(timeZone, Locale.getDefault());
+        this(timeZone, Locale.getDefault(), Clock.systemDefaultZone());
     }
 
-    public NaturalDateParser(final String timeZone, final Locale locale) throws IllegalArgumentException {
+    public NaturalDateParser(final String timeZone, final Locale locale, Clock clock) throws IllegalArgumentException {
         if (!isValidTimeZone(timeZone)) {
             throw new IllegalArgumentException("Invalid timeZone: " + timeZone);
         }
@@ -62,6 +65,7 @@ public class NaturalDateParser {
         this.timeZone = TimeZone.getTimeZone(timeZone);
         this.zoneId = ZoneId.of(timeZone);
         this.dateTimeZone = DateTimeZone.forTimeZone(this.timeZone);
+        this.clock = clock;
     }
 
     boolean isValidTimeZone(final String timeZone) {
@@ -129,7 +133,9 @@ public class NaturalDateParser {
     }
 
     public Result parse(final String string) throws DateNotParsableException {
-        return this.parse(string, new Date());
+        Instant instant = clock.instant();       // Get the current instant from the clock
+        Date date = Date.from(instant);
+        return this.parse(string, date);
     }
 
     Result parse(final String string, final Date referenceDate) throws DateNotParsableException {
