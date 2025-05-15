@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.users;
 
-import AppConfig from 'util/AppConfig';
+import org.graylog2.shared.users.Role;
 
-export const DEFAULT_PRODUCT_NAME = 'Graylog';
-
-const useProductName = () => AppConfig.branding?.()?.product_name ?? DEFAULT_PRODUCT_NAME;
-
-export default useProductName;
+/**
+ * Fired every time a role is persisted or deleted.
+ *
+ * @param roleName name from {@link Role#getName()}
+ */
+public record RoleChangedEvent(String roleName) {
+}
