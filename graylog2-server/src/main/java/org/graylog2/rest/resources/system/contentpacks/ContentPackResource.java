@@ -40,6 +40,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
@@ -102,8 +103,8 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
+    @RequiresPermissions(RestPermissions.CONTENT_PACK_READ)
     public ContentPackList listContentPacks() {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
         Set<ModelId> contentPackIds = contentPacks.stream().map(x -> x.id()).collect(Collectors.toSet());
         Map<ModelId, Map<Integer, ContentPackMetadata>> metaData =

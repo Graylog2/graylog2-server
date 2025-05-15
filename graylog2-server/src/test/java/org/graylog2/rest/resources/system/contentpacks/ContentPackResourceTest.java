@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.contentpacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
@@ -49,6 +50,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -96,6 +98,13 @@ public class ContentPackResourceTest {
                 contentPackService,
                 contentPackPersistenceService,
                 contentPackInstallationPersistenceService);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {})
+    public void testListContentPacksRequiresPermissionFail() {
+        assertThatThrownBy(() -> contentPackResource.listContentPacks())
+                .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
