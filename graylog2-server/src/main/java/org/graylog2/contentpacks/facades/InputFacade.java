@@ -635,9 +635,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         if (entity instanceof EntityV1 entityV1) {
             final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
             String type = inputEntity.type().asString();
-            return Optional.of(new EntityPermissions(
-                    List.of(RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + type
-                    )));
+            return EntityPermissions.of(RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + type);
         } else {
             return Optional.empty();
         }

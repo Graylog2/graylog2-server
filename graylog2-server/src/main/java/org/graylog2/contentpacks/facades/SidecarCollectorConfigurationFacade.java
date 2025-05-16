@@ -208,6 +208,6 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(SidecarRestPermissions.CONFIGURATIONS_CREATE)));
+        return EntityPermissions.of(SidecarRestPermissions.CONFIGURATIONS_CREATE);
     }
 }

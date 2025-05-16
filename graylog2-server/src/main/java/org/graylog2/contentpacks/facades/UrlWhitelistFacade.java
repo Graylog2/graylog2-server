@@ -123,6 +123,6 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.URL_WHITELIST_WRITE)));
+        return EntityPermissions.of(RestPermissions.URL_WHITELIST_WRITE);
     }
 }

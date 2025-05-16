@@ -186,6 +186,6 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.LOOKUP_TABLES_CREATE)));
+        return EntityPermissions.of(RestPermissions.LOOKUP_TABLES_CREATE);
     }
 }

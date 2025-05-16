@@ -199,6 +199,6 @@ public class OutputFacade implements EntityFacade<Output> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.OUTPUTS_CREATE)));
+        return EntityPermissions.of(RestPermissions.OUTPUTS_CREATE);
     }
 }

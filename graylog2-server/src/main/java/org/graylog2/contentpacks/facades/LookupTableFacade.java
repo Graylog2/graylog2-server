@@ -284,6 +284,6 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.LOOKUP_TABLES_CREATE)));
+        return EntityPermissions.of(RestPermissions.LOOKUP_TABLES_CREATE);
     }
 }

@@ -224,6 +224,6 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.EVENT_DEFINITIONS_CREATE)));
+        return EntityPermissions.of(RestPermissions.EVENT_DEFINITIONS_CREATE);
     }
 }

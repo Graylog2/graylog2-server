@@ -358,6 +358,6 @@ public class StreamFacade implements EntityFacade<Stream> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.STREAMS_CREATE)));
+        return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
     }
 }

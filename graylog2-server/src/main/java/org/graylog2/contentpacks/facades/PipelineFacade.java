@@ -346,6 +346,6 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(PipelineRestPermissions.PIPELINE_CREATE)));
+        return EntityPermissions.of(PipelineRestPermissions.PIPELINE_CREATE);
     }
 }

@@ -150,6 +150,4 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
     default Optional<EntityPermissions> getCreatePermissions(Entity entity) {
         return Optional.empty();
     }
-
-    ;
 }

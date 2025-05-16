@@ -19,7 +19,9 @@ package org.graylog2.contentpacks.model;
 
 import org.apache.shiro.authz.annotation.Logical;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public record EntityPermissions(List<String> permissions, Logical operator) {
 
@@ -27,4 +29,11 @@ public record EntityPermissions(List<String> permissions, Logical operator) {
         this(permissions, Logical.AND);
     }
 
+    public static Optional<EntityPermissions> of(String... permissions) {
+        if (permissions == null || permissions.length == 0) {
+            return Optional.empty();
+        } else {
+            return Optional.of(new EntityPermissions(Arrays.asList(permissions)));
+        }
+    }
 }

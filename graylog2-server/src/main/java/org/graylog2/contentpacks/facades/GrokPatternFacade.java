@@ -228,6 +228,6 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.INPUTS_CREATE)));
+        return EntityPermissions.of(RestPermissions.INPUTS_CREATE);
     }
 }

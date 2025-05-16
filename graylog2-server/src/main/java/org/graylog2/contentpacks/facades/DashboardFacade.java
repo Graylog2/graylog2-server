@@ -52,6 +52,6 @@ public class DashboardFacade extends ViewFacade implements DashboardEntityCreato
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return Optional.of(new EntityPermissions(List.of(RestPermissions.DASHBOARDS_CREATE)));
+        return EntityPermissions.of(RestPermissions.DASHBOARDS_CREATE);
     }
 }
