@@ -70,7 +70,7 @@ const useShowRouteForEntity = (id: string, type: string) => {
     case 'sigma_rule':
       return Routes.getPluginRoute('SECURITY_SIGMA');
     case 'report':
-      return Routes.getPluginRoute('REPORTS_REPORTID_CONFIGURATION')?.(id);
+      return Routes.getPluginRoute('REPORTS_REPORTID_ARCHIVE')?.(id);
     case 'role':
       return Routes.SYSTEM.AUTHZROLES.show(id);
     case 'output':

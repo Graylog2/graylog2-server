@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import AppConfig from 'util/AppConfig';
+import useFeaturesCustomization from 'brand-customization/useFeaturesCustomization';
 
-export const DEFAULT_PRODUCT_NAME = 'Graylog';
+const useInvestigationReportingByAICustomization = () => {
+  const { aiInvestigationReport } = useFeaturesCustomization();
 
-const useProductName = () => AppConfig.branding?.()?.product_name ?? DEFAULT_PRODUCT_NAME;
+  return {
+    enabled: aiInvestigationReport?.enabled !== false,
+  };
+};
 
-export default useProductName;
+export default useInvestigationReportingByAICustomization;

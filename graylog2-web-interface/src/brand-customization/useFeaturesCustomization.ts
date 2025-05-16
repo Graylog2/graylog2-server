@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import AppConfig from 'util/AppConfig';
 
-export const DEFAULT_PRODUCT_NAME = 'Graylog';
+const useFeaturesCustomization = () => ({
+  aiInvestigationReport: AppConfig?.branding?.()?.features?.ai_investigation_report,
+});
 
-const useProductName = () => AppConfig.branding?.()?.product_name ?? DEFAULT_PRODUCT_NAME;
-
-export default useProductName;
+export default useFeaturesCustomization;
