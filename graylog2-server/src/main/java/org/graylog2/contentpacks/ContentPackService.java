@@ -579,15 +579,11 @@ public class ContentPackService {
     }
 
     private void checkPermissions(EntityPermissions permissions, UserContext userContext) {
-        boolean permitted = (permissions.operator().equals(Logical.AND)) ?
-                permissions.permissions().stream().allMatch(userContext::isPermitted) :
-                permissions.permissions().stream().anyMatch(userContext::isPermitted);
-        if (!permitted) {
+        if (!permissions.isPermitted(userContext)) {
             permissions.permissions().stream()
                     .filter(p -> !userContext.isPermitted(p))
                     .forEach(p -> LOG.error("Missing permission <{}> (Logical {})", p, permissions.operator()));
             throw new ForbiddenException("Missing permissions");
         }
     }
-
 }

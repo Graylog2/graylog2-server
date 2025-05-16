@@ -18,6 +18,7 @@
 package org.graylog2.contentpacks.model;
 
 import org.apache.shiro.authz.annotation.Logical;
+import org.graylog.security.UserContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,5 +36,12 @@ public record EntityPermissions(List<String> permissions, Logical operator) {
         } else {
             return Optional.of(new EntityPermissions(Arrays.asList(permissions)));
         }
+    }
+
+
+    public boolean isPermitted(UserContext userContext) {
+        return (operator().equals(Logical.AND)) ?
+                permissions().stream().allMatch(userContext::isPermitted) :
+                permissions().stream().anyMatch(userContext::isPermitted);
     }
 }
