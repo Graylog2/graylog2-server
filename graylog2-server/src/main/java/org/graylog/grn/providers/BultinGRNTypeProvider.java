@@ -18,10 +18,9 @@ package org.graylog.grn.providers;
 
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypeProvider;
+import org.graylog.grn.GRNTypes;
 
 import java.util.Set;
-
-import static org.graylog.grn.GRNTypes.builtinTypes;
 
 /**
  * Default provider for GRN types
@@ -29,6 +28,6 @@ import static org.graylog.grn.GRNTypes.builtinTypes;
 public class BultinGRNTypeProvider implements GRNTypeProvider {
     @Override
     public Set<GRNType> getTypes() {
-        return builtinTypes();
+        return GRNTypes.builtinTypes();
     }
 }

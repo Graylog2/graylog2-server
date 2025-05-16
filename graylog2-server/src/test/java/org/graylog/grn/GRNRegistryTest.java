@@ -102,6 +102,7 @@ class GRNRegistryTest {
             assertThat(parse2.type()).isEqualTo("provided2");
         }
 
+        @Test
         void parseIllegal() {
             assertThatThrownBy(() -> registry.parse("grn::::dummy:123"))
                     .isInstanceOf(IllegalArgumentException.class);
