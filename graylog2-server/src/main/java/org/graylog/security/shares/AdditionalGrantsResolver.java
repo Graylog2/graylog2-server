@@ -14,31 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
+package org.graylog.security.shares;
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
-};
+import jakarta.annotation.Nonnull;
+import org.graylog.grn.GRN;
+import org.graylog.security.GrantDTO;
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-  'sigma_rule',
-]);
+import java.util.Collection;
 
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
-};
-
-export default getTitleForEntityType;
+public interface AdditionalGrantsResolver {
+    /**
+     * Return additional grants based on the specified primary entity.
+     *
+     * @param primaryEntity The primary entity
+     * @return A collection of related grants; or empty collection, if there are none.
+     */
+    @Nonnull
+    Collection<GrantDTO> additionalGrants(GRN primaryEntity);
+}

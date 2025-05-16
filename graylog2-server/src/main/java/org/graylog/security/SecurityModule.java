@@ -20,6 +20,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
@@ -38,6 +39,7 @@ import org.graylog.security.authservice.rest.HTTPHeaderAuthenticationConfigResou
 import org.graylog.security.authzroles.AuthzRolesResource;
 import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
+import org.graylog.security.shares.AdditionalGrantsResolver;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
@@ -60,9 +62,10 @@ public class SecurityModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), PermissionAndRoleResolver.class)
                 .setDefault().to(DefaultPermissionAndRoleResolver.class);
-
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
+
+        Multibinder.newSetBinder(binder(), AdditionalGrantsResolver.class);
 
         bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 

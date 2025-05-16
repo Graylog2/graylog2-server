@@ -46,7 +46,7 @@ import EntityShareValidationsDependencies from './EntityShareValidationsDependen
 type Props = {
   description: string;
   entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityTitle?: $PropertyType<SharedEntity, 'title'>;
   entityId?: string;
   entityTypeTitle?: string | null | undefined;
   onSetEntityShare: (payload: EntitySharePayload) => void;
@@ -72,7 +72,7 @@ const getAvailableGrantee = (grantees: GranteesListType, selected: SelectedGrant
 const EntityCreateShareFormGroup = ({
   description,
   entityType,
-  entityTitle,
+  entityTitle = '',
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',

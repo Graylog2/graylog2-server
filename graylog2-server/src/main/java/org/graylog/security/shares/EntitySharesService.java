@@ -61,20 +61,23 @@ public class EntitySharesService {
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
     private final EventBus serverEventBus;
+    private final Set<AdditionalGrantsResolver> additionalGrantsResolvers;
 
     @Inject
     public EntitySharesService(DBGrantService grantService,
-                                   EntityDependencyResolver entityDependencyResolver,
-                                   EntityDependencyPermissionChecker entityDependencyPermissionChecker,
-                                   GRNRegistry grnRegistry,
-                                   GranteeService granteeService,
-                                   EventBus serverEventBus) {
+                               EntityDependencyResolver entityDependencyResolver,
+                               EntityDependencyPermissionChecker entityDependencyPermissionChecker,
+                               GRNRegistry grnRegistry,
+                               GranteeService granteeService,
+                               EventBus serverEventBus,
+                               Set<AdditionalGrantsResolver> additionalGrantsResolvers) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
         this.serverEventBus = serverEventBus;
+        this.additionalGrantsResolvers = additionalGrantsResolvers;
     }
 
     /**
@@ -84,17 +87,12 @@ public class EntitySharesService {
      * @param ownedEntity    the entity that should be shared and is owned by the sharing user
      * @param request        sharing request
      * @param sharingUser    the sharing user
-     * @param sharingSubject the sharing subject
      * @return the response
      */
-    public EntityShareResponse prepareShare(GRN ownedEntity,
-                                            EntityShareRequest request,
-                                            User sharingUser,
-                                            Subject sharingSubject) {
+    public EntityShareResponse prepareShare(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser, ownedEntity);
@@ -164,6 +162,12 @@ public class EntitySharesService {
         return updateEntityShares(grnRegistry.newGRN(grnType, id), request, sharingUser);
     }
 
+    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        final EntityShareResponse result = updateOnlyEntityShares(ownedEntity, request, sharingUser);
+        resolveImplicitGrants(ownedEntity, sharingUser);
+        return result;
+    }
+
     /**
      * Share / unshare an entity with one or more grantees.
      * The grants in the request are created or, if they already exist, updated.
@@ -172,7 +176,7 @@ public class EntitySharesService {
      * @param request     the request containing grantees and their capabilities
      * @param sharingUser the user executing the request
      */
-    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+    private EntityShareResponse updateOnlyEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
@@ -255,6 +259,23 @@ public class EntitySharesService {
                 .build();
     }
 
+    /**
+     * Applies the share request to dependent entities, that we want to keep in sync.
+     *
+     * @param ownedEntity the parent entity
+     * @param sharingUser the sharing user
+     */
+    private void resolveImplicitGrants(GRN ownedEntity, User sharingUser) {
+        List<GrantDTO> grantDtos = additionalGrantsResolvers.stream()
+                .flatMap(resolver -> resolver.additionalGrants(ownedEntity).stream())
+                .toList();
+        Map<GRN, Capability> capabilities = grantDtos.stream()
+                .collect(Collectors.toUnmodifiableMap(GrantDTO::grantee, GrantDTO::capability));
+
+        grantDtos.forEach(dto ->
+                updateOnlyEntityShares(dto.target(), EntityShareRequest.create(capabilities), sharingUser));
+    }
+  
     /**
      * Add all grants of the original entity to the cloned entity, if they are visible to the sharing user.
      */
