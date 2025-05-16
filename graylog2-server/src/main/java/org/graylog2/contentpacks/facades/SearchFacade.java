@@ -19,12 +19,14 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.apache.shiro.authz.annotation.Logical;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.contentpacks.model.EntityPermissions;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -38,8 +40,13 @@ public class SearchFacade extends ViewFacade {
     public static final ModelType TYPE_V1 = ModelTypes.SEARCH_V1;
 
     @Inject
-    public SearchFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService, ViewSummaryService viewSummaryService, UserService userService) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
+    public SearchFacade(ObjectMapper objectMapper,
+                        SearchDbService searchDbService,
+                        ViewService viewService,
+                        ViewSummaryService viewSummaryService,
+                        UserService userService,
+                        EntityOwnershipService entityOwnershipService) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityOwnershipService);
     }
 
     @Override

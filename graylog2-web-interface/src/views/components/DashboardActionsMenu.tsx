@@ -202,7 +202,7 @@ const DashboardActionsMenu = () => {
         <DashboardPropertiesModal
           show
           view={view.toBuilder().newId().build()}
-          dashboardId={!isNewView && view.id}
+          dashboardId={view.id}
           title="Save new dashboard"
           submitButtonText="Create dashboard"
           onClose={() => setSaveNewDashboardOpen(false)}

@@ -33,6 +33,7 @@ import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.authz.annotation.Logical;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
+import org.graylog.security.GrantDTO;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -80,6 +81,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -320,6 +322,7 @@ public class ContentPackService {
         final Map<ModelId, Object> removedEntityObjects = new HashMap<>();
         final Set<NativeEntityDescriptor> failedEntities = new HashSet<>();
         final Set<NativeEntityDescriptor> skippedEntities = new HashSet<>();
+        final Map<ModelId, List<GrantDTO>> entityGrants = new HashMap<>();
 
         try {
             for (Entity entity : entitiesInOrder) {
@@ -350,6 +353,9 @@ public class ContentPackService {
                         final Object nativeEntity = nativeEntityOptional.get();
                         LOG.trace("Removing existing native entity for {}", nativeEntityDescriptor);
                         try {
+                            //noinspection unchecked
+                            List<GrantDTO> grants = facade.resolveGrants(((NativeEntity) nativeEntity).entity());
+                            entityGrants.put(entity.id(), grants);
                             // The EntityFacade#delete() method expects the actual entity object
                             //noinspection unchecked
                             facade.delete(((NativeEntity) nativeEntity).entity());
@@ -376,6 +382,7 @@ public class ContentPackService {
                 .entityObjects(ImmutableMap.copyOf(removedEntityObjects))
                 .skippedEntities(ImmutableSet.copyOf(skippedEntities))
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
+                .entityGrants(ImmutableMap.copyOf(entityGrants))
                 .build();
     }
 

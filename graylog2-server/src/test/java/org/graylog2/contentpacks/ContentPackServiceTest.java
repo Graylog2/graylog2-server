@@ -52,6 +52,7 @@ import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.security.UserContext;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
@@ -196,6 +197,8 @@ public class ContentPackServiceTest {
     ServerStatus serverStatus;
     @Mock
     Configuration configuration;
+    @Mock
+    EntityOwnershipService entityOwnershipService;
 
     private ContentPackService contentPackService;
     private Set<PluginMetaData> pluginMetaData;
@@ -221,8 +224,8 @@ public class ContentPackServiceTest {
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
-                ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
-                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
+                ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityOwnershipService),
+                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityOwnershipService),
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
                 );
@@ -421,6 +424,7 @@ public class ContentPackServiceTest {
                 .failedEntities(ImmutableSet.of())
                 .entities(nativeEntityDescriptors)
                 .entityObjects(entityObjectMap)
+                .entityGrants(ImmutableMap.of(ModelId.of("12345"), new ArrayList<>()))
                 .build();
 
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);

@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.facades.ViewFacade;
 import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelType;
@@ -57,8 +58,9 @@ public class DashboardV1Facade extends ViewFacade {
                              EntityConverter entityConverter,
                              ViewService viewService,
                              ViewSummaryService viewSummaryService,
-                             UserService userService) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
+                             UserService userService,
+                             EntityOwnershipService entityOwnershipService) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityOwnershipService);
         this.objectMapper = objectMapper;
         this.entityConverter = entityConverter;
     }

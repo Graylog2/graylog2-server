@@ -27,7 +27,6 @@ import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
-import useFeature from 'hooks/useFeature';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
@@ -62,7 +61,11 @@ const EventDefinitionSummary = ({
 }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
-  const isEventProceduresEnabled = useFeature('show_event_procedures');
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
 
   useEffect(() => {
     const flipShowValidation = () => {
@@ -84,7 +87,7 @@ const EventDefinitionSummary = ({
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
-        {isEventProceduresEnabled ? (
+        {validSecurityLicense ? (
           <>
             {!eventDefinition?.event_procedure ? (
               <>

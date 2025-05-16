@@ -53,6 +53,7 @@ public class EntityDependencyResolver {
             .put(GRNTypes.SEARCH, ImmutableSet.of(ModelTypes.OUTPUT_V1))
             .put(GRNTypes.STREAM, ImmutableSet.of(ModelTypes.OUTPUT_V1))
             .put(GRNTypes.DASHBOARD, ImmutableSet.of(ModelTypes.OUTPUT_V1))
+            .put(GRNTypes.EVENT_DEFINITION, ImmutableSet.of(ModelTypes.EVENT_PROCEDURE_V1))
             .build();
 
     @Inject

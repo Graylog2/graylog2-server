@@ -30,8 +30,11 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.grn.GRNTypes;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.security.GrantDTO;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.EntityPermissions;
@@ -68,6 +71,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
     private final UserService userService;
+    private final EntityOwnershipService entityOwnershipService;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
@@ -75,13 +79,15 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                                  Set<PluginMetaData> pluginMetaData,
                                  DBJobDefinitionService jobDefinitionService,
                                  DBEventDefinitionService eventDefinitionService,
-                                 UserService userService) {
+                                 UserService userService,
+                                 EntityOwnershipService entityOwnershipService) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
         this.userService = userService;
+        this.entityOwnershipService = entityOwnershipService;
     }
 
     @VisibleForTesting
@@ -220,6 +226,11 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public boolean usesScopedEntities() {
         return true;
+    }
+
+    @Override
+    public List<GrantDTO> resolveGrants(EventDefinitionDto nativeEntity) {
+        return entityOwnershipService.getGrantsForTarget(GRNTypes.EVENT_DEFINITION, nativeEntity.id());
     }
 
     @Override
