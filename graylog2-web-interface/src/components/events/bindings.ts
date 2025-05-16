@@ -28,17 +28,17 @@ const NOTIFICATIONS_TITLE = 'Notifications';
 const HasEventProceduresPlugin = () => {
   const pluggableEventProcedures = usePluginEntities('eventProcedures');
 
-  return pluggableEventProcedures[0]?.EventProcedures;
+  return pluggableEventProcedures[0]?.EventProcedures && typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
 };
 
 const ValidSecurityLicense = () => {
   const pluggableLicenseCheck = usePluginEntities('licenseCheck');
 
   const {
-    data: { valid: validSecurityLicense },
+    data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
   } = pluggableLicenseCheck[0]('/license/security');
 
-  return validSecurityLicense;
+  return validSecurityLicense && !violatedSecurityLicense;
 };
 
 const eventsBindings: PluginExports = {
