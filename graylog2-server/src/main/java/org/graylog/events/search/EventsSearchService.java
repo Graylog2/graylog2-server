@@ -65,9 +65,8 @@ public class EventsSearchService {
             return eventStreams;
         }
 
-        return eventStreams.stream()
-                .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                .collect(Collectors.toSet());
+        return subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, DEFAULT_SYSTEM_EVENTS_STREAM_ID)) ?
+                eventStreams : Set.of(DEFAULT_EVENTS_STREAM_ID);
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
