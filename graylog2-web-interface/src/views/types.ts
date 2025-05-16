@@ -523,20 +523,20 @@ export type SearchDataSource = {
 };
 
 type LICENSE_SUBJECTS = {
-  enterprise: '/license/enterprise',
-  archive: '/license/enterprise/archive',
-  auditlog: '/license/enterprise/auditlog',
-  illuminate: '/license/enterprise/illuminate',
-  searchFilter: '/license/enterprise/search-filter',
-  customization: '/license/enterprise/customization',
-  views: '/license/enterprise/views',
-  forwarder: '/license/enterprise/forwarder',
-  report: '/license/enterprise/report',
-  security: '/license/security',
-  anomaly: '/license/anomaly',
+  enterprise: '/license/enterprise';
+  archive: '/license/enterprise/archive';
+  auditlog: '/license/enterprise/auditlog';
+  illuminate: '/license/enterprise/illuminate';
+  searchFilter: '/license/enterprise/search-filter';
+  customization: '/license/enterprise/customization';
+  views: '/license/enterprise/views';
+  forwarder: '/license/enterprise/forwarder';
+  report: '/license/enterprise/report';
+  security: '/license/security';
+  anomaly: '/license/anomaly';
 };
 
-type LicenseSubject = (LICENSE_SUBJECTS)[keyof LICENSE_SUBJECTS];
+type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
 
 export type LicenseCheck = (subject: LicenseSubject) => {
   data: {
@@ -546,7 +546,7 @@ export type LicenseCheck = (subject: LicenseSubject) => {
   };
   isInitialLoading: boolean;
   refetch: () => void;
-}
+};
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
