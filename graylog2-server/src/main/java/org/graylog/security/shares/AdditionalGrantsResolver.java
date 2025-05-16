@@ -16,10 +16,11 @@
  */
 package org.graylog.security.shares;
 
-import com.google.common.collect.ImmutableCollection;
 import jakarta.annotation.Nonnull;
 import org.graylog.grn.GRN;
 import org.graylog.security.GrantDTO;
+
+import java.util.Collection;
 
 public interface AdditionalGrantsResolver {
     /**
@@ -29,5 +30,5 @@ public interface AdditionalGrantsResolver {
      * @return A collection of related grants; or empty collection, if there are none.
      */
     @Nonnull
-    ImmutableCollection<GrantDTO> additionalGrants(GRN primaryEntity);
+    Collection<GrantDTO> additionalGrants(GRN primaryEntity);
 }
