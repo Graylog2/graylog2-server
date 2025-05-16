@@ -34,24 +34,24 @@ type Props = {
   nodeValue?: string;
   titleValue?: string;
   typeName: string;
-  title: string;
-  includeTitleField: boolean;
+  title: React.ReactNode;
+  includeTitleField?: boolean;
   handleSubmit: (data: any) => void;
   values?: FormValues;
-  setShowModal: (boolean) => void;
+  setShowModal: (show: boolean) => void;
   submitButtonText: string;
 };
 
 const InputForm = ({
-  globalValue,
+  globalValue = false,
   configFields,
-  nodeValue,
-  titleValue,
+  nodeValue = undefined,
+  titleValue = undefined,
   title,
   typeName,
-  includeTitleField,
+  includeTitleField = undefined,
   handleSubmit,
-  values,
+  values = undefined,
   setShowModal,
   submitButtonText,
 }: Props) => {
@@ -138,10 +138,3 @@ const InputForm = ({
 };
 
 export default InputForm;
-
-InputForm.defaultProps = {
-  globalValue: false,
-  nodeValue: undefined,
-  titleValue: undefined,
-  values: undefined,
-};

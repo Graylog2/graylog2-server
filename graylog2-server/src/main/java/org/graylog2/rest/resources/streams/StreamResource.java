@@ -647,6 +647,8 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
         streamService.addOutputs(savedStreamObjectId, outputIds);
 
+        entitySharesService.cloneEntityGrants(GRNTypes.STREAM, streamId, savedStreamId, userContext.getUser());
+
         var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
