@@ -20,11 +20,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.facades.ViewFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -37,8 +39,6 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
@@ -55,8 +55,9 @@ public class DashboardV1Facade extends ViewFacade {
                              EntityConverter entityConverter,
                              ViewService viewService,
                              ViewSummaryService viewSummaryService,
-                             UserService userService) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
+                             UserService userService,
+                             EntityOwnershipService entityOwnershipService) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityOwnershipService);
         this.objectMapper = objectMapper;
         this.entityConverter = entityConverter;
     }
