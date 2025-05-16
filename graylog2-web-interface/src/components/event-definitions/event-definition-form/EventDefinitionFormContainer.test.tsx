@@ -69,8 +69,8 @@ jest.mock('stores/connect', () => ({
   default: jest.fn(
     (
       Component: React.ComponentType<React.ComponentProps<any>>,
-      stores: { [key: string]: any; },
-      _mapProps: (args: { [key: string]: any; }) => any,
+      stores: { [key: string]: any },
+      _mapProps: (args: { [key: string]: any }) => any,
     ) => {
       const storeProps = Object.fromEntries(
         Object.entries(stores).map(([key, store]) => [key, store.getInitialState()]),
@@ -193,8 +193,8 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
     <Component
       {...props}
       streams={[{ id: 'stream-id', title: 'stream-title' }]}
-      sendTelemetry={() => { }}
-      onChange={() => { }}
+      sendTelemetry={() => {}}
+      onChange={() => {}}
       currentUser={mockDefaultUser}
       validation={{ errors: {} }}
     />
@@ -234,9 +234,7 @@ describe('EventDefinitionFormContainer', () => {
       (entityKey) =>
         ({
           'views.components.eventProcedureSummary': [],
-          'licenseCheck': [
-            (_license: string) => ({ data: { valid: false } }),
-          ],
+          'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
         })[entityKey],
     );
   });
