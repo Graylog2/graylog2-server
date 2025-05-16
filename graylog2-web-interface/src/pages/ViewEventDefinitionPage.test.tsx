@@ -20,6 +20,8 @@ import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
+import Routes from 'routing/Routes';
+import usePluginEntities from 'hooks/usePluginEntities';
 import mockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -63,10 +65,22 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>
   mockComponent('EventDefinitionSummary'),
 );
+jest.mock('hooks/usePluginEntities');
 
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
+          'eventProcedures': [],
+          'alerts.pageNavigation': [
+            { description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST },
+          ],
+          'eventDefinitions.components.editSigmaModal': [],
+        })[entityKey],
+    );
   });
 
   it('should display the event definition page', async () => {
