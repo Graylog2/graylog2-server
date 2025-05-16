@@ -23,6 +23,7 @@ import Popover from 'components/common/Popover';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { GRN } from 'logic/permissions/types';
 
 import styles from './SavedSearchForm.css';
 
@@ -34,6 +35,7 @@ type Props = React.PropsWithChildren<{
   isCreateNew: boolean;
   value: string;
   viewId?: string;
+  selectedStreamGRN?: Array<GRN>;
 }>;
 
 const stopEvent = (e) => {
@@ -51,6 +53,7 @@ const SavedSearchForm = ({
   toggleModal,
   value,
   viewId = null,
+  selectedStreamGRN = null,
 }: Props) => {
   const [title, setTitle] = useState(value);
   const [sharePayload, setSharePayload] = useState(null);
@@ -84,6 +87,7 @@ const SavedSearchForm = ({
             entityType="search"
             entityTitle=""
             entityId={isCreateNew ? null : viewId}
+            dependenciesGRN={selectedStreamGRN}
             onSetEntityShare={(payload) => setSharePayload(payload)}
           />
           <ButtonToolbar>
