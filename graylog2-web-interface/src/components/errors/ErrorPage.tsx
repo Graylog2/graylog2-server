@@ -60,7 +60,7 @@ const ErrorPageStyles = createGlobalStyle`
 `;
 
 const ErrorPage = ({
-  children,
+  children = undefined,
   title,
   description,
   backgroundImage = NotFoundBackgroundImage,
