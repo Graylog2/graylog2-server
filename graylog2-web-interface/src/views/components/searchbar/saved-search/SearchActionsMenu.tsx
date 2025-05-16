@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
-import * as Immutable from 'immutable';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -43,7 +42,6 @@ import useIsNew from 'views/hooks/useIsNew';
 import useView from 'views/hooks/useView';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
-import useQueryFilters from 'views/logic/queries/useQueryFilters';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -53,8 +51,7 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
 import { createGRN } from 'logic/permissions/GRN';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import { filtersToStreamSet } from 'views/logic/queries/Query';
+import useSelectedStreamsGRN from "views/hooks/useSelectedStreamsGRN";
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -112,8 +109,6 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
 const SearchActionsMenu = () => {
   const dirty = useIsDirty();
   const view = useView();
-  const queryFilters = useQueryFilters();
-  const currentQuery = useCurrentQuery();
   const isNew = useIsNew();
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
@@ -128,6 +123,7 @@ const SearchActionsMenu = () => {
   const currentTitle = view?.title ?? '';
   const dispatch = useViewsDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
+  const { selectedStreamsGRN } = useSelectedStreamsGRN();
 
   const loaded = isNew === false;
   const disableReset = !(dirty || loaded);
@@ -227,9 +223,7 @@ const SearchActionsMenu = () => {
     callback: () => openFormModal(),
     scope: 'search',
   });
-  const streams = filtersToStreamSet(queryFilters.get(currentQuery.id, Immutable.Map())).toJS();
-  const selectedStreamGRN = streams?.map(stream => createGRN('stream', stream));
-  
+
   return (
     <Container aria-label="Search Meta Buttons">
       <SavedSearchForm
@@ -240,7 +234,7 @@ const SearchActionsMenu = () => {
         isCreateNew={isNew || !isAllowedToEdit}
         toggleModal={toggleFormModal}
         value={currentTitle}
-        selectedStreamGRN={selectedStreamGRN}
+        selectedStreamGRN={selectedStreamsGRN}
         viewId={!isNew && view.id}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>

@@ -102,10 +102,12 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
+      prepare_request: dependenciesGRN
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { ...payload, prepare_request: dependenciesGRN }).then((response) => {
-      onSetEntityShare(payload);
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
+      onSetEntityShare({ selected_grantee_capabilities: newSelectedCapabilities });
+
       resetSelection();
       setDisableSubmit(false);
 
@@ -122,10 +124,11 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
+      prepare_request,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, null, { ...payload, prepare_request }).then((response) => {
-      onSetEntityShare(payload);
+    return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
+      onSetEntityShare({ selected_grantee_capabilities: newSelectedGranteeCapabilities });
       setDisableSubmit(false);
 
       return response;
