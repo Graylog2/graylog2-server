@@ -22,11 +22,24 @@ import { Row } from 'components/bootstrap';
 
 const EventsPageNavigation = () => {
   const navigationItems = usePluginEntities('alerts.pageNavigation');
+  const pluggableEventProcedures = usePluginEntities('eventProcedures');
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
+
+  const hasEventProceduresPlugin = pluggableEventProcedures[0]?.EventProcedures && typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
+  const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
+
+  const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense;
   const formattedNavigationItems = navigationItems.map((item) => ({ title: item.description, path: item.path, exactPathMatch: item.description === 'Alerts & Events' }));
+
+  const filteredNavigationItems = shouldDisplayEventProcedures ? formattedNavigationItems : formattedNavigationItems.filter((item) => item.title !== 'Event Procedures');
 
   return (
     <Row>
-      <PageNavigation items={formattedNavigationItems} />
+      <PageNavigation items={filteredNavigationItems} />
     </Row>
   );
 };
