@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
-import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
+import NotFoundBackgroundImage from 'assets/error-page-bg.svg';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
@@ -60,7 +60,7 @@ const ErrorPageStyles = createGlobalStyle`
 `;
 
 const ErrorPage = ({
-  children,
+  children = undefined,
   title,
   description,
   backgroundImage = NotFoundBackgroundImage,
