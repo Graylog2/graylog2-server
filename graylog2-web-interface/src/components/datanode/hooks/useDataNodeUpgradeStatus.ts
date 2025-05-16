@@ -72,6 +72,7 @@ export interface DatanodeUpgradeStatus {
   shard_replication_enabled: boolean;
   cluster_state: ClusterState;
   server_version: Version;
+  warnings: string[];
 }
 
 export const saveNodeToUpgrade = (node_name: string) => localStorage.setItem('datanode-to-upgrade', node_name);
