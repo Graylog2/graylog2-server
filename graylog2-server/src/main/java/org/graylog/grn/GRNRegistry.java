@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -44,14 +43,14 @@ public class GRNRegistry {
 
     @Inject
     public GRNRegistry(Set<GRNTypeProvider> providers) {
-        Set<GRNType> providedTypes = providers.stream()
+        providers.stream()
                 .flatMap(provider -> provider.getTypes().stream())
-                .collect(Collectors.toSet());
-        providedTypes.forEach(this::registerType);
+                .forEach(this::registerType);
     }
 
     /**
      * Returns an empty registry.
+     *
      * @return the registry
      */
     public static GRNRegistry createEmpty() {

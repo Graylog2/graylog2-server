@@ -26,7 +26,7 @@ import static org.graylog.grn.GRNTypes.builtinTypes;
 /**
  * Default provider for GRN types
  */
-public class DefaultGRNTypeProvider implements GRNTypeProvider {
+public class BultinGRNTypeProvider implements GRNTypeProvider {
     @Override
     public Set<GRNType> getTypes() {
         return builtinTypes();
