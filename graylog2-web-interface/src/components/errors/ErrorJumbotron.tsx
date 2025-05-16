@@ -17,8 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
-import artiSvg from 'assets/arti.svg';
 
+import artiSvg from 'assets/arti.svg';
 import { Col, Jumbotron, Row } from 'components/bootstrap';
 
 const H1 = styled.h1(
