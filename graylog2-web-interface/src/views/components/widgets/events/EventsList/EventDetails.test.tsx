@@ -61,7 +61,7 @@ describe('EventDetails', () => {
       data: mockEventData.event,
       isLoading: false,
       isFetched: true,
-      refetch: () => { },
+      refetch: () => {},
     }));
   });
 
