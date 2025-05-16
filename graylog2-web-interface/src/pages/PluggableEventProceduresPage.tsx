@@ -26,7 +26,7 @@ const PluggableEventProceduresPage = () => {
 
   return (
     <>
-      {typeof EventProceduresPage !== 'undefined' && React.isValidElement(EventProceduresPage) && <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />}
+      <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />
     </>
   );
 };
