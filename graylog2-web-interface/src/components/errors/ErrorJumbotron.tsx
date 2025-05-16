@@ -17,6 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
+import artiSvg from 'assets/arti.svg';
 
 import { Col, Jumbotron, Row } from 'components/bootstrap';
 
@@ -43,10 +44,17 @@ type ErrorJumbotronProps = {
   title: string;
 };
 
+const StyledArti = styled.img`
+  height: 10rem;
+  float: right;
+`;
+const Arti = () => <StyledArti src={artiSvg} />;
+
 const ErrorJumbotron = ({ children, title }: ErrorJumbotronProps) => (
   <ContainerRow>
     <Col mdOffset={2} md={8}>
       <StyledErrorJumbotron>
+        <Arti />
         <H1>{title}</H1>
         {children}
       </StyledErrorJumbotron>
