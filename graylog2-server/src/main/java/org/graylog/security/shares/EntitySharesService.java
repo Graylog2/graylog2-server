@@ -16,7 +16,6 @@
  */
 package org.graylog.security.shares;
 
-import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
@@ -42,14 +41,12 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
@@ -165,6 +162,12 @@ public class EntitySharesService {
         return updateEntityShares(grnRegistry.newGRN(grnType, id), request, sharingUser);
     }
 
+    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        final EntityShareResponse result = updateOnlyEntityShares(ownedEntity, request, sharingUser);
+        resolveImplicitGrants(ownedEntity, sharingUser);
+        return result;
+    }
+
     /**
      * Share / unshare an entity with one or more grantees.
      * The grants in the request are created or, if they already exist, updated.
@@ -173,24 +176,10 @@ public class EntitySharesService {
      * @param request     the request containing grantees and their capabilities
      * @param sharingUser the user executing the request
      */
-    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest shareRequest, User sharingUser) {
+    private EntityShareResponse updateOnlyEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
-        requireNonNull(shareRequest, "request cannot be null");
+        requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-
-        final EntityShareRequest request = EntityShareRequest.create(
-                Stream.concat(
-                        shareRequest.selectedGranteeCapabilities().orElse(ImmutableMap.of()).entrySet().stream(),
-                        additionalGrantsResolvers.stream()
-                                .flatMap(resolver -> resolver.additionalGrants(ownedEntity).stream())
-                                .map(theGrant -> Map.entry(theGrant.grantee(), theGrant.capability()))
-                ).collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue,
-                                // Select the grant with the highest capability priority
-                                (a, b) -> Comparators.max(a, b, Comparator.comparingInt(Capability::priority))
-                        )
-                ));
 
         final ImmutableMap<GRN, Capability> selectedGranteeCapabilities = request.selectedGranteeCapabilities()
                 .orElse(ImmutableMap.of());
@@ -268,6 +257,23 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .build();
+    }
+
+    /**
+     * Applies the share request to dependent entities, that we want to keep in sync.
+     *
+     * @param ownedEntity the parent entity
+     * @param sharingUser the sharing user
+     */
+    private void resolveImplicitGrants(GRN ownedEntity, User sharingUser) {
+        List<GrantDTO> grantDtos = additionalGrantsResolvers.stream()
+                .flatMap(resolver -> resolver.additionalGrants(ownedEntity).stream())
+                .toList();
+        Map<GRN, Capability> capabilities = grantDtos.stream()
+                .collect(Collectors.toUnmodifiableMap(GrantDTO::grantee, GrantDTO::capability));
+
+        grantDtos.forEach(dto ->
+                updateOnlyEntityShares(dto.target(), EntityShareRequest.create(capabilities), sharingUser));
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
