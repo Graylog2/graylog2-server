@@ -37,6 +37,7 @@ import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
@@ -50,6 +51,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,5 +231,10 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public List<GrantDTO> resolveGrants(EventDefinitionDto nativeEntity) {
         return entityOwnershipService.getGrantsForTarget(GRNTypes.EVENT_DEFINITION, nativeEntity.id());
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.EVENT_DEFINITIONS_CREATE);
     }
 }
