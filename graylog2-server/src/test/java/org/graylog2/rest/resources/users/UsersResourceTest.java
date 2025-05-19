@@ -26,6 +26,7 @@ import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
@@ -43,6 +44,7 @@ import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
@@ -63,6 +65,8 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -72,6 +76,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -139,12 +144,23 @@ public class UsersResourceTest {
      * This tests the integration between the UsersResource and UserManagementServiceImpl.
      */
     @Test
-    public void createSuccess() throws ValidationException {
+    public void createSuccess() throws ValidationException, NotFoundException {
+        Role role = mock(Role.class);
+        when(role.getId()).thenReturn(new ObjectId().toHexString());
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        final Response response = usersResource.create(buildCreateUserRequest());
+        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE)));
         Assert.assertEquals(201, response.getStatus());
         verify(userManagementService).create(isA(UserImpl.class));
+    }
+
+    @Test
+    public void createFailureOnMissingRoleAssignPermission() throws ValidationException {
+        String testRole = "forbiddenRole";
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole))));
     }
 
     @Test
@@ -254,11 +270,11 @@ public class UsersResourceTest {
         }
     }
 
-    private CreateUserRequest buildCreateUserRequest() {
+    private CreateUserRequest buildCreateUserRequest(List<String> roles) {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                 TIMEZONE, SESSION_TIMEOUT,
-                startPage, Collections.emptyList(), false);
+                startPage, roles, false);
     }
 
     private Token createTokenAndPrepareMocks(Map<String, Object> owningUser, Map<String, Object> callingUser, boolean isAdmin) {
@@ -317,6 +333,7 @@ public class UsersResourceTest {
      */
     public static class TestUsersResource extends UsersResource {
 
+        private static final String ALLOWED_ROLE = "allowed_role";
         private final Subject subject;
 
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
@@ -335,6 +352,14 @@ public class UsersResourceTest {
         @Override
         protected Subject getSubject() {
             return subject;
+        }
+
+        @Override
+        protected void checkPermission(String permission, String instanceId) {
+            if (permission.equals(RestPermissions.ROLES_EDIT) && instanceId.equals(ALLOWED_ROLE)) {
+                return;
+            }
+            super.checkPermission(permission, instanceId);
         }
     }
 
