@@ -20,6 +20,7 @@ import chroma from 'chroma-js';
 
 import artiSvg from 'assets/arti.svg';
 import { Col, Jumbotron, Row } from 'components/bootstrap';
+import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
 const H1 = styled.h1(
   ({ theme }) => css`
@@ -50,16 +51,21 @@ const StyledArti = styled.img`
 `;
 const Arti = () => <StyledArti src={artiSvg} />;
 
-const ErrorJumbotron = ({ children, title }: ErrorJumbotronProps) => (
-  <ContainerRow>
-    <Col mdOffset={2} md={8}>
-      <StyledErrorJumbotron>
-        <Arti />
-        <H1>{title}</H1>
-        {children}
-      </StyledErrorJumbotron>
-    </Col>
-  </ContainerRow>
-);
+const ErrorJumbotron = ({ children, title }: ErrorJumbotronProps) => {
+  const productName = useProductName();
+  const isDefaultProduct = productName === DEFAULT_PRODUCT_NAME;
+
+  return (
+    <ContainerRow>
+      <Col mdOffset={2} md={8}>
+        <StyledErrorJumbotron>
+          {isDefaultProduct && <Arti />}
+          <H1>{title}</H1>
+          {children}
+        </StyledErrorJumbotron>
+      </Col>
+    </ContainerRow>
+  );
+};
 
 export default ErrorJumbotron;
