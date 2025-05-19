@@ -27,8 +27,10 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.primitives.Ints;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -70,11 +72,10 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.List;
@@ -626,6 +627,17 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
 
         public Map<String, Object> toMap() {
             return Map.of("type", type(), "configuration", configuration());
+        }
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        if (entity instanceof EntityV1 entityV1) {
+            final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
+            String type = inputEntity.type().asString();
+            return EntityPermissions.of(RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + type);
+        } else {
+            return Optional.empty();
         }
     }
 }
