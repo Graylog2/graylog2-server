@@ -16,25 +16,14 @@
  */
 package org.graylog.security;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog2.shared.security.RestPermissions;
 
-import java.util.Optional;
 import java.util.Set;
 
-@Singleton
-public class DefaultBuiltinCapabilities implements BuiltinCapabilities{
-    protected static ImmutableMap<Capability, CapabilityDescriptor> CAPABILITIES;
-
+public class DefaultBuiltinCapabilities implements CapabilityPermissions {
     @Override
-    public ImmutableMap<Capability, CapabilityDescriptor> capabilities() {
-        return CAPABILITIES;
-    }
-
-    protected Set<String> readPermissions() {
+    public Set<String> readPermissions() {
         return Set.of(
                 RestPermissions.STREAMS_READ,
                 RestPermissions.STREAM_OUTPUTS_READ,
@@ -47,7 +36,8 @@ public class DefaultBuiltinCapabilities implements BuiltinCapabilities{
         );
     }
 
-    protected Set<String> editPermissions() {
+    @Override
+    public Set<String> editPermissions() {
         return Set.of(
                 RestPermissions.STREAMS_EDIT,
                 RestPermissions.STREAMS_CHANGESTATE,
@@ -61,7 +51,8 @@ public class DefaultBuiltinCapabilities implements BuiltinCapabilities{
         );
     }
 
-    protected Set<String> deletePermissions() {
+    @Override
+    public Set<String> deletePermissions() {
         return Set.of(
                 RestPermissions.STREAM_OUTPUTS_DELETE,
                 ViewsRestPermissions.VIEW_DELETE,
@@ -70,34 +61,5 @@ public class DefaultBuiltinCapabilities implements BuiltinCapabilities{
                 RestPermissions.OUTPUTS_TERMINATE,
                 RestPermissions.SEARCH_FILTERS_DELETE
         );
-    }
-
-    public DefaultBuiltinCapabilities() {
-        CAPABILITIES = ImmutableMap.<Capability, CapabilityDescriptor>builder()
-                .put(Capability.VIEW, CapabilityDescriptor.create(
-                        Capability.VIEW,
-                        "Viewer",
-                        readPermissions()
-                ))
-                .put(Capability.MANAGE, CapabilityDescriptor.create(
-                        Capability.MANAGE,
-                        "Manager",
-                        ImmutableSet.<String>builder()
-                                .addAll(readPermissions())
-                                .addAll(editPermissions())
-                                .build()
-                ))
-                .put(Capability.OWN, CapabilityDescriptor.create(
-                                Capability.OWN,
-                                "Owner",
-                                ImmutableSet.<String>builder()
-                                        .add(RestPermissions.ENTITY_OWN)
-                                        .addAll(readPermissions())
-                                        .addAll(editPermissions())
-                                        .addAll(deletePermissions())
-                                        .build()
-                        )
-                )
-                .build();
     }
 }

@@ -27,18 +27,65 @@ import jakarta.inject.Singleton;
 import java.util.Optional;
 import java.util.Set;
 
-public interface BuiltinCapabilities {
-    ImmutableMap<Capability, CapabilityDescriptor> capabilities();
+@Singleton
+public class BuiltinCapabilities {
+    private static ImmutableMap<Capability, CapabilityDescriptor> CAPABILITIES;
 
-    default ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
+    @Inject
+    public BuiltinCapabilities(Set<CapabilityPermissions> capabilities) {
+        final ImmutableSet.Builder<String> readPermissionBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> editPermissionBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> deletePermissionBuilder = ImmutableSet.builder();
+
+        capabilities.stream().forEach(
+                permissions -> {
+                    readPermissionBuilder.addAll(permissions.readPermissions());
+                    editPermissionBuilder.addAll(permissions.editPermissions());
+                    deletePermissionBuilder.addAll(permissions.deletePermissions());
+                }
+        );
+
+        final ImmutableSet<String> readPermissions = readPermissionBuilder.build();
+        final ImmutableSet<String> editPermissions = editPermissionBuilder.build();
+        final ImmutableSet<String> deletePermissions = deletePermissionBuilder.build();
+
+        CAPABILITIES = ImmutableMap.<Capability, CapabilityDescriptor>builder()
+                .put(Capability.VIEW, CapabilityDescriptor.create(
+                        Capability.VIEW,
+                        "Viewer",
+                        readPermissions
+                ))
+                .put(Capability.MANAGE, CapabilityDescriptor.create(
+                        Capability.MANAGE,
+                        "Manager",
+                        ImmutableSet.<String>builder()
+                                .addAll(readPermissions)
+                                .addAll(editPermissions)
+                                .build()
+                ))
+                .put(Capability.OWN, CapabilityDescriptor.create(
+                                Capability.OWN,
+                                "Owner",
+                                ImmutableSet.<String>builder()
+                                        .add(RestPermissions.ENTITY_OWN)
+                                        .addAll(readPermissions)
+                                        .addAll(editPermissions)
+                                        .addAll(deletePermissions)
+                                        .build()
+                        )
+                )
+                .build();
+    }
+
+    public ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
         return ImmutableSet.of(
-                capabilities().get(Capability.VIEW),
-                capabilities().get(Capability.MANAGE),
-                capabilities().get(Capability.OWN)
+                CAPABILITIES.get(Capability.VIEW),
+                CAPABILITIES.get(Capability.MANAGE),
+                CAPABILITIES.get(Capability.OWN)
         );
     }
 
-    default Optional<CapabilityDescriptor> get(Capability capability) {
-        return Optional.ofNullable(capabilities().get(capability));
+    public Optional<CapabilityDescriptor> get(Capability capability) {
+        return Optional.ofNullable(CAPABILITIES.get(capability));
     }
 }
