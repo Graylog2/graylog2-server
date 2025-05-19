@@ -29,13 +29,22 @@ const EventsPageNavigation = () => {
     data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
   } = pluggableLicenseCheck[0]('/license/security');
 
-  const hasEventProceduresPlugin = pluggableEventProcedures !== undefined && pluggableEventProcedures[0]?.EventProcedures && typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
+  const hasEventProceduresPlugin =
+    pluggableEventProcedures !== undefined &&
+    pluggableEventProcedures[0]?.EventProcedures &&
+    typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
   const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
 
   const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense;
-  const formattedNavigationItems = navigationItems.map((item) => ({ title: item.description, path: item.path, exactPathMatch: item.description === 'Alerts & Events' }));
+  const formattedNavigationItems = navigationItems.map((item) => ({
+    title: item.description,
+    path: item.path,
+    exactPathMatch: item.description === 'Alerts & Events',
+  }));
 
-  const filteredNavigationItems = shouldDisplayEventProcedures ? formattedNavigationItems : formattedNavigationItems.filter((item) => item.title !== 'Event Procedures');
+  const filteredNavigationItems = shouldDisplayEventProcedures
+    ? formattedNavigationItems
+    : formattedNavigationItems.filter((item) => item.title !== 'Event Procedures');
 
   return (
     <Row>

@@ -75,9 +75,7 @@ describe('<ViewEventDefinitionPage />', () => {
         ({
           'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
           'eventProcedures': [],
-          'alerts.pageNavigation': [
-            { description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST },
-          ],
+          'alerts.pageNavigation': [{ description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST }],
           'eventDefinitions.components.editSigmaModal': [],
         })[entityKey],
     );
