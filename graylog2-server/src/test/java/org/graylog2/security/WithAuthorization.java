@@ -14,14 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
 
-import org.graylog.plugins.datanode.dto.ClusterState;
-import org.graylog2.plugin.Version;
+package org.graylog2.security;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public record DatanodeUpgradeStatus(Version serverVersion, ClusterState clusterState,
-                                    boolean clusterHealthy, boolean shardReplicationEnabled, List<DataNodeInformation> upToDateNodes,
-                                    List<DataNodeInformation> outdatedNodes, List<String> warnings) {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface WithAuthorization {
+    String[] permissions() default {};
+
+    String username() default "test_user";
+
+    String rolename() default "test_role";
 }

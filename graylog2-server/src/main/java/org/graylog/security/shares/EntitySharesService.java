@@ -315,6 +315,29 @@ public class EntitySharesService {
                 .build();
     }
 
+    /**
+     * Add all grants of the original entity to the cloned entity, if they are visible to the sharing user.
+     */
+    public EntityShareResponse cloneEntityGrants(GRNType grnType, String idOrigin, String idClone, User sharingUser) {
+        requireNonBlank(idOrigin, "original entity ID cannot be null or empty");
+        requireNonBlank(idClone, "cloned entity ID cannot be null or empty");
+        requireNonNull(sharingUser, "sharingUser cannot be null");
+        final GRN grnOrigin = grnRegistry.newGRN(grnType, idOrigin);
+        final GRN grnClone = grnRegistry.newGRN(grnType, idClone);
+
+        final Set<GRN> modifiableGranteeGRNs = getModifiableGrantees(sharingUser, grnOrigin)
+                .stream().map(Grantee::grn).collect(Collectors.toSet());
+        final List<GrantDTO> existingGrants = grantService.getForTarget(grnOrigin);
+
+        EntityShareRequest shareRequest = EntityShareRequest.create(
+                existingGrants.stream()
+                        .filter(grant -> modifiableGranteeGRNs.contains(grant.grantee()))
+                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability))
+        );
+
+        return updateEntityShares(grnClone, shareRequest, sharingUser);
+    }
+
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
         this.serverEventBus.post(updateEvent);
     }

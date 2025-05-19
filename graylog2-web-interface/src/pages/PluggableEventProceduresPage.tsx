@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+import * as React from 'react';
 
-import org.graylog.plugins.datanode.dto.ClusterState;
-import org.graylog2.plugin.Version;
+import usePluginEntities from 'hooks/usePluginEntities';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
-import java.util.List;
+const PluggableEventProceduresPage = () => {
+  const pluggableEventProcedures = usePluginEntities('eventProcedures');
 
-public record DatanodeUpgradeStatus(Version serverVersion, ClusterState clusterState,
-                                    boolean clusterHealthy, boolean shardReplicationEnabled, List<DataNodeInformation> upToDateNodes,
-                                    List<DataNodeInformation> outdatedNodes, List<String> warnings) {
-}
+  const EventProceduresPage = pluggableEventProcedures[0]?.EventProcedures;
+
+  return <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />;
+};
+
+export default PluggableEventProceduresPage;

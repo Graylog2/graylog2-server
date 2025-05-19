@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
@@ -259,6 +260,45 @@ class EntitySharesServiceTest {
         assertThat(entityShareResponse.selectedGranteeCapabilities()).isEmpty();
     }
 
+    @DisplayName("Clone grants along with entity")
+    @Test
+    void cloneGrants() {
+        final GRNType grnType = GRNTypes.DASHBOARD;
+        final String idOrigin = "54e3deadbeefdeadbeefaffe";
+        final String idClone = "54e3deadbeefdeadbeefbeef";
+        final User user = createMockUser("hans");
+
+        final GRN originGRN = grnRegistry.newGRN(grnType, idOrigin);
+        final GRN cloneGRN = grnRegistry.newGRN(grnType, idClone);
+        final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        final GRN bobGRN = grnRegistry.newGRN(GRNTypes.USER, "bob");
+
+        final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(
+                Grantee.createUser(janeGRN, "jane"), Grantee.createUser(bobGRN, "bob"));
+        final GrantDTO grantDTOjane = GrantDTO.builder()
+                .grantee(janeGRN)
+                .capability(Capability.MANAGE)
+                .target(originGRN)
+                .build();
+        dbGrantService.create(grantDTOjane, user.getName());
+
+        final GrantDTO grantDTObob = GrantDTO.builder()
+                .grantee(bobGRN)
+                .capability(Capability.VIEW)
+                .target(originGRN)
+                .build();
+        dbGrantService.create(grantDTObob, user.getName());
+
+        when(granteeService.getAvailableGrantees(any())).thenReturn(allGranteesSet);
+        when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
+
+        entitySharesService.cloneEntityGrants(grnType, idOrigin, idClone, user);
+
+        final List<GrantDTO> forTarget = dbGrantService.getForTarget(cloneGRN);
+        assertThat(forTarget).extracting(GrantDTO::grantee)
+                .containsExactlyInAnyOrder(janeGRN, bobGRN);
+    }
+
     @DisplayName("Show shares with permissions check")
     @Test
     void showShareWithCheck() {
@@ -282,7 +322,6 @@ class EntitySharesServiceTest {
         assertThat(entityDescriptors).hasSize(1);
         assertThat(entityDescriptors.iterator().next().id()).hasToString(STREAM_GRN_STRING);
     }
-
 
     private User createMockUser(String name) {
         final User user = mock(User.class);
