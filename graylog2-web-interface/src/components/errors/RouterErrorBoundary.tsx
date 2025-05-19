@@ -14,30 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import type { ErrorInfo } from 'react';
 
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 
 type RouterErrorBoundaryProps = {
-  children?: React.ReactNode;
+  children: React.ReactNode;
 };
 
-class RouterErrorBoundary extends React.Component<
-  RouterErrorBoundaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    children: null,
-  };
+type State = {
+  error?: Error;
+  info?: ErrorInfo;
+};
 
-  constructor(props) {
+class RouterErrorBoundary extends React.Component<RouterErrorBoundaryProps, State> {
+  constructor(props: RouterErrorBoundaryProps) {
     super(props);
     this.state = {};
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
     this.setState({ error, info });
   }
 
@@ -45,11 +42,7 @@ class RouterErrorBoundary extends React.Component<
     const { error, info } = this.state;
     const { children } = this.props;
 
-    if (error) {
-      return <RuntimeErrorPage error={error} componentStack={info.componentStack} />;
-    }
-
-    return children;
+    return error ? <RuntimeErrorPage error={error} componentStack={info.componentStack} /> : children;
   }
 }
 

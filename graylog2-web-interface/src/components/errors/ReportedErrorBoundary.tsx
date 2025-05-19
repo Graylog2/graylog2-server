@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import useLocation from 'routing/useLocation';
 import ErrorPage from 'components/errors/ErrorPage';
@@ -72,33 +72,17 @@ type Props = {
 const ReportedErrorBoundary = ({ children }: Props) => {
   const [reportedError, setReportedError] = useState<ReportedError | undefined>();
 
-  const report = (newError: ReportedError) => setReportedError(newError);
+  const report = useCallback((newError: ReportedError) => setReportedError(newError), []);
 
-  useEffect(() => {
-    const unlistenErrorsReport = ErrorsActions.report.listen(report);
-
-    return () => {
-      unlistenErrorsReport();
-    };
-  }, []);
+  useEffect(() => ErrorsActions.report.listen(report), [report]);
 
   const location = useLocation();
 
-  useEffect(
-    () => {
-      if (reportedError) {
-        setReportedError(null);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location],
-  );
+  useEffect(() => {
+    setReportedError(null);
+  }, [location]);
 
-  if (reportedError) {
-    return <ReportedErrorPage reportedError={reportedError} />;
-  }
-
-  return <>{children}</>;
+  return reportedError ? <ReportedErrorPage reportedError={reportedError} /> : <>{children}</>;
 };
 
 export default ReportedErrorBoundary;

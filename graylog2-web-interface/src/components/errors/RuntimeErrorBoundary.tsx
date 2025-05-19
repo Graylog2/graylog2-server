@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { ErrorInfo } from 'react';
 
 import { createReactError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -24,12 +25,8 @@ type Props = {
 };
 
 class RuntimeErrorBoundary extends React.Component<Props> {
-  static defaultProps = {
-    children: null,
-  };
-
-  componentDidCatch(error: Error, info: { componentStack: string }) {
-    ErrorsActions.report(createReactError(error, info));
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    ErrorsActions.report(createReactError(error, { componentStack: info?.componentStack }));
   }
 
   render() {
