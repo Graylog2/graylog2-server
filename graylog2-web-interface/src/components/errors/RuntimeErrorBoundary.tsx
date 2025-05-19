@@ -19,14 +19,20 @@ import type { ErrorInfo } from 'react';
 
 import { createReactError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
 type Props = {
   children: React.ReactNode;
 };
 
 class RuntimeErrorBoundary extends React.Component<Props> {
+  static contextType = TelemetryContext;
+
+  context: React.ContextType<typeof TelemetryContext>;
+
   componentDidCatch(error: Error, info: ErrorInfo) {
     ErrorsActions.report(createReactError(error, { componentStack: info?.componentStack }));
+    this.context.sendErrorReport(error);
   }
 
   render() {

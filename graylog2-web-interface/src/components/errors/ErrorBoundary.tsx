@@ -17,6 +17,8 @@
 import * as React from 'react';
 import type { ErrorInfo } from 'react';
 
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
+
 export type FallbackComponentType = React.ComponentType<{ error: Error; info: ErrorInfo }>;
 type Props = {
   FallbackComponent: FallbackComponentType;
@@ -29,6 +31,10 @@ type State = {
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
+  static contextType = TelemetryContext;
+
+  context: React.ContextType<typeof TelemetryContext>;
+
   constructor(props: Props) {
     super(props);
     this.state = {};
@@ -36,6 +42,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     this.setState({ error, info });
+    this.context.sendErrorReport(error);
   }
 
   render() {
