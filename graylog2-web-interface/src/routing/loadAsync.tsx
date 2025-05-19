@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+
+import ErrorBoundary from 'components/errors/ErrorBoundary';
+import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 
 type Props = {
   error: Error;
@@ -28,7 +30,7 @@ const ErrorComponent = ({ error }: Props) => {
     console.error(error);
   }, [error]);
 
-  return <div>Loading component failed: {error.message}</div>;
+  return <RuntimeErrorPage error={error} componentStack={error.stack} />;
 };
 
 type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TProps> }>;
