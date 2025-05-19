@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * {@link GRNType} registry.
+ * The global {@link GRNType} registry.
  */
 @Singleton
 public class GRNRegistry {

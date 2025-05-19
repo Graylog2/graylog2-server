@@ -162,20 +162,21 @@ public class EntitySharesService {
         return updateEntityShares(grnRegistry.newGRN(grnType, id), request, sharingUser);
     }
 
+    /**
+     * Share / unshare an entity with one or more grantees.
+     * The grants in the request are created or, if they already exist, updated. Any dependent entities - as
+     * provided by the {@link AdditionalGrantsResolver} - are also updated.
+     *
+     * @param ownedEntity the target entity for the updated grants
+     * @param request     the request containing grantees and their capabilities
+     * @param sharingUser the user executing the request
+     */
     public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         final EntityShareResponse result = updateOnlyEntityShares(ownedEntity, request, sharingUser);
         resolveImplicitGrants(ownedEntity, sharingUser);
         return result;
     }
 
-    /**
-     * Share / unshare an entity with one or more grantees.
-     * The grants in the request are created or, if they already exist, updated.
-     *
-     * @param ownedEntity the target entity for the updated grants
-     * @param request     the request containing grantees and their capabilities
-     * @param sharingUser the user executing the request
-     */
     private EntityShareResponse updateOnlyEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
@@ -275,7 +276,7 @@ public class EntitySharesService {
         grantDtos.forEach(dto ->
                 updateOnlyEntityShares(dto.target(), EntityShareRequest.create(capabilities), sharingUser));
     }
-  
+
     /**
      * Add all grants of the original entity to the cloned entity, if they are visible to the sharing user.
      */

@@ -77,8 +77,7 @@ public abstract class EntityShareResponse {
         }
 
         @JsonProperty("entity")
-        @Nullable
-        public abstract Builder entity(String entity);
+        public abstract Builder entity(@Nullable String entity);
 
         @JsonProperty("sharing_user")
         public abstract Builder sharingUser(GRN sharingUser);

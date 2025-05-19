@@ -23,7 +23,7 @@ import org.graylog.grn.GRNTypes;
 import java.util.Set;
 
 /**
- * Default provider for GRN types
+ * Provider for built-in GRN types.
  */
 public class BultinGRNTypeProvider implements GRNTypeProvider {
     @Override
