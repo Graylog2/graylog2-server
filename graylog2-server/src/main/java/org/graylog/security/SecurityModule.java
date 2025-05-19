@@ -53,7 +53,9 @@ public class SecurityModule extends PluginModule {
         );
         authServiceBackendBinder();
 
-        bind(BuiltinCapabilities.class).asEagerSingleton();
+        OptionalBinder.newOptionalBinder(binder(), BuiltinCapabilities.class)
+                .setDefault().to(DefaultBuiltinCapabilities.class);
+
         bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);
 
         install(new FactoryModuleBuilder().implement(GranteeAuthorizer.class, GranteeAuthorizer.class).build(GranteeAuthorizer.Factory.class));

@@ -25,83 +25,20 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.util.Optional;
+import java.util.Set;
 
-@Singleton
-public class BuiltinCapabilities {
-    private static ImmutableMap<Capability, CapabilityDescriptor> CAPABILITIES;
+public interface BuiltinCapabilities {
+    ImmutableMap<Capability, CapabilityDescriptor> capabilities();
 
-    @Inject
-    public BuiltinCapabilities() {
-        final ImmutableSet<String> readPermissions = ImmutableSet.of(
-                RestPermissions.STREAMS_READ,
-                RestPermissions.STREAM_OUTPUTS_READ,
-                RestPermissions.DASHBOARDS_READ,
-                ViewsRestPermissions.VIEW_READ,
-                RestPermissions.EVENT_DEFINITIONS_READ,
-                RestPermissions.EVENT_NOTIFICATIONS_READ,
-                RestPermissions.OUTPUTS_READ,
-                RestPermissions.SEARCH_FILTERS_READ
-        );
-
-        final ImmutableSet<String> editPermissions = ImmutableSet.of(
-                RestPermissions.STREAMS_EDIT,
-                RestPermissions.STREAMS_CHANGESTATE,
-                RestPermissions.STREAM_OUTPUTS_CREATE,
-                RestPermissions.DASHBOARDS_EDIT,
-                ViewsRestPermissions.VIEW_EDIT,
-                RestPermissions.EVENT_DEFINITIONS_EDIT,
-                RestPermissions.EVENT_NOTIFICATIONS_EDIT,
-                RestPermissions.OUTPUTS_EDIT,
-                RestPermissions.SEARCH_FILTERS_EDIT
-        );
-
-        final ImmutableSet<String> deletePermissions = ImmutableSet.of(
-                RestPermissions.STREAM_OUTPUTS_DELETE,
-                ViewsRestPermissions.VIEW_DELETE,
-                RestPermissions.EVENT_DEFINITIONS_DELETE,
-                RestPermissions.EVENT_NOTIFICATIONS_DELETE,
-                RestPermissions.OUTPUTS_TERMINATE,
-                RestPermissions.SEARCH_FILTERS_DELETE
-        );
-
-
-        CAPABILITIES = ImmutableMap.<Capability, CapabilityDescriptor>builder()
-                .put(Capability.VIEW, CapabilityDescriptor.create(
-                        Capability.VIEW,
-                        "Viewer",
-                        readPermissions
-                ))
-                .put(Capability.MANAGE, CapabilityDescriptor.create(
-                        Capability.MANAGE,
-                        "Manager",
-                        ImmutableSet.<String>builder()
-                                .addAll(readPermissions)
-                                .addAll(editPermissions)
-                                .build()
-                ))
-                .put(Capability.OWN, CapabilityDescriptor.create(
-                                Capability.OWN,
-                                "Owner",
-                                ImmutableSet.<String>builder()
-                                        .add(RestPermissions.ENTITY_OWN)
-                                        .addAll(readPermissions)
-                                        .addAll(editPermissions)
-                                        .addAll(deletePermissions)
-                                        .build()
-                        )
-                )
-                .build();
-    }
-
-    public static ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
+    default ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
         return ImmutableSet.of(
-                CAPABILITIES.get(Capability.VIEW),
-                CAPABILITIES.get(Capability.MANAGE),
-                CAPABILITIES.get(Capability.OWN)
+                capabilities().get(Capability.VIEW),
+                capabilities().get(Capability.MANAGE),
+                capabilities().get(Capability.OWN)
         );
     }
 
-    public Optional<CapabilityDescriptor> get(Capability capability) {
-        return Optional.ofNullable(CAPABILITIES.get(capability));
+    default Optional<CapabilityDescriptor> get(Capability capability) {
+        return Optional.ofNullable(capabilities().get(capability));
     }
 }
