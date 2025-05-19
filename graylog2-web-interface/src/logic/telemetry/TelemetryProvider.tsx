@@ -112,9 +112,9 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
             ...globalProps,
             app_theme: theme.mode,
           });
-        } catch {
+        } catch (e) {
           // eslint-disable-next-line no-console
-          console.warn('Could not capture telemetry event.');
+          console.warn('Could not capture telemetry event: ', e);
         }
       }
     };
