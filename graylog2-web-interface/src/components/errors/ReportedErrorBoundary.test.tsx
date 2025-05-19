@@ -64,8 +64,8 @@ describe('ReportedErrorBoundary', () => {
 
     await waitFor(() => expect(screen.queryByText('Hello World!')).toBeNull());
 
-    expect(screen.getByText('Page not found')).not.toBeNull();
-    expect(screen.getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull();
+    await screen.findByText('Page not found');
+    await screen.findByText(/The page you are looking for does not exist/i);
   });
 
   it('displays reported error with an unkown type', async () => {
