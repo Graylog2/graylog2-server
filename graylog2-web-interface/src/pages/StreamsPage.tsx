@@ -55,8 +55,6 @@ const StreamsPage = () => {
     return <Spinner />;
   }
 
-  throw new Error('Foo!');
-
   return (
     <DocumentTitle title="Streams">
       <PageHeader
