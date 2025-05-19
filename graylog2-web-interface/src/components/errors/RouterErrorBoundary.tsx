@@ -15,35 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { ErrorInfo } from 'react';
 
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
+import type { FallbackComponentType } from 'components/errors/ErrorBoundary';
+import ErrorBoundary from 'components/errors/ErrorBoundary';
 
 type RouterErrorBoundaryProps = {
   children: React.ReactNode;
 };
 
-type State = {
-  error?: Error;
-  info?: ErrorInfo;
-};
+const ErrorPage: FallbackComponentType = ({ error, info }) => (
+  <RuntimeErrorPage error={error} componentStack={info.componentStack} />
+);
 
-class RouterErrorBoundary extends React.Component<RouterErrorBoundaryProps, State> {
-  constructor(props: RouterErrorBoundaryProps) {
-    super(props);
-    this.state = {};
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    this.setState({ error, info });
-  }
-
-  render() {
-    const { error, info } = this.state;
-    const { children } = this.props;
-
-    return error ? <RuntimeErrorPage error={error} componentStack={info.componentStack} /> : children;
-  }
-}
+const RouterErrorBoundary = ({ children }: RouterErrorBoundaryProps) => (
+  <ErrorBoundary FallbackComponent={ErrorPage}>{children}</ErrorBoundary>
+);
 
 export default RouterErrorBoundary;
