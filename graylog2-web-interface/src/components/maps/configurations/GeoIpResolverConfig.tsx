@@ -23,6 +23,7 @@ import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import GCSSetupInfo from 'components/gcs/GCSSetupInfo';
 
 export type GeoVendorType = 'MAXMIND' | 'IPINFO';
 export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
@@ -258,17 +259,20 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                 </Field>
 
                 {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && (
-                  <FormikInput
-                    id="gcs_project_id"
-                    type="text"
-                    disabled={!values.enabled}
-                    label={
-                      <>
-                        Googe Cloud Storage Project ID <InputOptionalInfo />
-                      </>
-                    }
-                    name="gcs_project_id"
-                  />
+                  <>
+                    <GCSSetupInfo />
+                    <FormikInput
+                      id="gcs_project_id"
+                      type="text"
+                      disabled={!values.enabled}
+                      label={
+                        <>
+                          Googe Cloud Storage Project ID <InputOptionalInfo />
+                        </>
+                      }
+                      name="gcs_project_id"
+                    />
+                  </>
                 )}
               </Modal.Body>
               <Modal.Footer>
