@@ -58,12 +58,17 @@ public abstract class EntityShareResponse {
     @JsonProperty("missing_permissions_on_dependencies")
     public abstract ImmutableMap<GRN, Collection<EntityDescriptor>> missingPermissionsOnDependencies();
 
+    @JsonProperty("synced_dependent_entities")
+    public abstract ImmutableSet<GRN> syncedDependentEntities();
+
     @JsonProperty("validation_result")
     public abstract ValidationResult validationResult();
 
     public static Builder builder() {
         return Builder.create();
     }
+
+    public abstract EntityShareResponse.Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -73,6 +78,7 @@ public abstract class EntityShareResponse {
                     .activeShares(Collections.emptySet())
                     .selectedGranteeCapabilities(Collections.emptyMap())
                     .missingPermissionsOnDependencies(Collections.emptyMap())
+                    .syncedDependentEntities(Collections.emptySet())
                     .validationResult(new ValidationResult());
         }
 
@@ -96,6 +102,9 @@ public abstract class EntityShareResponse {
 
         @JsonProperty("missing_permissions_on_dependencies")
         public abstract Builder missingPermissionsOnDependencies(Map<GRN, Collection<EntityDescriptor>> missingDependencies);
+
+        @JsonProperty("synced_dependent_entities")
+        public abstract Builder syncedDependentEntities(Set<GRN> dependentEntities);
 
         @JsonProperty("validation_result")
         public abstract Builder validationResult(ValidationResult validationResult);

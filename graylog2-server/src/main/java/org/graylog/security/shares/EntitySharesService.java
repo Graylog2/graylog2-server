@@ -173,8 +173,9 @@ public class EntitySharesService {
      */
     public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         final EntityShareResponse result = updateEntitySharesWithoutDependencies(ownedEntity, request, sharingUser);
-        resolveImplicitGrants(ownedEntity, request, sharingUser);
-        return result;
+        return result.toBuilder().syncedDependentEntities(
+                        resolveImplicitGrants(ownedEntity, request, sharingUser))
+                .build();
     }
 
     private EntityShareResponse updateEntitySharesWithoutDependencies(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
@@ -266,11 +267,15 @@ public class EntitySharesService {
      * @param ownedEntity the parent entity
      * @param shareRequest the sharing request to apply to the dependent entities
      * @param sharingUser the sharing user
+     * @return list of updated dependent entities
      */
-    private void resolveImplicitGrants(GRN ownedEntity, EntityShareRequest shareRequest, User sharingUser) {
-        entitiesResolvers.stream()
+    private Set<GRN> resolveImplicitGrants(GRN ownedEntity, EntityShareRequest shareRequest, User sharingUser) {
+        Set<GRN> dependentEntities = entitiesResolvers.stream()
                 .flatMap(resolver -> resolver.dependentEntities(ownedEntity).stream())
-                .forEach(grn -> updateEntitySharesWithoutDependencies(grn, shareRequest, sharingUser));
+                .collect(Collectors.toSet());
+
+        dependentEntities.forEach(grn -> updateEntitySharesWithoutDependencies(grn, shareRequest, sharingUser));
+        return dependentEntities;
     }
 
     /**
