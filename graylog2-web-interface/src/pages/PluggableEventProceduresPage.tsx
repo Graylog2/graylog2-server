@@ -24,9 +24,7 @@ const PluggableEventProceduresPage = () => {
 
   const EventProceduresPage = pluggableEventProcedures[0]?.EventProcedures;
 
-  return (
-    <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />
-  );
+  return <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />;
 };
 
 export default PluggableEventProceduresPage;
