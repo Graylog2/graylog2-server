@@ -56,6 +56,10 @@ const Wrapper = styled.div`
   margin: 0 auto 15px;
 `;
 
+const AlertContainer = styled.div(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+`);
+
 const defaultNotifications: PublicNotificationsHooks = {
   usePublicNotifications: () => ({
     notifications: undefined,
@@ -96,21 +100,23 @@ const PublicNotifications = ({ readFromConfig = false }: Props) => {
       const _dismiss = () => onDismissPublicNotification(notificationId);
 
       return (
-        <StyledAlert
-          bsStyle={variant}
-          onDismiss={isDismissible ? _dismiss : undefined}
-          key={title}
-          title={!hiddenTitle && title}>
-          <FlexWrap>
-            <ShortContent>{shortMessage}</ShortContent>
-            {longMessage && (
-              <Button bsStyle="link" onClick={toggleReadMore}>
-                Read {showReadMore === notificationId ? 'Less' : 'More'}
-              </Button>
-            )}
-          </FlexWrap>
-          {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
-        </StyledAlert>
+        <AlertContainer>
+          <StyledAlert
+            bsStyle={variant}
+            onDismiss={isDismissible ? _dismiss : undefined}
+            key={title}
+            title={!hiddenTitle && title}>
+            <FlexWrap>
+              <ShortContent>{shortMessage}</ShortContent>
+              {longMessage && (
+                <Button bsStyle="link" onClick={toggleReadMore}>
+                  Read {showReadMore === notificationId ? 'Less' : 'More'}
+                </Button>
+              )}
+            </FlexWrap>
+            {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
+          </StyledAlert>
+        </AlertContainer>
       );
     })
     .filter((a) => a);
