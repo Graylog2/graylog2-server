@@ -48,8 +48,6 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
 import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.configuration.IndexerDiscoveryModule;
-import org.graylog2.configuration.NativeLibPathConfiguration;
-import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;

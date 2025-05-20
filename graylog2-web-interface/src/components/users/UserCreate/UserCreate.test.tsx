@@ -16,10 +16,10 @@
  */
 import React from 'react';
 import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import { alice as existingUser } from 'fixtures/users';
 import { rolesList } from 'fixtures/roles';
 import { UsersActions } from 'stores/users/UsersStore';

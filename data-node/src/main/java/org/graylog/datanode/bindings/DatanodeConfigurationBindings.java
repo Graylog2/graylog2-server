@@ -29,11 +29,13 @@ import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
+import org.graylog.datanode.jwt.DatanodeJwtAuthTokenProvider;
 import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.JwtSecretProvider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 import java.util.Map;
 
@@ -47,6 +49,8 @@ public class DatanodeConfigurationBindings extends AbstractModule {
         bind(OpensearchDistribution.class).toProvider(OpensearchDistributionProvider.class);
         bind(StateFileParser.class).to(StateFileParserImpl.class);
         bind(ShardStatsParser.class).to(ShardStatsParserImpl.class);
+
         bind(JwtSecret.class).toProvider(JwtSecretProvider.class).asEagerSingleton();
+        bind(IndexerJwtAuthToken.class).toProvider(DatanodeJwtAuthTokenProvider.class).asEagerSingleton();
     }
 }

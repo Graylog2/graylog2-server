@@ -41,6 +41,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import SaveDashboardButton from 'views/components/searchbar/SaveDashboardButton';
 import SaveAsDashboardButton from 'views/components/searchbar/SaveAsDashboardButton';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -78,6 +79,7 @@ const DashboardActionsMenu = () => {
       </MenuItem>
     </>
   );
+
   const dispatch = useViewsDispatch();
   const history = useHistory();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
@@ -110,7 +112,7 @@ const DashboardActionsMenu = () => {
   );
 
   const _onSaveNewDashboard = useCallback(
-    async (newDashboard: View) => {
+    async (newDashboard: View, entityShare?: EntitySharePayload) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
         app_pathname: 'dashboard',
         app_section: 'dashboard',
@@ -126,10 +128,10 @@ const DashboardActionsMenu = () => {
           pluggableSaveViewControls,
         );
 
-        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history));
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare));
       }
 
-      return dispatch(onSaveNewDashboard(newDashboard, history));
+      return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));
     },
     [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id],
   );
@@ -200,16 +202,18 @@ const DashboardActionsMenu = () => {
         <DashboardPropertiesModal
           show
           view={view.toBuilder().newId().build()}
+          dashboardId={view.id}
           title="Save new dashboard"
           submitButtonText="Create dashboard"
           onClose={() => setSaveNewDashboardOpen(false)}
-          onSave={(newDashboard) => _onSaveNewDashboard(newDashboard)}
+          onSave={(newDashboard, entityShare) => _onSaveNewDashboard(newDashboard, entityShare)}
         />
       )}
       {editDashboardOpen && (
         <DashboardPropertiesModal
           show
           view={view}
+          dashboardId={view.id}
           title="Editing dashboard"
           submitButtonText="Update dashboard"
           onClose={() => setEditDashboardOpen(false)}

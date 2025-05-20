@@ -38,7 +38,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,7 +79,7 @@ public class DBJobTriggerServiceTest {
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     private DBJobTriggerService dbJobTriggerService;
-    private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
+    private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-07-29T00:00:00.000Z"));
     private MongoJackObjectMapperProvider mapperProvider;
     private MongoCollections mongoCollections;
 

@@ -19,7 +19,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
+import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { FormSubmit } from 'components/common';
@@ -35,18 +36,8 @@ type Props = {
   disableEdit?: boolean;
 };
 
-const emptyPipeline: PipelineType = {
-  id: undefined,
-  title: '',
-  description: '',
-  stages: [{ stage: 0, rules: [], match: 'EITHER' }],
-  source: '',
-  created_at: '',
-  modified_at: '',
-};
-
 const PipelineForm = ({
-  pipeline = emptyPipeline,
+  pipeline = DEFAULT_PIPELINE,
   create = false,
   modal = true,
   save,

@@ -28,6 +28,8 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.JwtSecretProvider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 
 import java.net.URI;
 import java.util.List;
@@ -47,6 +49,7 @@ public class IndexerDiscoveryModule extends AbstractModule {
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(JwtSecret.class).toProvider(JwtSecretProvider.class).asEagerSingleton();
+        bind(IndexerJwtAuthToken.class).toProvider(IndexerJwtAuthTokenProvider.class).asEagerSingleton();
     }
 
     protected void registerIndexerDiscoveryListener(Class<? extends IndexerDiscoveryListener> listener) {

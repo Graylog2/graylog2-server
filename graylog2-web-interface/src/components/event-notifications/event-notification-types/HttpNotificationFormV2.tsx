@@ -24,6 +24,8 @@ import { Select, SourceCodeEditor, TimezoneSelect, URLWhiteListInput } from 'com
 import { Button, Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventNotificationTypes } from 'components/event-notifications/types';
+import DocsHelper from 'util/DocsHelper';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 import { DEFAULT_JSON_TEMPLATE, DEFAULT_FORM_PARAM_TEMPLATE, DEFAULT_PLAIN_TEXT_TEMPLATE } from './templates';
 
@@ -203,14 +205,10 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
       { value: 'FORM_DATA', label: 'application/x-www-form-urlencoded' },
       { value: 'PLAIN_TEXT', label: 'text/plain' },
     ];
-    const docsUrl = 'https://docs.graylog.org/docs/alerts#notifications';
     const helpElement = (
       <p>
-        Custom POST/PUT body. See{' '}
-        <a href={docsUrl} rel="noopener noreferrer" target="_blank">
-          docs{' '}
-        </a>
-        for more details. An empty POST/PUT body will send the full event details.
+        Custom POST/PUT body. See <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more details. An
+        empty POST/PUT body will send the full event details.
       </p>
     );
 

@@ -25,6 +25,7 @@ import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   fieldType: IndexSetFieldType;
@@ -39,6 +40,7 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
   const toggleEditModal = () => setShowEditModal((cur) => !cur);
   const showResetButton = hasOverride(fieldType);
+  const productName = useProductName();
 
   return (
     <>
@@ -53,7 +55,7 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
         {fieldType.isReserved && (
           <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
             We use reserved fields internally and expect a certain structure from them. Changing the field type for
-            reserved fields might impact the stability of Graylog
+            reserved fields might impact the stability of {productName}
           </HoverForHelp>
         )}
       </Button>

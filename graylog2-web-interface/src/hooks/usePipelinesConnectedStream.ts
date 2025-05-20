@@ -20,7 +20,7 @@ import { create, windowScheduler, indexedResolver } from '@yornaath/batshit';
 import { Streams } from '@graylog/server-api';
 
 import type FetchError from 'logic/errors/FetchError';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 
 export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>;
 

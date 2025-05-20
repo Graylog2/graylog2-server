@@ -115,12 +115,11 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
               allowCreate
             />
             <HelpBlock>
-              Select Fields that Graylog should use to group Filter results when they have identical values.{' '}
-              <b>Example:</b>
+              Select fields to group filter results when they have identical values. <b>Example:</b>
               <br />
-              Assuming you created a Filter with all failed log-in attempts in your network, Graylog could alert you
+              Assuming you created a Filter with all failed log-in attempts in your network, an alert could be triggered
               when there are more than 5 failed log-in attempts overall. Now, add <code>username</code> as Group by
-              Field and Graylog will alert you{' '}
+              Field and an alert will be triggered{' '}
               <em>
                 for each <code>username</code>
               </em>{' '}

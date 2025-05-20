@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Revert AWS SDK to version 2.29.52 to fix compatibility with S3-compatible services."
+
+issues = ["graylog-plugin-enterprise#10504"]
+pulls = ["22450"]

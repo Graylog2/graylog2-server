@@ -17,6 +17,7 @@
 package org.graylog2.storage.versionprobe;
 
 import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 public interface VersionProbeFactory {
     /**
@@ -27,5 +28,5 @@ public interface VersionProbeFactory {
     /**
      * Create instance with specific connection details and custom listener
      */
-    VersionProbe create(int probeAttempts, Duration probeDelay, boolean useJwtAuthentication, VersionProbeListener versionProbeListener);
+    VersionProbe create(IndexerJwtAuthToken jwtAuthToken, int probeAttempts, Duration probeDelay, VersionProbeListener versionProbeListener);
 }

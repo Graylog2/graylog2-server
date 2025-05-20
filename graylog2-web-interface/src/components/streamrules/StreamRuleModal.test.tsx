@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { MockStore, asMock } from 'helpers/mocking';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';

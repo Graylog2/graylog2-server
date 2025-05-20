@@ -111,7 +111,7 @@ describe('IndexSetFieldTypesPage', () => {
     const editButton = await within(tableRow).findByText('Edit');
     fireEvent.click(editButton);
     await screen.findByText(/change field-1 field type/i);
-    const modal = await screen.findByRole('dialog');
+    const modal = await screen.findByRole('dialog', { name: /Change field-1 Field Type/i });
     await within(modal).findByText('Boolean');
 
     expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
@@ -128,7 +128,7 @@ describe('IndexSetFieldTypesPage', () => {
     const editButton = await screen.findByRole('button', { name: /change field type/i });
     fireEvent.click(editButton);
 
-    const modal = await screen.findByRole('dialog');
+    const modal = await screen.findByRole('dialog', { name: /change field type/i });
     await within(modal).findByRole('heading', { name: /change field type/i });
     await within(modal).findByText(/select or type the field/i);
 

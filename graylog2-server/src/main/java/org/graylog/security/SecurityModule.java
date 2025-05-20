@@ -20,6 +20,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
@@ -53,7 +54,11 @@ public class SecurityModule extends PluginModule {
         );
         authServiceBackendBinder();
 
+        final Multibinder<CapabilityPermissions> capabilityPermissionsMultibinder = Multibinder.newSetBinder(binder(), CapabilityPermissions.class);
+        capabilityPermissionsMultibinder.addBinding().to(DefaultBuiltinCapabilities.class);
+
         bind(BuiltinCapabilities.class).asEagerSingleton();
+
         bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);
 
         install(new FactoryModuleBuilder().implement(GranteeAuthorizer.class, GranteeAuthorizer.class).build(GranteeAuthorizer.Factory.class));

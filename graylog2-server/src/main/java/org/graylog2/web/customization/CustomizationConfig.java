@@ -19,19 +19,27 @@ package org.graylog2.web.customization;
 import jakarta.inject.Inject;
 
 import javax.annotation.Nullable;
+import java.util.Base64;
 import java.util.Optional;
+
 
 public class CustomizationConfig {
     private static final String DEFAULT_PRODUCT_NAME = "Graylog";
     private final Config config;
+    private final Base64.Decoder base64Decoder;
 
     @Inject
     public CustomizationConfig(@Nullable Config config) {
         this.config = Optional.ofNullable(config).orElse(Config.empty());
+        this.base64Decoder = Base64.getDecoder();
     }
 
     public String productName() {
         return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    }
+
+    public Optional<byte[]> favicon() {
+        return config.favicon().map(base64Decoder::decode);
     }
 
     public static CustomizationConfig empty() {

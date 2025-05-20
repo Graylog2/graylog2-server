@@ -36,6 +36,7 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     private String mongoDbUri;
     private String passwordSecret;
     private String rootPasswordSha2;
+    private PluginJarsProvider datanodePluginJarsProvider;
 
     public SearchServerBuilder(final SearchVersion version) {
         this.version = version;
@@ -121,6 +122,15 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
 
     public String getHostname() {
         return hostname;
+    }
+
+    public SearchServerBuilder<T> datanodePluginJarsProvider(final PluginJarsProvider pluginJarsProvider) {
+        this.datanodePluginJarsProvider = pluginJarsProvider;
+        return this;
+    }
+
+    public PluginJarsProvider getDatanodePluginJarsProvider() {
+        return datanodePluginJarsProvider;
     }
 
     protected abstract T instantiate();

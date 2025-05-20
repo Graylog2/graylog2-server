@@ -27,7 +27,7 @@ import java.io.IOException;
 
 public class DatanodeTestExtension implements ParameterResolver, BeforeAllCallback, AfterAllCallback {
 
-    private final DatanodeContainerizedBackend datanodeBackend;
+    protected final DatanodeContainerizedBackend datanodeBackend;
 
     public DatanodeTestExtension() {
         this.datanodeBackend = new DatanodeContainerizedBackend();
