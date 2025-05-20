@@ -23,7 +23,7 @@ import styles from './TemplateFieldValueProviderPreview.css';
 const TemplateFieldValueProviderPreview = () => (
   <Panel className={styles.templatePreview} header={<h3>Available Fields in Template</h3>}>
     <p>
-      Graylog lets you enrich generated Events with dynamic values. You can access Fields from the Event context{' '}
+      It is possible to enrich generated Events with dynamic values. You can access Fields from the Event context{' '}
       {/* eslint-disable-next-line no-template-curly-in-string */}
       with <code>{'${source.<fieldName>}'}</code>.
       <br />

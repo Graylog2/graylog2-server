@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import AppConfig from 'util/AppConfig';
+
+const defaultDocsUrl = 'https://go2docs.graylog.org/current';
+const docsUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
+
 const docsHelper = {
   PAGES: {
     ALERTS: 'interacting_with_your_log_data/alerts.html',
     AUDIT_LOG: 'interacting_with_your_log_data/audit_log.html',
     AUTHENTICATORS: 'setting_up_graylog/user_authentication.htm',
+    AWS_KINESIS_CLOUDWATCH_INPUT: 'getting_in_log_data/aws_kinesis_cloudwatch_input.html',
     CHANGELOG: 'changelogs/changelog.html',
     CLUSTER_STATUS_EXPLAINED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
     COLLECTOR: 'getting_in_log_data/graylog_sidecar.html',
@@ -50,6 +56,7 @@ const docsHelper = {
     PIPELINES: 'making_sense_of_your_log_data/pipelines.html',
     REPORTING: 'interacting_with_your_log_data/reporting.html',
     ROLLING_ES_UPGRADE: 'setting_up_graylog/opensearch.htm#UpgradingtoOpenSearch',
+    SEARCH_FILTERS: 'making_sense_of_your_log_data/search_filters.htm',
     SEARCH_QUERY_ERRORS: 'making_sense_of_your_log_data/writing_search_queries.html#ErrorTypes',
     SEARCH_QUERY_LANGUAGE: 'making_sense_of_your_log_data/writing_search_queries.html',
     STREAMS: 'making_sense_of_your_log_data/streams.html',
@@ -60,9 +67,11 @@ const docsHelper = {
     USERS_ROLES: 'setting_up_graylog/users_teams.htm',
     DATA_LAKE_PREVIEW: 'setting_up_graylog/data_lake_preview.htm',
     WELCOME: '', // Welcome page to the documentation
+    DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
+    DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
   },
 
-  DOCS_URL: 'https://go2docs.graylog.org/current',
+  DOCS_URL: docsUrl,
 
   toString(path: string) {
     const baseUrl = this.DOCS_URL;

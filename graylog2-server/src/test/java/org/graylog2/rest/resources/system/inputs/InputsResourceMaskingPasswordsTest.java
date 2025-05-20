@@ -24,8 +24,8 @@ import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -185,6 +185,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(false);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(false);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -219,6 +220,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(true);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -251,6 +253,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(false);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(false);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -288,6 +291,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(true);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,

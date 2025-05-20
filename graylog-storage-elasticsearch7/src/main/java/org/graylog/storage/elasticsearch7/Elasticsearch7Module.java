@@ -25,10 +25,12 @@ import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.client.ESCredentialsProvider;
+import org.graylog.storage.elasticsearch7.client.IndexerHostsAdapterES7;
 import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsForFieldRetrieverES7;
 import org.graylog.storage.elasticsearch7.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7;
 import org.graylog.storage.elasticsearch7.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES7;
 import org.graylog2.indexer.IndexToolsAdapter;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -89,6 +91,8 @@ public class Elasticsearch7Module extends VersionAwareModule {
 
         bindForSupportedVersion(RemoteReindexingMigrationAdapter.class).to(UnsupportedRemoteReindexingMigrationAdapterES7.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterES7.class);
+
+        bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterES7.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

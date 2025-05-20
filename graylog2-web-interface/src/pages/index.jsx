@@ -24,6 +24,7 @@ const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverv
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
 const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
+const ClusterCertificateManagementPage = loadAsync(() => import('./ClusterCertificateManagementPage'));
 const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
@@ -34,7 +35,6 @@ const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const DataNodePage = loadAsync(() => import('./DataNodePage'));
 const DataNodeUpgradePage = loadAsync(() => import('./DataNodeUpgradePage'));
 const DataNodesClusterManagementPage = loadAsync(() => import('./DataNodesClusterManagementPage'));
-const DataNodesClusterConfigurationPage = loadAsync(() => import('./DataNodesClusterConfigurationPage'));
 const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
@@ -112,6 +112,7 @@ const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
+const PluggableEventProceduresPage = loadAsync(() => import('./PluggableEventProceduresPage'));
 
 export {
   AuthenticationCreatePage,
@@ -122,6 +123,7 @@ export {
   AuthenticationOverviewPage,
   AuthenticatorsPage,
   AuthenticatorsEditPage,
+  ClusterCertificateManagementPage,
   ClusterConfigurationPage,
   ConfigurationsPage,
   ContentPacksPage,
@@ -132,7 +134,6 @@ export {
   DataNodePage,
   DataNodeUpgradePage,
   DataNodesClusterManagementPage,
-  DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
@@ -210,4 +211,5 @@ export {
   UserEditPage,
   UserTokensEditPage,
   ViewEventDefinitionPage,
+  PluggableEventProceduresPage,
 };

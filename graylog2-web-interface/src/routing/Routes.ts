@@ -61,6 +61,9 @@ const Routes = {
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
     },
+    EVENT_PROCEDURES: {
+      LIST: (viewType: string) => `/alerts/event-procedures/${viewType}`,
+    },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
@@ -84,8 +87,8 @@ const Routes = {
     CLUSTER: {
       NODES: '/system/cluster',
       NODE_SHOW: (nodeId: string) => `/system/cluster/node/${nodeId}`,
+      CERTIFICATE_MANAGEMENT: '/system/cluster/certificate-management',
       DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
-      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
       DATANODE_MIGRATION: '/system/cluster/datanode-migration',
       DATANODE_UPGRADE: '/system/cluster/datanode-upgrade',
       DATANODE_SHOW: (dataNodeId: string) => `/system/cluster/datanode/${dataNodeId}`,

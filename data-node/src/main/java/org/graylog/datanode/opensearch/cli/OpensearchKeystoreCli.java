@@ -23,8 +23,10 @@ import java.util.List;
 
 public class OpensearchKeystoreCli extends AbstractOpensearchCli {
 
-    public OpensearchKeystoreCli(Path configDir, Path binDir) {
-        super(configDir, binDir, "opensearch-keystore");
+    public static final String KEYSTORE_BIN_NAME = "opensearch-keystore";
+
+    public OpensearchKeystoreCli(Path binDir, CliEnv env) {
+        super(binDir.resolve(KEYSTORE_BIN_NAME), env);
     }
 
     /**
@@ -43,6 +45,14 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
      */
     public void add(String key, String secretValue) {
         runWithStdin(List.of(secretValue), "add", "-x", key); // -x allows input from stdin, bypassing the prompt
+    }
+
+    /**
+     * Add secrets to the store. The command is interactive, it will ask for the secret value (to avoid recording the value
+     * in the command line history). So we have to work around that and provide the value in STDIN.
+     */
+    public void addFile(String key, Path file) {
+        runWithStdin(List.of(), "add-file", key, file.toAbsolutePath().toString()); // -x allows input from stdin, bypassing the prompt
     }
 
     public List<String> list() {

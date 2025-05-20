@@ -1,0 +1,5 @@
+type = "f"
+message = "Add missing column names on tabular export of widgets (CSV etc.)"
+
+issues = ["22074"]
+pulls = ["22426"]

@@ -31,19 +31,24 @@ import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
+import useProductName from 'brand-customization/useProductName';
 
-const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => (
-  <ErrorPage
-    title="Something went wrong"
-    description={
-      <p>
-        An unknown error has occurred. Please have a look at the following message and the graylog server log for more
-        information.
-      </p>
-    }>
-    <pre>{JSON.stringify(reportedError)}</pre>
-  </ErrorPage>
-);
+const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => {
+  const productName = useProductName();
+
+  return (
+    <ErrorPage
+      title="Something went wrong"
+      description={
+        <p>
+          An unknown error has occurred. Please have a look at the following message and the {productName} server log
+          for more information.
+        </p>
+      }>
+      <pre>{JSON.stringify(reportedError)}</pre>
+    </ErrorPage>
+  );
+};
 
 const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) => {
   switch (reportedError.type) {

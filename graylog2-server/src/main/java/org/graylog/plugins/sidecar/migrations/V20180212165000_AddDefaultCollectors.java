@@ -57,7 +57,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class V20180212165000_AddDefaultCollectors extends Migration {
     public static final String BEATS_PREAMBEL = """
-            # Needed for Graylog
+            # Required settings
             fields_under_root: true
             fields.collector_node_id: ${sidecar.nodeName}
             fields.gl2_source_collector: ${sidecar.nodeId}
@@ -420,7 +420,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         \tPort 12201
                         \tOutputType  GELF_TCP
                         \t<Exec>
-                        \t  # These fields are needed for Graylog
+                        \t  # These fields are needed for ingestion
                         \t  $gl2_source_collector = '${sidecar.nodeId}';
                         \t  $collector_node_id = '${sidecar.nodeName}';
                         \t</Exec>
@@ -504,7 +504,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         \tPort 12201
                         \tOutputType  GELF_TCP
                         \t<Exec>
-                        \t  # These fields are needed for Graylog
+                        \t  # These fields are needed for ingestion
                         \t  $gl2_source_collector = '${sidecar.nodeId}';
                         \t  $collector_node_id = '${sidecar.nodeName}';
                         \t</Exec>

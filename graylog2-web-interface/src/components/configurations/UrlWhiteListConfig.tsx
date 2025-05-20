@@ -32,8 +32,10 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useProductName from 'brand-customization/useProductName';
 
 const UrlWhiteListConfig = () => {
+  const productName = useProductName();
   const [showConfigModal, setShowConfigModal] = useState(false);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [viewConfig, setViewConfig] = useState<WhiteListConfig | undefined>(undefined);
@@ -102,11 +104,11 @@ const UrlWhiteListConfig = () => {
     <div>
       <h2>URL Whitelist Configuration {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
       <p>
-        When enabled, outgoing HTTP requests from Graylog servers, such as event notifications or HTTP-based data
+        When enabled, outgoing HTTP requests from {productName} servers, such as event notifications or HTTP-based data
         adapter requests, are validated against the whitelists configured here. Because the HTTP requests are made from
-        the Graylog servers, they might be able to reach more sensitive systems than an external user would have access
-        to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others. Whitelist
-        administrative access is separate from data adapters and event notification configuration.
+        the {productName} servers, they might be able to reach more sensitive systems than an external user would have
+        access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
+        Whitelist administrative access is separate from data adapters and event notification configuration.
       </p>
       <Table striped bordered condensed className="top-margin">
         <thead>

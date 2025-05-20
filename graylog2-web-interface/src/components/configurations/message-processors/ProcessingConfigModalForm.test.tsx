@@ -101,12 +101,10 @@ describe('MessageProcessorsConfig', () => {
 
     await screen.findByRole('heading', {
       name: /update message processors configuration/i,
-      hidden: true,
     });
 
     const gracePeriod = screen.getByRole('textbox', {
       name: /grace period/i,
-      hidden: true,
     });
 
     fireEvent.change(gracePeriod, {
@@ -116,7 +114,6 @@ describe('MessageProcessorsConfig', () => {
     fireEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
-        hidden: true,
       }),
     );
 
@@ -137,12 +134,10 @@ describe('MessageProcessorsConfig', () => {
 
     await screen.findByRole('heading', {
       name: /update message processors configuration/i,
-      hidden: true,
     });
 
     const enableTimestampNormalization = screen.getByRole('checkbox', {
       name: /future timestamp normalization/i,
-      hidden: true,
     });
 
     fireEvent.click(enableTimestampNormalization);
@@ -151,7 +146,6 @@ describe('MessageProcessorsConfig', () => {
     fireEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
-        hidden: true,
       }),
     );
 

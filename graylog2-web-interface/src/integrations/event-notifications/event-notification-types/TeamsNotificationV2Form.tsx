@@ -24,6 +24,8 @@ import { getValueFromInput } from 'util/FormsUtils';
 import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { TimezoneSelect, URLWhiteListInput, SourceCodeEditor } from 'components/common';
 import type { SelectCallback } from 'components/bootstrap/types';
+import DocsHelper from 'util/DocsHelper';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 import type { ValidationType, ConfigV2Type } from '../types';
 
@@ -45,7 +47,7 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
       '      "contentType": "application/vnd.microsoft.card.adaptive",\n' +
       '      "content": {\n' +
       '        "type": "AdaptiveCard",\n' +
-      '        "version": "1.6",\n' +
+      '        "version": "1.5",\n' +
       '        "msTeams": { "width": "full" },\n' +
       '        "body": [\n' +
       '          {\n' +
@@ -196,14 +198,10 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
   render() {
     const { config, validation } = this.props;
     const { isBacklogSizeEnabled, backlogSize } = this.state;
-    const url = 'https://docs.graylog.org/docs/alerts#notifications';
     const element = (
       <p>
-        Adaptive Card to post to Teams. See{' '}
-        <a href={url} rel="noopener noreferrer" target="_blank">
-          docs{' '}
-        </a>
-        for more details.
+        Adaptive Card to post to Teams. See <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more
+        details.
       </p>
     );
 

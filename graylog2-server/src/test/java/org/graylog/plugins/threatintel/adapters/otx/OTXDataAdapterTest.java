@@ -21,6 +21,7 @@ import com.google.common.io.Resources;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class OTXDataAdapterTest {
 
     @Before
     public void setUp() throws Exception {
-        final OTXDataAdapter.Config defaultConfiguration = new OTXDataAdapter.Descriptor().defaultConfiguration();
+        final OTXDataAdapter.Config defaultConfiguration = new OTXDataAdapter.Descriptor(CustomizationConfig.empty()).defaultConfiguration();
         final MetricRegistry metricRegistry = new MetricRegistry();
 
         this.otxDataAdapter = new OTXDataAdapter("1", "otx-test", defaultConfiguration, new OkHttpClient(), metricRegistry);

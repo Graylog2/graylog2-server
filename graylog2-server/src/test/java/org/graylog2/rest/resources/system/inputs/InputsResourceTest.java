@@ -49,6 +49,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -93,7 +94,7 @@ class InputsResourceTest {
     void testCreateNotGlobalInputInCloud() {
         when(configuration.isCloud()).thenReturn(true);
 
-        assertThatThrownBy(() -> inputsResource.create(getCR(false))).isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> inputsResource.create(false, getCR(false))).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Only global inputs");
     }
 
@@ -101,9 +102,9 @@ class InputsResourceTest {
     void testCreateNotCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(false);
-        when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
+        when(messageInputFactory.create(any(), any(), any(), anyBoolean())).thenReturn(messageInput);
 
-        assertThatThrownBy(() -> inputsResource.create(getCR(true))).isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> inputsResource.create(false, getCR(true))).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("not allowed in the cloud environment");
     }
 
@@ -111,19 +112,19 @@ class InputsResourceTest {
     void testCreateCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(true);
-        when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
+        when(messageInputFactory.create(any(), any(), any(), anyBoolean())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
-        assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
+        assertThat(inputsResource.create(false, getCR(true)).getStatus()).isEqualTo(201);
     }
 
     @Test
     void testCreateInput() throws Exception {
         when(configuration.isCloud()).thenReturn(false);
-        when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
+        when(messageInputFactory.create(any(), any(), any(), anyBoolean())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
-        assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
+        assertThat(inputsResource.create(false, getCR(true)).getStatus()).isEqualTo(201);
     }
 
     @Test

@@ -50,21 +50,21 @@ export const HELP = {
   ),
   userNameAttribute: (
     <span>
-      Which Active Directory attribute to use for the full name of the user in Graylog, e.g.{' '}
+      Which Active Directory attribute to use for the full name of the synchronized user, e.g.{' '}
       <code>userPrincipalName</code>.<br />
       Try to load a test user in the sidebar section <i>User Login Test</i>, if you are unsure which attribute to use.
     </span>
   ),
   userFullNameAttribute: (
     <span>
-      Which Active Directory attribute to use for the full name of a synchronized Graylog user, e.g.{' '}
-      <code>displayName</code>.<br />
+      Which Active Directory attribute to use for the full name of a synchronized user, e.g. <code>displayName</code>.
+      <br />
     </span>
   ),
   defaultRoles: (
     <span>
-      The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the
-      Graylog web interface
+      The default roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the web
+      interface
     </span>
   ),
 };

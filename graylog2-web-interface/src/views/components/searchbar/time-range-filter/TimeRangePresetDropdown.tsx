@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
@@ -109,17 +109,13 @@ const preparePresetOptions = async (
   ];
 };
 
-const usePresetOptions = (disabled: boolean) => {
+const usePresetOptions = (disabled: boolean, limitDuration: number) => {
   const { config } = useSearchConfiguration();
   const [presetOptions, setPresetOptions] = useState<Array<PresetOption> | undefined>();
-  const timeRangeLimit = useMemo(
-    () => moment.duration(config?.query_time_range_limit).asSeconds(),
-    [config?.query_time_range_limit],
-  );
 
   const onSetOptions = useCallback(async () => {
-    setPresetOptions(await preparePresetOptions(config?.quick_access_timerange_presets, timeRangeLimit, disabled));
-  }, [config?.quick_access_timerange_presets, disabled, timeRangeLimit]);
+    setPresetOptions(await preparePresetOptions(config?.quick_access_timerange_presets, limitDuration, disabled));
+  }, [config?.quick_access_timerange_presets, disabled, limitDuration]);
 
   return { options: presetOptions, setOptions: onSetOptions };
 };
@@ -132,24 +128,26 @@ type Props = {
   header?: string;
   disabled?: boolean;
   onChange?: (timerange: TimeRange) => void;
+  limitDuration: number;
 };
 
 const TimeRangePresetDropdown = ({
   disabled = false,
-  onChange,
+  limitDuration,
+  onChange = undefined,
   onToggle: onToggleProp,
-  className,
+  className = undefined,
   displayTitle = true,
   bsSize = 'small',
-  header,
+  header = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
   const location = useLocation();
-  const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled);
+  const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration);
 
   const _onChange = useCallback(
-    (timerange: any) => {
+    (timerange: TimeRange) => {
       if (timerange !== null && timerange !== undefined) {
         onChange(onInitializingTimerange(timerange, formatTime));
       }

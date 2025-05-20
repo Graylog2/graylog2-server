@@ -36,7 +36,6 @@ import {
   DataNodePage,
   DataNodeUpgradePage,
   DataNodesClusterManagementPage,
-  DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
@@ -113,6 +112,8 @@ import {
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
+  ClusterCertificateManagementPage,
+  PluggableEventProceduresPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -216,6 +217,10 @@ const AppRouter = () => {
               path: RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId'),
               element: <ShowEventNotificationPage />,
             },
+            {
+              path: RoutePaths.ALERTS.EVENT_PROCEDURES.LIST(':viewType'),
+              element: <PluggableEventProceduresPage />,
+            },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
             { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
@@ -298,8 +303,8 @@ const AppRouter = () => {
               element: <DataNodesClusterManagementPage />,
             },
             !isCloud && {
-              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
-              element: <DataNodesClusterConfigurationPage />,
+              path: RoutePaths.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
+              element: <ClusterCertificateManagementPage />,
             },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&

@@ -16,19 +16,14 @@
  */
 package org.graylog.integrations.aws.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.graylog.integrations.aws.AWSMessageType;
-import org.graylog.integrations.aws.AWSPolicy;
-import org.graylog.integrations.aws.AWSPolicyStatement;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.responses.AWSRegion;
-import org.graylog.integrations.aws.resources.responses.AvailableService;
-import org.graylog.integrations.aws.resources.responses.AvailableServiceResponse;
-import org.graylog.integrations.aws.resources.responses.KinesisPermissionsResponse;
 import org.graylog.integrations.aws.resources.responses.RegionsResponse;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.database.NotFoundException;
@@ -47,14 +42,6 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.RegionMetadata;
 
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.InternalServerErrorException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -120,12 +107,16 @@ public class AWSService {
         return regions;
     }
 
+    public Input saveInput(AWSInputCreateRequest request, User user) throws Exception {
+        return saveInput(request, user, false);
+    }
+
     /**
      * Save the AWS Input
      * This method takes the individual input params in the {@link AWSInputCreateRequest} and creates/saves
      * an input with them.
      */
-    public Input saveInput(AWSInputCreateRequest request, User user) throws Exception {
+    public Input saveInput(AWSInputCreateRequest request, User user, boolean isSetupWizard) throws Exception {
 
         // Transpose the SaveAWSInputRequest to the needed InputCreateRequest
         final HashMap<String, Object> configuration = new HashMap<>();
@@ -156,7 +147,7 @@ public class AWSService {
                 configuration,
                 nodeId.getNodeId());
         try {
-            final MessageInput messageInput = messageInputFactory.create(inputCreateRequest, user.getName(), nodeId.getNodeId());
+            final MessageInput messageInput = messageInputFactory.create(inputCreateRequest, user.getName(), nodeId.getNodeId(), isSetupWizard);
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);

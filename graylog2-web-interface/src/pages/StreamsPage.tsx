@@ -29,12 +29,13 @@ import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore'
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const sendTelemetry = useSendTelemetry();
 
-  const onSave = (stream: Stream) => {
+  const onSave = (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });

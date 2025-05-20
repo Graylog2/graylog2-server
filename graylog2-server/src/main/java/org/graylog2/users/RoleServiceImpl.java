@@ -33,6 +33,7 @@ import jakarta.validation.Validator;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.Role;
@@ -66,22 +67,24 @@ public class RoleServiceImpl implements RoleService {
     private final String adminRoleObjectId;
     private final String readerRoleObjectId;
     private final MongoCollection<RoleImpl> collection;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public RoleServiceImpl(MongoCollections mongoCollections,
                            Permissions permissions,
-                           Validator validator) {
+                           Validator validator, ClusterEventBus clusterEventBus) {
         this.validator = validator;
 
         collection = mongoCollections.nonEntityCollection(ROLES_COLLECTION_NAME, RoleImpl.class);
+        this.clusterEventBus = clusterEventBus;
         // lower case role names are unique, this allows arbitrary naming, but still uses an index
         collection.createIndex(Indexes.ascending(NAME_LOWER), new IndexOptions().unique(true));
 
         // make sure the two built-in roles actually exist
         adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
-                "Grants all permissions for Graylog administrators (built-in)"));
+                "Grants all permissions for administrators (built-in)"));
         readerRoleObjectId = checkNotNull(ensureBuiltinRole(READER_ROLENAME, permissions.readerBasePermissions(), "Reader",
-                "Grants basic permissions for every Graylog user (built-in)"));
+                "Grants basic permissions for every user (built-in)"));
 
     }
 
@@ -179,17 +182,19 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleImpl save(Role role1) throws ValidationException {
+    public RoleImpl save(Role role) throws ValidationException {
         // sucky but necessary because of graylog2-shared not knowing about mongodb :(
-        if (!(role1 instanceof final RoleImpl role)) {
+        if (!(role instanceof final RoleImpl roleImpl)) {
             throw new IllegalArgumentException("invalid Role implementation class");
         }
-        final Set<ConstraintViolation<Role>> violations = validate(role);
+        final Set<ConstraintViolation<Role>> violations = validate(roleImpl);
         if (!violations.isEmpty()) {
             throw new ValidationException("Validation failed.", violations.toString());
         }
-        return collection.findOneAndReplace(eq(NAME_LOWER, role.nameLower()), role,
+        final RoleImpl result = collection.findOneAndReplace(eq(NAME_LOWER, roleImpl.nameLower()), roleImpl,
                 new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true));
+        triggerChangeEvent(roleImpl.getName());
+        return result;
     }
 
     @Override
@@ -202,7 +207,17 @@ public class RoleServiceImpl implements RoleService {
         final var nameMatchesAndNotReadonly = Filters.and(
                 eq(READ_ONLY, false),
                 eq(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH)));
-        return Ints.saturatedCast(collection.deleteOne(nameMatchesAndNotReadonly).getDeletedCount());
+        final int result = Ints.saturatedCast(collection.deleteOne(nameMatchesAndNotReadonly).getDeletedCount());
+        triggerChangeEvent(roleName);
+        return result;
+    }
+
+    /**
+     * Notify other parts of the system and cluster that there was a change in roles.
+     * @param roleName which role has been persisted or deleted.
+     */
+    private void triggerChangeEvent(String roleName) {
+        clusterEventBus.post(new RoleChangedEvent(roleName));
     }
 
     @Override

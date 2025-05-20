@@ -60,6 +60,7 @@ export type Token = {
   name: string;
   token: string;
   last_access: string;
+  expires_at: string;
 };
 
 export type TokenSummary = {
@@ -67,6 +68,7 @@ export type TokenSummary = {
   name: string;
   last_access: string;
   created_at: string;
+  expires_at: string;
   tokenTtl: string;
 };
 

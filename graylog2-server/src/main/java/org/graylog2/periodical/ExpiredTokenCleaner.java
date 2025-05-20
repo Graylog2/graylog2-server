@@ -59,7 +59,7 @@ public class ExpiredTokenCleaner extends Periodical {
 
         for (AccessTokenService.ExpiredToken token : expiredTokens) {
             ImmutableMap.Builder<String, Object> ctxBuilder = ImmutableMap.builder();
-            ctxBuilder.put(AccessTokenImpl.NAME, token.tokenName()).put("userId", token.userId()).put("username", token.username());
+            ctxBuilder.put(AccessTokenImpl.NAME, token.tokenName()).put("userId", token.userId() == null ? "null" : token.userId()).put("username", token.username());
             try {
                 this.tokenService.deleteById(token.id());
                 LOG.info("Successfully removed expired token \"{}\" (id: {}) for user <{}> (id <{}>).", token.tokenName(), token.id(), token.username(), token.userId());

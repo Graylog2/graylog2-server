@@ -30,9 +30,10 @@ public record TokenUsageDTO(
         @JsonProperty(FIELD_TOKEN_NAME) String tokenName,
         @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
         @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
-        @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
+        @Nullable @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
         @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
-        @JsonProperty(FIELD_AUTH_BACKEND) String authBackend) {
+        @JsonProperty(FIELD_AUTH_BACKEND) String authBackend,
+        @JsonProperty(FIELD_IS_USER_DELETED) boolean isUserDeleted) {
 
     public static final String FIELD_TOKEN_ID = "_id";
     public static final String FIELD_USERNAME = "username";
@@ -43,6 +44,7 @@ public record TokenUsageDTO(
     public static final String FIELD_EXPIRES_AT = "expires_at";
     public static final String FIELD_USER_IS_EXTERNAL = "external_user";
     public static final String FIELD_AUTH_BACKEND = "title";
+    public static final String FIELD_IS_USER_DELETED = "user_deleted";
 
     public static TokenUsageDTO create(@JsonProperty(FIELD_TOKEN_ID) String tokenId,
                                        @JsonProperty(FIELD_USERNAME) String username,
@@ -52,14 +54,16 @@ public record TokenUsageDTO(
                                        @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
                                        @Nullable @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
                                        @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
-                                       @Nullable @JsonProperty(FIELD_AUTH_BACKEND) String authBackend) {
+                                       @Nullable @JsonProperty(FIELD_AUTH_BACKEND) String authBackend,
+                                       @JsonProperty(FIELD_IS_USER_DELETED) boolean isUserDeleted) {
         return new TokenUsageDTO(tokenId, username, userId,
                 tokenName,
                 createdAt,
                 lastAccess,
                 expiresAt,
                 userIsExternal,
-                authBackend);
+                authBackend,
+                isUserDeleted);
     }
 
 }

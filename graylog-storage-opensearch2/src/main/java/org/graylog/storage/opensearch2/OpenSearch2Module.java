@@ -18,17 +18,26 @@ package org.graylog.storage.opensearch2;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.client.IndexerHostsAdapterOS2;
 import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
+import org.graylog.storage.opensearch2.sniffer.SnifferBuilder;
+import org.graylog.storage.opensearch2.sniffer.SnifferFilter;
+import org.graylog.storage.opensearch2.sniffer.impl.DatanodesSniffer;
+import org.graylog.storage.opensearch2.sniffer.impl.NodeAttributesFilter;
+import org.graylog.storage.opensearch2.sniffer.impl.NodeLoggingFilter;
+import org.graylog.storage.opensearch2.sniffer.impl.OpensearchClusterSniffer;
 import org.graylog.storage.opensearch2.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
 import org.graylog2.indexer.IndexToolsAdapter;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -90,6 +99,16 @@ public class OpenSearch2Module extends VersionAwareModule {
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
+
+        Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
+        snifferBuilders.addBinding().to(OpensearchClusterSniffer.class);
+        snifferBuilders.addBinding().to(DatanodesSniffer.class);
+
+        Multibinder<SnifferFilter> snifferFilters = Multibinder.newSetBinder(binder(), SnifferFilter.class);
+        snifferFilters.addBinding().to(NodeAttributesFilter.class);
+        snifferFilters.addBinding().to(NodeLoggingFilter.class);
+
+        bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterOS2.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
