@@ -19,15 +19,17 @@ package org.graylog.security.shares;
 import jakarta.annotation.Nonnull;
 import org.graylog.grn.GRN;
 
-import java.util.Collection;
+import java.util.Set;
 
-public interface DependentEntitiesResolver {
+public interface SyncedEntitiesResolver {
     /**
-     * Return dependent entities based on the provided primary entity.
+     * Return a set of entities that are to be kept in sync with the given entity.
+     * The primary use case is to keep sharing of closely coupled entities in sync; specifically Sigma
+     * rules and event definitions.
      *
      * @param primaryEntity The primary entity
-     * @return A collection of related entities; or empty collection, if there are none.
+     * @return A set of related entities; or empty set, if there are none.
      */
     @Nonnull
-    Collection<GRN> dependentEntities(GRN primaryEntity);
+    Set<GRN> syncedEntities(GRN primaryEntity);
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog.grn;
 
+import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.grn.providers.BultinGRNTypeProvider;
 import org.graylog2.plugin.PluginModule;
@@ -23,6 +24,7 @@ import org.graylog2.plugin.PluginModule;
 public class GRNModule extends PluginModule {
     @Override
     protected void configure() {
+        bind(GRNRegistry.class).in(Scopes.SINGLETON);
         Multibinder.newSetBinder(binder(), GRNTypeProvider.class).addBinding().to(BultinGRNTypeProvider.class);
     }
 }
