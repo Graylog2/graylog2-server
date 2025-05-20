@@ -19,6 +19,7 @@ package org.graylog2.jmte;
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class NamedDateRenderer implements NamedRenderer {
             return (DateTime) o;
         } else if (o instanceof Number) {
             long longValue = ((Number) o).longValue();
-            return new DateTime(longValue);
+            return new DateTime(longValue, DateTimeZone.UTC);
         } else if (o instanceof String) {
             return DateTime.parse((String) o);
         }
