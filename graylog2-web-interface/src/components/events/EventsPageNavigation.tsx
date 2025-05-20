@@ -42,17 +42,8 @@ const EventsPageNavigation = () => {
     [permissions],
   );
 
-<<<<<<< Updated upstream
-  const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense;
-  const formattedNavigationItems = navigationItems.map((item) => ({
-    title: item.description,
-    path: item.path,
-    exactPathMatch: item.description === 'Alerts & Events',
-  }));
-=======
   const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense && canViewEventProcedures;
   const formattedNavigationItems = navigationItems.map((item) => ({ title: item.description, path: item.path, exactPathMatch: item.description === 'Alerts & Events' }));
->>>>>>> Stashed changes
 
   const filteredNavigationItems = shouldDisplayEventProcedures
     ? formattedNavigationItems
