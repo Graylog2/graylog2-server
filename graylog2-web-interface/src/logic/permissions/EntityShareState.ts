@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { GranteeType, CapabilityType, SharedEntityType, ActiveShareType, GRN } from 'logic/permissions/types';
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -33,10 +32,7 @@ export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare> | null;
 export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
-export type SelectedGranteeCapabilities = Immutable.Map<
-  $PropertyType<GranteeType, 'id'>,
-  $PropertyType<CapabilityType, 'id'>
->;
+export type SelectedGranteeCapabilities = Immutable.Map<GranteeType['id'], CapabilityType['id']>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
 const _missingDependenciesFromJSON = (missingDependenciesJSON): Immutable.Map<string, Immutable.List<SharedEntity>> => {
@@ -92,13 +88,13 @@ type InternalState = {
 };
 
 export type EntityShareStateJson = {
-  entity: $PropertyType<InternalState, 'entity'>;
+  entity: InternalState['entity'];
   available_grantees: Array<GranteeType>;
   available_capabilities: Array<CapabilityType>;
   active_shares: Array<ActiveShareType>;
   selected_grantee_capabilities:
     | {
-        [grantee: string]: $PropertyType<Capability, 'id'>;
+        [grantee: string]: Capability['id'];
       }
     | {};
   missing_permissions_on_dependencies: { [key: string]: Array<SharedEntityType> };
@@ -109,13 +105,13 @@ export default class EntityShareState {
   _value: InternalState;
 
   constructor(
-    entity: $PropertyType<InternalState, 'entity'>,
-    availableGrantees: $PropertyType<InternalState, 'availableGrantees'>,
-    availableCapabilities: $PropertyType<InternalState, 'availableCapabilities'>,
-    activeShares: $PropertyType<InternalState, 'activeShares'>,
-    selectedGranteeCapabilities: $PropertyType<InternalState, 'selectedGranteeCapabilities'>,
-    missingDependencies: $PropertyType<InternalState, 'missingDependencies'>,
-    validationResults: $PropertyType<InternalState, 'validationResults'>,
+    entity: InternalState['entity'],
+    availableGrantees: InternalState['availableGrantees'],
+    availableCapabilities: InternalState['availableCapabilities'],
+    activeShares: InternalState['activeShares'],
+    selectedGranteeCapabilities: InternalState['selectedGranteeCapabilities'],
+    missingDependencies: InternalState['missingDependencies'],
+    validationResults: InternalState['validationResults'],
   ) {
     this._value = {
       entity,
@@ -128,31 +124,31 @@ export default class EntityShareState {
     };
   }
 
-  get entity(): $PropertyType<InternalState, 'entity'> {
+  get entity(): InternalState['entity'] {
     return this._value.entity;
   }
 
-  get availableGrantees(): $PropertyType<InternalState, 'availableGrantees'> {
+  get availableGrantees(): InternalState['availableGrantees'] {
     return this._value.availableGrantees;
   }
 
-  get availableCapabilities(): $PropertyType<InternalState, 'availableCapabilities'> {
+  get availableCapabilities(): InternalState['availableCapabilities'] {
     return this._value.availableCapabilities;
   }
 
-  get activeShares(): $PropertyType<InternalState, 'activeShares'> {
+  get activeShares(): InternalState['activeShares'] {
     return this._value.activeShares;
   }
 
-  get selectedGranteeCapabilities(): $PropertyType<InternalState, 'selectedGranteeCapabilities'> {
+  get selectedGranteeCapabilities(): InternalState['selectedGranteeCapabilities'] {
     return this._value.selectedGranteeCapabilities;
   }
 
-  get missingDependencies(): $PropertyType<InternalState, 'missingDependencies'> {
+  get missingDependencies(): InternalState['missingDependencies'] {
     return this._value.missingDependencies;
   }
 
-  get validationResults(): $PropertyType<InternalState, 'validationResults'> {
+  get validationResults(): InternalState['validationResults'] {
     return this._value.validationResults;
   }
 
@@ -266,31 +262,31 @@ class Builder {
     this.value = value;
   }
 
-  entity(value: $PropertyType<InternalState, 'entity'>): Builder {
+  entity(value: InternalState['entity']): Builder {
     return new Builder(this.value.set('entity', value));
   }
 
-  availableGrantees(value: $PropertyType<InternalState, 'availableGrantees'>): Builder {
+  availableGrantees(value: InternalState['availableGrantees']): Builder {
     return new Builder(this.value.set('availableGrantees', value));
   }
 
-  availableCapabilities(value: $PropertyType<InternalState, 'availableCapabilities'>): Builder {
+  availableCapabilities(value: InternalState['availableCapabilities']): Builder {
     return new Builder(this.value.set('availableCapabilities', value));
   }
 
-  activeShares(value: $PropertyType<InternalState, 'activeShares'>): Builder {
+  activeShares(value: InternalState['activeShares']): Builder {
     return new Builder(this.value.set('activeShares', value));
   }
 
-  selectedGranteeCapabilities(value: $PropertyType<InternalState, 'selectedGranteeCapabilities'>): Builder {
+  selectedGranteeCapabilities(value: InternalState['selectedGranteeCapabilities']): Builder {
     return new Builder(this.value.set('selectedGranteeCapabilities', value));
   }
 
-  missingDependencies(value: $PropertyType<InternalState, 'missingDependencies'>): Builder {
+  missingDependencies(value: InternalState['missingDependencies']): Builder {
     return new Builder(this.value.set('missingDependencies', value));
   }
 
-  validationResults(value: $PropertyType<InternalState, 'validationResults'>): Builder {
+  validationResults(value: InternalState['validationResults']): Builder {
     return new Builder(this.value.set('validationResults', value));
   }
 

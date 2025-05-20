@@ -20,7 +20,6 @@ import compact from 'lodash/compact';
 import camelCase from 'lodash/camelCase';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
-import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
 
 import { validateField } from 'util/FormsUtils';
@@ -243,14 +242,14 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 
 type Props = {
   authBackendMeta: AuthBackendMeta;
-  initialStepKey?: $PropertyType<StepType, 'key'>;
+  initialStepKey?: StepType['key'];
   initialValues: WizardFormValues;
   excludedFields?: { [inputName: string]: boolean };
   help?: { [inputName: string]: React.ReactElement | string | null | undefined };
   onSubmit: (
     WizardSubmitPayload,
     WizardFormValues,
-    serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>,
+    serviceType: AuthBackendMeta['serviceType'],
     shouldUpdateGroupSync?: boolean,
   ) => Promise<LoadBackendResponse>;
 };
@@ -330,7 +329,7 @@ const BackendWizard = ({
 
   const _getSubmitPayload = _prepareSubmitPayload(stepsState, _getUpdatedFormsValues);
 
-  const _setActiveStepKey = (stepKey: $PropertyType<StepType, 'key'>) => {
+  const _setActiveStepKey = (stepKey: StepType['key']) => {
     const formValues = _getUpdatedFormsValues();
     let invalidStepKeys = [...stepsState.invalidStepKeys];
 

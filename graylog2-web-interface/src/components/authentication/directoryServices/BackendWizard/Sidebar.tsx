@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
