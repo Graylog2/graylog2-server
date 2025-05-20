@@ -100,11 +100,10 @@ const PublicNotifications = ({ readFromConfig = false }: Props) => {
       const _dismiss = () => onDismissPublicNotification(notificationId);
 
       return (
-        <AlertContainer>
+        <AlertContainer key={title}>
           <StyledAlert
             bsStyle={variant}
             onDismiss={isDismissible ? _dismiss : undefined}
-            key={title}
             title={!hiddenTitle && title}>
             <FlexWrap>
               <ShortContent>{shortMessage}</ShortContent>
