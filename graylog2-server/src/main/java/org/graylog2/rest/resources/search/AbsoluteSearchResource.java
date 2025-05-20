@@ -92,7 +92,7 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(name = "limit", value = "Maximum number of messages to return.") @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset") @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter") @QueryParam("filter") String filter,
-            @ApiParam(name = "streams", value = "Comma separated list of streams to search in") @QueryParam("streams")  String streams,
+            @ApiParam(name = "streams", value = "Comma separated list of stream IDs to search in") @QueryParam("streams")  String streams,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return") @QueryParam("fields") String fields,
             @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)") @QueryParam("sort") String sort,
             @ApiParam(name = "decorate", value = "Run decorators on search result") @QueryParam("decorate") @DefaultValue("true") boolean decorate,
