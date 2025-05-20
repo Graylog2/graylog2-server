@@ -62,6 +62,7 @@ public class EntitySharesService {
     private final GranteeService granteeService;
     private final EventBus serverEventBus;
     private final Set<DependentEntitiesResolver> entitiesResolvers;
+    private final BuiltinCapabilities builtinCapabilities;
 
     @Inject
     public EntitySharesService(DBGrantService grantService,
@@ -70,7 +71,8 @@ public class EntitySharesService {
                                GRNRegistry grnRegistry,
                                GranteeService granteeService,
                                EventBus serverEventBus,
-                               Set<DependentEntitiesResolver> entitiesResolvers) {
+                               Set<DependentEntitiesResolver> entitiesResolvers,
+                               final BuiltinCapabilities builtinCapabilities) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
@@ -78,6 +80,7 @@ public class EntitySharesService {
         this.granteeService = granteeService;
         this.serverEventBus = serverEventBus;
         this.entitiesResolvers = entitiesResolvers;
+        this.builtinCapabilities = builtinCapabilities;
     }
 
     /**
@@ -380,7 +383,7 @@ public class EntitySharesService {
 
     private ImmutableSet<AvailableCapability> getAvailableCapabilities() {
         // TODO: Don't use GRNs for capabilities
-        return BuiltinCapabilities.allSharingCapabilities().stream()
+        return builtinCapabilities.allSharingCapabilities().stream()
                 .map(descriptor -> EntityShareResponse.AvailableCapability.create(descriptor.capability().toId(), descriptor.title()))
                 .collect(ImmutableSet.toImmutableSet());
     }
