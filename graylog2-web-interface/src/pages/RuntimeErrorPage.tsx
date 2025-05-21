@@ -18,10 +18,10 @@ import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
-import { Icon } from 'components/common';
-import { Button } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
+import Button from 'components/bootstrap/Button';
 import ErrorPage from 'components/errors/ErrorPage';
-import { SupportSources } from 'components/support';
+import SupportSources from 'components/support/SupportSources';
 import ClipboardButton from 'components/common/ClipboardButton';
 import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
