@@ -27,7 +27,9 @@ import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
+import org.graylog.security.CapabilityPermissions;
 import org.graylog.security.DBGrantService;
+import org.graylog.security.DefaultBuiltinCapabilities;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDependencyPermissionChecker;
 import org.graylog.security.entities.EntityDependencyResolver;
@@ -90,10 +92,7 @@ class EntitySharesServiceTest {
         lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(ImmutableSet.of());
 
         final EventBus serverEventBus = mock(EventBus.class);
-        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
-
-        // TODO this is needed to initialize the CAPABILITIES field
-        new BuiltinCapabilities();
+        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus, new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
     }
 
     // TODO Test more EntitySharesService functionality
