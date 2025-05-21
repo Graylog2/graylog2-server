@@ -29,6 +29,7 @@ import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
+import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
@@ -59,35 +60,30 @@ public class OpensearchCommandLineProcess implements Closeable {
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
      * start the DataNode inside IntelliJ.
-     *
-     * @param config
      */
-    private void fixJdkOnMac(final OpensearchConfiguration config) {
-        final var isMacOS = OS.isFamilyMac();
-        final var jdk = config.getOpensearchDistribution().directory().resolve("jdk.app");
-        final var jdkNotLinked = !Files.exists(jdk);
-        if (isMacOS && jdkNotLinked) {
-            // Link System jdk into startup folder, get path:
-            final ProcessBuilder builder = new ProcessBuilder("/usr/libexec/java_home");
-            builder.redirectErrorStream(true);
-            try {
-                final Process process = builder.start();
-                final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
-                var line = reader.readLine();
-                if (line != null && Files.exists(Path.of(line))) {
-                    final var target = Path.of(line);
-                    final var src = Files.createDirectories(jdk.resolve("Contents"));
-                    Files.createSymbolicLink(src.resolve("Home"), target);
-                } else {
-                    LOG.error("Output of '/usr/libexec/java_home' is not the jdk: {}", line);
-                }
-                // cleanup
-                process.destroy();
-                reader.close();
-            } catch (IOException e) {
-                LOG.error("Could not link jdk.app on macOS: {}", e.getMessage(), e);
-            }
+    private Environment fixJdkOnMac(Environment environment) {
+        if (!OS.isFamilyMac()) {
+            return environment;
         }
+        // set system jdk as OS jdk
+        final ProcessBuilder builder = new ProcessBuilder("/usr/libexec/java_home");
+        builder.redirectErrorStream(true);
+        try {
+            final Process process = builder.start();
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
+            var line = reader.readLine();
+            if (line != null && Files.exists(Path.of(line))) {
+                return environment.withOpensearchJavaHome(Path.of(line));
+            } else {
+                LOG.error("Output of '/usr/libexec/java_home' is not the jdk: {}", line);
+            }
+            // cleanup
+            process.destroy();
+            reader.close();
+        } catch (IOException e) {
+            LOG.error("Could not link jdk.app on macOS: {}", e.getMessage(), e);
+        }
+        return environment;
     }
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
@@ -107,13 +103,13 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
-        fixJdkOnMac(config);
+        Environment env = fixJdkOnMac(config.getEnv());
         configureOpensearchKeystoreSecrets(config);
         final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
         logWarnings(config);
         resultHandler = new CommandLineProcessListener(listener);
-        commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
+        commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, env);
     }
 
     private void logWarnings(OpensearchConfiguration config) {
