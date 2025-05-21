@@ -99,6 +99,7 @@ export const ShareFormSection = styled.div(
 
 export const GranteesSelectorHeadline = styled.h5(
   ({ theme }) => css`
+    font-weight: bold;
     margin-bottom: ${theme.spacings.xs};
   `,
 );
