@@ -41,7 +41,7 @@ const StyledNavbar = styled(Navbar)(
           font-size: ${theme.fonts.size.navigation};
 
           &:hover,
-          &:focus {
+          &:focus-visible {
             ${hoverIndicatorStyles(theme)}
           }
         }
@@ -50,7 +50,7 @@ const StyledNavbar = styled(Navbar)(
           > * {
             ${activeIndicatorStyles(theme)}
             &:hover,
-          &:focus {
+            &:focus-visible {
               ${activeIndicatorStyles(theme)}
             }
           }

@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -74,6 +75,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -92,6 +94,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "latest(http_method)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -111,6 +114,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -134,6 +138,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "unknown_field_1", "unknown_field_2", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -156,6 +161,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "unknown_field_1", "http_method", "unknown_field_2", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -178,6 +184,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "unknown_field_1", "http_method", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -201,6 +208,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "unknown_field_1", "unknown_field_2", "unknown_field_3", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -221,6 +229,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -241,6 +250,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -268,6 +278,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "timestamp", "avg(took_ms)", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -302,6 +313,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "2022-09-26T14:12:10.000Z, avg(took_ms)", "2022-09-26T14:12:20.000Z, avg(took_ms)", "2022-09-26T14:12:30.000Z, avg(took_ms)", "2022-09-26T14:12:40.000Z, avg(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -331,6 +343,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "DELETE, count()", "GET, count()", "POST, count()", "PUT, count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -354,6 +367,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "DELETE, count()", "GET, count()", "POST, count()", "PUT, count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -378,6 +392,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "200, count()", "201, count()", "204, count()", "500, count()", "504, count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -425,6 +440,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "missing_row_pivot", "(Empty Value), count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(2));
@@ -448,6 +464,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -493,6 +510,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -540,6 +558,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -593,6 +612,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -630,6 +650,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "action", "controller", "max(took_ms)", "min(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -666,6 +687,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "action", "controller", "max(took_ms)", "min(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -697,6 +719,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "max(took_ms)", "min(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -725,6 +748,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -753,6 +777,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "Maximum Response Time", "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -855,6 +880,7 @@ public class SearchAggregationsIT {
                 .build();
 
         final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "percentage(took_ms,SUM)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -913,5 +939,10 @@ public class SearchAggregationsIT {
     private ValidatableResponse executePivot(Pivot pivot) {
         return api.search().executePivot(pivot)
                 .body(".total", equalTo(1000));
+    }
+
+    private void checkColumnNames(final ValidatableResponse validatableResponse, String... names) {
+        validatableResponse.rootPath(PIVOT_PATH).body("column_names", hasSize(names.length));
+        validatableResponse.rootPath(PIVOT_PATH).body("column_names", contains(names));
     }
 }

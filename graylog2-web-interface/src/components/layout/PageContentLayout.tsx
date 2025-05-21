@@ -21,13 +21,13 @@ import { Outlet } from 'react-router-dom';
 import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
+import useFooterCustomization from 'brand-customization/useFooterCustomization';
 
-type Props = {
-  children?: React.ReactNode;
+type Props = React.PropsWithChildren<{
   className?: string;
   FooterComponent?: React.ComponentType;
   NotificationsComponent?: React.ComponentType<{ children: React.ReactNode }>;
-};
+}>;
 
 const Container = styled.div(
   ({ theme }) => `
@@ -53,19 +53,23 @@ const StyledGrid = styled(Grid)`
  * The section includes all page specific components, but not elements like the navigation or sidebar.
  */
 const PageContentLayout = ({
-  children,
-  className,
+  children = null,
+  className = undefined,
   FooterComponent = Footer,
   NotificationsComponent = WithGlobalAppNotifications,
-}: Props) => (
-  <Container className={className}>
-    <NotificationsComponent>
-      <StyledGrid fluid className="page-content-grid">
-        {children || <Outlet />}
-      </StyledGrid>
-      <FooterComponent />
-    </NotificationsComponent>
-  </Container>
-);
+}: Props) => {
+  const { enabled } = useFooterCustomization();
+
+  return (
+    <Container className={className}>
+      <NotificationsComponent>
+        <StyledGrid fluid className="page-content-grid">
+          {children || <Outlet />}
+        </StyledGrid>
+        <>{enabled && <FooterComponent />}</>
+      </NotificationsComponent>
+    </Container>
+  );
+};
 
 export default PageContentLayout;

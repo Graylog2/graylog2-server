@@ -63,7 +63,7 @@ public class StreamServiceImplTest {
     private StreamService streamService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
                 outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
     }

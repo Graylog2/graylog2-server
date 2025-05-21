@@ -149,7 +149,6 @@ class SimulationResults extends React.Component<
         </Col>
         <Col md={6}>
           <h1>Original message</h1>
-          <p>This is the original message loaded from Graylog.</p>
           <div className="message-preview-wrapper">{originalMessagePreview}</div>
         </Col>
         <Col md={6}>

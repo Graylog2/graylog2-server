@@ -19,6 +19,7 @@ import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 
+import type { QualifiedUrl } from 'routing/Routes';
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
 import type Widget from 'views/logic/widgets/Widget';
@@ -206,7 +207,7 @@ export interface ExportFormat {
 }
 
 export interface SystemConfigurationComponentProps<T = unknown> {
-  config: T;
+  config?: T;
   updateConfig: (newConfig: T) => any;
 }
 
@@ -215,6 +216,7 @@ export interface SystemConfiguration {
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
+  useCondition?: () => boolean;
 }
 
 export type GenericResult = {
@@ -315,6 +317,18 @@ type AssetInformationComponentProps = {
   addToQuery?: (id: string) => void;
 };
 
+type EventProcedureFormProps = {
+  eventProcedureID: string | undefined;
+  remediationSteps: string;
+  onClose: () => void;
+  onSave: (eventProcedureId: string) => void;
+};
+
+type EventProcedureSummaryProps = {
+  eventDefinitionEventProcedure: string | undefined;
+  eventId?: string;
+};
+
 type SearchAction = {
   component: React.ComponentType<SearchActionComponentProps>;
   key: string;
@@ -349,6 +363,26 @@ type AssetInformation = {
   key: string;
 };
 
+type EventProceduresProps = {
+  navigationComponent?: React.ReactNode;
+  useCoreRoutes?: boolean;
+};
+
+type EventProcedures = {
+  EventProcedures: React.ComponentType<EventProceduresProps>;
+  key: string;
+};
+
+type EventProcedureForm = {
+  component: React.ComponentType<EventProcedureFormProps>;
+  key: string;
+};
+
+type EventProcedureSummary = {
+  component: React.ComponentType<EventProcedureSummaryProps>;
+  key: string;
+};
+
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
   modalRef: () => T;
@@ -365,6 +399,20 @@ type SearchActionComponentProps = {
   search: View;
   modalRefs?: { [key: string]: () => unknown };
 };
+
+type PluginNavigationLink = {
+  path: QualifiedUrl<string>;
+};
+
+type PluginNavigation = {
+  description: string;
+  requiredFeatureFlag?: string;
+  perspective?: string;
+  BadgeComponent?: React.ComponentType<{ text: string }>;
+  position?: { last: true } | { after: string } | undefined;
+  permissions?: string | Array<string>;
+  useIsValidLicense?: () => boolean;
+} & PluginNavigationLink;
 
 export type CopyParamsToView = (sourceView: View, targetView: View) => View;
 
@@ -500,6 +548,32 @@ export type SearchDataSource = {
   useCondition: () => boolean;
 };
 
+type LICENSE_SUBJECTS = {
+  enterprise: '/license/enterprise';
+  archive: '/license/enterprise/archive';
+  auditlog: '/license/enterprise/auditlog';
+  illuminate: '/license/enterprise/illuminate';
+  searchFilter: '/license/enterprise/search-filter';
+  customization: '/license/enterprise/customization';
+  views: '/license/enterprise/views';
+  forwarder: '/license/enterprise/forwarder';
+  report: '/license/enterprise/report';
+  security: '/license/security';
+  anomaly: '/license/anomaly';
+};
+
+type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
+
+export type LicenseCheck = (subject: LicenseSubject) => {
+  data: {
+    valid: boolean;
+    expired: boolean;
+    violated: boolean;
+  };
+  isInitialLoading: boolean;
+  refetch: () => void;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -514,8 +588,12 @@ declare module 'graylog-web-plugin/plugin' {
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
+    'alerts.pageNavigation'?: Array<PluginNavigation>;
+    'eventProcedures'?: Array<EventProcedures>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
+    'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
+    'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
@@ -564,5 +642,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
+    'licenseCheck'?: LicenseCheck;
   }
 }

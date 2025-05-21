@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { Button, Panel, Input } from 'components/bootstrap';
@@ -27,11 +27,7 @@ import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/co
 import { ApiContext } from 'integrations/aws/context/Api';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import Icon from 'components/common/Icon';
-
-type StepHealthCheckProps = {
-  onSubmit: (...args: any[]) => void;
-  onChange: (...args: any[]) => void;
-};
+import useProductName from 'brand-customization/useProductName';
 
 const Notice = styled.span`
   display: flex;
@@ -51,10 +47,16 @@ const CheckAgain = styled.p`
   }
 `;
 
+type StepHealthCheckProps = {
+  onSubmit: (...args: any[]) => void;
+  onChange: (...args: any[]) => void;
+};
+
 const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [pauseCountdown, setPauseCountdown] = useState(false);
+  const productName = useProductName();
 
   const [logDataProgress, setLogDataUrl] = useFetch(
     null,
@@ -78,14 +80,14 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     if (!logData) {
       checkForLogs();
     }
-  }, [logData, checkForLogs]);
+  }, [checkForLogs, logData]);
 
   useEffect(() => {
     if (!logDataProgress.loading && !logDataProgress.data) {
       setPauseCountdown(false);
       setLogDataUrl(null);
     }
-  }, [logDataProgress.loading, logDataProgress.data, setLogDataUrl]);
+  }, [logDataProgress.data, logDataProgress.loading, setLogDataUrl]);
 
   if (!logData) {
     return (
@@ -170,7 +172,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
         }>
         {knownLog
           ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'
-          : 'Not to worry, you can still create the input and ingest messages later!'}
+          : `Not to worry, ${productName} can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!`}
       </Panel>
 
       <Input

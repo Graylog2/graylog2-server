@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.BuiltinCapabilities;
+import org.graylog.security.DefaultBuiltinCapabilities;
 import org.graylog.security.GranteeAuthorizer;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +29,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +53,7 @@ public class EntityDependencyPermissionCheckerTest {
 
     @Before
     public void setUp() throws Exception {
-        this.resolver = new EntityDependencyPermissionChecker(userAuthorizerFactory, new BuiltinCapabilities());
+        this.resolver = new EntityDependencyPermissionChecker(userAuthorizerFactory,new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
     }
 
     @Test

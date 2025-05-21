@@ -29,7 +29,6 @@ import { ApiContext } from 'integrations/aws/context/Api';
 
 import SetupModal from './setup-steps/SetupModal';
 
-
 const BackButton = styled(Button)`
   margin-right: 9px;
 `;
@@ -113,8 +112,8 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
       title="Set Up Kinesis Automatically"
       description="">
       <p>
-        Complete the fields below and Graylog will perform the automated Kinesis setup, which performs the following
-        operations within your AWS account. See{' '}
+        Complete the fields below to start the automated Kinesis setup. This will perform the following operations
+        within your AWS account. See{' '}
         <a
           target="_blank"
           rel="noopener noreferrer"

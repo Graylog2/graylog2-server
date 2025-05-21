@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import useProductName from 'brand-customization/useProductName';
 import LoginChrome from 'components/login/LoginChrome';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Alert from 'components/bootstrap/Alert';
@@ -31,6 +30,7 @@ import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useProductName from 'brand-customization/useProductName';
 
 import LoadingPage from './LoadingPage';
 
@@ -120,6 +120,7 @@ const LoginPage = () => {
     () => registeredLoginComponents.find((c) => c.type === activeBackend),
     [activeBackend, registeredLoginComponents],
   );
+  const loginComponentTitle = loginComponent?.title ?? loginComponent?.type.replace(/^\w/, (c) => c.toUpperCase());
   const CustomLogin = loginComponent?.formComponent;
   const hasCustomLogin = CustomLogin !== undefined;
 
@@ -174,7 +175,7 @@ const LoginPage = () => {
         <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+            {`Login with ${useFallback ? loginComponentTitle : 'default method'}`}
           </StyledButton>
         )}
       </LoginChrome>

@@ -17,19 +17,40 @@
 import * as React from 'react';
 
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { Row } from 'components/bootstrap';
 
-const NAV_ITEMS = [
-  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
-  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST },
-  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST },
-];
+const EventsPageNavigation = () => {
+  const navigationItems = usePluginEntities('alerts.pageNavigation');
+  const pluggableEventProcedures = usePluginEntities('eventProcedures');
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
 
-const EventsPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
+  const {
+    data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
+
+  const hasEventProceduresPlugin =
+    pluggableEventProcedures !== undefined &&
+    pluggableEventProcedures[0]?.EventProcedures &&
+    typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
+  const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
+
+  const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense;
+  const formattedNavigationItems = navigationItems.map((item) => ({
+    title: item.description,
+    path: item.path,
+    exactPathMatch: item.description === 'Alerts & Events',
+  }));
+
+  const filteredNavigationItems = shouldDisplayEventProcedures
+    ? formattedNavigationItems
+    : formattedNavigationItems.filter((item) => item.title !== 'Event Procedures');
+
+  return (
+    <Row>
+      <PageNavigation items={filteredNavigationItems} />
+    </Row>
+  );
+};
 
 export default EventsPageNavigation;

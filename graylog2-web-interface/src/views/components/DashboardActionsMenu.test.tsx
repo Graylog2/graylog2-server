@@ -87,7 +87,7 @@ describe('DashboardActionsMenu', () => {
   useViewsPlugin();
 
   const submitDashboardSaveForm = async () => {
-    const saveDashboardModal = await screen.findByRole('dialog');
+    const saveDashboardModal = await screen.findByRole('dialog', { name: /Save new dashboard/i });
 
     const saveButton = within(saveDashboardModal).getByRole('button', {
       name: /create dashboard/i,
@@ -122,7 +122,7 @@ describe('DashboardActionsMenu', () => {
 
     const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null));
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
@@ -146,7 +146,7 @@ describe('DashboardActionsMenu', () => {
       .summary('This dashboard has been extended by a plugin')
       .build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null));
   });
 
   it('should open edit dashboard meta information modal', async () => {
