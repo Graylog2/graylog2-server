@@ -85,7 +85,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
   return (
     <>
       <Button
-        disabled={!isPermitted(currentUser.permissions, 'stream:edit')}
+        disabled={!isPermitted(currentUser.permissions, 'streams:edit')}
         bsSize="sm"
         onClick={openModal}
         title="Edit index set">
