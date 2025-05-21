@@ -20,6 +20,8 @@ import styled from 'styled-components';
 import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Spinner, ISODurationInput } from 'components/common';
 
+import useTokenTTL from './useTokenTTL';
+
 const StyledForm = styled.form`
   margin-top: 10px;
 
@@ -52,7 +54,8 @@ const CreateTokenForm = ({
   onCreate,
 }: Props) => {
   const [tokenName, setTokenName] = useState('');
-  const [tokenTtl, setTokenTtl] = useState(defaultTtl);
+  //const [tokenTtl, setTokenTtl] = useState(defaultTtl);
+  const [tokenTtl, setTokenTtl] = useTokenTTL(defaultTtl);
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
