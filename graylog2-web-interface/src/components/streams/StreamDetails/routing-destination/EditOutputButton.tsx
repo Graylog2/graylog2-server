@@ -53,7 +53,7 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
     <>
       <Button
         bsStyle="link"
-        disabled={!isPermitted(currentUser.permissions, 'outputs:edit') || disabled}
+        disabled={!isPermitted(currentUser.permissions, ['outputs:edit', 'streams:edit']) || disabled}
         bsSize="xsmall"
         onClick={onClick}
         title="Edit Output">
