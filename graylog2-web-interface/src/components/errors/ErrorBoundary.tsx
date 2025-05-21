@@ -17,29 +17,44 @@
 import * as React from 'react';
 import type { ErrorInfo } from 'react';
 
-import { createReactError } from 'logic/errors/ReportedErrors';
-import ErrorsActions from 'actions/errors/ErrorsActions';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
+export type FallbackComponentType = React.ComponentType<{ error: Error; info: ErrorInfo }>;
 type Props = {
+  FallbackComponent: FallbackComponentType;
   children: React.ReactNode;
 };
 
-class RuntimeErrorBoundary extends React.Component<Props> {
+type State = {
+  error?: Error;
+  info?: ErrorInfo;
+};
+
+class ErrorBoundary extends React.Component<Props, State> {
   static contextType = TelemetryContext;
 
   context: React.ContextType<typeof TelemetryContext>;
 
+  constructor(props: Props) {
+    super(props);
+    this.state = {};
+  }
+
   componentDidCatch(error: Error, info: ErrorInfo) {
-    ErrorsActions.report(createReactError(error, { componentStack: info?.componentStack }));
+    this.setState({ error, info });
     this.context.sendErrorReport(error);
   }
 
   render() {
-    const { children } = this.props;
+    const { error, info } = this.state;
+    const { FallbackComponent, children } = this.props;
+
+    if (error) {
+      return <FallbackComponent error={error} info={info} />;
+    }
 
     return children;
   }
 }
 
-export default RuntimeErrorBoundary;
+export default ErrorBoundary;
