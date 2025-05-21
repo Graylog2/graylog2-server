@@ -1,0 +1,4 @@
+type = "f"
+message = "Close threat intelligence lookup configuration modal, located on system overview page, on cancel."
+
+pulls = ["22643"]
