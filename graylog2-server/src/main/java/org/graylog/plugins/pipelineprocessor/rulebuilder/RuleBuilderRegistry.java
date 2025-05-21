@@ -17,11 +17,16 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
 import com.google.common.collect.Streams;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import java.util.Collection;
 import java.util.Map;
@@ -32,12 +37,21 @@ public class RuleBuilderRegistry {
 
     private final FunctionRegistry functionRegistry;
     private final RuleFragmentService ruleFragmentService;
+    private final SecureFreemarkerConfigProvider secureFreemarkerConfigProvider;
+    private Collection<RuleFragment> ruleFragments;
+    private Configuration freemarkerConfiguration;
 
     @Inject
     public RuleBuilderRegistry(FunctionRegistry functionRegistry,
-                               RuleFragmentService ruleFragmentService) {
+                               RuleFragmentService ruleFragmentService,
+                               SecureFreemarkerConfigProvider secureFreemarkerConfigProvider,
+                               EventBus eventBus) {
         this.functionRegistry = functionRegistry;
         this.ruleFragmentService = ruleFragmentService;
+        this.ruleFragments = ruleFragmentService.all();
+        this.secureFreemarkerConfigProvider = secureFreemarkerConfigProvider;
+        initializeFragmentTemplates();
+        eventBus.register(this);
     }
 
     /**
@@ -68,7 +82,7 @@ public class RuleBuilderRegistry {
                         .descriptor(f.descriptor())
                         .build()
                 );
-        final Stream<RuleFragment> fragmentConditions = ruleFragmentService.all().stream()
+        final Stream<RuleFragment> fragmentConditions = ruleFragments.stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled() && f.isCondition());
         return Streams.concat(functionConditions, fragmentConditions)
                 .collect(Collectors.toMap(f -> f.descriptor().name(), function -> function));
@@ -103,10 +117,30 @@ public class RuleBuilderRegistry {
                         .build()
                 );
         final Stream<RuleFragment> fragmentActions =
-                ruleFragmentService.all().stream()
+                ruleFragments.stream()
                         .filter(f -> f.descriptor().ruleBuilderEnabled() && !f.isCondition());
         return Streams.concat(functionActions, fragmentActions)
                 .collect(Collectors.toMap(f -> f.descriptor().name(), function -> function));
+    }
+
+    public Configuration getFreemarkerConfiguration() {
+        return freemarkerConfiguration;
+    }
+
+    private void initializeFragmentTemplates() {
+        Map<String, RuleFragment> fragments = conditionsWithInternal();
+        fragments.putAll(actionsWithInternal());
+        final Configuration freemarkerConfiguration = secureFreemarkerConfigProvider.get();
+        StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
+        fragments.entrySet().stream().filter(c -> c.getValue().isFragment()).forEach(c -> stringTemplateLoader.putTemplate(c.getKey(), c.getValue().fragment()));
+        freemarkerConfiguration.setTemplateLoader(stringTemplateLoader);
+        this.freemarkerConfiguration = freemarkerConfiguration;
+    }
+
+    @Subscribe
+    public void updateRuleFragments(final RuleFragmentUpdateEvent event) {
+        this.ruleFragments = ruleFragmentService.all();
+        initializeFragmentTemplates();
     }
 
 }

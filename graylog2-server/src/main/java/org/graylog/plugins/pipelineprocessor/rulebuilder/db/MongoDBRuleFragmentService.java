@@ -24,8 +24,10 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleFragmentUpdateEvent;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.events.ClusterEventBus;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -38,26 +40,31 @@ public class MongoDBRuleFragmentService implements RuleFragmentService {
 
     private final MongoCollection<RuleFragment> collection;
     private final MongoUtils<RuleFragment> mongoUtils;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public MongoDBRuleFragmentService(MongoCollections mongoCollections) {
+    public MongoDBRuleFragmentService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
         collection = mongoCollections.collection(COLLECTION_NAME, RuleFragment.class);
         mongoUtils = mongoCollections.utils(collection);
         collection.createIndex(Indexes.ascending("name"), new IndexOptions().unique(true));
+        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
     public RuleFragment save(RuleFragment ruleFragment) {
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
         return mongoUtils.save(ruleFragment);
     }
 
     @Override
     public void delete(String name) {
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
         collection.deleteOne(eq("name", name));
     }
 
     @Override
     public void deleteAll() {
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
         collection.deleteMany(Filters.empty());
     }
 
