@@ -87,7 +87,7 @@ const EntityCreateShareFormGroup = ({
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
-  }, [entityType, entityTitle, entityGRN]);
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
