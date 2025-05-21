@@ -30,6 +30,7 @@ import useLocation from 'routing/useLocation';
 import type { Traffic } from 'components/common/Graph/types';
 import { DAYS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const StyledH3 = styled.h3(
   ({ theme }) => css`
@@ -66,6 +67,7 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title }: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
   const { pathname } = useLocation();
+  const { formatTime } = useUserDateTime();
 
   const sendTelemetry = useSendTelemetry();
 
@@ -95,7 +97,7 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title }: Props) => {
       </small>
     );
 
-    const unixTraffic = formatTrafficData(traffic);
+    const unixTraffic = formatTrafficData(traffic, formatTime);
 
     trafficGraph = <TrafficGraph traffic={unixTraffic} trafficLimit={trafficLimit} width={graphWidth} />;
   }

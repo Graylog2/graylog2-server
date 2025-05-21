@@ -14,25 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import map from 'lodash/map';
-import mapKeys from 'lodash/mapKeys';
-import mapValues from 'lodash/mapValues';
-import moment from 'moment';
-import crossfilter from 'crossfilter';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
 type Traffic = {
   [key: string]: number;
 };
 
-export const formatTrafficData = (traffic: Traffic) => {
-  const ndx = crossfilter(map(traffic, (value, key) => ({ ts: key, bytes: value })));
-  const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
+// Group traffic data by day
+export const formatTrafficData = (
+  traffic: Traffic,
+  formatTime: (dateTime: DateTime, format: DateTimeFormats) => string,
+) =>
+  Object.entries(traffic).reduce((acc, [utcTimestamp, value]) => {
+    const day = formatTime(utcTimestamp, 'date');
+    acc[day] = (acc[day] || 0) + value;
 
-  const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
-  const t = mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').toISOString());
-
-  return mapValues(t, (val) => val.value);
-};
+    return acc;
+  }, {});
 
 export default {
   formatTrafficData,
