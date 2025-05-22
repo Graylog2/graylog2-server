@@ -171,7 +171,7 @@ public class EntitySharesService {
 
     /**
      * Share / unshare an entity with one or more grantees.
-     * The grants in the request are created or, if they already exist, updated. Any dependent entities - as
+     * The grants in the request are created or, if they already exist, updated. Any synced entities - as
      * provided by the {@link SyncedEntitiesResolver} - are also updated.
      *
      * @param ownedEntity the target entity for the updated grants
@@ -180,7 +180,7 @@ public class EntitySharesService {
      */
     public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         final EntityShareResponse result = updatePrimaryEntityShares(ownedEntity, request, sharingUser);
-        return result.toBuilder().syncedDependentEntities(
+        return result.toBuilder().syncedEntities(
                         resolveImplicitGrants(ownedEntity, request, sharingUser))
                 .build();
     }
@@ -277,12 +277,12 @@ public class EntitySharesService {
      * @return list of synced entities
      */
     private Set<GRN> resolveImplicitGrants(GRN ownedEntity, EntityShareRequest shareRequest, User sharingUser) {
-        Set<GRN> dependentEntities = entitiesResolvers.stream()
+        Set<GRN> syncedEntities = entitiesResolvers.stream()
                 .flatMap(resolver -> resolver.syncedEntities(ownedEntity).stream())
                 .collect(Collectors.toSet());
 
         ImmutableSet.Builder<GRN> failureBuilder = ImmutableSet.builder();
-        dependentEntities.forEach(grn -> {
+        syncedEntities.forEach(grn -> {
             final EntityShareResponse response = updatePrimaryEntityShares(grn, shareRequest, sharingUser);
             if (response.validationResult().failed()) {
                 failureBuilder.add(grn);
@@ -294,7 +294,7 @@ public class EntitySharesService {
             LOG.warn("Failed to sync sharing to the following related entities: {}", failedEntities);
         }
 
-        return dependentEntities;
+        return syncedEntities;
     }
 
     /**
