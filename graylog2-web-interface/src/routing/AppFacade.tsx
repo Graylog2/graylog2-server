@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import { useStore } from 'stores/connect';
 import 'bootstrap/less/bootstrap.less';
-import 'toastr/toastr.less';
 import type { Store } from 'stores/StoreTypes';
 import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -30,6 +29,7 @@ import type { SessionStoreState } from 'stores/sessions/SessionStore';
 import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import Notifications from 'routing/Notifications';
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
@@ -40,6 +40,7 @@ const SERVER_PING_TIMEOUT = 20000;
 const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
   <GraylogThemeProvider userIsLoggedIn={false}>
     <GlobalThemeStyles />
+    <Notifications />
     {children}
   </GraylogThemeProvider>
 );
@@ -55,31 +56,27 @@ const AppFacade = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (server.up === false) {
-    return (
-      <LoggedOutThemeProvider>
-        <ServerUnavailablePage server={server} />
-      </LoggedOutThemeProvider>
-    );
-  }
+  const ThemeProvider = useMemo(
+    () => (server.up && username && currentUser ? React.Fragment : LoggedOutThemeProvider),
+    [currentUser, server.up, username],
+  );
+  const content = useMemo(() => {
+    if (server.up === false) {
+      return <ServerUnavailablePage server={server} />;
+    }
 
-  if (!username) {
-    return (
-      <LoggedOutThemeProvider>
-        <LoginPage />
-      </LoggedOutThemeProvider>
-    );
-  }
+    if (!username) {
+      return <LoginPage />;
+    }
 
-  if (!currentUser) {
-    return (
-      <LoggedOutThemeProvider>
-        <LoadingPage text="We are preparing the web interface for you..." />
-      </LoggedOutThemeProvider>
-    );
-  }
+    if (!currentUser) {
+      return <LoadingPage text="We are preparing the web interface for you..." />;
+    }
 
-  return <LoggedInPage />;
+    return <LoggedInPage />;
+  }, [currentUser, server, username]);
+
+  return <ThemeProvider>{content}</ThemeProvider>;
 };
 
 export default AppFacade;

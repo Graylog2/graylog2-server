@@ -31,9 +31,11 @@ export type TelemetryEventType = '$pageview' | EventType;
 
 type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent | { [key: string]: unknown }) => void;
+  sendErrorReport: (error: unknown) => void;
 };
 const TelemetryContext = React.createContext<ContextType>({
   sendTelemetry: () => {},
+  sendErrorReport: () => {},
 });
 
 export default singleton('contexts.TelemetryContext', () => TelemetryContext);

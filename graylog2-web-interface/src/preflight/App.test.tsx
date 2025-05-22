@@ -53,7 +53,7 @@ jest.mock('preflight/hooks/useDataNodesCA', () =>
   })),
 );
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));

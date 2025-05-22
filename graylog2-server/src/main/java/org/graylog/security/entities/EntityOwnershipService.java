@@ -16,6 +16,8 @@
  */
 package org.graylog.security.entities;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -27,8 +29,7 @@ import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import java.util.List;
 
 @Singleton
 public class EntityOwnershipService {
@@ -79,6 +80,11 @@ public class EntityOwnershipService {
     //TODO: this method could replace all methods from unregister... family, so that we don't have to add two methods and tests for each new GRN Type in the future
     public void unregisterEntity(final String id, final GRNType grnType) {
         removeGrantsForTarget(grnRegistry.newGRN(grnType, id));
+    }
+
+    public List<GrantDTO> getGrantsForTarget(final GRNType type, final String id) {
+        final GRN grn = grnRegistry.newGRN(type, id);
+        return dbGrantService.getForTarget(grn);
     }
 
     private void registerNewEntity(GRN entity, User user) {

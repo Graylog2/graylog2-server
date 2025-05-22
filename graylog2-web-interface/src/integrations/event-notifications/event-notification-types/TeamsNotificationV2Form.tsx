@@ -47,7 +47,7 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
       '      "contentType": "application/vnd.microsoft.card.adaptive",\n' +
       '      "content": {\n' +
       '        "type": "AdaptiveCard",\n' +
-      '        "version": "1.6",\n' +
+      '        "version": "1.5",\n' +
       '        "msTeams": { "width": "full" },\n' +
       '        "body": [\n' +
       '          {\n' +

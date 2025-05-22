@@ -23,10 +23,13 @@ import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
+import org.graylog.security.CapabilityPermissions;
 import org.graylog.security.DBGrantService;
+import org.graylog.security.DefaultBuiltinCapabilities;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDependencyPermissionChecker;
 import org.graylog.security.entities.EntityDependencyResolver;
@@ -45,6 +48,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -87,12 +91,8 @@ class EntitySharesServiceTest {
         lenient().when(entityDependencyPermissionChecker.check(any(), any(), any())).thenReturn(ImmutableMultimap.of());
         lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(ImmutableSet.of());
 
-
         final EventBus serverEventBus = mock(EventBus.class);
-        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
-
-        // TODO this is needed to initialize the CAPABILITIES field
-        new BuiltinCapabilities();
+        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus, new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
     }
 
     // TODO Test more EntitySharesService functionality
@@ -230,6 +230,7 @@ class EntitySharesServiceTest {
         });
 
     }
+
     @DisplayName("Only show shares for visible grantees")
     @Test
     void showShareForVisibleGrantee() {
@@ -240,7 +241,7 @@ class EntitySharesServiceTest {
         final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
         final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(Grantee.createUser(janeGRN, "jane"));
         when(granteeService.getAvailableGrantees(user)).thenReturn(allGranteesSet);
-        lenient().when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
+        when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
@@ -249,6 +250,65 @@ class EntitySharesServiceTest {
             assertThat(activeShares.iterator().next().grantee()).isEqualTo(janeGRN);
         });
     }
+
+    @DisplayName("Show shares without entity")
+    @Test
+    void showShareWithoutEntity() {
+        final EntityShareRequest shareRequest = EntityShareRequest.create(null);
+
+        final User user = createMockUser("hans");
+        final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(Grantee.createUser(janeGRN, "jane"));
+        when(granteeService.getAvailableGrantees(user)).thenReturn(allGranteesSet);
+        when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
+
+        final Subject subject = mock(Subject.class);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(shareRequest, user, subject);
+        assertThat(entityShareResponse.activeShares()).isEmpty();
+        assertThat(entityShareResponse.availableGrantees()).hasSize(1);
+        assertThat(entityShareResponse.availableCapabilities()).hasSize(3);
+        assertThat(entityShareResponse.selectedGranteeCapabilities()).isEmpty();
+    }
+
+    @DisplayName("Clone grants along with entity")
+    @Test
+    void cloneGrants() {
+        final GRNType grnType = GRNTypes.DASHBOARD;
+        final String idOrigin = "54e3deadbeefdeadbeefaffe";
+        final String idClone = "54e3deadbeefdeadbeefbeef";
+        final User user = createMockUser("hans");
+
+        final GRN originGRN = grnRegistry.newGRN(grnType, idOrigin);
+        final GRN cloneGRN = grnRegistry.newGRN(grnType, idClone);
+        final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        final GRN bobGRN = grnRegistry.newGRN(GRNTypes.USER, "bob");
+
+        final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(
+                Grantee.createUser(janeGRN, "jane"), Grantee.createUser(bobGRN, "bob"));
+        final GrantDTO grantDTOjane = GrantDTO.builder()
+                .grantee(janeGRN)
+                .capability(Capability.MANAGE)
+                .target(originGRN)
+                .build();
+        dbGrantService.create(grantDTOjane, user.getName());
+
+        final GrantDTO grantDTObob = GrantDTO.builder()
+                .grantee(bobGRN)
+                .capability(Capability.VIEW)
+                .target(originGRN)
+                .build();
+        dbGrantService.create(grantDTObob, user.getName());
+
+        when(granteeService.getAvailableGrantees(any())).thenReturn(allGranteesSet);
+        when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
+
+        entitySharesService.cloneEntityGrants(grnType, idOrigin, idClone, user);
+
+        final List<GrantDTO> forTarget = dbGrantService.getForTarget(cloneGRN);
+        assertThat(forTarget).extracting(GrantDTO::grantee)
+                .containsExactlyInAnyOrder(janeGRN, bobGRN);
+    }
+
 
     private User createMockUser(String name) {
         final User user = mock(User.class);

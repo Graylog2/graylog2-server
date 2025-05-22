@@ -27,7 +27,6 @@ import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'com
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
 import * as FormsUtils from 'util/FormsUtils';
-import useFeature from 'hooks/useFeature';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -59,7 +58,11 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
-  const isEventProceduresEnabled = useFeature('show_event_procedures');
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
 
   const handleChange = (event) => {
     const { name } = event.target;
@@ -80,27 +83,27 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
   const hasEventProcedure = !!eventDefinitionEventProcedure;
+  const hasRemediationSteps = eventDefinition?.remediation_steps;
 
   const renderEventProcedure = () => {
-    if (isEventProceduresEnabled) {
+    if (validSecurityLicense) {
       return (
         <>
-          {hasEventProcedure || showAddEventProcedureForm ? (
+          {hasEventProcedure || hasRemediationSteps || showAddEventProcedureForm ? (
             <>
               {pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
                 <PluggableEventProcedureForm
-                  eventDefinition={eventDefinition}
                   eventProcedureID={eventDefinitionEventProcedure}
+                  remediationSteps={eventDefinition?.remediation_steps}
                   onClose={() => setShowAddEventProcedureForm(false)}
                   onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
-                  canEdit={canEdit}
                 />
               ))}
             </>
           ) : (
             <>
               <ControlLabel>Event Procedure Summary</ControlLabel>
-              <p>This Event does not have any Event Procedures yet.</p>
+              <p>This Event Definition does not have any Event Procedures yet.</p>
               <Button bsStyle="success" onClick={() => setShowAddEventProcedureForm(true)}>
                 Add Event Procedure
               </Button>

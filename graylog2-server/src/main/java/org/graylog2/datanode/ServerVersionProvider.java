@@ -14,10 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.map.config;
+package org.graylog2.datanode;
 
-public class S3DownloadException extends Exception {
-    public S3DownloadException(String message) {
-        super(message);
+import jakarta.inject.Provider;
+import org.graylog2.plugin.Version;
+
+/**
+ * Let's inject the server version where needed. Using the static CURRENT_CLASSPATH field is making our code untestable.
+ * Injection allows clean unit tests.
+ */
+public class ServerVersionProvider implements Provider<Version> {
+    @Override
+    public Version get() {
+        return Version.CURRENT_CLASSPATH;
     }
 }
