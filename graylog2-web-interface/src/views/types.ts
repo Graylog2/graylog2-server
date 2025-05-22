@@ -19,7 +19,6 @@ import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 
-import type { QualifiedUrl } from 'routing/Routes';
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
 import type Widget from 'views/logic/widgets/Widget';
@@ -390,20 +389,6 @@ type SearchActionComponentProps = {
   modalRefs?: { [key: string]: () => unknown };
 };
 
-type PluginNavigationLink = {
-  path: QualifiedUrl<string>;
-};
-
-type PluginNavigation = {
-  description: string;
-  requiredFeatureFlag?: string;
-  perspective?: string;
-  BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: { last: true } | { after: string } | undefined;
-  permissions?: string | Array<string>;
-  useIsValidLicense?: () => boolean;
-} & PluginNavigationLink;
-
 export type CopyParamsToView = (sourceView: View, targetView: View) => View;
 
 type RemovingWidgetHook = (widgetId: string, dashboardId: string) => boolean;
@@ -578,7 +563,6 @@ declare module 'graylog-web-plugin/plugin' {
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
-    'alerts.pageNavigation'?: Array<PluginNavigation>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
