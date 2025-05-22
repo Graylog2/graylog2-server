@@ -22,6 +22,7 @@ import org.graylog.datanode.process.Environment;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Utility for correct removal of opensearch plugins from a maven build. This makes sure that no dependencies are
@@ -40,7 +41,7 @@ public class RemoveOpensearchPlugins {
         final Path binDir = opensearchDist.resolve("bin");
         final Path configDir = opensearchDist.resolve("config");
 
-        Environment env = new Environment(System.getenv())
+        Environment env = new Environment(Map.of())
                 .withOpensearchJavaHome(Path.of(System.getProperty("java.home")))
                 .withOpensearchPathConf(configDir);
 

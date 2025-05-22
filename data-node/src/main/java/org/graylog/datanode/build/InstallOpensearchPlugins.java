@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,7 @@ public class InstallOpensearchPlugins {
         final Path binDir = opensearchDist.resolve("bin");
         final Path configDir = opensearchDist.resolve("config");
 
-        Environment env = new Environment(System.getenv())
+        Environment env = new Environment(Map.of())
                 .withOpensearchJavaHome(Path.of(System.getProperty("java.home")))
                 .withOpensearchPathConf(configDir);
 
