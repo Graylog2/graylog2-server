@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -69,11 +70,14 @@ class V20230601104500_AddSourcesPageV2Test {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private Configuration configuration;
+
     private V20230601104500_AddSourcesPageV2 migration;
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null);
+            super(null, null, Map.of(), null, null, null);
         }
 
         @Override
@@ -108,7 +112,7 @@ class V20230601104500_AddSourcesPageV2Test {
                 new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
         ContentPackService contentPackService = new TestContentPackService();
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
-                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService);
+                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService, configuration);
     }
 
     @Test
@@ -125,6 +129,7 @@ class V20230601104500_AddSourcesPageV2Test {
     void freshInstallInstallsNewSourcesPage() {
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();
@@ -140,6 +145,7 @@ class V20230601104500_AddSourcesPageV2Test {
         previousMigrationHasRun();
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();

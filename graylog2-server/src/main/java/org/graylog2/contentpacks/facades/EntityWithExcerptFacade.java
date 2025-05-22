@@ -22,6 +22,7 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.graylog.security.GrantDTO;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -156,5 +157,9 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
      */
     default List<GrantDTO> resolveGrants(EntityClass nativeEntity) {
         return List.of();
+    }
+
+    default Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return Optional.empty();
     }
 }

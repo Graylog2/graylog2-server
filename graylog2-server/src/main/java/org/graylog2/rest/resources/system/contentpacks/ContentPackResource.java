@@ -36,10 +36,13 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
+import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
@@ -100,8 +103,8 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
+    @RequiresPermissions(RestPermissions.CONTENT_PACK_READ)
     public ContentPackList listContentPacks() {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
         Set<ModelId> contentPackIds = contentPacks.stream().map(x -> x.id()).collect(Collectors.toSet());
         Map<ModelId, Map<Integer, ContentPackMetadata>> metaData =
@@ -285,7 +288,8 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision") int revision,
             @ApiParam(name = "installation request", value = "Content pack installation request", required = true)
-            @Valid @NotNull ContentPackInstallationRequest contentPackInstallationRequest) {
+            @Valid @NotNull ContentPackInstallationRequest contentPackInstallationRequest,
+            @Context UserContext userContext) {
         checkPermission(RestPermissions.CONTENT_PACK_INSTALL, id.toString());
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
@@ -296,7 +300,7 @@ public class ContentPackResource extends RestResource {
                 contentPack,
                 contentPackInstallationRequest.parameters(),
                 contentPackInstallationRequest.comment(),
-                userName);
+                userContext);
 
         return installation;
     }

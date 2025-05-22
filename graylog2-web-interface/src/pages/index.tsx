@@ -112,6 +112,7 @@ const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
+const PluggableEventProceduresPage = loadAsync(() => import('./PluggableEventProceduresPage'));
 
 export {
   AuthenticationCreatePage,
@@ -210,4 +211,5 @@ export {
   UserEditPage,
   UserTokensEditPage,
   ViewEventDefinitionPage,
+  PluggableEventProceduresPage,
 };
