@@ -29,7 +29,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcernResult;
 import com.mongodb.WriteError;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.RawBsonDocument;
