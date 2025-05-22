@@ -19,6 +19,7 @@ import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 
+import type { QualifiedUrl } from 'routing/Routes';
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
 import type Widget from 'views/logic/widgets/Widget';
@@ -362,6 +363,16 @@ type AssetInformation = {
   key: string;
 };
 
+type EventProceduresProps = {
+  navigationComponent?: React.ReactNode;
+  useCoreRoutes?: boolean;
+};
+
+type EventProcedures = {
+  EventProcedures: React.ComponentType<EventProceduresProps>;
+  key: string;
+};
+
 type EventProcedureForm = {
   component: React.ComponentType<EventProcedureFormProps>;
   key: string;
@@ -388,6 +399,20 @@ type SearchActionComponentProps = {
   search: View;
   modalRefs?: { [key: string]: () => unknown };
 };
+
+type PluginNavigationLink = {
+  path: QualifiedUrl<string>;
+};
+
+type PluginNavigation = {
+  description: string;
+  requiredFeatureFlag?: string;
+  perspective?: string;
+  BadgeComponent?: React.ComponentType<{ text: string }>;
+  position?: { last: true } | { after: string } | undefined;
+  permissions?: string | Array<string>;
+  useIsValidLicense?: () => boolean;
+} & PluginNavigationLink;
 
 export type CopyParamsToView = (sourceView: View, targetView: View) => View;
 
@@ -563,6 +588,8 @@ declare module 'graylog-web-plugin/plugin' {
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
+    'alerts.pageNavigation'?: Array<PluginNavigation>;
+    'eventProcedures'?: Array<EventProcedures>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;

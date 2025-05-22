@@ -16,41 +16,59 @@
  */
 package org.graylog.datanode.process;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
-public class Environment {
+public record Environment(Map<String, String> env) {
 
     private static final String JAVA_HOME_ENV = "JAVA_HOME";
-
-    private final Map<String, String> env;
-    private final Map<String, String> additionalVariables = new HashMap<>();
+    private static final String OPENSEARCH_JAVA_HOME_ENV = "OPENSEARCH_JAVA_HOME";
+    public static final String OPENSEARCH_JAVA_OPTS_ENV = "OPENSEARCH_JAVA_OPTS";
+    public static final String OPENSEARCH_PATH_CONF_ENV = "OPENSEARCH_PATH_CONF";
 
     public Environment(Map<String, String> env) {
-        this.env = env;
+        this.env = new HashMap<>(cleanEnvironment(env));
     }
 
     public Environment put(String key, String value) {
-        this.additionalVariables.put(key, value);
+        this.env.put(key, value);
         return this;
     }
 
-    public Map<String, String> getEnv() {
-        Map<String, String> env = new HashMap<>();
-        env.putAll(cleanEnvironment(this.env));
-        env.putAll(additionalVariables);
+    /**
+     * OPENSEARCH_JAVA_HOME is the first env property where opensearch binary is looking for java home. If we set this,
+     * we can be sure that this JVM will be actually used, preventing users to override it.
+     */
+    public Environment withOpensearchJavaHome(Path javaHome) {
+        put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath().toString());
+        return this;
+    }
+
+    public Environment withOpensearchJavaOpts(List<String> javaOpts) {
+        put(OPENSEARCH_JAVA_OPTS_ENV, String.join(" ", javaOpts));
+        return this;
+    }
+
+    public Environment withOpensearchPathConf(Path opensearchConfPath) {
+        put(OPENSEARCH_PATH_CONF_ENV, opensearchConfPath.toString());
+        return this;
+    }
+
+    @Override
+    public Map<String, String> env() {
         return Collections.unmodifiableMap(env);
     }
 
-    private Map<String, String> cleanEnvironment(Map<String, String> env) {
+    private static Map<String, String> cleanEnvironment(Map<String, String> env) {
         return env.entrySet().stream()
                 // Remove JAVA_HOME from environment because OpenSearch should use its bundled JVM.
-                .filter(not(entry -> JAVA_HOME_ENV.equals(entry.getKey())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(not(entry -> JAVA_HOME_ENV.equals(entry.getKey()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
 

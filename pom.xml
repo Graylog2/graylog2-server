@@ -118,7 +118,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.38.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.52.2</gcs.version>
+        <gcs.version>2.52.3</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -145,7 +145,7 @@
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-org.version>20250107</json-org.version>
+        <json-org.version>20250517</json-org.version>
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -167,7 +167,7 @@
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>3.25.7</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
-        <retrofit.version>2.11.0</retrofit.version>
+        <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>2.0.4</shiro.version>
         <snakeyaml.version>2.4</snakeyaml.version>
@@ -176,7 +176,7 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.3</streamex.version>
-        <swagger.version>1.6.15</swagger.version>
+        <swagger.version>1.6.16</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
@@ -199,7 +199,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
-        <mockito.version>5.17.0</mockito.version>
+        <mockito.version>5.18.0</mockito.version>
         <restassured.version>5.5.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.0</testcontainers.version>

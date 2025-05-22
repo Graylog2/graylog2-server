@@ -23,5 +23,5 @@ import java.util.List;
 
 public record DatanodeUpgradeStatus(Version serverVersion, ClusterState clusterState,
                                     boolean clusterHealthy, boolean shardReplicationEnabled, List<DataNodeInformation> upToDateNodes,
-                                    List<DataNodeInformation> outdatedNodes) {
+                                    List<DataNodeInformation> outdatedNodes, List<String> warnings) {
 }

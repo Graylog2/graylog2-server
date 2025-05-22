@@ -185,7 +185,7 @@ const EventDefinitionForm = ({
       app_pathname: getPathnameWithoutId(pathname),
       app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'event-definition-step',
-      current_step: steps[STEP_KEYS.indexOf(activeStep)].title,
+      current_step: steps[activeStepIndex]?.title,
     });
 
     onChangeStep(nextStep);
@@ -196,7 +196,7 @@ const EventDefinitionForm = ({
       app_pathname: getPathnameWithoutId(pathname),
       app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'previous-button',
-      current_step: steps[activeStepIndex].title,
+      current_step: steps[activeStepIndex]?.title,
     });
 
     const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
