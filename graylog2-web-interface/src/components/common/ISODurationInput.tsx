@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Input } from 'components/bootstrap';
 import * as ISODurationUtils from 'util/ISODurationUtils';
@@ -51,9 +50,7 @@ const ISODurationInput = ({
   const [duration, setDuration] = useState(propDuration);
 
   useEffect(() => {
-    if (propDuration !== duration) {
-      setDuration(propDuration);
-    }
+    setDuration(propDuration);
   }, [propDuration]);
 
   const handleChange = (event: React.ChangeEvent) => {
