@@ -18,13 +18,11 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { ConfigurationFormData } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
 import type { Output } from 'stores/outputs/OutputsStore';
 import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, IfPermitted } from 'components/common';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 
 type Props = {
@@ -35,7 +33,6 @@ type Props = {
 };
 
 const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinition }: Props) => {
-  const currentUser = useCurrentUser();
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
   const configFormRef = useRef(null);
 
@@ -50,10 +47,10 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
   const handleUpdate = (data: ConfigurationFormData<Output['configuration']>) => onUpdate(output, data);
 
   return (
-    <>
+    <IfPermitted permissions={`outputs:edit:${output.id}`}>
       <Button
         bsStyle="link"
-        disabled={!isPermitted(currentUser.permissions, 'stream:edit') || disabled}
+        disabled={disabled}
         bsSize="xsmall"
         onClick={onClick}
         title="Edit Output">
@@ -71,7 +68,7 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
         values={output.configuration}
         titleValue={output.title}
       />
-    </>
+    </IfPermitted>
   );
 };
 
