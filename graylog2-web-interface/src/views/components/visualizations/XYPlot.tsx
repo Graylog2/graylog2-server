@@ -77,6 +77,43 @@ const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
   line: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
+type RangeProps = { minX: string; maxX: string };
+const adjustRangeWithStep = ({ minX, maxX }: RangeProps, itemsLength: number): RangeProps => {
+  const minMoment = moment(minX);
+  const maxMoment = moment(maxX);
+
+  const durationMs = maxMoment.diff(minMoment);
+  const stepDurationMs = durationMs / itemsLength;
+
+  const adjustedMinX = minMoment.clone().subtract(stepDurationMs / 2, 'milliseconds');
+  const adjustedMaxX = maxMoment.clone().add(stepDurationMs / 2, 'milliseconds');
+
+  return {
+    minX: adjustedMinX.format(),
+    maxX: adjustedMaxX.format(),
+  };
+};
+
+const findDateRange = (dateArray: Array<string>): RangeProps => {
+  let earliest = moment(dateArray[0]);
+  let latest = moment(dateArray[0]);
+
+  dateArray.forEach((dateStr) => {
+    const current = moment(dateStr);
+    if (current.isBefore(earliest)) {
+      earliest = current;
+    }
+    if (current.isAfter(latest)) {
+      latest = current;
+    }
+  });
+
+  return {
+    minX: earliest.format(),
+    maxX: latest.format(),
+  };
+};
+
 const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
@@ -89,7 +126,7 @@ const XYPlot = ({
   onZoom = undefined,
   onClickMarker = undefined,
 }: Props) => {
-  const { formatTime, userTimezone } = useUserDateTime();
+  const { userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
   const defaultLayout: Partial<PlotLayout> = {
     yaxis,
@@ -111,42 +148,9 @@ const XYPlot = ({
     [config.isTimeline, onZoom],
   );
 
-  function floorToSeconds(momentObj, interval) {
-    const secondsSinceHour = momentObj.minutes() * 60 + momentObj.seconds();
-    const floored = Math.floor(secondsSinceHour / interval) * interval;
-
-    const minutes = Math.floor(floored / 60);
-    const seconds = floored % 60;
-
-    return moment(momentObj).minutes(minutes).seconds(seconds).milliseconds(0);
-  }
-
-  function ceilToSeconds(momentObj, interval) {
-    const secondsSinceHour = momentObj.minutes() * 60 + momentObj.seconds();
-    const ceiled = Math.ceil(secondsSinceHour / interval) * interval;
-
-    const minutes = Math.floor(ceiled / 60);
-    const seconds = ceiled % 60;
-
-    return moment(momentObj).minutes(minutes).seconds(seconds).milliseconds(0);
-  }
-
   if (config.isTimeline && effectiveTimerange) {
-    const normalizedFrom = floorToSeconds(
-      moment.parseZone(formatTime(effectiveTimerange.from, 'internal')),
-      3,
-    ).format();
-    const normalizedTo = ceilToSeconds(moment.parseZone(formatTime(effectiveTimerange.to, 'internal')), 3).format();
-    console.log({
-      config,
-      chartData,
-      effectiveTimerange,
-      normalizedFrom,
-      normalizedTo,
-    });
     const xValues = chartData?.[0]?.x;
-    const minX = xValues?.[0];
-    const maxX = xValues?.[xValues.length - 1];
+    const { minX, maxX } = adjustRangeWithStep(findDateRange(xValues), xValues.length);
     layout.xaxis = merge(layout.xaxis, {
       range: [minX, maxX],
       type: 'date',
