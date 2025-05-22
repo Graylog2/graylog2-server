@@ -118,7 +118,7 @@ public class MongoCollections {
         final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
                 collection.getCodecRegistry());
         jacksonCodecRegistry.addCodecForClass(valueType);
-        return collection.withCodecRegistry(jacksonCodecRegistry);
+        return new GraylogMongoCollection<>(collection.withCodecRegistry(jacksonCodecRegistry));
     }
 
 }
