@@ -22,23 +22,34 @@ import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import { getConfig } from 'components/configurations/helpers';
 
-const useTokenTTL = (fallbackDefaultTokenTTL: string) => {
-  const [tokenTtl, setTokenTtl] = useState('');
+const useTokenTTL = (
+  fallbackDefaultTokenTTL: string,
+): {
+  tokenTtl: string;
+  defaultTokenTtl: string;
+  setTokenTtl: (ttl: string) => void;
+  resetTokenTtl: () => void;
+} => {
+  const [tokenTtl, setTokenTtl] = useState(fallbackDefaultTokenTTL);
+  const [defaultTokenTtl, setDefaultTokenTtl] = useState(fallbackDefaultTokenTTL);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
   useEffect(() => {
     ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG).then(() => {
       const config = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
-      if(config?.default_ttl_for_new_tokens){
+      if (config?.default_ttl_for_new_tokens) {
         setTokenTtl(config?.default_ttl_for_new_tokens);
+        setDefaultTokenTtl(config?.default_ttl_for_new_tokens);
       }
     });
   }, [configuration]);
 
-  console.log(tokenTtl);
+  const resetTokenTtl = () => {
+    setTokenTtl(defaultTokenTtl);
+  };
 
-  return [tokenTtl, setTokenTtl] as [string, (ttl: string) => void]
+  return { tokenTtl, defaultTokenTtl, setTokenTtl, resetTokenTtl };
 };
 
 export default useTokenTTL;
