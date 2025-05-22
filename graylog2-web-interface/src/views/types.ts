@@ -363,16 +363,6 @@ type AssetInformation = {
   key: string;
 };
 
-type EventProceduresProps = {
-  navigationComponent?: React.ReactNode;
-  useCoreRoutes?: boolean;
-};
-
-type EventProcedures = {
-  EventProcedures: React.ComponentType<EventProceduresProps>;
-  key: string;
-};
-
 type EventProcedureForm = {
   component: React.ComponentType<EventProcedureFormProps>;
   key: string;
@@ -589,7 +579,6 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'alerts.pageNavigation'?: Array<PluginNavigation>;
-    'eventProcedures'?: Array<EventProcedures>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
