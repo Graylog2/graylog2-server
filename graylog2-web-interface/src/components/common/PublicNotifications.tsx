@@ -56,9 +56,11 @@ const Wrapper = styled.div`
   margin: 0 auto 15px;
 `;
 
-const AlertContainer = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-`);
+const AlertContainer = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+  `,
+);
 
 const defaultNotifications: PublicNotificationsHooks = {
   usePublicNotifications: () => ({
@@ -101,10 +103,7 @@ const PublicNotifications = ({ readFromConfig = false }: Props) => {
 
       return (
         <AlertContainer key={title}>
-          <StyledAlert
-            bsStyle={variant}
-            onDismiss={isDismissible ? _dismiss : undefined}
-            title={!hiddenTitle && title}>
+          <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} title={!hiddenTitle && title}>
             <FlexWrap>
               <ShortContent>{shortMessage}</ShortContent>
               {longMessage && (
