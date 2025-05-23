@@ -16,7 +16,6 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import type FetchError from 'logic/errors/FetchError';
 import { type IndexSetStats } from 'stores/indices/IndexSetsStore';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';

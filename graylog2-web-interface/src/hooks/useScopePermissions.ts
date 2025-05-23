@@ -42,7 +42,7 @@ export type PermissionsByScopeReturnType = {
   checkPermissions: (inEntity: Partial<GenericEntityType>) => boolean;
 };
 
-function fetchScopePermissions() {
+function fetchScopePermissions(): Promise<EntityScopeType> {
   return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
 }
 
