@@ -642,6 +642,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
-    'licenseCheck'?: LicenseCheck;
+    'licenseCheck'?: Array<LicenseCheck>;
   }
 }
