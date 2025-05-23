@@ -25,7 +25,7 @@ type Options = {
   enabled: boolean;
 };
 
-export const fetchEventDefinitions = (searchParams: SearchParams) =>
+export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> =>
   EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,

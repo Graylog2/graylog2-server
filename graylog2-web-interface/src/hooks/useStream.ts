@@ -33,7 +33,7 @@ const useStream = (
   isInitialLoading: boolean;
   error: FetchError;
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery({
+  const { data, refetch, isInitialLoading, error } = useQuery<Stream, FetchError>({
     queryKey: ['stream', streamId],
     queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load stream.'),
     notifyOnChangeProps: ['data', 'error'],

@@ -172,7 +172,7 @@ export const renewDatanodeCertificate = (nodeId: string) =>
       UserNotification.error(`Certificate renewal failed with error: ${error}`);
     });
 
-export const fetchDataNodes = async (params: SearchParams) => {
+export const fetchDataNodes = async (params: SearchParams): Promise<DataNodeResponse> => {
   const url = PaginationURL('/system/cluster/datanodes', params.page, params.pageSize, params.query, {
     sort: params.sort?.attributeId,
     order: params.sort?.direction,
