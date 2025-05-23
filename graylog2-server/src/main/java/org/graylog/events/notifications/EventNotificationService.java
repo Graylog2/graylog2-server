@@ -17,13 +17,14 @@
 package org.graylog.events.notifications;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
+import org.graylog.events.event.EventDto;
+import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.MessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 public class EventNotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(EventNotificationService.class);
@@ -38,22 +39,26 @@ public class EventNotificationService {
         this.configurationProvider = configurationProvider;
     }
 
-    public ImmutableList<MessageSummary> getBacklogForEvent(EventNotificationContext ctx) {
+    public ImmutableList<MessageSummary> getBacklogForEvent(EventDefinitionDto eventDefinition, EventDto event) {
         final ImmutableList<MessageSummary> backlog;
         try {
-            if (ctx.eventDefinition().isPresent()) {
-                final long backlogSize = ctx.eventDefinition().get().notificationSettings().backlogSize();
+            if (eventDefinition != null) {
+                final long backlogSize = eventDefinition.notificationSettings().backlogSize();
                 if (backlogSize <= 0) {
                     return ImmutableList.of();
                 }
-                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), backlogSize);
+                backlog = eventBacklogService.getMessagesForEvent(event, backlogSize);
             } else {
-                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), configurationProvider.get().eventNotificationsBacklog());
+                backlog = eventBacklogService.getMessagesForEvent(event, configurationProvider.get().eventNotificationsBacklog());
             }
         } catch (NotFoundException e) {
-            LOG.error("Failed to fetch backlog for event {}", ctx.event().id());
+            LOG.error("Failed to fetch backlog for event {}", event.id());
             return ImmutableList.of();
         }
         return backlog;
+    }
+
+    public ImmutableList<MessageSummary> getBacklogForEvent(EventNotificationContext ctx) {
+        return getBacklogForEvent(ctx.eventDefinition().orElse(null), ctx.event());
     }
 }
