@@ -320,7 +320,7 @@ const IndexSetConfigurationForm = ({
   return (
     <Row>
       <Col md={12}>
-        <Formik onSubmit={saveConfiguration} enableReinitialize initialValues={prepareInitialValues()}>
+        <Formik validateOnMount onSubmit={saveConfiguration} enableReinitialize initialValues={prepareInitialValues()}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
               <Form>
