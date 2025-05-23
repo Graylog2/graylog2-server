@@ -34,7 +34,8 @@ const useTriggerMigrationState = (): {
     isPending: isLoadingNextMigrationState,
     error,
     isError,
-  } = useMutation(Migration.trigger, {
+  } = useMutation({
+    mutationFn: Migration.trigger,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },

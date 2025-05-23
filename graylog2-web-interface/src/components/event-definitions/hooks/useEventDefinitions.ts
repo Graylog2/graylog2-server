@@ -35,7 +35,7 @@ export const fetchEventDefinitions = (searchParams: SearchParams): Promise<Event
     attributes,
   }));
 
-export const fetchEventDefinition = (eventDefinitionId: string) =>
+export const fetchEventDefinition = (eventDefinitionId: string): Promise<any> =>
   EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
     eventDefinition: event_definition,
     context: context,
