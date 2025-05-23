@@ -56,7 +56,7 @@ const useRemoveProfileFromIndexMutation = () => {
     },
   });
 
-  return { removeProfileFromIndex: put.mutateAsync, isLoading: put.isLoading };
+  return { removeProfileFromIndex: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default useRemoveProfileFromIndexMutation;

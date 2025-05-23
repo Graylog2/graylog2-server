@@ -109,10 +109,10 @@ const useProfileMutation = () => {
 
   return {
     editProfile: put.mutateAsync,
-    isEditLoading: put.isLoading,
+    isEditLoading: put.isPending,
     createProfile: post.mutateAsync,
-    isCreateLoading: post.isLoading,
-    isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
+    isCreateLoading: post.isPending,
+    isLoading: post.mutateAsync || post.isPending || remove.isPending,
     deleteProfile: remove.mutateAsync,
   };
 };

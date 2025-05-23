@@ -136,10 +136,10 @@ const useTemplate = () => {
 
   return {
     updateTemplate: put.mutateAsync,
-    isEditLoading: put.isLoading,
+    isEditLoading: put.isPending,
     createTemplate: post.mutateAsync,
-    isCreateLoading: post.isLoading,
-    isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
+    isCreateLoading: post.isPending,
+    isLoading: post.mutateAsync || post.isPending || remove.isPending,
     deleteTemplate: remove.mutateAsync,
     setAsDefault: setAsDefault.mutateAsync,
   };

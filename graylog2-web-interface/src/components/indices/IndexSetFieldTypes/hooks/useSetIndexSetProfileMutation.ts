@@ -57,7 +57,7 @@ const useSetIndexSetProfileMutation = () => {
     },
   });
 
-  return { setIndexSetFieldTypeProfile: put.mutateAsync, isLoading: put.isLoading };
+  return { setIndexSetFieldTypeProfile: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default useSetIndexSetProfileMutation;
