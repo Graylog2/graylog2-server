@@ -56,22 +56,18 @@ const useStreams = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    {
-      queryKey: keyFn(searchParams),
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
 
-      queryFn: () =>
-        defaultOnError<StreamsResponse>(
-          fetchStreams(searchParams),
-          'Loading streams failed with status',
-          'Could not load streams',
-        ),
-    },
-    {
-      placeholderData: keepPreviousData,
-      enabled,
-    },
-  );
+    queryFn: () =>
+      defaultOnError<StreamsResponse>(
+        fetchStreams(searchParams),
+        'Loading streams failed with status',
+        'Could not load streams',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

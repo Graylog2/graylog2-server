@@ -53,23 +53,19 @@ const useFetchEntities = <T, M = unknown>({
   data: PaginatedResponse<T, M>;
   refetch: () => void;
 } => {
-  const { data, isInitialLoading, refetch } = useQuery(
-    {
-      queryKey: fetchKey,
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: fetchKey,
 
-      queryFn: () =>
-        defaultOnError(
-          fetchEntities(searchParams),
-          `Fetching ${humanName} failed with status`,
-          `Could not retrieve ${humanName}`,
-        ),
-    },
-    {
-      enabled,
-      placeholderData: keepPreviousData,
-      ...fetchOptions,
-    },
-  );
+    queryFn: () =>
+      defaultOnError(
+        fetchEntities(searchParams),
+        `Fetching ${humanName} failed with status`,
+        `Could not retrieve ${humanName}`,
+      ),
+    enabled,
+    placeholderData: keepPreviousData,
+    ...fetchOptions,
+  });
 
   return {
     data,

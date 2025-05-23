@@ -65,22 +65,18 @@ const useIndexSetFieldTypes = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    {
-      queryKey: keyFn(searchParams),
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: keyFn(searchParams),
 
-      queryFn: () =>
-        defaultOnError(
-          fetchIndexSetFieldTypes(indexSetId, searchParams),
-          'Loading index field types failed with status',
-          'Could not load index field types',
-        ),
-    },
-    {
-      placeholderData: keepPreviousData,
-      enabled,
-    },
-  );
+    queryFn: () =>
+      defaultOnError(
+        fetchIndexSetFieldTypes(indexSetId, searchParams),
+        'Loading index field types failed with status',
+        'Could not load index field types',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

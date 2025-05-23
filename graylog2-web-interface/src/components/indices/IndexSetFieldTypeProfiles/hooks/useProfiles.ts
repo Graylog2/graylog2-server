@@ -77,22 +77,18 @@ const useProfiles = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    {
-      queryKey: keyFn(searchParams),
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: keyFn(searchParams),
 
-      queryFn: () =>
-        defaultOnError(
-          fetchIndexSetFieldTypeProfiles(searchParams),
-          'Loading index field type profiles failed with status',
-          'Could not load index field type profiles',
-        ),
-    },
-    {
-      placeholderData: keepPreviousData,
-      enabled,
-    },
-  );
+    queryFn: () =>
+      defaultOnError(
+        fetchIndexSetFieldTypeProfiles(searchParams),
+        'Loading index field type profiles failed with status',
+        'Could not load index field type profiles',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

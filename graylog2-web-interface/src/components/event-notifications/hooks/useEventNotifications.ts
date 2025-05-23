@@ -55,22 +55,18 @@ const useEventNotifications = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    {
-      queryKey: keyFn(searchParams),
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
 
-      queryFn: () =>
-        defaultOnError(
-          fetchEventNotifications(searchParams),
-          'Loading event notifications failed with status',
-          'Could not load event notifications',
-        ),
-    },
-    {
-      placeholderData: keepPreviousData,
-      enabled,
-    },
-  );
+    queryFn: () =>
+      defaultOnError(
+        fetchEventNotifications(searchParams),
+        'Loading event notifications failed with status',
+        'Could not load event notifications',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data,
