@@ -793,10 +793,6 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.proto</groupId>
-            <artifactId>opentelemetry-proto</artifactId>
-        </dependency>
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
