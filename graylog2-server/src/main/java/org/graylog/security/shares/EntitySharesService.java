@@ -36,6 +36,8 @@ import org.graylog.security.shares.EntityShareResponse.ActiveShare;
 import org.graylog.security.shares.EntityShareResponse.AvailableCapability;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -57,12 +59,15 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
  * Handler for sharing calls.
  */
 public class EntitySharesService {
+    private static final Logger LOG = LoggerFactory.getLogger(EntitySharesService.class);
+
     private final DBGrantService grantService;
     private final EntityDependencyResolver entityDependencyResolver;
     private final EntityDependencyPermissionChecker entityDependencyPermissionChecker;
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
     private final EventBus serverEventBus;
+    private final Set<SyncedEntitiesResolver> entitiesResolvers;
     private final BuiltinCapabilities builtinCapabilities;
 
     @Inject
@@ -72,6 +77,7 @@ public class EntitySharesService {
                                final GRNRegistry grnRegistry,
                                final GranteeService granteeService,
                                final EventBus serverEventBus,
+                               final Set<SyncedEntitiesResolver> entitiesResolvers,
                                final BuiltinCapabilities builtinCapabilities) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
@@ -79,6 +85,7 @@ public class EntitySharesService {
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
         this.serverEventBus = serverEventBus;
+        this.entitiesResolvers = entitiesResolvers;
         this.builtinCapabilities = builtinCapabilities;
     }
 
@@ -229,13 +236,21 @@ public class EntitySharesService {
 
     /**
      * Share / unshare an entity with one or more grantees.
-     * The grants in the request are created or, if they already exist, updated.
+     * The grants in the request are created or, if they already exist, updated. Any synced entities - as
+     * provided by the {@link SyncedEntitiesResolver} - are also updated.
      *
      * @param ownedEntity the target entity for the updated grants
      * @param request     the request containing grantees and their capabilities
      * @param sharingUser the user executing the request
      */
     public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        final EntityShareResponse result = updatePrimaryEntityShares(ownedEntity, request, sharingUser);
+        return result.toBuilder().syncedEntities(
+                        resolveImplicitGrants(ownedEntity, request, sharingUser))
+                .build();
+    }
+
+    private EntityShareResponse updatePrimaryEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
@@ -274,7 +289,7 @@ public class EntitySharesService {
         }
 
         // Update capabilities of existing grants (for a grantee)
-        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
+        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach(g -> {
             final Capability newCapability = selectedGranteeCapabilities.get(g.grantee());
             if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
@@ -284,7 +299,7 @@ public class EntitySharesService {
                         .build());
                 updateEventBuilder.addUpdates(g.grantee(), newCapability, g.capability());
             }
-        }));
+        });
 
         // Create newly added grants
         // TODO Create multiple entries with one db query
@@ -316,6 +331,35 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .build();
+    }
+
+    /**
+     * Applies the share request to related entities, that we want to keep in sync.
+     *
+     * @param ownedEntity the parent entity
+     * @param shareRequest the sharing request to apply to the related entities
+     * @param sharingUser the sharing user
+     * @return list of synced entities
+     */
+    private Set<GRN> resolveImplicitGrants(GRN ownedEntity, EntityShareRequest shareRequest, User sharingUser) {
+        Set<GRN> syncedEntities = entitiesResolvers.stream()
+                .flatMap(resolver -> resolver.syncedEntities(ownedEntity).stream())
+                .collect(Collectors.toSet());
+
+        ImmutableSet.Builder<GRN> failureBuilder = ImmutableSet.builder();
+        syncedEntities.forEach(grn -> {
+            final EntityShareResponse response = updatePrimaryEntityShares(grn, shareRequest, sharingUser);
+            if (response.validationResult().failed()) {
+                failureBuilder.add(grn);
+            }
+        });
+
+        final ImmutableSet<GRN> failedEntities = failureBuilder.build();
+        if (!failedEntities.isEmpty()) {
+            LOG.warn("Failed to sync sharing to the following related entities: {}", failedEntities);
+        }
+
+        return syncedEntities;
     }
 
     /**
