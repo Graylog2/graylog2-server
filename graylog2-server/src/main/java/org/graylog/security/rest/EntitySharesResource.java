@@ -116,7 +116,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         // we can do a second request including the "grantees". Then we can do the dependency check to
         // fill out "missing_dependencies".
         // This should probably be a POST request with a JSON payload.
-        return entitySharesService.prepareShare(grn, request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(grn, request, getCurrentUser());
     }
 
     @POST

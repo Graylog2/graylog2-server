@@ -14,31 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
-};
+package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-  'sigma_rule',
-]);
-
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
-};
-
-export default getTitleForEntityType;
+public record RuleFragmentUpdateEvent() {
+}

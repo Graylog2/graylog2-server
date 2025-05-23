@@ -74,6 +74,7 @@ const TypeAheadFieldInput = ({
   ) : (
     <Input label={label} error={error}>
       <Select
+        allowCreate
         inputId={id}
         onChange={_onChange}
         onBlur={onBlur}
