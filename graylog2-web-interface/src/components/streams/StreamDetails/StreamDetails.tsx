@@ -215,7 +215,7 @@ const StreamDetails = ({ stream }: Props) => {
 
             <h1>Stream: {stream.title}</h1>
 
-            <IfPermitted permissions="stream:edit">
+            <IfPermitted permissions={`streams:edit:${stream.id}`}>
               <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
                 <MenuItem onClick={() => toggleUpdateModal()}>Edit</MenuItem>
               </DropdownButton>
