@@ -81,7 +81,7 @@ const useFieldTypes = (
     queryFn: () => fetchAllFieldTypes(streams, _timerange),
     staleTime: 30000,
     refetchOnWindowFocus: false,
-    cacheTime: 0,
+    gcTime: 0,
     enabled,
   });
 };
