@@ -52,20 +52,21 @@ public class MongoDBRuleFragmentService implements RuleFragmentService {
 
     @Override
     public RuleFragment save(RuleFragment ruleFragment) {
+        RuleFragment fragment = mongoUtils.save(ruleFragment);
         clusterEventBus.post(new RuleFragmentUpdateEvent());
-        return mongoUtils.save(ruleFragment);
+        return fragment;
     }
 
     @Override
     public void delete(String name) {
-        clusterEventBus.post(new RuleFragmentUpdateEvent());
         collection.deleteOne(eq("name", name));
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
     }
 
     @Override
     public void deleteAll() {
-        clusterEventBus.post(new RuleFragmentUpdateEvent());
         collection.deleteMany(Filters.empty());
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
     }
 
     @Override
