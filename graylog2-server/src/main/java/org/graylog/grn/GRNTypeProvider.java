@@ -14,31 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
+package org.graylog.grn;
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
-};
+import java.util.Set;
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-  'sigma_rule',
-]);
-
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
-};
-
-export default getTitleForEntityType;
+/**
+ * Provides the set of valid {@link GRNType} instances.
+ */
+public interface GRNTypeProvider {
+    Set<GRNType> getTypes();
+}
