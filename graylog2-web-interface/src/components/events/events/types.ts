@@ -15,6 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { PluginNavigation } from 'graylog-web-plugin';
+
+import type { QualifiedUrl } from 'routing/Routes';
+
 export type EventReplayInfo = {
   timerange_start: string;
   timerange_end: string;
@@ -52,3 +56,17 @@ export type EventDefinitionContexts = { [eventDefinitionId: string]: EventDefini
 export type EventsAdditionalData = {
   context: { event_definitions?: EventDefinitionContexts; streams?: EventDefinitionContexts };
 };
+
+type PageNavigation = {
+  description: string;
+  position?: PluginNavigation['position'];
+  permissions?: string | Array<string>;
+  useIsValidLicense?: () => boolean;
+  path: QualifiedUrl<string>;
+};
+
+declare module 'graylog-web-plugin/plugin' {
+  export interface PluginExports {
+    'alerts.pageNavigation'?: Array<PageNavigation>;
+  }
+}

@@ -28,6 +28,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import NavigationItem from 'components/navigation/NavigationItem';
 import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
 import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
+import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
 const _existingDropdownItemIndex = (
   existingNavigationItems: Array<PluginNavigation>,
@@ -78,29 +79,6 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
 };
 
-const sortInAfterItems = (targetList: Array<PluginNavigation>, afterItems: Array<PluginNavigation>) => {
-  const result = [...targetList];
-
-  afterItems.forEach((afterItem) => {
-    const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
-    if (index !== -1) {
-      result.splice(index + 1, 0, afterItem);
-    } else {
-      result.push(afterItem);
-    }
-  });
-
-  return result;
-};
-
-const sortItemsByPosition = (navigationItems: Array<PluginNavigation>) => {
-  const withoutPositionItems = navigationItems.filter((item) => !item.position);
-  const afterItems = navigationItems.filter((item) => !!item.position?.after);
-  const lastItems = navigationItems.filter((item) => !!item.position?.last);
-
-  return [...sortInAfterItems(withoutPositionItems, afterItems), ...lastItems];
-};
-
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
   const { activePerspective } = useActivePerspective();
@@ -134,7 +112,7 @@ const useNavigationItems = () => {
 
     const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
 
-    return sortItemsByPosition(itemsForActivePerspective);
+    return sortNavigationItems(itemsForActivePerspective);
   }, [activePerspective?.id, navigationItems, permissions, securityLicenseInvalid]);
 };
 
