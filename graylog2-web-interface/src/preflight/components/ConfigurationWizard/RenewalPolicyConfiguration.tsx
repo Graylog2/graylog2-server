@@ -80,7 +80,7 @@ const RenewalPolicyConfiguration = () => {
 
     onSuccess: () => {
       UserNotification.success('Renewal policy created successfully');
-      queryClient.invalidateQueries(RENEWAL_POLICY_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: RENEWAL_POLICY_QUERY_KEY });
     },
 
     onError: (error) => {

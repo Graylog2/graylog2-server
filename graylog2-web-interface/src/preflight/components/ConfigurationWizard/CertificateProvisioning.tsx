@@ -41,12 +41,12 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
 
     onSuccess: () => {
       UserNotification.success('Started certificate provisioning successfully');
-      queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_OVERVIEW_QUERY_KEY });
     },
 
     onError: (error) => {
       UserNotification.error(`Starting certificate provisioning failed with error: ${error}`);
-      queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_OVERVIEW_QUERY_KEY });
       setIsProvisioning(false);
     },
   });
