@@ -21,9 +21,9 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Lookup Tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
-  { title: 'Caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
-  { title: 'Data Adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
+  { description: 'Lookup Tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
+  { description: 'Caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
+  { description: 'Data Adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
 ];
 
 const LUTPageNavigation = () => (
