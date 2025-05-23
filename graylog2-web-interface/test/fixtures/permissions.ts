@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types';
-
 import type User from 'logic/users/User';
 
 // eslint-disable-next-line import/prefer-default-export
-export const readerPermissions = (username: $PropertyType<User, 'username'>) => [
+export const readerPermissions = (username: User['username']) => [
   `users:tokenlist:${username}`,
   `users:edit:${username}`,
   `users:tokencreate:${username}`,

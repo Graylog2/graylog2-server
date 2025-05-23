@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
@@ -77,11 +76,11 @@ type Props = {
   activeShares: ActiveShares;
   availableCapabilities: CapabilitiesList;
   className?: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
+  entityType: SharedEntity['type'];
   onDelete: (GRN) => Promise<EntityShareState | undefined | null>;
   onCapabilityChange: (payload: {
-    granteeId: $PropertyType<Grantee, 'id'>;
-    capabilityId: $PropertyType<Capability, 'id'>;
+    granteeId: Grantee['id'];
+    capabilityId: Capability['id'];
   }) => Promise<EntityShareState | undefined | null>;
   selectedGrantees: SelectedGrantees;
   title: string;

@@ -29,7 +29,6 @@ import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -85,7 +84,7 @@ const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => (
   title: 'new title',
 });
 
-type EventDefinitionConfig = $PropertyType<EventDefinition, 'config'>;
+type EventDefinitionConfig = EventDefinition['config'];
 
 type Props = {
   currentUser: User;

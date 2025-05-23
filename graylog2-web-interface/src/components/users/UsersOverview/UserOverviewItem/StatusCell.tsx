@@ -16,15 +16,14 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
 import { Icon } from 'components/common';
 import Tooltip from 'components/common/Tooltip';
 
 type Props = {
-  authServiceEnabled: $PropertyType<UserOverview, 'authServiceEnabled'>;
-  accountStatus: $PropertyType<UserOverview, 'accountStatus'>;
+  authServiceEnabled: UserOverview['authServiceEnabled'];
+  accountStatus: UserOverview['accountStatus'];
 };
 
 const Wrapper = styled.div<{ $enabled: boolean }>(

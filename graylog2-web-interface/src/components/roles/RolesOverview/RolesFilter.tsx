@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import { SearchForm } from 'components/common';
 import type { Pagination } from 'stores/PaginationTypes';
@@ -24,7 +23,7 @@ import type { Pagination } from 'stores/PaginationTypes';
 import RolesQueryHelper from '../RolesQueryHelper';
 
 type Props = {
-  onSearch: (query: $PropertyType<Pagination, 'query'>) => void;
+  onSearch: (query: Pagination['query']) => void;
 };
 
 const Container = styled.div`

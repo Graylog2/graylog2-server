@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { Formik, Form } from 'formik';
-import type { $PropertyType } from 'utility-types';
 import styled from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
@@ -35,9 +34,9 @@ const isCloud = AppConfig.isCloud();
 type Props = {
   user: User;
   onSubmit: (payload: {
-    first_name: $PropertyType<User, 'firstName'>;
-    last_name: $PropertyType<User, 'lastName'>;
-    email: $PropertyType<User, 'email'>;
+    first_name: User['firstName'];
+    last_name: User['lastName'];
+    email: User['email'];
   }) => Promise<void>;
 };
 

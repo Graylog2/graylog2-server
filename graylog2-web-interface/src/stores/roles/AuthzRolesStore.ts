@@ -16,7 +16,6 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { PaginatedUsersResponse } from 'stores/users/UsersStore';
 import type { Store } from 'stores/StoreTypes';
@@ -78,7 +77,7 @@ const AuthzRolesStore: Store<{}> = singletonStore('AuthzRoles', () =>
   Reflux.createStore({
     listenables: [AuthzRolesActions],
 
-    load(roleId: $PropertyType<Role, 'id'>): Promise<Role> {
+    load(roleId: Role['id']): Promise<Role> {
       const url = qualifyUrl(encodeApiUrl(ApiRoutes.AuthzRolesController.load, [roleId]));
       const promise = fetch('GET', url).then(Role.fromJSON);
 

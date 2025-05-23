@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 type InternalState = {
   enabled: boolean;
@@ -30,10 +29,7 @@ export type HTTPHeaderAuthConfigJSON = {
 export default class HTTPHeaderAuthConfig {
   _value: InternalState;
 
-  constructor(
-    usernameHeader: $PropertyType<InternalState, 'usernameHeader'>,
-    enabled: $PropertyType<InternalState, 'enabled'>,
-  ) {
+  constructor(usernameHeader: InternalState['usernameHeader'], enabled: InternalState['enabled']) {
     this._value = { usernameHeader, enabled };
   }
 
@@ -52,10 +48,7 @@ export default class HTTPHeaderAuthConfig {
     return new Builder(Immutable.Map({ usernameHeader, enabled }));
   }
 
-  static create(
-    usernameHeader: $PropertyType<InternalState, 'usernameHeader'>,
-    enabled: $PropertyType<InternalState, 'enabled'>,
-  ) {
+  static create(usernameHeader: InternalState['usernameHeader'], enabled: InternalState['enabled']) {
     return new HTTPHeaderAuthConfig(usernameHeader, enabled);
   }
 
@@ -89,11 +82,11 @@ class Builder {
     this.value = value;
   }
 
-  usernameHeader(value: $PropertyType<InternalState, 'usernameHeader'>) {
+  usernameHeader(value: InternalState['usernameHeader']) {
     return new Builder(this.value.set('usernameHeader', value));
   }
 
-  enabled(value: $PropertyType<InternalState, 'enabled'>) {
+  enabled(value: InternalState['enabled']) {
     return new Builder(this.value.set('enabled', value));
   }
 

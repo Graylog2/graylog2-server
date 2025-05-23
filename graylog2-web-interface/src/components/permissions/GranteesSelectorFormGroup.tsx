@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { Field } from 'formik';
-import type { $PropertyType } from 'utility-types';
 import styled from 'styled-components';
 
 import type { CapabilitiesList, GranteesList } from 'logic/permissions/EntityShareState';
@@ -54,13 +53,7 @@ const _granteesOptions = (grantees: GranteesList) =>
 
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
-const _renderGranteesSelectOption = ({
-  label,
-  granteeType,
-}: {
-  label: string;
-  granteeType: $PropertyType<Grantee, 'type'>;
-}) => (
+const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; granteeType: Grantee['type'] }) => (
   <GranteesSelectOption>
     <StyledGranteeIcon type={granteeType} />
     {label}

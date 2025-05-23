@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types';
 import * as Immutable from 'immutable';
 
 import type { ActiveShareType } from 'logic/permissions/types';
@@ -25,22 +24,22 @@ export default class Grantee {
   _value: InternalState;
 
   constructor(
-    grant: $PropertyType<ActiveShareType, 'grant'>,
-    grantee: $PropertyType<ActiveShareType, 'grantee'>,
-    capability: $PropertyType<ActiveShareType, 'capability'>,
+    grant: ActiveShareType['grant'],
+    grantee: ActiveShareType['grantee'],
+    capability: ActiveShareType['capability'],
   ) {
     this._value = { grant, grantee, capability };
   }
 
-  get grant(): $PropertyType<InternalState, 'grant'> {
+  get grant(): InternalState['grant'] {
     return this._value.grant;
   }
 
-  get grantee(): $PropertyType<InternalState, 'grantee'> {
+  get grantee(): InternalState['grantee'] {
     return this._value.grantee;
   }
 
-  get capability(): $PropertyType<InternalState, 'capability'> {
+  get capability(): InternalState['capability'] {
     return this._value.capability;
   }
 
@@ -78,15 +77,15 @@ class Builder {
     this.value = value;
   }
 
-  grant(value: $PropertyType<InternalState, 'grant'>): Builder {
+  grant(value: InternalState['grant']): Builder {
     return new Builder(this.value.set('grant', value));
   }
 
-  grantee(value: $PropertyType<InternalState, 'grantee'>): Builder {
+  grantee(value: InternalState['grantee']): Builder {
     return new Builder(this.value.set('grantee', value));
   }
 
-  capability(value: $PropertyType<InternalState, 'capability'>): Builder {
+  capability(value: InternalState['capability']): Builder {
     return new Builder(this.value.set('capability', value));
   }
 
