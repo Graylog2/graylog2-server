@@ -32,14 +32,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class MongoDbIndexTools<T> {
+public class MongoDbIndexTools {
 
     static final String COLLATION_KEY = "collation";
     static final String INDEX_DOCUMENT_KEY = "key";
 
-    private final MongoCollection<T> db;
+    private final MongoCollection<Document> db;
 
-    public MongoDbIndexTools(final MongoCollection<T> db) {
+    public MongoDbIndexTools(final MongoCollection<Document> db) {
         this.db = db;
     }
 

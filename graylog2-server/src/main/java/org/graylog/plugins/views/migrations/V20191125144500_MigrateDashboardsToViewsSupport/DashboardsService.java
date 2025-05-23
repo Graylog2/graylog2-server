@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;

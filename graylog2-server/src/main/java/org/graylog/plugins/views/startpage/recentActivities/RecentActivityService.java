@@ -18,7 +18,7 @@ package org.graylog.plugins.views.startpage.recentActivities;
 
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;

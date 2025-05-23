@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.db;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;

@@ -17,7 +17,7 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.google.common.primitives.Ints;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;

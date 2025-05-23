@@ -18,7 +18,7 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import one.util.streamex.StreamEx;
@@ -117,6 +117,6 @@ public class DBJobDefinitionService {
     }
 
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
-        return mongoUtils.getOrCreate(dto);
+        return collection.getOrCreate(dto);
     }
 }

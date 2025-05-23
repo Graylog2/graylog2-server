@@ -18,7 +18,6 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableList;
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
@@ -29,6 +28,7 @@ import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -61,13 +61,11 @@ public class IndexFieldTypesService {
 
     private final MongoCollection<IndexFieldTypesDTO> collection;
     private final MongoUtils<IndexFieldTypesDTO> mongoUtils;
-    private final MongoCollection<Document> rawCollection;
 
     @Inject
     public IndexFieldTypesService(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("index_field_types", IndexFieldTypesDTO.class);
         mongoUtils = mongoCollections.utils(collection);
-        rawCollection = collection.withDocumentClass(Document.class);
 
         collection.createIndex(ascending(FIELD_INDEX_NAME, FIELD_INDEX_SET_ID), new IndexOptions().unique(true));
         collection.createIndex(ascending(FIELD_INDEX_NAME), new IndexOptions().unique(true));
@@ -78,7 +76,7 @@ public class IndexFieldTypesService {
     public List<String> fieldTypeHistory(final String indexSetId,
                                          final String fieldName,
                                          final boolean skipEntriesWithUnchangedType) {
-        final AggregateIterable<Document> aggregateResult = this.rawCollection.aggregate(List.of(
+        final AggregateIterable<Document> aggregateResult = collection.aggregate(List.of(
                         Aggregates.unwind("$" + FIELD_FIELDS),
                         Aggregates.match(and(
                                 eq(FIELD_INDEX_SET_ID, indexSetId),
@@ -88,7 +86,8 @@ public class IndexFieldTypesService {
                                 include(FIELD_FIELDS + "." + FIELD_PHYSICAL_TYPE),
                                 excludeId()
                         ))
-                )
+                ),
+                Document.class
         );
 
         List<String> typeHistory = new ArrayList<>();

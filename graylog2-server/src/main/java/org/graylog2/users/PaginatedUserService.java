@@ -16,7 +16,7 @@
  */
 package org.graylog2.users;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;

@@ -16,7 +16,7 @@
  */
 package org.graylog.events.notifications;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.security.entities.EntityOwnershipService;

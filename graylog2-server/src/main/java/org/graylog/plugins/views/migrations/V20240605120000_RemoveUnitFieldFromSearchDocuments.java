@@ -22,8 +22,8 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
-import org.graylog.plugins.views.search.Search;
-import org.graylog2.database.MongoCollections;
+import org.bson.Document;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +35,11 @@ public class V20240605120000_RemoveUnitFieldFromSearchDocuments extends Migratio
 
     private static final Logger LOG = LoggerFactory.getLogger(V20240605120000_RemoveUnitFieldFromSearchDocuments.class);
 
-    private final MongoCollection<Search> searchesCollection;
+    private final MongoCollection<Document> searchesCollection;
 
     @Inject
-    public V20240605120000_RemoveUnitFieldFromSearchDocuments(final MongoCollections mongoCollections) {
-        this.searchesCollection = mongoCollections.collection("searches", Search.class);
+    public V20240605120000_RemoveUnitFieldFromSearchDocuments(final MongoConnection mongoConnection) {
+        this.searchesCollection = mongoConnection.getMongoDatabase().getCollection("searches", Document.class);
     }
 
     @Override

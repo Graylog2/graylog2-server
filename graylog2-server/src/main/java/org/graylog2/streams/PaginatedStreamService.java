@@ -17,7 +17,7 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Variable;

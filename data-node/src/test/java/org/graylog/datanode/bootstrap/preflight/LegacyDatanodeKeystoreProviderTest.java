@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
 import jakarta.annotation.Nonnull;

@@ -21,7 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
@@ -240,7 +240,7 @@ public class DBJobTriggerService {
      * @throws NullPointerException when the trigger or trigger ID is null
      */
     public JobTriggerDto getOrCreate(JobTriggerDto trigger) {
-        return mongoUtils.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
+        return collection.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
     }
 
     /**

@@ -17,7 +17,7 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

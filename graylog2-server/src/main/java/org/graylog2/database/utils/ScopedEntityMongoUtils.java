@@ -16,7 +16,7 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import org.bson.types.ObjectId;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
