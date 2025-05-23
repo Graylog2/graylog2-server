@@ -102,7 +102,7 @@ const CAUpload = () => {
     UserNotification.error('CA upload failed');
   }, []);
 
-  const { mutateAsync: onProcessUpload, isLoading } = useMutation({
+  const { mutateAsync: onProcessUpload, isPending: isLoading } = useMutation({
     mutationFn: submitUpload,
 
     onSuccess: () => {
