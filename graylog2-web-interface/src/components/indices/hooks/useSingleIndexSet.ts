@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import type FetchError from 'logic/errors/FetchError';
 import { type IndexSet } from 'stores/indices/IndexSetsStore';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -44,7 +43,7 @@ const useSingleIndexSet = (
         'Could not load index set',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

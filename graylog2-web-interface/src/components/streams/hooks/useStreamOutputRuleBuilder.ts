@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { StreamDestinationsFiltersBuilder } from '@graylog/server-api';
 
@@ -56,7 +56,7 @@ const useStreamOutputRuleBuilder = () => {
         'Could not load Stream Output Filter Rule Builder Conditions list.',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

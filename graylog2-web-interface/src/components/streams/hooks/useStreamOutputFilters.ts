@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as Immutable from 'immutable';
 
 import PaginationURL from 'util/PaginationURL';
@@ -89,7 +89,7 @@ const useStreamOutputFilters = (
         ),
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     },
   );
 

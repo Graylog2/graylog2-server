@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { StreamRuleType } from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
@@ -31,7 +31,7 @@ const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
         'Could not load stream rule types',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
 
     // 1 hour
     staleTime: 60 * (60 * 1000),

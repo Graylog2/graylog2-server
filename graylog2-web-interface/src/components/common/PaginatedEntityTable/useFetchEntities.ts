@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import { type Attribute } from 'stores/PaginationTypes';
@@ -66,7 +66,7 @@ const useFetchEntities = <T, M = unknown>({
     },
     {
       enabled,
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       ...fetchOptions,
     },
   );

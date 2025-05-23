@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { Output } from 'stores/outputs/OutputsStore';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -53,7 +53,7 @@ const useOutputs = (
       queryFn: () => defaultOnError(fetchOutputs(), 'Loading outputs failed with status', 'Could not load outputs'),
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled,
     },
   );

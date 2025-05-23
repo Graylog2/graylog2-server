@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
+import type { RuleBuilderRule } from 'components/rules/rule-builder/types';
 import useParams from 'routing/useParams';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -113,7 +113,7 @@ const useRuleBuilder = () => {
         'Could not load Rule Builder Conditions list.',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
   const {
     data: actionsDict,
@@ -129,7 +129,7 @@ const useRuleBuilder = () => {
         'Could not load Rule Builder Actions list.',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

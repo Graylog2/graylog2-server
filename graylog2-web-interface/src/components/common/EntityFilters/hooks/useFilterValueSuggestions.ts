@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
@@ -77,7 +77,7 @@ const useFilterValueSuggestions = (
       ),
 
     retry: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

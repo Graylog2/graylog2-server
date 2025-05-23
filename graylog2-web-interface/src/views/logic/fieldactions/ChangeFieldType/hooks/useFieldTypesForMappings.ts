@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemFieldTypes } from '@graylog/server-api';
 
@@ -45,7 +45,7 @@ const useFieldTypesForMappings = (): {
         'Could not load field type options',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

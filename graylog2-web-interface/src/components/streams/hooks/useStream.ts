@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import fetch from 'logic/rest/FetchProvider';
@@ -40,7 +40,7 @@ const useStream = (
   const { data, refetch, isFetching, isError } = useQuery({
     queryKey: ['stream', streamId],
     queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     enabled,
   });
 

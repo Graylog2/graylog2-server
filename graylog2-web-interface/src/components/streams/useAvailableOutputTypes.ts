@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ConfigurationField } from 'components/configurationforms';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -71,7 +71,7 @@ const useAvailableOutputTypes = (
         ),
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled,
     },
   );

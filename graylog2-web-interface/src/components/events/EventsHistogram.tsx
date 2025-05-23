@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import moment from 'moment';
 
@@ -174,7 +174,7 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
   const { data, isInitialLoading, refetch } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
     queryFn: () => eventsHistogramFetcher(searchParams),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   useOnRefresh(refetch);
