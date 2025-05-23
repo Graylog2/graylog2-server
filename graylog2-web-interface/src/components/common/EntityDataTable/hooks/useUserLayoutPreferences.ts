@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 import fetch from 'logic/rest/FetchProvider';
@@ -49,7 +49,7 @@ const useUserLayoutPreferences = <T>(
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
 
     // 1 hour
     staleTime: 60 * (60 * 1000),

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { OrderedMap } from 'immutable';
 
@@ -189,7 +189,7 @@ const useFiltersWithTitle = (
     queryFn: () =>
       defaultOnError(fetchFilterTitles(payload), 'Loading filter titles failed with status', 'Could not load streams'),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     enabled: enabled && !!payload.entities.length,
   });
 

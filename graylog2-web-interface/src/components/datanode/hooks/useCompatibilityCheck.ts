@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import type { CompatibilityResponseType } from 'components/datanode/Types';
@@ -42,7 +42,7 @@ const useCompatibilityCheck = (
   const { data, refetch, isInitialLoading, error, isError } = useQuery({
     queryKey: ['datanodes', 'compatibility'],
     queryFn: () => fetchCompatibility(),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     enabled,
   });
 

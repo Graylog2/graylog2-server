@@ -16,7 +16,7 @@
  */
 import { useState } from 'react';
 import type { QueryObserverResult } from '@tanstack/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -85,7 +85,7 @@ const useClusterSupportBundle = () => {
         'Could not load Support Bundle list.',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

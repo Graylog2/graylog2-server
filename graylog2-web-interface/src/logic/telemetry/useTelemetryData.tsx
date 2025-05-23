@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { Telemetry } from '@graylog/server-api';
 
@@ -49,7 +49,7 @@ const useTelemetryData = () =>
     queryKey: [TELEMETRY_CLUSTER_INFO_QUERY_KEY],
     queryFn: () => Telemetry.get() as Promise<TelemetryDataType>,
     retry: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     notifyOnChangeProps: ['data', 'error'],
   });
 

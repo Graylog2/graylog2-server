@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -88,7 +88,7 @@ const useDashboards = (
         ),
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled,
     },
   );

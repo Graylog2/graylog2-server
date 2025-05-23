@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
@@ -91,7 +91,7 @@ const useFieldTypeUsages = (
         'Could not load field types',
       ),
 
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     enabled,
   });
 
