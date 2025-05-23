@@ -23,18 +23,10 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { defaultOnError } from 'util/conditional/onError';
 
-const fetchIndexSetStats = (indexSetId: string) =>
+const fetchIndexSetStats = (indexSetId: string): Promise<IndexSetStats> =>
   fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.getIndexSetStats(indexSetId).url));
 
-const useIndexSetStats = (
-  indexSetId: string,
-): {
-  data: IndexSetStats;
-  refetch: () => void;
-  isLoading: boolean;
-  error: FetchError;
-  isSuccess: boolean;
-} => {
+const useIndexSetStats = (indexSetId: string) => {
   const { data, refetch, isLoading, error, isSuccess } = useQuery({
     queryKey: ['indexSet', indexSetId, 'stats'],
 

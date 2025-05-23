@@ -68,30 +68,19 @@ export const useGetEventDefinition = (eventDefinitionId: string) => {
   };
 };
 
-const useEventDefinitions = (
-  searchParams: SearchParams,
-  { enabled }: Options = { enabled: true },
-): {
-  data: EventDefinitionResult | undefined;
-  refetch: () => void;
-  isInitialLoading: boolean;
-} => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    {
-      queryKey: keyFn(searchParams),
+const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }) => {
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
 
-      queryFn: () =>
-        defaultOnError(
-          fetchEventDefinitions(searchParams),
-          'Loading Event Definitions failed with status',
-          'Could not load Event definition',
-        ),
-    },
-    {
-      placeholderData: keepPreviousData,
-      enabled,
-    },
-  );
+    queryFn: () =>
+      defaultOnError(
+        fetchEventDefinitions(searchParams),
+        'Loading Event Definitions failed with status',
+        'Could not load Event definition',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data,
