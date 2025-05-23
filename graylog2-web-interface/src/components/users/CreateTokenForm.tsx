@@ -42,19 +42,19 @@ type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
-  defaultTtl?: string;
+  forceDefaultTtl?: string;
   disableTtl?: boolean;
 };
 
 const CreateTokenForm = ({
   creatingToken = false,
   disableForm = false,
-  defaultTtl = 'P30D',
+  forceDefaultTtl = undefined,
   disableTtl = false,
   onCreate,
 }: Props) => {
   const [tokenName, setTokenName] = useState('');
-  const { tokenTtl, setTokenTtl, resetTokenTtl } = useTokenTTL(defaultTtl);
+  const { tokenTtl, setTokenTtl, resetTokenTtl } = useTokenTTL(forceDefaultTtl);
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
