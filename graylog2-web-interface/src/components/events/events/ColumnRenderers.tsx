@@ -24,6 +24,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
+import AppConfig from 'util/AppConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
@@ -119,16 +120,6 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
     <em>No time range</em>
   );
 
-const ValidSecurityLicense = () => {
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
-  const {
-    data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
-
-  return validSecurityLicense;
-};
-
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
   T,
   M
@@ -177,15 +168,19 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
-        <>
-          {ValidSecurityLicense ? (
-            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
-          ) : (
-            <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
-          )}
-        </>
-      ),
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
+        const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
+
+        return (
+          <>
+            {isEventProceduresEnabled ? (
+              <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+            ) : (
+              <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+            )}
+          </>
+        );
+      },
       width: 0.3,
     },
     timerange_start: {

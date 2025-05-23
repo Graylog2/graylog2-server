@@ -523,32 +523,6 @@ export type SearchDataSource = {
   useCondition: () => boolean;
 };
 
-type LICENSE_SUBJECTS = {
-  enterprise: '/license/enterprise';
-  archive: '/license/enterprise/archive';
-  auditlog: '/license/enterprise/auditlog';
-  illuminate: '/license/enterprise/illuminate';
-  searchFilter: '/license/enterprise/search-filter';
-  customization: '/license/enterprise/customization';
-  views: '/license/enterprise/views';
-  forwarder: '/license/enterprise/forwarder';
-  report: '/license/enterprise/report';
-  security: '/license/security';
-  anomaly: '/license/anomaly';
-};
-
-type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
-
-export type LicenseCheck = (subject: LicenseSubject) => {
-  data: {
-    valid: boolean;
-    expired: boolean;
-    violated: boolean;
-  };
-  isInitialLoading: boolean;
-  refetch: () => void;
-};
-
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -615,6 +589,5 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
-    'licenseCheck'?: LicenseCheck;
   }
 }

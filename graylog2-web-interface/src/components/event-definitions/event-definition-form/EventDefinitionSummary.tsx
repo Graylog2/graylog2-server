@@ -21,6 +21,7 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
+import AppConfig from 'util/AppConfig';
 import 'moment-duration-format';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
@@ -61,11 +62,7 @@ const EventDefinitionSummary = ({
 }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
-  const {
-    data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
 
   useEffect(() => {
     const flipShowValidation = () => {
@@ -87,7 +84,7 @@ const EventDefinitionSummary = ({
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
-        {validSecurityLicense ? (
+        {isEventProceduresEnabled ? (
           <>
             {eventDefinition?.event_procedure ? (
               <>
