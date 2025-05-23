@@ -25,7 +25,7 @@ import { getConfig } from 'components/configurations/helpers';
 const FallbackDefaultTokenTTL = 'P30D';
 
 const useTokenTTL = (
-  forceDefaultTokenTTL: string,
+  forceDefaultTokenTTL?: string,
 ): {
   tokenTtl: string;
   defaultTokenTtl: string;
