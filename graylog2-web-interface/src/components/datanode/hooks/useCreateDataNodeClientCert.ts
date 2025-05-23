@@ -52,7 +52,7 @@ const useCreateDataNodeClientCert = (): {
 } => {
   const {
     mutateAsync: onTriggerNextState,
-    isLoading,
+    isPending: isLoading,
     error,
     isError,
   } = useMutation({

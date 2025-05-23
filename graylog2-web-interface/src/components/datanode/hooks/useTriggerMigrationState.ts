@@ -31,7 +31,7 @@ const useTriggerMigrationState = (): {
   const queryClient = useQueryClient();
   const {
     mutateAsync: onTriggerNextState,
-    isLoading: isLoadingNextMigrationState,
+    isPending: isLoadingNextMigrationState,
     error,
     isError,
   } = useMutation(Migration.trigger, {

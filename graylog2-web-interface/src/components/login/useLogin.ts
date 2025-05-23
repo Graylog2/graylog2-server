@@ -24,7 +24,7 @@ const performLogin = ([username, password, host]: [string, string, string]) =>
   SessionActions.login(username, password, host);
 
 const useLogin = (onErrorChange: (message?: string) => void) => {
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: performLogin,
 
     onError: (error: FetchError) => {

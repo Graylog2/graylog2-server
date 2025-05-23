@@ -24,7 +24,7 @@ const _setSubsystemLoggerLevel = (args: { nodeId: string; name: string; level: s
 
 const useSetSubsystemLoggerLevel = () => {
   const queryClient = useQueryClient();
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: _setSubsystemLoggerLevel,
 
     onSuccess: () => {
