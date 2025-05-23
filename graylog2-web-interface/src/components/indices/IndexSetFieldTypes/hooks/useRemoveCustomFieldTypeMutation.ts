@@ -112,7 +112,7 @@ const useRemoveCustomFieldTypeMutation = (params: {
     },
   });
 
-  return { removeCustomFieldTypeMutation: put.mutateAsync, isLoading: put.isLoading };
+  return { removeCustomFieldTypeMutation: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default useRemoveCustomFieldTypeMutation;

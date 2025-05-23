@@ -52,7 +52,7 @@ const usePutFieldTypeMutation = () => {
     },
   });
 
-  return { putFieldTypeMutation: put.mutateAsync, isLoading: put.isLoading };
+  return { putFieldTypeMutation: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default usePutFieldTypeMutation;
