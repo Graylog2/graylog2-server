@@ -78,13 +78,16 @@ const useStreamOutputFilters = (
   isSuccess: boolean;
 } => {
   const { data, refetch, isLoading, isSuccess } = useQuery(
-    keyFn(streamId, destinationType, pagination),
-    () =>
-      defaultOnError(
-        fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
-        'Loading stream output filters failed with status',
-        'Could not load stream output filters',
-      ),
+    {
+      queryKey: keyFn(streamId, destinationType, pagination),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
+          'Loading stream output filters failed with status',
+          'Could not load stream output filters',
+        ),
+    },
     {
       keepPreviousData: true,
     },

@@ -47,15 +47,17 @@ function fetchScopePermissions() {
 }
 
 const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined) => {
-  const { data, isLoading } = useQuery<EntityScopeType, Error>(
-    ['scope-permissions'],
-    () => onError(fetchScopePermissions(), (e) => UserNotification.error(e.message)),
-    {
-      retry: 1,
-      cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
-      staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours
-    },
-  );
+  const { data, isLoading } = useQuery({
+    queryKey: ['scope-permissions'],
+    queryFn: () => onError(fetchScopePermissions(), (e) => UserNotification.error(e.message)),
+    retry: 1,
+
+    // cache for 3 hours
+    cacheTime: 1000 * 60 * 60 * 3,
+
+    // data is valid for 3 hours
+    staleTime: 1000 * 60 * 60 * 3,
+  });
 
   const scope = entity?._scope?.toUpperCase() || 'DEFAULT';
   const permissions: ScopeParams = isLoading ? { is_mutable: false, is_deletable: false } : data.entity_scopes[scope];

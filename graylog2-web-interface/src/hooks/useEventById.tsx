@@ -36,9 +36,10 @@ const useEventById = (
   isLoading: boolean;
   isFetched: boolean;
 } => {
-  const { data, refetch, isLoading, isFetched } = useQuery<Event>(
-    ['event-by-id', eventId],
-    () =>
+  const { data, refetch, isLoading, isFetched } = useQuery({
+    queryKey: ['event-by-id', eventId],
+
+    queryFn: () =>
       onError(fetchEvent(eventId), (errorThrown: FetchError) => {
         if (onErrorHandler) onErrorHandler(errorThrown);
 
@@ -47,11 +48,10 @@ const useEventById = (
           'Could not load event or alert',
         );
       }),
-    {
-      keepPreviousData: true,
-      enabled: !!eventId,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled: !!eventId,
+  });
 
   return {
     data,

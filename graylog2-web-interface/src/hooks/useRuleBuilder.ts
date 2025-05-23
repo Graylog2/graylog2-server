@@ -87,50 +87,50 @@ const useRuleBuilder = () => {
     data: rule,
     refetch: refetchRule,
     isFetching: isLoadingRule,
-  } = useQuery<RuleBuilderRule | null>(
-    ['rule'],
-    () =>
+  } = useQuery({
+    queryKey: ['rule'],
+
+    queryFn: () =>
       defaultOnError(
         fetchRule(ruleId),
         'Loading Rule Builder Rule failed with status',
         'Could not load Rule Builder Rule.',
       ),
-    {
-      enabled,
-    },
-  );
+
+    enabled,
+  });
   const {
     data: conditionsDict,
     refetch: refetchConditionsDict,
     isFetching: isLoadingConditionsDict,
-  } = useQuery<Array<BlockDict>>(
-    ['conditions'],
-    () =>
+  } = useQuery({
+    queryKey: ['conditions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchConditionsDict(),
         'Loading Rule Builder Conditions list failed with status',
         'Could not load Rule Builder Conditions list.',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    keepPreviousData: true,
+  });
   const {
     data: actionsDict,
     refetch: refetchActionsDict,
     isFetching: isLoadingActionsDict,
-  } = useQuery<Array<BlockDict>>(
-    ['actions'],
-    () =>
+  } = useQuery({
+    queryKey: ['actions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchActionsDict(),
         'Loading Rule Builder Actions list failed with status',
         'Could not load Rule Builder Actions list.',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    keepPreviousData: true,
+  });
 
   return {
     isLoadingRule,

@@ -39,10 +39,9 @@ const useCompatibilityCheck = (
   isInitialLoading: boolean;
   isError: boolean;
 } => {
-  const { data, refetch, isInitialLoading, error, isError } = useQuery<
-    { [hostname: string]: CompatibilityResponseType },
-    Error
-  >(['datanodes', 'compatibility'], () => fetchCompatibility(), {
+  const { data, refetch, isInitialLoading, error, isError } = useQuery({
+    queryKey: ['datanodes', 'compatibility'],
+    queryFn: () => fetchCompatibility(),
     keepPreviousData: true,
     enabled,
   });

@@ -40,12 +40,15 @@ const CaCreateForm = () => {
   const sendTelemetry = useSendTelemetry();
   const productName = useProductName();
 
-  const { mutateAsync: onCreateCA } = useMutation(createCA, {
+  const { mutateAsync: onCreateCA } = useMutation({
+    mutationFn: createCA,
+
     onSuccess: () => {
       UserNotification.success('CA created successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
+
     onError: (error) => {
       UserNotification.error(`CA creation failed with error: ${error}`);
     },

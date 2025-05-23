@@ -35,18 +35,18 @@ const useFieldTypesForMappings = (): {
   data: { fieldTypes: FieldTypes };
   isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery(
-    ['fieldTypeOptions'],
-    () =>
+  const { data, isLoading } = useQuery({
+    queryKey: ['fieldTypeOptions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchFieldTypes(),
         'Loading field type options failed with status',
         'Could not load field type options',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    keepPreviousData: true,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

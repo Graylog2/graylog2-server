@@ -35,19 +35,19 @@ const useBuiltInTemplates = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetTemplatesBuiltIn', warmTierEnabled],
-    () =>
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetTemplatesBuiltIn', warmTierEnabled],
+
+    queryFn: () =>
       defaultOnError(
         fetchBuiltInIndexSetTemplates(warmTierEnabled),
         'Loading built in index set templates failed with status',
         'Could not load built in index set templates',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled,
+  });
 
   return {
     data: data ?? [],

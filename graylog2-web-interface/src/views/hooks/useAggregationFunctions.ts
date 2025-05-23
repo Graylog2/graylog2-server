@@ -28,6 +28,10 @@ type AggregationFunctions = {
 };
 
 const fetchAggregationFunctions = (): Promise<AggregationFunctions> => fetch('GET', functionsUrl);
-const useAggregationFunctions = () => useQuery(['aggregationFunctions'], fetchAggregationFunctions);
+const useAggregationFunctions = () =>
+  useQuery({
+    queryKey: ['aggregationFunctions'],
+    queryFn: fetchAggregationFunctions,
+  });
 
 export default useAggregationFunctions;

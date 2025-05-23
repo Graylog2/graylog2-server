@@ -48,8 +48,10 @@ const useOutputs = (
   isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(),
-    () => defaultOnError(fetchOutputs(), 'Loading outputs failed with status', 'Could not load outputs'),
+    {
+      queryKey: keyFn(),
+      queryFn: () => defaultOnError(fetchOutputs(), 'Loading outputs failed with status', 'Could not load outputs'),
+    },
     {
       keepPreviousData: true,
       enabled,

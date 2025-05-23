@@ -50,19 +50,19 @@ const useIndexSetFieldTypesAll = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypesAll', indexSetId],
-    () =>
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypesAll', indexSetId],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetFieldTypesAll(indexSetId),
         'Loading index field types failed with status',
         'Could not load index field types',
       ),
-    {
-      keepPreviousData: true,
-      enabled: !!indexSetId,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled: !!indexSetId,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

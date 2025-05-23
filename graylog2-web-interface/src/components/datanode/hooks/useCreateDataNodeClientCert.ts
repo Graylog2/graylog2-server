@@ -55,7 +55,8 @@ const useCreateDataNodeClientCert = (): {
     isLoading,
     error,
     isError,
-  } = useMutation(createClientCa, {
+  } = useMutation({
+    mutationFn: createClientCa,
     onError: (err: Error) => UserNotification.error(err.message),
   });
 

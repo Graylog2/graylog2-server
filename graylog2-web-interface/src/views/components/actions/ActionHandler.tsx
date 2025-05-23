@@ -124,7 +124,13 @@ export function createHandlerFor<T>(
         />
       );
 
-      setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents }) as ActionComponents);
+      setActionComponents(
+        (actionComponents) =>
+          ({
+            [id]: renderedComponent,
+            ...actionComponents,
+          }) as ActionComponents,
+      );
 
       return Promise.resolve();
     };

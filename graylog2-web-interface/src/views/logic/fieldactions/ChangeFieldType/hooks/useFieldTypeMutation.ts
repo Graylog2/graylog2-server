@@ -37,13 +37,16 @@ const putFieldType = async ({ indexSetSelection, newFieldType, rotated, field }:
 };
 
 const usePutFieldTypeMutation = () => {
-  const put = useMutation(putFieldType, {
+  const put = useMutation({
+    mutationFn: putFieldType,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Changing the field type failed with status: ${errorThrown}`,
         'Could not change the field type',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('The field type changed successfully', 'Success!');
     },

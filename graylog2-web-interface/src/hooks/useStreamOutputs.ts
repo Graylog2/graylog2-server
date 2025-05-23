@@ -49,13 +49,16 @@ const useStreamOutputs = (
   isError: boolean;
 } => {
   const { data, refetch, isInitialLoading, isError } = useQuery(
-    keyFn(streamId),
-    () =>
-      defaultOnError(
-        fetchStreamOutputs(streamId),
-        'Loading stream outputs failed with status',
-        'Could not load stream outputs',
-      ),
+    {
+      queryKey: keyFn(streamId),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchStreamOutputs(streamId),
+          'Loading stream outputs failed with status',
+          'Could not load stream outputs',
+        ),
+    },
     {
       keepPreviousData: true,
       enabled,

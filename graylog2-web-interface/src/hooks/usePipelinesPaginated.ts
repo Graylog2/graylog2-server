@@ -69,18 +69,18 @@ const usePipelinesPaginated = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<PaginatedPipelinesResponse, FetchError>(
-    [...PIPELINES_QUERY_KEY, ...Object.values(params)],
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: [...PIPELINES_QUERY_KEY, ...Object.values(params)],
+
+    queryFn: () =>
       defaultOnError(
         getPaginatedPipelines(params),
         'Loading paginated pipelines failed with status',
         'Could not load  paginated pipelines',
       ),
-    {
-      enabled,
-    },
-  );
+
+    enabled,
+  });
 
   return {
     data: data ?? DEFAULT_DATA,

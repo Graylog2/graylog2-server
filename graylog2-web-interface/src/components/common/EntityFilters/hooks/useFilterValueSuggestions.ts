@@ -66,19 +66,19 @@ const useFilterValueSuggestions = (
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(
-    ['filters', 'suggestions', searchParams],
-    () =>
+  const { data, isInitialLoading } = useQuery({
+    queryKey: ['filters', 'suggestions', searchParams],
+
+    queryFn: () =>
       defaultOnError(
         fetchFilterValueSuggestions(collection, searchParams, collectionProperty),
         'Loading suggestions for filter failed with status',
         'Could not load filter suggestions',
       ),
-    {
-      retry: 0,
-      keepPreviousData: true,
-    },
-  );
+
+    retry: 0,
+    keepPreviousData: true,
+  });
 
   return {
     data: data ?? DEFAULT_DATA,

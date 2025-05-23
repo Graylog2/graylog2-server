@@ -34,18 +34,18 @@ const useSingleIndexSet = (
   isSuccess: boolean;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isSuccess } = useQuery<IndexSet, FetchError>(
-    ['indexSet', indexSetId],
-    () =>
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery({
+    queryKey: ['indexSet', indexSetId],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSet(indexSetId),
         `Loading index set with id: ${indexSetId} failed with status`,
         'Could not load index set',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    keepPreviousData: true,
+  });
 
   return {
     data,

@@ -48,19 +48,19 @@ const useTemplate = (
   isError: boolean;
   refetch: () => void;
 } => {
-  const { data, isFetched, isFetching, isSuccess, isError, refetch } = useQuery(
-    ['indexSetTemplate', id],
-    () =>
+  const { data, isFetched, isFetching, isSuccess, isError, refetch } = useQuery({
+    queryKey: ['indexSetTemplate', id],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetTemplate(id),
         'Loading index set template failed with status',
         'Could not load index set template',
       ),
-    {
-      keepPreviousData: true,
-      enabled: !!id,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled: !!id,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

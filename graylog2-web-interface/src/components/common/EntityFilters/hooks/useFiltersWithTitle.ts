@@ -183,15 +183,15 @@ const useFiltersWithTitle = (
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
-  const { data, isInitialLoading, isError } = useQuery(
-    ['entity_titles', payload],
-    () =>
+  const { data, isInitialLoading, isError } = useQuery({
+    queryKey: ['entity_titles', payload],
+
+    queryFn: () =>
       defaultOnError(fetchFilterTitles(payload), 'Loading filter titles failed with status', 'Could not load streams'),
-    {
-      keepPreviousData: true,
-      enabled: enabled && !!payload.entities.length,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled: enabled && !!payload.entities.length,
+  });
 
   const cachedResponse = queryClient.getQueryData(['entity_titles', payload]);
   const requestedFilterTitles = (cachedResponse ?? data)?.entities;

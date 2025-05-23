@@ -37,14 +37,12 @@ const useStream = (
   isFetching: boolean;
   isError;
 } => {
-  const { data, refetch, isFetching, isError } = useQuery(
-    ['stream', streamId],
-    () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isFetching, isError } = useQuery({
+    queryKey: ['stream', streamId],
+    queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
+    keepPreviousData: true,
+    enabled,
+  });
 
   return {
     data,

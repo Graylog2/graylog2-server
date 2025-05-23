@@ -42,7 +42,10 @@ export const fetchSearchVersionCheck = async ({ queryKey }): Promise<VersionChec
 const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch' | 'datanode', version?: string) => {
   const MAIN_KEY = 'SearchVersionQuery';
   const queryKey = [MAIN_KEY, { distribution, version: version ?? null }];
-  const { data, isLoading, error } = useQuery(queryKey, fetchSearchVersionCheck);
+  const { data, isLoading, error } = useQuery({
+    queryKey: queryKey,
+    queryFn: fetchSearchVersionCheck,
+  });
 
   return {
     data,

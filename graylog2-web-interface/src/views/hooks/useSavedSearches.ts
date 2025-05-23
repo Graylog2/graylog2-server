@@ -67,19 +67,19 @@ const useSavedSearches = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    ['saved-searches', 'overview', searchParams],
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: ['saved-searches', 'overview', searchParams],
+
+    queryFn: () =>
       defaultOnError(
         fetchSavedSearches(searchParams),
         'Loading saved searches failed with status',
         'Could not load saved searches',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

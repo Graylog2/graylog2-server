@@ -36,18 +36,18 @@ const usePipeline = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<PipelineType, FetchError>(
-    [...PIPELINE_QUERY_KEY, pipelineId],
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: [...PIPELINE_QUERY_KEY, pipelineId],
+
+    queryFn: () =>
       defaultOnError(
         PipelinesPipelines.get(pipelineId),
         'Loading pipeline failed with status',
         'Could not load pipeline',
       ),
-    {
-      enabled,
-    },
-  );
+
+    enabled,
+  });
 
   return {
     data: data ?? undefined,
