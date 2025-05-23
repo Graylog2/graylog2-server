@@ -89,13 +89,14 @@ public class AWSServiceTest {
                 AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
                         .awsAccessKeyId("a-key")
                         .awsSecretAccessKey(encryptedValue)
-                                     .name("AWS Input")
-                                     .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
-                                     .streamName("a-stream")
-                                     .batchSize(10000)
-                                     .addFlowLogPrefix(true)
-                                     .throttlingAllowed(true)
-                                     .build();
+                        .name("AWS Input")
+                        .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                        .streamName("a-stream")
+                        .batchSize(10000)
+                        .addFlowLogPrefix(true)
+                        .throttlingAllowed(true)
+                        .overrideSource("test-source")
+                        .build();
         awsService.saveInput(request, user);
 
         // Verify that inputService received a valid input to save.

@@ -69,12 +69,12 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
                                  KinesisTransport transport,
                                  Consumer<byte[]> handleMessageCallback,
                                  String kinesisStreamName,
-                                 AWSMessageType awsMessageType) {
+                                 AWSMessageType awsMessageType, String region) {
         this.objectMapper = objectMapper;
         this.transport = transport;
         this.handleMessageCallback = requireNonNull(handleMessageCallback, "dataHandler");
         this.kinesisStreamName = kinesisStreamName;
-        this.kinesisPayloadDecoder = new KinesisPayloadDecoder(objectMapper, awsMessageType, kinesisStreamName);
+        this.kinesisPayloadDecoder = new KinesisPayloadDecoder(objectMapper, awsMessageType, kinesisStreamName, region);
     }
 
     @Override

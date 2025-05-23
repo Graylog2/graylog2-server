@@ -29,6 +29,7 @@ export const toAWSRequest = (formData, options) => {
     awsEndpointKinesis,
     key,
     secret,
+    overrideSource,
   } = formData;
 
   return {
@@ -46,6 +47,7 @@ export const toAWSRequest = (formData, options) => {
     dynamodb_endpoint: awsEndpointDynamoDB?.value,
     iam_endpoint: awsEndpointIAM?.value,
     kinesis_endpoint: awsEndpointKinesis?.value,
+    override_source: overrideSource?.value,
     ...options,
   };
 };
@@ -68,6 +70,7 @@ export const toGenericInputCreateRequest = ({
   awsCloudWatchAwsSecret,
   key,
   secret,
+  overrideSource,
 }) => ({
   type: 'org.graylog.integrations.aws.inputs.AWSInput',
   title: awsCloudWatchName.value,
@@ -92,5 +95,6 @@ export const toGenericInputCreateRequest = ({
     kinesis_endpoint: awsEndpointKinesis?.value,
     kinesis_stream_name: awsCloudWatchKinesisStream.value,
     kinesis_record_batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
+    override_source: overrideSource?.value,
   },
 });

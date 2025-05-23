@@ -18,6 +18,8 @@ const KINESIS_LOG_TYPES = [
   { value: 'KINESIS_CLOUDWATCH_FLOW_LOGS', label: 'Kinesis CloudWatch Flow Logs' },
   { value: 'KINESIS_CLOUDWATCH_RAW', label: 'Kinesis CloudWatch Raw' },
   { value: 'KINESIS_RAW', label: 'Kinesis Raw' },
+  { value: 'UNKNOWN', label: 'Unknown' },
+  { value: 'NONE', label: 'None' },
 ];
 
 const DEFAULT_KINESIS_LOG_TYPE = 'KINESIS_CLOUDWATCH_FLOW_LOGS';

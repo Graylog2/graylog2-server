@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixes the error panel text readability in dark mode."
+
+issues = ["22137"]

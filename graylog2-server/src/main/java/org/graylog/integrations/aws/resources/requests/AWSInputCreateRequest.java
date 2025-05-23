@@ -37,6 +37,7 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     private static final String BATCH_SIZE = "batch_size";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
+    private static final String OVERRIDE_SOURCE = "override_source";
 
     @JsonProperty(NAME)
     public abstract String name();
@@ -52,6 +53,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonProperty(THROTTLING_ALLOWED)
     public abstract boolean throttlingAllowed();
+
+    @JsonProperty(OVERRIDE_SOURCE)
+    public abstract String overrideSource();
 
     @JsonProperty(ADD_FLOW_LOG_PREFIX)
     public abstract boolean addFlowLogPrefix();
@@ -81,6 +85,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
         @JsonProperty(THROTTLING_ALLOWED)
         public abstract Builder throttlingAllowed(boolean throttlingAllowed);
+
+        @JsonProperty(OVERRIDE_SOURCE)
+        public abstract Builder overrideSource(String overrideSource);
 
         @JsonProperty(ADD_FLOW_LOG_PREFIX)
         public abstract Builder addFlowLogPrefix(boolean addFlowLogPrefix);

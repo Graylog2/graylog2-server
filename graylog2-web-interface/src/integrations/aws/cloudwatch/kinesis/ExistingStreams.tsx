@@ -169,3 +169,4 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
 };
 
 export default KinesisStreams;
+
