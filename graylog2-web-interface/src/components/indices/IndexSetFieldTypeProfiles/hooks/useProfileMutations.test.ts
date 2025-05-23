@@ -26,13 +26,6 @@ import { formValuesProfile1, requestBodyProfile1JSON } from 'fixtures/indexSetFi
 
 const urlPrefix = '/system/indices/index_sets/profiles';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -50,7 +43,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.editProfile(requestBody);
@@ -69,7 +62,7 @@ describe('useProfileMutations', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.editProfile(requestBody).catch(() => {});
@@ -93,7 +86,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.createProfile(requestBody);
@@ -112,7 +105,7 @@ describe('useProfileMutations', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.createProfile(requestBody).catch(() => {});
@@ -133,7 +126,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.deleteProfile('111');
@@ -152,7 +145,7 @@ describe('useProfileMutations', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.deleteProfile('111').catch(() => {});
