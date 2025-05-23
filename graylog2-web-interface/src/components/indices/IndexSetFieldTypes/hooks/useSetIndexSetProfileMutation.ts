@@ -40,13 +40,16 @@ const putProfile = async ({ indexSetId, profileId, rotated }: SetIndexSetFieldTy
 const useSetIndexSetProfileMutation = () => {
   const queryClient = useQueryClient();
 
-  const put = useMutation(putProfile, {
+  const put = useMutation({
+    mutationFn: putProfile,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Setting index set profile failed with status: ${errorThrown}`,
         'Could not set index set profile',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Set index set profile successfully', 'Success!');
 

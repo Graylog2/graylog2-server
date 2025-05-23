@@ -32,11 +32,14 @@ const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('/api/ca/creat
 const CACreateForm = () => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: onCreateCA } = useMutation(createCA, {
+  const { mutateAsync: onCreateCA } = useMutation({
+    mutationFn: createCA,
+
     onSuccess: () => {
       UserNotification.success('CA created successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
     },
+
     onError: (error) => {
       UserNotification.error(`CA creation failed with error: ${error}`);
     },

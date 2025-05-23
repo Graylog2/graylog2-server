@@ -52,19 +52,19 @@ const useProfile = (
   isFetching: boolean;
   refetch: () => void;
 } => {
-  const { data, isFetched, isFetching, refetch } = useQuery(
-    ['indexSetFieldTypeProfile', id],
-    () =>
+  const { data, isFetched, isFetching, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypeProfile', id],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetFieldTypeProfile(id),
         'Loading index field type profile failed with status',
         'Could not load index field type profile',
       ),
-    {
-      keepPreviousData: true,
-      enabled: !!id,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled: !!id,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

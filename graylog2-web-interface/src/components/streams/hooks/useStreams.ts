@@ -57,13 +57,16 @@ const useStreams = (
   isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(searchParams),
-    () =>
-      defaultOnError<StreamsResponse>(
-        fetchStreams(searchParams),
-        'Loading streams failed with status',
-        'Could not load streams',
-      ),
+    {
+      queryKey: keyFn(searchParams),
+
+      queryFn: () =>
+        defaultOnError<StreamsResponse>(
+          fetchStreams(searchParams),
+          'Loading streams failed with status',
+          'Could not load streams',
+        ),
+    },
     {
       keepPreviousData: true,
       enabled,

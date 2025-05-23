@@ -60,9 +60,16 @@ const useAvailableOutputTypes = (
   isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(),
-    () =>
-      defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
+    {
+      queryKey: keyFn(),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchOutputsTypes(),
+          'Loading stream outputs failed with status',
+          'Could not load stream outputs',
+        ),
+    },
     {
       keepPreviousData: true,
       enabled,

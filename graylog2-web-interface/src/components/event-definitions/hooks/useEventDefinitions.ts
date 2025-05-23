@@ -51,13 +51,16 @@ type EventDefinitionResult = {
 };
 
 export const useGetEventDefinition = (eventDefinitionId: string) => {
-  const { data, isFetching } = useQuery<any, Error>(['get-event-definition', eventDefinitionId], () =>
-    defaultOnError(
-      fetchEventDefinition(eventDefinitionId),
-      'Loading Event Definition failed with status',
-      'Could not load Event definition',
-    ),
-  );
+  const { data, isFetching } = useQuery({
+    queryKey: ['get-event-definition', eventDefinitionId],
+
+    queryFn: () =>
+      defaultOnError(
+        fetchEventDefinition(eventDefinitionId),
+        'Loading Event Definition failed with status',
+        'Could not load Event definition',
+      ),
+  });
 
   return {
     data: isFetching ? null : data,
@@ -73,14 +76,17 @@ const useEventDefinitions = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<EventDefinitionResult>(
-    keyFn(searchParams),
-    () =>
-      defaultOnError(
-        fetchEventDefinitions(searchParams),
-        'Loading Event Definitions failed with status',
-        'Could not load Event definition',
-      ),
+  const { data, refetch, isInitialLoading } = useQuery(
+    {
+      queryKey: keyFn(searchParams),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchEventDefinitions(searchParams),
+          'Loading Event Definitions failed with status',
+          'Could not load Event definition',
+        ),
+    },
     {
       keepPreviousData: true,
       enabled,

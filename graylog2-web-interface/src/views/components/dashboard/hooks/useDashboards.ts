@@ -77,13 +77,16 @@ const useDashboards = (
   isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(searchParams),
-    () =>
-      defaultOnError(
-        fetchDashboards(searchParams),
-        'Loading dashboards failed with status',
-        'Could not load dashboards',
-      ),
+    {
+      queryKey: keyFn(searchParams),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchDashboards(searchParams),
+          'Loading dashboards failed with status',
+          'Could not load dashboards',
+        ),
+    },
     {
       keepPreviousData: true,
       enabled,

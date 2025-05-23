@@ -35,12 +35,15 @@ const ResetMigrationButton = () => {
   const [showDialog, setShowDialog] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
-  const { mutateAsync: onResetMigration } = useMutation(resetMigration, {
+  const { mutateAsync: onResetMigration } = useMutation({
+    mutationFn: resetMigration,
+
     onSuccess: () => {
       UserNotification.success('Migration state reset successful.');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
+
     onError: (error) => {
       UserNotification.error(
         `Resetting migration state failed with status: ${error}`,

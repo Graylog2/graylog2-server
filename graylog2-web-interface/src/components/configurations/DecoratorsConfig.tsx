@@ -35,19 +35,22 @@ import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
 const DecoratorsConfig = () => {
-  const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>(
-    ['streamsMap'],
-    StreamsActions.listStreams,
-  );
-  const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>(
-    ['decorators', 'types'],
-    DecoratorsActions.available,
-  );
+  const { data: streams, isLoading: streamsLoading } = useQuery({
+    queryKey: ['streamsMap'],
+    ...StreamsActions.listStreams,
+  });
+  const { data: types, isLoading: typesLoading } = useQuery({
+    queryKey: ['decorators', 'types'],
+    ...DecoratorsActions.available,
+  });
   const {
     data: decorators,
     isLoading: decoratorsLoading,
     refetch: refetchDecorators,
-  } = useQuery<Array<Decorator>>(['decorators', 'available'], DecoratorsActions.list);
+  } = useQuery({
+    queryKey: ['decorators', 'available'],
+    ...DecoratorsActions.list,
+  });
   const [showConfigModal, setShowConfigModal] = useState(false);
   const streamsMap = useMemo(() => Object.fromEntries(streams?.map((s) => [s.id, s] as const) ?? []), [streams]);
 

@@ -60,13 +60,16 @@ const useTemplates = (
   refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery(
-    keyFn(searchParams),
-    () =>
-      defaultOnError(
-        fetchIndexSetTemplates(searchParams),
-        'Loading index set templates failed with status',
-        'Could not load index set templates',
-      ),
+    {
+      queryKey: keyFn(searchParams),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchIndexSetTemplates(searchParams),
+          'Loading index set templates failed with status',
+          'Could not load index set templates',
+        ),
+    },
     {
       keepPreviousData: true,
       enabled,

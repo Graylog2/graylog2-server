@@ -56,7 +56,9 @@ const CreateStreamRuleButton = ({
     (_streamRuleId: string, streamRule: StreamRule) =>
       StreamRulesStore.create(streamId, streamRule, () => {
         UserNotification.success('Stream rule was created successfully.', 'Success');
-        queryClient.invalidateQueries(['stream', streamId]);
+        queryClient.invalidateQueries({
+          queryKey: ['stream', streamId],
+        });
       }),
     [streamId, queryClient],
   );

@@ -74,7 +74,9 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
         onDelete(streamRule.id);
       }
 
-      queryClient.invalidateQueries(STREAM_QUERY_KEY);
+      queryClient.invalidateQueries({
+        queryKey: STREAM_QUERY_KEY,
+      });
       setShowConfirmDelete(false);
       UserNotification.success('Stream rule has been successfully deleted.', 'Success');
     });
@@ -86,7 +88,9 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
         onSubmit(streamRuleId, data);
       }
 
-      queryClient.invalidateQueries(STREAM_QUERY_KEY);
+      queryClient.invalidateQueries({
+        queryKey: STREAM_QUERY_KEY,
+      });
       UserNotification.success('Stream rule has been successfully updated.', 'Success');
     });
 

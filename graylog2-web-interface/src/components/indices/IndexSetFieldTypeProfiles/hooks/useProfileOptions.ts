@@ -36,18 +36,18 @@ const useProfileOptions = (): {
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypeProfileOptions'],
-    () =>
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypeProfileOptions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchProfileOptions(),
         'Loading index field type profile options failed with status',
         'Could not load index field type profile options',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    keepPreviousData: true,
+  });
 
   return {
     options: data ?? INITIAL_DATA,

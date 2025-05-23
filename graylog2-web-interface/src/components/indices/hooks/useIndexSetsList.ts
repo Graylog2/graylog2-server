@@ -48,19 +48,19 @@ const useIndexSetsList = (
   isSuccess: boolean;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isSuccess } = useQuery<State>(
-    ['IndexSetsList', stats],
-    () =>
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery({
+    queryKey: ['IndexSetsList', stats],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetsList(stats, only_open),
         'Loading index sets with list failed with status',
         'Could not load index sets list',
       ),
-    {
-      keepPreviousData: true,
-      refetchInterval,
-    },
-  );
+
+    keepPreviousData: true,
+    refetchInterval,
+  });
 
   return {
     data: data ?? initialData,

@@ -208,14 +208,17 @@ const useDataNodes = (
   isInitialLoading: boolean;
   error: FetchError;
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery<DataNodeResponse, FetchError>(
-    keyFn(searchParams),
-    () =>
-      defaultOnError(
-        fetchDataNodes(searchParams),
-        'Loading Data Nodes failed with status',
-        'Could not load Data Nodes.',
-      ),
+  const { data, refetch, isInitialLoading, error } = useQuery(
+    {
+      queryKey: keyFn(searchParams),
+
+      queryFn: () =>
+        defaultOnError(
+          fetchDataNodes(searchParams),
+          'Loading Data Nodes failed with status',
+          'Could not load Data Nodes.',
+        ),
+    },
     {
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval,

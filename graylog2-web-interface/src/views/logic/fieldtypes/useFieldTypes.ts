@@ -76,7 +76,9 @@ const useFieldTypes = (
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
 
-  return useQuery(['fieldTypes', streams, _timerange], () => fetchAllFieldTypes(streams, _timerange), {
+  return useQuery({
+    queryKey: ['fieldTypes', streams, _timerange],
+    queryFn: () => fetchAllFieldTypes(streams, _timerange),
     staleTime: 30000,
     refetchOnWindowFocus: false,
     cacheTime: 0,

@@ -171,11 +171,11 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading, refetch } = useQuery(
-    ['events', 'histogram', searchParams],
-    () => eventsHistogramFetcher(searchParams),
-    { keepPreviousData: true },
-  );
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: ['events', 'histogram', searchParams],
+    queryFn: () => eventsHistogramFetcher(searchParams),
+    keepPreviousData: true,
+  });
 
   useOnRefresh(refetch);
 

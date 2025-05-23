@@ -45,7 +45,9 @@ export type TelemetryDataType = {
 };
 
 const useTelemetryData = () =>
-  useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get() as Promise<TelemetryDataType>, {
+  useQuery({
+    queryKey: [TELEMETRY_CLUSTER_INFO_QUERY_KEY],
+    queryFn: () => Telemetry.get() as Promise<TelemetryDataType>,
     retry: 0,
     keepPreviousData: true,
     notifyOnChangeProps: ['data', 'error'],

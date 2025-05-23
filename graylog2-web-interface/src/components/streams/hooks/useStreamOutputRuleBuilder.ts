@@ -46,18 +46,18 @@ const useStreamOutputRuleBuilder = () => {
     data: conditions,
     refetch: refetchConditions,
     isFetching: isLoadingConditions,
-  } = useQuery<Array<BlockDict>>(
-    ['stream', 'filter', 'conditions'],
-    () =>
+  } = useQuery({
+    queryKey: ['stream', 'filter', 'conditions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchRuleConditions(),
         'Loading Stream Output Filter Rule Builder Conditions list failed with status',
         'Could not load Stream Output Filter Rule Builder Conditions list.',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    keepPreviousData: true,
+  });
 
   return {
     conditions: conditions,

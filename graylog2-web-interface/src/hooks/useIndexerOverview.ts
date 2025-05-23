@@ -35,19 +35,19 @@ const useIndexerOverview = (
   error: FetchError;
   isSuccess: boolean;
 } => {
-  const { data, refetch, isLoading, error, isSuccess } = useQuery<IndexerOverview, FetchError>(
-    ['indexerOverview', indexSetId, 'stats'],
-    () => fetchIndexerOverview(indexSetId),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(
-          `Loading indexer overview for index set failed with status: ${errorThrown}`,
-          'Could not load indexer overview.',
-        );
-      },
-      notifyOnChangeProps: ['data', 'error'],
+  const { data, refetch, isLoading, error, isSuccess } = useQuery({
+    queryKey: ['indexerOverview', indexSetId, 'stats'],
+    queryFn: () => fetchIndexerOverview(indexSetId),
+
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Loading indexer overview for index set failed with status: ${errorThrown}`,
+        'Could not load indexer overview.',
+      );
     },
-  );
+
+    notifyOnChangeProps: ['data', 'error'],
+  });
 
   return {
     data,

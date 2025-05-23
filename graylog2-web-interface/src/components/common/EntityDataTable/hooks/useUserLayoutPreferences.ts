@@ -40,18 +40,20 @@ const fetchUserLayoutPreferences = (entityId: string) =>
 const useUserLayoutPreferences = <T>(
   entityId: string,
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
-  const { data, isInitialLoading, refetch } = useQuery(
-    ['table-layout', entityId],
-    () =>
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: ['table-layout', entityId],
+
+    queryFn: () =>
       defaultOnError(
         fetchUserLayoutPreferences(entityId),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
-    {
-      keepPreviousData: true,
-      staleTime: 60 * (60 * 1000), // 1 hour
-    },
-  );
+
+    keepPreviousData: true,
+
+    // 1 hour
+    staleTime: 60 * (60 * 1000),
+  });
 
   return {
     data: data ?? INITIAL_DATA,

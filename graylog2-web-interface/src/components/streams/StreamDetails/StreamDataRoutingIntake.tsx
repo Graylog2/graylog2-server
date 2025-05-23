@@ -44,7 +44,9 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
   const isNotEditable = !stream.is_editable;
 
   const handleMatchingTypeSwitched = () => {
-    queryClient.invalidateQueries(['stream', stream.id]);
+    queryClient.invalidateQueries({
+      queryKey: ['stream', stream.id],
+    });
   };
 
   return (

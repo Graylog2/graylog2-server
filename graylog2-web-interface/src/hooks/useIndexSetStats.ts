@@ -35,18 +35,18 @@ const useIndexSetStats = (
   error: FetchError;
   isSuccess: boolean;
 } => {
-  const { data, refetch, isLoading, error, isSuccess } = useQuery<IndexSetStats, FetchError>(
-    ['indexSet', indexSetId, 'stats'],
-    () =>
+  const { data, refetch, isLoading, error, isSuccess } = useQuery({
+    queryKey: ['indexSet', indexSetId, 'stats'],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetStats(indexSetId),
         'Loading index set stats failed with status',
         'Could not load index set stats.',
       ),
-    {
-      notifyOnChangeProps: ['data', 'error'],
-    },
-  );
+
+    notifyOnChangeProps: ['data', 'error'],
+  });
 
   return {
     data,

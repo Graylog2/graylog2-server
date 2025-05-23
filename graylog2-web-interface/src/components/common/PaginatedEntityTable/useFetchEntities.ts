@@ -54,13 +54,16 @@ const useFetchEntities = <T, M = unknown>({
   refetch: () => void;
 } => {
   const { data, isInitialLoading, refetch } = useQuery(
-    fetchKey,
-    () =>
-      defaultOnError(
-        fetchEntities(searchParams),
-        `Fetching ${humanName} failed with status`,
-        `Could not retrieve ${humanName}`,
-      ),
+    {
+      queryKey: fetchKey,
+
+      queryFn: () =>
+        defaultOnError(
+          fetchEntities(searchParams),
+          `Fetching ${humanName} failed with status`,
+          `Could not retrieve ${humanName}`,
+        ),
+    },
     {
       enabled,
       keepPreviousData: true,

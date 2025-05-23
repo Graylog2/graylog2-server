@@ -24,7 +24,9 @@ const performLogin = ([username, password, host]: [string, string, string]) =>
   SessionActions.login(username, password, host);
 
 const useLogin = (onErrorChange: (message?: string) => void) => {
-  const { mutateAsync, isLoading } = useMutation(performLogin, {
+  const { mutateAsync, isLoading } = useMutation({
+    mutationFn: performLogin,
+
     onError: (error: FetchError) => {
       if (error.additional.status === 401) {
         onErrorChange('Invalid credentials, please verify them and retry.');

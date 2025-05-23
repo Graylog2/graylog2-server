@@ -59,7 +59,10 @@ const TypeAheadFieldInput = ({
   name = undefined,
   defaultValue = undefined,
 }: Props) => {
-  const { data, isInitialLoading } = useQuery(['system', 'fields'], () => SystemFields.fields());
+  const { data, isInitialLoading } = useQuery({
+    queryKey: ['system', 'fields'],
+    queryFn: () => SystemFields.fields(),
+  });
   const options = useMemo(() => (isInitialLoading ? [] : prepareOptions(data)), [data, isInitialLoading]);
   const _onChange = useCallback(
     (fieldName: string) => onChange({ target: { value: fieldName, name } }),

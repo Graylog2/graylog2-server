@@ -58,39 +58,48 @@ const deleteProfile = async (id: string) => {
 const useProfileMutation = () => {
   const queryClient = useQueryClient();
 
-  const post = useMutation(postProfile, {
+  const post = useMutation({
+    mutationFn: postProfile,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Creating index set field type profile failed with status: ${errorThrown}`,
         'Could not create index set field type profile',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set field type profile has been successfully created.', 'Success!');
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },
   });
-  const put = useMutation(putProfile, {
+  const put = useMutation({
+    mutationFn: putProfile,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Updating index set field type profile failed with status: ${errorThrown}`,
         'Could not update index set field type profile',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set field type profile has been successfully updated.', 'Success!');
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },
   });
-  const remove = useMutation(deleteProfile, {
+  const remove = useMutation({
+    mutationFn: deleteProfile,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting index set field type profile failed with status: ${errorThrown}`,
         'Could not delete index set field type profile',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set field type profile has been successfully deleted.', 'Success!');
 

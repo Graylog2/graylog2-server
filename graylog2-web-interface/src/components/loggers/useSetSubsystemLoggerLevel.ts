@@ -24,9 +24,13 @@ const _setSubsystemLoggerLevel = (args: { nodeId: string; name: string; level: s
 
 const useSetSubsystemLoggerLevel = () => {
   const queryClient = useQueryClient();
-  const { mutateAsync, isLoading } = useMutation(_setSubsystemLoggerLevel, {
+  const { mutateAsync, isLoading } = useMutation({
+    mutationFn: _setSubsystemLoggerLevel,
+
     onSuccess: () => {
-      queryClient.invalidateQueries(['loggers']);
+      queryClient.invalidateQueries({
+        queryKey: ['loggers'],
+      });
     },
   });
   const setSubsystemLoggerLevel = useCallback(

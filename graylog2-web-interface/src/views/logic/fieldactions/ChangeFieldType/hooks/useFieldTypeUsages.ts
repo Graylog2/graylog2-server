@@ -81,19 +81,19 @@ const useFieldTypeUsages = (
   isInitialLoading: boolean;
   isLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isLoading } = useQuery(
-    ['fieldTypeUsages', field, searchParams],
-    () =>
+  const { data, refetch, isInitialLoading, isLoading } = useQuery({
+    queryKey: ['fieldTypeUsages', field, searchParams],
+
+    queryFn: () =>
       defaultOnError(
         fetchFieldTypeUsages({ streams, field }, searchParams),
         `Loading ${field} types failed with status`,
         'Could not load field types',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+
+    keepPreviousData: true,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

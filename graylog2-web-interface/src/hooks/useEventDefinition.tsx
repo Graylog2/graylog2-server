@@ -112,9 +112,10 @@ const useEventDefinition = (
   isLoading: boolean;
   isFetched: boolean;
 } => {
-  const { data, refetch, isLoading, isFetched } = useQuery(
-    ['event-definition-by-id', definitionId],
-    () =>
+  const { data, refetch, isLoading, isFetched } = useQuery({
+    queryKey: ['event-definition-by-id', definitionId],
+
+    queryFn: () =>
       onError(fetchDefinition(definitionId), (errorThrown: FetchError) => {
         if (onErrorHandler) onErrorHandler(errorThrown);
 
@@ -123,15 +124,15 @@ const useEventDefinition = (
           'Could not load event definition',
         );
       }),
-    {
-      keepPreviousData: true,
-      enabled: !!definitionId,
-      initialData: {
-        eventDefinition: null,
-        aggregations: [],
-      },
+
+    keepPreviousData: true,
+    enabled: !!definitionId,
+
+    initialData: {
+      eventDefinition: null,
+      aggregations: [],
     },
-  );
+  });
 
   return {
     data,
