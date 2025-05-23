@@ -130,11 +130,11 @@ public class RuleBuilderRegistry {
     private void initializeFragmentTemplates() {
         Map<String, RuleFragment> fragments = conditionsWithInternal();
         fragments.putAll(actionsWithInternal());
-        final Configuration freemarkerConfiguration = secureFreemarkerConfigProvider.get();
+        final Configuration config = secureFreemarkerConfigProvider.get();
         StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
         fragments.entrySet().stream().filter(c -> c.getValue().isFragment()).forEach(c -> stringTemplateLoader.putTemplate(c.getKey(), c.getValue().fragment()));
-        freemarkerConfiguration.setTemplateLoader(stringTemplateLoader);
-        this.freemarkerConfiguration = freemarkerConfiguration;
+        config.setTemplateLoader(stringTemplateLoader);
+        this.freemarkerConfiguration = config;
     }
 
     @Subscribe
