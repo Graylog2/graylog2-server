@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 import PageNavigation from 'components/common/PageNavigation';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row } from 'components/bootstrap';
@@ -34,8 +36,10 @@ const EventsPageNavigation = () => {
     pluggableEventProcedures[0]?.EventProcedures &&
     typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
   const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
+  const { permissions } = useCurrentUser();
+  const canViewEventProcedures = React.useMemo(() => isPermitted(permissions, 'event_procedure:read'), [permissions]);
 
-  const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense;
+  const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense && canViewEventProcedures;
   const formattedNavigationItems = navigationItems.map((item) => ({
     title: item.description,
     path: item.path,

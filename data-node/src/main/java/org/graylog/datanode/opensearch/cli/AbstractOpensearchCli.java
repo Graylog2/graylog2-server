@@ -20,6 +20,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.graylog.datanode.process.Environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,13 +36,13 @@ import java.util.List;
 
 public abstract class AbstractOpensearchCli {
 
-    private final CliEnv env;
+    private final Environment env;
     private final Path binPath;
 
     /**
      * @param bin location of the actual executable binary that this wrapper handles
      */
-    protected AbstractOpensearchCli(Path bin, CliEnv env) {
+    protected AbstractOpensearchCli(Path bin, Environment env) {
         this.env = env;
         this.binPath = checkExecutable(bin);
     }
@@ -86,7 +87,7 @@ public abstract class AbstractOpensearchCli {
 
         try {
             final DefaultExecuteResultHandler executeResultHandler = new DefaultExecuteResultHandler();
-            executor.execute(cmd, env.getEnv(), executeResultHandler);
+            executor.execute(cmd, env.env(), executeResultHandler);
             executeResultHandler.waitFor();
             final int exitValue = executeResultHandler.getExitValue();
             if (exitValue != 0) {

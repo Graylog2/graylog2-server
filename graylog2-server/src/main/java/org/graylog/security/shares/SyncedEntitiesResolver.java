@@ -14,11 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.security.shares;
 
-import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
-import { formatNumber } from 'util/NumberFormatting';
+import jakarta.annotation.Nonnull;
+import org.graylog.grn.GRN;
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
-  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
+import java.util.Set;
 
-export default formatValueWithUnitLabel;
+public interface SyncedEntitiesResolver {
+    /**
+     * Return a set of entities that are to be kept in sync with the given entity.
+     * The primary use case is to keep sharing of closely coupled entities in sync; specifically Sigma
+     * rules and event definitions.
+     *
+     * @param primaryEntity The primary entity
+     * @return A set of related entities; or empty set, if there are none.
+     */
+    @Nonnull
+    Set<GRN> syncedEntities(GRN primaryEntity);
+}

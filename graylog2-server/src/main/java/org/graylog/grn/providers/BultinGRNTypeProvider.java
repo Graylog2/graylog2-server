@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.grn.providers;
 
-import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
-import { formatNumber } from 'util/NumberFormatting';
+import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypeProvider;
+import org.graylog.grn.GRNTypes;
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
-  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
+import java.util.Set;
 
-export default formatValueWithUnitLabel;
+/**
+ * Provider for built-in GRN types.
+ */
+public class BultinGRNTypeProvider implements GRNTypeProvider {
+    @Override
+    public Set<GRNType> getTypes() {
+        return GRNTypes.builtinTypes();
+    }
+}

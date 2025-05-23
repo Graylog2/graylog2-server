@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
-import { formatNumber } from 'util/NumberFormatting';
+package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
-  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
-
-export default formatValueWithUnitLabel;
+public record RuleFragmentUpdateEvent() {
+}

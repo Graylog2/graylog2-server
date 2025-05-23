@@ -32,6 +32,7 @@ const supportedTypes = new Set([
   'report',
   'role',
   'output',
+  'sigma_rule',
 ]);
 
 const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {

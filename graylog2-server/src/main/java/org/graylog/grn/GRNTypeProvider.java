@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.grn;
 
-import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
-import { formatNumber } from 'util/NumberFormatting';
+import java.util.Set;
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
-  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
-
-export default formatValueWithUnitLabel;
+/**
+ * Provides the set of valid {@link GRNType} instances.
+ */
+public interface GRNTypeProvider {
+    Set<GRNType> getTypes();
+}

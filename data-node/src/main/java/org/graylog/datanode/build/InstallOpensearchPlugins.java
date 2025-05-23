@@ -16,14 +16,15 @@
  */
 package org.graylog.datanode.build;
 
-import org.graylog.datanode.opensearch.cli.CliEnv;
 import org.graylog.datanode.opensearch.cli.OpensearchCli;
+import org.graylog.datanode.process.Environment;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,10 @@ public class InstallOpensearchPlugins {
         final Path binDir = opensearchDist.resolve("bin");
         final Path configDir = opensearchDist.resolve("config");
 
-        final CliEnv env = new CliEnv(configDir).javaHome(System.getProperty("java.home"));
+        Environment env = new Environment(Map.of())
+                .withOpensearchJavaHome(Path.of(System.getProperty("java.home")))
+                .withOpensearchPathConf(configDir);
+
         final OpensearchCli cli = new OpensearchCli(env, binDir);
 
         final List<String> installedPlugins = cli.plugin().listPlugins();
