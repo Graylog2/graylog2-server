@@ -29,7 +29,7 @@ const EventsPageNavigation = () => {
 
   const {
     data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  } = pluggableLicenseCheck?.[0]?.('/license/security') ?? { data: { valid: false, violated: false } };
 
   const hasEventProceduresPlugin =
     pluggableEventProcedures !== undefined &&
