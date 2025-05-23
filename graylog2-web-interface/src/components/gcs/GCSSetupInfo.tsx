@@ -27,6 +27,7 @@ const StyledOl = styled.ol(
     > li {
       margin-bottom: ${theme.spacings.sm};
     }
+
     > li:last-child {
       margin-bottom: 0;
     }

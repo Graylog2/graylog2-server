@@ -14,11 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.bindings.providers;
 
-import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
-import { formatNumber } from 'util/NumberFormatting';
+import com.floreysoft.jmte.Engine;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+import org.graylog2.jmte.NamedDateRenderer;
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
-  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
+@Singleton
+public class DefaultJmteEngineProvider implements Provider<Engine> {
+    private final Engine engine;
 
-export default formatValueWithUnitLabel;
+    @Inject
+    public DefaultJmteEngineProvider() {
+        engine = Engine.createEngine();
+        engine.registerNamedRenderer(new NamedDateRenderer());
+    }
+
+    @Override
+    public Engine get() {
+        return engine;
+    }
+}
