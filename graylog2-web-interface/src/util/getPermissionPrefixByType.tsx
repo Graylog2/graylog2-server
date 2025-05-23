@@ -31,6 +31,7 @@ const supportedTypes = new Set([
   'report',
   'role',
   'output',
+  'sigma_rule',
 ]);
 
 const typePrefixCornerCasesMap = {
