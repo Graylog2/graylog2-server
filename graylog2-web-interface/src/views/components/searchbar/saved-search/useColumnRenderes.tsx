@@ -68,7 +68,7 @@ const useColumnRenderers = (onLoadSavedSearch: () => void, searchParams: SearchP
             grn={createGRN('search', search.id)}
             onChange={(newValue) => {
               queryClient.setQueriesData(
-                ['saved-searches', 'overview', searchParams],
+                { queryKey: ['saved-searches', 'overview', searchParams] },
                 (cur: { list: Array<View>; pagination: { total: number } }) => ({
                   ...cur,
                   list: cur.list.map((view) => {
