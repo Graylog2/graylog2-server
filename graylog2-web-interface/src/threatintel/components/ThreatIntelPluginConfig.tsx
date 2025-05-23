@@ -63,6 +63,7 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
   const _resetConfig = () => {
     // Reset to initial state when the modal is closed without saving.
     setConfig(initialConfig);
+    _closeModal();
   };
 
   const _saveConfig = () => {

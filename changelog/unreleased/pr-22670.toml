@@ -1,0 +1,5 @@
+type = "f"
+message = "make Threat Intelligence Lookup Modal closable."
+
+issues = ["graylog-plugin-enterprise#10785"]
+pulls = ["22670"]
