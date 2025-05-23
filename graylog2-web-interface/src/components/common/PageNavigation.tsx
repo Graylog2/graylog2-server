@@ -19,11 +19,12 @@ import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
-import { IfPermitted } from 'components/common';
 import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -71,30 +72,38 @@ type Props = {
     path: string;
     permissions?: string | Array<string>;
     exactPathMatch?: boolean;
+    useIsValidLicense?: () => boolean;
   }>;
 };
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const PageNavigation = ({ items }: Props) => (
-  <Container>
-    {items.map(({ path, title, permissions, exactPathMatch }) => {
-      if (!path) {
-        return null;
-      }
+const PageNavigation = ({ items }: Props) => {
+  const currentUser = useCurrentUser();
+  const availableItems = items.filter(
+    (item) =>
+      (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
+      isPermitted(currentUser.permissions, item.permissions),
+  );
 
-      return (
-        <IfPermitted permissions={permissions ?? []} key={path}>
-          <LinkContainer to={path} relativeActive={!exactPathMatch}>
+  return (
+    <Container>
+      {availableItems.map(({ path, title, exactPathMatch }) => {
+        if (!path) {
+          return null;
+        }
+
+        return (
+          <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
             <StyledButton bsStyle="transparent">
               <NavItemStateIndicator>{title}</NavItemStateIndicator>
             </StyledButton>
           </LinkContainer>
-        </IfPermitted>
-      );
-    })}
-  </Container>
-);
+        );
+      })}
+    </Container>
+  );
+};
 
 export default PageNavigation;

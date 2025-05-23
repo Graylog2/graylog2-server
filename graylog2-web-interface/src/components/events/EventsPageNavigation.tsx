@@ -16,38 +16,24 @@
  */
 import * as React from 'react';
 
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import PageNavigation from 'components/common/PageNavigation';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row } from 'components/bootstrap';
 
 const EventsPageNavigation = () => {
   const navigationItems = usePluginEntities('alerts.pageNavigation');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
 
-  const {
-    data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
-
-  const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
-  const { permissions } = useCurrentUser();
-  const canViewEventProcedures = React.useMemo(() => isPermitted(permissions, 'event_procedure:read'), [permissions]);
-
-  const shouldDisplayEventProcedures = hasValidSecurityLicense && canViewEventProcedures;
   const formattedNavigationItems = navigationItems.map((item) => ({
     title: item.description,
     path: item.path,
+    permissions: item.permissions,
+    useIsValidLicense: item.useIsValidLicense,
     exactPathMatch: item.description === 'Alerts & Events',
   }));
 
-  const filteredNavigationItems = shouldDisplayEventProcedures
-    ? formattedNavigationItems
-    : formattedNavigationItems.filter((item) => item.title !== 'Event Procedures');
-
   return (
     <Row>
-      <PageNavigation items={filteredNavigationItems} />
+      <PageNavigation items={formattedNavigationItems} />
     </Row>
   );
 };
