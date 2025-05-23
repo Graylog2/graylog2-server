@@ -104,7 +104,7 @@ const CAUpload = () => {
 
     onSuccess: () => {
       UserNotification.success('CA uploaded successfully');
-      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
     },
 
     onError: (error) => {

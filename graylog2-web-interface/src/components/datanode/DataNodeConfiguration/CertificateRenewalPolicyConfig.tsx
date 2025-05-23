@@ -135,7 +135,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
       queryClient.invalidateQueries({
         queryKey: queryKey,
       });
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
       setShowModal(false);
     },
 

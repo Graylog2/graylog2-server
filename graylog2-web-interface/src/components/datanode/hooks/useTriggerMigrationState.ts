@@ -36,7 +36,7 @@ const useTriggerMigrationState = (): {
     isError,
   } = useMutation(Migration.trigger, {
     onSuccess: () => {
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
     onError: (err: Error) => UserNotification.error(err.message),
   });

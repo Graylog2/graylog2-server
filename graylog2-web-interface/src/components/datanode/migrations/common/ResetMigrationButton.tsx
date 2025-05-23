@@ -40,8 +40,8 @@ const ResetMigrationButton = () => {
 
     onSuccess: () => {
       UserNotification.success('Migration state reset successful.');
-      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
 
     onError: (error) => {

@@ -100,7 +100,7 @@ const useContentStreamSettings = (): {
       queryClient.invalidateQueries({
         queryKey: CONTENT_STREAM_SETTINGS_KEY,
       });
-      queryClient.invalidateQueries(CONTENT_STREAM_CONTENT_KEY);
+      queryClient.invalidateQueries({ queryKey: CONTENT_STREAM_CONTENT_KEY });
     },
 
     onError: (errorThrown) => {

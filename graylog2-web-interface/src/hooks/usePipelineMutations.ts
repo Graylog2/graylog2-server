@@ -56,7 +56,7 @@ const usePipelineMutations = () => {
 
     onSuccess: () => {
       UserNotification.success('Pipeline has been successfully created.', 'Success!');
-      queryClient.invalidateQueries(PIPELINES_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
     },
   });
 
@@ -69,8 +69,8 @@ const usePipelineMutations = () => {
 
     onSuccess: () => {
       UserNotification.success('Pipeline has been successfully updated.', 'Success!');
-      queryClient.invalidateQueries(PIPELINES_QUERY_KEY);
-      queryClient.invalidateQueries(PIPELINE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PIPELINE_QUERY_KEY });
     },
   });
 
@@ -83,8 +83,8 @@ const usePipelineMutations = () => {
 
     onSuccess: () => {
       UserNotification.success('Pipeline has been successfully deleted.', 'Success!');
-      queryClient.invalidateQueries(PIPELINES_QUERY_KEY);
-      queryClient.invalidateQueries(PIPELINE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PIPELINE_QUERY_KEY });
     },
   });
 
