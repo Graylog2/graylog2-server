@@ -37,13 +37,14 @@ const EventsPageNavigation = () => {
     typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
   const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
   const { permissions } = useCurrentUser();
-  const canViewEventProcedures = React.useMemo(
-    () => isPermitted(permissions, 'event_procedure:read'),
-    [permissions],
-  );
+  const canViewEventProcedures = React.useMemo(() => isPermitted(permissions, 'event_procedure:read'), [permissions]);
 
   const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense && canViewEventProcedures;
-  const formattedNavigationItems = navigationItems.map((item) => ({ title: item.description, path: item.path, exactPathMatch: item.description === 'Alerts & Events' }));
+  const formattedNavigationItems = navigationItems.map((item) => ({
+    title: item.description,
+    path: item.path,
+    exactPathMatch: item.description === 'Alerts & Events',
+  }));
 
   const filteredNavigationItems = shouldDisplayEventProcedures
     ? formattedNavigationItems

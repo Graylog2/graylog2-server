@@ -48,12 +48,7 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
 
   return (
     <IfPermitted permissions={`outputs:edit:${output.id}`}>
-      <Button
-        bsStyle="link"
-        disabled={disabled}
-        bsSize="xsmall"
-        onClick={onClick}
-        title="Edit Output">
+      <Button bsStyle="link" disabled={disabled} bsSize="xsmall" onClick={onClick} title="Edit Output">
         <Icon name="edit_square" />
       </Button>
       <ConfigurationForm<Output['configuration']>
