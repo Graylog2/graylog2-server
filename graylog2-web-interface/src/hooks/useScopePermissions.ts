@@ -53,7 +53,7 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined
     retry: 1,
 
     // cache for 3 hours
-    cacheTime: 1000 * 60 * 60 * 3,
+    gcTime: 1000 * 60 * 60 * 3,
 
     // data is valid for 3 hours
     staleTime: 1000 * 60 * 60 * 3,
