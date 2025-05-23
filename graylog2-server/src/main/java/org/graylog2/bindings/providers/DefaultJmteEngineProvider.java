@@ -14,31 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
+package org.graylog2.bindings.providers;
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
-};
+import com.floreysoft.jmte.Engine;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+import org.graylog2.jmte.NamedDateRenderer;
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-  'sigma_rule',
-]);
+@Singleton
+public class DefaultJmteEngineProvider implements Provider<Engine> {
+    private final Engine engine;
 
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
+    @Inject
+    public DefaultJmteEngineProvider() {
+        engine = Engine.createEngine();
+        engine.registerNamedRenderer(new NamedDateRenderer());
+    }
 
-  return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
-};
-
-export default getTitleForEntityType;
+    @Override
+    public Engine get() {
+        return engine;
+    }
+}
