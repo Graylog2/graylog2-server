@@ -75,7 +75,6 @@ import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -96,6 +95,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
+import org.graylog2.rest.resources.streams.responses.StreamDTOResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
@@ -246,7 +246,7 @@ public class StreamResource extends RestResource {
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of streams")
     @Produces(MediaType.APPLICATION_JSON)
-    public PageListResponse<StreamDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<StreamDTOResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
@@ -273,10 +273,10 @@ public class StreamResource extends RestResource {
                 })
                 .toList();
         final long total = paginatedStreamService.count();
-        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
-                streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        final PaginatedList<StreamDTOResponse> streamDTOS = new PaginatedList<>(
+                streams.stream().map(this::dtoToResponse).toList(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
-        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streamDTOS, attributes, settings);
     }
 
     @GET
@@ -729,10 +729,10 @@ public class StreamResource extends RestResource {
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
 
-        final Set<String> existingStreams = streamService.loadByIds(streamIds)
-                .stream()
-                .map(Persisted::getId)
-                .collect(Collectors.toSet());
+        final Set<String> existingStreams;
+        try (var stream = streamService.streamDTOByIds(streamIds)) {
+            existingStreams = stream.map(StreamDTO::id).collect(Collectors.toSet());
+        }
 
         final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
 
@@ -774,6 +774,25 @@ public class StreamResource extends RestResource {
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
                 stream.getCategories()
+        );
+    }
+
+    private StreamDTOResponse dtoToResponse(StreamDTO dto) {
+        return new StreamDTOResponse(dto.id(),
+                dto.creatorUserId(),
+                dto.outputs(),
+                dto.matchingType(),
+                dto.description(),
+                dto.createdAt(),
+                dto.rules(),
+                dto.disabled(),
+                dto.title(),
+                dto.contentPack(),
+                firstNonNull(dto.isDefault(), false),
+                dto.removeMatchesFromDefaultStream(),
+                dto.indexSetId(),
+                dto.isEditable(),
+                dto.categories()
         );
     }
 
