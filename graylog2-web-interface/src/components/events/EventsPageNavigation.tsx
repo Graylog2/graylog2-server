@@ -19,16 +19,15 @@ import * as React from 'react';
 import PageNavigation from 'components/common/PageNavigation';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row } from 'components/bootstrap';
+import { ALERTS_TITLE } from 'components/events/bindings';
 
 const EventsPageNavigation = () => {
   const navigationItems = usePluginEntities('alerts.pageNavigation');
 
-  const formattedNavigationItems = navigationItems.map((item) => ({
-    title: item.description,
-    path: item.path,
-    permissions: item.permissions,
-    useIsValidLicense: item.useIsValidLicense,
-    exactPathMatch: item.description === 'Alerts & Events',
+  const formattedNavigationItems = navigationItems.map(({ description, ...item }) => ({
+    ...item,
+    title: description,
+    exactPathMatch: description === ALERTS_TITLE,
   }));
 
   return (

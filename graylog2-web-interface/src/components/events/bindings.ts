@@ -19,8 +19,8 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 
-const ALERTS_TITLE = 'Alerts & Events';
-const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
+export const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
+export const ALERTS_TITLE = 'Alerts & Events';
 const NOTIFICATIONS_TITLE = 'Notifications';
 
 const eventsBindings: PluginExports = {

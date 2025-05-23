@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useMemo } from 'react';
+import type { PluginNavigation } from 'graylog-web-plugin';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -25,6 +27,7 @@ import NavItemStateIndicator, {
 } from 'components/common/NavItemStateIndicator';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -73,6 +76,7 @@ type Props = {
     permissions?: string | Array<string>;
     exactPathMatch?: boolean;
     useIsValidLicense?: () => boolean;
+    position?: PluginNavigation['position'];
   }>;
 };
 
@@ -81,27 +85,27 @@ type Props = {
  */
 const PageNavigation = ({ items }: Props) => {
   const currentUser = useCurrentUser();
-  const availableItems = items.filter(
-    (item) =>
-      (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
-      isPermitted(currentUser.permissions, item.permissions),
-  );
+
+  const formatedItems = useMemo(() => {
+    const availableItems = items.filter(
+      (item) =>
+        (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
+        isPermitted(currentUser.permissions, item.permissions) &&
+        !!item.path,
+    );
+
+    return sortNavigationItems(availableItems, 'title');
+  }, [currentUser.permissions, items]);
 
   return (
     <Container>
-      {availableItems.map(({ path, title, exactPathMatch }) => {
-        if (!path) {
-          return null;
-        }
-
-        return (
-          <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
-            <StyledButton bsStyle="transparent">
-              <NavItemStateIndicator>{title}</NavItemStateIndicator>
-            </StyledButton>
-          </LinkContainer>
-        );
-      })}
+      {formatedItems.map(({ path, title, exactPathMatch }) => (
+        <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
+          <StyledButton bsStyle="transparent">
+            <NavItemStateIndicator>{title}</NavItemStateIndicator>
+          </StyledButton>
+        </LinkContainer>
+      ))}
     </Container>
   );
 };

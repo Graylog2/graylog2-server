@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type React from 'react';
+import type { PluginNavigation } from 'graylog-web-plugin';
 
 import type { QualifiedUrl } from 'routing/Routes';
 
@@ -57,12 +57,9 @@ export type EventsAdditionalData = {
   context: { event_definitions?: EventDefinitionContexts; streams?: EventDefinitionContexts };
 };
 
-type PluginNavigation = {
+type PageNavigation = {
   description: string;
-  requiredFeatureFlag?: string;
-  perspective?: string;
-  BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: { last: true } | { after: string } | undefined;
+  position?: PluginNavigation['position'];
   permissions?: string | Array<string>;
   useIsValidLicense?: () => boolean;
   path: QualifiedUrl<string>;
@@ -70,6 +67,6 @@ type PluginNavigation = {
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
-    'alerts.pageNavigation'?: Array<PluginNavigation>;
+    'alerts.pageNavigation'?: Array<PageNavigation>;
   }
 }

@@ -210,5 +210,4 @@ export {
   UserEditPage,
   UserTokensEditPage,
   ViewEventDefinitionPage,
-  PluggableEventProceduresPage,
 };
