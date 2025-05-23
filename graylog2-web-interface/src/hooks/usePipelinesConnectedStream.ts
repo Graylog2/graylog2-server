@@ -40,7 +40,7 @@ const usePipelinesConnectedStream = (
   error: FetchError;
   isError: boolean;
 } => {
-  const { data, refetch, isInitialLoading, error, isError } = useQuery({
+  const { data, refetch, isInitialLoading, error, isError } = useQuery<StreamConnectedPipelines, FetchError>({
     queryKey: ['stream', 'pipelines', streamId],
     queryFn: () => pipelines.fetch(streamId),
     notifyOnChangeProps: ['data', 'error'],

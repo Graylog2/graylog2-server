@@ -35,11 +35,11 @@ import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
 const DecoratorsConfig = () => {
-  const { data: streams, isLoading: streamsLoading } = useQuery({
+  const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>({
     queryKey: ['streamsMap'],
     ...StreamsActions.listStreams,
   });
-  const { data: types, isLoading: typesLoading } = useQuery({
+  const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>({
     queryKey: ['decorators', 'types'],
     ...DecoratorsActions.available,
   });
@@ -47,7 +47,7 @@ const DecoratorsConfig = () => {
     data: decorators,
     isLoading: decoratorsLoading,
     refetch: refetchDecorators,
-  } = useQuery({
+  } = useQuery<Array<Decorator>>({
     queryKey: ['decorators', 'available'],
     ...DecoratorsActions.list,
   });
