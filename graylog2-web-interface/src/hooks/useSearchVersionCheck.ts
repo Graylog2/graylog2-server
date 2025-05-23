@@ -26,16 +26,14 @@ type VersionCheckType = {
   errorMessage?: string;
 };
 
-export const fetchSearchVersionCheck = async ({ queryKey }) => {
+export const fetchSearchVersionCheck = async ({ queryKey }): Promise<VersionCheckType> => {
   const [, /* queryName */ { distribution, version }] = queryKey;
 
   try {
-    const data = await fetch(
+    return await fetch(
       'GET',
       qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url),
     );
-
-    return data;
   } catch (e) {
     return UserNotification.error('Could not fetch override data.');
   }
@@ -43,8 +41,8 @@ export const fetchSearchVersionCheck = async ({ queryKey }) => {
 
 const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch' | 'datanode', version?: string) => {
   const MAIN_KEY = 'SearchVersionQuery';
-  const queryKey = version ? [MAIN_KEY, { distribution, version }] : [MAIN_KEY, { distribution, version: null }];
-  const { data, isLoading, error } = useQuery<VersionCheckType, Error>(queryKey, fetchSearchVersionCheck);
+  const queryKey = [MAIN_KEY, { distribution, version: version ?? null }];
+  const { data, isLoading, error } = useQuery(queryKey, fetchSearchVersionCheck);
 
   return {
     data,
