@@ -16,14 +16,12 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
-import freemarker.template.Configuration;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
-import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -35,18 +33,16 @@ import java.util.stream.Collectors;
 public class ActionParser {
 
     public static final String NL = System.lineSeparator();
-    protected final Map<String, RuleFragment> actions;
 
-    private final Configuration freemarkerConfiguration;
+    private final RuleBuilderRegistry ruleBuilderRegistry;
 
     @Inject
-    public ActionParser(RuleBuilderRegistry ruleBuilderRegistry, SecureFreemarkerConfigProvider secureFreemarkerConfigProvider) {
-        this.actions = ruleBuilderRegistry.actionsWithInternal();
-        this.freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, actions);
+    public ActionParser(RuleBuilderRegistry ruleBuilderRegistry) {
+        this.ruleBuilderRegistry = ruleBuilderRegistry;
     }
 
     public Map<String, RuleFragment> getActions() {
-        return actions;
+        return ruleBuilderRegistry.actionsWithInternal();
     }
 
     public String generate(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {
@@ -55,7 +51,7 @@ public class ActionParser {
     }
 
     String generateAction(RuleBuilderStep step, boolean generateSimulatorFields, int index) {
-        final RuleFragment ruleFragment = actions.get(step.function());
+        final RuleFragment ruleFragment = getActions().get(step.function());
         if (Objects.isNull(ruleFragment)) {
             return "";
         }
@@ -72,7 +68,7 @@ public class ActionParser {
         }
 
         if (ruleFragment.isFragment()) {
-            syntax += ParserUtil.generateForFragment(step, freemarkerConfiguration);
+            syntax += ParserUtil.generateForFragment(step, ruleBuilderRegistry.getFreemarkerConfiguration());
         } else {
             syntax += ParserUtil.generateForFunction(step, function) + ";";
         }
