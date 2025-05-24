@@ -32,7 +32,6 @@ import org.graylog2.Configuration;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.ObjectIdStringFunction;
 import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.StringObjectIdFunction;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.LimitedOptionalStringValidator;
 import org.graylog2.database.validators.LimitedStringValidator;
@@ -41,6 +40,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.rest.helpers.DatabaseIdParser;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
@@ -403,7 +403,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public void setRoleIds(Set<String> roles) {
-        fields.put(ROLES, new ArrayList<>(Collections2.transform(roles, new StringObjectIdFunction())));
+        fields.put(ROLES, roles.stream().map(DatabaseIdParser::safeParseObjectId).toList());
     }
 
     @Override

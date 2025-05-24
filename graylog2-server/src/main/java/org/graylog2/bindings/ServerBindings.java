@@ -69,6 +69,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.ElasticsearchExceptionMapper;
 import org.graylog2.rest.GenericErrorCsvWriter;
 import org.graylog2.rest.GraylogErrorPageGenerator;
+import org.graylog2.rest.InvalidObjectIdExceptionMapper;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.QueryParsingExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
@@ -230,6 +231,7 @@ public class ServerBindings extends Graylog2Module {
     private void bindExceptionMappers() {
         final Multibinder<Class<? extends ExceptionMapper>> exceptionMappers = jerseyExceptionMapperBinder();
         exceptionMappers.addBinding().toInstance(NotFoundExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(InvalidObjectIdExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ValidationExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ValidationFailureExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
