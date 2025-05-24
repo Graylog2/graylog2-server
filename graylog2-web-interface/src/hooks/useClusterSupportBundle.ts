@@ -16,7 +16,7 @@
  */
 import { useState } from 'react';
 import type { QueryObserverResult } from '@tanstack/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -75,18 +75,18 @@ const downloadSupportBundle = async (filename: string) => {
 
 const useClusterSupportBundle = () => {
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const { data, refetch } = useQuery<BundleFile[]>(
-    ['supportBundleList', 'overview'],
-    () =>
+  const { data, refetch } = useQuery({
+    queryKey: ['supportBundleList', 'overview'],
+
+    queryFn: () =>
       defaultOnError(
         fetchSupportBundleList(),
         'Loading Support Bundle list failed with status',
         'Could not load Support Bundle list.',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+  });
 
   return {
     isCreating,

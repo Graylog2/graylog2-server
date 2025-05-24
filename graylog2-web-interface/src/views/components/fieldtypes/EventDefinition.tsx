@@ -29,9 +29,11 @@ const fetchEventDefinition = create({
 });
 
 const EventDefinition = ({ value }: { value: string }) => {
-  const { data: eventDefinition, isLoading } = useQuery(['event-definitions', 'batched', value], () =>
-    fetchEventDefinition.fetch(value),
-  );
+  const { data: eventDefinition, isLoading } = useQuery({
+    queryKey: ['event-definitions', 'batched', value],
+
+    queryFn: () => fetchEventDefinition.fetch(value),
+  });
 
   if (isLoading) {
     return <Spinner />;

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -35,19 +35,19 @@ const useBuiltInTemplates = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetTemplatesBuiltIn', warmTierEnabled],
-    () =>
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetTemplatesBuiltIn', warmTierEnabled],
+
+    queryFn: () =>
       defaultOnError(
         fetchBuiltInIndexSetTemplates(warmTierEnabled),
         'Loading built in index set templates failed with status',
         'Could not load built in index set templates',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? [],

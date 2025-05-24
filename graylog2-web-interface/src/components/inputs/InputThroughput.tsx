@@ -270,7 +270,7 @@ class InputThroughput extends React.Component<Props, State> {
           {!isNaN(writtenBytes1Sec) && input.global && (
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
             <a href="" onClick={this._toggleShowDetails}>
-              {showDetails ? 'Hide' : 'Show'} details
+              {showDetails ? 'Hide' : 'Show'}details
             </a>
           )}
           {!isNaN(writtenBytes1Sec) && showDetails && this._formatAllNodeDetails(metrics)}

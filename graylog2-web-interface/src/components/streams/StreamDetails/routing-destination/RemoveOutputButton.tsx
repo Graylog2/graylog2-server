@@ -35,7 +35,9 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
   const queryClient = useQueryClient();
 
   const onConfirmRemoveOutput = () => {
-    removeStreamOutput({ streamId, outputId: output.id }).then(() => queryClient.invalidateQueries(keyFn(streamId)));
+    removeStreamOutput({ streamId, outputId: output.id }).then(() =>
+      queryClient.invalidateQueries({ queryKey: keyFn(streamId) }),
+    );
   };
 
   return (

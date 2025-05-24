@@ -123,13 +123,11 @@ const useContentStream = (path?: string): { isLoadingFeed: boolean; feedList: Ar
 
   const rssUrl = rss_url && `${rss_url}/${getDefaultTag()}/feed`;
 
-  const { data, isLoading, error } = useQuery<Array<FeedItem>, Error>(
-    [...CONTENT_STREAM_CONTENT_KEY, rssUrl],
-    () => fetchNewsFeed(rssUrl),
-    {
-      initialData: [],
-    },
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: [...CONTENT_STREAM_CONTENT_KEY, rssUrl],
+    queryFn: () => fetchNewsFeed(rssUrl),
+    initialData: [],
+  });
 
   return {
     error,

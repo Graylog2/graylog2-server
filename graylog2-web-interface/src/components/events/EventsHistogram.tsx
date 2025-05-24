@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import moment from 'moment';
 
@@ -171,11 +171,11 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading, refetch } = useQuery(
-    ['events', 'histogram', searchParams],
-    () => eventsHistogramFetcher(searchParams),
-    { keepPreviousData: true },
-  );
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: ['events', 'histogram', searchParams],
+    queryFn: () => eventsHistogramFetcher(searchParams),
+    placeholderData: keepPreviousData,
+  });
 
   useOnRefresh(refetch);
 

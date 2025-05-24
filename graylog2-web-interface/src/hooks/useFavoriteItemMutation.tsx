@@ -36,7 +36,9 @@ const deleteFavoriteItem = (grn: string) => {
 };
 
 const useFavoriteItemMutation = () => {
-  const putMutation = useMutation(putFavoriteItem, {
+  const putMutation = useMutation({
+    mutationFn: putFavoriteItem,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Adding item to favorites failed with status: ${errorThrown}`,
@@ -45,7 +47,9 @@ const useFavoriteItemMutation = () => {
     },
   });
 
-  const deleteMutation = useMutation(deleteFavoriteItem, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteFavoriteItem,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting item from favorites failed with status: ${errorThrown}`,
