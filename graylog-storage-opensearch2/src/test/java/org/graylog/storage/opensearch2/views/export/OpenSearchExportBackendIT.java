@@ -39,11 +39,16 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -53,6 +58,7 @@ import static org.mockito.Mockito.mock;
 
 @Ignore("Temporarily disabled because of flakiness")
 public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchExportBackendIT.class);
 
     private IndexLookup indexLookup;
     private OpenSearchExportBackend backend;
@@ -61,6 +67,20 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     @Override
     public String messageTemplateIndexPattern() {
         return "graylog_*";
+    }
+
+    @Rule
+    public TestWatcher watchman = new TestWatcher() {
+        @Override
+        protected void failed(Throwable e, Description description) {
+            LOG.error("Test failed: " + description.getMethodName());
+            LOG.error("Opensearch Logs: \n" + openSearchInstance.getLogs() + "\n========================");
+            LOG.error("Index mapping for graylog_0:\n" + prettyPrint(openSearchInstance.adapters().indicesAdapter().getIndexMapping("graylog_0")));
+        }
+    };
+
+    private String prettyPrint(Map<String, Object> indexMapping) {
+        return indexMapping.entrySet().stream().map(entry -> entry.getKey() + "\t" + entry.getValue()).collect(Collectors.joining("\n"));
     }
 
     @Rule
