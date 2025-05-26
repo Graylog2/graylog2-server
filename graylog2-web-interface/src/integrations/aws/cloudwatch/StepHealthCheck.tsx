@@ -76,9 +76,9 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
 
   useEffect(() => {
     if (fetchStreamArnStatus.error) {
-      
+      // Proceed even if fetching the stream ARN fails — failure is non-blocking and intentionally ignored
     }
-  });
+  },[fetchStreamArnStatus]);
 
   const [logDataProgress, setLogDataUrl] = useFetch(
     null,
