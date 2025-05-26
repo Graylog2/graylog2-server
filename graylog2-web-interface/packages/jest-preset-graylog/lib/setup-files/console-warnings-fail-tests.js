@@ -30,9 +30,15 @@ const ignoredWarnings = [
   DEPRECATION_NOTICE,
   'A suspended resource finished loading inside a test, but the event was not wrapped in act',
   'When testing, code that causes React state updates should be wrapped into act(...)',
+  'Support for defaultProps will be removed from function components in a future major release',
+  'Support for defaultProps will be removed from memo components in a future major release',
+  'uses the legacy contextTypes API which is no longer supported and will be removed in the next major release',
+  'uses the legacy childContextTypes API which is no longer supported and will be removed in the next major',
+  'findDOMNode is deprecated and will be removed in the next major release',
 ];
 
-const ignoreWarning = (args) => (!args[0] || ignoredWarnings.filter((warning) => args[0]?.includes?.(warning)).length > 0);
+const ignoreWarning = (args) =>
+  !args[0] || ignoredWarnings.filter((warning) => args[0]?.includes?.(warning)).length > 0;
 
 console.warn = jest.fn((...args) => {
   console.origWarn(...args);
