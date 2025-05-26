@@ -149,7 +149,5 @@ public interface MongoCollection<TDocument extends MongoEntity> {
 
     void dropIndex(@Nonnull String indexName);
 
-    void dropIndex(@Nonnull Bson bson);
-
     void dropIndexes();
 }

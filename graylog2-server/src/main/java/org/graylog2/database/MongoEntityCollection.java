@@ -849,12 +849,12 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 //    public void dropIndex(@Nonnull String s, @Nonnull DropIndexOptions dropIndexOptions) {
 //        delegate.dropIndex(s, dropIndexOptions);
 //    }
-
-    @Override
-    public void dropIndex(@Nonnull Bson bson) {
-        delegate.dropIndex(bson);
-    }
-
+//
+//    @Override
+//    public void dropIndex(@Nonnull Bson bson) {
+//        delegate.dropIndex(bson);
+//    }
+//
 //    @Override
 //    public void dropIndex(@Nonnull Bson bson, @Nonnull DropIndexOptions dropIndexOptions) {
 //        delegate.dropIndex(bson, dropIndexOptions);
