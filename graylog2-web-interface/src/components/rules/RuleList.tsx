@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
 
 import RuleListEntry from './RuleListEntry';
 
