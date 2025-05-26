@@ -278,7 +278,7 @@ export type StepsType = Array<StepType>;
 type Props = {
   steps: StepsType;
   activeStep?: StepKey | null | undefined;
-  onStepChange: (StepKey) => void;
+  onStepChange: (stepKey: StepKey) => void;
   children?: React.ReactNode;
   horizontal?: boolean;
   justified?: boolean;

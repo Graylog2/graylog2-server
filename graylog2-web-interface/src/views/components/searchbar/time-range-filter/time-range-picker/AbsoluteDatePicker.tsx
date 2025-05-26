@@ -23,7 +23,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
   dateTime: string;
-  onChange?: (string) => void;
+  onChange?: (newDateTime: string) => void;
   startDate?: Date;
 };
 

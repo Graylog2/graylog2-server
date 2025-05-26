@@ -40,7 +40,7 @@ const ActionsWrapper = styled.div`
 const _deleteRole = (
   roleId: $PropertyType<Role, 'id'>,
   roleName: $PropertyType<Role, 'name'>,
-  setDeleting: (boolean) => void,
+  setDeleting: (deleting: boolean) => void,
 ) => {
   let confirmMessage = `Do you really want to delete role "${roleName}"?`;
   const getOneUser = { page: 1, perPage: 1, query: '' };

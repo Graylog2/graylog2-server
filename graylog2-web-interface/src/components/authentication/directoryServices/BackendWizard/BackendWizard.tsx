@@ -248,8 +248,8 @@ type Props = {
   excludedFields?: { [inputName: string]: boolean };
   help?: { [inputName: string]: React.ReactElement | string | null | undefined };
   onSubmit: (
-    WizardSubmitPayload,
-    WizardFormValues,
+    payload: WizardSubmitPayload,
+    values: WizardFormValues,
     serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>,
     shouldUpdateGroupSync?: boolean,
   ) => Promise<LoadBackendResponse>;

@@ -64,7 +64,7 @@ export type WizardStepsState = {
 };
 
 export type BackendWizardType = WizardStepsState & {
-  setStepsState: (BackendWizardType) => void;
+  setStepsState: (type: BackendWizardType) => void;
 };
 
 const initialState = {

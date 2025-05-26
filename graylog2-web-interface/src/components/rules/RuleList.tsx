@@ -25,7 +25,7 @@ type Props = {
   rules: Array<RuleType>;
   metricsConfig?: MetricsConfigType;
   rulesContext?: RulesContext;
-  onDelete: (RuleType) => () => void;
+  onDelete: (ruleType: RuleType) => () => void;
   searchFilter: React.ReactNode;
 };
 
