@@ -32,11 +32,6 @@ class MongoEntityCollectionTest {
     }
 
     @Test
-    void getCollectionName() {
-        assertThat(collection.getCollectionName()).isEqualTo("mongo_collection_test");
-    }
-
-    @Test
     void getOrCreate() {
         final var id = new org.bson.types.ObjectId();
         final var idString = id.toHexString();

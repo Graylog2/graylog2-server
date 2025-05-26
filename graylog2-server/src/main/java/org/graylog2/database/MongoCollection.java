@@ -56,9 +56,6 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     TDocument getOrCreate(TDocument entity);
 
     @Nonnull
-    String getCollectionName();
-
-    @Nonnull
     MongoNamespace getNamespace();
 
     @Nonnull

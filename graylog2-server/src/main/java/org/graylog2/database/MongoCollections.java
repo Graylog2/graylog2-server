@@ -103,7 +103,7 @@ public class MongoCollections {
     }
 
     public <T extends MongoEntity> MongoDbIndexTools indexUtils(MongoCollection<T> collection) {
-        return new MongoDbIndexTools(mongoConnection.getMongoDatabase().getCollection(collection.getCollectionName(), Document.class));
+        return new MongoDbIndexTools(mongoConnection.getMongoDatabase().getCollection(collection.getNamespace().getCollectionName(), Document.class));
     }
 
     private <T extends MongoEntity> MongoCollection<T> getCollection(String collectionName, Class<T> valueType) {

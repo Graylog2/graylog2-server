@@ -79,12 +79,6 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public String getCollectionName() {
-        return delegate.getNamespace().getCollectionName();
-    }
-
-    @Nonnull
-    @Override
     public MongoNamespace getNamespace() {
         return delegate.getNamespace();
     }
