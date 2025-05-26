@@ -70,7 +70,7 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   useEffect(() => {
     const app_pathname = getPathnameWithoutId(window.location.pathname);
     const setGroup = () => {
-      if (isTelemetryDataLoaded && telemetryData && telemetryData.user_telemetry_settings?.telemetry_enabled) {
+      if (isTelemetryDataLoaded && telemetryData?.user_telemetry_settings?.telemetry_enabled) {
         const {
           cluster: { cluster_id: clusterId, ...clusterDetails },
           current_user: { user },
@@ -112,15 +112,25 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
             ...globalProps,
             app_theme: theme.mode,
           });
-        } catch {
+        } catch (e) {
           // eslint-disable-next-line no-console
-          console.warn('Could not capture telemetry event.');
+          console.warn('Could not capture telemetry event: ', e);
         }
+      }
+    };
+
+    const sendErrorReport = (error: unknown) => {
+      try {
+        posthog.captureException(error);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Unable to report exception: ', e);
       }
     };
 
     return {
       sendTelemetry,
+      sendErrorReport,
     };
   }, [globalProps, isPosthogLoaded, posthog, theme.mode]);
 
@@ -142,14 +152,7 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   );
 };
 
-const noopContextValue = { sendTelemetry: () => {} };
-const NoopTelemetryProvider = ({ children }) => (
-  <TelemetryContext.Provider value={noopContextValue}>{children}</TelemetryContext.Provider>
-);
 const isTelemetryEnabled = AppConfig?.telemetry()?.enabled;
-const TelemetryProvider = ({ children }) => {
-  if (!isTelemetryEnabled) return <NoopTelemetryProvider>{children}</NoopTelemetryProvider>;
-
-  return <PostHogTelemetryProvider>{children}</PostHogTelemetryProvider>;
-};
+const TelemetryProvider = ({ children }) =>
+  isTelemetryEnabled ? <PostHogTelemetryProvider>{children}</PostHogTelemetryProvider> : children;
 export default TelemetryProvider;

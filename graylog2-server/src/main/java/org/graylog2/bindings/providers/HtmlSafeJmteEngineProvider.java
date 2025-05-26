@@ -19,10 +19,10 @@ package org.graylog2.bindings.providers;
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.Renderer;
 import com.google.common.html.HtmlEscapers;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog2.jmte.NamedDateRenderer;
 
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +35,7 @@ public class HtmlSafeJmteEngineProvider implements Provider<Engine> {
     @Inject
     public HtmlSafeJmteEngineProvider() {
         engine = Engine.createEngine();
+        engine.registerNamedRenderer(new NamedDateRenderer());
         engine.registerRenderer(String.class, new HtmlSafeRenderer());
     }
 

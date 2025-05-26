@@ -36,7 +36,6 @@ const getFirstMatchingEntityRoute = (
 
 const useEntityRouteFromPlugin = (id: string, type: string) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
-
   if (!pluginEntityRoutesResolver?.length) {
     return null;
   }
@@ -68,6 +67,8 @@ const useShowRouteForEntity = (id: string, type: string) => {
       return Routes.stream_search(id);
     case 'search_filter':
       return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')?.(id);
+    case 'sigma_rule':
+      return Routes.getPluginRoute('SECURITY_SIGMA');
     case 'report':
       return Routes.getPluginRoute('REPORTS_REPORTID_ARCHIVE')?.(id);
     case 'role':
