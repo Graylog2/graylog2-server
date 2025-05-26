@@ -69,40 +69,40 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     long countDocuments(@Nonnull Bson bson);
 
     @Nonnull
-    <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Class<TResult> aClass);
+    <TResult> DistinctIterable<TResult> distinct(@Nonnull String fieldName, @Nonnull Class<TResult> resultClass);
 
     @Nonnull
-    <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Bson bson, @Nonnull Class<TResult> aClass);
+    <TResult> DistinctIterable<TResult> distinct(@Nonnull String fieldName, @Nonnull Bson filter, @Nonnull Class<TResult> resultClass);
 
     @Nonnull
     FindIterable<TDocument> find();
 
     @Nonnull
-    FindIterable<TDocument> find(@Nonnull Bson bson);
+    FindIterable<TDocument> find(@Nonnull Bson filter);
 
     @Nonnull
     <TResult> FindIterable<TResult> find(@Nonnull Bson filter, @Nonnull Class<TResult> resultClass);
 
     @Nonnull
-    AggregateIterable<TDocument> aggregate(@Nonnull List<? extends Bson> list);
+    AggregateIterable<TDocument> aggregate(@Nonnull List<? extends Bson> pipeline);
 
     @Nonnull
-    <TResult> AggregateIterable<TResult> aggregate(@Nonnull List<? extends Bson> list, @Nonnull Class<TResult> aClass);
+    <TResult> AggregateIterable<TResult> aggregate(@Nonnull List<? extends Bson> pipeline, @Nonnull Class<TResult> resultClass);
 
     @Nonnull
-    BulkWriteResult bulkWrite(@Nonnull List<? extends WriteModel<? extends TDocument>> list);
+    BulkWriteResult bulkWrite(@Nonnull List<? extends WriteModel<? extends TDocument>> requests);
 
     @Nonnull
     InsertOneResult insertOne(@Nonnull TDocument entity);
 
     @Nonnull
-    InsertManyResult insertMany(@Nonnull List<? extends TDocument> list);
+    InsertManyResult insertMany(@Nonnull List<? extends TDocument> entities);
 
     @Nonnull
-    DeleteResult deleteOne(@Nonnull Bson bson);
+    DeleteResult deleteOne(@Nonnull Bson filter);
 
     @Nonnull
-    DeleteResult deleteMany(@Nonnull Bson bson);
+    DeleteResult deleteMany(@Nonnull Bson filter);
 
     @Nonnull
     UpdateResult replaceOne(@Nonnull Bson filter, @Nonnull TDocument entity);
@@ -136,13 +136,13 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     void drop();
 
     @Nonnull
-    String createIndex(@Nonnull Bson bson);
+    String createIndex(@Nonnull Bson keys);
 
     @Nonnull
-    String createIndex(@Nonnull Bson bson, @Nonnull IndexOptions indexOptions);
+    String createIndex(@Nonnull Bson keys, @Nonnull IndexOptions indexOptions);
 
     @Nonnull
-    List<String> createIndexes(@Nonnull List<IndexModel> list);
+    List<String> createIndexes(@Nonnull List<IndexModel> indexes);
 
     @Nonnull
     ListIndexesIterable<Document> listIndexes();

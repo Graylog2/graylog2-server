@@ -199,14 +199,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Class<TResult> aClass) {
-        return delegate.distinct(s, aClass);
+    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String fieldName, @Nonnull Class<TResult> resultClass) {
+        return delegate.distinct(fieldName, resultClass);
     }
 
     @Nonnull
     @Override
-    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Bson bson, @Nonnull Class<TResult> aClass) {
-        return delegate.distinct(s, bson, aClass);
+    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String fieldName, @Nonnull Bson filter, @Nonnull Class<TResult> resultClass) {
+        return delegate.distinct(fieldName, filter, resultClass);
     }
 
 //    @Nonnull
@@ -235,8 +235,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 //
     @Nonnull
     @Override
-    public FindIterable<T> find(@Nonnull Bson bson) {
-        return delegate.find(bson);
+    public FindIterable<T> find(@Nonnull Bson filter) {
+        return delegate.find(filter);
     }
 
 
@@ -272,14 +272,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public AggregateIterable<T> aggregate(@Nonnull List<? extends Bson> list) {
-        return delegate.aggregate(list);
+    public AggregateIterable<T> aggregate(@Nonnull List<? extends Bson> pipeline) {
+        return delegate.aggregate(pipeline);
     }
 
     @Nonnull
     @Override
-    public <TResult> AggregateIterable<TResult> aggregate(@Nonnull List<? extends Bson> list, @Nonnull Class<TResult> resultClass) {
-        return delegate.aggregate(list, resultClass);
+    public <TResult> AggregateIterable<TResult> aggregate(@Nonnull List<? extends Bson> pipeline, @Nonnull Class<TResult> resultClass) {
+        return delegate.aggregate(pipeline, resultClass);
     }
 
 //    @Nonnull
@@ -372,8 +372,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public BulkWriteResult bulkWrite(@Nonnull List<? extends WriteModel<? extends T>> list) {
-        return delegate.bulkWrite(list);
+    public BulkWriteResult bulkWrite(@Nonnull List<? extends WriteModel<? extends T>> requests) {
+        return delegate.bulkWrite(requests);
     }
 
 //    @Nonnull
@@ -420,8 +420,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public InsertManyResult insertMany(@Nonnull List<? extends T> list) {
-        return delegate.insertMany(list);
+    public InsertManyResult insertMany(@Nonnull List<? extends T> entities) {
+        return delegate.insertMany(entities);
     }
 
 //    @Nonnull
@@ -444,8 +444,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public DeleteResult deleteOne(@Nonnull Bson bson) {
-        return delegate.deleteOne(bson);
+    public DeleteResult deleteOne(@Nonnull Bson filter) {
+        return delegate.deleteOne(filter);
     }
 
 //    @Nonnull
@@ -468,8 +468,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public DeleteResult deleteMany(@Nonnull Bson bson) {
-        return delegate.deleteMany(bson);
+    public DeleteResult deleteMany(@Nonnull Bson filter) {
+        return delegate.deleteMany(filter);
     }
 
 //    @Nonnull
@@ -770,14 +770,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public String createIndex(@Nonnull Bson bson) {
-        return delegate.createIndex(bson);
+    public String createIndex(@Nonnull Bson keys) {
+        return delegate.createIndex(keys);
     }
 
     @Nonnull
     @Override
-    public String createIndex(@Nonnull Bson bson, @Nonnull IndexOptions indexOptions) {
-        return delegate.createIndex(bson, indexOptions);
+    public String createIndex(@Nonnull Bson keys, @Nonnull IndexOptions indexOptions) {
+        return delegate.createIndex(keys, indexOptions);
     }
 
 //    @Nonnull
@@ -794,8 +794,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public List<String> createIndexes(@Nonnull List<IndexModel> list) {
-        return delegate.createIndexes(list);
+    public List<String> createIndexes(@Nonnull List<IndexModel> indexes) {
+        return delegate.createIndexes(indexes);
     }
 
 //    @Nonnull
