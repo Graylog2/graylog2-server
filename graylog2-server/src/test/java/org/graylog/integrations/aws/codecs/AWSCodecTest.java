@@ -94,7 +94,8 @@ public class AWSCodecTest {
         Assert.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
         Assert.assertEquals("log-stream", message.getField(AbstractKinesisCodec.FIELD_LOG_STREAM));
         Assert.assertEquals("a-stream", message.getField(AbstractKinesisCodec.FIELD_KINESIS_STREAM));
-        Assert.assertEquals("123456789", message.getField("source"));
+        Assert.assertEquals("123456789",message.getField("aws_owner"));
+        Assert.assertEquals("aws-kinesis-raw-logs", message.getField("source"));
         Assert.assertEquals("This a raw message", message.getField("message"));
         Assert.assertEquals(timestamp, message.getTimestamp());
     }

@@ -61,7 +61,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import static org.graylog.integrations.aws.inputs.AWSInput.getKinesisStreamARNDefinition;
+
 public class KinesisTransport extends ThrottleableTransport2 {
+
     private static final Logger LOG = LoggerFactory.getLogger(KinesisTransport.class);
     public static final String NAME = "aws-kinesis-transport";
 
@@ -69,6 +72,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     private static final String CK_ACCESS_KEY = "aws_access_key";
     private static final String CK_SECRET_KEY = "aws_secret_key";
     public static final String CK_KINESIS_STREAM_NAME = "kinesis_stream_name";
+    public static final String CK_KINESIS_STREAM_ARN = "kinesis_stream_arn";
     public static final String CK_KINESIS_RECORD_BATCH_SIZE = "kinesis_record_batch_size";
 
     public static final int DEFAULT_BATCH_SIZE = 10000;
@@ -144,6 +148,8 @@ public class KinesisTransport extends ThrottleableTransport2 {
 
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
+        final String streamArn = configuration.getString(CK_KINESIS_STREAM_ARN);
+        LOG.info("Kinesis Stream ARN: {}",streamArn);
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),
@@ -242,6 +248,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "The name of the Kinesis stream that receives your messages. See README for instructions on how to connect messages to a Kinesis Stream.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
+            r.addField(getKinesisStreamARNDefinition());
 
             r.addField(new NumberField(
                     CK_KINESIS_RECORD_BATCH_SIZE,

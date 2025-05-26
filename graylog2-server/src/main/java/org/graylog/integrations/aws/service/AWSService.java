@@ -136,6 +136,7 @@ public class AWSService {
         AWSMessageType inputType = AWSMessageType.valueOf(request.awsMessageType());
         if (inputType.isKinesis()) {
             configuration.put(KinesisTransport.CK_KINESIS_STREAM_NAME, request.streamName());
+            configuration.put(KinesisTransport.CK_KINESIS_STREAM_ARN, request.streamArn());
             configuration.put(KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE, request.batchSize());
         } else {
             throw new Exception("The specified input type is not supported.");

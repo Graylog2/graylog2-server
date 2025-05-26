@@ -26,10 +26,6 @@ type FormAdvancedOptionsProps = {
   onChange: (...args: any[]) => void;
 };
 
-const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
-`;
-
 const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);

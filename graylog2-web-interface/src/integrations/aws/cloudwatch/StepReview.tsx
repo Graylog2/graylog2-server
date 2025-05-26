@@ -113,6 +113,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
   const overrideSource = formData.overrideSource?.value ?? '';
+  const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
 
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
@@ -129,6 +130,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
       override_source: overrideSource,
     },
   );
@@ -236,6 +238,10 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
           <li>
             <strong>Stream</strong>
             <span>{awsCloudWatchKinesisStream.value}</span>
+          </li>
+          <li>
+            <strong>Stream ARN</strong>
+            <span>{awsCloudwatchKinesisStreamArn}</span>
           </li>
           <li>
             <strong>Global Input</strong>

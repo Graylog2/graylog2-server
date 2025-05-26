@@ -58,6 +58,31 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const [pauseCountdown, setPauseCountdown] = useState(false);
   const productName = useProductName();
 
+  const [fetchStreamArnStatus, setStreamArnFetch] = useFetch(
+    null,
+    (response) => {
+      console.log("streamArn Response:", response);
+      onChange({ target: { name: 'awsCloudwatchKinesisStreamArn', value: response.result } });
+      // formData('awsCloudwatchKinesisStreamArn', { value: response.result });
+    },
+    'POST',
+    {
+      region: formData.awsCloudWatchAwsRegion.value,
+      stream_name: formData.awsCloudWatchKinesisStream.value,
+    },
+  );
+
+   useEffect(() => {
+    setStreamArnFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAM_ARN);
+  }, [setStreamArnFetch]); 
+
+  useEffect(() => {
+    if(fetchStreamArnStatus.error){
+      
+    } 
+  });
+
+
   const [logDataProgress, setLogDataUrl] = useFetch(
     null,
     (response) => {
@@ -79,6 +104,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   useEffect(() => {
     if (!logData) {
       checkForLogs();
+
     }
   }, [checkForLogs, logData]);
 
@@ -137,7 +163,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const getLogType = () => {
     if (knownLog) return `a ${logTypeLabel}`;
     if (logTypeLabel === 'None') return logData.additional;
-    
+
     return 'an unknown message type.';
   };
 

@@ -95,6 +95,7 @@ public class AWSServiceTest {
                         .batchSize(10000)
                         .addFlowLogPrefix(true)
                         .throttlingAllowed(true)
+                        .streamArn("test-arn")
                         .overrideSource("test-source")
                         .build();
         awsService.saveInput(request, user);

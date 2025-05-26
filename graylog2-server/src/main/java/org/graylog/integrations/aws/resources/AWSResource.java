@@ -39,6 +39,7 @@ import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
+import org.graylog.integrations.aws.resources.responses.CreateLogSubscriptionResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
 import org.graylog.integrations.aws.resources.responses.RegionsResponse;
@@ -104,6 +105,19 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @NoAuditEvent("This does not change any data")
     public StreamsResponse getKinesisStreams(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) throws ExecutionException {
         return kinesisService.getKinesisStreamNames(request);
+    }
+
+    @POST
+    @Timed
+    @Path("/kinesis/stream_arn")
+    @ApiOperation(value = "Get stream ARN for the specified stream and region.")
+    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @NoAuditEvent("This does not change any data")
+    public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisHealthCheckRequest request) {
+        String response = KinesisService.getStreamArn(request.streamName(), request.region());
+        System.out.println(response);
+        final CreateLogSubscriptionResponse createLogSubscriptionResponse = CreateLogSubscriptionResponse.create(response);
+        return Response.ok().entity(createLogSubscriptionResponse).build();
     }
 
     @POST

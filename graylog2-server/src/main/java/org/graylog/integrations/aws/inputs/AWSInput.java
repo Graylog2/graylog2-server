@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.service.AWSService;
+import org.graylog.integrations.aws.service.KinesisService;
 import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -184,6 +185,7 @@ public class AWSInput extends MessageInput {
                     "The name of the Kinesis stream that receives your messages. See README for instructions on how to connect messages to a Kinesis Stream.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 
+            request.addField(getKinesisStreamARNDefinition());
             request.addField(new NumberField(
                     KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE,
                     "Kinesis Record batch size.",
@@ -201,9 +203,20 @@ public class AWSInput extends MessageInput {
     public static TextField getOverrideSourceFieldDefinition() {
         return new TextField(
                 CK_OVERRIDE_SOURCE,
-                "Override Source (optional)",
+                "Override Source",
                 "",
                 "The source is set to the Kinesis message by default. Set this if you want to override it with a custom value.",
                 ConfigurationField.Optional.OPTIONAL);
     }
+
+    public static TextField getKinesisStreamARNDefinition() {
+        return new TextField(
+                KinesisTransport.CK_KINESIS_STREAM_ARN,
+                "Kinesis Stream Arn",
+                "",
+                "The ARN of the Kinesis stream.",
+                ConfigurationField.Optional.OPTIONAL);
+    }
+
+
 }

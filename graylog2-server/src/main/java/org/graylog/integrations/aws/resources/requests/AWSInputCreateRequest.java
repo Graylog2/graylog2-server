@@ -34,6 +34,7 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     private static final String NAME = "name";
     private static final String AWS_MESSAGE_TYPE = "aws_input_type";
     private static final String STREAM_NAME = "stream_name";
+    private static final String KINESIS_STREAM_ARN = "kinesis_stream_arn";
     private static final String BATCH_SIZE = "batch_size";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
@@ -47,6 +48,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonProperty(STREAM_NAME)
     public abstract String streamName();
+
+    @JsonProperty(KINESIS_STREAM_ARN)
+    public abstract String streamArn();
 
     @JsonProperty(BATCH_SIZE)
     public abstract int batchSize();
@@ -79,6 +83,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
         @JsonProperty(STREAM_NAME)
         public abstract Builder streamName(String streamName);
+
+        @JsonProperty(KINESIS_STREAM_ARN)
+        public abstract Builder streamArn(String streamArn);
 
         @JsonProperty(BATCH_SIZE)
         public abstract Builder batchSize(int batchSize);

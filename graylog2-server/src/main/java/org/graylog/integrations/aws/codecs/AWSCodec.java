@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.graylog.integrations.aws.inputs.AWSInput.getKinesisStreamARNDefinition;
 import static org.graylog.integrations.aws.inputs.AWSInput.getOverrideSourceFieldDefinition;
 
 public class AWSCodec extends AbstractCodec {
@@ -118,6 +119,7 @@ public class AWSCodec extends AbstractCodec {
                     "Add field with the Flow Log prefix e. g. \"src_addr\" -> \"flow_log_src_addr\"."
             ));
 
+            request.addField(getKinesisStreamARNDefinition());
             request.addField(getOverrideSourceFieldDefinition());
 
             return request;

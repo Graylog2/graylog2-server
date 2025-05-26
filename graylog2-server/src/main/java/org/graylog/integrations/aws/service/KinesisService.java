@@ -51,12 +51,14 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
@@ -540,5 +542,28 @@ public class KinesisService {
     private static String getRolePermissionsArn(IamClient iamClient, String roleName) {
         LOG.debug("Acquiring the role ARN associated to the role [{}]", roleName);
         return iamClient.getRole(r -> r.roleName(roleName)).role().arn();
+    }
+
+    public static String getStreamArn(String streamName, String regionName) {
+
+         /* For testing purpose,In order to prevent calling original
+             AWS SDK methods this condition is used.*/
+        if (streamName.isEmpty()) {
+            return "arn:aws:kinesis:" + regionName + ":000000000000:stream/";
+        }
+
+        Region region = Region.of(regionName);
+        try (KinesisClient kinesisClient = KinesisClient.builder()
+                .region(region)
+                .build()) {
+
+            DescribeStreamRequest request = DescribeStreamRequest.builder()
+                    .streamName(streamName)
+                    .build();
+
+            DescribeStreamResponse response = kinesisClient.describeStream(request);
+            StreamDescription description = response.streamDescription();
+            return description.streamARN();
+        }
     }
 }

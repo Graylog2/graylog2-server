@@ -22,16 +22,12 @@ import jakarta.inject.Inject;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
+import org.graylog.integrations.aws.service.KinesisService;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.kinesis.KinesisClient;
-import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
-import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
-import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -85,7 +81,7 @@ public class KinesisPayloadDecoder {
         // If a user needs to change the type of data stored in a stream, they will need to set the integration up again.
         if (awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS || awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_RAW) {
             final CloudWatchLogSubscriptionData logSubscriptionData = decompressCloudWatchMessages(payloadBytes, objectMapper);
-            String streamArn = getStreamArn(kinesisStream, region);
+            String streamArn = KinesisService.getStreamArn(kinesisStream, region);
             return logSubscriptionData.logEvents().stream()
                     .map(le -> {
                         DateTime timestamp = new DateTime(le.timestamp(), DateTimeZone.UTC);
@@ -139,30 +135,5 @@ public class KinesisPayloadDecoder {
 
         return logSubscriptionData;
     }
-
-    public String getStreamArn(String streamName, String regionName) {
-
-         /* For testing purpose,In order to prevent calling original
-             AWS SDK methods this condition is used.*/
-        if (streamName.isEmpty()) {
-            return "arn:aws:kinesis:" + regionName + ":000000000000:stream/";
-        }
-
-        Region region = Region.of(regionName);
-        try (KinesisClient kinesisClient = KinesisClient.builder()
-                .region(region)
-                .build()) {
-
-            DescribeStreamRequest request = DescribeStreamRequest.builder()
-                    .streamName(streamName)
-                    .build();
-
-            DescribeStreamResponse response = kinesisClient.describeStream(request);
-            StreamDescription description = response.streamDescription();
-
-            return description.streamARN();
-        }
-    }
-
 
 }
