@@ -17,7 +17,7 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import com.mongodb.client.FindIterable;
-import org.graylog2.database.MongoCollection;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -26,7 +26,6 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
