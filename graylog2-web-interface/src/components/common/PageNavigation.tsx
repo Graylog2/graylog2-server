@@ -16,14 +16,18 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useMemo } from 'react';
+import type { PluginNavigation } from 'graylog-web-plugin';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
-import { IfPermitted } from 'components/common';
 import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -71,30 +75,39 @@ type Props = {
     path: string;
     permissions?: string | Array<string>;
     exactPathMatch?: boolean;
+    useIsValidLicense?: () => boolean;
+    position?: PluginNavigation['position'];
   }>;
 };
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const PageNavigation = ({ items }: Props) => (
-  <Container>
-    {items.map(({ path, title, permissions, exactPathMatch }) => {
-      if (!path) {
-        return null;
-      }
+const PageNavigation = ({ items }: Props) => {
+  const currentUser = useCurrentUser();
 
-      return (
-        <IfPermitted permissions={permissions ?? []} key={path}>
-          <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton bsStyle="transparent">
-              <NavItemStateIndicator>{title}</NavItemStateIndicator>
-            </StyledButton>
-          </LinkContainer>
-        </IfPermitted>
-      );
-    })}
-  </Container>
-);
+  const formatedItems = useMemo(() => {
+    const availableItems = items.filter(
+      (item) =>
+        (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
+        isPermitted(currentUser.permissions, item.permissions) &&
+        !!item.path,
+    );
+
+    return sortNavigationItems(availableItems, 'title');
+  }, [currentUser.permissions, items]);
+
+  return (
+    <Container>
+      {formatedItems.map(({ path, title, exactPathMatch }) => (
+        <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
+          <StyledButton bsStyle="transparent">
+            <NavItemStateIndicator>{title}</NavItemStateIndicator>
+          </StyledButton>
+        </LinkContainer>
+      ))}
+    </Container>
+  );
+};
 
 export default PageNavigation;
