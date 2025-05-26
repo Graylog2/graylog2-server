@@ -20,10 +20,12 @@ import com.mongodb.MongoNamespace;
 import com.mongodb.WriteConcern;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ReturnDocument;
@@ -212,19 +214,19 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 //    public long estimatedDocumentCount(@Nonnull EstimatedDocumentCountOptions estimatedDocumentCountOptions) {
 //        return delegate.estimatedDocumentCount(estimatedDocumentCountOptions);
 //    }
-//
-//    @Nonnull
-//    @Override
-//    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Class<TResult> aClass) {
-//        return delegate.distinct(s, aClass);
-//    }
-//
-//    @Nonnull
-//    @Override
-//    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Bson bson, @Nonnull Class<TResult> aClass) {
-//        return delegate.distinct(s, bson, aClass);
-//    }
-//
+
+    @Nonnull
+    @Override
+    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Class<TResult> aClass) {
+        return delegate.distinct(s, aClass);
+    }
+
+    @Nonnull
+    @Override
+    public <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Bson bson, @Nonnull Class<TResult> aClass) {
+        return delegate.distinct(s, bson, aClass);
+    }
+
 //    @Nonnull
 //    @Override
 //    public <TResult> DistinctIterable<TResult> distinct(@Nonnull ClientSession clientSession, @Nonnull String s, @Nonnull Class<TResult> aClass) {
@@ -807,13 +809,13 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 //    public String createIndex(@Nonnull ClientSession clientSession, @Nonnull Bson bson, @Nonnull IndexOptions indexOptions) {
 //        return delegate.createIndex(clientSession, bson, indexOptions);
 //    }
-//
-//    @Nonnull
-//    @Override
-//    public List<String> createIndexes(@Nonnull List<IndexModel> list) {
-//        return delegate.createIndexes(list);
-//    }
-//
+
+    @Nonnull
+    @Override
+    public List<String> createIndexes(@Nonnull List<IndexModel> list) {
+        return delegate.createIndexes(list);
+    }
+
 //    @Nonnull
 //    @Override
 //    public List<String> createIndexes(@Nonnull List<IndexModel> list, @Nonnull CreateIndexOptions createIndexOptions) {
@@ -895,12 +897,12 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 //    public void dropIndex(@Nonnull ClientSession clientSession, @Nonnull Bson bson, @Nonnull DropIndexOptions dropIndexOptions) {
 //        delegate.dropIndex(clientSession, bson, dropIndexOptions);
 //    }
-//
-//    @Override
-//    public void dropIndexes() {
-//        delegate.dropIndexes();
-//    }
-//
+
+    @Override
+    public void dropIndexes() {
+        delegate.dropIndexes();
+    }
+
 //    @Override
 //    public void dropIndexes(@Nonnull ClientSession clientSession) {
 //        delegate.dropIndexes(clientSession);

@@ -20,10 +20,12 @@ import com.mongodb.MongoNamespace;
 import com.mongodb.WriteConcern;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
@@ -57,6 +59,12 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     long countDocuments();
 
     long countDocuments(@Nonnull Bson bson);
+
+    @Nonnull
+    <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Class<TResult> aClass);
+
+    @Nonnull
+    <TResult> DistinctIterable<TResult> distinct(@Nonnull String s, @Nonnull Bson bson, @Nonnull Class<TResult> aClass);
 
     @Nonnull
     FindIterable<TDocument> find();
@@ -126,9 +134,14 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     String createIndex(@Nonnull Bson bson, @Nonnull IndexOptions indexOptions);
 
     @Nonnull
+    List<String> createIndexes(@Nonnull List<IndexModel> list);
+
+    @Nonnull
     ListIndexesIterable<Document> listIndexes();
 
     void dropIndex(@Nonnull String indexName);
 
     void dropIndex(@Nonnull Bson bson);
+
+    void dropIndexes();
 }
