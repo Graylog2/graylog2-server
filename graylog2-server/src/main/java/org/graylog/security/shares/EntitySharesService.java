@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
+import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.security.BuiltinCapabilities;
@@ -43,7 +44,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +69,7 @@ public class EntitySharesService {
     private final EventBus serverEventBus;
     private final Set<SyncedEntitiesResolver> entitiesResolvers;
     private final BuiltinCapabilities builtinCapabilities;
+    private final GRNDescriptorService grnDescriptorService;
 
     @Inject
     public EntitySharesService(final DBGrantService grantService,
@@ -78,7 +79,8 @@ public class EntitySharesService {
                                final GranteeService granteeService,
                                final EventBus serverEventBus,
                                final Set<SyncedEntitiesResolver> entitiesResolvers,
-                               final BuiltinCapabilities builtinCapabilities) {
+                               final BuiltinCapabilities builtinCapabilities,
+                               final GRNDescriptorService grnDescriptorService) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
@@ -87,6 +89,7 @@ public class EntitySharesService {
         this.serverEventBus = serverEventBus;
         this.entitiesResolvers = entitiesResolvers;
         this.builtinCapabilities = builtinCapabilities;
+        this.grnDescriptorService = grnDescriptorService;
     }
 
     /**
@@ -195,18 +198,20 @@ public class EntitySharesService {
 
     private Map<GRN, Collection<EntityDescriptor>> missingPermissions(Set<GRN> selectedGrantees, List<String> entityGRNs, GRN sharingUserGRN) {
         final ImmutableSet<EntityDescriptor> entities = entityGRNs.stream()
-                .map(grn -> EntityDescriptor.create(grnRegistry.parse(grn), grn, Set.of()))
+                .map(grn -> {
+                    GRN theGRN = grnRegistry.parse(grn);
+                    return EntityDescriptor.create(theGRN, grnDescriptorService.getDescriptor(theGRN).title(), Set.of());
+                })
                 .collect(ImmutableSet.toImmutableSet());
 
         final ImmutableMultimap<GRN, EntityDescriptor> deniedEntities =
                 entityDependencyPermissionChecker.check(sharingUserGRN, entities, selectedGrantees);
 
-        Map<GRN, Collection<EntityDescriptor>> missingPermissions = new HashMap<>();
-        deniedEntities.keySet().forEach(grantee -> {
-            final ImmutableSet<EntityDescriptor> missing = deniedEntities.get(grantee).stream().collect(ImmutableSet.toImmutableSet());
-            missingPermissions.put(grantee, missing);
-        });
-        return missingPermissions;
+        return deniedEntities.asMap().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream().collect(ImmutableSet.toImmutableSet())
+                ));
     }
 
     private Set<Grantee> getModifiableGrantees(User sharingUser, GRN ownedEntity) {
