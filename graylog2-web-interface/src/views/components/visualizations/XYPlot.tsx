@@ -17,6 +17,8 @@
 
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
+import cloneDeep from 'lodash/cloneDeep';
+import moment from 'moment';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -75,6 +77,48 @@ const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
   line: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
+type RangeProps = { minX: string; maxX: string };
+const adjustRangeWithStep = ({ minX, maxX }: RangeProps, itemsLength: number, chartsLength: number): RangeProps => {
+  const minMoment = moment(minX);
+  const maxMoment = moment(maxX);
+
+  const durationMs = maxMoment.diff(minMoment);
+  const stepDurationMs = durationMs / itemsLength;
+
+  const delta = 1 / (2 * chartsLength);
+  console.log({ delta, stepDurationMs });
+  const adjustedMinX = minMoment.clone().subtract(stepDurationMs * delta, 'milliseconds');
+  const adjustedMaxX = maxMoment.clone().add(stepDurationMs * (1 - delta), 'milliseconds');
+
+  return {
+    minX: adjustedMinX.format(),
+    maxX: adjustedMaxX.format(),
+  };
+};
+
+const findDateRange = (chartDataArray: Array<{ x: Array<string> }>): RangeProps => {
+  // Flatten all date strings from the 'x' arrays
+  const allDates = chartDataArray.flatMap((data) => data.x || []);
+
+  if (allDates.length === 0) {
+    throw new Error('No date values found in the ChartData array');
+  }
+
+  let earliest = moment(allDates[0]);
+  let latest = moment(allDates[0]);
+
+  allDates.forEach((dateStr) => {
+    const current = moment(dateStr);
+    if (current.isBefore(earliest)) earliest = current;
+    if (current.isAfter(latest)) latest = current;
+  });
+
+  return {
+    minX: earliest.format(), // keeps original timezone
+    maxX: latest.format(),
+  };
+};
+
 const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
@@ -87,7 +131,7 @@ const XYPlot = ({
   onZoom = undefined,
   onClickMarker = undefined,
 }: Props) => {
-  const { formatTime, userTimezone } = useUserDateTime();
+  const { userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
   const defaultLayout: Partial<PlotLayout> = {
     yaxis,
@@ -98,7 +142,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = cloneDeep({ ...defaultLayout, ...plotLayout });
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
@@ -110,11 +154,11 @@ const XYPlot = ({
   );
 
   if (config.isTimeline && effectiveTimerange) {
-    const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
-    const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
-
+    console.log({ chartData });
+    const xValues = chartData?.[0]?.x;
+    const { minX, maxX } = adjustRangeWithStep(findDateRange(chartData), xValues.length, chartData.length);
     layout.xaxis = merge(layout.xaxis, {
-      range: [normalizedFrom, normalizedTo],
+      range: [minX, maxX],
       type: 'date',
     });
   } else {
@@ -124,6 +168,7 @@ const XYPlot = ({
       type: config.sort.length > 0 ? 'category' : undefined,
     });
   }
+  console.log({ layout });
 
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
