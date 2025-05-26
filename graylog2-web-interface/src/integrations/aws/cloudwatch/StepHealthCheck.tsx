@@ -61,9 +61,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const [fetchStreamArnStatus, setStreamArnFetch] = useFetch(
     null,
     (response) => {
-      console.log("streamArn Response:", response);
       onChange({ target: { name: 'awsCloudwatchKinesisStreamArn', value: response.result } });
-      // formData('awsCloudwatchKinesisStreamArn', { value: response.result });
     },
     'POST',
     {
@@ -72,16 +70,15 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     },
   );
 
-   useEffect(() => {
+  useEffect(() => {
     setStreamArnFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAM_ARN);
-  }, [setStreamArnFetch]); 
+  }, [setStreamArnFetch]);
 
   useEffect(() => {
-    if(fetchStreamArnStatus.error){
+    if (fetchStreamArnStatus.error) {
       
-    } 
+    }
   });
-
 
   const [logDataProgress, setLogDataUrl] = useFetch(
     null,

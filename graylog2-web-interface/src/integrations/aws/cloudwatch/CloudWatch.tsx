@@ -34,7 +34,7 @@ import SidebarPermissions from './SidebarPermissions';
 
 type CloudWatchProps = {
   externalInputSubmit?: boolean;
-  onSubmit: (...args: any[]) => void;
+  onSubmit?: (...args: any[]) => void;
 };
 
 const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: CloudWatchProps) => {

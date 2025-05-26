@@ -115,7 +115,6 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @NoAuditEvent("This does not change any data")
     public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisHealthCheckRequest request) {
         String response = KinesisService.getStreamArn(request.streamName(), request.region());
-        System.out.println(response);
         final CreateLogSubscriptionResponse createLogSubscriptionResponse = CreateLogSubscriptionResponse.create(response);
         return Response.ok().entity(createLogSubscriptionResponse).build();
     }
