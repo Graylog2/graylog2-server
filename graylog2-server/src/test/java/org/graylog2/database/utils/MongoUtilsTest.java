@@ -160,47 +160,6 @@ class MongoUtilsTest {
     }
 
     @Test
-    void testGetOrCreate() {
-        final var id = new ObjectId().toHexString();
-        final var dto = new DTO(id, "test");
-
-        assertThat(utils.getById(id)).isEmpty();
-
-        assertThat(utils.getOrCreate(dto)).satisfies(result -> {
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.name()).isEqualTo("test");
-            assertThat(result).isEqualTo(dto);
-        });
-
-        assertThat(utils.getById(id)).isPresent().get().satisfies(result -> {
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.name()).isEqualTo("test");
-            assertThat(result).isEqualTo(dto);
-        });
-
-        // Using a different name in the DTO doesn't update the existing entry in the collection
-        assertThat(utils.getOrCreate(new DTO(id, "another"))).satisfies(result -> {
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.name()).isEqualTo("test");
-            assertThat(result).isEqualTo(dto);
-        });
-    }
-
-    @Test
-    void testGetOrCreateWithNullEntity() {
-        assertThatThrownBy(() -> utils.getOrCreate(null))
-                .hasMessageContaining("entity cannot be null")
-                .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    void testGetOrCreateWithNullEntityID() {
-        assertThatThrownBy(() -> utils.getOrCreate(new DTO(null, "test")))
-                .hasMessageContaining("entity ID cannot be null")
-                .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
     @SuppressForbidden("Using a DuplicateKeyException in our own code is discouraged, but the legacy driver might still throw it.")
     void testIsDuplicateKeyError() {
         final var clientException = new MongoClientException("Something went wrong!");

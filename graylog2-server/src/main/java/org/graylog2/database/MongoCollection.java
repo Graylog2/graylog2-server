@@ -42,7 +42,18 @@ import org.bson.conversions.Bson;
 import java.util.List;
 
 public interface MongoCollection<TDocument extends MongoEntity> {
-    <MET extends MongoEntity> TDocument getOrCreate(MET entity);
+    /**
+     * Convenience method to atomically get or create the given entity. If the collection doesn't contain an entity
+     * with the entity's ID, it will be created and returned. If the entity exists, the method returns the unmodified
+     * entity from the collection.
+     * <p>
+     * The entity's ID must not be null!
+     *
+     * @param entity the entity to
+     * @return the existing or newly created entity
+     * @throws NullPointerException when the entity or entity ID is null
+     */
+    TDocument getOrCreate(TDocument entity);
 
     @Nonnull
     String getCollectionName();

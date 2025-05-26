@@ -203,21 +203,6 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
-     * Convenience method to atomically get or create the given entity. If the collection doesn't contain an entity
-     * with the entity's ID, it will be created and returned. If the entity exists, the method returns the unmodified
-     * entity from the collection.
-     * <p>
-     * The entity's ID must not be null!
-     *
-     * @param entity the entity to
-     * @return the existing or newly created entity
-     * @throws NullPointerException when the entity or entity ID is null
-     */
-    public T getOrCreate(T entity) {
-        return collection.getOrCreate(entity);
-    }
-
-    /**
      * Saves an entity by either inserting or replacing the document.
      * <p>
      * This method exists to avoid the repeated implementation of this functionality during migration from the old

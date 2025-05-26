@@ -57,25 +57,13 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
         this.delegate = delegate;
     }
 
-    /**
-     * Convenience method to atomically get or create the given entity. If the collection doesn't contain an entity
-     * with the entity's ID, it will be created and returned. If the entity exists, the method returns the unmodified
-     * entity from the collection.
-     * <p>
-     * The entity's ID must not be null!
-     *
-     * @param entity the entity to
-     * @return the existing or newly created entity
-     * @throws NullPointerException when the entity or entity ID is null
-     */
     @Override
-    public <MET extends MongoEntity> T getOrCreate(MET entity) {
+    public T getOrCreate(@Nonnull T entity) {
         requireNonNull(entity, "entity cannot be null");
         final var entityId = new ObjectId(requireNonNull(entity.id(), "entity ID cannot be null"));
 
         final var codec = delegate.getCodecRegistry().get(delegate.getDocumentClass());
         try (var writer = new BsonDocumentWriter(new BsonDocument())) {
-            // TODO: Fix the type params for this method!
             // Convert the DTO class to a Bson object, so we can use it with $setOnInsert
             codec.encode(writer, (T) entity, EncoderContext.builder().build());
 
