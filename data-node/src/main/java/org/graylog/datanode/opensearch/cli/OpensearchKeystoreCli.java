@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
+import org.graylog.datanode.process.Environment;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +27,7 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
 
     public static final String KEYSTORE_BIN_NAME = "opensearch-keystore";
 
-    public OpensearchKeystoreCli(Path binDir, CliEnv env) {
+    public OpensearchKeystoreCli(Path binDir, Environment env) {
         super(binDir.resolve(KEYSTORE_BIN_NAME), env);
     }
 

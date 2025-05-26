@@ -14,17 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import usePluginEntities from 'hooks/usePluginEntities';
-import EventsPageNavigation from 'components/events/EventsPageNavigation';
+package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
-const PluggableEventProceduresPage = () => {
-  const pluggableEventProcedures = usePluginEntities('eventProcedures');
-
-  const EventProceduresPage = pluggableEventProcedures[0]?.EventProcedures;
-
-  return <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />;
-};
-
-export default PluggableEventProceduresPage;
+public record RuleFragmentUpdateEvent() {
+}

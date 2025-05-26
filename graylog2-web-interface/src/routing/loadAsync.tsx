@@ -16,7 +16,10 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import ErrorBoundary from 'components/errors/ErrorBoundary';
+import { createReactError } from 'logic/errors/ReportedErrors';
 
 type Props = {
   error: Error;
@@ -26,9 +29,10 @@ const ErrorComponent = ({ error }: Props) => {
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.error(error);
+    ErrorsActions.report(createReactError(error, { componentStack: error.stack }));
   }, [error]);
 
-  return <div>Loading component failed: {error.message}</div>;
+  return null;
 };
 
 type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TProps> }>;
