@@ -30,7 +30,7 @@ import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import type { StepKey, StepType } from 'components/common/Wizard';
+import type { StepType } from 'components/common/Wizard';
 import Wizard from 'components/common/Wizard';
 import type FetchError from 'logic/errors/FetchError';
 import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
@@ -155,7 +155,7 @@ const _prepareSubmitPayload =
     };
   };
 
-const _getInvalidStepKeys = (formValues, newBackendValidationErrors, excludedFields): StepKey[] => {
+const _getInvalidStepKeys = (formValues, newBackendValidationErrors, excludedFields): Array<string> => {
   const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const groupSyncValidation = enterpriseGroupSyncPlugin?.validation.GroupSyncValidation;
@@ -243,7 +243,7 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 
 type Props = {
   authBackendMeta: AuthBackendMeta;
-  initialStepKey?: $PropertyType<StepType, 'key'>;
+  initialStepKey?: StepType<string>['key'];
   initialValues: WizardFormValues;
   excludedFields?: { [inputName: string]: boolean };
   help?: { [inputName: string]: React.ReactElement | string | null | undefined };
@@ -308,7 +308,7 @@ const BackendWizard = ({
     return { ...stepsState.formValues, ...activeForm?.values };
   };
 
-  const _validateSteps = (formValues: WizardFormValues, newBackendValidationErrors): Array<StepKey> => {
+  const _validateSteps = (formValues: WizardFormValues, newBackendValidationErrors): Array<string> => {
     const invalidStepKeys = _getInvalidStepKeys(formValues, newBackendValidationErrors, excludedFields);
 
     if (invalidStepKeys.length >= 1) {
@@ -330,7 +330,7 @@ const BackendWizard = ({
 
   const _getSubmitPayload = _prepareSubmitPayload(stepsState, _getUpdatedFormsValues);
 
-  const _setActiveStepKey = (stepKey: $PropertyType<StepType, 'key'>) => {
+  const _setActiveStepKey = (stepKey: StepType<string>['key']) => {
     const formValues = _getUpdatedFormsValues();
     let invalidStepKeys = [...stepsState.invalidStepKeys];
 
