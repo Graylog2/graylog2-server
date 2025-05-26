@@ -16,43 +16,23 @@
  */
 import * as React from 'react';
 
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import PageNavigation from 'components/common/PageNavigation';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row } from 'components/bootstrap';
+import { ALERTS_TITLE } from 'components/events/bindings';
 
 const EventsPageNavigation = () => {
   const navigationItems = usePluginEntities('alerts.pageNavigation');
-  const pluggableEventProcedures = usePluginEntities('eventProcedures');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
 
-  const {
-    data: { valid: validSecurityLicense, violated: violatedSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
-
-  const hasEventProceduresPlugin =
-    pluggableEventProcedures !== undefined &&
-    pluggableEventProcedures[0]?.EventProcedures &&
-    typeof pluggableEventProcedures[0]?.EventProcedures === 'function';
-  const hasValidSecurityLicense = validSecurityLicense && !violatedSecurityLicense;
-  const { permissions } = useCurrentUser();
-  const canViewEventProcedures = React.useMemo(() => isPermitted(permissions, 'event_procedure:read'), [permissions]);
-
-  const shouldDisplayEventProcedures = hasEventProceduresPlugin && hasValidSecurityLicense && canViewEventProcedures;
-  const formattedNavigationItems = navigationItems.map((item) => ({
-    title: item.description,
-    path: item.path,
-    exactPathMatch: item.description === 'Alerts & Events',
+  const formattedNavigationItems = navigationItems.map(({ description, ...item }) => ({
+    ...item,
+    title: description,
+    exactPathMatch: description === ALERTS_TITLE,
   }));
-
-  const filteredNavigationItems = shouldDisplayEventProcedures
-    ? formattedNavigationItems
-    : formattedNavigationItems.filter((item) => item.title !== 'Event Procedures');
 
   return (
     <Row>
-      <PageNavigation items={filteredNavigationItems} />
+      <PageNavigation items={formattedNavigationItems} />
     </Row>
   );
 };

@@ -73,4 +73,12 @@ then
         );
     set_fields(fields: map, prefix: "ignore_extra_field_names_");
 
+    let csv = "v1,v2,v3,v4";
+            let map =  csv_to_map(
+                value: csv,
+                fieldNames: "k1,k2,k3",
+                ignoreExtraCsvValues: true
+            );
+    set_fields(fields: map, prefix: "ignore_extra_values_");
+
 end
