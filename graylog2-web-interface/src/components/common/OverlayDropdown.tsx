@@ -55,7 +55,7 @@ const OverlayDropdown = ({
   alwaysShowCaret = false,
   children,
   closeOnSelect = true,
-  dropdownZIndex,
+  dropdownZIndex = undefined,
   menuContainer = document.body,
   onToggle,
   placement = 'bottom',

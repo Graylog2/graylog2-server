@@ -31,7 +31,7 @@ type Props = {
   userIsLoggedIn: boolean;
 };
 
-const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLoggedIn }: Props) => {
+const GraylogThemeProvider = ({ children, initialThemeModeOverride = undefined, userIsLoggedIn }: Props) => {
   const { scTheme, mantineTheme, colorScheme } = useThemes(initialThemeModeOverride, userIsLoggedIn);
 
   return (

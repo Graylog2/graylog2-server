@@ -54,23 +54,23 @@ type Props<T = undefined> = React.PropsWithChildren<{
 }>;
 
 const CustomMenuItem = <T,>({
-  children,
-  className,
+  children = undefined,
+  className = undefined,
   disabled = false,
   divider = false,
-  eventKey,
+  eventKey = undefined,
   header = false,
-  href,
-  icon,
-  id,
-  onClick,
-  onSelect,
-  rel,
-  target,
-  title,
-  'data-tab-id': dataTabId,
-  component,
-  closeMenuOnClick,
+  href = undefined,
+  icon = undefined,
+  id = undefined,
+  onClick = undefined,
+  onSelect = undefined,
+  rel = undefined,
+  target = undefined,
+  title = undefined,
+  'data-tab-id': dataTabId = undefined,
+  component = undefined,
+  closeMenuOnClick = undefined,
 }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);

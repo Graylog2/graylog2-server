@@ -30,7 +30,7 @@ type Props = {
   rotationStrategyClass?: string;
 };
 
-const IndexMaintenanceStrategiesSummary = ({ config, pluginExports, rotationStrategyClass }: Props) => {
+const IndexMaintenanceStrategiesSummary = ({ config, pluginExports, rotationStrategyClass = undefined }: Props) => {
   if (!config) {
     return <Spinner />;
   }

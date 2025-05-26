@@ -125,7 +125,7 @@ const ElementConfigurationSection = ({
   elementTitle,
   isEmpty = false,
   onCreate,
-  sectionTitle,
+  sectionTitle = undefined,
 }: Props) => {
   const title = sectionTitle ?? elementTitle;
 

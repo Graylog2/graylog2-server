@@ -28,6 +28,10 @@ class IndexRangeSummary extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    indexRange: undefined,
+  };
+
   render() {
     const { indexRange } = this.props;
 

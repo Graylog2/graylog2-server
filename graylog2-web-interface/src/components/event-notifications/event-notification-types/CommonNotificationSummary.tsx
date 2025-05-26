@@ -33,6 +33,10 @@ class CommonNotificationSummary extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    definitionNotification: undefined,
+  };
+
   state = {
     displayDetails: false,
   };

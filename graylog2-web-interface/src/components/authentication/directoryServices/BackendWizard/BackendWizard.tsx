@@ -266,7 +266,7 @@ const BackendWizard = ({
   initialStepKey = SERVER_CONFIG_KEY,
   onSubmit,
   authBackendMeta,
-  help,
+  help = undefined,
   excludedFields = {},
 }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();

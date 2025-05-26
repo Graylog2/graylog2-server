@@ -35,19 +35,19 @@ type Props = PropsWithChildren<{
 }>;
 
 const Menu = ({
-  children,
+  children = undefined,
   closeOnItemClick = true,
-  keepMounted,
-  offset,
-  onChange,
-  onClose,
-  opened,
-  portalProps,
-  position,
-  shadow,
-  width,
+  keepMounted = undefined,
+  offset = undefined,
+  onChange = undefined,
+  onClose = undefined,
+  opened = undefined,
+  portalProps = undefined,
+  position = undefined,
+  shadow = undefined,
+  width = undefined,
   withinPortal = false,
-  zIndex,
+  zIndex = undefined,
 }: Props) => (
   <MantineMenu
     closeOnItemClick={closeOnItemClick}
