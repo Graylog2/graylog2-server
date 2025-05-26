@@ -50,6 +50,11 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 
+/**
+ * The default implementation of {@link MongoCollection}.
+ * <p>
+ * This class delegates most method calls to a {@link com.mongodb.client.MongoCollection} instance.
+ */
 public class MongoEntityCollection<T extends MongoEntity> implements MongoCollection<T> {
     private final com.mongodb.client.MongoCollection<T> delegate;
 
@@ -163,8 +168,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
     }
 
     @Override
-    public long countDocuments(@Nonnull Bson bson) {
-        return delegate.countDocuments(bson);
+    public long countDocuments(@Nonnull Bson filter) {
+        return delegate.countDocuments(filter);
     }
 
     //    @Override
@@ -492,14 +497,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public UpdateResult replaceOne(@Nonnull Bson filter, @Nonnull T entity) {
-        return delegate.replaceOne(filter, entity);
+    public UpdateResult replaceOne(@Nonnull Bson filter, @Nonnull T replacement) {
+        return delegate.replaceOne(filter, replacement);
     }
 
     @Nonnull
     @Override
-    public UpdateResult replaceOne(@Nonnull Bson filter, @Nonnull T entity, @Nonnull ReplaceOptions options) {
-        return delegate.replaceOne(filter, entity, options);
+    public UpdateResult replaceOne(@Nonnull Bson filter, @Nonnull T replacement, @Nonnull ReplaceOptions replaceOptions) {
+        return delegate.replaceOne(filter, replacement, replaceOptions);
     }
 
 //    @Nonnull
@@ -516,14 +521,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public UpdateResult updateOne(@Nonnull Bson filter, @Nonnull Bson updates) {
-        return delegate.updateOne(filter, updates);
+    public UpdateResult updateOne(@Nonnull Bson filter, @Nonnull Bson update) {
+        return delegate.updateOne(filter, update);
     }
 
     @Nonnull
     @Override
-    public UpdateResult updateOne(@Nonnull Bson filter, @Nonnull Bson updates, @Nonnull UpdateOptions options) {
-        return delegate.updateOne(filter, updates, options);
+    public UpdateResult updateOne(@Nonnull Bson filter, @Nonnull Bson update, @Nonnull UpdateOptions updateOptions) {
+        return delegate.updateOne(filter, update, updateOptions);
     }
 
 
@@ -565,14 +570,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nonnull
     @Override
-    public UpdateResult updateMany(@Nonnull Bson filter, @Nonnull Bson updates) {
-        return delegate.updateMany(filter, updates);
+    public UpdateResult updateMany(@Nonnull Bson filter, @Nonnull Bson update) {
+        return delegate.updateMany(filter, update);
     }
 
     @Nonnull
     @Override
-    public UpdateResult updateMany(@Nonnull Bson filter, @Nonnull Bson updates, @Nonnull UpdateOptions options) {
-        return delegate.updateMany(filter, updates, options);
+    public UpdateResult updateMany(@Nonnull Bson filter, @Nonnull Bson update, @Nonnull UpdateOptions updateOptions) {
+        return delegate.updateMany(filter, update, updateOptions);
     }
 
 //    @Nonnull
@@ -643,8 +648,8 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nullable
     @Override
-    public T findOneAndReplace(@Nonnull Bson filter, @Nonnull T entity, @Nonnull FindOneAndReplaceOptions options) {
-        return delegate.findOneAndReplace(filter, entity, options);
+    public T findOneAndReplace(@Nonnull Bson filter, @Nonnull T replacement, @Nonnull FindOneAndReplaceOptions options) {
+        return delegate.findOneAndReplace(filter, replacement, options);
     }
 
 
@@ -662,14 +667,14 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
 
     @Nullable
     @Override
-    public T findOneAndUpdate(@Nonnull Bson filter, @Nonnull Bson updates) {
-        return delegate.findOneAndUpdate(filter, updates);
+    public T findOneAndUpdate(@Nonnull Bson filter, @Nonnull Bson update) {
+        return delegate.findOneAndUpdate(filter, update);
     }
 
     @Nullable
     @Override
-    public T findOneAndUpdate(@Nonnull Bson filter, @Nonnull Bson updates, @Nonnull FindOneAndUpdateOptions options) {
-        return delegate.findOneAndUpdate(filter, updates, options);
+    public T findOneAndUpdate(@Nonnull Bson filter, @Nonnull Bson update, @Nonnull FindOneAndUpdateOptions options) {
+        return delegate.findOneAndUpdate(filter, update, options);
     }
 
 //    @Nullable
