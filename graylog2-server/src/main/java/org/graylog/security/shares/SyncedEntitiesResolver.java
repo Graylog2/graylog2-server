@@ -14,31 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
+package org.graylog.security.shares;
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
-};
+import jakarta.annotation.Nonnull;
+import org.graylog.grn.GRN;
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-  'sigma_rule',
-]);
+import java.util.Set;
 
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
-};
-
-export default getTitleForEntityType;
+public interface SyncedEntitiesResolver {
+    /**
+     * Return a set of entities that are to be kept in sync with the given entity.
+     * The primary use case is to keep sharing of closely coupled entities in sync; specifically Sigma
+     * rules and event definitions.
+     *
+     * @param primaryEntity The primary entity
+     * @return A set of related entities; or empty set, if there are none.
+     */
+    @Nonnull
+    Set<GRN> syncedEntities(GRN primaryEntity);
+}

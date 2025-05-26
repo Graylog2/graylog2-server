@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.grn.providers;
 
-import usePluginEntities from 'hooks/usePluginEntities';
-import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypeProvider;
+import org.graylog.grn.GRNTypes;
 
-const PluggableEventProceduresPage = () => {
-  const pluggableEventProcedures = usePluginEntities('eventProcedures');
+import java.util.Set;
 
-  const EventProceduresPage = pluggableEventProcedures[0]?.EventProcedures;
-
-  return <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />;
-};
-
-export default PluggableEventProceduresPage;
+/**
+ * Provider for built-in GRN types.
+ */
+public class BultinGRNTypeProvider implements GRNTypeProvider {
+    @Override
+    public Set<GRNType> getTypes() {
+        return GRNTypes.builtinTypes();
+    }
+}

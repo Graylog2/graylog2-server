@@ -61,9 +61,6 @@ const Routes = {
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
     },
-    EVENT_PROCEDURES: {
-      LIST: (viewType: string) => `/alerts/event-procedures/${viewType}`,
-    },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',

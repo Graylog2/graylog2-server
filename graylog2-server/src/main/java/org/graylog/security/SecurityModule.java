@@ -41,6 +41,7 @@ import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
+import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.plugin.PluginModule;
 
 public class SecurityModule extends PluginModule {
@@ -65,9 +66,10 @@ public class SecurityModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), PermissionAndRoleResolver.class)
                 .setDefault().to(DefaultPermissionAndRoleResolver.class);
-
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
+
+        Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
 
         bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 
