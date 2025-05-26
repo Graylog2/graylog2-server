@@ -101,7 +101,7 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
         <CreateTokenForm
           onCreate={handleTokenCreation}
           creatingToken={creatingToken}
-          defaultTtl={user.serviceAccount ? 'P100Y' : 'P30D'}
+          forceDefaultTtl={user.serviceAccount ? 'P100Y' : undefined}
         />
       </IfPermitted>
       {createdToken && (
