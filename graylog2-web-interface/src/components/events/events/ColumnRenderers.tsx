@@ -105,7 +105,7 @@ export const MessageRenderer = ({ message, eventId }: { message: string; eventId
 
   const toggleExtraSection = () => toggleSection(eventId, 'restFieldsExpandedSection');
 
-  return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
+  return <StyledDiv role="button" onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
 const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
