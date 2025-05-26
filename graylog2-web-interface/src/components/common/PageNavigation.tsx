@@ -64,20 +64,22 @@ const StyledButton = styled(Button)(
 
 StyledButton.displayName = 'Button';
 
+type PageNavItem = {
+  description: string;
+  path: string;
+  permissions?: string | Array<string>;
+  exactPathMatch?: boolean;
+  useIsValidLicense?: () => boolean;
+  position?: PluginNavigation['position'];
+};
+
 type Props = {
   /**
-   * List of nav items. Define permissions, if the item should only be displayed for users with specific permissions.
+   * List of nav items. Define permissions if the item should only be displayed for users with specific permissions.
    * By default, an item is active if the current URL starts with the item URL.
    * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
    */
-  items: Array<{
-    title: string;
-    path: string;
-    permissions?: string | Array<string>;
-    exactPathMatch?: boolean;
-    useIsValidLicense?: () => boolean;
-    position?: PluginNavigation['position'];
-  }>;
+  items: Array<PageNavItem>;
 };
 
 /**
@@ -94,15 +96,15 @@ const PageNavigation = ({ items }: Props) => {
         !!item.path,
     );
 
-    return sortNavigationItems(availableItems, 'title');
+    return sortNavigationItems<PageNavItem>(availableItems);
   }, [currentUser.permissions, items]);
 
   return (
     <Container>
-      {formatedItems.map(({ path, title, exactPathMatch }) => (
+      {formatedItems.map(({ path, description, exactPathMatch }) => (
         <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
           <StyledButton bsStyle="transparent">
-            <NavItemStateIndicator>{title}</NavItemStateIndicator>
+            <NavItemStateIndicator>{description}</NavItemStateIndicator>
           </StyledButton>
         </LinkContainer>
       ))}

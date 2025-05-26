@@ -24,10 +24,9 @@ import { ALERTS_TITLE } from 'components/events/bindings';
 const EventsPageNavigation = () => {
   const navigationItems = usePluginEntities('alerts.pageNavigation');
 
-  const formattedNavigationItems = navigationItems.map(({ description, ...item }) => ({
+  const formattedNavigationItems = navigationItems.map((item) => ({
     ...item,
-    title: description,
-    exactPathMatch: description === ALERTS_TITLE,
+    exactPathMatch: item.description === ALERTS_TITLE,
   }));
 
   return (

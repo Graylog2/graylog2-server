@@ -112,7 +112,7 @@ const useNavigationItems = () => {
 
     const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
 
-    return sortNavigationItems(itemsForActivePerspective);
+    return sortNavigationItems<PluginNavigation>(itemsForActivePerspective);
   }, [activePerspective?.id, navigationItems, permissions, securityLicenseInvalid]);
 };
 
