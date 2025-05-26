@@ -35,15 +35,15 @@ const sortInAfterItems = (
   return result;
 };
 
-const sortNavigationItems = (
-  navigationItems: Array<{ position?: PluginNavigation['position'] }>,
+const sortNavigationItems = <T extends { position?: PluginNavigation['position'] }>(
+  navigationItems: Array<T>,
   titleAttribute = 'description',
 ) => {
   const withoutPositionItems = navigationItems.filter((item) => !item.position);
   const afterItems = navigationItems.filter((item) => !!item.position?.after);
   const lastItems = navigationItems.filter((item) => !!item.position?.last);
 
-  return [...sortInAfterItems(withoutPositionItems, afterItems, titleAttribute), ...lastItems];
+  return [...sortInAfterItems(withoutPositionItems, afterItems, titleAttribute), ...lastItems] as T[];
 };
 
 export default sortNavigationItems;

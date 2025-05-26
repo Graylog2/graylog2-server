@@ -25,9 +25,8 @@ import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
+import IfPermitted from 'components/common/IfPermitted';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -80,31 +79,48 @@ type Props = {
   }>;
 };
 
+type FormattedItemProps = {
+  path: string;
+  exactPathMatch: boolean;
+  title: string;
+  useIsValidLicense: () => boolean;
+  permissions: string | Array<string>;
+};
+const FormattedItem = ({ path, exactPathMatch, title, useIsValidLicense, permissions }: FormattedItemProps) => {
+  const hasValidLicense = useIsValidLicense?.() ?? true;
+
+  return hasValidLicense ? (
+    <IfPermitted permissions={permissions}>
+      <LinkContainer to={path} relativeActive={!exactPathMatch}>
+        <StyledButton bsStyle="transparent">
+          <NavItemStateIndicator>{title}</NavItemStateIndicator>
+        </StyledButton>
+      </LinkContainer>
+    </IfPermitted>
+  ) : null;
+};
+
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
 const PageNavigation = ({ items }: Props) => {
-  const currentUser = useCurrentUser();
-
-  const formatedItems = useMemo(() => {
-    const availableItems = items.filter(
-      (item) =>
-        (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
-        isPermitted(currentUser.permissions, item.permissions) &&
-        !!item.path,
-    );
+  const sortedItems = useMemo(() => {
+    const availableItems = items.filter((item) => !!item.path);
 
     return sortNavigationItems(availableItems, 'title');
-  }, [currentUser.permissions, items]);
+  }, [items]);
 
   return (
     <Container>
-      {formatedItems.map(({ path, title, exactPathMatch }) => (
-        <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
-          <StyledButton bsStyle="transparent">
-            <NavItemStateIndicator>{title}</NavItemStateIndicator>
-          </StyledButton>
-        </LinkContainer>
+      {sortedItems.map(({ path, title, exactPathMatch, permissions, useIsValidLicense }) => (
+        <FormattedItem
+          key={`page-navigation-${path}-${title}`}
+          path={path}
+          title={title}
+          exactPathMatch={exactPathMatch}
+          permissions={permissions}
+          useIsValidLicense={useIsValidLicense}
+        />
       ))}
     </Container>
   );
