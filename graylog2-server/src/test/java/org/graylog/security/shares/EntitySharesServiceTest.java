@@ -21,8 +21,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
-import org.graylog.grn.GRNDescriptor;
-import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
@@ -79,9 +77,6 @@ class EntitySharesServiceTest {
     @Mock
     private GranteeService granteeService;
 
-    @Mock
-    private GRNDescriptorService grnDescriptorService;
-
     private GRNRegistry grnRegistry;
     private DBGrantService dbGrantService;
 
@@ -100,8 +95,7 @@ class EntitySharesServiceTest {
         final EventBus serverEventBus = mock(EventBus.class);
         this.entitySharesService = new EntitySharesService(
                 dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
-                grnRegistry, granteeService, serverEventBus, new HashSet<>(), new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())),
-                grnDescriptorService);
+                grnRegistry, granteeService, serverEventBus, new HashSet<>(), new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
     }
 
     @DisplayName("Validates we cannot remove the last owner")
@@ -317,8 +311,6 @@ class EntitySharesServiceTest {
         when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
         when(entityDependencyPermissionChecker.check(any(), any(), any()))
                 .thenReturn(ImmutableMultimap.of(janeGRN, EntityDescriptor.create(STREAM_GRN, "stream", Set.of())));
-        when(grnDescriptorService.getDescriptor(any())).thenReturn(
-                GRNDescriptor.create(janeGRN, "jane"));
 
         final EntityShareResponse entityShareResponse =
                 entitySharesService.prepareShare(List.of(STREAM_GRN_STRING), user);
