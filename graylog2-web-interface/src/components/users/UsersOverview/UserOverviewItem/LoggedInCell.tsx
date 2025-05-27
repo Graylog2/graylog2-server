@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
 import { OverlayTrigger, RelativeTime } from 'components/common';
@@ -24,9 +23,9 @@ import { OverlayTrigger, RelativeTime } from 'components/common';
 import LoggedInIcon from '../../LoggedInIcon';
 
 type Props = {
-  lastActivity: $PropertyType<UserOverview, 'lastActivity'>;
-  clientAddress: $PropertyType<UserOverview, 'clientAddress'>;
-  sessionActive: $PropertyType<UserOverview, 'sessionActive'>;
+  lastActivity: UserOverview['lastActivity'];
+  clientAddress: UserOverview['clientAddress'];
+  sessionActive: UserOverview['sessionActive'];
 };
 
 const Td = styled.td`

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { GRN } from './types';
 
@@ -47,9 +46,9 @@ export default class ValidationResult {
   _value: InternalState;
 
   constructor(
-    errors: $PropertyType<InternalState, 'errors'>,
-    errorContext: $PropertyType<InternalState, 'errorContext'>,
-    failed: $PropertyType<InternalState, 'failed'>,
+    errors: InternalState['errors'],
+    errorContext: InternalState['errorContext'],
+    failed: InternalState['failed'],
   ) {
     this._value = {
       errors,
@@ -84,9 +83,9 @@ export default class ValidationResult {
   }
 
   static create(
-    errors: $PropertyType<InternalState, 'errors'>,
-    errorContext: $PropertyType<InternalState, 'errorContext'>,
-    failed: $PropertyType<InternalState, 'failed'>,
+    errors: InternalState['errors'],
+    errorContext: InternalState['errorContext'],
+    failed: InternalState['failed'],
   ) {
     return new ValidationResult(errors, errorContext, failed);
   }
@@ -145,15 +144,15 @@ class Builder {
     this.value = value;
   }
 
-  errors(value: $PropertyType<InternalState, 'errors'>) {
+  errors(value: InternalState['errors']) {
     return new Builder(this.value.set('errors', value));
   }
 
-  errorContext(value: $PropertyType<InternalState, 'errorContext'>) {
+  errorContext(value: InternalState['errorContext']) {
     return new Builder(this.value.set('errorContext', value));
   }
 
-  failed(value: $PropertyType<InternalState, 'failed'>) {
+  failed(value: InternalState['failed']) {
     return new Builder(this.value.set('failed', value));
   }
 
