@@ -72,7 +72,12 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId);
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(
+        mockEntity.entityType,
+        '',
+        mockEntity.entityId,
+        undefined,
+      );
     });
   });
 

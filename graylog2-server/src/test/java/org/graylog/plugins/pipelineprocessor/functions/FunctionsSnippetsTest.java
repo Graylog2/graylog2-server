@@ -1614,6 +1614,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("ignore_extra_field_names_k2")).isEqualTo("v2");
         assertThat(message.getField("ignore_extra_field_names_k3")).isEqualTo("v3");
         assertThat(message.getField("ignore_extra_field_names_k4")).isNull();
+
+        // When extra values are ignored, extra specified values should be permitted (and ignored).
+        assertThat(message.getField("ignore_extra_values_k1")).isEqualTo("v1");
+        assertThat(message.getField("ignore_extra_values_k2")).isEqualTo("v2");
+        assertThat(message.getField("ignore_extra_values_k3")).isEqualTo("v3");
     }
 
     @Test
