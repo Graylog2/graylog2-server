@@ -46,10 +46,6 @@ const StyledDeleteButton = styled(Button)(
 );
 
 type Props = {
-  matchData?: {
-    matches: boolean;
-    rules: { [id: string]: false };
-  };
   stream: Stream;
   onDelete?: (ruleId: string) => void;
   onSubmit?: (ruleId: string, data: unknown) => void;
