@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 import { useState } from 'react';
 
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
@@ -39,10 +38,10 @@ type Props = {
   availableCapabilities: CapabilitiesList;
   currentGranteeState: CurrentGranteeState;
   grantee: SelectedGrantee;
-  onDelete: (grantee: $PropertyType<Grantee, 'id'>) => Promise<EntityShareState | undefined | null>;
+  onDelete: (grantee: Grantee['id']) => Promise<EntityShareState | undefined | null>;
   onCapabilityChange: (payload: {
-    granteeId: $PropertyType<Grantee, 'id'>;
-    capabilityId: $PropertyType<Capability, 'id'>;
+    granteeId: Grantee['id'];
+    capabilityId: Capability['id'];
   }) => Promise<EntityShareState | undefined | null>;
 };
 

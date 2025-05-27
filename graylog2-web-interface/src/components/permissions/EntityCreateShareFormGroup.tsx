@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import type { $PropertyType } from 'utility-types';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -45,20 +44,15 @@ import EntityShareValidationsDependencies from './EntityShareValidationsDependen
 
 type Props = {
   description: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle?: $PropertyType<SharedEntity, 'title'>;
+  entityType: SharedEntity['type'];
+  entityTitle?: SharedEntity['title'];
   entityId?: string;
   entityTypeTitle?: string | null | undefined;
+  defaultSharePayload?: EntitySharePayload;
   onSetEntityShare: (payload: EntitySharePayload) => void;
 };
 
-const _renderGranteesSelectOption = ({
-  label,
-  granteeType,
-}: {
-  label: string;
-  granteeType: $PropertyType<Grantee, 'type'>;
-}) => (
+const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; granteeType: Grantee['type'] }) => (
   <GranteesSelectOption>
     <StyledGranteeIcon type={granteeType} />
     {label}
@@ -76,6 +70,7 @@ const EntityCreateShareFormGroup = ({
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',
+  defaultSharePayload = undefined,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
@@ -84,8 +79,8 @@ const EntityCreateShareFormGroup = ({
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityType, entityTitle, entityGRN]);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
