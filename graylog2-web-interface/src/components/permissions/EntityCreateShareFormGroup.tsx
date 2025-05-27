@@ -46,9 +46,10 @@ import EntityShareValidationsDependencies from './EntityShareValidationsDependen
 type Props = {
   description: string;
   entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityTitle?: $PropertyType<SharedEntity, 'title'>;
   entityId?: string;
   entityTypeTitle?: string | null | undefined;
+  defaultSharePayload?: EntitySharePayload;
   onSetEntityShare: (payload: EntitySharePayload) => void;
 };
 
@@ -72,10 +73,11 @@ const getAvailableGrantee = (grantees: GranteesListType, selected: SelectedGrant
 const EntityCreateShareFormGroup = ({
   description,
   entityType,
-  entityTitle,
+  entityTitle = '',
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',
+  defaultSharePayload = undefined,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
@@ -84,8 +86,8 @@ const EntityCreateShareFormGroup = ({
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityType, entityTitle, entityGRN]);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
