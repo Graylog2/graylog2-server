@@ -16,15 +16,13 @@
  */
 import type { PluginNavigation } from 'graylog-web-plugin';
 
-const sortInAfterItems = (
-  targetList: Array<PluginNavigation>,
-  afterItems: Array<PluginNavigation>,
-  titleAttribute: string,
-) => {
+type Item = { position?: PluginNavigation['position']; description: string };
+
+const sortInAfterItems = <T extends Item>(targetList: Array<T>, afterItems: Array<T>) => {
   const result = [...targetList];
 
   afterItems.forEach((afterItem) => {
-    const index = result.findIndex((targetItem) => targetItem[titleAttribute] === afterItem.position?.after);
+    const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
     if (index !== -1) {
       result.splice(index + 1, 0, afterItem);
     } else {
@@ -35,15 +33,12 @@ const sortInAfterItems = (
   return result;
 };
 
-const sortNavigationItems = <T extends { position?: PluginNavigation['position'] }>(
-  navigationItems: Array<T>,
-  titleAttribute = 'description',
-) => {
+const sortNavigationItems = <T extends Item>(navigationItems: Array<T>) => {
   const withoutPositionItems = navigationItems.filter((item) => !item.position);
   const afterItems = navigationItems.filter((item) => !!item.position?.after);
   const lastItems = navigationItems.filter((item) => !!item.position?.last);
 
-  return [...sortInAfterItems(withoutPositionItems, afterItems, titleAttribute), ...lastItems] as T[];
+  return [...sortInAfterItems<T>(withoutPositionItems, afterItems), ...lastItems] as T[];
 };
 
 export default sortNavigationItems;
