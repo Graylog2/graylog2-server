@@ -23,7 +23,7 @@ import type { SelectCallback } from 'components/bootstrap/types';
 
 import Icon from './Icon';
 
-type BaseStepKey = string | number;
+type BaseStepKey = string;
 
 const SubnavigationCol = styled(Col)(
   ({ theme }) => css`
