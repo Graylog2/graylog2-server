@@ -17,13 +17,12 @@
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
 
 import RuleListEntry from './RuleListEntry';
 
 type Props = {
   rules: Array<RuleType>;
-  metricsConfig?: MetricsConfigType;
   rulesContext?: RulesContext;
   onDelete: (ruleType: RuleType) => () => void;
   searchFilter: React.ReactNode;

@@ -20,7 +20,6 @@ import compact from 'lodash/compact';
 import camelCase from 'lodash/camelCase';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
-import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
 
 import { validateField } from 'util/FormsUtils';
@@ -250,7 +249,7 @@ type Props = {
   onSubmit: (
     payload: WizardSubmitPayload,
     values: WizardFormValues,
-    serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>,
+    serviceType: AuthBackendMeta['serviceType'],
     shouldUpdateGroupSync?: boolean,
   ) => Promise<LoadBackendResponse>;
 };
@@ -266,7 +265,7 @@ const BackendWizard = ({
   initialStepKey = SERVER_CONFIG_KEY,
   onSubmit,
   authBackendMeta,
-  help,
+  help = undefined,
   excludedFields = {},
 }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();

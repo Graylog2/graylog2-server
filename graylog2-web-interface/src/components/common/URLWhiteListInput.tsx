@@ -42,7 +42,7 @@ const URLWhiteListInput = ({
   label,
   onChange,
   validationMessage = '',
-  validationState,
+  validationState = undefined,
   url = '',
   onValidationChange = () => {},
   labelClassName = '',
