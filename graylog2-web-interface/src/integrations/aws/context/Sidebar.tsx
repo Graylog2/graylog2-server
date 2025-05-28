@@ -24,10 +24,10 @@ type SidebarProviderProps = {
 };
 
 export const SidebarProvider = ({ children }: SidebarProviderProps) => {
-  const [sidebar, setSidebar] = useState(<></>);
+  const [sidebar, setSidebar] = useState(null);
 
   const clearSidebar = () => {
-    setSidebar(<></>);
+    setSidebar(null);
   };
 
   return <SidebarContext.Provider value={{ sidebar, clearSidebar, setSidebar }}>{children}</SidebarContext.Provider>;
