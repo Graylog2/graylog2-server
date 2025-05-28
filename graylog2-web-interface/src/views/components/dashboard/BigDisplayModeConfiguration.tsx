@@ -146,7 +146,7 @@ const redirectToBigDisplayMode = (
 };
 
 const createQueryFromConfiguration = (
-  { queryCycleInterval, queryTabs, refreshInterval }: Configuration,
+  { queryCycleInterval = undefined, queryTabs = undefined, refreshInterval }: Configuration,
   view: View,
 ): UntypedBigDisplayModeQuery => {
   const basicConfiguration = {

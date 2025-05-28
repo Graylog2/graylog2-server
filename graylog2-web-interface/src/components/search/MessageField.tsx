@@ -29,7 +29,13 @@ type MessageFieldProps = {
   value: any;
 };
 
-const MessageField = ({ message, value, fieldName, customFieldActions, renderForDisplay }: MessageFieldProps) => {
+const MessageField = ({
+  message,
+  value,
+  fieldName,
+  customFieldActions = undefined,
+  renderForDisplay,
+}: MessageFieldProps) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 
   return (

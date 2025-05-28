@@ -40,7 +40,7 @@ const _getEffectiveConfiguration = (configuration: Config) =>
 
 const SubstringExtractorConfiguration = ({
   configuration: initialConfig,
-  exampleMessage,
+  exampleMessage = undefined,
   onChange,
   onExtractorPreviewLoad,
 }: Props) => {

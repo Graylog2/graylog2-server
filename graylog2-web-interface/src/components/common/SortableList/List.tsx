@@ -29,9 +29,9 @@ export type Props<ItemType extends ListItemType> = {
 };
 
 const List = <ItemType extends ListItemType>({
-  alignItemContent,
-  customContentRender,
-  customListItemRender,
+  alignItemContent = undefined,
+  customContentRender = undefined,
+  customListItemRender = undefined,
   disableDragging = false,
   displayOverlayInPortal = false,
   items = [],
