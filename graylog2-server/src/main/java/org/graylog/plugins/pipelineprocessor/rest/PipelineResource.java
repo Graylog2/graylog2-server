@@ -307,7 +307,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
         final PipelineSource pipelineSource = PipelineSource.builder()
                 .title(GL_INPUT_ROUTING_PIPELINE)
-                .description("GL generated pipeline")
+                .description("System generated pipeline")
                 .source("pipeline \"" + GL_INPUT_ROUTING_PIPELINE + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
                 .stages(stages)
                 .build();
