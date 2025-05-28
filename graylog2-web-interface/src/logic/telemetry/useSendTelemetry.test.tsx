@@ -25,6 +25,7 @@ jest.mock('util/AppConfig');
 
 const contextValue = {
   sendTelemetry: jest.fn(),
+  sendErrorReport: jest.fn(),
 };
 const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <TelemetryContext.Provider value={contextValue}>{children}</TelemetryContext.Provider>

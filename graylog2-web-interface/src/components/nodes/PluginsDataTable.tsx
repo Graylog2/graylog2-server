@@ -34,6 +34,10 @@ class PluginsDataTable extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    plugins: undefined,
+  };
+
   _headerCellFormatter = (header) => <th>{header}</th>;
 
   _pluginInfoFormatter = (plugin) => (

@@ -23,7 +23,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 
 const MemoNodesProvider = React.memo(
   ({
-    children,
+    children = undefined,
     value,
   }: React.PropsWithChildren<{ value: React.ComponentProps<typeof NodesContext.Provider>['value'] }>) => (
     <NodesContext.Provider value={value}>{children}</NodesContext.Provider>
@@ -31,7 +31,7 @@ const MemoNodesProvider = React.memo(
   isEqual,
 );
 
-const NodesProvider = ({ children }: React.PropsWithChildren<{}>) => {
+const NodesProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => {
   const value = useStore(NodesStore, ({ nodes }) =>
     Object.fromEntries(
       Object.entries(nodes ?? {}).map(([id, { short_node_id, hostname }]) => [id, { id, short_node_id, hostname }]),

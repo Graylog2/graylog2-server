@@ -17,7 +17,6 @@
 import * as React from 'react';
 import type { FormikProps } from 'formik';
 import { Formik, Form } from 'formik';
-import type { $PropertyType } from 'utility-types';
 import styled, { css } from 'styled-components';
 
 import type { GranteesList, CapabilitiesList } from 'logic/permissions/EntityShareState';
@@ -29,13 +28,13 @@ import { Button } from 'components/bootstrap';
 import GranteesSelectorFormGroup from './GranteesSelectorFormGroup';
 
 export type SelectionRequest = {
-  granteeId: $PropertyType<Grantee, 'id'>;
-  capabilityId: $PropertyType<Capability, 'id'>;
+  granteeId: Grantee['id'];
+  capabilityId: Capability['id'];
 };
 
 export type FormValues = {
-  granteeId: $PropertyType<Grantee, 'id'> | undefined;
-  capabilityId: $PropertyType<Capability, 'id'>;
+  granteeId: Grantee['id'] | undefined;
+  capabilityId: Capability['id'];
 };
 
 type Props = {

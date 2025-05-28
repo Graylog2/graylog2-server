@@ -47,7 +47,13 @@ type TypeSpecificValueWithHighlightProps = {
   render?: React.ComponentType<ValueRendererProps>;
   unit?: FieldUnit;
 };
-const TypeSpecificValueWithHighlight = ({ field, value, type, render, unit }: TypeSpecificValueWithHighlightProps) => (
+const TypeSpecificValueWithHighlight = ({
+  field,
+  value = undefined,
+  type = undefined,
+  render = undefined,
+  unit = undefined,
+}: TypeSpecificValueWithHighlightProps) => (
   <CustomHighlighting field={field} value={value}>
     <TypeSpecificValue field={field} value={value} type={type} render={render} unit={unit} />
   </CustomHighlighting>
@@ -55,7 +61,7 @@ const TypeSpecificValueWithHighlight = ({ field, value, type, render, unit }: Ty
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit }: Props) => {
+const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit = undefined }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(
     () => render ?? ((props: ValueRendererProps) => props.value),
@@ -78,7 +84,7 @@ const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit }
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit }: Props) => (
+const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit = undefined }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) =>
       interactive ? (
