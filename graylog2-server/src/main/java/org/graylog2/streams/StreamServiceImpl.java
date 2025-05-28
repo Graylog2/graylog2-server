@@ -205,6 +205,18 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
+    public java.util.stream.Stream<String> streamAllIds() {
+        final var cursor = collection(StreamImpl.class).find(
+                new BasicDBObject(),
+                new BasicDBObject(StreamImpl.FIELD_ID, 1)
+        );
+        try (cursor) {
+            return StreamSupport.stream(cursor.spliterator(), false)
+                    .map(o -> o.get(StreamImpl.FIELD_ID).toString());
+        }
+    }
+
+    @Override
     public Map<String, String> loadStreamTitles(Collection<String> streamIds) {
         if (streamIds.isEmpty()) {
             return Map.of();

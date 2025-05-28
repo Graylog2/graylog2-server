@@ -59,6 +59,8 @@ public interface StreamService extends PersistedService {
         return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
     }
 
+    java.util.stream.Stream<String> streamAllIds();
+
     Map<String, String> loadStreamTitles(Collection<String> streamIds);
 
     @Nullable

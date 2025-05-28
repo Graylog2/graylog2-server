@@ -120,21 +120,19 @@ public class EventsSearchService {
         return EventsHistogramResult.fromResult(result);
     }
 
-    // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
-    //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
-    //       most probably not more efficient.
-    private Set<String> forbiddenSourceStreams(Subject subject) {
+    public Set<String> forbiddenSourceStreams(Subject subject) {
         // Users with the generic streams:read permission can read all streams so we don't need to check every single
-        // stream here and can take a short cut.
+        // stream here and can take a shortcut.
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return Collections.emptySet();
         }
 
-        return streamService.loadAll().stream()
-                .map(Persisted::getId)
-                // Select all streams the user is NOT permitted to access
-                .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                .collect(Collectors.toSet());
+        try (var streamIds = streamService.streamAllIds()) {
+            return streamIds
+                    // Filter all streams the user is NOT permitted to access
+                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                    .collect(Collectors.toSet());
+        }
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
