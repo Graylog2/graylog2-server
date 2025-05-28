@@ -32,7 +32,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(
-  ({ children, className, isFocused, style = {}, ...rest }: Props, ref) => {
+  ({ children = undefined, className = undefined, isFocused, style = {}, ...rest }: Props, ref) => {
     let containerStyle = {
       ...style,
       transition: 'none',

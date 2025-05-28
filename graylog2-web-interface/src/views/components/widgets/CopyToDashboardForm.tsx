@@ -35,8 +35,8 @@ const CopyToDashboardForm = ({
   onCopyToDashboard,
   submitButtonText,
   submitLoadingText,
-  activeDashboardId,
-  onCreateNewDashboard,
+  activeDashboardId = undefined,
+  onCreateNewDashboard = undefined,
 }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);

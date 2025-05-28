@@ -76,10 +76,10 @@ const ConfigurationForm = forwardRef(
       submitAction,
       title = null,
       titleValue: initialTitleValue = '',
-      typeName,
+      typeName = undefined,
       values: initialValues = defaultInitialValues,
       wrapperComponent: WrapperComponent = BootstrapModalForm as Props<Configuration>['wrapperComponent'],
-      submitButtonText,
+      submitButtonText = undefined,
     }: Props<Configuration>,
     ref: React.ForwardedRef<RefType<Configuration>>,
   ) => {

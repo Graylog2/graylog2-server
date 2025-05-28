@@ -43,7 +43,7 @@ type FormWrapProps = {
 const FormWrap = ({
   buttonContent = 'Submit',
   children,
-  className,
+  className = undefined,
   disabled = false,
   description = null,
   error = null,

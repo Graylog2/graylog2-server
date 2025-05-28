@@ -21,7 +21,7 @@ import useFetchView from 'views/hooks/useFetchView';
 
 import SearchPage from './SearchPage';
 
-const ShowViewPage = ({ children }: React.PropsWithChildren<{}>) => {
+const ShowViewPage = ({ children = undefined }: React.PropsWithChildren<{}>) => {
   const { viewId } = useParams<{ viewId?: string }>();
 
   if (!viewId) {

@@ -69,12 +69,12 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(
   (
     {
       title,
-      onClick,
+      onClick = undefined,
       focusable = true,
-      className,
+      className = undefined,
       disabled = false,
-      iconType,
-      'data-testid': dataTestId,
+      iconType = undefined,
+      'data-testid': dataTestId = undefined,
       ...rest
     }: Props,
     ref,

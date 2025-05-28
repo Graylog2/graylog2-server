@@ -40,7 +40,17 @@ type Props = {
   style?: MantineStyleProp;
 };
 
-const Switch = ({ 'aria-label': ariaLabel, checked, className, disabled, id, label, name, onChange, style }: Props) => (
+const Switch = ({
+  'aria-label': ariaLabel = undefined,
+  checked,
+  className = undefined,
+  disabled = undefined,
+  id = undefined,
+  label = undefined,
+  name = undefined,
+  onChange,
+  style = undefined,
+}: Props) => (
   <StyledSwitch
     aria-label={ariaLabel}
     className={className}
