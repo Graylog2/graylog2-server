@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -621,7 +622,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
 
-        if (messages.isEmpty()) {
+        if (messages.isEmpty() && !shuttingDown) {
             // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
             // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
             // end of the log.
@@ -855,7 +856,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Shutting down journal!");
-        shuttingDown = true;
+        triggerShutDown();
 
         offsetFlusherFuture.cancel(false);
         logRetentionFuture.cancel(false);
@@ -869,6 +870,11 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         // Teardown log metrics to prevent errors when restarting instances.
         teardownLogMetrics();
+    }
+
+    @VisibleForTesting
+    void triggerShutDown() {
+        shuttingDown = true;
     }
 
     /**
