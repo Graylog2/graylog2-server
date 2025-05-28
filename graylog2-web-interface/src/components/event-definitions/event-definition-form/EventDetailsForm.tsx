@@ -21,6 +21,7 @@ import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 
+import AppConfig from 'util/AppConfig';
 import { Select } from 'components/common';
 import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -58,11 +59,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
-  const {
-    data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
 
   const handleChange = (event) => {
     const { name } = event.target;
@@ -86,7 +83,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const hasRemediationSteps = eventDefinition?.remediation_steps;
 
   const renderEventProcedure = () => {
-    if (validSecurityLicense) {
+    if (isEventProceduresEnabled) {
       return (
         <>
           {hasEventProcedure || hasRemediationSteps || showAddEventProcedureForm ? (
