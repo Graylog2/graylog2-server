@@ -42,7 +42,8 @@ const typePrefixCornerCasesMap = {
 };
 
 const getPermissionPrefixByType = (type: string, id: string, throwErrorOnUnknown = true) => {
-  if (id.startsWith('graylog-security-views__') && supportedTypes.has(type)) return 'graylog_security:';
+  // fixing this in the FE for views, prefixed by 'graylog-security-views__' but making it a bit more general for future, other special entities
+  if (id.startsWith('graylog-security-') && supportedTypes.has(type)) return 'graylog_security:';
 
   if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s:`;
 
