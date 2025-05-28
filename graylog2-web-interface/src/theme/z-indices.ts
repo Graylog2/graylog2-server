@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import * as React from 'react';
-import { Timeline as MantineTimeline } from '@mantine/core';
-
-type Props = React.PropsWithChildren<{
-  active: number;
-  bulletSize: number;
-  className?: string;
-  color: string;
-}>;
-
-const Timeline = ({ children = undefined, bulletSize, color, active, className = undefined }: Props) => (
-  <MantineTimeline bulletSize={bulletSize} color={color} className={className} active={active}>
-    {children}
-  </MantineTimeline>
-);
-
-Timeline.Item = MantineTimeline.Item;
-
-export default Timeline;
+const modalBase = 1040;
+const zIndices = {
+  modalOverlay: modalBase,
+  modalBody: modalBase + 10,
+  notifications: modalBase + 11,
+} as const;
+export default zIndices;

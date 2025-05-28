@@ -39,13 +39,13 @@ type Props = {
  */
 const OverlayDropdownButton = ({
   alwaysShowCaret = false,
-  bsSize,
-  buttonTitle,
+  bsSize = undefined,
+  buttonTitle = undefined,
   children,
   closeOnSelect = true,
   disabled = false,
-  dropdownZIndex,
-  onToggle: onToggleProp,
+  dropdownZIndex = undefined,
+  onToggle: onToggleProp = undefined,
   title,
 }: Props) => {
   const [show, setShowDropdown] = useState(false);

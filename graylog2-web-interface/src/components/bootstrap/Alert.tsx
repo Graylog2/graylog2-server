@@ -65,7 +65,15 @@ const iconNameForType = (bsStyle: ColorVariant) => {
   }
 };
 
-const Alert = ({ children, bsStyle = 'default', title, style, className, onDismiss, noIcon = false }: Props) => {
+const Alert = ({
+  children,
+  bsStyle = 'default',
+  title = undefined,
+  style = undefined,
+  className = undefined,
+  onDismiss = undefined,
+  noIcon = false,
+}: Props) => {
   const displayCloseButton = typeof onDismiss === 'function';
   const iconName = iconNameForType(bsStyle);
 

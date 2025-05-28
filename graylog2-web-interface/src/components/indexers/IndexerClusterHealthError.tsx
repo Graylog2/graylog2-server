@@ -27,7 +27,7 @@ const ESClusterError = styled(Alert)`
 
 const IndexerClusterHealthError = ({
   error,
-  name,
+  name = undefined,
 }: {
   error: FetchError;
   name?: { name: string; distribution: string };

@@ -36,6 +36,10 @@ class NodeListItem extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    systemOverview: undefined,
+  };
+
   render() {
     const { node } = this.props;
     const title = <LinkToNode nodeId={node.node_id} />;

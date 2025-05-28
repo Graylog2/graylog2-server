@@ -19,15 +19,16 @@ import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
+import zIndices from 'theme/z-indices';
 
 export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
 
 const ModalOverlay = styled(MantineModal.Overlay)`
-  z-index: 1040;
+  z-index: ${zIndices.modalOverlay};
 `;
 
 const ModalContent = styled(MantineModal.Content)`
-  z-index: 1050;
+  z-index: ${zIndices.modalBody};
 `;
 
 const ModalRoot = styled(MantineModal.Root)(
