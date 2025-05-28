@@ -273,15 +273,15 @@ const warnOnInvalidActiveStep = <StepKey extends BaseStepKey>(
   }
 };
 
-export type StepType<StepKey> = {
+export type StepType<StepKey extends string> = {
   key: StepKey;
   title: React.ReactNode;
   component: React.ReactElement;
   disabled?: boolean;
 };
 
-export type StepsType<StepKey> = Array<StepType<StepKey>>;
-type Props<StepKey> = {
+export type StepsType<StepKey extends string> = Array<StepType<StepKey>>;
+type Props<StepKey extends string> = {
   steps: StepsType<StepKey>;
   activeStep?: StepKey | null | undefined;
   onStepChange: (stepKey: StepKey) => void;

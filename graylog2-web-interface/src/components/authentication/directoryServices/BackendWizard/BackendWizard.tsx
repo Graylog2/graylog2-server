@@ -29,7 +29,6 @@ import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import type { StepType } from 'components/common/Wizard';
 import Wizard from 'components/common/Wizard';
 import type FetchError from 'logic/errors/FetchError';
 import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
@@ -242,7 +241,7 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 
 type Props = {
   authBackendMeta: AuthBackendMeta;
-  initialStepKey?: StepType<string>['key'];
+  initialStepKey?: string;
   initialValues: WizardFormValues;
   excludedFields?: { [inputName: string]: boolean };
   help?: { [inputName: string]: React.ReactElement | string | null | undefined };
@@ -329,7 +328,7 @@ const BackendWizard = ({
 
   const _getSubmitPayload = _prepareSubmitPayload(stepsState, _getUpdatedFormsValues);
 
-  const _setActiveStepKey = (stepKey: StepType<string>['key']) => {
+  const _setActiveStepKey = (stepKey: string) => {
     const formValues = _getUpdatedFormsValues();
     let invalidStepKeys = [...stepsState.invalidStepKeys];
 
