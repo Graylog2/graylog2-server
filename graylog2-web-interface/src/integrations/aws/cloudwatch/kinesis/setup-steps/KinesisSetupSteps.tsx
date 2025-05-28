@@ -23,6 +23,12 @@ import { FormDataContext } from 'integrations/aws/context/FormData';
 
 import KinesisSetupStep from './KinesisSetupStep';
 
+const StepItems = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`;
+
 type KinesisSetupStepsProps = {
   onSuccess: (...args: any[]) => void;
   onError: (...args: any[]) => void;
@@ -94,11 +100,5 @@ const KinesisSetupSteps = ({ onSuccess, onError }: KinesisSetupStepsProps) => {
     </StepItems>
   );
 };
-
-const StepItems = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
 
 export default KinesisSetupSteps;
