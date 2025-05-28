@@ -210,7 +210,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should save view when pressing related keyboard shortcut', async () => {
     render(<SUT />);
-    userEvent.keyboard('{Meta>}s{/Meta}');
+    await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 });

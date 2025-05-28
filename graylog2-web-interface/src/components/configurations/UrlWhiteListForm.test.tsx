@@ -88,8 +88,8 @@ describe('UrlWhitelistForm', () => {
 
     const titleInput = screen.getByDisplayValue(config.entries[0].title);
 
-    userEvent.clear(titleInput);
-    userEvent.type(titleInput, nextValue);
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, nextValue);
 
     const numberCalls = 2; // First render + debounce
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -187,8 +187,8 @@ describe('UrlWhitelistForm', () => {
 
       const urlInput = screen.getByDisplayValue(config.entries[0].value);
 
-      userEvent.clear(urlInput);
-      userEvent.type(urlInput, nextValue);
+      await userEvent.clear(urlInput);
+      await userEvent.type(urlInput, nextValue);
 
       const numberCalls = 2; // First render + debounce
       await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -217,7 +217,7 @@ describe('UrlWhitelistForm', () => {
 
       expect(titleInput).toBeInTheDocument();
 
-      userEvent.clear(titleInput);
+      await userEvent.clear(titleInput);
 
       await screen.findByText(/Required field/i);
 

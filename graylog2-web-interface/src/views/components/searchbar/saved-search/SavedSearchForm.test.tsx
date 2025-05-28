@@ -154,7 +154,7 @@ describe('SavedSearchForm', () => {
 
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
-      userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       await userEvent.click(saveAsButton);
 
@@ -177,7 +177,7 @@ describe('SavedSearchForm', () => {
 
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
 
-      userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
       await userEvent.click(createNewButton);
 
@@ -187,7 +187,7 @@ describe('SavedSearchForm', () => {
     it('should handle saveSearch with share settings', async () => {
       const onSaveAs = jest.fn();
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
-      userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
 
       await shareWithCollaborator();

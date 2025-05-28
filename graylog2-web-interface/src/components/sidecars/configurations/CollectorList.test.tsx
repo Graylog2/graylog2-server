@@ -103,7 +103,7 @@ describe('CollectorList', () => {
     render(<SUT onQueryChange={onQueryChange} />);
 
     const queryInput = await screen.findByPlaceholderText('Find collectors');
-    userEvent.type(queryInput, 'newquery{enter}');
+    await userEvent.type(queryInput, 'newquery{enter}');
 
     await waitFor(() => {
       expect(onQueryChange).toHaveBeenCalledWith('newquery', expect.any(Function));

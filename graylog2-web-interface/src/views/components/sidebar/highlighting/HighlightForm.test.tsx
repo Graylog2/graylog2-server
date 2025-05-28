@@ -114,8 +114,8 @@ describe('HighlightForm', () => {
     await userEvent.click(screen.getByLabelText('Gradient'));
 
     const highestValue = await screen.findByLabelText('Specify highest value');
-    userEvent.clear(highestValue);
-    userEvent.type(highestValue, '100');
+    await userEvent.clear(highestValue);
+    await userEvent.type(highestValue, '100');
 
     await triggerSaveButtonClick();
 

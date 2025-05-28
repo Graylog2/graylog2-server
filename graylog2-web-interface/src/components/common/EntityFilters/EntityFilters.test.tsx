@@ -349,9 +349,9 @@ describe('<EntityFilters />', () => {
 
       const fromPicker = await screen.findByTestId('date-picker-from');
       await userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
 
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /create filter/i,
@@ -405,9 +405,9 @@ describe('<EntityFilters />', () => {
 
       const fromPicker = await screen.findByTestId('date-picker-from');
       await userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
       const submitButton = within(timeRangeForm).getByRole('button', {
@@ -475,7 +475,7 @@ describe('<EntityFilters />', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: /generic/i }));
 
       const filterInput = await screen.findByPlaceholderText('Enter value to filter for');
-      userEvent.type(filterInput, 'foo');
+      await userEvent.type(filterInput, 'foo');
 
       const form = await screen.findByTestId('generic-filter-form');
       await userEvent.click(await within(form).findByRole('button', { name: /create filter/i }));
@@ -497,7 +497,7 @@ describe('<EntityFilters />', () => {
       await userEvent.click(await screen.findByText('foo'));
 
       const filterInput = await screen.findByPlaceholderText('Enter value to filter for');
-      userEvent.type(filterInput, '{selectall}bar');
+      await userEvent.type(filterInput, '{selectall}bar');
 
       const form = await screen.findByTestId('generic-filter-form');
       await userEvent.click(await within(form).findByRole('button', { name: /update filter/i }));
@@ -517,7 +517,7 @@ describe('<EntityFilters />', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: /custom component/i }));
 
       const filterInput = await screen.findByPlaceholderText('My custom input');
-      userEvent.type(filterInput, 'foo');
+      await userEvent.type(filterInput, 'foo');
 
       const form = await screen.findByTestId('custom-component-form');
       await userEvent.click(await within(form).findByRole('button', { name: /create filter/i }));
@@ -539,7 +539,7 @@ describe('<EntityFilters />', () => {
       await userEvent.click(await screen.findByText('foo'));
 
       const filterInput = await screen.findByPlaceholderText('My custom input');
-      userEvent.type(filterInput, '{selectall}bar');
+      await userEvent.type(filterInput, '{selectall}bar');
 
       const form = await screen.findByTestId('custom-component-form');
       await userEvent.click(await within(form).findByRole('button', { name: /update filter/i }));

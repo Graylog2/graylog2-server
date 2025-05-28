@@ -222,7 +222,7 @@ describe('SearchActionsMenu', () => {
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
 
       await userEvent.click(await screen.findByTitle('Save search'));
-      userEvent.type(await findTitleInput(), 'Test');
+      await userEvent.type(await findTitleInput(), 'Test');
       await userEvent.click(await findCreateNewButton());
 
       await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
@@ -236,7 +236,7 @@ describe('SearchActionsMenu', () => {
       render(<SimpleSearchActionsMenu />);
 
       await userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.type(await findTitleInput(), ' and further title');
       await userEvent.click(await findCreateNewButton());
 
       const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
@@ -261,7 +261,7 @@ describe('SearchActionsMenu', () => {
       render(<SimpleSearchActionsMenu />);
 
       await userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.type(await findTitleInput(), ' and further title');
       await userEvent.click(await findCreateNewButton());
 
       const updatedView = defaultView
@@ -278,7 +278,7 @@ describe('SearchActionsMenu', () => {
     it('should save search when pressing related keyboard shortcut', async () => {
       asMock(useView).mockReturnValue(createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Meta>}s{/Meta}');
 
       await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
     });

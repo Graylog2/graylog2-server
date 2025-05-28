@@ -133,7 +133,7 @@ describe('Select', () => {
 
       const select = await screen.findByLabelText('Select value');
       selectEvent.openMenu(select);
-      userEvent.type(select, 'value1');
+      await userEvent.type(select, 'value1');
 
       await screen.findByRole('option', { name: /label1/ });
 

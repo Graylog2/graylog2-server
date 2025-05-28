@@ -142,7 +142,7 @@ describe('SearchBar pluggable controls', () => {
       render(<SearchBar />);
 
       const pluggableFormField = await screen.findByLabelText('Pluggable Control');
-      userEvent.type(pluggableFormField, '2');
+      await userEvent.type(pluggableFormField, '2');
 
       const searchButton = screen.getByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,

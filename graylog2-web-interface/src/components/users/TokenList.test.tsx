@@ -86,7 +86,7 @@ describe('<TokenList />', () => {
     render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} user={alice} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
-    userEvent.type(nameInput, 'hans');
+    await userEvent.type(nameInput, 'hans');
 
     const ttlInput = await screen.findByLabelText('Token TTL');
     fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
@@ -117,7 +117,7 @@ describe('<TokenList />', () => {
     render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} user={serviceUser} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
-    userEvent.type(nameInput, 'hans');
+    await userEvent.type(nameInput, 'hans');
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
     createToken.click();

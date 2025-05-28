@@ -84,7 +84,7 @@ describe('AdaptableQueryTabs', () => {
   };
 
   const closeMoreTabsDropdown = async () => {
-    userEvent.keyboard('{esc}');
+    await userEvent.keyboard('{esc}');
     await waitFor(() => expect(screen.getByRole('menu')).not.toBeVisible());
   };
 

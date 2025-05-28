@@ -87,7 +87,7 @@ describe('QueryInput', () => {
     render(<SimpleQueryInput onBlur={onBlur} />);
 
     await paste(await findQueryInput(), 'the query');
-    userEvent.tab();
+    await userEvent.tab();
 
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
@@ -99,7 +99,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).toHaveBeenCalledTimes(1);
       expect(onExecute).toHaveBeenCalledWith('the query');
@@ -111,7 +111,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).not.toHaveBeenCalledTimes(1);
     });
@@ -122,7 +122,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
@@ -136,7 +136,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
@@ -162,7 +162,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{ctrl}{enter}');
+      await userEvent.type(queryInput, '{ctrl}{enter}');
 
       await waitFor(() => {
         expect(exec).toHaveBeenCalled();

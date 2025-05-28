@@ -67,7 +67,7 @@ describe('CAUpload', () => {
     render(<CAUpload />);
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
+    await userEvent.upload(dropzone, files);
     await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() =>
@@ -87,7 +87,7 @@ describe('CAUpload', () => {
     );
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
+    await userEvent.upload(dropzone, files);
 
     await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
