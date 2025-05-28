@@ -41,7 +41,9 @@ const typePrefixCornerCasesMap = {
   report: 'report:',
 };
 
-const getPermissionPrefixByType = (type: string, throwErrorOnUnknown = true) => {
+const getPermissionPrefixByType = (type: string, id: string, throwErrorOnUnknown = true) => {
+  if (id.startsWith('graylog-security-views__') && supportedTypes.has(type)) return 'graylog_security:';
+
   if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s:`;
 
   return throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`;
