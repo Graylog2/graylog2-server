@@ -311,6 +311,7 @@ class EntitySharesServiceTest {
         when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
         when(entityDependencyPermissionChecker.check(any(), any(), any()))
                 .thenReturn(ImmutableMultimap.of(janeGRN, EntityDescriptor.create(STREAM_GRN, "stream", Set.of())));
+        when(entityDependencyResolver.descriptorFromGRN(any())).thenReturn(EntityDescriptor.create(STREAM_GRN, "stream", Set.of()));
 
         final EntityShareResponse entityShareResponse =
                 entitySharesService.prepareShare(List.of(STREAM_GRN_STRING), user);

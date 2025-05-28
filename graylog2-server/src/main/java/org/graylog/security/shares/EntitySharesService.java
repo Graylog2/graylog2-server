@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -196,7 +195,6 @@ public class EntitySharesService {
     private Map<GRN, Collection<EntityDescriptor>> missingPermissions(Set<GRN> selectedGrantees, List<String> entityGRNs, GRN sharingUserGRN) {
         final ImmutableSet<EntityDescriptor> entities = entityGRNs.stream()
                 .map(grn -> entityDependencyResolver.descriptorFromGRN(grnRegistry.parse(grn)))
-                .flatMap(Optional::stream)
                 .collect(ImmutableSet.toImmutableSet());
 
         final ImmutableMultimap<GRN, EntityDescriptor> deniedEntities =

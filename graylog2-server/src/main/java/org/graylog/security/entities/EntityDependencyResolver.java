@@ -66,7 +66,7 @@ public class EntityDependencyResolver {
     }
 
     public ImmutableSet<EntityDescriptor> resolve(GRN entity) {
-        final ImmutableSet<GRN> dependencies = cpDescriptorfromGRN(entity).stream()
+        final ImmutableSet<GRN> dependencies = cpDescriptorsfromGRN(entity).stream()
                 .filter(dep -> {
                     // Filter dependencies that aren't needed for grants sharing
                     // TODO This is another reason why we shouldn't be using the content pack resolver ¯\_(ツ)_/¯
@@ -83,9 +83,32 @@ public class EntityDependencyResolver {
                 .filter(dependency -> !entity.equals(dependency)) // Don't include the given entity in dependencies
                 .collect(ImmutableSet.toImmutableSet());
 
+        final ImmutableMap<GRN, Optional<String>> entityExcerpts = entityExcerpts();
         return dependencies.stream()
-                .flatMap(dependency -> descriptorFromGRN(dependency, entityExcerpts()).stream())
+                .map(dependency -> descriptorFromGRN(dependency, entityExcerpts, grantService.getOwnersForTargets(ImmutableSet.of(dependency))))
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public EntityDescriptor descriptorFromGRN(GRN entity) {
+        return descriptorFromGRN(entity, entityExcerpts(), grantService.getOwnersForTargets(ImmutableSet.of(entity)));
+    }
+
+    private EntityDescriptor descriptorFromGRN(GRN entity, ImmutableMap<GRN, Optional<String>> entityExcerpts, Map<GRN, Set<GRN>> targetOwners) {
+        return EntityDescriptor.create(entity, getExcerptTitle(entity, entityExcerpts), getOwners(targetOwners.get(entity)));
+    }
+
+    private String getExcerptTitle(GRN entity, ImmutableMap<GRN, Optional<String>> entityExcerpts) {
+        return entityExcerpts.get(entity) != null
+                ? entityExcerpts.get(entity).orElse("unnamed dependency: <" + entity + ">")
+                : "unknown dependency: <" + entity + ">";
+    }
+
+    private Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> cpDescriptorsfromGRN(GRN entity) {
+        return contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
+                .id(ModelId.of(entity.entity()))
+                // TODO: This is a hack! Until we stop using the content-pack dependency resolver, we have to use a different version for dashboards here
+                .type(ModelType.of(entity.type(), "dashboard".equals(entity.type()) ? "2" : "1")) // TODO: Any way of NOT hardcoding the version here?
+                .build()));
     }
 
     private ImmutableMap<GRN, Optional<String>> entityExcerpts() {
@@ -94,30 +117,6 @@ public class EntityDependencyResolver {
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
                 .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(),
                         v -> Optional.ofNullable(v.title())));
-    }
-
-    public Optional<EntityDescriptor> descriptorFromGRN(GRN grn) {
-        return descriptorFromGRN(grn, entityExcerpts()).stream().findFirst();
-    }
-
-    private Set<EntityDescriptor> descriptorFromGRN(GRN entity, ImmutableMap<GRN, Optional<String>> entityExcerpts) {
-        return cpDescriptorfromGRN(entity).stream()
-                .map(descriptor -> {
-                    final Map<GRN, Set<GRN>> targetOwners = grantService.getOwnersForTargets(ImmutableSet.of(entity));
-                    String title = entityExcerpts.get(entity) != null
-                            ? entityExcerpts.get(entity).orElse("unnamed dependency: <" + entity + ">")
-                            : "unknown dependency: <" + entity + ">";
-                    return EntityDescriptor.create(entity, title, getOwners(targetOwners.get(entity)));
-                })
-                .collect(Collectors.toSet());
-    }
-
-    private Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> cpDescriptorfromGRN(GRN entity) {
-        return contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
-                .id(ModelId.of(entity.entity()))
-                // TODO: This is a hack! Until we stop using the content-pack dependency resolver, we have to use a different version for dashboards here
-                .type(ModelType.of(entity.type(), "dashboard".equals(entity.type()) ? "2" : "1")) // TODO: Any way of NOT hardcoding the version here?
-                .build()));
     }
 
     private Set<Grantee> getOwners(@Nullable Set<GRN> owners) {
