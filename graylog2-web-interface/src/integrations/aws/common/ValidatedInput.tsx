@@ -52,19 +52,17 @@ type ValidatedInputProps = {
 } & React.ComponentProps<typeof Input>;
 
 const ValidatedInput = ({
-  className,
+  className = undefined,
   help = '',
   onChange = () => {},
   id,
   label,
-
   fieldData = {
     dirty: false,
     error: undefined,
     value: undefined,
   },
-
-  type,
+  type = undefined,
   required = false,
   ...restProps
 }: ValidatedInputProps) => {

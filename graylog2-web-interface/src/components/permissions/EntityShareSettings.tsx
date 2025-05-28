@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
 
 import type { GRN } from 'logic/permissions/types';
@@ -35,8 +34,8 @@ import EntityShareValidationsDependencies from './EntityShareValidationsDependen
 type Props = {
   entityGRN: GRN;
   description: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityType: SharedEntity['type'];
+  entityTitle: SharedEntity['title'];
   entityShareState: EntityShareState;
   setDisableSubmit: (boolean) => void;
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>;

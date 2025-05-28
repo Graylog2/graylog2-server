@@ -198,13 +198,13 @@ type PanelProps = React.ComponentProps<typeof DeprecatedStyledPanel> &
   }>;
 
 const Panel = ({
-  title,
-  children,
+  title = undefined,
+  children = undefined,
   collapsible = false,
   defaultExpanded = null,
   expanded = null,
-  footer,
-  header,
+  footer = undefined,
+  header = undefined,
   onToggle = () => {},
   ...props
 }: PanelProps) => {

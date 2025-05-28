@@ -27,7 +27,7 @@ type Props = React.PropsWithChildren<{
   id: string;
 }>;
 
-const ExpandedRowToggleWrapper = ({ id, children }: Props) => {
+const ExpandedRowToggleWrapper = ({ id, children = undefined }: Props) => {
   const { toggleSection } = useExpandedSections();
   const _toggleSection = () => toggleSection(id, 'overriddenProfile');
 

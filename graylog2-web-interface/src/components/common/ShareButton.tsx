@@ -36,7 +36,14 @@ type Props = {
   bsSize?: BsSize;
 };
 
-const ShareButton = ({ bsStyle = 'default', bsSize, entityId, entityType, onClick, disabledInfo }: Props) => (
+const ShareButton = ({
+  bsStyle = 'default',
+  bsSize = undefined,
+  entityId,
+  entityType,
+  onClick,
+  disabledInfo = undefined,
+}: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => (
       <Button

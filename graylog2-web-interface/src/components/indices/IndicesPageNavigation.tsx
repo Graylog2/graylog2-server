@@ -22,12 +22,16 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const PREM_ONLY_NAV_ITEMS = [
-  { title: 'Index Set Templates', path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW, exactPathMatch: false },
+  { description: 'Index Set Templates', path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW, exactPathMatch: false },
 ];
 
 const NAV_ITEMS = [
-  { title: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  { title: 'Field Type Profiles', path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, exactPathMatch: false },
+  { description: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
+  {
+    description: 'Field Type Profiles',
+    path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
+    exactPathMatch: false,
+  },
 ];
 
 const IndicesPageNavigation = () => {
