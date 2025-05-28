@@ -18,6 +18,8 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import paste from 'helpers/user-event/paste';
+
 import TimeUnitInput from './TimeUnitInput';
 
 describe('<TimeUnitInput />', () => {
@@ -103,8 +105,8 @@ describe('<TimeUnitInput />', () => {
 
     const timeInput = await findTimeInput();
 
-    userEvent.clear(timeInput);
-    userEvent.paste(timeInput, '42');
+    await userEvent.clear(timeInput);
+    await paste(timeInput, '42');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
