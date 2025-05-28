@@ -56,7 +56,7 @@ type Props = {
   dataTestid?: string;
 };
 
-const SectionHeader = ({ title, actions, titleOrder = 2 }: Props) => (
+const SectionHeader = ({ title, actions = undefined, titleOrder = 2 }: Props) => (
   <Row>
     <Col span={{ base: 12, lg: 6, md: 6 }}>
       <Title order={titleOrder}>{title}</Title>
@@ -67,14 +67,25 @@ const SectionHeader = ({ title, actions, titleOrder = 2 }: Props) => (
   </Row>
 );
 
-export const Subsection = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => (
+export const Subsection = ({
+  title,
+  children = undefined,
+  actions = undefined,
+  titleOrder = undefined,
+}: React.PropsWithChildren<Props>) => (
   <SubsectionContainer component="section">
     <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
     {children}
   </SubsectionContainer>
 );
 
-const Section = ({ title, children, actions, titleOrder, dataTestid }: React.PropsWithChildren<Props>) => (
+const Section = ({
+  title,
+  children = undefined,
+  actions = undefined,
+  titleOrder = undefined,
+  dataTestid = undefined,
+}: React.PropsWithChildren<Props>) => (
   <SectionContainer component="section" data-testid={dataTestid}>
     <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
     {children}

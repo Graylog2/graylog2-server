@@ -39,7 +39,7 @@ type Props = {
 
 const SplitAndIndexExtractorConfiguration = ({
   configuration: initialConfiguration,
-  exampleMessage,
+  exampleMessage = undefined,
   onChange,
   onExtractorPreviewLoad,
 }: Props) => {

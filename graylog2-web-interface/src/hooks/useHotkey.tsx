@@ -63,11 +63,11 @@ export type HotkeysProps = {
 
 const useHotkey = <T extends HTMLElement>({
   actionKey,
-  callback,
+  callback = undefined,
   scope,
-  options,
-  dependencies,
-  telemetryAppPathname,
+  options = undefined,
+  dependencies = undefined,
+  telemetryAppPathname = undefined,
 }: HotkeysProps) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();

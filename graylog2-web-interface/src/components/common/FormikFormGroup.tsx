@@ -46,7 +46,7 @@ type Props = React.PropsWithChildren<{
 
 /** Displays the FormikInput with a specific layout */
 const FormikFormGroup = ({
-  children,
+  children = undefined,
   disabled = false,
   required = false,
   validate = () => undefined,
@@ -55,7 +55,7 @@ const FormikFormGroup = ({
   wrapperClassName = 'col-sm-9',
   label,
   name,
-  onChange,
+  onChange = undefined,
   ...rest
 }: Props) => (
   <FormikInput
