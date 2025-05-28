@@ -89,6 +89,7 @@ export const GranteeListItemActions = styled.div(
 
 export const ShareFormSection = styled.div(
   ({ theme }) => css`
+    width: inherit;
     margin-bottom: ${theme.spacings.sm};
 
     &:last-child {
