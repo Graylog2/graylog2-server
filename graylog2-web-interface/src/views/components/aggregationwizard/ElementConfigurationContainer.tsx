@@ -75,11 +75,11 @@ const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(
   (
     {
       children,
-      onRemove,
+      onRemove = undefined,
       testIdPrefix = 'configuration',
-      dragHandleProps,
-      className,
-      draggableProps,
+      dragHandleProps = undefined,
+      className = undefined,
+      draggableProps = undefined,
       elementTitle,
     }: Props,
     ref,

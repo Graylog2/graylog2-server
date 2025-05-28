@@ -66,12 +66,14 @@ class Input extends React.Component<
 > {
   static defaultProps = {
     type: undefined,
+    id: undefined,
     label: '',
     labelClassName: undefined,
     name: undefined,
     formGroupClassName: undefined,
     inputDescClassName: undefined,
     bsStyle: null,
+    bsSize: undefined,
     value: undefined,
     placeholder: '',
     error: undefined,

@@ -42,6 +42,10 @@ class EditExtractorConfiguration extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    exampleMessage: undefined,
+  };
+
   state = {
     extractorPreview: undefined,
   };

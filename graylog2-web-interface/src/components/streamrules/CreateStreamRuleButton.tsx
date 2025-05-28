@@ -40,12 +40,12 @@ type Props = {
 };
 
 const CreateStreamRuleButton = ({
-  bsSize,
-  bsStyle,
+  bsSize = undefined,
+  bsStyle = undefined,
   buttonText = 'Create Rule',
-  className,
+  className = undefined,
   disabled = false,
-  streamId,
+  streamId = undefined,
 }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();

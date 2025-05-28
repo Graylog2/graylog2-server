@@ -52,7 +52,7 @@ const ConfigurationForm = ({
     color: '#FFFFFF',
     tags: [],
   },
-  configurationSidecars,
+  configurationSidecars = undefined,
 }: Props) => {
   const initFormData = {
     id: configuration.id,

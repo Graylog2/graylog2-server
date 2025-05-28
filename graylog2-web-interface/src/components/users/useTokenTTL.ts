@@ -40,7 +40,7 @@ const useTokenTTL = (
     if (!forceDefaultTokenTTL) {
       ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG).then(() => {
         const config = getConfig(ConfigurationType.USER_CONFIG, configuration);
-  
+
         if (config?.default_ttl_for_new_tokens) {
           setTokenTtl(config?.default_ttl_for_new_tokens);
           setDefaultTokenTtl(config?.default_ttl_for_new_tokens);

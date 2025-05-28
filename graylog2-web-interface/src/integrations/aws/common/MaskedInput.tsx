@@ -26,7 +26,7 @@ type MaskedInputProps = React.ComponentProps<typeof ValidatedInput> & {
   className?: string;
 };
 
-const MaskedInput = ({ className, label, ...props }: MaskedInputProps) => {
+const MaskedInput = ({ className = undefined, label, ...props }: MaskedInputProps) => {
   const [masked, setMasked] = useState(true);
   const toggleLabel = (
     <LabelWrapper>
