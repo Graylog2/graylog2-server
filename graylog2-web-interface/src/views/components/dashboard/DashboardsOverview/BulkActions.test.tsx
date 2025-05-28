@@ -44,7 +44,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
   };
 
   const openActionsDropdown = async () => {
-    userEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /bulk actions/i,
       }),
@@ -54,7 +54,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
   };
 
   const deleteDashboards = async () => {
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   };
 

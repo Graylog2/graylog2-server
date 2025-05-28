@@ -36,7 +36,7 @@ describe('ExtraMenuWidgetActions', () => {
 
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
+    await userEvent.click(exportButton);
 
     const plugText = screen.queryByText(plugExplanation);
 
@@ -53,7 +53,7 @@ describe('ExtraMenuWidgetActions', () => {
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /dummy export action/i });
     const plugExportButton = screen.queryByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
+    await userEvent.click(exportButton);
 
     const plugText = screen.queryByText(plugExplanation);
 

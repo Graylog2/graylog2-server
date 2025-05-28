@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import useRuleBuilder from 'hooks/useRuleBuilder';
+import paste from 'helpers/user-event/paste';
 
 import RuleBuilder from './RuleBuilder';
 import { jsonifyText } from './helpers';
@@ -77,10 +78,10 @@ describe('RuleBuilder', () => {
     const titleInput = await screen.findByLabelText('Title');
     const descriptionInput = await screen.findByLabelText('Description');
 
-    userEvent.paste(titleInput, title);
-    userEvent.paste(descriptionInput, description);
+    await paste(titleInput, title);
+    await paste(descriptionInput, description);
     const createRuleButton = await screen.findByRole('button', { name: 'Create rule' });
-    userEvent.click(createRuleButton);
+    await userEvent.click(createRuleButton);
 
     expect(createRule).toHaveBeenCalledWith({
       title,
@@ -89,7 +90,7 @@ describe('RuleBuilder', () => {
     });
   });
 
-  it('should update Title and Description', () => {
+  it('should update Title and Description', async () => {
     const updateRule = jest.fn();
     const title = 'title';
     const description = 'description';
@@ -113,10 +114,10 @@ describe('RuleBuilder', () => {
     const titleInput = getByLabelText('Title');
     const descriptionInput = getByLabelText('Description');
 
-    userEvent.paste(titleInput, title);
-    userEvent.paste(descriptionInput, description);
+    await paste(titleInput, title);
+    await paste(descriptionInput, description);
     const updateRuleButton = getByRole('button', { name: 'Update rule' });
-    userEvent.click(updateRuleButton);
+    await userEvent.click(updateRuleButton);
 
     expect(updateRule).toHaveBeenCalledWith({
       title,
@@ -146,7 +147,7 @@ describe('RuleBuilder', () => {
     );
 
     const convertButton = await screen.findByRole('button', { name: 'Convert Rule Builder to Source Code' });
-    userEvent.click(convertButton);
+    await userEvent.click(convertButton);
 
     const createRuleFromCodeButton = await screen.findByRole('button', { name: 'Create new Rule from Code' });
     const copyCloseButton = await screen.findByRole('button', { name: 'Copy & Close' });

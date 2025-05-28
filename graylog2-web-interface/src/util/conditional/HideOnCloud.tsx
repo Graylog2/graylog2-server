@@ -14,22 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 
 import AppConfig from '../AppConfig';
 
-const HideOnCloud = ({ children, ...rest }) => {
-  if (AppConfig.isCloud()) {
-    return <></>;
-  }
-
-  return React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, rest);
-    }
-
-    return child;
-  });
-};
+const HideOnCloud = ({ children = undefined }: React.PropsWithChildren<{}>) => (AppConfig.isCloud() ? null : children);
 
 export default HideOnCloud;

@@ -57,8 +57,8 @@ describe('PerspectivesSwitcher', () => {
   it('should render dropdown with available perspectives', async () => {
     render(<PerspectivesSwitcher />);
 
-    userEvent.click(await screen.findByRole('button', { name: /change ui perspective/i }));
-    userEvent.click(await screen.findByText(new RegExp(examplePerspective.title, 'i')));
+    await userEvent.click(await screen.findByRole('button', { name: /change ui perspective/i }));
+    await userEvent.click(await screen.findByText(new RegExp(examplePerspective.title, 'i')));
 
     await waitFor(() => expect(history.push).toHaveBeenCalledWith(examplePerspective.welcomeRoute));
 

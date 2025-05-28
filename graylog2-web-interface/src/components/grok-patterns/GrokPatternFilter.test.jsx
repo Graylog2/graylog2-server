@@ -60,7 +60,7 @@ describe('<GrokPatternFilter />', () => {
 
     const patternFilter = await screen.findByRole('textbox', { name: /filter pattern/i });
 
-    userEvent.type(patternFilter, 'COMMON');
+    await userEvent.type(patternFilter, 'COMMON');
 
     await waitFor(async () => {
       const buttons = await screen.findAllByRole('button', { name: 'Add' });

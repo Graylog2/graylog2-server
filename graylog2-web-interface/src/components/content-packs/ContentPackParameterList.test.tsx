@@ -165,7 +165,7 @@ describe('<ContentPackParameterList />', () => {
     await screen.findByText('PARAM');
 
     const input = await screen.findByPlaceholderText('Enter search query...');
-    userEvent.type(input, 'Bad');
+    await userEvent.type(input, 'Bad');
 
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);

@@ -213,7 +213,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    userEvent.click(await screen.findByTitle(/sort description ascending/i));
+    await userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
@@ -248,12 +248,12 @@ describe('<EntityDataTable />', () => {
     );
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
-    userEvent.click(rowCheckboxes[0]);
+    await userEvent.click(rowCheckboxes[0]);
 
     await screen.findByText(selectedItemInfo);
     const customBulkAction = await screen.findByRole('button', { name: /reset selection/i });
 
-    userEvent.click(customBulkAction);
+    await userEvent.click(customBulkAction);
 
     expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
     expect(rowCheckboxes[0]).not.toBeChecked();
@@ -279,13 +279,13 @@ describe('<EntityDataTable />', () => {
     expect(rowCheckboxes[0]).not.toBeChecked();
 
     const selectAllCheckbox = await screen.findByRole('checkbox', { name: /select all visible entities/i });
-    userEvent.click(selectAllCheckbox);
+    await userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).toBeChecked();
 
     await screen.findByText('1 item selected');
 
-    userEvent.click(selectAllCheckbox);
+    await userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).not.toBeChecked();
   });
@@ -304,8 +304,8 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
   });

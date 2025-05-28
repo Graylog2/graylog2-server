@@ -178,7 +178,7 @@ describe('CacheForm', () => {
 
     fireEvent.change(titleEle, { target: { value: '' } });
     fireEvent.change(nameEle, { target: { value: '' } });
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockSaved).not.toHaveBeenCalled();
@@ -207,7 +207,7 @@ describe('CacheForm', () => {
 
     fireEvent.change(titleEle, { target: { value: 'Test title' } });
     fireEvent.change(nameEle, { target: { value: 'test-title' } });
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockSaved).toHaveBeenCalled();

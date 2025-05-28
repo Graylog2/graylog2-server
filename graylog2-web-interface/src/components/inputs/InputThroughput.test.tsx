@@ -156,7 +156,7 @@ describe('InputThroughput', () => {
 
     expect(screen.queryByText('foobar / existing.node')).not.toBeInTheDocument();
 
-    userEvent.click(detailsLink);
+    await userEvent.click(detailsLink);
 
     await screen.findByText('foobar / existing.node');
   });

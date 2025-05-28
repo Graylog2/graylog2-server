@@ -22,6 +22,7 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import paste from 'helpers/user-event/paste';
 
 import ViewsQueryInput from './ViewsQueryInput';
 
@@ -75,7 +76,7 @@ describe('QueryInput', () => {
     const onChange = jest.fn();
     render(<SimpleQueryInput onChange={onChange} />);
 
-    userEvent.paste(await findQueryInput(), 'the query');
+    await paste(await findQueryInput(), 'the query');
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith({ target: { value: 'the query', name: 'search-query' } });
@@ -85,8 +86,8 @@ describe('QueryInput', () => {
     const onBlur = jest.fn();
     render(<SimpleQueryInput onBlur={onBlur} />);
 
-    userEvent.paste(await findQueryInput(), 'the query');
-    userEvent.tab();
+    await paste(await findQueryInput(), 'the query');
+    await userEvent.tab();
 
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
@@ -98,7 +99,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).toHaveBeenCalledTimes(1);
       expect(onExecute).toHaveBeenCalledWith('the query');
@@ -110,7 +111,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).not.toHaveBeenCalledTimes(1);
     });
@@ -121,7 +122,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
@@ -135,7 +136,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
@@ -161,7 +162,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{ctrl}{enter}');
+      await userEvent.type(queryInput, '{ctrl}{enter}');
 
       await waitFor(() => {
         expect(exec).toHaveBeenCalled();

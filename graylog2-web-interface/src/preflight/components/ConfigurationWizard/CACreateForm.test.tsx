@@ -46,7 +46,7 @@ describe('CACreateForm', () => {
   });
 
   const submitForm = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /Create CA/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Create CA/i }));
   };
 
   it('should create CA', async () => {

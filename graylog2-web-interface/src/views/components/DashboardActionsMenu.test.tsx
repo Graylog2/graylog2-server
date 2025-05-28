@@ -93,13 +93,13 @@ describe('DashboardActionsMenu', () => {
       name: /create dashboard/i,
     });
 
-    userEvent.click(saveButton);
+    await userEvent.click(saveButton);
   };
 
   const openDashboardSaveForm = async () => {
     const saveAsMenuItem = await screen.findByRole('button', { name: /save as new dashboard/i });
 
-    userEvent.click(saveAsMenuItem);
+    await userEvent.click(saveAsMenuItem);
   };
 
   beforeEach(() => {
@@ -151,10 +151,10 @@ describe('DashboardActionsMenu', () => {
 
   it('should open edit dashboard meta information modal', async () => {
     const { findByText } = render(<SUT />);
-    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     const editMenuItem = await screen.findByText(/Edit metadata/i);
 
-    userEvent.click(editMenuItem);
+    await userEvent.click(editMenuItem);
 
     await findByText(/Editing dashboard/);
   });
@@ -162,7 +162,7 @@ describe('DashboardActionsMenu', () => {
   it('should open dashboard share modal', async () => {
     render(<SUT />);
     const openShareButton = await screen.findByRole('button', { name: /Share/i });
-    userEvent.click(openShareButton);
+    await userEvent.click(openShareButton);
 
     await screen.findByRole('button', { name: /update sharing/i });
   });
@@ -210,7 +210,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should save view when pressing related keyboard shortcut', async () => {
     render(<SUT />);
-    userEvent.keyboard('{Meta>}s{/Meta}');
+    await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 });

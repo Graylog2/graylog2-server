@@ -82,7 +82,7 @@ describe('NestedForm', () => {
       </Formik>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /reset/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /reset/i }));
 
     expect(onReset).toHaveBeenCalledTimes(1);
     expect(onResetParentForm).not.toHaveBeenCalled();

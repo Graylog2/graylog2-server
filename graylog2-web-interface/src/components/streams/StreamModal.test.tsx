@@ -143,8 +143,8 @@ describe('StreamModal', () => {
       name: /description/i,
     });
 
-    userEvent.type(title, 'New title');
-    userEvent.type(description, 'New description');
+    await userEvent.type(title, 'New title');
+    await userEvent.type(description, 'New description');
 
     const indexSetSelect = await screen.findByLabelText('Index Set');
 

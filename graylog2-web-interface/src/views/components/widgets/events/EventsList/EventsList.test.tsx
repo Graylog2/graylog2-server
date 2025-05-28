@@ -68,11 +68,11 @@ describe('EventsList', () => {
     });
   });
 
-  const clickNextPageButton = () => {
+  const clickNextPageButton = async () => {
     const paginationListItem = screen.getByRole('listitem', { name: /next/i });
 
     const nextPageButton = within(paginationListItem).getByRole('button');
-    userEvent.click(nextPageButton);
+    await userEvent.click(nextPageButton);
   };
 
   const SimpleEventsList = ({
@@ -120,7 +120,7 @@ describe('EventsList', () => {
 
     render(<SimpleEventsList data={{ ...data, totalResults: 10 + secondPageSize }} />);
 
-    clickNextPageButton();
+    await clickNextPageButton();
 
     await waitFor(() => expect(reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload));
   });
@@ -146,7 +146,7 @@ describe('EventsList', () => {
 
     render(<SimpleEventsList data={{ ...data, totalResults: 10 + secondPageSize }} />);
 
-    clickNextPageButton();
+    await clickNextPageButton();
 
     await waitFor(() => expect(stopAutoRefresh).toHaveBeenCalledTimes(1));
   });
@@ -170,7 +170,7 @@ describe('EventsList', () => {
 
     render(<SimpleEventsList data={{ ...data, totalResults: 10 + secondPageSize }} />);
 
-    clickNextPageButton();
+    await clickNextPageButton();
 
     await screen.findByText('Error description');
   });

@@ -161,7 +161,7 @@ describe('AggregationWizard/Visualizations', () => {
     await selectEvent.openMenu(visualizationSelect);
     await selectEvent.select(visualizationSelect, 'Without Config');
 
-    userEvent.click(await findWidgetConfigSubmitButton());
+    await userEvent.click(await findWidgetConfigSubmitButton());
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(
@@ -202,7 +202,7 @@ describe('AggregationWizard/Visualizations', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(
@@ -239,9 +239,9 @@ describe('AggregationWizard/Visualizations', () => {
     );
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
-    userEvent.click(updateViewportButton);
+    await userEvent.click(updateViewportButton);
     const submitButton = await findWidgetConfigSubmitButton();
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(

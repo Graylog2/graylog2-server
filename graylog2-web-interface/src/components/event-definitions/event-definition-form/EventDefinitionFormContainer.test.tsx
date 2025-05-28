@@ -263,7 +263,7 @@ describe('EventDefinitionFormContainer', () => {
   it('should render Filters & Aggregation form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
     const tab = await screen.findByRole('button', { name: /condition/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
     const conditionTypeSelect = await screen.findByLabelText('Condition Type');
 
     expect(conditionTypeSelect).toBeInTheDocument();
@@ -274,18 +274,20 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /condition/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
-    expect(screen.getByText(/cannot be edited/i)).toBeVisible();
+    await screen.findByText(/cannot be edited/i);
   });
 
   it('should render Fields form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /fields/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
-    expect(screen.getByRole('button', { name: /add custom field/i })).toBeEnabled();
+    const customFieldButton = await screen.findByRole('button', { name: /add custom field/i });
+
+    expect(customFieldButton).toBeEnabled();
   });
 
   it('Fields should not be accessible for immutable entities', async () => {
@@ -293,16 +295,16 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /fields/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
-    expect(screen.getByText(/cannot be edited/i)).toBeVisible();
+    await screen.findByText(/cannot be edited/i);
   });
 
   it('should render Notifications form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notifications/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add notification/i })).toBeEnabled();
   });
@@ -312,7 +314,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notification/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add notification/i })).toBeEnabled();
   });
@@ -321,16 +323,16 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notification/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
     const addNotificationButton = screen.getByRole('button', { name: /add notification/i });
 
     expect(addNotificationButton).toBeEnabled();
 
-    userEvent.click(addNotificationButton);
-    userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
-    userEvent.click(screen.getByRole('button', { name: /add notification/i }));
+    await userEvent.click(addNotificationButton);
+    await userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
+    await userEvent.click(screen.getByRole('button', { name: /add notification/i }));
 
-    expect(screen.getByText(/mock-notification-title/i)).toBeVisible();
+    await screen.findByText(/mock-notification-title/i);
   });
 
   it('should be able to add notifications to immutable entities', async () => {
@@ -338,15 +340,15 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notification/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
     const addNotificationButton = screen.getByRole('button', { name: /add notification/i });
 
     expect(addNotificationButton).toBeEnabled();
 
-    userEvent.click(addNotificationButton);
-    userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
-    userEvent.click(screen.getByRole('button', { name: /add notification/i }));
+    await userEvent.click(addNotificationButton);
+    await userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
+    await userEvent.click(screen.getByRole('button', { name: /add notification/i }));
 
-    expect(screen.getByText(/mock-notification-title/i)).toBeVisible();
+    await screen.findByText(/mock-notification-title/i);
   });
 });

@@ -97,7 +97,7 @@ describe('MessageProcessorsConfig', () => {
 
     const editButton = await screen.findByRole('button', { name: /edit configuration/i });
 
-    userEvent.click(editButton);
+    await userEvent.click(editButton);
 
     await screen.findByRole('heading', {
       name: /update message processors configuration/i,

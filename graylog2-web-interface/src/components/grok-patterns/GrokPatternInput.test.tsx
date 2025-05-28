@@ -59,7 +59,7 @@ describe('<GrokPatternInput />', () => {
     expect(addButtons).toHaveLength(3);
 
     const filterInput = await screen.findByRole('textbox', { name: /filter pattern/i });
-    userEvent.type(filterInput, 'COMMON');
+    await userEvent.type(filterInput, 'COMMON');
 
     await waitFor(async () => {
       const patternButtons = await screen.findAllByRole('button', { name: 'Add' });
