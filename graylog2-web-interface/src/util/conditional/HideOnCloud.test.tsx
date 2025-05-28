@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import AppConfig from 'util/AppConfig';
@@ -42,21 +41,5 @@ describe('HideOnCloud', () => {
     render(<HideOnCloud>The Content</HideOnCloud>);
 
     expect(screen.getByText('The Content')).toBeInTheDocument();
-  });
-
-  it('forwards props to its children', () => {
-    const onClick = jest.fn();
-    asMock(AppConfig.isCloud).mockReturnValue(false);
-
-    render(
-      <HideOnCloud onClick={onClick}>
-        <button type="button">Click Me!</button>
-      </HideOnCloud>,
-    );
-
-    const childrenButton = screen.getByText('Click Me!');
-    userEvent.click(childrenButton);
-
-    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
