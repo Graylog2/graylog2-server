@@ -25,9 +25,8 @@ import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
+import IfPermitted from 'components/common/IfPermitted';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -82,31 +81,48 @@ type Props = {
   items: Array<PageNavItem>;
 };
 
+type FormattedItemProps = {
+  path: string;
+  exactPathMatch: boolean;
+  title: string;
+  useIsValidLicense: () => boolean;
+  permissions: string | Array<string>;
+};
+const FormattedItem = ({ path, exactPathMatch, title, useIsValidLicense, permissions }: FormattedItemProps) => {
+  const hasValidLicense = useIsValidLicense?.() ?? true;
+
+  return hasValidLicense ? (
+    <IfPermitted permissions={permissions}>
+      <LinkContainer to={path} relativeActive={!exactPathMatch}>
+        <StyledButton bsStyle="transparent">
+          <NavItemStateIndicator>{title}</NavItemStateIndicator>
+        </StyledButton>
+      </LinkContainer>
+    </IfPermitted>
+  ) : null;
+};
+
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
 const PageNavigation = ({ items }: Props) => {
-  const currentUser = useCurrentUser();
-
-  const formatedItems = useMemo(() => {
-    const availableItems = items.filter(
-      (item) =>
-        (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
-        isPermitted(currentUser.permissions, item.permissions) &&
-        !!item.path,
-    );
+  const sortedItems = useMemo(() => {
+    const availableItems = items.filter((item) => !!item.path);
 
     return sortNavigationItems<PageNavItem>(availableItems);
-  }, [currentUser.permissions, items]);
+  }, [items]);
 
   return (
     <Container>
-      {formatedItems.map(({ path, description, exactPathMatch }) => (
-        <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
-          <StyledButton bsStyle="transparent">
-            <NavItemStateIndicator>{description}</NavItemStateIndicator>
-          </StyledButton>
-        </LinkContainer>
+      {sortedItems.map(({ path, description, exactPathMatch, permissions, useIsValidLicense }) => (
+        <FormattedItem
+          key={`page-navigation-${path}-${description}`}
+          path={path}
+          title={description}
+          exactPathMatch={exactPathMatch}
+          permissions={permissions}
+          useIsValidLicense={useIsValidLicense}
+        />
       ))}
     </Container>
   );
