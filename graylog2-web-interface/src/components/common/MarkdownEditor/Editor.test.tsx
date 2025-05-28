@@ -18,8 +18,9 @@ import * as React from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import Editor from './Editor';
 import paste from 'helpers/user-event/paste';
+
+import Editor from './Editor';
 
 describe('MarkdownEditor', () => {
   it('renders the editor', async () => {

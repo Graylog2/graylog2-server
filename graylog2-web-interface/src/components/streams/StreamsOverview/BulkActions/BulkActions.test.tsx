@@ -54,7 +54,7 @@ describe('StreamsOverview BulkActionsRow', () => {
   };
 
   const openActionsDropdown = async () =>
-    await userEvent.click(
+    userEvent.click(
       await screen.findByRole('button', {
         name: /bulk actions/i,
       }),
