@@ -181,7 +181,7 @@ class SelectPopover extends React.Component<
   };
 
   render() {
-    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, disabled, title } =
+    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, disabled, title, id } =
       this.props;
     const { filteredItems, selectedItems } = this.state;
     const popover = (
@@ -213,6 +213,7 @@ class SelectPopover extends React.Component<
         placement={placement}
         overlay={popover}
         title={title}
+        id={id}
         rootClose>
         {triggerNode}
       </OverlayTrigger>
