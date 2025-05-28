@@ -621,7 +621,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
 
-        if (messages.isEmpty()) {
+        if (messages.isEmpty() && !shuttingDown) {
             // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
             // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
             // end of the log.
