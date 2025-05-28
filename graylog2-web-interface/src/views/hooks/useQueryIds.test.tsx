@@ -34,12 +34,12 @@ const createView = (queryIds: Array<string>) =>
     )
     .build();
 
-const Wrapper = ({ children, queryIds }: React.PropsWithChildren<{ queryIds: Array<string> }>) => (
+const Wrapper = ({ children = undefined, queryIds }: React.PropsWithChildren<{ queryIds: Array<string> }>) => (
   <TestStoreProvider view={createView(queryIds)}>{children}</TestStoreProvider>
 );
 const createWrapper =
   (queryIds: Array<string>) =>
-  ({ children }: React.PropsWithChildren<{}>) => <Wrapper queryIds={queryIds}>{children}</Wrapper>;
+  ({ children = undefined }: React.PropsWithChildren<{}>) => <Wrapper queryIds={queryIds}>{children}</Wrapper>;
 
 describe('useQueryIds', () => {
   beforeEach(() => {

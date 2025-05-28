@@ -30,12 +30,12 @@ type Props<OptionValue> = {
 };
 
 const SegmentedControl = <OptionValue extends string>({
-  className,
+  className = undefined,
   data,
-  defaultValue,
+  defaultValue = undefined,
   disabled = false,
-  onChange,
-  value,
+  onChange = undefined,
+  value = undefined,
   radius = 'xs',
 }: Props<OptionValue>) => {
   const theme = useTheme();

@@ -198,22 +198,22 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
  * Flexible data table component which allows defining custom column renderers.
  */
 const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
-  actionsCellWidth: fixedActionsCellWidth,
-  activeSort,
+  actionsCellWidth: fixedActionsCellWidth = undefined,
+  activeSort = undefined,
   entityAttributesAreCamelCase,
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnDefinitions,
-  columnRenderers: customColumnRenderers,
+  columnRenderers: customColumnRenderers = undefined,
   columnsOrder = [],
   entities,
-  expandedSectionsRenderer,
+  expandedSectionsRenderer = undefined,
   onColumnsChange,
-  onPageSizeChange,
+  onPageSizeChange = undefined,
   onSortChange,
-  pageSize,
-  entityActions,
+  pageSize = undefined,
+  entityActions = undefined,
   visibleColumns,
-  meta,
+  meta = undefined,
 }: Props<Entity, Meta>) => {
   const currentUser = useCurrentUser();
   const displayActionsCol = typeof entityActions === 'function';

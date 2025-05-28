@@ -36,6 +36,10 @@ class OTXAdapterSummary extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    dataAdapter: undefined,
+  };
+
   render() {
     const { config } = this.props.dataAdapter;
 

@@ -26,10 +26,12 @@ type Props = {
   title?: string;
 };
 
-const CountBadge = forwardRef<HTMLDivElement, Props>(({ children, onClick, className = '', title }: Props, ref) => (
-  <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
-    {children}
-  </Badge>
-));
+const CountBadge = forwardRef<HTMLDivElement, Props>(
+  ({ children, onClick = undefined, className = '', title = undefined }: Props, ref) => (
+    <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
+      {children}
+    </Badge>
+  ),
+);
 
 export default CountBadge;

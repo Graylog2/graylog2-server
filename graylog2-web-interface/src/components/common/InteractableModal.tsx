@@ -121,8 +121,8 @@ type Props = {
 };
 
 const InteractableModal = ({
-  children,
-  className,
+  children = undefined,
+  className = undefined,
   minHeight = DEFAULT_SIZE.height,
   minWidth = DEFAULT_SIZE.width,
   onClose = () => {},
@@ -131,7 +131,7 @@ const InteractableModal = ({
   position = DEFAULT_POSITION,
   size = DEFAULT_STRING_SIZE,
   title = '',
-  wrapperClassName,
+  wrapperClassName = undefined,
 }: React.PropsWithChildren<Props>) => {
   const dragHandleRef = useRef(null);
   const [dragHandleClassName, setDragHandleClassName] = useState(null);

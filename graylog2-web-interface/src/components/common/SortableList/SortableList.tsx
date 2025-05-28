@@ -48,9 +48,9 @@ export type Props<ItemType extends ListItemType> = {
  * This way consumers can add or remove items easily.
  */
 const SortableList = <ItemType extends ListItemType>({
-  alignItemContent,
-  customContentRender,
-  customListItemRender,
+  alignItemContent = undefined,
+  customContentRender = undefined,
+  customListItemRender = undefined,
   disableDragging = false,
   displayOverlayInPortal = false,
   items = [],

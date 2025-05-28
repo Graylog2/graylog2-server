@@ -102,7 +102,7 @@ const Icon = ({
   spin = false,
   flip = undefined,
   style = undefined,
-  'data-testid': testId,
+  'data-testid': testId = undefined,
   onClick = undefined,
   onMouseEnter = undefined,
   onMouseLeave = undefined,

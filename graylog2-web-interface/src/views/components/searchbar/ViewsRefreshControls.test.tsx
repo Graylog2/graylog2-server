@@ -47,7 +47,13 @@ const autoRefreshOptions = {
 describe('RefreshControls', () => {
   useViewsPlugin();
 
-  const SUT = ({ onSubmit = () => {}, children }: { onSubmit?: () => void; children?: React.ReactNode }) => (
+  const SUT = ({
+    onSubmit = () => {},
+    children = undefined,
+  }: {
+    onSubmit?: () => void;
+    children?: React.ReactNode;
+  }) => (
     <TestStoreProvider>
       <Formik initialValues={{}} onSubmit={onSubmit}>
         <Form>
