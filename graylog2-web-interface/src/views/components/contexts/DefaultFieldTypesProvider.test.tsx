@@ -120,7 +120,7 @@ describe('DefaultFieldTypesProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: /refresh search/i });
-    userEvent.click(button);
+    await userEvent.click(button);
 
     await waitFor(() => {
       expect(refetchMock).toHaveBeenCalledTimes(2);

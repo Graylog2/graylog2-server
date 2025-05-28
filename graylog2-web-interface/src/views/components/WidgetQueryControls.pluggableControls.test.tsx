@@ -156,7 +156,7 @@ describe('WidgetQueryControls pluggable controls', () => {
         name: /perform search \(changes were made after last search execution\)/i,
       });
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-      userEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(

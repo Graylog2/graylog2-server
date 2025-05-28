@@ -37,11 +37,11 @@ const selectRangePreset = async (optionLabel: string) => {
   const timeRangePresetButton = screen.getByRole('button', {
     name: /open time range preset select/i,
   });
-  userEvent.click(timeRangePresetButton);
+  await userEvent.click(timeRangePresetButton);
   const rangePresetOption = await screen.findByRole('menuitem', {
     name: new RegExp(optionLabel, 'i'),
   });
-  userEvent.click(rangePresetOption);
+  await userEvent.click(rangePresetOption);
 };
 
 describe('TimeRangeFilterButtons', () => {
@@ -67,7 +67,7 @@ describe('TimeRangeFilterButtons', () => {
 
     const timeRangePickerButton = screen.getByLabelText('Open Time Range Selector');
 
-    userEvent.click(timeRangePickerButton);
+    await userEvent.click(timeRangePickerButton);
 
     expect(toggleShow).toHaveBeenCalled();
   });

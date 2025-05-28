@@ -38,7 +38,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'SECONDS', true));
   });
@@ -55,7 +55,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', false));
   });
@@ -72,7 +72,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown('days');
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'DAYS', false));
   });
@@ -89,7 +89,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(124, 'SECONDS', true));
   });

@@ -250,7 +250,7 @@ describe('AdaptableQueryTabs', () => {
     const tab2 = await screen.findByRole(mainTabRole, {
       name: /Tab 2/i,
     });
-    userEvent.click(tab2);
+    await userEvent.click(tab2);
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
@@ -264,7 +264,7 @@ describe('AdaptableQueryTabs', () => {
     await finishInitialRender();
     await openMoreTabsDropdown();
 
-    userEvent.click(await screen.findByRole(dropdownTabRole, { name: /tab 4/i }));
+    await userEvent.click(await screen.findByRole(dropdownTabRole, { name: /tab 4/i }));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
@@ -277,7 +277,7 @@ describe('AdaptableQueryTabs', () => {
     const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
-    userEvent.click(await screen.findByTitle('Create New Page'));
+    await userEvent.click(await screen.findByTitle('Create New Page'));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
@@ -287,8 +287,8 @@ describe('AdaptableQueryTabs', () => {
   it('should show copy page to dashboard modal', async () => {
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
-    userEvent.click((await screen.findAllByRole('button', { name: /page actions/i }))[0]);
-    userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i, hidden: true }));
+    await userEvent.click((await screen.findAllByRole('button', { name: /page actions/i }))[0]);
+    await userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i, hidden: true }));
 
     await screen.findByRole('button', {
       name: /copy page/i,

@@ -143,7 +143,7 @@ describe('UrlWhitelistForm', () => {
 
     expect(button).toBeInTheDocument();
 
-    userEvent.click(button);
+    await userEvent.click(button);
 
     expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
 
@@ -164,7 +164,7 @@ describe('UrlWhitelistForm', () => {
 
     expect(deleteButton).toBeInTheDocument();
 
-    userEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
 

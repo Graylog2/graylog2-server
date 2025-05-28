@@ -87,7 +87,7 @@ describe('BulkEventReplay', () => {
     const onClose = jest.fn();
     render(<SUT onClose={onClose} />);
     const closeButton = await screen.findByRole('button', { name: 'Close' });
-    userEvent.click(closeButton);
+    await userEvent.click(closeButton);
 
     await waitFor(() => {
       expect(onClose).toHaveBeenCalled();
@@ -132,11 +132,11 @@ describe('BulkEventReplay', () => {
     render(<SUT />);
     await expectReplayingEvent(initialEventIds[0]);
 
-    userEvent.click(await screen.findByText(eventMessage(1)));
+    await userEvent.click(await screen.findByText(eventMessage(1)));
 
     await expectReplayingEvent(initialEventIds[1]);
 
-    userEvent.click(await screen.findByText(eventMessage(0)));
+    await userEvent.click(await screen.findByText(eventMessage(0)));
 
     await expectReplayingEvent(initialEventIds[0]);
   });
@@ -159,8 +159,8 @@ describe('BulkEventReplay', () => {
     render(<SUT />);
     await removeEvent(initialEventIds[1]);
 
-    userEvent.click(await screen.findByRole('button', { name: /bulk actions/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /test action/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /bulk actions/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /test action/i }));
 
     await waitFor(() => {
       expect(bulkAction).toHaveBeenCalledWith([eventByIndex(0), eventByIndex(2)]);

@@ -86,7 +86,7 @@ describe('Rule', () => {
       name: /delete rule/i,
     });
 
-    userEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     expect(onDeleteMock).toHaveBeenCalledWith(ruleMock);
   });

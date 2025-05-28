@@ -63,7 +63,7 @@ const shareWithCollaborator = async () => {
     name: /add collaborator/i,
   });
 
-  userEvent.click(addCollaborator);
+  await userEvent.click(addCollaborator);
 
   await screen.findByText(/everyone/i);
 };
@@ -133,7 +133,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} toggleModal={onToggleModal} />);
 
       const cancelButton = await screen.findByRole('button', { name: /cancel/i });
-      userEvent.click(cancelButton);
+      await userEvent.click(cancelButton);
 
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
@@ -144,7 +144,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} saveSearch={onSave} />);
 
       const saveButton = await screen.findByRole('button', { name: /Save search/i });
-      userEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
@@ -156,7 +156,7 @@ describe('SavedSearchForm', () => {
 
       userEvent.type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
-      userEvent.click(saveAsButton);
+      await userEvent.click(saveAsButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
@@ -167,7 +167,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
-      userEvent.click(saveAsButton);
+      await userEvent.click(saveAsButton);
 
       expect(onSaveAs).not.toHaveBeenCalled();
     });
@@ -179,7 +179,7 @@ describe('SavedSearchForm', () => {
 
       userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
-      userEvent.click(createNewButton);
+      await userEvent.click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
@@ -192,7 +192,7 @@ describe('SavedSearchForm', () => {
 
       await shareWithCollaborator();
 
-      userEvent.click(createNewButton);
+      await userEvent.click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledTimes(1);
     });

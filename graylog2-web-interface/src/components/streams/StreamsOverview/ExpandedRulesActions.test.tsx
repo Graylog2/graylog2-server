@@ -29,7 +29,7 @@ describe('ExpandedRulesActions', () => {
   it('should open add rule modal', async () => {
     render(<ExpandedRulesActions stream={stream} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /quick add rule/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /quick add rule/i }));
 
     await screen.findByRole('heading', {
       name: /new stream rule/i,

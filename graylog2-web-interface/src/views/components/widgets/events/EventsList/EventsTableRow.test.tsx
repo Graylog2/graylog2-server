@@ -72,7 +72,7 @@ describe('EventsTableRow', () => {
       </table>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /toggle event actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /toggle event actions/i }));
 
     await screen.findByRole('menuitem', { name: /replay search/i });
   });

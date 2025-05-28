@@ -42,7 +42,7 @@ describe('ElementConfigurationContainer', () => {
     );
 
     const removeBtn = await screen.findByTitle('Remove element');
-    userEvent.click(removeBtn);
+    await userEvent.click(removeBtn);
 
     await waitFor(() => expect(onRemove).toHaveBeenCalledTimes(1));
   });

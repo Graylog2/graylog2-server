@@ -93,7 +93,7 @@ describe('HighlightForm', () => {
     const onSubmit = jest.fn(() => Promise.resolve());
     render(<SUT rule={rule} onSubmit={onSubmit} />);
 
-    userEvent.click(screen.getByLabelText('Static Color'));
+    await userEvent.click(screen.getByLabelText('Static Color'));
 
     await triggerSaveButtonClick();
 
@@ -111,7 +111,7 @@ describe('HighlightForm', () => {
     const onSubmit = jest.fn(() => Promise.resolve());
     render(<SUT rule={rule} onSubmit={onSubmit} />);
 
-    userEvent.click(screen.getByLabelText('Gradient'));
+    await userEvent.click(screen.getByLabelText('Gradient'));
 
     const highestValue = await screen.findByLabelText('Specify highest value');
     userEvent.clear(highestValue);
