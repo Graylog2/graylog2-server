@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view;
-
-import org.graylog2.database.MongoCollection;
-import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
-import org.graylog2.database.MongoCollections;
-import org.graylog2.database.utils.MongoUtils;
-
-public class ViewService {
-    protected final MongoCollection<View> db;
-
-    @Inject
-    ViewService(MongoCollections mongoCollections) {
-        this.db = mongoCollections.collection("views", View.class);
-    }
-
-    public ObjectId save(View view) {
-        return MongoUtils.insertedId(db.insertOne(view));
-    }
-}
+const modalBase = 1040;
+const zIndices = {
+  modalOverlay: modalBase,
+  modalBody: modalBase + 10,
+  notifications: modalBase + 11,
+} as const;
+export default zIndices;
