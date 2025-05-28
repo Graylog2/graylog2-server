@@ -26,7 +26,7 @@ import LegacyNotificationForm from './LegacyNotificationForm';
 
 type LegacyNotificationFormContainerProps = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
-const LegacyNotificationFormContainer = (props: LegacyNotificationFormContainerProps) => {
+const LegacyNotificationFormContainer = ({ ...props }: LegacyNotificationFormContainerProps) => {
   useEffect(() => {
     EventNotificationsActions.listAllLegacyTypes();
   }, []);

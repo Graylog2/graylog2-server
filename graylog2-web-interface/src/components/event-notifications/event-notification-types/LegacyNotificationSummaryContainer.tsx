@@ -26,7 +26,7 @@ import LegacyNotificationSummary from './LegacyNotificationSummary';
 
 type LegacyNotificationSummaryContainerProps = React.ComponentProps<EventNotificationTypes['summaryComponent']>;
 
-const LegacyNotificationSummaryContainer = (props: LegacyNotificationSummaryContainerProps) => {
+const LegacyNotificationSummaryContainer = ({ ...props }: LegacyNotificationSummaryContainerProps) => {
   const { allLegacyTypes } = useStore(EventNotificationsStore);
 
   useEffect(() => {
