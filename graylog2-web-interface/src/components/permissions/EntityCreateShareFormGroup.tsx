@@ -46,8 +46,8 @@ import EntityShareValidationsDependencies from './EntityShareValidationsDependen
 
 type Props = {
   description: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle?: $PropertyType<SharedEntity, 'title'>;
+  entityType: SharedEntity['type'];
+  entityTitle?: SharedEntity['title'];
   entityId?: string;
   entityTypeTitle?: string | null | undefined;
   defaultSharePayload?: EntitySharePayload;
@@ -55,13 +55,7 @@ type Props = {
   dependenciesGRN?: Array<GRN>;
 };
 
-const _renderGranteesSelectOption = ({
-  label,
-  granteeType,
-}: {
-  label: string;
-  granteeType: $PropertyType<Grantee, 'type'>;
-}) => (
+const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; granteeType: Grantee['type'] }) => (
   <GranteesSelectOption>
     <StyledGranteeIcon type={granteeType} />
     {label}
