@@ -18,6 +18,6 @@ const modalBase = 1040;
 const zIndices = {
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
-  notifications: modalBase + 1,
+  notifications: modalBase + 11,
 } as const;
 export default zIndices;
