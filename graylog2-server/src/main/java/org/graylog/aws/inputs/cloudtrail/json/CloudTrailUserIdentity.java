@@ -52,6 +52,14 @@ public class CloudTrailUserIdentity {
             m.put("user_session_mfa_authenticated", Boolean.valueOf(sessionContext.attributes.mfaAuthenticated));
         }
 
+        if (sessionContext != null && sessionContext.sessionIssuer != null) {
+            m.put("user_type", sessionContext.sessionIssuer.type);
+            m.put("user_name", sessionContext.sessionIssuer.userName);
+            m.put("user_principal_id", sessionContext.sessionIssuer.principalId);
+            m.put("user_principal_arn", sessionContext.sessionIssuer.arn);
+            m.put("user_account_id", sessionContext.sessionIssuer.accountId);
+        }
+
         return m;
     }
 
