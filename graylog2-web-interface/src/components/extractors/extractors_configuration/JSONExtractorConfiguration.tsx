@@ -53,6 +53,10 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
     key_whitespace_replacement: '_',
   };
 
+  static defaultProps = {
+    exampleMessage: undefined,
+  };
+
   constructor(props: Props, context: any) {
     super(props, context);
 

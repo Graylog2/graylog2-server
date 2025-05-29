@@ -26,7 +26,7 @@ type KeySecretProps = {
   awsSecret?: any;
 };
 
-const KeySecret = ({ onChange, awsKey, awsSecret }: KeySecretProps) => (
+const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeySecretProps) => (
   <>
     <ValidatedInput
       id="awsCloudWatchAwsKey"
