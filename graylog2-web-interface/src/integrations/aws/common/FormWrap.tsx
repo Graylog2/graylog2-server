@@ -110,7 +110,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
 const FormWrap = ({
   buttonContent = 'Submit',
   children,
-  className = '',
+  className = undefined,
   disabled = false,
   description = null,
   error = null,
