@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.AbstractConversion;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Optional;
@@ -35,22 +36,30 @@ public class UrlConversion extends AbstractFunction<URL> {
 
     @Override
     public URL evaluate(FunctionArgs args, EvaluationContext context) {
-        final String urlString = String.valueOf(urlParam.required(args, context));
+        final Object urlValue = urlParam.required(args, context);
+        final String urlString = urlValue == null ? null : String.valueOf(urlValue);
         try {
+            if (urlString == null) {
+                return getDefault(args, context);
+            }
             return new URL(urlString);
         } catch (IllegalArgumentException e) {
             log.debug(context.pipelineErrorMessage("Unable to parse URL for string " + urlString), e);
+            return getDefault(args, context);
+        }
+    }
 
-            final Optional<String> defaultUrl = defaultParam.optional(args, context);
-            if (!defaultUrl.isPresent()) {
-                return null;
-            }
-            try {
-                return new URL(defaultUrl.get());
-            } catch (IllegalArgumentException e1) {
-                log.warn(context.pipelineErrorMessage("Parameter `default` for to_url() is not a valid URL: " + defaultUrl.get()));
-                throw Throwables.propagate(e1);
-            }
+    private URL getDefault(FunctionArgs args, EvaluationContext context) {
+
+        final Optional<String> defaultUrl = defaultParam.optional(args, context);
+        if (defaultUrl.isEmpty()) {
+            return null;
+        }
+        try {
+            return new URL(defaultUrl.get());
+        } catch (IllegalArgumentException e1) {
+            log.warn(context.pipelineErrorMessage("Parameter `default` for to_url() is not a valid URL: " + defaultUrl.get()));
+            throw Throwables.propagate(e1);
         }
     }
 

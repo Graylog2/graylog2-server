@@ -148,6 +148,7 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConvers
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
+import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
@@ -938,6 +939,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
         assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
         assertThat(message.getField("authority")).isEqualTo("admin:s3cr31@some.host.with.lots.of.subdomains.com:9999");
+        assertThat(((URL)message.getField("default_specified")).getHost()).isEqualTo("example.com");
+        assertThat(message.getField("default_null")).isNull();
     }
 
     @Test
@@ -1081,6 +1084,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("string_5")).isEqualTo("false");
         assertThat(message.getField("string_6")).isEqualTo("42");
         assertThat(message.getField("string_7")).isEqualTo("23.42");
+        assertThat(message.getField("string_default_null_set_single_field")).isNull();
+        assertThat(message.getField("string_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("long_1")).isEqualTo(1L);
         assertThat(message.getField("long_2")).isEqualTo(2L);
@@ -1093,6 +1098,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("long_min2")).isEqualTo(1L);
         assertThat(message.getField("long_max1")).isEqualTo(Long.MAX_VALUE);
         assertThat(message.getField("long_max2")).isEqualTo(1L);
+        assertThat(message.getField("long_default_null")).isNull();
+        assertThat(message.getField("long_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("double_1")).isEqualTo(1d);
         assertThat(message.getField("double_2")).isEqualTo(2d);
@@ -1108,17 +1115,23 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("double_inf2")).isEqualTo(Double.NEGATIVE_INFINITY);
         assertThat(message.getField("double_inf3")).isEqualTo(Double.POSITIVE_INFINITY);
         assertThat(message.getField("double_inf4")).isEqualTo(Double.NEGATIVE_INFINITY);
+        assertThat(message.getField("double_default_null_set_single_field")).isNull();
+        assertThat(message.getField("double_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("bool_1")).isEqualTo(true);
         assertThat(message.getField("bool_2")).isEqualTo(false);
         assertThat(message.getField("bool_3")).isEqualTo(false);
         assertThat(message.getField("bool_4")).isEqualTo(true);
+        assertThat(message.getField("bool_default_null_set_single_field")).isNull();
+        assertThat(message.getField("bool_default_null_set_single_field")).isNull();
 
         // the is wrapped in our own class for safety in rules
         assertThat(message.getField("ip_1")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_2")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
         assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
+        assertThat(message.getField("ip_default_null_set_single_field")).isNull();
+        assertThat(message.getField("ip_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("map_1")).isEqualTo(Collections.singletonMap("foo", "bar"));
         assertThat(message.getField("map_2")).isEqualTo(Collections.emptyMap());
@@ -1126,6 +1139,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_4")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_5")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_default_null_set_single_field")).isNull();
+        assertThat(message.getField("map_default_null_set_single_field")).isNull();
     }
 
     @Test
