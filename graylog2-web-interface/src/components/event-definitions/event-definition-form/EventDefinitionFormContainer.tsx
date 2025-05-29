@@ -25,6 +25,7 @@ import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/Ava
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
   EventDefinition,
   EventDefinitionFormControlsProps,
@@ -89,7 +90,7 @@ const EventDefinitionFormContainer = ({
   initialStep = STEP_KEYS[0],
   onCancel = undefined,
   onChangeStep = undefined,
-  onEventDefinitionChange = () => {},
+  onEventDefinitionChange = () => { },
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
@@ -147,6 +148,7 @@ const EventDefinitionFormContainer = ({
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
+    CurrentUserStore.update(currentUser.username);
 
     onSubmit();
   };

@@ -24,11 +24,14 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +75,7 @@ public class EventsSearchService {
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
         final var eventStreams = allowedEventStreams(subject);
-        if(eventStreams.isEmpty()) {
+        if (eventStreams.isEmpty()) {
             return EventsSearchResult.empty();
         }
 
@@ -110,7 +113,7 @@ public class EventsSearchService {
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
         final var eventStreams = allowedEventStreams(subject);
-        if(eventStreams.isEmpty()) {
+        if (eventStreams.isEmpty()) {
             return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
         }
 
@@ -118,6 +121,23 @@ public class EventsSearchService {
         final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
+    }
+
+    public EventsSearchResult searchByIds(Collection<String> eventIds, Subject subject) {
+        final var query = eventIds.stream()
+                .map(eventId -> EventDto.FIELD_ID + ":" + eventId)
+                .collect(Collectors.joining(" OR "));
+        final EventsSearchParameters parameters = EventsSearchParameters.builder()
+                .page(1)
+                .perPage(eventIds.size())
+                .timerange(RelativeRange.allTime())
+                .query(query)
+                .filter(EventsSearchFilter.empty())
+                .sortBy(Message.FIELD_TIMESTAMP)
+                .sortDirection(EventsSearchParameters.SortDirection.DESC)
+                .build();
+
+        return search(parameters, subject);
     }
 
     public Set<String> forbiddenSourceStreams(Subject subject) {
