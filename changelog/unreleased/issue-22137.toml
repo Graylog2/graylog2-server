@@ -1,4 +1,5 @@
 type = "f"
-message = "Fixes the error panel text readability in dark mode."
+message = "Improve error handling for the Kinesis/Cloudwatch input."
 
 issues = ["22137"]
+pulls = ["22370"]

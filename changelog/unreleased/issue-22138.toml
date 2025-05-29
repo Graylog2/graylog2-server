@@ -1,4 +1,5 @@
 type = "f"
-message = "Fixes the user to create input even if stream does not contain any messages."
+message = "Allow the Kinesis/Cloudwatch input to be created for empty Kinesis streams."
 
 issues = ["22138"]
+pulls = ["22370"]

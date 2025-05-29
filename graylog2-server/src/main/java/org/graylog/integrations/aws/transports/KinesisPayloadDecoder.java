@@ -79,7 +79,7 @@ public class KinesisPayloadDecoder {
         // This method will be called from a codec, and therefore will not perform any detection. It will rely
         // exclusively on the AWSMessageType detected in the setup HealthCheck.
         // If a user needs to change the type of data stored in a stream, they will need to set the integration up again.
-        if (awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS || awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_RAW) {
+        if (awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS || awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_RAW || awsMessageType == AWSMessageType.NONE) {
             final CloudWatchLogSubscriptionData logSubscriptionData = decompressCloudWatchMessages(payloadBytes, objectMapper);
             String streamArn = KinesisService.getStreamArn(kinesisStream, region);
             return logSubscriptionData.logEvents().stream()

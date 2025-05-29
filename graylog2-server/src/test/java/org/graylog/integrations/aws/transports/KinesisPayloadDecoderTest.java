@@ -36,7 +36,6 @@ public class KinesisPayloadDecoderTest {
 
     private KinesisPayloadDecoder flowLogDecoder;
     private KinesisPayloadDecoder rawDecoder;
-
     public static final String TEST_REGION = "ap-northeast-1";
 
     @Before
@@ -44,7 +43,7 @@ public class KinesisPayloadDecoderTest {
 
         flowLogDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
                 AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
-                "", TEST_REGION);
+                "a-stream", TEST_REGION);
 
         rawDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
                 AWSMessageType.KINESIS_RAW,

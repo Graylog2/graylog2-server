@@ -73,6 +73,14 @@ const EditAnchor = styled.a`
   }
 `;
 
+const ArnErrorMessage = styled.span`
+  color: #856404;
+  background-color: #fff3cd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+`;
+
 type DefaultProps = {
   value: string;
 };
@@ -241,8 +249,17 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
           </li>
           <li>
             <strong>Stream ARN</strong>
-            <span>{awsCloudwatchKinesisStreamArn}</span>
+            <span>
+              {awsCloudwatchKinesisStreamArn.startsWith("ERROR:") ? (
+                <ArnErrorMessage>
+                  {awsCloudwatchKinesisStreamArn.replace("ERROR: ", "")}
+                </ArnErrorMessage>
+              ) : (
+                awsCloudwatchKinesisStreamArn
+              )}
+            </span>
           </li>
+
           <li>
             <strong>Global Input</strong>
             <span>

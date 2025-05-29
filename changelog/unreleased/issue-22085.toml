@@ -1,4 +1,5 @@
 type = "f"
-message = "Add missing data fileds to the messages."
+message = "Add additional data fields for the Kinesis/Cloudwatch input."
 
 issues = ["22085"]
+pulls = ["22370"]

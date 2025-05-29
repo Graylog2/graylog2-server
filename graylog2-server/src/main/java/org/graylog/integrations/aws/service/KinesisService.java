@@ -546,12 +546,6 @@ public class KinesisService {
 
     public static String getStreamArn(String streamName, String regionName) {
 
-         /* For testing purpose,In order to prevent calling original
-             AWS SDK methods this condition is used.*/
-        if (streamName.isEmpty()) {
-            return "arn:aws:kinesis:" + regionName + ":000000000000:stream/";
-        }
-
         Region region = Region.of(regionName);
         try (KinesisClient kinesisClient = KinesisClient.builder()
                 .region(region)
@@ -564,6 +558,9 @@ public class KinesisService {
             DescribeStreamResponse response = kinesisClient.describeStream(request);
             StreamDescription description = response.streamDescription();
             return description.streamARN();
+        } catch (Exception e) {
+            LOG.error("Failed to get stream ARN for stream: " + streamName);
+            return "ERROR: Failed to get stream ARN. Please ensure the IAM role includes the 'kinesis:DescribeStream' permission.";
         }
     }
 }
