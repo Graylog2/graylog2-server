@@ -37,6 +37,7 @@ const DEFAULT_ICONS: Record<NavIconType, IconName> = {
 const SvgContainer = styled.div`
   svg {
     width: 100%;
+    max-width: 30px;
     height: 22px;
     display: block;
     fill: currentColor;
