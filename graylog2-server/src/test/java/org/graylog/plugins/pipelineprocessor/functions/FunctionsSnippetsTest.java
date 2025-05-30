@@ -1543,6 +1543,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Long manilaHour = (Long) message.getField("manilaHour");
         assertThat(utcHour).isEqualTo(10);
         assertThat(manilaHour).isEqualTo(18);
+        assertThat(message.getField("null_value")).isNull();
     }
 
     @Test
