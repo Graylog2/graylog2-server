@@ -24,7 +24,7 @@ import RuleListEntry from './RuleListEntry';
 type Props = {
   rules: Array<RuleType>;
   rulesContext?: RulesContext;
-  onDelete: (RuleType) => () => void;
+  onDelete: (ruleType: RuleType) => () => void;
   searchFilter: React.ReactNode;
 };
 
