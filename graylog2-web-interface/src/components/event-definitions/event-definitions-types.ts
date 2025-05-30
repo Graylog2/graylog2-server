@@ -117,7 +117,7 @@ export type EventDefinitionFormControlsProps = {
   onOpenNextPage: () => void;
   onOpenPrevPage: () => void;
   onSubmit: (event: SyntheticEvent) => void;
-  steps: StepsType;
+  steps: StepsType<string>;
 };
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>
