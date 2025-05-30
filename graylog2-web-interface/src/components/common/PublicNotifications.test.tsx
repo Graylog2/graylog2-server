@@ -24,7 +24,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 import PublicNotifications from './PublicNotifications';
 
-const mockedNotifications = {
+const mockedNotifications: Notifications = {
   '607468afaaa2380afe0757f1': {
     title: "A really long title that really shouldn't be this long but people sometimes are do it",
     shortMessage: 'zxcvzxcv',
@@ -58,8 +58,8 @@ const mockedNotifications = {
     isGlobal: true,
     isDismissible: true,
   },
-} as Notifications;
-const mockedConfigNotifications = {
+};
+const mockedConfigNotifications: Notifications = {
   '607468afaaa2380afe0757f1': {
     title: "A really long title that really shouldn't be this long but people sometimes are do it",
     shortMessage: 'zxcvzxcv',
@@ -71,7 +71,7 @@ const mockedConfigNotifications = {
     isGlobal: false,
     isDismissible: false,
   },
-} as Notifications;
+};
 
 jest.mock('hooks/usePluginEntities');
 
