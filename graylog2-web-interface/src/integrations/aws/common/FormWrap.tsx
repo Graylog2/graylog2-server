@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
 
 import { Button, Panel } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -40,48 +40,6 @@ type FormWrapProps = {
   className?: string;
 };
 
-const FormWrap = ({
-  buttonContent = 'Submit',
-  children,
-  className = undefined,
-  disabled = false,
-  description = null,
-  error = null,
-  loading = false,
-  onSubmit = () => {},
-  title = null,
-}: FormWrapProps) => {
-  const formRef = useRef();
-  const [disabledButton, setDisabledButton] = useState(disabled);
-
-  const prevent = (event) => {
-    event.preventDefault();
-
-    return false;
-  };
-
-  useEffect(() => {
-    setDisabledButton(loading || disabled);
-  }, [loading, disabled]);
-
-  return (
-    <form onSubmit={prevent} autoComplete="off" noValidate className={className} ref={formRef}>
-      {title && (typeof title === 'string' ? <h2>{title}</h2> : title)}
-      {description && (typeof description === 'string' ? <p>{description}</p> : description)}
-
-      {error && error.full_message && (
-        <ErrorMessage fullMessage={error.full_message} niceMessage={error.nice_message} />
-      )}
-
-      {children}
-
-      <Button type="button" onClick={disabledButton ? null : onSubmit} bsStyle="primary" disabled={disabledButton}>
-        {loading ? 'Loading...' : buttonContent}
-      </Button>
-    </form>
-  );
-};
-
 const ErrorOutputStyle = createGlobalStyle`
   /* NOTE: This is to remove Bootstrap styles from the anchor element I can't override in Panel.Header */
   form {
@@ -103,10 +61,10 @@ const ErrorOutput = styled.span`
   display: block;
 `;
 
-const ErrorToggleInfo = styled.button`
+const ErrorToggleInfo = styled.button<{ isDarkMode: boolean }>`
   border: 0;
   background: none;
-  color: #1f1f1f;
+  color:${({ isDarkMode }) => (isDarkMode ? 'white' : 'black')};
   font-size: 11px;
   text-transform: uppercase;
   margin: 12px 0 0;
@@ -122,13 +80,15 @@ const MoreIcon = styled(Icon)<{ expanded: boolean }>(
 
 export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessageProps) => {
   const [expanded, toggleExpanded] = useState(false);
+  const theme = useTheme();
+  const isDarkMode = theme.mode === 'dark';
 
   const Header = (
     <>
       <ErrorOutputStyle />
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
       {niceMessage && (
-        <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
+        <ErrorToggleInfo isDarkMode={isDarkMode} onClick={() => toggleExpanded(!expanded)}>
           More Info <MoreIcon name="chevron_right" expanded={expanded} />
         </ErrorToggleInfo>
       )}
@@ -144,6 +104,49 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       <strong>Additional Information: </strong>
       {fullMessage}
     </Panel>
+  );
+};
+
+const FormWrap = ({
+  buttonContent = 'Submit',
+  children,
+  className = undefined,
+  disabled = false,
+  description = null,
+  error = null,
+  loading = false,
+  onSubmit = () => { },
+  title = null,
+}: FormWrapProps) => {
+  const formRef = useRef();
+  const [disabledButton, setDisabledButton] = useState(disabled);
+
+  const prevent = (event) => {
+    event.preventDefault();
+
+    return false;
+  };
+
+
+  useEffect(() => {
+    setDisabledButton(loading || disabled);
+  }, [loading, disabled]);
+
+  return (
+    <form onSubmit={prevent} autoComplete="off" noValidate className={className} ref={formRef}>
+      {title && (typeof title === 'string' ? <h2>{title}</h2> : title)}
+      {description && (typeof description === 'string' ? <p>{description}</p> : description)}
+
+      {error && error.full_message && (
+        <ErrorMessage fullMessage={error.full_message} niceMessage={error.nice_message} />
+      )}
+
+      {children}
+
+      <Button type="button" onClick={disabledButton ? null : onSubmit} bsStyle="primary" disabled={disabledButton}>
+        {loading ? 'Loading...' : buttonContent}
+      </Button>
+    </form>
   );
 };
 

@@ -28,6 +28,59 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 
+const Container = styled.div`
+  border: 1px solid #a6afbd;
+  margin: 25px 0;
+  padding: 15px;
+  border-radius: 4px;
+`;
+
+const Subheader = styled.h3`
+  margin: 0 0 10px;
+`;
+
+const ReviewItems = styled.ul`
+  list-style: none;
+  margin: 0 0 25px 10px;
+  padding: 0;
+
+  li {
+    padding: 5px;
+
+    &:nth-of-type(odd) {
+      background-color: rgb(220 225 229 / 40%);
+    }
+  }
+
+  strong::after {
+    content: ':';
+    margin-right: 5px;
+  }
+`;
+
+const EditAnchor = styled.a`
+  font-size: 12px;
+  margin-left: 5px;
+  font-style: italic;
+  cursor: pointer;
+
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+`;
+
+const ArnErrorMessage = styled.span`
+  color: #856404;
+  background-color: #fff3cd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+`;
+
 type DefaultProps = {
   value: string;
 };
@@ -67,6 +120,9 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const overrideSource = formData.overrideSource?.value ?? '';
+  const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
+
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
@@ -82,6 +138,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
+      override_source: overrideSource,
     },
   );
 
@@ -190,6 +248,19 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <span>{awsCloudWatchKinesisStream.value}</span>
           </li>
           <li>
+            <strong>Stream ARN</strong>
+            <span>
+              {awsCloudwatchKinesisStreamArn.startsWith("ERROR:") ? (
+                <ArnErrorMessage>
+                  {awsCloudwatchKinesisStreamArn.replace("ERROR: ", "")}
+                </ArnErrorMessage>
+              ) : (
+                awsCloudwatchKinesisStreamArn
+              )}
+            </span>
+          </li>
+
+          <li>
             <strong>Global Input</strong>
             <span>
               <Icon name="check" />
@@ -243,50 +314,5 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     </FormWrap>
   );
 };
-
-const Container = styled.div`
-  border: 1px solid #a6afbd;
-  margin: 25px 0;
-  padding: 15px;
-  border-radius: 4px;
-`;
-
-const Subheader = styled.h3`
-  margin: 0 0 10px;
-`;
-
-const ReviewItems = styled.ul`
-  list-style: none;
-  margin: 0 0 25px 10px;
-  padding: 0;
-
-  li {
-    padding: 5px;
-
-    &:nth-of-type(odd) {
-      background-color: rgb(220 225 229 / 40%);
-    }
-  }
-
-  strong::after {
-    content: ':';
-    margin-right: 5px;
-  }
-`;
-
-const EditAnchor = styled.a`
-  font-size: 12px;
-  margin-left: 5px;
-  font-style: italic;
-  cursor: pointer;
-
-  &::before {
-    content: '(';
-  }
-
-  &::after {
-    content: ')';
-  }
-`;
 
 export default StepReview;
