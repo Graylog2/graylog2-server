@@ -59,7 +59,7 @@ public class OutputServiceImpl implements OutputService {
         this.streamService = streamService;
         final String collectionName = OutputImpl.class.getAnnotation(DbEntity.class).collection();
         this.collection = mongoCollections.nonEntityCollection(collectionName, OutputImpl.class);
-        this.rawCollection = collection.withDocumentClass(Document.class);
+        this.rawCollection = mongoCollections.nonEntityCollection(collectionName, Document.class);
         this.clusterEventBus = clusterEventBus;
     }
 

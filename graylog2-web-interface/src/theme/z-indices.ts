@@ -14,25 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { Icon } from 'components/common';
-
-type Props = {
-  invalidStepKeys: Array<string>;
-  stepKey: string;
-};
-
-const StepTitleWarning = ({ invalidStepKeys = [], stepKey }: Props) => {
-  if (invalidStepKeys.includes(stepKey)) {
-    return (
-      <>
-        <Icon name="warning" />{' '}
-      </>
-    );
-  }
-
-  return null;
-};
-
-export default StepTitleWarning;
+const modalBase = 1040;
+const zIndices = {
+  modalOverlay: modalBase,
+  modalBody: modalBase + 10,
+  notifications: modalBase + 11,
+} as const;
+export default zIndices;

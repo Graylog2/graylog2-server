@@ -30,7 +30,7 @@ type Props = {
   groupLabel: string;
   checked: Checked;
   labels: { [name: string]: JSX.Element };
-  onChange: (Checked) => void;
+  onChange: (newChecked: Checked) => void;
 };
 
 const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {

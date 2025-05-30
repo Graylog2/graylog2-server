@@ -19,30 +19,22 @@ package org.graylog2.database.utils;
 import com.google.common.collect.Streams;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReplaceOptions;
-import com.mongodb.client.model.ReturnDocument;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
-import org.bson.BsonDocument;
-import org.bson.BsonDocumentWriter;
 import org.bson.BsonValue;
-import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoEntity;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Utility methods to interact with MongoDB collections of document types that extend {@link MongoEntity}. Some static
@@ -208,36 +200,6 @@ public class MongoUtils<T extends MongoEntity> {
      */
     public boolean deleteById(String id) {
         return deleteById(new ObjectId(id));
-    }
-
-    /**
-     * Convenience method to atomically get or create the given entity. If the collection doesn't contain an entity
-     * with the entity's ID, it will be created and returned. If the entity exists, the method returns the unmodified
-     * entity from the collection.
-     * <p>
-     * The entity's ID must not be null!
-     *
-     * @param entity the entity to
-     * @return the existing or newly created entity
-     * @throws NullPointerException when the entity or entity ID is null
-     */
-    public T getOrCreate(T entity) {
-        requireNonNull(entity, "entity cannot be null");
-        final var entityId = new ObjectId(requireNonNull(entity.id(), "entity ID cannot be null"));
-
-        final var codec = collection.getCodecRegistry().get(collection.getDocumentClass());
-        try (var writer = new BsonDocumentWriter(new BsonDocument())) {
-            // Convert the DTO class to a Bson object, so we can use it with $setOnInsert
-            codec.encode(writer, entity, EncoderContext.builder().build());
-
-            return collection.findOneAndUpdate(
-                    idEq(entityId),
-                    Updates.setOnInsert(writer.getDocument()),
-                    new FindOneAndUpdateOptions()
-                            .returnDocument(ReturnDocument.AFTER)
-                            .upsert(true)
-            );
-        }
     }
 
     /**
