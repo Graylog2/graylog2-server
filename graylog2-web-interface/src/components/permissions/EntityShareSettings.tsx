@@ -37,7 +37,7 @@ type Props = {
   entityType: SharedEntity['type'];
   entityTitle: SharedEntity['title'];
   entityShareState: EntityShareState;
-  setDisableSubmit: (boolean) => void;
+  setDisableSubmit: (disabled: boolean) => void;
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>;
   showShareableEntityURL?: boolean;
   entityTypeTitle?: string | null | undefined;

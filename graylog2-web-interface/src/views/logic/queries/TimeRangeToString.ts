@@ -48,7 +48,10 @@ const relativeTimeRangeToString = (timerange: RelativeTimeRange): string => {
   return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to', 'Now')}`;
 };
 
-const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (str) => str): string => {
+const absoluteTimeRangeToString = (
+  timerange: AbsoluteTimeRange,
+  localizer = (dateTime: string) => dateTime,
+): string => {
   const { from, to } = timerange;
 
   return `${localizer(from)} - ${localizer(to)}`;
@@ -56,7 +59,7 @@ const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (st
 
 const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => timerange.keyword;
 
-const TimeRangeToString = (timerange?: TimeRange, localizer?: (string) => string): string => {
+const TimeRangeToString = (timerange?: TimeRange, localizer?: (dateTime: string) => string): string => {
   const { type } = timerange || {};
 
   switch (type) {

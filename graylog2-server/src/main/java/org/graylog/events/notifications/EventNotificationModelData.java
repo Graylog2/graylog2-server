@@ -25,7 +25,6 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Data object that can be used in notifications to provide structured data to plugins.
@@ -94,17 +93,21 @@ public abstract class EventNotificationModelData {
     }
 
     public static EventNotificationModelData of(EventNotificationContext ctx, List<MessageSummary> backlog) {
-        final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
-        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
+        return of(ctx.eventDefinition().orElse(null),
+                ctx.jobTrigger().orElse(null),
+                ctx.event(),
+                backlog);
+    }
 
+    public static EventNotificationModelData of(EventDefinitionDto definitionDto, JobTriggerDto jobTriggerDto, EventDto event, List<MessageSummary> backlog) {
         return EventNotificationModelData.builder()
-                .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
-                .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
-                .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
-                .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
-                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
-                .event(ctx.event())
+                .eventDefinitionId(definitionDto != null ? definitionDto.id() : UNKNOWN)
+                .eventDefinitionType(definitionDto != null ? definitionDto.config().type() : UNKNOWN)
+                .eventDefinitionTitle(definitionDto != null ? definitionDto.title() : UNKNOWN)
+                .eventDefinitionDescription(definitionDto != null ? definitionDto.description() : UNKNOWN)
+                .jobDefinitionId(jobTriggerDto != null ? jobTriggerDto.jobDefinitionId() : UNKNOWN)
+                .jobTriggerId(jobTriggerDto != null ? jobTriggerDto.id() : UNKNOWN)
+                .event(event)
                 .backlog(backlog)
                 .build();
     }

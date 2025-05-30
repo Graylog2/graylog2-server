@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-export type ViewLoaderContextType = (string) => unknown;
+export type ViewLoaderContextType = (viewId: string) => unknown;
 
 const ViewLoaderContext = React.createContext<ViewLoaderContextType | undefined>(undefined);
 
