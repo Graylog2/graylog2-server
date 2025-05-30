@@ -290,8 +290,9 @@ const RuleBuilder = () => {
           app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
         },
       );
-      
-      const {_scope, ...updatedRule} = rule;
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _scope , ...updatedRule } = rule;
       await updateRule(updatedRule);
       if (closeAfter) handleCancel();
     } else {
