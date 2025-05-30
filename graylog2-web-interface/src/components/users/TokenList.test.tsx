@@ -142,7 +142,8 @@ describe('<TokenList />', () => {
   });
 
   it('should delete a token', async () => {
-    render(<TokenList tokens={tokens} user={alice} />);
+    const onDeleteFn = jest.fn();
+    render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn}/>);
 
     (await screen.findAllByRole('button', { name: 'Delete' }))[0].click();
     await screen.findByRole('heading', {
@@ -154,6 +155,10 @@ describe('<TokenList />', () => {
     await waitFor(() => {
       expect(deleteToken).toHaveBeenCalledTimes(1);
     });
+
+    await waitFor(() => {
+      expect(onDeleteFn).toHaveBeenCalledTimes(1);
+    })
   });
 
   it('show include token last access time', async () => {

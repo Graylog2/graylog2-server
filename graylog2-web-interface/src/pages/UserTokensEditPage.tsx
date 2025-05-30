@@ -112,6 +112,7 @@ const UserEditPage = ({ params }: Props) => {
               user={loadedUser}
               onCreate={_handleTokenCreate}
               creatingToken={creatingToken}
+              onDelete={loadTokens}
             />
           ) : (
             <Row>

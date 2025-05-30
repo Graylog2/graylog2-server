@@ -61,9 +61,10 @@ type Props = {
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => Promise<Token>;
   tokens?: TokenSummary[];
   user: User;
+  onDelete?: () => void;
 };
 
-const TokenList = ({ creatingToken = false, onCreate, user, tokens = [] }: Props) => {
+const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {}, tokens = [] }: Props) => {
   const currentUser = useCurrentUser();
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
@@ -151,7 +152,8 @@ const TokenList = ({ creatingToken = false, onCreate, user, tokens = [] }: Props
                     <TokenActions
                       userId={currentUser.id}
                       tokenId={token.id}
-                      tokenName={token.name} />
+                      tokenName={token.name}
+                      onDeleteCb={onDelete} />
                   </td>
                 </tr>
               );
