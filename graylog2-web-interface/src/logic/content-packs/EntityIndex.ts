@@ -42,6 +42,7 @@ export default class EntityIndex {
   toBuilder() {
     const { id, title, type } = this._value;
 
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ id, title, type }));
   }
 

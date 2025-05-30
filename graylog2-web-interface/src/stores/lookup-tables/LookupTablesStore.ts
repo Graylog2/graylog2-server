@@ -367,7 +367,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
           if (error.additional.body[0].message_template) {
             return;
           }
-        } catch (e) {
+        } catch (_e) {
           // ignored
         }
 
@@ -375,7 +375,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
 
         try {
           errorMessage = error.additional.body.message;
-        } catch (e) {
+        } catch (_e) {
           errorMessage = error.message;
         }
 

@@ -43,7 +43,7 @@ const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array
 
   return [
     ...createdDecorators.map(
-      ({ id, ...newDecorator }) =>
+      ({ id: _id, ...newDecorator }) =>
         () =>
           DecoratorsActions.create(newDecorator),
     ),

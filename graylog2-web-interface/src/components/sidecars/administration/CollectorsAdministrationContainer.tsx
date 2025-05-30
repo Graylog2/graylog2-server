@@ -44,7 +44,7 @@ type Props = {
   paginationQueryParameter: PaginationQueryParameterResult;
 };
 
-const CollectorsAdministrationContainer = (props: Props) => {
+const CollectorsAdministrationContainer = ({ ...props }: Props) => {
   const collectors = useStore(CollectorsStore);
   const sidecars = useStore(SidecarsAdministrationStore);
   const configurations = useStore(CollectorConfigurationsStore);

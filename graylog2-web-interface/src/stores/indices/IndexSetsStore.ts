@@ -350,7 +350,7 @@ export const IndexSetsStore = singletonStore('core.IndexSets', () =>
         }
 
         return error.additional.body.message;
-      } catch (e) {
+      } catch (_e) {
         return error.message;
       }
     },

@@ -18,6 +18,7 @@ const ignorePattern = '^(_|ignored)';
 const noUnusedVarsOptions = {
   argsIgnorePattern: ignorePattern,
   caughtErrorsIgnorePattern: ignorePattern,
+  varsIgnorePattern: ignorePattern,
 };
 
 module.exports = {

@@ -122,7 +122,6 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   return (
     <span>
       <SelectPopover
-        id="process-management-action"
         title="Manage collector processes"
         triggerNode={
           <Button bsStyle="primary" bsSize="small">

@@ -37,7 +37,7 @@ export const fetchSearchVersionCheck = async ({ queryKey }) => {
 
     return data;
   } catch (e) {
-    return UserNotification.error('Could not fetch override data.');
+    return UserNotification.error(`Could not fetch override data. Error: ${e}`);
   }
 };
 

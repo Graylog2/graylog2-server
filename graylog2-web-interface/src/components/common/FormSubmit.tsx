@@ -68,7 +68,7 @@ const isWithCancelProps = (props: Props): props is WithCancelProps =>
 // @ts-expect-error
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
-const FormSubmit = (props: Props) => {
+const FormSubmit = ({ ...props }: Props) => {
   const {
     bsSize,
     className,

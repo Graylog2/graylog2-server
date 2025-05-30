@@ -24,6 +24,10 @@ import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 
+const StyledFormWrap = styled(FormWrap)`
+  padding-top: 25px;
+`;
+
 type SkipHealthCheckProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
@@ -59,9 +63,5 @@ const SkipHealthCheck = ({ onChange, onSubmit }: SkipHealthCheckProps) => {
     </AdditionalFields>
   );
 };
-
-const StyledFormWrap = styled(FormWrap)`
-  padding-top: 25px;
-`;
 
 export default SkipHealthCheck;

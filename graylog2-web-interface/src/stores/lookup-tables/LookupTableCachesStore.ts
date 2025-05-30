@@ -235,7 +235,7 @@ export const LookupTableCachesStore = singletonStore('core.LookupTableCaches', (
 
         try {
           errorMessage = error.additional.body.message;
-        } catch (e) {
+        } catch (_e) {
           errorMessage = error.message;
         }
 

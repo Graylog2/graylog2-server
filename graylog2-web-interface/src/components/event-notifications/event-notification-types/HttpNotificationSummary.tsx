@@ -22,7 +22,7 @@ import CommonNotificationSummary from './CommonNotificationSummary';
 
 type HttpNotificationSummaryProps = React.ComponentProps<EventNotificationTypes['summaryComponent']>;
 
-const HttpNotificationSummary = (props: HttpNotificationSummaryProps) => (
+const HttpNotificationSummary = ({ ...props }: HttpNotificationSummaryProps) => (
   <CommonNotificationSummary {...props}>
     <tr>
       <td>URL</td>

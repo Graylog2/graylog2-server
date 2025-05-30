@@ -287,7 +287,7 @@ const CollectorsAdministration = ({
           id: result.collector_id,
         };
       }
-    } catch (e) {
+    } catch (_e) {
       // Do nothing
     }
 
