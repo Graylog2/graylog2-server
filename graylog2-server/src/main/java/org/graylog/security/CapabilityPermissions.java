@@ -19,9 +19,15 @@ package org.graylog.security;
 import java.util.Set;
 
 public interface CapabilityPermissions {
-    Set<String> readPermissions();
+    default Set<String> readPermissions() {
+        return Set.of();
+    }
 
-    Set<String> editPermissions();
+    default Set<String> editPermissions() {
+        return Set.of();
+    }
 
-    Set<String> deletePermissions();
+    default Set<String> deletePermissions() {
+        return Set.of();
+    }
 }
