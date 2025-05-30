@@ -17,10 +17,9 @@
 import * as React from 'react';
 
 import { Icon } from 'components/common';
-import type { StepKey } from 'components/common/Wizard';
 
 type Props = {
-  invalidStepKeys: Array<StepKey>;
+  invalidStepKeys: Array<string>;
   stepKey: string;
 };
 
