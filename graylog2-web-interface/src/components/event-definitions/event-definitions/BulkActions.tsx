@@ -65,7 +65,10 @@ const BulkActions = () => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const refetchEventDefinitions = useCallback(
-    () => queryClient.invalidateQueries(['eventDefinition', 'overview']),
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: ['eventDefinition', 'overview'],
+      }),
     [queryClient],
   );
 

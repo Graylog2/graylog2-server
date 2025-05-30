@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -29,7 +29,7 @@ const useEventDefinition = (eventDefId: string, enabled = true) => {
     queryKey: ['get-event-definition-details', eventDefId],
     queryFn: () => defaultOnError(fetchEventDefinitionDetails(eventDefId), 'Loading archives failed with status'),
     retry: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     enabled: !!eventDefId && enabled,
   });
 

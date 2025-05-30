@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 import fetch from 'logic/rest/FetchProvider';
@@ -40,18 +40,20 @@ const fetchUserLayoutPreferences = (entityId: string) =>
 const useUserLayoutPreferences = <T>(
   entityId: string,
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
-  const { data, isInitialLoading, refetch } = useQuery(
-    ['table-layout', entityId],
-    () =>
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: ['table-layout', entityId],
+
+    queryFn: () =>
       defaultOnError(
         fetchUserLayoutPreferences(entityId),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
-    {
-      keepPreviousData: true,
-      staleTime: 60 * (60 * 1000), // 1 hour
-    },
-  );
+
+    placeholderData: keepPreviousData,
+
+    // 1 hour
+    staleTime: 60 * (60 * 1000),
+  });
 
   return {
     data: data ?? INITIAL_DATA,

@@ -25,13 +25,6 @@ import { overriddenIndexField, overriddenIndexFieldJson } from 'fixtures/indexSe
 
 const urlPrefix = '/system/indices/mappings/remove_mapping';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -69,13 +62,11 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         }),
       );
 
-      const { result, waitFor } = renderHook(
-        () =>
-          useRemoveCustomFieldTypeMutation({
-            onSuccessHandler: mockOnSuccessHandler,
-            onErrorHandler: mockOnErrorHandler,
-          }),
-        { queryClientOptions: { logger } },
+      const { result, waitFor } = renderHook(() =>
+        useRemoveCustomFieldTypeMutation({
+          onSuccessHandler: mockOnSuccessHandler,
+          onErrorHandler: mockOnErrorHandler,
+        }),
       );
 
       act(() => {
@@ -104,13 +95,11 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(
-        () =>
-          useRemoveCustomFieldTypeMutation({
-            onSuccessHandler: mockOnSuccessHandler,
-            onErrorHandler: mockOnErrorHandler,
-          }),
-        { queryClientOptions: { logger } },
+      const { result, waitFor } = renderHook(() =>
+        useRemoveCustomFieldTypeMutation({
+          onSuccessHandler: mockOnSuccessHandler,
+          onErrorHandler: mockOnErrorHandler,
+        }),
       );
 
       act(() => {
@@ -137,13 +126,11 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         }),
       );
 
-      const { result, waitFor } = renderHook(
-        () =>
-          useRemoveCustomFieldTypeMutation({
-            onSuccessHandler: mockOnSuccessHandler,
-            onErrorHandler: mockOnErrorHandler,
-          }),
-        { queryClientOptions: { logger } },
+      const { result, waitFor } = renderHook(() =>
+        useRemoveCustomFieldTypeMutation({
+          onSuccessHandler: mockOnSuccessHandler,
+          onErrorHandler: mockOnErrorHandler,
+        }),
       );
 
       act(() => {

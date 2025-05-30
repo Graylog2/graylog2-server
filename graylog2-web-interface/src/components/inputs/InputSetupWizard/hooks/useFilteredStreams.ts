@@ -43,13 +43,16 @@ const useStreams = (): {
   data: StreamsResponse;
   isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery<StreamsResponse, FetchError>([STREAMS_NO_SECURITY_ID], () =>
-    onError(getStreams(), (errorThrown: FetchError) => {
-      if (!(errorThrown.status === 404)) {
-        UserNotification.error(`Loading streams failed with: ${errorThrown}`);
-      }
-    }),
-  );
+  const { data, isLoading } = useQuery({
+    queryKey: [STREAMS_NO_SECURITY_ID],
+
+    queryFn: () =>
+      onError(getStreams(), (errorThrown: FetchError) => {
+        if (!(errorThrown.status === 404)) {
+          UserNotification.error(`Loading streams failed with: ${errorThrown}`);
+        }
+      }),
+  });
 
   return {
     data: data ?? INITIAL_DATA,

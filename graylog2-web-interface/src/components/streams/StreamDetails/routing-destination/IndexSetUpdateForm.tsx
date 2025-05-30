@@ -76,7 +76,9 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
     StreamsStore.update(stream.id, values, (response) => {
       UserNotification.success(`IndexSet of stream'${stream.title}' was updated successfully.`, 'Success');
       setShowModal(false);
-      queryClient.invalidateQueries(['stream', stream.id]);
+      queryClient.invalidateQueries({
+        queryKey: ['stream', stream.id],
+      });
 
       return response;
     });

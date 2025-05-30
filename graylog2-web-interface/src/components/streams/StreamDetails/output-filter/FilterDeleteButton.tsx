@@ -38,7 +38,9 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
 
   const onConfirmDelete = async () => {
     await removeStreamOutputRule({ streamId, filterId: filterOutputRule.id }).then(() => {
-      queryClient.invalidateQueries(['streams']);
+      queryClient.invalidateQueries({
+        queryKey: ['streams'],
+      });
     });
 
     setShowDialog(false);
