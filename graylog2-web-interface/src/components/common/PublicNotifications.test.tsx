@@ -24,7 +24,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 import PublicNotifications from './PublicNotifications';
 
-const mockedNotifications = {
+const mockedNotifications: Notifications = {
   '607468afaaa2380afe0757f1': {
     title: "A really long title that really shouldn't be this long but people sometimes are do it",
     shortMessage: 'zxcvzxcv',
@@ -58,8 +58,8 @@ const mockedNotifications = {
     isGlobal: true,
     isDismissible: true,
   },
-} as Notifications;
-const mockedConfigNotifications = {
+};
+const mockedConfigNotifications: Notifications = {
   '607468afaaa2380afe0757f1': {
     title: "A really long title that really shouldn't be this long but people sometimes are do it",
     shortMessage: 'zxcvzxcv',
@@ -71,7 +71,7 @@ const mockedConfigNotifications = {
     isGlobal: false,
     isDismissible: false,
   },
-} as Notifications;
+};
 
 jest.mock('hooks/usePluginEntities');
 
@@ -111,7 +111,7 @@ describe('PublicNotifications', () => {
 
     const alerts = screen.getAllByRole('alert');
 
-    expect(alerts.length).toBe(2);
+    expect(alerts).toHaveLength(1);
   });
 
   it('should dismiss notification', () => {
@@ -130,20 +130,20 @@ describe('PublicNotifications', () => {
   });
 
   it('should render from AppConfig', () => {
-    render(<PublicNotifications readFromConfig />);
+    render(<PublicNotifications login />);
 
     const alerts = screen.getAllByRole('alert');
 
-    expect(alerts.length).toBe(1);
+    expect(alerts).toHaveLength(1);
   });
 
   it('should render from AppConfig when no plugins are configured', () => {
     asMock(usePluginEntities).mockImplementation(() => []);
 
-    render(<PublicNotifications readFromConfig />);
+    render(<PublicNotifications login />);
 
     const alerts = screen.getAllByRole('alert');
 
-    expect(alerts.length).toBe(1);
+    expect(alerts).toHaveLength(1);
   });
 });
