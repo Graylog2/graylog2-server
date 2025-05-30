@@ -20,9 +20,14 @@ import { Button, ButtonToolbar } from 'components/bootstrap';
 import { ConfirmDialog } from 'components/common';
 import useDeleteTokenMutation from 'components/users/UsersTokenManagement/hooks/useDeleteTokenMutation';
 
-type Props = { userId: string; tokenId: string; tokenName: string };
+type Props = {
+  userId: string;
+  tokenId: string;
+  tokenName: string;
+  onDeleteCb?: () => void;
+};
 
-const TokenActions = ({ userId, tokenId, tokenName }: Props) => {
+const TokenActions = ({ userId, tokenId, tokenName, onDeleteCb = () => {} }: Props) => {
   const { deleteToken } = useDeleteTokenMutation(userId, tokenId);
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -37,6 +42,7 @@ const TokenActions = ({ userId, tokenId, tokenName }: Props) => {
     deleteToken().then(() => {
       setShowDeleteDialog(false);
       setIsDeleting(false);
+      onDeleteCb();
     });
   };
 
