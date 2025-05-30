@@ -111,7 +111,7 @@ describe('PublicNotifications', () => {
 
     const alerts = screen.getAllByRole('alert');
 
-    expect(alerts.length).toBe(2);
+    expect(alerts).toHaveLength(1);
   });
 
   it('should dismiss notification', () => {
@@ -130,20 +130,20 @@ describe('PublicNotifications', () => {
   });
 
   it('should render from AppConfig', () => {
-    render(<PublicNotifications readFromConfig />);
+    render(<PublicNotifications login />);
 
     const alerts = screen.getAllByRole('alert');
 
-    expect(alerts.length).toBe(1);
+    expect(alerts).toHaveLength(1);
   });
 
   it('should render from AppConfig when no plugins are configured', () => {
     asMock(usePluginEntities).mockImplementation(() => []);
 
-    render(<PublicNotifications readFromConfig />);
+    render(<PublicNotifications login />);
 
     const alerts = screen.getAllByRole('alert');
 
-    expect(alerts.length).toBe(1);
+    expect(alerts).toHaveLength(1);
   });
 });
