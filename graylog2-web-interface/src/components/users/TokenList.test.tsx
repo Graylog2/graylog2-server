@@ -21,6 +21,8 @@ import type { Optional } from 'utility-types';
 
 import OriginalTokenList from 'components/users/TokenList';
 import { alice, serviceUser } from 'fixtures/users';
+import useDeleteTokenMutation from 'components/users/UsersTokenManagement/hooks/useDeleteTokenMutation';
+import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('components/common/ClipboardButton', () => 'clipboard-button');
 
@@ -44,14 +46,26 @@ const tokens = [
     tokenTtl: 'PT48H',
   },
 ];
-const TokenList = (props: Optional<React.ComponentProps<typeof OriginalTokenList>, 'onCreate' | 'onDelete'>) => (
-  <OriginalTokenList onCreate={async () => tokens[0]} onDelete={() => {}} {...props} />
+const TokenList = (props: Optional<React.ComponentProps<typeof OriginalTokenList>, 'onCreate'>) => (
+  <OriginalTokenList onCreate={async () => tokens[0]} {...props} />
 );
+
+const deleteToken =  jest.fn(() => Promise.resolve());
+
+jest.mock('components/users/UsersTokenManagement/hooks/useDeleteTokenMutation', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ deleteToken: jest.fn(() => Promise.resolve()) })),
+}));
+
 
 describe('<TokenList />', () => {
   beforeAll(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2020-12-09T17:42:00Z'));
+  });
+
+  beforeEach(() => {
+    asMock(useDeleteTokenMutation).mockImplementation(() => ({ deleteToken }));
   });
 
   afterAll(() => {
@@ -83,7 +97,7 @@ describe('<TokenList />', () => {
       });
     });
 
-    render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} user={alice} />);
+    render(<TokenList tokens={tokens} onCreate={createFn} user={alice} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
     userEvent.type(nameInput, 'hans');
@@ -114,7 +128,7 @@ describe('<TokenList />', () => {
       });
     });
 
-    render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} user={serviceUser} />);
+    render(<TokenList tokens={tokens} onCreate={createFn} user={serviceUser} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
     userEvent.type(nameInput, 'hans');
@@ -128,15 +142,23 @@ describe('<TokenList />', () => {
   });
 
   it('should delete a token', async () => {
-    const deleteFn = jest.fn();
-
-    render(<TokenList tokens={tokens} onDelete={deleteFn} user={alice} />);
+    const onDeleteFn = jest.fn();
+    render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn}/>);
 
     (await screen.findAllByRole('button', { name: 'Delete' }))[0].click();
+    await screen.findByRole('heading', {
+      name: /deleting token/i
+    });
+
+    userEvent.click(await screen.findByRole('button', { name: /Confirm/i }));
 
     await waitFor(() => {
-      expect(deleteFn).toHaveBeenCalledWith('abc1', 'Acme');
+      expect(deleteToken).toHaveBeenCalledTimes(1);
     });
+
+    await waitFor(() => {
+      expect(onDeleteFn).toHaveBeenCalledTimes(1);
+    })
   });
 
   it('show include token last access time', async () => {
