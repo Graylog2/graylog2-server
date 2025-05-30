@@ -20,8 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.integrations.aws.codecs.AWSCodec;
+import org.graylog.integrations.aws.codecs.KinesisRawLogCodec;
 import org.graylog.integrations.aws.service.AWSService;
-import org.graylog.integrations.aws.service.KinesisService;
 import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -205,14 +205,14 @@ public class AWSInput extends MessageInput {
                 CK_OVERRIDE_SOURCE,
                 "Override Source",
                 "",
-                "The source is set to the Kinesis message by default. Set this if you want to override it with a custom value.",
+                "The source is set to '%s' by default. Set this if you want to override it with a custom value.".formatted(KinesisRawLogCodec.SOURCE),
                 ConfigurationField.Optional.OPTIONAL);
     }
 
     public static TextField getKinesisStreamARNDefinition() {
         return new TextField(
                 KinesisTransport.CK_KINESIS_STREAM_ARN,
-                "Kinesis Stream Arn",
+                "Kinesis Stream ARN",
                 "",
                 "The ARN of the Kinesis stream.",
                 ConfigurationField.Optional.OPTIONAL);

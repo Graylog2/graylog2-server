@@ -35,8 +35,8 @@ import static org.graylog.integrations.aws.transports.KinesisTransport.CK_KINESI
 
 public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "CloudWatchRawLog";
-    public static final String SUBSCRIPTION_FILTERS = "subscription_filters";
-    public static final String STREAM_ARN = "stream_arn";
+    public static final String FIELD_SUBSCRIPTION_FILTERS = "aws_subscription_filters";
+    public static final String FIELD_STREAM_ARN = "aws_kinesis_stream_arn";
     public static final String SOURCE = "aws-kinesis-raw-logs";
     public static final String FIELD_MESSAGE_TYPE = "aws_kinesis_message_type";
     private static final String FIELD_OWNER = "aws_owner";
@@ -63,8 +63,8 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
             result.addField(FIELD_LOG_GROUP, logEvent.logGroup());
             result.addField(FIELD_LOG_STREAM, logEvent.logStream());
             result.addField(FIELD_MESSAGE_TYPE, logEvent.messageType());
-            result.addField(SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
-            result.addField(STREAM_ARN, streamArn);
+            result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
+            result.addField(FIELD_STREAM_ARN, streamArn);
 
             return Optional.of(result);
         } catch (Exception e) {
