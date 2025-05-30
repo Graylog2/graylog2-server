@@ -939,8 +939,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
         assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
         assertThat(message.getField("authority")).isEqualTo("admin:s3cr31@some.host.with.lots.of.subdomains.com:9999");
-        assertThat(((URL)message.getField("default_specified")).getHost()).isEqualTo("example.com");
+        assertThat(message.getField("invalid_default_specified")).isNull();
         assertThat(message.getField("default_null")).isNull();
+        // When an invalid default URL is specified, an exception should be thrown, since that is a pipeline coding error
+        final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        assertThat(context.evaluationErrors().size()).isEqualTo(1);
+        assertThat(context.evaluationErrors().get(0).toString()).contains("Could not parse a valid URL from: not-a-url");
     }
 
     @Test

@@ -22,11 +22,15 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.functions.conversion.AbstractConversion;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Optional;
 
+/**
+ * Converts a value to a valid URL using its string representation.
+ * If the input is null or malformed, return a null or a default URL.
+ * An exception will be thrown if the default URL is malformed, since that is a pipeline coding error.
+ */
 public class UrlConversion extends AbstractFunction<URL> {
 
     public static final String NAME = "to_url";
@@ -36,31 +40,30 @@ public class UrlConversion extends AbstractFunction<URL> {
 
     @Override
     public URL evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object urlValue = urlParam.required(args, context);
-        final String urlString = urlValue == null ? null : String.valueOf(urlValue);
+        final String urlString = String.valueOf(urlParam.required(args, context));
         try {
-            if (urlString == null) {
-                return getDefault(args, context);
-            }
-            return new URL(urlString);
+            return parseUrl(urlString);
         } catch (IllegalArgumentException e) {
             log.debug(context.pipelineErrorMessage("Unable to parse URL for string " + urlString), e);
-            return getDefault(args, context);
+            final Optional<String> defaultUrl = defaultParam.optional(args, context);
+            if (defaultUrl.isEmpty()) {
+                return null;
+            }
+            try {
+                return parseUrl(defaultUrl.get());
+            } catch (IllegalArgumentException e1) {
+                log.warn(context.pipelineErrorMessage("Parameter `default` for to_url() is not a valid URL: " + defaultUrl.get()));
+                throw Throwables.propagate(e1);
+            }
         }
     }
 
-    private URL getDefault(FunctionArgs args, EvaluationContext context) {
-
-        final Optional<String> defaultUrl = defaultParam.optional(args, context);
-        if (defaultUrl.isEmpty()) {
-            return null;
+    private static URL parseUrl(String urlString) {
+        final URL url = new URL(urlString);
+        if (!url.hasParsedUrl()) {
+            throw new IllegalArgumentException("Could not parse a valid URL from: " + urlString);
         }
-        try {
-            return new URL(defaultUrl.get());
-        } catch (IllegalArgumentException e1) {
-            log.warn(context.pipelineErrorMessage("Parameter `default` for to_url() is not a valid URL: " + defaultUrl.get()));
-            throw Throwables.propagate(e1);
-        }
+        return url;
     }
 
     @Override
