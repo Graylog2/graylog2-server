@@ -20,9 +20,10 @@ import DOMPurify from 'dompurify';
 
 import { Alert } from 'components/bootstrap';
 import { RelativeTime, Spinner } from 'components/common';
-import type { NotificationType } from 'stores/notifications/NotificationsStore';
-import { NotificationsActions } from 'stores/notifications/NotificationsStore';
-import useNotificationMessage from 'hooks/useNotificationMessage';
+import type { NotificationType } from 'components/notifications/types';
+import useNotificationDelete from 'components/notifications/useNotificationDelete';
+
+import useNotificationMessage from './useNotificationMessage';
 
 type Props = {
   notification: NotificationType;
@@ -49,15 +50,16 @@ const NotificationTimestamp = styled.span(
   `,
 );
 
-const _sanitizeDescription = (description) => DOMPurify.sanitize(description);
+const _sanitizeDescription = (description: string) => DOMPurify.sanitize(description);
 
 const Notification = ({ notification }: Props) => {
   const message = useNotificationMessage(notification);
+  const deleteNotification = useNotificationDelete();
 
   const _onClose = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Really delete this notification?')) {
-      NotificationsActions.delete(notification.type, notification.key);
+      deleteNotification({ type: notification.type, key: notification.key });
     }
   };
 

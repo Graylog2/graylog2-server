@@ -34,11 +34,6 @@ jest.mock('stores/sessions/SessionStore', () => ({
   SessionStore: MockStore(['isLoggedIn', jest.fn()]),
 }));
 
-jest.mock('stores/notifications/NotificationsStore', () => ({
-  NotificationsActions: { list: jest.fn() },
-  NotificationsStore: MockStore(),
-}));
-
 jest.mock('stores/users/CurrentUserStore', () => ({
   __esModule: true,
   CurrentUserStore: {

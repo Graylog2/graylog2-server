@@ -14,28 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import type { NotificationType } from 'stores/notifications/NotificationsStore';
-import { NotificationsStore, NotificationsActions } from 'stores/notifications/NotificationsStore';
+import { SystemNotificationMessage } from '@graylog/server-api';
+
+import NotificationsFactory from 'components/notifications/NotificationsFactory';
+import type { NotificationType } from 'components/notifications/types';
+import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
 const useNotificationMessage = (notification: NotificationType) => {
-  const { messages } = useStore(NotificationsStore);
+  const { data } = useQuery({
+    queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', notification.type],
+    queryFn: () =>
+      SystemNotificationMessage.renderHtmlWithKey(
+        // @ts-expect-error Should be fixed
+        notification.type.toLocaleUpperCase(),
+        notification.key,
+        NotificationsFactory.getValuesForNotification(notification),
+      ),
+  });
 
-  useEffect(() => {
-    NotificationsActions.getHtmlMessage(
-      notification.type,
-      notification.key,
-      NotificationsFactory.getValuesForNotification(notification),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const key = `${notification.type}-${notification.key}`;
-
-  return messages?.[key];
+  return data;
 };
 
 export default useNotificationMessage;
