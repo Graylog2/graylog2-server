@@ -17,11 +17,11 @@
 import * as React from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
-import DOMPurify from 'dompurify';
 
 import { Button } from 'components/bootstrap';
-import { Icon, SourceCodeEditor } from 'components/common';
+import { Icon } from 'components/common';
 
+import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
 
 const Backdrop = styled.div`
@@ -72,12 +72,6 @@ const Row = styled.div`
   }
 `;
 
-const EditorWrapper = styled.div`
-  .ace_editor {
-    border: 1px solid ${({ theme }) => theme.colors.input.border} !important;
-  }
-`;
-
 type Props = {
   value: string;
   readOnly?: boolean;
@@ -109,9 +103,8 @@ function EditorModal({
 
   const handleOnChange = React.useCallback(
     (newValue: string) => {
-      const sanitizedValue = DOMPurify.sanitize(newValue);
-      setLocalValue(sanitizedValue);
-      onChange(sanitizedValue);
+      setLocalValue(newValue);
+      onChange(newValue);
     },
     [onChange],
   );
@@ -134,19 +127,15 @@ function EditorModal({
             <Row id="editor-body">
               {height > 0 && (
                 <>
-                  <EditorWrapper style={{ width: '50%' }}>
-                    <SourceCodeEditor
-                      id="md-editor"
-                      mode="markdown"
-                      theme="light"
-                      toolbar={false}
-                      resizable={false}
+                  <div style={{ width: '50%' }}>
+                    <MDBaseEditor
+                      onChange={handleOnChange}
+                      value={localValue}
                       readOnly={readOnly}
                       height={height}
-                      value={localValue}
-                      onChange={handleOnChange}
+                      onBlur={handleOnChange}
                     />
-                  </EditorWrapper>
+                  </div>
                   <div style={{ width: '50%' }}>
                     <Preview show value={localValue} height={height} />
                   </div>

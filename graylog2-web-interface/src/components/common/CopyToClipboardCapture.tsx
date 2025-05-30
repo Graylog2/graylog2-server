@@ -27,7 +27,7 @@ type Props = {
  * `formatSelection` allows to format the selected content before it gets stored in the clipboard.
  */
 const CopyToClipboardCapture = React.forwardRef<HTMLDivElement, Props>(
-  ({ formatSelection, children, className }: Props, ref) => {
+  ({ formatSelection, children, className = undefined }: Props, ref) => {
     const _onCopy = (event) => {
       const selection = formatSelection(document.getSelection());
       event.clipboardData.setData('text/plain', selection);

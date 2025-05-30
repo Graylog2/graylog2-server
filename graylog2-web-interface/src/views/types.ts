@@ -206,7 +206,7 @@ export interface ExportFormat {
 }
 
 export interface SystemConfigurationComponentProps<T = unknown> {
-  config: T;
+  config?: T;
   updateConfig: (newConfig: T) => any;
 }
 
@@ -215,6 +215,7 @@ export interface SystemConfiguration {
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
+  useCondition?: () => boolean;
 }
 
 export type GenericResult = {
@@ -315,6 +316,18 @@ type AssetInformationComponentProps = {
   addToQuery?: (id: string) => void;
 };
 
+type EventProcedureFormProps = {
+  eventProcedureID: string | undefined;
+  remediationSteps: string;
+  onClose: () => void;
+  onSave: (eventProcedureId: string) => void;
+};
+
+type EventProcedureSummaryProps = {
+  eventDefinitionEventProcedure: string | undefined;
+  eventId?: string;
+};
+
 type SearchAction = {
   component: React.ComponentType<SearchActionComponentProps>;
   key: string;
@@ -346,6 +359,16 @@ type EventWidgetAction<T> = {
 
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>;
+  key: string;
+};
+
+type EventProcedureForm = {
+  component: React.ComponentType<EventProcedureFormProps>;
+  key: string;
+};
+
+type EventProcedureSummary = {
+  component: React.ComponentType<EventProcedureSummaryProps>;
   key: string;
 };
 
@@ -500,6 +523,32 @@ export type SearchDataSource = {
   useCondition: () => boolean;
 };
 
+type LICENSE_SUBJECTS = {
+  enterprise: '/license/enterprise';
+  archive: '/license/enterprise/archive';
+  auditlog: '/license/enterprise/auditlog';
+  illuminate: '/license/enterprise/illuminate';
+  searchFilter: '/license/enterprise/search-filter';
+  customization: '/license/enterprise/customization';
+  views: '/license/enterprise/views';
+  forwarder: '/license/enterprise/forwarder';
+  report: '/license/enterprise/report';
+  security: '/license/security';
+  anomaly: '/license/anomaly';
+};
+
+type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
+
+export type LicenseCheck = (subject: LicenseSubject) => {
+  data: {
+    valid: boolean;
+    expired: boolean;
+    violated: boolean;
+  };
+  isInitialLoading: boolean;
+  refetch: () => void;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -516,6 +565,8 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
+    'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
+    'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
@@ -564,5 +615,6 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
+    'licenseCheck'?: LicenseCheck;
   }
 }

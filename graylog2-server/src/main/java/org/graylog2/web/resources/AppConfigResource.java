@@ -21,6 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
@@ -28,16 +34,10 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
+import org.graylog2.web.customization.Config;
 
 import java.io.IOException;
 import java.net.URI;
@@ -50,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 
 @Path("/config.js")
 @CSP(group = CSP.DEFAULT)
+@NonApiResource
 public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;
@@ -59,6 +60,7 @@ public class AppConfigResource {
     private final FeatureFlags featureFlags;
     private final TelemetryConfiguration telemetryConfiguration;
     private final ContentStreamConfiguration contentStreamConfiguration;
+    private final Config customizationConfig;
 
     @Inject
     public AppConfigResource(Configuration configuration,
@@ -68,7 +70,8 @@ public class AppConfigResource {
                              ObjectMapper objectMapper,
                              FeatureFlags featureFlags,
                              TelemetryConfiguration telemetryConfiguration,
-                             ContentStreamConfiguration contentStreamConfiguration) {
+                             ContentStreamConfiguration contentStreamConfiguration,
+                             Config customizationConfig) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
@@ -77,6 +80,7 @@ public class AppConfigResource {
         this.featureFlags = featureFlags;
         this.telemetryConfiguration = telemetryConfiguration;
         this.contentStreamConfiguration = contentStreamConfiguration;
+        this.customizationConfig = customizationConfig;
     }
 
     @GET
@@ -100,6 +104,7 @@ public class AppConfigResource {
                 .put("featureFlags", toPrettyJsonString(featureFlags.getAll()))
                 .put("telemetry", toPrettyJsonString(telemetryConfiguration.telemetryFrontendSettings()))
                 .put("contentStream", toPrettyJsonString((contentStreamConfiguration.contentStreamFrontendSettings())))
+                .put("branding", toPrettyJsonString(customizationConfig))
                 .build();
         return templateEngine.transform(template, model);
     }
@@ -111,9 +116,9 @@ public class AppConfigResource {
         return toPrettyJsonString(pluginUISettings);
     }
 
-    private String toPrettyJsonString(Map<String, ?> pluginUISettings) {
+    private String toPrettyJsonString(Object config) {
         try {
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pluginUISettings);
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(config);
         } catch (JsonProcessingException ex) {
             return "{}";
         }

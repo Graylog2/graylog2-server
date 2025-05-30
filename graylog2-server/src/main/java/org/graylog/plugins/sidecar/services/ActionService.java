@@ -16,12 +16,12 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.ReturnDocument;
 import jakarta.inject.Inject;
 import org.graylog.plugins.sidecar.rest.models.CollectorAction;
 import org.graylog.plugins.sidecar.rest.models.CollectorActions;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

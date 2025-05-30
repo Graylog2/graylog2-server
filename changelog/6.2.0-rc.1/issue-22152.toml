@@ -1,0 +1,5 @@
+type = "f"
+message = "Suggest a reload when Graylog server version changed."
+
+pulls = ["22236"]
+issues = ["22152"]

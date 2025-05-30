@@ -68,7 +68,7 @@ const readableValue = (value: Props['value']): React.ReactNode => {
 };
 
 /** Displays the provided label and value with the same layout like the FormikFormGroup */
-const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
+const ReadOnlyFormGroup = ({ label, value, help = undefined, className = undefined }: Props) => (
   <StyledRow className={className}>
     <LabelCol sm={3}>{label}</LabelCol>
     <Col sm={9} className="read-only-value-col">

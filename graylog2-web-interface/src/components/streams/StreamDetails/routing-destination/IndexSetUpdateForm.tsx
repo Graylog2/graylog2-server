@@ -85,7 +85,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
   return (
     <>
       <Button
-        disabled={!isPermitted(currentUser.permissions, 'stream:edit')}
+        disabled={!isPermitted(currentUser.permissions, `streams:edit:${stream.id}`)}
         bsSize="sm"
         onClick={openModal}
         title="Edit index set">
@@ -97,7 +97,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
           <Formik<FormValues> initialValues={_initialValues} onSubmit={onSave} validate={validate}>
             {({ isSubmitting, isValidating }) => (
               <Form>
-                <Modal.Header closeButton>
+                <Modal.Header>
                   <Modal.Title>Edit Stream IndexSet</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

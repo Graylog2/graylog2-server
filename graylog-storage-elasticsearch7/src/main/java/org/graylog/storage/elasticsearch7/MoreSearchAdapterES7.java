@@ -38,7 +38,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedAutoDateHistogram;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
@@ -188,7 +188,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
-        final ParsedAutoDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+        final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
         final var histogramBuckets = histogramResult.getBuckets();
 
         final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
@@ -237,7 +237,17 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         return filter;
     }
 
-    private QueryBuilder buildExtraFilter(String field, String value) {
+    static QueryBuilder buildExtraFilter(String field, String value) {
+        // Handle range queries, which require special query builders.
+        if (value.startsWith("<=")) {
+            return QueryBuilders.rangeQuery(field).lte(value.replace("<=", ""));
+        } else if (value.startsWith(">=")) {
+            return QueryBuilders.rangeQuery(field).gte(value.replace(">=", ""));
+        } else if (value.startsWith("<")) {
+            return QueryBuilders.rangeQuery(field).lt(value.replace("<", ""));
+        } else if (value.startsWith(">")) {
+            return QueryBuilders.rangeQuery(field).gt(value.replace(">", ""));
+        }
         return QueryBuilders.multiMatchQuery(value, field);
     }
 

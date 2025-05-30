@@ -58,13 +58,11 @@ describe('ConfigurationForm', () => {
 
     await screen.findByRole('heading', {
       name: /edit entity/i,
-      hidden: true,
     });
 
     userEvent.click(
       await screen.findByRole('button', {
         name: /update entity/i,
-        hidden: true,
       }),
     );
 
@@ -74,7 +72,6 @@ describe('ConfigurationForm', () => {
       expect(
         screen.queryByRole('heading', {
           name: /edit entity/i,
-          hidden: true,
         }),
       ).not.toBeInTheDocument(),
     );

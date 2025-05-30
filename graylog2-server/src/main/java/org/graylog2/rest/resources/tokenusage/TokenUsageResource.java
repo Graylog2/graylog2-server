@@ -72,10 +72,11 @@ public class TokenUsageResource extends RestResource {
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_TOKEN_NAME).title("Token Name").searchable(true).sortable(true).build(),
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).searchable(true).sortable(true).build(),
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_LAST_ACCESS).title("Last Accessed").type(SearchQueryField.Type.DATE).searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_EXPIRES_AT).title("Expires At").type(SearchQueryField.Type.DATE).searchable(true).sortable(true).build(),
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_USER_IS_EXTERNAL).title("External User")
-                    .relatedCollection(UserImpl.COLLECTION_NAME).type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true).build(),
+                    .relatedCollection(UserImpl.COLLECTION_NAME).type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_AUTH_BACKEND).title("Authentication Backend")
-                    .relatedCollection(DBAuthServiceBackendService.COLLECTION_NAME).searchable(true).sortable(true).filterable(true).build()
+                    .relatedCollection(DBAuthServiceBackendService.COLLECTION_NAME).sortable(false).build()
     );
     static final EntityDefaults SETTINGS = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))

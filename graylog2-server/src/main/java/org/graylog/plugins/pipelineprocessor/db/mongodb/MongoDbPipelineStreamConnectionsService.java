@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.swrve.ratelimitedlogger.RateLimitedLog;

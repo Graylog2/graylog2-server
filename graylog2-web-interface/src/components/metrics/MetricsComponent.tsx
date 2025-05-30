@@ -47,7 +47,7 @@ const safelyFilterNames = (filter: string, names: Array<Metric>) => {
     const filterRegex = new RegExp(filter, 'i');
 
     return names.filter((metric) => String(metric.full_name).match(filterRegex));
-  } catch (e) {
+  } catch (_e) {
     return [];
   }
 };
@@ -63,7 +63,6 @@ const MetricsListContainer = styled.div`
 
 class MetricsComponent extends React.Component<Props, State> {
   static defaultProps = {
-    names: undefined,
     filter: '',
     error: undefined,
   };
@@ -100,7 +99,7 @@ class MetricsComponent extends React.Component<Props, State> {
               ) : (
                 <span>There was a problem fetching node metrics.</span>
               )}{' '}
-              Graylog will keep trying to get them in the background.
+              Attempts to retrieve them will continue in the background.
             </Alert>
           </Col>
         </Row>

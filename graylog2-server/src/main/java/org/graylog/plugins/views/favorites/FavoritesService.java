@@ -20,7 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
@@ -72,11 +72,13 @@ public class FavoritesService {
                         .map(title -> new Favorite(i, title))
                 )
                 .flatMap(Optional::stream)
+                .toList();
+        var itemsToShow = items.stream()
                 .skip(perPage * Math.max(0L, page - 1))
                 .limit(perPage)
                 .toList();
 
-        return PaginatedResponse.create("favorites", new PaginatedList<>(items, items.size(), page, perPage));
+        return PaginatedResponse.create("favorites", new PaginatedList<>(itemsToShow, items.size(), page, perPage));
     }
 
     public void save(FavoritesForUserDTO favorite) {

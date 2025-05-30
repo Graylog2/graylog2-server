@@ -39,7 +39,7 @@ type Props = {
   permissions: Immutable.List<string>;
 };
 
-const OutputsComponent = ({ streamId, permissions }: Props) => {
+const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { types } = useOutputTypes();

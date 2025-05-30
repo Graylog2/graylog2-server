@@ -110,6 +110,7 @@ const TimeRangeFilter = ({
       <FlexContainer className={className} ref={containerRef}>
         {showDropdownButton && (
           <TimeRangeFilterButtons
+            limitDuration={limitDuration}
             disabled={disabled}
             toggleShow={toggleShow}
             onPresetSelectOpen={hideTimeRangeDropDown}

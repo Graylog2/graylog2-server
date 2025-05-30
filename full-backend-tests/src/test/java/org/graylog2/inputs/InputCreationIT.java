@@ -41,7 +41,6 @@ public class InputCreationIT {
                 Map.of("sleep", 30,
                         "sleep_deviation", 30,
                         "source", "example.org"));
-        apis.inputs().setRunningState(inputId);
         apis.inputs().getInput(inputId)
                 .assertThat().body("title", equalTo("testInput"));
         apis.waitFor(() ->
@@ -64,7 +63,6 @@ public class InputCreationIT {
                         "aws_sqs_queue_name", "invalid-queue-no-messages-read",
                         "aws_access_key", "invalid-access-key",
                         "aws_secret_key", "invalid-secret-key"));
-        apis.inputs().setRunningState(inputId);
         apis.inputs().getInput(inputId)
                 .assertThat().body("attributes.aws_access_key", equalTo("invalid-access-key"));
         apis.waitFor(() ->

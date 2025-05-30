@@ -51,7 +51,7 @@ const StyledDeleteButton = styled(IconButton)`
   flex: 0;
 `;
 
-const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
+const PaginatedItem = ({ item: { name, description }, onDeleteItem = undefined, item }: Props) => {
   const deleteButton =
     typeof onDeleteItem === 'function' ? (
       <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />

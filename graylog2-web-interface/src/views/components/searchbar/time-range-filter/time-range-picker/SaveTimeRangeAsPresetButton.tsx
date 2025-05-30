@@ -70,7 +70,7 @@ type Props = React.PropsWithChildren<{
   toggleModal: () => void;
 }>;
 
-const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show }: Props) => {
+const TimeRangeAddToQuickListForm = ({ children = undefined, addTimerange, toggleModal, show }: Props) => {
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
   const {

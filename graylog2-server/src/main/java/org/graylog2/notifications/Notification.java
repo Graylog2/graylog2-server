@@ -86,6 +86,7 @@ public interface Notification extends Persisted {
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+        ES_SHARD_ALLOCATION_MAXIMUM,
         ES_VERSION_MISMATCH,
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,
@@ -98,7 +99,8 @@ public interface Notification extends Persisted {
         REMOTE_REINDEX_RUNNING,
         REMOTE_REINDEX_FINISHED,
         DATA_NODE_VERSION_MISMATCH,
-        DATA_TIERING_ROLLOVER_ERROR
+        DATA_TIERING_ROLLOVER_ERROR,
+        DATA_NODE_HEAP_WARNING
     }
 
     enum Severity {

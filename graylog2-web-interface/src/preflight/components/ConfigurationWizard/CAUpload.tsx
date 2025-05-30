@@ -22,7 +22,7 @@ import { Formik, Form, Field } from 'formik';
 
 import Icon from 'components/common/Icon';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import { Input, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';

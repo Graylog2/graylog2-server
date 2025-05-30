@@ -43,7 +43,7 @@ describe('QueryValidation', () => {
     userEvent.click(validationExplanationTrigger);
   };
 
-  const SUT = ({ error, warning }: SUTProps) => (
+  const SUT = ({ error = undefined, warning = undefined }: SUTProps) => (
     <Formik
       onSubmit={() => {}}
       initialValues={{}}

@@ -45,7 +45,7 @@ class NotificationsFactory {
       case 'data_node_needs_provisioning':
         return {
           values: {
-            DATA_NODE_CONFIGURATION: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+            DATA_NODE_CONFIGURATION: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
           },
         };
 

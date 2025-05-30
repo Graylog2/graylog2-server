@@ -26,6 +26,7 @@ import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrat
 import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import useProductName from 'brand-customization/useProductName';
 
 const WizardContainer = styled(Col)`
   .nav-pills > li > a {
@@ -36,6 +37,7 @@ const WizardContainer = styled(Col)`
 const DataNodesMigrationPage = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
+  const productName = useProductName();
 
   useEffect(() => {
     if (!isLoading && currentStep.state === MIGRATION_STATE.NEW.key) {
@@ -54,8 +56,8 @@ const DataNodesMigrationPage = () => {
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
         <span>
-          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to
-          index and search through all the messages in your Graylog message database.
+          {productName} Data Nodes offer a better integration with {productName} and simplify future updates. They allow
+          you to index and search through all the messages in your {productName} message database.
         </span>
       </PageHeader>
       <Row className="content">

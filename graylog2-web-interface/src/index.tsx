@@ -36,10 +36,12 @@ import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 import PerspectivesBindings from 'components/perspectives/bindings';
 import NavigationBindings from 'components/navigation/bindings';
 import SecurityBindings from 'components/security/bindings';
+import EventsBindings from 'components/events/bindings';
 
 import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
+import '@mantine/notifications/styles.css';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
@@ -53,6 +55,7 @@ PluginStore.register(new PluginManifest({}, FieldValueProvidersBindings));
 PluginStore.register(new PluginManifest({}, PerspectivesBindings));
 PluginStore.register(new PluginManifest({}, NavigationBindings));
 PluginStore.register(new PluginManifest({}, SecurityBindings));
+PluginStore.register(new PluginManifest({}, EventsBindings));
 
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);

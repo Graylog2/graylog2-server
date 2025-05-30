@@ -29,7 +29,6 @@ import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -75,6 +74,7 @@ type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
   embryonic?: boolean;
 };
 const LOOKUP_PERMISSIONS = ['lookuptables:read'];
+const STREAM_PERMISSIONS = ['streams:read'];
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
@@ -84,7 +84,7 @@ const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => (
   title: 'new title',
 });
 
-type EventDefinitionConfig = $PropertyType<EventDefinition, 'config'>;
+type EventDefinitionConfig = EventDefinition['config'];
 
 type Props = {
   currentUser: User;
@@ -121,6 +121,11 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const userCanViewLookupTables = useCallback(
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
+    [currentUser.permissions],
+  );
+
+  const isStreamRequired = useCallback(
+    () => !isPermitted(currentUser.permissions, STREAM_PERMISSIONS),
     [currentUser.permissions],
   );
 
@@ -538,11 +543,12 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         <>
           <FormGroup controlId="filter-streams">
             <ControlLabel>
-              Streams <small className="text-muted">(Optional)</small>
+              Streams{!isStreamRequired() && <small className="text-muted"> (Optional)</small>}
             </ControlLabel>
             <MultiSelect
               id="filter-streams"
               matchProp="label"
+              required={isStreamRequired()}
               onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
               options={formattedStreams}
               value={defaultTo(eventDefinition.config.streams, []).join(',')}

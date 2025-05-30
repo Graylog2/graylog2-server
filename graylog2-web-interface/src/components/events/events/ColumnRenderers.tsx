@@ -80,6 +80,18 @@ const RemediationStepRenderer = ({
   );
 };
 
+const EventProcedureRenderer = ({ eventId, eventProcedureId }: { eventId: string; eventProcedureId: string }) => {
+  const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+
+  return (
+    <>
+      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
+        <PluggableEventProcedureSummary eventId={eventId} eventDefinitionEventProcedure={eventProcedureId} />
+      ))}
+    </>
+  );
+};
+
 const StyledDiv = styled.div`
   cursor: pointer;
 
@@ -106,6 +118,16 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
   ) : (
     <em>No time range</em>
   );
+
+const ValidSecurityLicense = () => {
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
+
+  return validSecurityLicense;
+};
 
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
   T,
@@ -155,8 +177,14 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData) => (
-        <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
+        <>
+          {ValidSecurityLicense ? (
+            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+          ) : (
+            <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+          )}
+        </>
       ),
       width: 0.3,
     },
