@@ -32,7 +32,7 @@ class DeletedStreamNotificationListenerTest {
     @Test
     void testNotificationDeletion() {
         EventBus eventBus = new EventBus();
-        final NotificationService notificationService = mockNotificationService("123", "456");
+        final NotificationPersistenceService notificationService = mockNotificationService("123", "456");
         new DeletedStreamNotificationListener(eventBus, notificationService);
 
         eventBus.post(StreamDeletedEvent.create("123"));
@@ -43,9 +43,9 @@ class DeletedStreamNotificationListenerTest {
                 .isEqualTo("123");
     }
 
-    private NotificationService mockNotificationService(String... streamIDs) {
+    private NotificationPersistenceService mockNotificationService(String... streamIDs) {
         final List<Notification> allNotifications = Arrays.stream(streamIDs).map(id -> new NotificationImpl().addDetail("stream_id", id)).toList();
-        final NotificationService notificationService = Mockito.mock(NotificationService.class);
+        final NotificationPersistenceService notificationService = Mockito.mock(NotificationPersistenceService.class);
         Mockito.when(notificationService.all()).thenReturn(allNotifications);
         return notificationService;
     }

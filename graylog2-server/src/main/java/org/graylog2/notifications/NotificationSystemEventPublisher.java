@@ -152,11 +152,11 @@ public class NotificationSystemEventPublisher extends AbstractExecutionThreadSer
             return;
         }
 
-        notification.addDetail("message_details", renderResponse.description);
+        notification.addDetail("message_details", renderResponse.description());
         SystemNotificationEventProcessorParameters parameters =
                 SystemNotificationEventProcessorParameters.builder()
                         .notificationType(notification.getType())
-                        .notificationMessage(renderResponse.title)
+                        .notificationMessage(renderResponse.title())
                         .notificationDetails(notification.getDetails())
                         .timestamp(notification.getTimestamp())
                         .build();
