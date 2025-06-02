@@ -75,15 +75,15 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
   `;
 });
 
-type FormGroupProps = React.ComponentProps<typeof StyledFormGroup> & {
+type Props = React.ComponentProps<typeof StyledFormGroup> & {
   children?: React.ReactNode;
   validationState?: 'error' | 'success' | 'warning';
 };
 
-const FormGroup = memo(({ children, validationState = null, ...props }: FormGroupProps) => (
+const FormGroup = ({ children, validationState = null, ...props }: Props) => (
   <StyledFormGroup validationState={validationState} {...props}>
     {children}
   </StyledFormGroup>
-));
+);
 
-export default FormGroup;
+export default memo(FormGroup);
