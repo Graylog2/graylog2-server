@@ -21,63 +21,45 @@ import { Icon } from 'components/common';
 
 import styles from './CommonNotificationSummary.css';
 
-type CommonNotificationSummaryProps = React.PropsWithChildren<{
+type Props = React.PropsWithChildren<{
   type: string;
   notification: any;
   definitionNotification?: any;
 }>;
 
-class CommonNotificationSummary extends React.Component<
-  CommonNotificationSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    definitionNotification: undefined,
+const CommonNotificationSummary = ({ definitionNotification = undefined, type, notification, children }: Props) => {
+  const [displayDetails, setDisplayDetails] = React.useState(false);
+
+  const toggleDisplayDetails = () => {
+    setDisplayDetails((prevDisplayDetails) => !prevDisplayDetails);
   };
 
-  state = {
-    displayDetails: false,
-  };
-
-  toggleDisplayDetails = () => {
-    const { displayDetails } = this.state;
-
-    this.setState({ displayDetails: !displayDetails });
-  };
-
-  render() {
-    const { type, notification, definitionNotification, children } = this.props;
-    const { displayDetails } = this.state;
-
-    return (
-      <>
-        <h4>{notification.title || definitionNotification.notification_id}</h4>
-        <dl>
-          <dd>{type}</dd>
-          <dd>
-            <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-              <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
-              &nbsp;
-              {displayDetails ? 'Less details' : 'More details'}
-            </Button>
-            {displayDetails && (
-              <Table condensed hover className={styles.fixedTable}>
-                <tbody>
-                  <tr>
-                    <td>Description</td>
-                    <td>{notification.description || 'No description given'}</td>
-                  </tr>
-                  {children}
-                </tbody>
-              </Table>
-            )}
-          </dd>
-        </dl>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <h4>{notification.title || definitionNotification.notification_id}</h4>
+      <dl>
+        <dd>{type}</dd>
+        <dd>
+          <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDisplayDetails}>
+            <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
+            &nbsp;
+            {displayDetails ? 'Less details' : 'More details'}
+          </Button>
+          {displayDetails && (
+            <Table condensed hover className={styles.fixedTable}>
+              <tbody>
+                <tr>
+                  <td>Description</td>
+                  <td>{notification.description || 'No description given'}</td>
+                </tr>
+                {children}
+              </tbody>
+            </Table>
+          )}
+        </dd>
+      </dl>
+    </>
+  );
+};
 
 export default CommonNotificationSummary;

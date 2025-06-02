@@ -24,26 +24,24 @@ import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
-type RegexExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
 };
 
-class RegexExtractorConfiguration extends React.Component<
-  RegexExtractorConfigurationProps,
-  {
-    [key: string]: any;
-  }
-> {
+class RegexExtractorConfiguration extends React.Component<Props, { trying: boolean }> {
   static defaultProps = {
     exampleMessage: undefined,
   };
 
-  state = {
-    trying: false,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+    };
+  }
 
   _onChange = (key) => (event) => {
     this.props.onExtractorPreviewLoad(undefined);
