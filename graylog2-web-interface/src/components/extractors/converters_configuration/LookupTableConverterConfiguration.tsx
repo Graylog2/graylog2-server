@@ -20,7 +20,7 @@ import { Link } from 'components/common/router';
 import { Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 type LookupTableConverterConfigurationProps = {
@@ -58,7 +58,7 @@ class LookupTableConverterConfiguration extends React.Component<
   _toggleConverter = (event) => {
     let converter;
 
-    if (FormUtils.getValueFromInput(event.target) === true) {
+    if (getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
@@ -72,7 +72,7 @@ class LookupTableConverterConfiguration extends React.Component<
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
   };
 
-  _onChange = (key) => (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
+  _onChange = (key) => (event) => this._updateConfigValue(key, getValueFromInput(event.target));
 
   _onSelect = (key) => (value) => this._updateConfigValue(key, value);
 

@@ -21,7 +21,7 @@ import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 const DEFAULT_CONFIGURATION = { index: 1 };
@@ -54,7 +54,7 @@ const SplitAndIndexExtractorConfiguration = ({
     onExtractorPreviewLoad(undefined);
     const newConfig = configuration;
 
-    newConfig[key] = FormUtils.getValueFromInput(event.target);
+    newConfig[key] = getValueFromInput(event.target);
     onChange(newConfig);
   };
 
