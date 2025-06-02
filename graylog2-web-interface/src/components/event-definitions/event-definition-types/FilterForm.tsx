@@ -152,11 +152,14 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
   const { tables = {} } = useStore(LookupTablesStore);
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
-  const onChangeQueryParameters = (newQueryParameters: Array<LookupTableParameterJson>) => {
-    const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
+  const onChangeQueryParameters = useCallback(
+    (newQueryParameters: Array<LookupTableParameterJson>) => {
+      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
 
-    return onChange(newConfig);
-  };
+      return onChange(newConfig);
+    },
+    [eventDefinition.config, onChange],
+  );
 
   if (!userCanViewLookupTables) {
     return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
@@ -282,17 +285,23 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     validateQueryString,
   ]);
 
-  const getUpdatedConfig = <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
-    const config = cloneDeep(eventDefinition.config);
-    config[key] = value;
-    setCurrentConfig(config);
+  const getUpdatedConfig = useCallback(
+    <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
+      const config = cloneDeep(eventDefinition.config);
+      config[key] = value;
+      setCurrentConfig(config);
 
-    return config;
-  };
+      return config;
+    },
+    [eventDefinition.config],
+  );
 
-  const propagateChange = (config: EventDefinitionConfig) => {
-    onChange('config', config);
-  };
+  const propagateChange = useCallback(
+    (config: EventDefinitionConfig) => {
+      onChange('config', config);
+    },
+    [onChange],
+  );
 
   const formatStreamIds = memoize(
     (streamIds: Array<string>) =>
