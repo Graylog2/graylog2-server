@@ -19,36 +19,25 @@ import type { FieldValueProvider } from 'graylog-web-plugin';
 
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
-type TemplateFieldValueProviderSummaryProps = React.ComponentProps<FieldValueProvider['summaryComponent']>;
+type Props = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
-class TemplateFieldValueProviderSummary extends React.Component<
-  TemplateFieldValueProviderSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    const { config } = this.props;
-
-    return (
-      <CommonFieldValueProviderSummary {...this.props}>
-        <>
-          <tr>
-            <td>Value source</td>
-            <td>Template</td>
-          </tr>
-          <tr>
-            <td>Template</td>
-            <td>{config.providers[0].template}</td>
-          </tr>
-          <tr>
-            <td>Validate that all Template values are set</td>
-            <td>{config.providers[0].require_values ? 'Yes' : 'No'}</td>
-          </tr>
-        </>
-      </CommonFieldValueProviderSummary>
-    );
-  }
-}
+const TemplateFieldValueProviderSummary = (props: Props) => (
+  <CommonFieldValueProviderSummary {...props}>
+    <>
+      <tr>
+        <td>Value source</td>
+        <td>Template</td>
+      </tr>
+      <tr>
+        <td>Template</td>
+        <td>{props.config.providers[0].template}</td>
+      </tr>
+      <tr>
+        <td>Validate that all Template values are set</td>
+        <td>{props.config.providers[0].require_values ? 'Yes' : 'No'}</td>
+      </tr>
+    </>
+  </CommonFieldValueProviderSummary>
+);
 
 export default TemplateFieldValueProviderSummary;

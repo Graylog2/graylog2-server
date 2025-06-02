@@ -21,39 +21,31 @@ import { IfPermitted } from 'components/common';
 
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
-type LookupTableFieldValueProviderSummaryProps = React.ComponentProps<FieldValueProvider['summaryComponent']>;
+type Props = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
-class LookupTableFieldValueProviderSummary extends React.Component<
-  LookupTableFieldValueProviderSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    const { config } = this.props;
-    const provider = config.providers[0];
+const LookupTableFieldValueProviderSummary = (props: Props) => {
+  const provider = props.config.providers[0];
 
-    return (
-      <CommonFieldValueProviderSummary {...this.props}>
-        <IfPermitted permissions="lookuptables:read">
-          <>
-            <tr>
-              <td>Value source</td>
-              <td>Lookup Table</td>
-            </tr>
-            <tr>
-              <td>Lookup Table</td>
-              <td>{provider.table_name}</td>
-            </tr>
-            <tr>
-              <td>Lookup Table Key Field</td>
-              <td>{provider.key_field}</td>
-            </tr>
-          </>
-        </IfPermitted>
-      </CommonFieldValueProviderSummary>
-    );
-  }
-}
+  return (
+    <CommonFieldValueProviderSummary {...props}>
+      <IfPermitted permissions="lookuptables:read">
+        <>
+          <tr>
+            <td>Value source</td>
+            <td>Lookup Table</td>
+          </tr>
+          <tr>
+            <td>Lookup Table</td>
+            <td>{provider.table_name}</td>
+          </tr>
+          <tr>
+            <td>Lookup Table Key Field</td>
+            <td>{provider.key_field}</td>
+          </tr>
+        </>
+      </IfPermitted>
+    </CommonFieldValueProviderSummary>
+  );
+};
 
 export default LookupTableFieldValueProviderSummary;
