@@ -34,6 +34,7 @@ import java.util.Set;
  */
 public class PerformSearch extends Action {
     public static final String NAME = "perform_search";
+    public static final String FIELD_USE_SAVED_SEARCH = "use_saved_search";
     public static final String FIELD_SAVED_SEARCH = "saved_search";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
@@ -58,6 +59,10 @@ public class PerformSearch extends Action {
         @Override
         @JsonProperty(TYPE_FIELD)
         public abstract String type();
+
+        @Nullable
+        @JsonProperty(FIELD_USE_SAVED_SEARCH)
+        public abstract Boolean useSavedSearch();
 
         @Nullable
         @JsonProperty(FIELD_SAVED_SEARCH)
@@ -86,6 +91,9 @@ public class PerformSearch extends Action {
             @JsonProperty(TYPE_FIELD)
             public abstract Builder type(String type);
 
+            @JsonProperty(value = FIELD_USE_SAVED_SEARCH)
+            public abstract Builder useSavedSearch(Boolean useSavedSearch);
+
             @JsonProperty(FIELD_SAVED_SEARCH)
             public abstract Builder savedSearch(String savedSearch);
 
@@ -100,10 +108,21 @@ public class PerformSearch extends Action {
 
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_PerformSearch_Config.Builder().type(NAME);
+                return new AutoValue_PerformSearch_Config.Builder()
+                        .type(NAME)
+                        .useSavedSearch(false);
             }
 
-            public abstract Config build();
+            public Config build() {
+                if (useSavedSearch() == null) {
+                    useSavedSearch(false);
+                }
+                return autoBuild();
+            }
+
+            abstract Config autoBuild();
+
+            abstract Boolean useSavedSearch();
         }
 
     }
