@@ -26,7 +26,7 @@ const previousButton = () => screen.findByRole('button', { name: /Previous/i });
 const nextButton = () => screen.findByRole('button', { name: /Next/i });
 
 describe('<Wizard />', () => {
-  const steps: StepsType = [
+  const steps: StepsType<string> = [
     { key: 'Key1', title: 'Title1', component: <div>Component1</div> },
     { key: 'Key2', title: 'Title2', component: <div>Component2</div> },
     { key: 'Key3', title: 'Title3', component: <div>Component3</div> },
@@ -181,7 +181,7 @@ describe('<Wizard />', () => {
       const consoleWarn = console.warn;
 
       console.warn = jest.fn();
-      const { rerender } = render(<Wizard onStepChange={jest.fn} steps={steps} activeStep={0} />);
+      const { rerender } = render(<Wizard onStepChange={jest.fn} steps={steps} activeStep="not-found" />);
 
       await screen.findByText('Component1');
 
