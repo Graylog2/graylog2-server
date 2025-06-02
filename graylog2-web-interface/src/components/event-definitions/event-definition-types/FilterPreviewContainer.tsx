@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { Map } from 'immutable';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
-import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import { FilterPreviewActions, FilterPreviewStore } from 'stores/event-definitions/FilterPreviewStore';
 import generateId from 'logic/generateId';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
+import createSearch from 'views/logic/slices/createSearch';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { SearchExecutionResult } from 'views/types';
+import type { LookupTableParameterJsonEmbryonic } from 'components/event-definitions/event-definition-types/FilterForm';
+import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 import FilterPreview from './FilterPreview';
 
@@ -39,73 +43,88 @@ const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['con
   return !missingPermissions;
 };
 
-const fetchSearch = debounce(
-  (config: EventDefinition['config'], searchTypeId: string, queryId: string, currentUser: User) => {
-    if (!isPermittedToSeePreview(currentUser, config)) {
-      return;
-    }
+const constructSearch = (config: EventDefinition['config'], searchTypeId: string, queryId: string) => {
+  const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
 
-    const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
+  const queryBuilder = Query.builder()
+    .id(queryId)
+    .query({ type: 'elasticsearch', query_string: config?.query || '*' })
+    .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
+    .filter(formattedStreams.length === 0 ? null : Map({ type: 'or', filters: formattedStreams }))
+    .filters(config.filters)
+    .searchTypes([
+      {
+        id: searchTypeId,
+        type: 'messages',
+        limit: 10,
+        offset: 0,
+        filter: undefined,
+        filters: undefined,
+        name: undefined,
+        query: undefined,
+        timerange: undefined,
+        streams: [],
+        stream_categories: [],
+        sort: [],
+        decorators: [],
+      },
+    ]);
 
-    const queryBuilder = Query.builder()
-      .id(queryId)
-      .query({ type: 'elasticsearch', query_string: config?.query || '*' })
-      .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
-      .filter(formattedStreams.length === 0 ? null : Map({ type: 'or', filters: formattedStreams }))
-      .filters(config.filters)
-      .searchTypes([
-        {
-          id: searchTypeId,
-          type: 'messages',
-          limit: 10,
-          offset: 0,
-          filter: undefined,
-          filters: undefined,
-          name: undefined,
-          query: undefined,
-          timerange: undefined,
-          streams: [],
-          stream_categories: [],
-          sort: [],
-          decorators: [],
-        },
-      ]);
+  const query = queryBuilder.build();
 
-    const query = queryBuilder.build();
-
-    const search = Search.create()
-      .toBuilder()
-      .parameters(config?.query_parameters?.filter((param) => !param.embryonic) || [])
-      .queries([query])
-      .build();
-
-    FilterPreviewActions.search(search);
-  },
-  250,
-);
+  return Search.create()
+    .toBuilder()
+    .parameters(
+      config?.query_parameters
+        ?.filter((param: LookupTableParameterJsonEmbryonic) => !param.embryonic)
+        .map((param) => LookupTableParameter.fromJSON(param)) ?? [],
+    )
+    .queries([query])
+    .build();
+};
 
 type FilterPreviewContainerProps = {
   eventDefinition: EventDefinition;
 };
-const FilterPreviewContainer = ({ eventDefinition }: FilterPreviewContainerProps) => {
+
+const useExecutePreview = (config: EventDefinition['config']) => {
+  const currentUser = useCurrentUser();
   const queryId = useMemo(() => generateId(), []);
   const searchTypeId = useMemo(() => generateId(), []);
-  const currentUser = useCurrentUser();
-  const filterPreview = useStore(FilterPreviewStore);
+  const [results, setResults] = useState<SearchExecutionResult>();
+  const { startJob, executeJobResult } = useSearchExecutors();
+  const executeSearch = useMemo(
+    () =>
+      debounce(
+        (search: Search) =>
+          createSearch(search)
+            .then((createdSearch) => startJob(createdSearch, [searchTypeId], SearchExecutionState.empty()))
+            .then((jobIds) => executeJobResult({ jobIds }))
+            .then((result) => setResults(result)),
+        250,
+      ),
+    [executeJobResult, searchTypeId, startJob],
+  );
 
   useEffect(() => {
-    fetchSearch(eventDefinition.config, searchTypeId, queryId, currentUser);
-  }, [currentUser, eventDefinition.config, queryId, searchTypeId]);
+    if (isPermittedToSeePreview(currentUser, config)) {
+      const search = constructSearch(config, searchTypeId, queryId);
+      executeSearch(search);
+    }
+  }, [config, currentUser, executeSearch, queryId, searchTypeId]);
 
-  const isLoading = !filterPreview?.result?.forId(queryId);
-  let searchResult;
-  let errors;
+  return {
+    errors: results?.result?.errors,
+    result: results?.result?.forId(queryId)?.searchTypes?.[searchTypeId],
+  };
+};
+const FilterPreviewContainer = ({ eventDefinition }: FilterPreviewContainerProps) => {
+  const currentUser = useCurrentUser();
+  const results = useExecutePreview(eventDefinition.config);
 
-  if (!isLoading) {
-    searchResult = filterPreview.result.forId(queryId).searchTypes[searchTypeId];
-
-    errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
-  }
+  const isLoading = !results?.result;
+  const searchResult = results?.result;
+  const errors = results?.errors;
 
   return (
     <FilterPreview

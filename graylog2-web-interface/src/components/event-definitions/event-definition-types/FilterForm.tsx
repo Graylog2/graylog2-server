@@ -65,7 +65,7 @@ import commonStyles from '../common/commonStyles.css';
 
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
-type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
+export type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
   embryonic?: boolean;
 };
 const LOOKUP_PERMISSIONS = ['lookuptables:read'];
