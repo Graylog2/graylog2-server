@@ -14,22 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useMemo } from 'react';
 import debounce from 'lodash/debounce';
-import isEqual from 'lodash/isEqual';
 import { Map } from 'immutable';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { FilterPreviewActions, FilterPreviewStore } from 'stores/event-definitions/FilterPreviewStore';
 import generateId from 'logic/generateId';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type User from 'logic/users/User';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import FilterPreview from './FilterPreview';
 
-const isPermittedToSeePreview = (currentUser, config) => {
+const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['config']) => {
   const missingPermissions = config?.streams?.some(
     (stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`),
   );
@@ -37,26 +39,11 @@ const isPermittedToSeePreview = (currentUser, config) => {
   return !missingPermissions;
 };
 
-type FilterPreviewContainerProps = {
-  eventDefinition: any;
-  filterPreview: any;
-  currentUser: any;
-};
-
-class FilterPreviewContainer extends React.Component<
-  FilterPreviewContainerProps,
-  {
-    [key: string]: any;
-  }
-> {
-  fetchSearch = debounce((config) => {
-    const { currentUser } = this.props;
-
+const fetchSearch = debounce(
+  (config: EventDefinition['config'], searchTypeId: string, queryId: string, currentUser: User) => {
     if (!isPermittedToSeePreview(currentUser, config)) {
       return;
     }
-
-    const { queryId, searchTypeId } = this.state;
 
     const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
 
@@ -93,81 +80,41 @@ class FilterPreviewContainer extends React.Component<
       .build();
 
     FilterPreviewActions.search(search);
-  }, 250);
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      queryId: generateId(),
-      searchTypeId: generateId(),
-    };
-  }
-
-  componentDidMount() {
-    const { eventDefinition } = this.props;
-
-    this.fetchSearch(eventDefinition.config);
-  }
-
-  componentDidUpdate(prevProps) {
-    const { eventDefinition } = this.props;
-
-    const {
-      query: prevQuery,
-      query_parameters: prevQueryParameters,
-      streams: prevStreams,
-      search_within_ms: prevSearchWithin,
-    } = prevProps.eventDefinition.config;
-    const {
-      query,
-      query_parameters: queryParameters,
-      streams,
-      search_within_ms: searchWithin,
-    } = eventDefinition.config;
-
-    if (
-      query !== prevQuery ||
-      queryParameters !== prevQueryParameters ||
-      !isEqual(streams, prevStreams) ||
-      searchWithin !== prevSearchWithin
-    ) {
-      this.fetchSearch(eventDefinition.config);
-    }
-  }
-
-  render() {
-    const { eventDefinition, filterPreview, currentUser } = this.props;
-    const { queryId, searchTypeId } = this.state;
-    const isLoading = !filterPreview.result || !filterPreview.result.forId(queryId);
-    let searchResult;
-    let errors;
-
-    if (!isLoading) {
-      searchResult = filterPreview.result.forId(queryId).searchTypes[searchTypeId];
-
-      errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
-    }
-
-    return (
-      <FilterPreview
-        isFetchingData={isLoading}
-        displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
-        searchResult={searchResult}
-        errors={errors}
-      />
-    );
-  }
-}
-
-export default connect(
-  FilterPreviewContainer,
-  {
-    filterPreview: FilterPreviewStore,
-    currentUser: CurrentUserStore,
   },
-  ({ currentUser, ...otherProps }) => ({
-    ...otherProps,
-    currentUser: currentUser.currentUser,
-  }),
+  250,
 );
+
+type FilterPreviewContainerProps = {
+  eventDefinition: EventDefinition;
+};
+const FilterPreviewContainer = ({ eventDefinition }: FilterPreviewContainerProps) => {
+  const queryId = useMemo(() => generateId(), []);
+  const searchTypeId = useMemo(() => generateId(), []);
+  const currentUser = useCurrentUser();
+  const filterPreview = useStore(FilterPreviewStore);
+
+  useEffect(() => {
+    fetchSearch(eventDefinition.config, searchTypeId, queryId, currentUser);
+  }, [currentUser, eventDefinition.config, queryId, searchTypeId]);
+
+  const isLoading = !filterPreview?.result?.forId(queryId);
+  let searchResult;
+  let errors;
+
+  if (!isLoading) {
+    searchResult = filterPreview.result.forId(queryId).searchTypes[searchTypeId];
+
+    errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
+  }
+
+  return (
+    <FilterPreview
+      isFetchingData={isLoading}
+      displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
+      searchResult={searchResult}
+      errors={errors}
+    />
+  );
+};
+
+export default FilterPreviewContainer;
