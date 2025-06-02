@@ -127,7 +127,7 @@ const EntityCreateShareFormGroup = ({
   };
 
   return (
-    <Section title=''>
+    <Section title="">
       {entityShareState ? (
         <>
           <ShareFormSection>

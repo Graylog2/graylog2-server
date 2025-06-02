@@ -36,7 +36,7 @@ const ActionsWrapper = styled.div`
   justify-content: flex-end;
 `;
 
-const _deleteRole = (roleId: Role['id'], roleName: Role['name'], setDeleting: (boolean) => void) => {
+const _deleteRole = (roleId: Role['id'], roleName: Role['name'], setDeleting: (deleting: boolean) => void) => {
   let confirmMessage = `Do you really want to delete role "${roleName}"?`;
   const getOneUser = { page: 1, perPage: 1, query: '' };
   setDeleting(true);
