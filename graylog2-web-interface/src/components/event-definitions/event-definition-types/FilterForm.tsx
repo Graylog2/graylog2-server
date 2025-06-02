@@ -28,6 +28,7 @@ import memoize from 'lodash/memoize';
 import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
+import type { Set } from 'immutable';
 import { OrderedMap } from 'immutable';
 
 import { describeExpression } from 'util/CronUtils';
@@ -56,7 +57,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
 import useUserDateTime from 'hooks/useUserDateTime';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
@@ -85,6 +86,7 @@ const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => (
 });
 
 type EventDefinitionConfig = EventDefinition['config'];
+type EventDefinitionConfigKeys = keyof EventDefinitionConfig;
 
 type Props = {
   currentUser: User;
@@ -93,6 +95,11 @@ type Props = {
   streams: Array<Stream>;
   validation: EventDefinitionValidation;
 };
+
+const toTimeRange = (from: number): RelativeTimeRangeWithEnd => ({
+  type: 'relative',
+  from: from / 1000,
+});
 
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
@@ -172,12 +179,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [setFieldWarning],
   );
 
-  const toTimeRange = (from) =>
-    ({
-      type: 'relative',
-      from: from / 1000,
-    }) as RelativeTimeRangeWithEnd;
-
   useEffect(() => {
     if (userCanViewLookupTables()) {
       LookupTablesActions.searchPaginated(1, 0, undefined, false);
@@ -200,7 +201,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     validateQueryString,
   ]);
 
-  const getUpdatedConfig = (key, value) => {
+  const getUpdatedConfig = <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
     const config = cloneDeep(eventDefinition.config);
     config[key] = value;
     setCurrentConfig(config);
@@ -213,7 +214,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   };
 
   const formatStreamIds = memoize(
-    (streamIds) =>
+    (streamIds: Array<string>) =>
       streamIds
         .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
         .map((streamOrId) => {
@@ -225,10 +226,10 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
           };
         })
         .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label)),
-    (streamIds) => streamIds.join('-'),
+    (streamIds: Array<String>) => streamIds.join('-'),
   );
 
-  const syncParamsWithQuery = (paramsInQuery, config: EventDefinitionConfig) => {
+  const syncParamsWithQuery = (paramsInQuery: Set<string>, config: EventDefinitionConfig) => {
     const queryParameters = config?.query_parameters || [];
     const keptParameters = [];
     const staleParameters = {};
@@ -310,27 +311,27 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     propagateChange(config);
   };
 
-  const handleQueryChange = (event) => {
+  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name, value);
+    const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
     handleConfigChange(name, newConfig);
     debouncedParseQuery(value, newConfig);
   };
 
-  const handleCronExpressionChange = (event) => {
+  const handleCronExpressionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name, value);
+    const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
     handleConfigChange(name, newConfig);
   };
 
-  const handleCronTimezoneChange = (tz) => {
+  const handleCronTimezoneChange = (tz: string) => {
     const newConfig = getUpdatedConfig('cron_timezone', tz);
     handleConfigChange('cron_timezone', newConfig);
   };
 
-  const handleSearchFiltersChange = (searchFilters) => {
+  const handleSearchFiltersChange = (searchFilters: OrderedMap<string, SearchFilter>) => {
     const { query } = eventDefinition.config;
 
     const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
@@ -339,14 +340,14 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     debouncedParseQuery(query, newConfig);
   };
 
-  const handleEnabledChange = (event) => {
+  const handleEnabledChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name, value);
+    const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
     handleConfigChange(name, newConfig);
   };
 
-  const handleUseCronSchedulingChange = (event) => {
+  const handleUseCronSchedulingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
     const newConfig = cloneDeep(eventDefinition.config);
@@ -364,12 +365,12 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     propagateChange(newConfig);
   };
 
-  const hideFiltersPreview = (value) => {
+  const hideFiltersPreview = (value: boolean) => {
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
     setSearchFiltersHidden(value);
   };
 
-  const handleStreamsChange = (nextValue) => {
+  const handleStreamsChange = (nextValue: Array<string>) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-condition',
@@ -379,44 +380,45 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     propagateChange(getUpdatedConfig('streams', nextValue));
   };
 
-  const handleTimeRangeChange = (fieldName) => (nextValue, nextUnit) => {
-    if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'searchWithinMsUnit-select',
-        new_unit: nextUnit,
-      });
-    } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'executeEveryMsUnit-select',
-        new_unit: nextUnit,
-      });
-    }
+  const handleTimeRangeChange =
+    (fieldName: EventDefinitionConfigKeys) => (nextValue: number, nextUnit: 'hours' | 'minutes' | 'seconds') => {
+      if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-condition',
+          app_action_value: 'searchWithinMsUnit-select',
+          new_unit: nextUnit,
+        });
+      } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-condition',
+          app_action_value: 'executeEveryMsUnit-select',
+          new_unit: nextUnit,
+        });
+      }
 
-    const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
+      const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
 
-    propagateChange(getUpdatedConfig(fieldName, durationInMs));
+      propagateChange(getUpdatedConfig(fieldName, durationInMs));
 
-    const stateFieldName = camelCase(fieldName);
+      const stateFieldName = camelCase(fieldName);
 
-    if (stateFieldName === 'searchWithinMs') {
-      setSearchWithinMsDuration(nextValue);
-      setSearchWithinMsUnit(nextUnit);
+      if (stateFieldName === 'searchWithinMs') {
+        setSearchWithinMsDuration(nextValue);
+        setSearchWithinMsUnit(nextUnit);
 
-      return;
-    }
+        return;
+      }
 
-    setExecuteEveryMsDuration(nextValue);
-    setExecuteEveryMsUnit(nextUnit);
-  };
+      setExecuteEveryMsDuration(nextValue);
+      setExecuteEveryMsUnit(nextUnit);
+    };
 
   const renderQueryParameters = () => {
     const queryParameters = eventDefinition?.config?.query_parameters || [];
 
-    const onChangeQueryParameters = (newQueryParameters) => {
+    const onChangeQueryParameters = (newQueryParameters: Array<LookupTableParameterJson>) => {
       const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
 
       return onChange('config', newConfig);
