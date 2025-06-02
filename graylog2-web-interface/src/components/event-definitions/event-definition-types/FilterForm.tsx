@@ -24,7 +24,6 @@ import defaultTo from 'lodash/defaultTo';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
-import memoize from 'lodash/memoize';
 import max from 'lodash/max';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
@@ -34,7 +33,6 @@ import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
@@ -303,22 +301,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [onChange],
   );
 
-  const formatStreamIds = memoize(
-    (streamIds: Array<string>) =>
-      streamIds
-        .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
-        .map((streamOrId) => {
-          const stream = typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId };
-
-          return {
-            label: stream.title,
-            value: stream.id,
-          };
-        })
-        .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label)),
-    (streamIds: Array<String>) => streamIds.join('-'),
-  );
-
   const syncParamsWithQuery = (paramsInQuery: Immutable.Set<string>, config: EventDefinitionConfig) => {
     const queryParameters = config?.query_parameters || [];
     const keptParameters = [];
@@ -508,8 +490,17 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
-  const allStreamIds = [...streams.map((s) => s.id), ...(eventDefinition.config.streams ?? [])];
-  const formattedStreams = formatStreamIds(allStreamIds);
+  const formattedStreams = useMemo(
+    () =>
+      [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
+        .map((streamId) => {
+          const stream = streams.find((s) => s.id === streamId);
+
+          return { label: stream?.title ?? streamId, value: streamId };
+        })
+        .sort((s1, s2) => defaultCompare(s1.label, s2.label)),
+    [eventDefinition?.config?.streams, streams],
+  );
 
   return (
     <fieldset>
