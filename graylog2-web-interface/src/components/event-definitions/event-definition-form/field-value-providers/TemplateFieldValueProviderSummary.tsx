@@ -21,7 +21,7 @@ import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
 type Props = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
-const TemplateFieldValueProviderSummary = (props: Props) => (
+const TemplateFieldValueProviderSummary = ({ ...props }: Props) => (
   <CommonFieldValueProviderSummary {...props}>
     <>
       <tr>

@@ -21,7 +21,7 @@ import { DataTable, ExternalLink, Spinner } from 'components/common';
 import { Alert } from 'components/bootstrap';
 
 const StyledExternalLink = styled(ExternalLink)`
-  margin-left: 10;
+  margin-left: 10px;
 `;
 
 const headerCellFormatter = (header) => <th>{header}</th>;
