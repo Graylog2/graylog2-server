@@ -301,158 +301,188 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [onChange],
   );
 
-  const syncParamsWithQuery = (paramsInQuery: Immutable.Set<string>, config: EventDefinitionConfig) => {
-    const queryParameters = config?.query_parameters || [];
-    const keptParameters = [];
-    const staleParameters = {};
+  const syncParamsWithQuery = useCallback(
+    (paramsInQuery: Immutable.Set<string>, config: EventDefinitionConfig) => {
+      const queryParameters = config?.query_parameters || [];
+      const keptParameters = [];
+      const staleParameters = {};
 
-    queryParameters.forEach((p) => {
-      if (paramsInQuery.has(p.name)) {
-        keptParameters.push(p);
-      } else {
-        staleParameters[p.name] = p;
-      }
-    });
-
-    const newParameters = [];
-
-    paramsInQuery.forEach((np) => {
-      if (!keptParameters.find((p) => p.name === np)) {
-        if (queryParameterStash[np]) {
-          newParameters.push(queryParameterStash[np]);
+      queryParameters.forEach((p) => {
+        if (paramsInQuery.has(p.name)) {
+          keptParameters.push(p);
         } else {
-          newParameters.push(buildNewParameter(np));
+          staleParameters[p.name] = p;
         }
+      });
+
+      const newParameters = [];
+
+      paramsInQuery.forEach((np) => {
+        if (!keptParameters.find((p) => p.name === np)) {
+          if (queryParameterStash[np]) {
+            newParameters.push(queryParameterStash[np]);
+          } else {
+            newParameters.push(buildNewParameter(np));
+          }
+        }
+      });
+
+      setQueryParameterStash(merge(queryParameterStash, staleParameters));
+
+      onChange('config', { ...config, query_parameters: keptParameters.concat(newParameters) });
+    },
+    [onChange, queryParameterStash],
+  );
+
+  const parseQuery = useCallback(
+    (queryString: string, config: EventDefinitionConfig, searchFilters = OrderedMap()) => {
+      if (!userCanViewLookupTables) {
+        return;
       }
-    });
 
-    setQueryParameterStash(merge(queryParameterStash, staleParameters));
+      const queryBuilder = Query.builder()
+        .id(queryId)
+        .query({ type: 'elasticsearch', query_string: queryString })
+        .timerange({ type: 'relative', range: 1000 })
+        .filters(searchFilters.toList() as FiltersType)
+        .searchTypes([
+          {
+            id: searchTypeId,
+            type: 'messages',
+            limit: 10,
+            offset: 0,
+            filter: undefined,
+            filters: undefined,
+            name: undefined,
+            query: undefined,
+            timerange: undefined,
+            streams: undefined,
+            stream_categories: undefined,
+            sort: [],
+            decorators: [],
+          },
+        ]);
 
-    onChange('config', { ...config, query_parameters: keptParameters.concat(newParameters) });
-  };
+      const query = queryBuilder.build();
 
-  const parseQuery = (queryString: string, config: EventDefinitionConfig, searchFilters = OrderedMap()) => {
-    if (!userCanViewLookupTables) {
-      return;
-    }
+      const search = Search.create().toBuilder().queries([query]).build();
 
-    const queryBuilder = Query.builder()
-      .id(queryId)
-      .query({ type: 'elasticsearch', query_string: queryString })
-      .timerange({ type: 'relative', range: 1000 })
-      .filters(searchFilters.toList() as FiltersType)
-      .searchTypes([
-        {
-          id: searchTypeId,
-          type: 'messages',
-          limit: 10,
-          offset: 0,
-          filter: undefined,
-          filters: undefined,
-          name: undefined,
-          query: undefined,
-          timerange: undefined,
-          streams: undefined,
-          stream_categories: undefined,
-          sort: [],
-          decorators: [],
-        },
-      ]);
-
-    const query = queryBuilder.build();
-
-    const search = Search.create().toBuilder().queries([query]).build();
-
-    parseSearch(search).then((res) => {
-      syncParamsWithQuery(res.undeclared, config);
-    });
-  };
+      parseSearch(search).then((res) => {
+        syncParamsWithQuery(res.undeclared, config);
+      });
+    },
+    [queryId, searchTypeId, syncParamsWithQuery, userCanViewLookupTables],
+  );
 
   const debouncedParseQuery = debounce(parseQuery, 250);
 
-  const handleConfigChange = (name: string, config: EventDefinitionConfig) => {
-    if (name === '_is_scheduled') {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'enable-checkbox',
-        is_scheduled: config._is_scheduled,
-      });
-    }
+  const handleConfigChange = useCallback(
+    (name: string, config: EventDefinitionConfig) => {
+      if (name === '_is_scheduled') {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-condition',
+          app_action_value: 'enable-checkbox',
+          is_scheduled: config._is_scheduled,
+        });
+      }
 
-    propagateChange(config);
-  };
+      propagateChange(config);
+    },
+    [pathname, propagateChange, sendTelemetry],
+  );
 
-  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
-    handleConfigChange(name, newConfig);
-    debouncedParseQuery(value, newConfig);
-  };
+  const handleQueryChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
+      handleConfigChange(name, newConfig);
+      debouncedParseQuery(value, newConfig);
+    },
+    [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleCronExpressionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
-    handleConfigChange(name, newConfig);
-  };
+  const handleCronExpressionChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
+      handleConfigChange(name, newConfig);
+    },
+    [getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleCronTimezoneChange = (tz: string) => {
-    const newConfig = getUpdatedConfig('cron_timezone', tz);
-    handleConfigChange('cron_timezone', newConfig);
-  };
+  const handleCronTimezoneChange = useCallback(
+    (tz: string) => {
+      const newConfig = getUpdatedConfig('cron_timezone', tz);
+      handleConfigChange('cron_timezone', newConfig);
+    },
+    [getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleSearchFiltersChange = (searchFilters: OrderedMap<string, SearchFilter>) => {
-    const { query } = eventDefinition.config;
+  const handleSearchFiltersChange = useCallback(
+    (searchFilters: OrderedMap<string, SearchFilter>) => {
+      const { query } = eventDefinition.config;
 
-    const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
-    propagateChange(newConfig);
+      const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
+      propagateChange(newConfig);
 
-    debouncedParseQuery(query, newConfig);
-  };
+      debouncedParseQuery(query, newConfig);
+    },
+    [debouncedParseQuery, eventDefinition.config, getUpdatedConfig, propagateChange],
+  );
 
-  const handleEnabledChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
-    handleConfigChange(name, newConfig);
-  };
+  const handleEnabledChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
+      handleConfigChange(name, newConfig);
+    },
+    [getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleUseCronSchedulingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = cloneDeep(eventDefinition.config);
-    newConfig[name] = value;
+  const handleUseCronSchedulingChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = cloneDeep(eventDefinition.config);
+      newConfig[name] = value;
 
-    if (value) {
-      newConfig.cron_expression = '';
-      newConfig.cron_timezone = userTimezone;
-    } else {
-      newConfig.cron_expression = null;
-      newConfig.cron_timezone = null;
-    }
+      if (value) {
+        newConfig.cron_expression = '';
+        newConfig.cron_timezone = userTimezone;
+      } else {
+        newConfig.cron_expression = null;
+        newConfig.cron_timezone = null;
+      }
 
-    setCurrentConfig(newConfig);
-    propagateChange(newConfig);
-  };
+      setCurrentConfig(newConfig);
+      propagateChange(newConfig);
+    },
+    [eventDefinition.config, propagateChange, userTimezone],
+  );
 
-  const hideFiltersPreview = (value: boolean) => {
+  const hideFiltersPreview = useCallback((value: boolean) => {
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
     setSearchFiltersHidden(value);
-  };
+  }, []);
 
-  const handleStreamsChange = (nextValue: Array<string>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-condition',
-      app_action_value: 'stream-select',
-    });
+  const handleStreamsChange = useCallback(
+    (nextValue: Array<string>) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'event-definition-condition',
+        app_action_value: 'stream-select',
+      });
 
-    propagateChange(getUpdatedConfig('streams', nextValue));
-  };
+      propagateChange(getUpdatedConfig('streams', nextValue));
+    },
+    [getUpdatedConfig, pathname, propagateChange, sendTelemetry],
+  );
 
-  const handleTimeRangeChange =
+  const handleTimeRangeChange = useCallback(
     (fieldName: EventDefinitionConfigKeys) => (nextValue: number, nextUnit: 'hours' | 'minutes' | 'seconds') => {
       if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
@@ -485,7 +515,9 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       setExecuteEveryMsDuration(nextValue);
       setExecuteEveryMsUnit(nextUnit);
-    };
+    },
+    [executeEveryMsUnit, getUpdatedConfig, pathname, propagateChange, searchWithinMsUnit, sendTelemetry],
+  );
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
