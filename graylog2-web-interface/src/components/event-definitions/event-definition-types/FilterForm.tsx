@@ -20,11 +20,8 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
-import defaultTo from 'lodash/defaultTo';
-import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
-import max from 'lodash/max';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
@@ -191,7 +188,7 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
       {hasEmbryonicParameters && (
         <HelpBlock>
           {validation.errors.query_parameters
-            ? get(validation, 'errors.query_parameters[0]')
+            ? validation?.errors.query_parameters[0]
             : 'Please declare missing query parameters by clicking on the buttons above.'}
         </HelpBlock>
       )}
@@ -329,9 +326,9 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       setQueryParameterStash(merge(queryParameterStash, staleParameters));
 
-      onChange('config', { ...config, query_parameters: keptParameters.concat(newParameters) });
+      propagateChange({ ...config, query_parameters: keptParameters.concat(newParameters) });
     },
-    [onChange, queryParameterStash],
+    [propagateChange, queryParameterStash],
   );
 
   const parseQuery = useCallback(
@@ -500,7 +497,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         });
       }
 
-      const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
+      const durationInMs = moment.duration(Math.max(nextValue, 1), nextUnit).asMilliseconds();
 
       propagateChange(getUpdatedConfig(fieldName, durationInMs));
 
@@ -550,7 +547,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
             </span>
           }
-          value={defaultTo(currentConfig.query, '')}
+          value={currentConfig.query ?? ''}
           onChange={handleQueryChange}
         />
       )}
@@ -589,7 +586,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               required={isStreamRequired}
               onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
               options={formattedStreams}
-              value={defaultTo(eventDefinition.config.streams, []).join(',')}
+              value={(eventDefinition.config.streams ?? []).join(',')}
             />
             <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
           </FormGroup>
@@ -597,7 +594,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             onChange={(selected) =>
               propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
             }
-            value={defaultTo(eventDefinition.config.stream_categories, []).join(',')}
+            value={(eventDefinition.config.stream_categories ?? []).join(',')}
             streams={streams}
           />
           {isSearchingWarmTier(warmTierRanges) && (
@@ -618,9 +615,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               clearable
               required
             />
-            {validation.errors.search_within_ms && (
-              <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
-            )}
+            {validation.errors.search_within_ms && <HelpBlock>{validation.errors.search_within_ms[0]}</HelpBlock>}
           </FormGroup>
           <Input
             id="is-cron-checkbox"
@@ -628,7 +623,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             name="use_cron_scheduling"
             label="Use Cron Scheduling"
             help="Schedule this event with a Quartz cron expression"
-            checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
+            checked={eventDefinition.config.use_cron_scheduling ?? false}
             onChange={handleUseCronSchedulingChange}
           />
           {currentConfig.use_cron_scheduling ? (
@@ -646,18 +641,16 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
                       {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
                     </span>
                   }
-                  value={defaultTo(currentConfig.cron_expression, '')}
+                  value={currentConfig.cron_expression ?? ''}
                   onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
                   onChange={handleCronExpressionChange}
                 />
-                {validation.errors.cron_expression && (
-                  <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
-                )}
+                {validation.errors.cron_expression && <HelpBlock>{validation.errors.cron_expression[0]}</HelpBlock>}
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Cron Time Zone</ControlLabel>
                 <TimezoneSelect
-                  value={defaultTo(currentConfig.cron_timezone, userTimezone)}
+                  value={currentConfig.cron_timezone ?? userTimezone}
                   name="cron_timezone"
                   clearable={false}
                   onChange={handleCronTimezoneChange}
@@ -675,9 +668,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
                 clearable
                 required
               />
-              {validation.errors.execute_every_ms && (
-                <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
-              )}
+              {validation.errors.execute_every_ms && <HelpBlock>{validation.errors.execute_every_ms[0]}</HelpBlock>}
             </FormGroup>
           )}
 
@@ -687,7 +678,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             name="_is_scheduled"
             label="Enable"
             help="Should this event definition be executed automatically?"
-            checked={defaultTo(eventDefinition.config._is_scheduled, true)}
+            checked={eventDefinition.config._is_scheduled ?? true}
             onChange={handleEnabledChange}
           />
         </>
