@@ -97,26 +97,25 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
 
     const _dismiss = () => onDismissPublicNotification(notificationId);
 
-      return (
-        <AlertContainer key={title}>
-          <StyledAlert
-            bsStyle={variant}
-            onDismiss={isDismissible ? _dismiss : undefined}
-            title={!hiddenTitle && title}>
-            <FlexWrap>
-              <ShortContent>{shortMessage}</ShortContent>
-              {longMessage && (
-                <Button bsStyle="link" onClick={toggleReadMore}>
-                  Read {showReadMore === notificationId ? 'Less' : 'More'}
-                </Button>
-              )}
-            </FlexWrap>
-            {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
-          </StyledAlert>
-        </AlertContainer>
-      );
-    })
-    .filter((a) => a);
+    return (
+      <AlertContainer key={title}>
+        <StyledAlert bsStyle={variant}
+                     onDismiss={isDismissible ? _dismiss : undefined}
+                     title={!hiddenTitle && title}>
+          <FlexWrap>
+            <ShortContent>{shortMessage}</ShortContent>
+            {longMessage && (
+              <Button bsStyle="link" onClick={toggleReadMore}>
+                Read {showReadMore === notificationId ? 'Less' : 'More'}
+              </Button>
+            )}
+          </FlexWrap>
+          {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
+        </StyledAlert>
+      </AlertContainer>
+    );
+  })
+  .filter((a) => a);
 
   if (publicNotifications.length) {
     return <Wrapper>{publicNotifications}</Wrapper>;
