@@ -115,7 +115,7 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
       </AlertContainer>
     );
   })
-  .filter((a) => a);
+    .filter((a) => a);
 
   if (publicNotifications.length) {
     return <Wrapper>{publicNotifications}</Wrapper>;
