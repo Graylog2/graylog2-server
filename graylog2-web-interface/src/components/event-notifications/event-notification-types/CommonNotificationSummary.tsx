@@ -27,7 +27,12 @@ type Props = React.PropsWithChildren<{
   definitionNotification?: any;
 }>;
 
-const CommonNotificationSummary = ({ definitionNotification = undefined, type, notification, children }: Props) => {
+const CommonNotificationSummary = ({
+  definitionNotification = undefined,
+  type,
+  notification,
+  children = undefined,
+}: Props) => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
 
   const toggleDisplayDetails = () => {

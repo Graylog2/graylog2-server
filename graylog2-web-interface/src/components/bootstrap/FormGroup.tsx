@@ -80,7 +80,7 @@ type Props = React.ComponentProps<typeof StyledFormGroup> & {
   validationState?: 'error' | 'success' | 'warning';
 };
 
-const FormGroup = ({ children, validationState = null, ...props }: Props) => (
+const FormGroup = ({ children = undefined, validationState = null, ...props }: Props) => (
   <StyledFormGroup validationState={validationState} {...props}>
     {children}
   </StyledFormGroup>

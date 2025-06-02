@@ -39,7 +39,14 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const Badge = (
-  { bsStyle = 'default', className, children, 'data-testid': dataTestid, onClick, title }: Props,
+  {
+    bsStyle = 'default',
+    className = undefined,
+    children = undefined,
+    'data-testid': dataTestid,
+    onClick = undefined,
+    title = undefined,
+  }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
   <StyledBadge

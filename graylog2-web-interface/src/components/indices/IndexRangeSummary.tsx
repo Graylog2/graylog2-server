@@ -22,7 +22,7 @@ type Props = {
   indexRange?: any;
 };
 
-const IndexRangeSummary = ({ indexRange }: Props) => {
+const IndexRangeSummary = ({ indexRange = undefined }: Props) => {
   if (!indexRange) {
     return (
       <span>
