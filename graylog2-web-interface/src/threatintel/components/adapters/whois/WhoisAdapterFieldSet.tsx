@@ -19,7 +19,7 @@ import React from 'react';
 import { Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
 
-type WhoisAdapterFieldSetProps = {
+type Props = {
   config: {
     connect_timeout: number;
     read_timeout: number;
@@ -29,46 +29,35 @@ type WhoisAdapterFieldSetProps = {
   validationState: (...args: any[]) => ValidationState;
 };
 
-class WhoisAdapterFieldSet extends React.Component<
-  WhoisAdapterFieldSetProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    const { config } = this.props;
-
-    return (
-      <fieldset>
-        <Input
-          type="number"
-          id="connect_timeout"
-          name="connect_timeout"
-          label="Connect timeout"
-          required
-          onChange={this.props.handleFormEvent}
-          help={this.props.validationMessage('connect_timeout', 'WHOIS connection timeout in milliseconds.')}
-          bsStyle={this.props.validationState('connect_timeout')}
-          value={config.connect_timeout}
-          labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        />
-        <Input
-          type="number"
-          id="read_timeout"
-          name="read_timeout"
-          label="Read timeout"
-          required
-          onChange={this.props.handleFormEvent}
-          help={this.props.validationMessage('read_timeout', 'WHOIS connection read timeout in milliseconds.')}
-          bsStyle={this.props.validationState('read_timeout')}
-          value={config.read_timeout}
-          labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        />
-      </fieldset>
-    );
-  }
-}
+const WhoisAdapterFieldSet = ({ config, handleFormEvent, validationMessage, validationState }: Props) => {
+  <fieldset>
+    <Input
+      type="number"
+      id="connect_timeout"
+      name="connect_timeout"
+      label="Connect timeout"
+      required
+      onChange={handleFormEvent}
+      help={validationMessage('connect_timeout', 'WHOIS connection timeout in milliseconds.')}
+      bsStyle={validationState('connect_timeout')}
+      value={config.connect_timeout}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+    />
+    <Input
+      type="number"
+      id="read_timeout"
+      name="read_timeout"
+      label="Read timeout"
+      required
+      onChange={handleFormEvent}
+      help={validationMessage('read_timeout', 'WHOIS connection read timeout in milliseconds.')}
+      bsStyle={validationState('read_timeout')}
+      value={config.read_timeout}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+    />
+  </fieldset>;
+};
 
 export default WhoisAdapterFieldSet;
