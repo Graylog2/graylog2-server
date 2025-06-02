@@ -43,7 +43,7 @@ type Configuration = {
 
 type ConfigurationModalProps = {
   onClose: () => void;
-  onSave: (Configuration) => void;
+  onSave: (configuration: Configuration) => void;
   show: boolean;
   view: View;
 };
