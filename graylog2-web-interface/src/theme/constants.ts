@@ -37,7 +37,9 @@ const NAV_ITEM_HEIGHT = '50px';
 
 const NAV_LOGO_HEIGHT = '30px';
 
-const MAX_LOGO_WIDTH = '120px';
+const MAX_NAV_LOGO_WIDTH = '120px';
+
+const MAX_NAV_ICON_WIDTH = '30px';
 
 export {
   DEFAULT_THEME_MODE,
@@ -52,5 +54,6 @@ export {
   INPUT_BORDER_RADIUS,
   NAV_ITEM_HEIGHT,
   NAV_LOGO_HEIGHT,
-  MAX_LOGO_WIDTH,
+  MAX_NAV_LOGO_WIDTH,
+  MAX_NAV_ICON_WIDTH,
 };

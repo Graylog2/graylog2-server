@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
-import { NAV_LOGO_HEIGHT, MAX_LOGO_WIDTH } from 'theme/constants';
+import { NAV_LOGO_HEIGHT, MAX_NAV_LOGO_WIDTH } from 'theme/constants';
 import useCustomLogo from 'brand-customization/useCustomLogo';
 
 export const Logo = ({ color }: { color: string }) => (
@@ -76,7 +76,7 @@ type Props = {
 const StyledSvgContainer = styled.div`
   svg {
     width: 100%;
-    max-width: ${MAX_LOGO_WIDTH};
+    max-width: ${MAX_NAV_LOGO_WIDTH};
     height: ${NAV_LOGO_HEIGHT};
     display: block;
   }
