@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
@@ -26,10 +26,9 @@ import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
 import memoize from 'lodash/memoize';
 import max from 'lodash/max';
-import union from 'lodash/union';
 import moment from 'moment';
-import type { Set } from 'immutable';
 import { OrderedMap } from 'immutable';
+import type * as Immutable from 'immutable';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -101,6 +100,104 @@ const toTimeRange = (from: number): RelativeTimeRangeWithEnd => ({
   from: from / 1000,
 });
 
+const WarmTierTimeStamp = () => {
+  const { warnings } = useContext(FormWarningsContext);
+  const validationState = warnings?.queryString as QueryValidationState;
+  const warmTierRanges = indicesInWarmTier(validationState);
+  const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
+
+  return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
+};
+
+type StreamCategorySelectorProps = {
+  onChange: (value: string) => void;
+  value: string;
+  streams: Array<Stream>;
+};
+const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySelectorProps) => {
+  const streamCategoryOptions = useMemo(
+    () =>
+      [...new Set<string>(streams.flatMap((stream) => stream?.categories))]
+        .sort(defaultCompare)
+        .map((category) => ({ label: category, value: category })),
+    [streams],
+  );
+
+  if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
+
+  return (
+    <FormGroup controlId="filter-stream-categories">
+      <ControlLabel>
+        Stream Categories <small className="text-muted">(Optional)</small>
+      </ControlLabel>
+      <MultiSelect
+        id="filter-stream-categories"
+        matchProp="label"
+        onChange={onChange}
+        options={streamCategoryOptions}
+        value={value}
+      />
+      <HelpBlock>Select stream categories the search should include.</HelpBlock>
+    </FormGroup>
+  );
+};
+
+type QueryParametersProps = {
+  eventDefinition: EventDefinition;
+  onChange: (config: EventDefinitionConfig) => void;
+  userCanViewLookupTables: boolean;
+  validation: Props['validation'];
+};
+const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, validation }: QueryParametersProps) => {
+  const { tables = {} } = useStore(LookupTablesStore);
+  const queryParameters = eventDefinition?.config?.query_parameters ?? [];
+
+  const onChangeQueryParameters = (newQueryParameters: Array<LookupTableParameterJson>) => {
+    const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
+
+    return onChange(newConfig);
+  };
+
+  if (!userCanViewLookupTables) {
+    return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
+  }
+
+  const parameterButtons = queryParameters.map((queryParam) => (
+    <EditQueryParameterModal
+      key={queryParam.name}
+      queryParameter={LookupTableParameter.fromJSON(queryParam)}
+      embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
+      queryParameters={queryParameters}
+      lookupTables={Object.values(tables)}
+      onChange={onChangeQueryParameters}
+    />
+  ));
+
+  if (isEmpty(parameterButtons)) {
+    return null;
+  }
+
+  const hasEmbryonicParameters = !isEmpty(
+    queryParameters.filter((param: LookupTableParameterJsonEmbryonic) => param.embryonic),
+  );
+
+  return (
+    <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
+      <ControlLabel>Query Parameters</ControlLabel>
+      <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
+        <ButtonToolbar>{parameterButtons}</ButtonToolbar>
+      </Alert>
+      {hasEmbryonicParameters && (
+        <HelpBlock>
+          {validation.errors.query_parameters
+            ? get(validation, 'errors.query_parameters[0]')
+            : 'Please declare missing query parameters by clicking on the buttons above.'}
+        </HelpBlock>
+      )}
+    </FormGroup>
+  );
+};
+
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
@@ -111,7 +208,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const validationState = warnings?.queryString as QueryValidationState;
   const warmTierRanges = indicesInWarmTier(validationState);
 
-  const { tables } = useStore(LookupTablesStore);
   const { pathname } = useLocation();
 
   const sendTelemetry = useSendTelemetry();
@@ -126,7 +222,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const [searchWithinMsDuration, setSearchWithinMsDuration] = useState<number>(searchWithin.duration);
   const [executeEveryMsDuration, setExecuteEveryMsDuration] = useState<number>(executeEvery.duration);
 
-  const userCanViewLookupTables = useCallback(
+  const userCanViewLookupTables = useMemo(
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
     [currentUser.permissions],
   );
@@ -134,21 +230,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const isStreamRequired = useCallback(
     () => !isPermitted(currentUser.permissions, STREAM_PERMISSIONS),
     [currentUser.permissions],
-  );
-
-  const streamCategoryOptions = React.useMemo(
-    () =>
-      streams
-        .reduce((acc: { label: string; value: string }[], stream: Stream) => {
-          stream.categories?.forEach((category: string) => {
-            if (!acc.find((option: { value: string }) => option.value === category))
-              acc.push({ label: category, value: category });
-          });
-
-          return acc;
-        }, [])
-        .sort((a, b) => defaultCompare(a.value, b.value)),
-    [streams],
   );
 
   const [cronDescription, setCronDescription] = useState<string>(
@@ -180,7 +261,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   );
 
   useEffect(() => {
-    if (userCanViewLookupTables()) {
+    if (userCanViewLookupTables) {
       LookupTablesActions.searchPaginated(1, 0, undefined, false);
     }
   }, [userCanViewLookupTables]);
@@ -229,7 +310,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     (streamIds: Array<String>) => streamIds.join('-'),
   );
 
-  const syncParamsWithQuery = (paramsInQuery: Set<string>, config: EventDefinitionConfig) => {
+  const syncParamsWithQuery = (paramsInQuery: Immutable.Set<string>, config: EventDefinitionConfig) => {
     const queryParameters = config?.query_parameters || [];
     const keptParameters = [];
     const staleParameters = {};
@@ -260,7 +341,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   };
 
   const parseQuery = (queryString: string, config: EventDefinitionConfig, searchFilters = OrderedMap()) => {
-    if (!userCanViewLookupTables()) {
+    if (!userCanViewLookupTables) {
       return;
     }
 
@@ -415,92 +496,10 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       setExecuteEveryMsUnit(nextUnit);
     };
 
-  const renderQueryParameters = () => {
-    const queryParameters = eventDefinition?.config?.query_parameters || [];
-
-    const onChangeQueryParameters = (newQueryParameters: Array<LookupTableParameterJson>) => {
-      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
-
-      return onChange('config', newConfig);
-    };
-
-    if (!userCanViewLookupTables()) {
-      return (
-        <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>
-      );
-    }
-
-    const parameterButtons = queryParameters.map((queryParam) => (
-      <EditQueryParameterModal
-        key={queryParam.name}
-        queryParameter={LookupTableParameter.fromJSON(queryParam)}
-        embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
-        queryParameters={queryParameters}
-        lookupTables={Object.values(tables || {})}
-        onChange={onChangeQueryParameters}
-      />
-    ));
-
-    if (isEmpty(parameterButtons)) {
-      return null;
-    }
-
-    const hasEmbryonicParameters = !isEmpty(
-      queryParameters.filter((param: LookupTableParameterJsonEmbryonic) => param.embryonic),
-    );
-
-    return (
-      <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
-        <ControlLabel>Query Parameters</ControlLabel>
-        <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
-          <ButtonToolbar>{parameterButtons}</ButtonToolbar>
-        </Alert>
-        {hasEmbryonicParameters && (
-          <HelpBlock>
-            {validation.errors.query_parameters
-              ? get(validation, 'errors.query_parameters[0]')
-              : 'Please declare missing query parameters by clicking on the buttons above.'}
-          </HelpBlock>
-        )}
-      </FormGroup>
-    );
-  };
-
-  const streamCategorySelector = () => {
-    if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
-
-    return (
-      <FormGroup controlId="filter-stream-categories">
-        <ControlLabel>
-          Stream Categories <small className="text-muted">(Optional)</small>
-        </ControlLabel>
-        <MultiSelect
-          id="filter-stream-categories"
-          matchProp="label"
-          onChange={(selected) =>
-            propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
-          }
-          options={streamCategoryOptions}
-          value={defaultTo(eventDefinition.config.stream_categories, []).join(',')}
-        />
-        <HelpBlock>Select stream categories the search should include.</HelpBlock>
-      </FormGroup>
-    );
-  };
-
-  const warmTierTimeStamp = () => {
-    const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
-
-    return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
-  };
-
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
-  const allStreamIds = union(
-    streams.map((s) => s.id),
-    defaultTo(eventDefinition.config.streams, []),
-  );
+  const allStreamIds = [...streams.map((s) => s.id), ...(eventDefinition.config.streams ?? [])];
   const formattedStreams = formatStreamIds(allStreamIds);
 
   return (
@@ -524,7 +523,14 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         />
       )}
 
-      {onlyFilters || renderQueryParameters()}
+      {onlyFilters || (
+        <QueryParameters
+          eventDefinition={eventDefinition}
+          onChange={propagateChange}
+          userCanViewLookupTables={userCanViewLookupTables}
+          validation={validation}
+        />
+      )}
 
       {!searchFiltersHidden && (
         <FormGroup controlId="search-filters">
@@ -557,13 +563,19 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             />
             <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
           </FormGroup>
-          {streamCategorySelector()}
+          <StreamCategorySelector
+            onChange={(selected) =>
+              propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
+            }
+            value={defaultTo(eventDefinition.config.stream_categories, []).join(',')}
+            streams={streams}
+          />
           {isSearchingWarmTier(warmTierRanges) && (
             <Alert bsStyle="danger" title="Warm Tier Warning">
               The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve
               data from the Warm Tier may cause performance problems. A value for{' '}
               <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier:{' '}
-              {warmTierTimeStamp()}.
+              <WarmTierTimeStamp />.
             </Alert>
           )}
           <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
