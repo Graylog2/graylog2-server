@@ -21,11 +21,16 @@ import { MoreActions } from 'components/common/EntityDataTable';
 import type { Event } from 'components/events/events/types';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import useEventAction from 'components/events/events/hooks/useEventAction';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const EventActions = ({ event }: { event: Event }) => {
   const { moreActions, pluggableActionModals } = useEventAction(event);
   const { toggleSection } = useExpandedSections();
   const toggleExtraSection = () => toggleSection(event.id, 'restFieldsExpandedSection');
+
+  const { permissions } = useCurrentUser();
+  const canReadEventDefinition = isPermitted(permissions, `eventdefinitions:edit:${event.event_definition_id}`);
 
   return (
     <>
@@ -33,7 +38,7 @@ const EventActions = ({ event }: { event: Event }) => {
         <Button bsSize="xs" onClick={toggleExtraSection}>
           Details
         </Button>
-        {moreActions.length ? <MoreActions>{moreActions}</MoreActions> : null}
+        {moreActions.length && canReadEventDefinition ? <MoreActions>{moreActions}</MoreActions> : null}
       </ButtonToolbar>
       {pluggableActionModals}
     </>
