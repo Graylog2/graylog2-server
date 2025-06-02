@@ -23,23 +23,21 @@ import Routes from 'routing/Routes';
 import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
-type LookupTableConverterConfigurationProps = {
+type Props = {
   type: string;
   configuration: any;
   onChange: (...args: any[]) => void;
 };
 
-class LookupTableConverterConfiguration extends React.Component<
-  LookupTableConverterConfigurationProps,
-  {
-    [key: string]: any;
-  }
-> {
-  state = {
-    lookupTables: undefined,
-  };
-
+class LookupTableConverterConfiguration extends React.Component<Props, { lookupTables: any }> {
   private converterEnabled: Input;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      lookupTables: false,
+    };
+  }
 
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
