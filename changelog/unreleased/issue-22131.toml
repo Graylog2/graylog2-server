@@ -1,0 +1,5 @@
+type="a"
+message="Update system generated routing rule when corresponding input is renamed or deleted."
+
+pulls = [""]
+issues = ["22131"]
