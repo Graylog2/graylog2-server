@@ -84,13 +84,13 @@ const KinesisSetupSteps = ({ onSuccess, onError }: KinesisSetupStepsProps) => {
 
   useEffect(() => {
     setCreateStreamUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS_AUTO_SETUP.CREATE_STREAM);
-  }, []);
+  }, [setCreateStreamUrl]);
 
   useEffect(() => {
     if (createStreamProgress.error || createPolicyProgress.error || createSubsciptionProgress.error) {
       onError();
     }
-  }, [createStreamProgress.error, createPolicyProgress.error, createSubsciptionProgress.error]);
+  }, [createStreamProgress.error, createPolicyProgress.error, createSubsciptionProgress.error, onError]);
 
   return (
     <StepItems>
