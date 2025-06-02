@@ -33,11 +33,13 @@ import {
 
 import isEqualForSearch from './isEqualForSearch';
 
-export class AlwaysEqualForSearch {
+class AlwaysEqualForSearch {
+  // eslint-disable-next-line class-methods-use-this
   equalsForSearch = () => true;
 }
 
-export class NeverEqualForSearch {
+class NeverEqualForSearch {
+  // eslint-disable-next-line class-methods-use-this
   equalsForSearch = () => false;
 }
 
