@@ -28,7 +28,7 @@ import OriginalValue from './Value';
 import InteractiveContext from './contexts/InteractiveContext';
 
 jest.mock('views/hooks/useExternalValueActions');
-const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
+const Value = ({ ...props }: React.ComponentProps<typeof OriginalValue>) => (
   <TestStoreProvider>
     <OriginalValue {...props} />
   </TestStoreProvider>
@@ -165,11 +165,13 @@ describe('Value', () => {
   );
 
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive: boolean) => (props: React.ComponentProps<typeof Value>) => (
-      <InteractiveContext.Provider value={interactive}>
-        <Value {...props} />
-      </InteractiveContext.Provider>
-    );
+    const component =
+      (interactive: boolean) =>
+      ({ ...props }: React.ComponentProps<typeof Value>) => (
+        <InteractiveContext.Provider value={interactive}>
+          <Value {...props} />
+        </InteractiveContext.Provider>
+      );
 
     it('does not show value actions if interactive context is `false`', async () => {
       const NoninteractiveComponent = component(false);
