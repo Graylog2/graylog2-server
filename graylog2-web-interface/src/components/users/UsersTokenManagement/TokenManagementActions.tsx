@@ -24,10 +24,10 @@ type Props = {
   userId: string;
   tokenId: string;
   tokenName: string;
-  onDeleteCb?: () => void;
+  onDeleteCallback?: () => void;
 };
 
-const TokenActions = ({ userId, tokenId, tokenName, onDeleteCb = () => {} }: Props) => {
+const TokenActions = ({ userId, tokenId, tokenName, onDeleteCallback = () => {} }: Props) => {
   const { deleteToken } = useDeleteTokenMutation(userId, tokenId);
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -42,7 +42,7 @@ const TokenActions = ({ userId, tokenId, tokenName, onDeleteCb = () => {} }: Pro
     deleteToken().then(() => {
       setShowDeleteDialog(false);
       setIsDeleting(false);
-      onDeleteCb();
+      onDeleteCallback();
     });
   };
 
