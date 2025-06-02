@@ -228,7 +228,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [currentUser.permissions],
   );
 
-  const isStreamRequired = useCallback(
+  const isStreamRequired = useMemo(
     () => !isPermitted(currentUser.permissions, STREAM_PERMISSIONS),
     [currentUser.permissions],
   );
@@ -550,13 +550,11 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       {onlyFilters || (
         <>
           <FormGroup controlId="filter-streams">
-            <ControlLabel>
-              Streams{!isStreamRequired() && <small className="text-muted"> (Optional)</small>}
-            </ControlLabel>
+            <ControlLabel>Streams{!isStreamRequired && <small className="text-muted"> (Optional)</small>}</ControlLabel>
             <MultiSelect
               id="filter-streams"
               matchProp="label"
-              required={isStreamRequired()}
+              required={isStreamRequired}
               onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
               options={formattedStreams}
               value={defaultTo(eventDefinition.config.streams, []).join(',')}
