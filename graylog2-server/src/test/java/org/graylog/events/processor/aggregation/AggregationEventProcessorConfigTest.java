@@ -49,6 +49,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -68,7 +69,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.events.processor.aggregation.AggregationEventProcessorConfig.FIELD_SERIES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AggregationEventProcessorConfigTest {
     public static final EventDefinitionConfiguration EVENT_DEFINITION_CONFIGURATION = new EventDefinitionConfiguration();
@@ -98,6 +101,8 @@ public class AggregationEventProcessorConfigTest {
         objectMapper.registerSubtypes(new NamedType(AggregationEventProcessorConfig.class, AggregationEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TemplateFieldValueProvider.Config.class, TemplateFieldValueProvider.Config.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
+
+        when(userContext.isPermitted(anyString())).thenReturn(true);
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
@@ -356,7 +361,9 @@ public class AggregationEventProcessorConfigTest {
     @Test
     @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissionsWithEmptyStreams() {
+        when(userContext.isPermitted(RestPermissions.STREAMS_READ)).thenReturn(false);
+
         assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition ->
-                assertThat(definition.config().requiredPermissions()).containsOnly("streams:read"));
+                assertThat(definition.config().validate(userContext).getErrors()).containsKey("streams"));
     }
 }
