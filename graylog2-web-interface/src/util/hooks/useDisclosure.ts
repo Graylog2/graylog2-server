@@ -14,9 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { TextInput as MantineTextInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
-const TextInput = ({ ...props }: React.ComponentProps<typeof MantineTextInput>) => <MantineTextInput {...props} />;
-
-export default TextInput;
+export default useDisclosure;

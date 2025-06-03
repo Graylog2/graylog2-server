@@ -15,8 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { TextInput as MantineTextInput } from '@mantine/core';
 
-const TextInput = ({ ...props }: React.ComponentProps<typeof MantineTextInput>) => <MantineTextInput {...props} />;
+import { Panel } from 'components/bootstrap';
 
-export default TextInput;
+import styles from './FilterPreview.css';
+
+type Props = React.PropsWithChildren<{
+  hasError?: boolean;
+}>;
+const FilterPreviewResults = ({ children = undefined, hasError = false }: Props) => (
+  <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
+    <Panel.Heading>
+      <Panel.Title>Filter Preview</Panel.Title>
+    </Panel.Heading>
+    <Panel.Body>{children}</Panel.Body>
+  </Panel>
+);
+
+export default FilterPreviewResults;

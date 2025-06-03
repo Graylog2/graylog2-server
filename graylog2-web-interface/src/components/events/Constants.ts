@@ -69,7 +69,8 @@ export const detailsAttributes: Array<Attribute> = [
   ...commonEventAttributes,
   {
     id: 'remediation_steps',
-    title: 'Remediation Steps',
+    title: 'Event Procedures',
+    hidden: true,
     sortable: false,
   },
   {

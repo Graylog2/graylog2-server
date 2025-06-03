@@ -55,7 +55,7 @@ export type Scheduler = {
 
 export type SearchFilter = {
   id: string;
-  type: string;
+  type: 'referenced' | 'inlineQueryString';
   title: string;
   queryString: string;
   disabled: boolean;
