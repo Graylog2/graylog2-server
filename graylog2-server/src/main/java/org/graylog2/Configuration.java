@@ -153,7 +153,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;
 
-    @Parameter(value = "static_leader_timeout")
+    @Parameter(value = "static_leader_timeout", converter = JavaDurationConverter.class)
     private java.time.Duration staticLeaderTimeout = java.time.Duration.of(60, java.time.temporal.ChronoUnit.SECONDS);
 
     @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
