@@ -95,7 +95,7 @@ class ContentPackInstall extends React.Component<
   _validateInput = () => {
     const { parameterInput } = this.state;
     const errors = this.props.contentPack.parameters.reduce((result, parameter) => {
-      if (parameterInput[parameter.name] && parameterInput[parameter.name].length > 0) {
+      if (parameterInput[parameter.name]?.length) {
         return result;
       }
 
