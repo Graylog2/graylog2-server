@@ -40,6 +40,7 @@ class CounterRate extends React.Component<
     suffix: 'per second',
     hideOnZero: false,
     hideOnMissing: false,
+    metric: undefined,
   };
 
   state = {

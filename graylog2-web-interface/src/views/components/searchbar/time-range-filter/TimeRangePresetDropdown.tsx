@@ -135,7 +135,7 @@ const TimeRangePresetDropdown = ({
   disabled = false,
   limitDuration,
   onChange = undefined,
-  onToggle: onToggleProp,
+  onToggle: onToggleProp = undefined,
   className = undefined,
   displayTitle = true,
   bsSize = 'small',

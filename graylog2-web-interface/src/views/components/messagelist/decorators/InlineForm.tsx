@@ -27,7 +27,7 @@ type Props = {
 };
 
 const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> =>
-  React.forwardRef<HTMLFormElement, Props>(({ children, disabled, onCancel, onSubmitForm }: Props, ref) => {
+  React.forwardRef<HTMLFormElement, Props>(({ children, disabled = undefined, onCancel, onSubmitForm }: Props, ref) => {
     const onSubmit = (event) => {
       event.stopPropagation();
       const { target: formDOMNode } = event;

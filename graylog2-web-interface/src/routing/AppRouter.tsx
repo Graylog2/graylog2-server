@@ -113,7 +113,6 @@ import {
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
   ClusterCertificateManagementPage,
-  PluggableEventProceduresPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -216,10 +215,6 @@ const AppRouter = () => {
             {
               path: RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId'),
               element: <ShowEventNotificationPage />,
-            },
-            {
-              path: RoutePaths.ALERTS.EVENT_PROCEDURES.LIST(':viewType'),
-              element: <PluggableEventProceduresPage />,
             },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
