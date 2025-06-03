@@ -22,7 +22,6 @@ import jakarta.inject.Inject;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
-import org.graylog.integrations.aws.service.KinesisService;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -47,14 +46,12 @@ public class KinesisPayloadDecoder {
     private final ObjectMapper objectMapper;
     private final AWSMessageType awsMessageType;
     private final String kinesisStream;
-    private final String region;
 
     @Inject
-    public KinesisPayloadDecoder(ObjectMapper objectMapper, AWSMessageType awsMessageType, String kinesisStream, String region) {
+    public KinesisPayloadDecoder(ObjectMapper objectMapper, AWSMessageType awsMessageType, String kinesisStream) {
         this.objectMapper = objectMapper;
         this.awsMessageType = awsMessageType;
         this.kinesisStream = kinesisStream;
-        this.region = region;
     }
 
     /**
@@ -133,5 +130,4 @@ public class KinesisPayloadDecoder {
 
         return logSubscriptionData;
     }
-
 }

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
@@ -51,8 +52,6 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
-
-import jakarta.inject.Inject;
 
 import java.net.URL;
 import java.util.Locale;
@@ -148,8 +147,6 @@ public class KinesisTransport extends ThrottleableTransport2 {
 
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
-        final String streamArn = configuration.getString(CK_KINESIS_STREAM_ARN);
-        LOG.info("Kinesis Stream ARN: {}",streamArn);
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),

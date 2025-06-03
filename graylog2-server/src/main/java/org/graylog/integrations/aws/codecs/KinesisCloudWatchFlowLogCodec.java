@@ -99,7 +99,6 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
     }
 
     private Map<String, Object> addFlowLogFields(FlowLogMessage msg) {
-
         final String prefix = this.noFlowLogPrefix ? "" : FLOW_LOG_PREFIX;
         final HashMap<String, Object> fields = new HashMap<>();
         fields.put(prefix + FIELD_ACCOUNT_ID, msg.getAccountId());

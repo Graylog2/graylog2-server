@@ -217,6 +217,4 @@ public class AWSInput extends MessageInput {
                 "The ARN of the Kinesis stream.",
                 ConfigurationField.Optional.OPTIONAL);
     }
-
-
 }

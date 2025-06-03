@@ -42,12 +42,12 @@ public class KinesisPayloadDecoderTest {
     public void setUp() {
 
         flowLogDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
-                AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
-                "a-stream", TEST_REGION);
+                                                   AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
+                                                   "a-stream");
 
         rawDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
-                AWSMessageType.KINESIS_RAW,
-                "a-stream", TEST_REGION);
+                                               AWSMessageType.KINESIS_RAW,
+                                               "a-stream");
     }
 
     @Test
@@ -107,5 +107,4 @@ public class KinesisPayloadDecoderTest {
         Assert.assertEquals(textLogMessage, resultLogEntry.message());
         Assert.assertEquals(new DateTime(now.toEpochMilli(), DateTimeZone.UTC), resultLogEntry.timestamp());
     }
-
 }

@@ -33,11 +33,6 @@ import java.util.Optional;
 
 public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "CloudWatchRawLog";
-    public static final String FIELD_SUBSCRIPTION_FILTERS = "aws_subscription_filters";
-    public static final String FIELD_STREAM_ARN = "aws_kinesis_stream_arn";
-    public static final String SOURCE = "aws-kinesis-raw-logs";
-    public static final String FIELD_MESSAGE_TYPE = "aws_kinesis_message_type";
-    private static final String FIELD_OWNER = "aws_owner";
     private final MessageFactory messageFactory;
 
     @Inject
@@ -56,10 +51,6 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
                     logEvent.timestamp()
             );
             setCommonFields(logEvent, result);
-            result.addField(FIELD_OWNER, logEvent.owner());
-            result.addField(FIELD_MESSAGE_TYPE, logEvent.messageType());
-            result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
-
             return Optional.of(result);
         } catch (Exception e) {
             throw new RuntimeException("Could not deserialize AWS FlowLog record.", e);

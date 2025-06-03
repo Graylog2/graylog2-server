@@ -51,7 +51,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
@@ -545,7 +544,7 @@ public class KinesisService {
     }
 
     public String getStreamArn(KinesisHealthCheckRequest arnRequest) {
-        try(KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, arnRequest)) {
+        try (KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, arnRequest)) {
             DescribeStreamRequest request = DescribeStreamRequest.builder()
                     .streamName(arnRequest.streamName())
                     .build();
@@ -555,7 +554,7 @@ public class KinesisService {
             return description.streamARN();
         } catch (Exception e) {
             LOG.error("Failed to get stream ARN for stream: [{}]", arnRequest.streamName());
-            return "ERROR: Failed to get stream ARN. Please ensure the IAM role includes the 'kinesis:DescribeStream' permission.";
+            return "Error: Failed to get stream ARN. Please ensure the IAM role includes the 'kinesis:DescribeStream' permission.";
         }
     }
 }
