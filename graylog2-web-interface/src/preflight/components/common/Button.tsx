@@ -49,10 +49,10 @@ export type Props = { type?: 'submit' | 'button' | 'reset' } & (
   | StyledMantineButtonProps
 );
 
-const Button = forwardRef<HTMLButtonElement, Props>(({ type = 'button', children, ...otherProps }, ref) => (
+const Button = ({ type = 'button', children, ...otherProps }: Props, ref: React.ForwardedRef<HTMLButtonElement>) => (
   <StyledButton type={type} {...otherProps} ref={ref}>
     {children}
   </StyledButton>
-));
+);
 
-export default Button;
+export default forwardRef(Button);
