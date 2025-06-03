@@ -23,6 +23,7 @@ import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
+import org.graylog.security.UserContext;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class EventDefinitionDtoTest {
     @Before
     public void setUp() throws Exception {
         final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
-        when(configMock.validate()).thenReturn(new ValidationResult());
+        when(configMock.validate(mock(UserContext.class))).thenReturn(new ValidationResult());
         when(configMock.validate(any(), any())).thenReturn(new ValidationResult());
 
         testSubject = EventDefinitionDto.builder()
@@ -80,7 +81,7 @@ public class EventDefinitionDtoTest {
         final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
         final ValidationResult mockedValidationResult = new ValidationResult();
         mockedValidationResult.addError("foo", "bar");
-        when(configMock.validate()).thenReturn(mockedValidationResult);
+        when(configMock.validate(mock(UserContext.class))).thenReturn(mockedValidationResult);
         when(configMock.validate(any(), any())).thenReturn(mockedValidationResult);
 
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
@@ -161,6 +162,6 @@ public class EventDefinitionDtoTest {
     }
 
     private static ValidationResult validate(EventDefinitionDto eventDefinitionDto) {
-        return eventDefinitionDto.validate(null, new EventDefinitionConfiguration());
+        return eventDefinitionDto.validate(null, new EventDefinitionConfiguration(), mock(UserContext.class));
     }
 }

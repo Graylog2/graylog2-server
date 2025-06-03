@@ -40,6 +40,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -84,6 +85,9 @@ public class AggregationEventProcessorConfigTest {
 
     @Mock
     private DBEventProcessorStateService stateService;
+
+    @Mock
+    private UserContext userContext;
 
     private DBEventDefinitionService dbService;
     private JobSchedulerTestClock clock;
@@ -167,7 +171,7 @@ public class AggregationEventProcessorConfigTest {
                 .searchWithinMs(-1)
                 .build();
 
-        final ValidationResult validationResult1 = invalidConfig1.validate();
+        final ValidationResult validationResult1 = invalidConfig1.validate(userContext);
         assertThat(validationResult1.failed()).isTrue();
         assertThat(validationResult1.getErrors()).containsOnlyKeys("search_within_ms");
 
@@ -175,7 +179,7 @@ public class AggregationEventProcessorConfigTest {
                 .searchWithinMs(0)
                 .build();
 
-        final ValidationResult validationResult2 = invalidConfig2.validate();
+        final ValidationResult validationResult2 = invalidConfig2.validate(userContext);
         assertThat(validationResult2.failed()).isTrue();
         assertThat(validationResult2.getErrors()).containsOnlyKeys("search_within_ms");
     }
@@ -189,7 +193,7 @@ public class AggregationEventProcessorConfigTest {
                 .conditions(trueConditionThatDoesNotMatter)
                 .build();
 
-        ValidationResult validationResult = configWithSingleSeriesWithoutField.validate();
+        ValidationResult validationResult = configWithSingleSeriesWithoutField.validate(userContext);
         assertTrue(validationResult.failed());
         assertEquals(1, validationResult.getErrors().get(FIELD_SERIES).size());
         assertThat(validationResult.getErrors()).containsOnlyKeys(FIELD_SERIES);
@@ -208,7 +212,7 @@ public class AggregationEventProcessorConfigTest {
                 .conditions(trueConditionThatDoesNotMatter)
                 .build();
 
-        validationResult = configWithMultipleSeriesWithoutField.validate();
+        validationResult = configWithMultipleSeriesWithoutField.validate(userContext);
         assertTrue(validationResult.failed());
         assertThat(validationResult.getErrors()).containsOnlyKeys(FIELD_SERIES);
         assertEquals(5, validationResult.getErrors().get(FIELD_SERIES).size());
@@ -221,7 +225,7 @@ public class AggregationEventProcessorConfigTest {
                 .executeEveryMs(-1)
                 .build();
 
-        final ValidationResult validationResult1 = invalidConfig1.validate();
+        final ValidationResult validationResult1 = invalidConfig1.validate(userContext);
         assertThat(validationResult1.failed()).isTrue();
         assertThat(validationResult1.getErrors()).containsOnlyKeys("execute_every_ms");
 
@@ -229,7 +233,7 @@ public class AggregationEventProcessorConfigTest {
                 .executeEveryMs(0)
                 .build();
 
-        final ValidationResult validationResult2 = invalidConfig2.validate();
+        final ValidationResult validationResult2 = invalidConfig2.validate(userContext);
         assertThat(validationResult2.failed()).isTrue();
         assertThat(validationResult2.getErrors()).containsOnlyKeys("execute_every_ms");
     }
@@ -289,7 +293,7 @@ public class AggregationEventProcessorConfigTest {
                 .groupBy(ImmutableList.of("foo"))
                 .build();
 
-        ValidationResult validationResult = invalidConfig.validate();
+        ValidationResult validationResult = invalidConfig.validate(userContext);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("series", "conditions");
 
@@ -297,7 +301,7 @@ public class AggregationEventProcessorConfigTest {
                 .series(ImmutableList.of(this.getSeries()))
                 .build();
 
-        validationResult = invalidConfig.validate();
+        validationResult = invalidConfig.validate(userContext);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("conditions");
 
@@ -305,14 +309,14 @@ public class AggregationEventProcessorConfigTest {
                 .conditions(this.getConditions())
                 .build();
 
-        validationResult = invalidConfig.validate();
+        validationResult = invalidConfig.validate(userContext);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("series");
     }
 
     @Test
     public void testValidConfiguration() {
-        final ValidationResult validationResult = getConfig().validate();
+        final ValidationResult validationResult = getConfig().validate(userContext);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
     }
@@ -324,7 +328,7 @@ public class AggregationEventProcessorConfigTest {
                 .streams(ImmutableSet.of("1", "2"))
                 .build();
 
-        final ValidationResult validationResult = config.validate();
+        final ValidationResult validationResult = config.validate(userContext);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
     }
@@ -337,7 +341,7 @@ public class AggregationEventProcessorConfigTest {
                 .conditions(this.getConditions())
                 .build();
 
-        final ValidationResult validationResult = config.validate();
+        final ValidationResult validationResult = config.validate(userContext);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
     }
