@@ -15,124 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import debounce from 'lodash/debounce';
-import { Map } from 'immutable';
+import { useContext } from 'react';
 
-import Query from 'views/logic/queries/Query';
-import Search from 'views/logic/search/Search';
-import { isPermitted } from 'util/PermissionsMixin';
-import generateId from 'logic/generateId';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type User from 'logic/users/User';
-import useCurrentUser from 'hooks/useCurrentUser';
-import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
-import createSearch from 'views/logic/slices/createSearch';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecutionResult } from 'views/types';
-import type { LookupTableParameterJsonEmbryonic } from 'components/event-definitions/event-definition-types/FilterForm';
-import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import StreamsContext from 'contexts/StreamsContext';
+import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 
 import FilterPreview from './FilterPreview';
-
-const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['config']) => {
-  const missingPermissions = config?.streams?.some(
-    (stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`),
-  );
-
-  return !missingPermissions;
-};
-
-const constructSearch = (config: EventDefinition['config'], searchTypeId: string, queryId: string) => {
-  const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
-
-  const queryBuilder = Query.builder()
-    .id(queryId)
-    .query({ type: 'elasticsearch', query_string: config?.query || '*' })
-    .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
-    .filter(formattedStreams.length === 0 ? null : Map({ type: 'or', filters: formattedStreams }))
-    .filters(config.filters)
-    .searchTypes([
-      {
-        id: searchTypeId,
-        type: 'messages',
-        limit: 10,
-        offset: 0,
-        filter: undefined,
-        filters: undefined,
-        name: undefined,
-        query: undefined,
-        timerange: undefined,
-        streams: [],
-        stream_categories: [],
-        sort: [],
-        decorators: [],
-      },
-    ]);
-
-  const query = queryBuilder.build();
-
-  return Search.create()
-    .toBuilder()
-    .parameters(
-      config?.query_parameters
-        ?.filter((param: LookupTableParameterJsonEmbryonic) => !param.embryonic)
-        .map((param) => LookupTableParameter.fromJSON(param)) ?? [],
-    )
-    .queries([query])
-    .build();
-};
 
 type FilterPreviewContainerProps = {
   eventDefinition: EventDefinition;
 };
-
-const useExecutePreview = (config: EventDefinition['config']) => {
-  const currentUser = useCurrentUser();
-  const queryId = useMemo(() => generateId(), []);
-  const searchTypeId = useMemo(() => generateId(), []);
-  const [results, setResults] = useState<SearchExecutionResult>();
-  const { startJob, executeJobResult } = useSearchExecutors();
-  const executeSearch = useMemo(
-    () =>
-      debounce(
-        (search: Search) =>
-          createSearch(search)
-            .then((createdSearch) => startJob(createdSearch, [searchTypeId], SearchExecutionState.empty()))
-            .then((jobIds) => executeJobResult({ jobIds }))
-            .then((result) => setResults(result)),
-        250,
-      ),
-    [executeJobResult, searchTypeId, startJob],
-  );
-
-  useEffect(() => {
-    if (isPermittedToSeePreview(currentUser, config)) {
-      const search = constructSearch(config, searchTypeId, queryId);
-      executeSearch(search);
-    }
-  }, [config, currentUser, executeSearch, queryId, searchTypeId]);
-
-  return {
-    errors: results?.result?.errors,
-    result: results?.result?.forId(queryId)?.searchTypes?.[searchTypeId],
-  };
-};
 const FilterPreviewContainer = ({ eventDefinition }: FilterPreviewContainerProps) => {
-  const currentUser = useCurrentUser();
-  const results = useExecutePreview(eventDefinition.config);
+  const streams = useContext(StreamsContext);
 
-  const isLoading = !results?.result;
-  const searchResult = results?.result;
-  const errors = results?.errors;
-
-  return (
-    <FilterPreview
-      isFetchingData={isLoading}
-      displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
-      searchResult={searchResult}
-      errors={errors}
-    />
+  return streams?.length ? (
+    <FilterPreview config={eventDefinition?.config} />
+  ) : (
+    <FilterPreviewResults>Unable to preview filter, user does not have access to any streams.</FilterPreviewResults>
   );
 };
 
