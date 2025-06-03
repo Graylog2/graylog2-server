@@ -46,7 +46,7 @@ const ContentPackDetails = ({
     if (hasAcceptedProtocol(contentPack.url)) {
       contentPackAnchor = <a href={contentPack.url}>{contentPack.url}</a>;
     }
-  } catch (e) {
+  } catch (_e) {
     // Do nothing
   }
 
