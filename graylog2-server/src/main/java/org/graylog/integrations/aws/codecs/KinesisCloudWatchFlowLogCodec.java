@@ -77,10 +77,8 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
                     buildSummary(flowLogMessage),
                     source,
                     flowLogMessage.getTimestamp());
-            result.addFields(buildFields(flowLogMessage));
-            result.addField(FIELD_KINESIS_STREAM, logEvent.kinesisStream());
-            result.addField(FIELD_LOG_GROUP, logEvent.logGroup());
-            result.addField(FIELD_LOG_STREAM, logEvent.logStream());
+            result.addFields(addFlowLogFields(flowLogMessage));
+            setCommonFields(logEvent, result);
             result.addField(SOURCE_GROUP_IDENTIFIER, true);
 
             return Optional.of(result);
@@ -100,7 +98,7 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
                 .toString();
     }
 
-    private Map<String, Object> buildFields(FlowLogMessage msg) {
+    private Map<String, Object> addFlowLogFields(FlowLogMessage msg) {
 
         final String prefix = this.noFlowLogPrefix ? "" : FLOW_LOG_PREFIX;
         final HashMap<String, Object> fields = new HashMap<>();

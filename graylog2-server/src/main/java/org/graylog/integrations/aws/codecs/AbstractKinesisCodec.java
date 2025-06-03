@@ -18,6 +18,7 @@ package org.graylog.integrations.aws.codecs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
+import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
@@ -37,6 +38,7 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
 
     static final String SOURCE_GROUP_IDENTIFIER = "aws_source";
     static final String FIELD_KINESIS_STREAM = "aws_kinesis_stream";
+    static final String FIELD_KINESIS_STREAM_ARN = "aws_kinesis_stream_arn";
     static final String FIELD_LOG_GROUP = "aws_log_group";
     static final String FIELD_LOG_STREAM = "aws_log_stream";
 
@@ -65,6 +67,13 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
     }
 
     protected abstract Optional<Message> decodeLogData(@Nonnull final KinesisLogEntry event);
+
+    public void setCommonFields(KinesisLogEntry logEvent, Message result) {
+        result.addField(FIELD_LOG_GROUP, logEvent.logGroup());
+        result.addField(FIELD_LOG_STREAM, logEvent.logStream());
+        result.addField(FIELD_KINESIS_STREAM, logEvent.kinesisStream());
+        result.addField(FIELD_KINESIS_STREAM_ARN, configuration.getString(KinesisTransport.CK_KINESIS_STREAM_ARN));
+    }
 
     @Nonnull
     @Override

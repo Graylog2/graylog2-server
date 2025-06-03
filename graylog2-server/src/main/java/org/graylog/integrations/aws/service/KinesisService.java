@@ -349,7 +349,7 @@ public class KinesisService {
         final String responseMessage = String.format(Locale.ROOT, "Success. The message is a %s message.", awsMessageType.getLabel());
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create(kinesisStreamName, logGroupName, logStreamName,
-                timestamp, logMessage, "", "", awsMessageType.getLabel(), new ArrayList<>());
+                timestamp, logMessage, "", awsMessageType.getLabel(), new ArrayList<>());
 
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
@@ -544,22 +544,17 @@ public class KinesisService {
         return iamClient.getRole(r -> r.roleName(roleName)).role().arn();
     }
 
-    public static String getStreamArn(String streamName, String regionName) {
-
-        Region region = Region.of(regionName);
-        try (KinesisClient kinesisClient = KinesisClient.builder()
-                .region(region)
-                .build()) {
-
+    public String getStreamArn(KinesisHealthCheckRequest arnRequest) {
+        try(KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, arnRequest)) {
             DescribeStreamRequest request = DescribeStreamRequest.builder()
-                    .streamName(streamName)
+                    .streamName(arnRequest.streamName())
                     .build();
 
             DescribeStreamResponse response = kinesisClient.describeStream(request);
             StreamDescription description = response.streamDescription();
             return description.streamARN();
         } catch (Exception e) {
-            LOG.error("Failed to get stream ARN for stream: " + streamName);
+            LOG.error("Failed to get stream ARN for stream: [{}]", arnRequest.streamName());
             return "ERROR: Failed to get stream ARN. Please ensure the IAM role includes the 'kinesis:DescribeStream' permission.";
         }
     }

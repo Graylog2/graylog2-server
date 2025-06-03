@@ -23,8 +23,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
@@ -37,7 +37,6 @@ public abstract class KinesisLogEntry {
     private static final String TIMESTAMP = "timestamp";
     private static final String MESSAGE = "message";
     private static final String OWNER = "owner";
-    private static final String STREAM_ARN = "stream_arn";
     private static final String MESSAGE_TYPE = "message_type";
     private static final String SUBSCRIPTION_FILTERS = "subscription_filters";
 
@@ -64,12 +63,11 @@ public abstract class KinesisLogEntry {
     @JsonProperty(OWNER)
     public abstract String owner();
 
-    @JsonProperty(STREAM_ARN)
-    public abstract String streamArn();
-
+    @Nullable
     @JsonProperty(MESSAGE_TYPE)
     public abstract String messageType();
 
+    @Nullable
     @JsonProperty(SUBSCRIPTION_FILTERS)
     public abstract List<String> subscriptionFilters();
 
@@ -80,10 +78,9 @@ public abstract class KinesisLogEntry {
                                          @JsonProperty(TIMESTAMP) DateTime timestamp,
                                          @JsonProperty(MESSAGE) String message,
                                          @JsonProperty(OWNER) String owner,
-                                         @JsonProperty(STREAM_ARN) String streamArn,
                                          @JsonProperty(MESSAGE_TYPE) String messageType,
                                          @JsonProperty(SUBSCRIPTION_FILTERS) List<String> subscriptionFilters) {
         return new AutoValue_KinesisLogEntry(kinesisStream, logGroup, logStream, timestamp, message,
-                owner, streamArn, messageType, subscriptionFilters);
+                owner, messageType, subscriptionFilters);
     }
 }
