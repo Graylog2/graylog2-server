@@ -84,8 +84,9 @@ public class EntityDependencyResolver {
                 .collect(ImmutableSet.toImmutableSet());
 
         final ImmutableMap<GRN, Optional<String>> entityExcerpts = entityExcerpts();
+        final Map<GRN, Set<GRN>> owners = grantService.getOwnersForTargets(dependencies);
         return dependencies.stream()
-                .map(dependency -> descriptorFromGRN(dependency, entityExcerpts, grantService.getOwnersForTargets(ImmutableSet.of(dependency))))
+                .map(dependency -> descriptorFromGRN(dependency, entityExcerpts, owners))
                 .collect(ImmutableSet.toImmutableSet());
     }
 
