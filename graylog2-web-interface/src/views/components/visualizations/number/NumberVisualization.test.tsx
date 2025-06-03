@@ -33,7 +33,7 @@ import NumberVisualization from './NumberVisualization';
 jest.mock(
   './AutoFontSizer',
   () =>
-    ({ children }: React.PropsWithChildren<{}>) =>
+    ({ children = undefined }: React.PropsWithChildren<{}>) =>
       children,
 );
 

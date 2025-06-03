@@ -17,11 +17,9 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
-import type { StepType } from 'components/common/Wizard';
 import type { SelectCallback } from 'components/bootstrap/types';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -58,7 +56,7 @@ type Props = {
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
-  const [activeKey, setActiveKey] = useState<$PropertyType<StepType, 'key'>>(SERVER_CONFIG_KEY);
+  const [activeKey, setActiveKey] = useState<string>(SERVER_CONFIG_KEY);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 

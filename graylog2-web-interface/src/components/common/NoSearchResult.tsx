@@ -27,7 +27,7 @@ type Props = {
  * Component used to display a simple alert message for a search that returned no matching results.
  * Usage should include utilizing the `children` props to supply the user with a descriptive message.
  */
-const NoSearchResult = ({ children, className }: Props) => (
+const NoSearchResult = ({ children, className = undefined }: Props) => (
   <Alert className={`${className ?? ''} no-bm`}>{children || 'No data available.'}</Alert>
 );
 

@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import Immutable from 'immutable';
+import * as React from 'react';
 import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
+import type { TypeAheadInputRef } from 'components/common/TypeAheadInput';
 import TypeAheadInput from 'components/common/TypeAheadInput';
 
 const StyledButton = styled(Button)`
-  margin-left: 5;
+  margin-left: 5px;
 `;
 
 type TypeAheadDataFilterProps = {
@@ -34,15 +34,6 @@ type TypeAheadDataFilterProps = {
    * the keys to be filtered, specified in the `searchInKeys` prop.
    */
   data?: any[];
-  /** Object key to use to display items in the suggestions. */
-  displayKey?: string;
-  /**
-   * Object key being used to provide suggestions.
-   *
-   * **Warning** The key in the data objects is expected to be plural,
-   * but here you must give the singular form.
-   */
-  filterBy?: string;
   /**
    * Function to override the default filtering algorithm.
    * @deprecated We never used the function and it seems to be broken,
@@ -50,18 +41,6 @@ type TypeAheadDataFilterProps = {
    * in the filter field.
    */
   filterData?: (...args: any[]) => void;
-  /**
-   * Object key where the auto-completion suggestions are stored. Use this
-   * if passing an array of objects to `filterSuggestions`.
-   */
-  filterSuggestionAccessor?: string;
-  /**
-   * Array of strings or objects containing available suggestions to auto
-   * complete. If an array of objects is given to this prop, please ensure
-   * the `filterSuggestionAccessor` prop specifies which key contains the
-   * suggestions.
-   */
-  filterSuggestions?: any[];
   /** Label to use for the filter input field. */
   label?: string;
   /**
@@ -95,30 +74,23 @@ class TypeAheadDataFilter extends React.Component<
   static defaultProps = {
     id: '',
     data: [],
-    displayKey: '',
-    filterBy: '',
     filterData: undefined,
-    filterSuggestionAccessor: '',
-    filterSuggestions: [],
     label: '',
     onDataFiltered: undefined,
     searchInKeys: [],
   };
 
-  private typeAheadInput: TypeAheadInput;
+  private typeAheadInput: TypeAheadInputRef;
 
-  constructor(props) {
+  constructor(props: TypeAheadDataFilterProps) {
     super(props);
-    const { filterBy } = this.props;
 
     this.state = {
       filterText: '',
-      filters: Immutable.OrderedSet(),
-      filterByKey: `${filterBy}s`,
     };
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: TypeAheadDataFilterProps) {
     const { data } = this.props;
 
     if (!isEqual(prevProps.data, data)) {
@@ -126,49 +98,10 @@ class TypeAheadDataFilter extends React.Component<
     }
   }
 
-  _onSearchTextChanged = (event) => {
+  _onSearchTextChanged = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.stopPropagation();
     this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
-  };
-
-  _onFilterAdded = (_event, suggestion) => {
-    const { filters } = this.state;
-    const { displayKey } = this.props;
-
-    this.setState(
-      {
-        filters: filters.add(suggestion[displayKey]),
-        filterText: '',
-      },
-      this.filterData,
-    );
-
-    this.typeAheadInput.clear();
-  };
-
-  _onFilterRemoved = (event) => {
-    const { filters } = this.state;
-
-    event.preventDefault();
-    this.setState({ filters: filters.delete(event.target.getAttribute('data-target')) }, this.filterData);
-  };
-
-  _matchFilters = (datum) => {
-    const { filters, filterByKey } = this.state;
-    const { filterSuggestionAccessor } = this.props;
-
-    return filters.every((filter) => {
-      let dataToFilter = datum[filterByKey];
-
-      if (filterSuggestionAccessor) {
-        dataToFilter = dataToFilter.map((data) => data[filterSuggestionAccessor].toLocaleLowerCase());
-      } else {
-        dataToFilter = dataToFilter.map((data) => data.toLocaleLowerCase());
-      }
-
-      return dataToFilter.indexOf(filter.toLocaleLowerCase()) !== -1;
-    }, this);
   };
 
   _matchStringSearch = (datum) => {
@@ -201,7 +134,7 @@ class TypeAheadDataFilter extends React.Component<
 
   _resetFilters = () => {
     this.typeAheadInput.clear();
-    this.setState({ filterText: '', filters: Immutable.OrderedSet() }, this.filterData);
+    this.setState({ filterText: '' }, this.filterData);
   };
 
   filterData = () => {
@@ -212,7 +145,7 @@ class TypeAheadDataFilter extends React.Component<
       return filterData(data);
     }
 
-    const filteredData = data.filter((datum) => this._matchFilters(datum) && this._matchStringSearch(datum), this);
+    const filteredData = data.filter((datum) => this._matchStringSearch(datum), this);
 
     onDataFiltered(filteredData, filterText);
 
@@ -220,34 +153,8 @@ class TypeAheadDataFilter extends React.Component<
   };
 
   render() {
-    const { filters, filterText } = this.state;
-    const { id, label, displayKey, filterBy, filterSuggestionAccessor, filterSuggestions } = this.props;
-    const filtersContent = filters.map((filter) => (
-      <li key={`li-${filter}`}>
-        <span className="pill label label-default">
-          {filterBy}: {filter}
-          <button
-            type="button"
-            className="tag-remove"
-            data-target={filter}
-            onClick={this._onFilterRemoved}
-            aria-label={`Remove filter ${filter}`}
-          />
-        </span>
-      </li>
-    ));
-
-    let suggestions;
-
-    if (filterSuggestionAccessor) {
-      suggestions = filterSuggestions.map((filterSuggestion) =>
-        filterSuggestion[filterSuggestionAccessor].toLocaleLowerCase(),
-      );
-    } else {
-      suggestions = filterSuggestions.map((filterSuggestion) => filterSuggestion.toLocaleLowerCase());
-    }
-
-    suggestions.filter((filterSuggestion) => !filters.includes(filterSuggestion));
+    const { filterText } = this.state;
+    const { id, label } = this.props;
 
     return (
       <div className="filter">
@@ -260,22 +167,14 @@ class TypeAheadDataFilter extends React.Component<
             ref={(typeAheadInput) => {
               this.typeAheadInput = typeAheadInput;
             }}
-            onSuggestionSelected={this._onFilterAdded}
             formGroupClassName=""
-            suggestionText={`Filter by ${filterBy}: `}
-            suggestions={suggestions}
             label={label}
-            displayKey={displayKey}
           />
           <StyledButton type="submit">Filter</StyledButton>
-          <StyledButton
-            type="button"
-            onClick={this._resetFilters}
-            disabled={filters.count() === 0 && filterText === ''}>
+          <StyledButton type="button" onClick={this._resetFilters} disabled={filterText === ''}>
             Reset
           </StyledButton>
         </form>
-        <ul className="pill-list">{filtersContent}</ul>
       </div>
     );
   }

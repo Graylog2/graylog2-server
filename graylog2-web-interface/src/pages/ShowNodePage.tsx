@@ -26,7 +26,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
 import usePluginList from 'hooks/usePluginList';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const ShowNodePage = () => {
   const productName = useProductName();

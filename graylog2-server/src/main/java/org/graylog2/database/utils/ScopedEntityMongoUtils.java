@@ -16,8 +16,8 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.ReplaceOptions;
+import org.graylog2.database.MongoCollection;
 import org.bson.types.ObjectId;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;

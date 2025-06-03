@@ -33,6 +33,7 @@ type DataTableElementProps = {
  * should not use this component directly, but through `DataTable`. Look at the `DataTable`
  * section for a usage example.
  */
-const DataTableElement = ({ formatter, element, index }: DataTableElementProps) => formatter(element, index);
+const DataTableElement = ({ formatter, element = undefined, index = undefined }: DataTableElementProps) =>
+  formatter(element, index);
 
 export default DataTableElement;

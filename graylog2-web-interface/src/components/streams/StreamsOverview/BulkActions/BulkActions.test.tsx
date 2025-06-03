@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import selectEvent from 'react-select-event';
 
 import { Streams } from '@graylog/server-api';
 
+import selectEvent from 'helpers/selectEvent';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';

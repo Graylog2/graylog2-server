@@ -49,7 +49,6 @@ type Props = {
   excludedFields?: Array<string>;
   id: string;
   isFieldQualified?: (field: FieldTypeMapping) => boolean;
-  menuPortalTarget?: HTMLElement;
   name: string;
   onChange: (fieldName: string) => void;
   onMenuClose?: () => void;
@@ -81,7 +80,7 @@ type OptionRendererProps = {
   type?: FieldType;
 };
 
-const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
+const OptionRenderer = ({ label, qualified, type = undefined }: OptionRendererProps) => {
   const children = (
     <FieldName>
       {type && (
@@ -97,27 +96,26 @@ const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
 };
 
 const FieldSelect = ({
-  ariaLabel,
-  autoFocus,
+  ariaLabel = undefined,
+  autoFocus = undefined,
   allowCreate = false,
-  className,
+  className = undefined,
   clearable = false,
   excludedFields = [],
   id,
   isFieldQualified = () => true,
-  menuPortalTarget,
   name,
   onChange,
-  onMenuClose,
-  openMenuOnFocus,
-  persistSelection,
-  placeholder,
-  selectRef,
+  onMenuClose = undefined,
+  openMenuOnFocus = undefined,
+  persistSelection = undefined,
+  placeholder = undefined,
+  selectRef = undefined,
   size = 'small',
   value,
-  onSelectAllRest,
+  onSelectAllRest = undefined,
   showSelectAllRest = false,
-  onDeSelectAll,
+  onDeSelectAll = undefined,
   showDeSelectAll = false,
   options,
 }: Props) => {
@@ -163,7 +161,6 @@ const FieldSelect = ({
         optionRenderer={OptionRenderer}
         size={size}
         autoFocus={autoFocus}
-        menuPortalTarget={menuPortalTarget}
         onChange={onChange}
       />
       {(_showSelectAllRest || _showDeSelectAll) && (

@@ -17,8 +17,9 @@
 package org.graylog.events.processor;
 
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.conversions.Bson;
@@ -229,5 +230,27 @@ public class DBEventDefinitionService {
         return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
                 .map(this::getEventDefinitionWithRefetchedFilters)
                 .toList();
+    }
+
+    /**
+     * Stream event definitions by using the provided query. Use judiciously!
+     *
+     * @param query The query
+     * @return Stream of all found event definitions
+     */
+    @MustBeClosed
+    public Stream<EventDefinitionDto> streamByQuery(Bson query) {
+        return stream(collection.find(query));
+    }
+
+    /**
+     * Remove event procedures from all event definitions that reference it.
+     *
+     * @param procedureId The event procedure ID
+     */
+    public void removeEventProcedureFromAll(String procedureId) {
+        collection.updateMany(
+                Filters.eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
+                Updates.unset(EventDefinitionDto.FIELD_EVENT_PROCEDURE));
     }
 }

@@ -35,7 +35,12 @@ const StyledSlide = styled.div<{ $size?: string | number; $gap?: number }>(
   `,
 );
 
-const CarouselSlide = ({ children, size, gap, className }: CarouselSlideProps) => (
+const CarouselSlide = ({
+  children = undefined,
+  size = undefined,
+  gap = undefined,
+  className = undefined,
+}: CarouselSlideProps) => (
   <StyledSlide $size={size} $gap={gap} className={className}>
     {children}
   </StyledSlide>

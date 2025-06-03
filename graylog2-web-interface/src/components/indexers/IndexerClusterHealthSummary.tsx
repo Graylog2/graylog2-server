@@ -28,7 +28,7 @@ const ESClusterStatus = styled(Alert)`
 
 const IndexerClusterHealthSummary = ({
   health,
-  name,
+  name = undefined,
 }: {
   health: {
     status: string;

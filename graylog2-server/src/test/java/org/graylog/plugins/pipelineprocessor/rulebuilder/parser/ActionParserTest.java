@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
@@ -73,16 +74,18 @@ public class ActionParserTest {
         RuleFragmentService ruleFragmentService = mock(RuleFragmentService.class);
         when(ruleFragmentService.all()).thenReturn(new ArrayList<>());
 
+        final SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
+        secureFreemarkerConfigProvider.get().setLogTemplateExceptions(false);
         ruleBuilderRegistry = new RuleBuilderRegistry(
                 new FunctionRegistry(functions),
-                ruleFragmentService);
+                ruleFragmentService, secureFreemarkerConfigProvider, new EventBus());
     }
 
     @Before
     public void initialize() {
         final SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
         secureFreemarkerConfigProvider.get().setLogTemplateExceptions(false);
-        actionParser = new ActionParser(ruleBuilderRegistry, secureFreemarkerConfigProvider);
+        actionParser = new ActionParser(ruleBuilderRegistry);
     }
 
 

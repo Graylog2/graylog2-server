@@ -32,7 +32,8 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const EditContentPackPage = () => {
   useStore(ContentPacksStore);
@@ -177,11 +178,7 @@ const EditContentPackPage = () => {
             Content packs accelerate the set up process for a specific data source. A content pack can include
             inputs/extractors, streams, and dashboards.
             <br />
-            Find more content packs in{' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">
-              the Graylog Marketplace
-            </a>
-            .
+            <MarketplaceLink prefix="Find more content packs in" />
           </span>
         </PageHeader>
         <ContentPackEdit

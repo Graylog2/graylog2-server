@@ -22,6 +22,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.rest.models.system.inputs.responses.InputTypeInfo;
@@ -29,17 +36,9 @@ import org.graylog2.rest.models.system.inputs.responses.InputTypesSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,6 +70,9 @@ public class InputTypesResource extends RestResource {
             if (config.isCloud() && !entry.getValue().isCloudCompatible()) {
                 continue;
             }
+            if (!isPermitted(RestPermissions.INPUT_TYPES_CREATE, entry.getKey())) {
+                continue;
+            }
             types.put(entry.getKey(), entry.getValue().getName());
         }
         return InputTypesSummary.create(types);
@@ -88,7 +90,9 @@ public class InputTypesResource extends RestResource {
         if (config.isCloud()) {
             inputStream = inputStream.filter(e -> e.getValue().isCloudCompatible());
         }
-        return inputStream.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+        return inputStream
+                .filter(e -> isPermitted(RestPermissions.INPUT_TYPES_CREATE, e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             final InputDescription description = entry.getValue();
             return InputTypeInfo.create(entry.getKey(), description.getName(), description.isExclusive(),
                     description.getRequestedConfiguration(), description.getLinkToDocs());
@@ -107,6 +111,8 @@ public class InputTypesResource extends RestResource {
         if (description == null) {
             throwInputTypeNotFound(inputType);
         } else if (config.isCloud() && !description.isCloudCompatible()) {
+            throwInputTypeNotFound(inputType);
+        } else if (!isPermitted(RestPermissions.INPUT_TYPES_CREATE, inputType)) {
             throwInputTypeNotFound(inputType);
         }
 

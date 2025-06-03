@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useMemo, useCallback } from 'react';
 
 // TODO: Fix typing
 export const FormDataContext = createContext<any>(undefined);
@@ -27,25 +27,40 @@ type FormDataProviderProps = {
 export const FormDataProvider = ({ initialFormData = {}, children }: FormDataProviderProps) => {
   const [formData, updateState] = useState(initialFormData);
 
-  const setFormData = (id, fieldData) => {
-    updateState({
-      ...formData,
-      [id]: {
-        ...formData[id],
-        ...fieldData,
-        dirty: true,
-      },
-    });
-  };
+  const setFormData = useCallback(
+    (id, fieldData) => {
+      updateState({
+        ...formData,
+        [id]: {
+          ...formData[id],
+          ...fieldData,
+          dirty: true,
+        },
+      });
+    },
+    [formData],
+  );
 
-  const clearField = (id) => {
-    if (Object.keys(formData).find((field) => field === id)) {
-      delete formData[id];
-      updateState(formData);
-    }
-  };
+  const clearField = useCallback(
+    (id) => {
+      if (Object.keys(formData).find((field) => field === id)) {
+        delete formData[id];
+        updateState(formData);
+      }
+    },
+    [formData],
+  );
 
-  return <FormDataContext.Provider value={{ formData, setFormData, clearField }}>{children}</FormDataContext.Provider>;
+  const contextValue = useMemo(
+    () => ({
+      formData,
+      setFormData,
+      clearField,
+    }),
+    [clearField, formData, setFormData],
+  );
+
+  return <FormDataContext.Provider value={contextValue}>{children}</FormDataContext.Provider>;
 };
 
 export default FormDataProvider;

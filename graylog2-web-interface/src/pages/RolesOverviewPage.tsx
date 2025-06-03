@@ -23,7 +23,7 @@ import DocsHelper from 'util/DocsHelper';
 import { Button, Row, Col, Alert } from 'components/bootstrap';
 import { PageHeader, DocumentTitle, Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const RolesOverviewPage = () => {
   const productName = useProductName();
@@ -50,10 +50,9 @@ const RolesOverviewPage = () => {
       <Row className="content">
         <Col xs={12}>
           <Alert bsStyle="info" title={<>Granting Permissions</>}>
-            With version 4.0, we&apos;ve updated the permissions system and changed the purpose of roles. The built-in
-            roles still allow granting capabilities to users, like creating dashboards or viewing the archive catalog.
-            But they no longer grant permissions for a specific dashboard or stream. It is also not possible to create
-            an own role. Granting permissions for a specific entity can now be done by using its{' '}
+            The built-in roles allow granting capabilities to users, like creating dashboards or viewing the archive
+            catalog. But they do not grant permissions for a specific dashboard or stream. It is also not possible to
+            create an own role. Granting permissions for a specific entity can be done by using its{' '}
             <b>
               <Icon name="person_add" /> Share
             </b>{' '}

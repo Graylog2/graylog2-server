@@ -27,6 +27,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.entities.EntityDescriptor;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Set;
 @JsonDeserialize(builder = EntityShareResponse.Builder.class)
 public abstract class EntityShareResponse {
     @JsonProperty("entity")
+    @Nullable
     public abstract String entity();
 
     @JsonProperty("sharing_user")
@@ -56,12 +58,17 @@ public abstract class EntityShareResponse {
     @JsonProperty("missing_permissions_on_dependencies")
     public abstract ImmutableMap<GRN, Collection<EntityDescriptor>> missingPermissionsOnDependencies();
 
+    @JsonProperty("synced_entities")
+    public abstract ImmutableSet<GRN> syncedEntities();
+
     @JsonProperty("validation_result")
     public abstract ValidationResult validationResult();
 
     public static Builder builder() {
         return Builder.create();
     }
+
+    public abstract EntityShareResponse.Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -71,11 +78,12 @@ public abstract class EntityShareResponse {
                     .activeShares(Collections.emptySet())
                     .selectedGranteeCapabilities(Collections.emptyMap())
                     .missingPermissionsOnDependencies(Collections.emptyMap())
+                    .syncedEntities(Collections.emptySet())
                     .validationResult(new ValidationResult());
         }
 
         @JsonProperty("entity")
-        public abstract Builder entity(String entity);
+        public abstract Builder entity(@Nullable String entity);
 
         @JsonProperty("sharing_user")
         public abstract Builder sharingUser(GRN sharingUser);
@@ -94,6 +102,9 @@ public abstract class EntityShareResponse {
 
         @JsonProperty("missing_permissions_on_dependencies")
         public abstract Builder missingPermissionsOnDependencies(Map<GRN, Collection<EntityDescriptor>> missingDependencies);
+
+        @JsonProperty("synced_entities")
+        public abstract Builder syncedEntities(Set<GRN> syncedEntities);
 
         @JsonProperty("validation_result")
         public abstract Builder validationResult(ValidationResult validationResult);

@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public record ExportTabularResultResponse(@JsonProperty List<String> header,
                                           @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
@@ -38,12 +40,9 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
 
     public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
-        final Collection<PivotResult.Row> rows = pivotResult.rows();
+        final var header = pivotResult.columnNames();
 
-        final int longestRowKey = rows.stream()
-                .mapToInt(row -> row.key().size())
-                .max()
-                .orElse(0);
+        final Collection<PivotResult.Row> rows = pivotResult.rows();
 
         final List<ImmutableList<String>> columns = rows.stream()
                 .flatMap(row -> row.values()
@@ -53,10 +52,6 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                 .distinct()
                 .sorted(new ListOfStringsComparator())
                 .toList();
-
-        final List<String> header = new ArrayList<>(longestRowKey + columns.size());
-        header.addAll(Collections.nCopies(longestRowKey, ""));
-        columns.forEach(column -> header.add(column.toString()));
 
         final List<DataRow> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))

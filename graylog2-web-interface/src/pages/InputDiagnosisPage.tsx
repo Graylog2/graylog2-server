@@ -37,7 +37,7 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 const LeftCol = styled.div(

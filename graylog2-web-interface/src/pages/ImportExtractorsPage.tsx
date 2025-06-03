@@ -23,7 +23,8 @@ import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { Input } from 'components/messageloaders/Types';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 type Props = ParamsContext;
 
@@ -51,12 +52,11 @@ const ImportExtractorsPage = ({ params }: Props) => {
             </span>
           }>
           <span>
-            Exported extractors can be imported to an input. All you need is the JSON export of extractors from any
-            other {productName} setup or from{' '}
-            <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
-              the Graylog Marketplace
-            </a>
-            .
+            Exported extractors can be imported to an input.{' '}
+            <MarketplaceLink
+              prefix={`All you need is the JSON export of extractors from any
+            other ${productName} setup or from`}
+            />
           </span>
         </PageHeader>
         <ImportExtractors input={input} />
