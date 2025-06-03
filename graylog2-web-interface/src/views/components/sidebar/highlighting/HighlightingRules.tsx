@@ -47,20 +47,30 @@ type SortableHighlightingRuleProps = {
   onDelete: (rule: HighlightingRuleClass) => Promise<void>;
 };
 
-const SortableHighlightingRule = forwardRef<HTMLDivElement, SortableHighlightingRuleProps>(
-  ({ item: { id, rule }, draggableProps, dragHandleProps, className = undefined, onUpdate, onDelete }, ref) => (
-    <HighlightingRule
-      key={id}
-      rule={rule}
-      onUpdate={onUpdate}
-      onDelete={onDelete}
-      dragHandleProps={dragHandleProps}
-      draggableProps={draggableProps}
-      className={className}
-      ref={ref}
-    />
-  ),
+const SortableHighlightingRule = (
+  {
+    item: { id, rule },
+    draggableProps,
+    dragHandleProps,
+    className = undefined,
+    onUpdate,
+    onDelete,
+  }: SortableHighlightingRuleProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <HighlightingRule
+    key={id}
+    rule={rule}
+    onUpdate={onUpdate}
+    onDelete={onDelete}
+    dragHandleProps={dragHandleProps}
+    draggableProps={draggableProps}
+    className={className}
+    ref={ref}
+  />
 );
+
+const SortableHighlightingRuleWrapper = forwardRef(SortableHighlightingRule);
 
 type Props = {
   description: string;
@@ -113,7 +123,7 @@ const HighlightingRules = ({
       draggableProps: DraggableProps;
       dragHandleProps: DragHandleProps;
       className?: string;
-    }) => <SortableHighlightingRule {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />,
+    }) => <SortableHighlightingRuleWrapper {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />,
     [onDeleteRule, onUpdateRule],
   );
 

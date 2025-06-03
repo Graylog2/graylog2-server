@@ -14,25 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { forwardRef } from 'react';
+import { useDisclosure } from '@mantine/hooks';
 
-import Badge from 'components/bootstrap/Badge';
-
-type Props = {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-  title?: string;
-};
-
-const CountBadge = (
-  { children, onClick = undefined, className = '', title = undefined }: Props,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => (
-  <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
-    {children}
-  </Badge>
-);
-
-export default forwardRef(CountBadge);
+export default useDisclosure;
