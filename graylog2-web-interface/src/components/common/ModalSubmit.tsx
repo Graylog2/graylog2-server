@@ -66,7 +66,7 @@ const isWithCancelProps = (props: Props): props is WithCancelProps =>
 // @ts-expect-error
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
-const ModalSubmit = (props: Props) => {
+const ModalSubmit = ({ ...props }: Props) => {
   const {
     bsSize,
     className,

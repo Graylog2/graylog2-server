@@ -136,7 +136,7 @@ class ContentPackSelection extends React.Component<
         if (!hasAcceptedProtocol(contentPack.url)) {
           errors.url = 'Must use a URL starting with http or https.';
         }
-      } catch (e) {
+      } catch (_e) {
         errors.url = 'Invalid URL';
       }
     }
