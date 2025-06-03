@@ -181,7 +181,7 @@ public class StreamOutputResource extends RestResource {
     }
 
     private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+        if (!streamService.isEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }

@@ -58,9 +58,11 @@ import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.SystemStreamScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.nullToEmpty;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 
 public class StreamFacade implements EntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamFacade.class);
@@ -240,8 +243,18 @@ public class StreamFacade implements EntityFacade<Stream> {
 
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final String streamId = entity.id().id();
+        final StreamDTO dto;
+        try {
+            dto = streamService.getDTO(streamId);
+        } catch (NotFoundException e) {
+            // Entity does not exist
+            return Optional.empty();
+        }
         // Always use the existing system stream
-        if (Stream.isSystemStreamId(streamId)) {
+        // We no longer support exporting system streams, so this code only exists for old content packs that
+        // contain system streams. They should be loaded by the ContentPackService for any entities that reference
+        // them by title.
+        if (DEFAULT_STREAM_ID.equals(streamId) || dto.scope().equals(SystemStreamScope.NAME)) {
             try {
                 final Stream stream = streamService.load(streamId);
                 return Optional.of(NativeEntity.create(entity.id(), streamId, ModelTypes.STREAM_V1, stream.getTitle(), stream));
@@ -290,6 +303,8 @@ public class StreamFacade implements EntityFacade<Stream> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return streamService.loadAll().stream()
+                // We filter out system streams when collecting entities for the content pack, so just don't list them.
+                .filter(stream -> !DEFAULT_STREAM_ID.equals(stream.getId()) && !SystemStreamScope.NAME.equals(stream.getScope()))
                 .map(this::createExcerpt)
                 .collect(Collectors.toSet());
     }

@@ -44,7 +44,6 @@ import org.graylog2.contentpacks.exceptions.InvalidParametersException;
 import org.graylog2.contentpacks.exceptions.MissingParametersException;
 import org.graylog2.contentpacks.exceptions.UnexpectedEntitiesException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
-import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
@@ -70,6 +69,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.parameters.Parameter;
 import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
@@ -100,6 +100,7 @@ public class ContentPackService {
     private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
     private final ObjectMapper objectMapper;
     private final Configuration configuration;
+    private final StreamService streamService;
     private final UserService userService;
 
     @Inject
@@ -108,12 +109,14 @@ public class ContentPackService {
                               Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
                               ObjectMapper objectMapper,
                               Configuration configuration,
+                              StreamService streamService,
                               UserService userService) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
         this.objectMapper = objectMapper;
         this.configuration = configuration;
+        this.streamService = streamService;
         this.userService = userService;
     }
 
@@ -229,15 +232,12 @@ public class ContentPackService {
 
     private Map<EntityDescriptor, Object> getMapWithSystemStreamEntities() {
         Map<EntityDescriptor, Object> entities = new HashMap<>();
-        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+        for (Stream stream : streamService.loadSystemStreams(true)) {
             try {
-                final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(id, ModelTypes.STREAM_V1);
-                final StreamFacade streamFacade = (StreamFacade) entityFacades.getOrDefault(ModelTypes.STREAM_V1, UnsupportedEntityFacade.INSTANCE);
-                final Entity streamEntity = streamFacade.exportEntity(streamEntityDescriptor, EntityDescriptorIds.of(streamEntityDescriptor)).get();
-                final NativeEntity<Stream> streamNativeEntity = streamFacade.findExisting(streamEntity, Collections.emptyMap()).get();
-                entities.put(streamEntityDescriptor, streamNativeEntity.entity());
+                final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
+                entities.put(streamEntityDescriptor, stream);
             } catch (Exception e) {
-                LOG.debug("Failed to load system stream <{}>", id, e);
+                LOG.debug("Failed to load system stream <{}>", stream.getId(), e);
             }
         }
         return entities;

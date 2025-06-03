@@ -19,7 +19,6 @@ package org.graylog2.database.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 /**
  * Entity base class, which can be used to enforce that each entity implementation
@@ -39,7 +38,6 @@ public abstract class ScopedEntity implements MongoEntity {
         }
 
         @Id
-        @ObjectId
         @JsonProperty(FIELD_ID)
         public abstract SELF id(String id);
 

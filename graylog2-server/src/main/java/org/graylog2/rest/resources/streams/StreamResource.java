@@ -68,6 +68,7 @@ import org.graylog2.audit.jersey.SuccessContextCreator;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -169,6 +170,7 @@ public class StreamResource extends RestResource {
     private final BulkExecutor<Stream, UserContext> bulkStreamStopExecutor;
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
+    private final EntityScopeService scopeService;
     private final EntitySharesService entitySharesService;
 
     private final DbQueryCreator dbQueryCreator;
@@ -184,6 +186,7 @@ public class StreamResource extends RestResource {
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService,
+                          EntityScopeService scopeService,
                           EntitySharesService entitySharesService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
@@ -193,6 +196,7 @@ public class StreamResource extends RestResource {
         this.messageFactory = messageFactory;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineService = pipelineService;
+        this.scopeService = scopeService;
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
@@ -773,6 +777,7 @@ public class StreamResource extends RestResource {
                 stream.isDefaultStream(),
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
+                stream.isEditable(),
                 stream.getCategories()
         );
     }
@@ -791,7 +796,7 @@ public class StreamResource extends RestResource {
                 firstNonNull(dto.isDefault(), false),
                 dto.removeMatchesFromDefaultStream(),
                 dto.indexSetId(),
-                dto.isEditable(),
+                scopeService.isMutable(dto.scope()),
                 dto.categories()
         );
     }
@@ -804,7 +809,7 @@ public class StreamResource extends RestResource {
     }
 
     private void checkNotEditableStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !streamService.isEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }

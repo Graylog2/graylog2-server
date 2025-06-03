@@ -130,11 +130,13 @@ public interface Stream {
 
     void setIndexSetId(String indexSetId);
 
+    boolean isEditable();
+
+    String getScope();
+
+    void setScope(String scope);
+
     static boolean isSystemStreamId(String id) {
         return ALL_SYSTEM_STREAM_IDS.contains(id);
-    }
-
-    static boolean streamIsEditable(String streamId) {
-        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
     }
 }
