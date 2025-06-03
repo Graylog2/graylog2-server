@@ -34,6 +34,10 @@ class IndexSummary extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    indexRange: undefined,
+  };
+
   state = { showDetails: this.props.isDeflector };
 
   _formatLabels = (index) => {

@@ -26,10 +26,13 @@ type Props = {
   title?: string;
 };
 
-const CountBadge = forwardRef<HTMLDivElement, Props>(({ children, onClick, className = '', title }: Props, ref) => (
+const CountBadge = (
+  { children, onClick = undefined, className = '', title = undefined }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
   <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
     {children}
   </Badge>
-));
+);
 
-export default CountBadge;
+export default forwardRef(CountBadge);

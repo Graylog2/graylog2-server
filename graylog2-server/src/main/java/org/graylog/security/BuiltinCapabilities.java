@@ -25,45 +25,29 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 public class BuiltinCapabilities {
     private static ImmutableMap<Capability, CapabilityDescriptor> CAPABILITIES;
 
     @Inject
-    public BuiltinCapabilities() {
-        final ImmutableSet<String> readPermissions = ImmutableSet.of(
-                RestPermissions.STREAMS_READ,
-                RestPermissions.STREAM_OUTPUTS_READ,
-                RestPermissions.DASHBOARDS_READ,
-                ViewsRestPermissions.VIEW_READ,
-                RestPermissions.EVENT_DEFINITIONS_READ,
-                RestPermissions.EVENT_NOTIFICATIONS_READ,
-                RestPermissions.OUTPUTS_READ,
-                RestPermissions.SEARCH_FILTERS_READ
+    public BuiltinCapabilities(Set<CapabilityPermissions> capabilities) {
+        final ImmutableSet.Builder<String> readPermissionBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> editPermissionBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> deletePermissionBuilder = ImmutableSet.builder();
+
+        capabilities.stream().forEach(
+                permissions -> {
+                    readPermissionBuilder.addAll(permissions.readPermissions());
+                    editPermissionBuilder.addAll(permissions.editPermissions());
+                    deletePermissionBuilder.addAll(permissions.deletePermissions());
+                }
         );
 
-        final ImmutableSet<String> editPermissions = ImmutableSet.of(
-                RestPermissions.STREAMS_EDIT,
-                RestPermissions.STREAMS_CHANGESTATE,
-                RestPermissions.STREAM_OUTPUTS_CREATE,
-                RestPermissions.DASHBOARDS_EDIT,
-                ViewsRestPermissions.VIEW_EDIT,
-                RestPermissions.EVENT_DEFINITIONS_EDIT,
-                RestPermissions.EVENT_NOTIFICATIONS_EDIT,
-                RestPermissions.OUTPUTS_EDIT,
-                RestPermissions.SEARCH_FILTERS_EDIT
-        );
-
-        final ImmutableSet<String> deletePermissions = ImmutableSet.of(
-                RestPermissions.STREAM_OUTPUTS_DELETE,
-                ViewsRestPermissions.VIEW_DELETE,
-                RestPermissions.EVENT_DEFINITIONS_DELETE,
-                RestPermissions.EVENT_NOTIFICATIONS_DELETE,
-                RestPermissions.OUTPUTS_TERMINATE,
-                RestPermissions.SEARCH_FILTERS_DELETE
-        );
-
+        final ImmutableSet<String> readPermissions = readPermissionBuilder.build();
+        final ImmutableSet<String> editPermissions = editPermissionBuilder.build();
+        final ImmutableSet<String> deletePermissions = deletePermissionBuilder.build();
 
         CAPABILITIES = ImmutableMap.<Capability, CapabilityDescriptor>builder()
                 .put(Capability.VIEW, CapabilityDescriptor.create(
@@ -93,7 +77,7 @@ public class BuiltinCapabilities {
                 .build();
     }
 
-    public static ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
+    public ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
         return ImmutableSet.of(
                 CAPABILITIES.get(Capability.VIEW),
                 CAPABILITIES.get(Capability.MANAGE),

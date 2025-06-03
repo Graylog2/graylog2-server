@@ -40,10 +40,10 @@ type HelpPanelProps = {
 
 export const HelpPanel = ({
   bsStyle = 'info',
-  children,
+  children = undefined,
   className = '',
   collapsible = false,
-  header,
+  header = undefined,
   title = '',
   defaultExpanded = false,
 }: HelpPanelProps) => {

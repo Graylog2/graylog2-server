@@ -133,7 +133,7 @@ const SearchForm = ({
   onSearch = null,
   wrapperClass = 'search',
   topMargin = 0,
-  onQueryChange,
+  onQueryChange = undefined,
   query: propsQuery = '',
 }: Props) => {
   const [query, setQuery] = useState(propsQuery);

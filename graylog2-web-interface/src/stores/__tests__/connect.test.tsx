@@ -59,7 +59,7 @@ type SimpleComponentWithDummyStoreProps = {
   };
 };
 
-const SimpleComponentWithDummyStore = ({ simpleStore }: SimpleComponentWithDummyStoreProps) => {
+const SimpleComponentWithDummyStore = ({ simpleStore = undefined }: SimpleComponentWithDummyStoreProps) => {
   if (simpleStore && simpleStore.value) {
     return <span>Value is: {simpleStore.value}</span>;
   }

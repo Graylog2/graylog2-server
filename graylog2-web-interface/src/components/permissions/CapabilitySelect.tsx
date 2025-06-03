@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 import { useCallback } from 'react';
 import { Field } from 'formik';
 
@@ -27,7 +26,7 @@ const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
   capabilities.map((capability) => ({ label: capability.title, value: capability.id })).toJS();
 
 type Props = {
-  onChange?: (id: $PropertyType<CapabilityType, 'id'>) => void;
+  onChange?: (id: CapabilityType['id']) => void;
   capabilities: CapabilitiesList;
   title?: string;
 };

@@ -139,7 +139,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const TimeRangePicker = ({
-  children,
+  children = undefined,
   show,
   noOverride = false,
   toggleDropdownShow,

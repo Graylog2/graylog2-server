@@ -3,7 +3,9 @@ Upgrading to Graylog 6.3.x
 
 ## Breaking Changes
 
-- tbd
+- By introducing a report creator role in Enterprise, we change from the functionality in the 
+previous version that allowed every user to create reports to a more restrictive approach that a 
+user needs the report creator role from now on to create reports.
 
 ## Configuration File Changes
 
@@ -24,7 +26,7 @@ Upgrading to Graylog 6.3.x
 
 ## Java API Changes
 
-- tbd
+- Database consumers are now using our custom MongoDB collection interface `org.graylog2.database.MongoCollection` instead of `com.mongodb.client.MongoCollection`.
 
 ## REST API Endpoint Changes
 

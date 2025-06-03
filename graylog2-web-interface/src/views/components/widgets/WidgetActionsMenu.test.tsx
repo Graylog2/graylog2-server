@@ -116,7 +116,7 @@ describe('<WidgetActionsMenu />', () => {
     setWidgetEditing = () => {},
     unsetWidgetFocusing = () => {},
     unsetWidgetEditing = () => {},
-    focusedWidget,
+    focusedWidget = undefined,
     ...props
   }: DummyWidgetProps) => (
     <TestStoreProvider view={view} initialQuery="query-id">
