@@ -61,7 +61,7 @@ public class RemoveStringFieldsByValue extends AbstractFunction<Void> {
         } else {
             final String ruleId = context.getRule() != null ? context.getRule().id() : null;
             final String ruleName = context.getRule() != null ? context.getRule().name() : null;
-            LOG.warn("{} called by pipeline rule [{}/{}] with no {} or {} provided. One or both must be provided for the rule to execute.",
+            LOG.warn("{} called by pipeline rule [{}/{}] with no {} or {} provided. One or both must be provided for the function to execute.",
                     NAME, ruleId, ruleName, VALUES_ARG, PATTERN_ARG);
         }
         return null;
@@ -99,7 +99,7 @@ public class RemoveStringFieldsByValue extends AbstractFunction<Void> {
                 .description("Removes fields whose value exists in the values list or matches the regex pattern, unless the field name is reserved. Operates on fields with string values only, other types will be ignored. If no specific message is provided, it uses the currently processed message.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Remove string fields by value")
-                .ruleBuilderTitle("Remove multiple fields whose value is a string and matches<#if pattern??> regex '${pattern}'</#if><#if pattern?? && values??> or</#if><#if values??> exists in values list '${values}'</#if>")
+                .ruleBuilderTitle("Remove multiple fields whose value is a string and<#if pattern??> matches regex '${pattern}'</#if><#if pattern?? && values??> or</#if><#if values??> exists in values list '${values}'</#if>")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
