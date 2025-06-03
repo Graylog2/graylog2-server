@@ -15,37 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import PermissionsBinder from 'logic/permissions/PermissionsBinder';
+
 const assertUnreachable = (type: string): never => {
   throw new Error(`Can't find prefix for type: ${type ?? '(undefined)'}`);
 };
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-  'sigma_rule',
-]);
-
-const typePrefixCornerCasesMap = {
-  event_definition: 'eventdefinitions:',
-  notification: 'eventnotifications:',
-  search: 'view:',
-  report: 'report:',
-};
-
 const getPermissionPrefixByType = (type: string, id: string, throwErrorOnUnknown = true) => {
-  // fixing this in the FE for views, prefixed by 'graylog-security-views__' but making it a bit more general for future, other special entities
-  if (id.startsWith('graylog-security-') && supportedTypes.has(type)) return 'graylog_security:';
-
-  if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s:`;
+  const check = PermissionsBinder.check(type, id);
+  if (check) return check;
 
   return throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`;
 };
