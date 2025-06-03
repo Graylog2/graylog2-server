@@ -15,24 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { forwardRef } from 'react';
 
-import Badge from 'components/bootstrap/Badge';
+import { Panel } from 'components/bootstrap';
 
-type Props = {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-  title?: string;
-};
+import styles from './FilterPreview.css';
 
-const CountBadge = (
-  { children, onClick = undefined, className = '', title = undefined }: Props,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => (
-  <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
-    {children}
-  </Badge>
+type Props = React.PropsWithChildren<{
+  hasError?: boolean;
+}>;
+const FilterPreviewResults = ({ children = undefined, hasError = false }: Props) => (
+  <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
+    <Panel.Heading>
+      <Panel.Title>Filter Preview</Panel.Title>
+    </Panel.Heading>
+    <Panel.Body>{children}</Panel.Body>
+  </Panel>
 );
 
-export default forwardRef(CountBadge);
+export default FilterPreviewResults;

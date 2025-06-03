@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 
+import useDisclosure from 'util/hooks/useDisclosure';
 import Popover from 'components/common/Popover';
 import useClickOutside from 'hooks/useClickOutside';
 
@@ -48,71 +48,70 @@ const Container = styled.div`
 type OverlayType = {
   hide: () => void;
 };
-const OverlayTrigger = React.forwardRef<OverlayType, Props>(
-  (
-    {
-      children,
-      disabled = false,
-      placement,
-      overlay,
-      rootClose = false,
-      trigger = 'click',
-      testId,
-      className,
-      title,
-      width = 275,
-    },
+
+const OverlayTrigger = (
+  {
+    children,
+    disabled = false,
+    placement,
+    overlay,
+    rootClose = false,
+    trigger = 'click',
+    testId = undefined,
+    className = undefined,
+    title = undefined,
+    width = 275,
+  }: Props,
+  ref: React.ForwardedRef<OverlayType>,
+) => {
+  const [opened, { close, open, toggle }] = useDisclosure(false);
+
+  useImperativeHandle(
     ref,
-  ) => {
-    const [opened, { close, open, toggle }] = useDisclosure(false);
+    () => ({
+      hide: close,
+    }),
+    [close],
+  );
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        hide: close,
-      }),
-      [close],
-    );
+  // @ts-ignore
+  OverlayTrigger.hide = close;
 
-    // @ts-ignore
-    OverlayTrigger.hide = close;
+  const containerRef = useRef();
 
-    const containerRef = useRef();
+  const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
+  const [control, setControl] = useState<HTMLSpanElement | null>(null);
+  useClickOutside(rootClose ? close : () => {}, null, [control, dropdown]);
 
-    const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
-    const [control, setControl] = useState<HTMLSpanElement | null>(null);
-    useClickOutside(rootClose ? close : () => {}, null, [control, dropdown]);
+  const hover = trigger === 'hover' || trigger?.includes?.('hover');
+  const focus = trigger === 'focus' || trigger?.includes?.('focus');
+  const click = trigger === 'click' || trigger?.includes?.('click');
 
-    const hover = trigger === 'hover' || trigger?.includes?.('hover');
-    const focus = trigger === 'focus' || trigger?.includes?.('focus');
-    const click = trigger === 'click' || trigger?.includes?.('click');
+  return disabled ? (
+    children
+  ) : (
+    <Container ref={containerRef} data-testid={testId} className={className}>
+      <Popover opened={opened} withArrow width={width} position={placement} withinPortal>
+        <Popover.Target>
+          <TriggerWrap
+            className={children.props.className}
+            ref={setControl}
+            role="button"
+            onClick={click ? toggle : undefined}
+            onMouseEnter={hover ? open : undefined}
+            onMouseLeave={hover ? close : undefined}
+            onFocus={focus ? open : undefined}
+            onBlur={focus ? open : undefined}>
+            {children}
+          </TriggerWrap>
+        </Popover.Target>
 
-    return disabled ? (
-      children
-    ) : (
-      <Container ref={containerRef} data-testid={testId} className={className}>
-        <Popover opened={opened} withArrow width={width} position={placement} withinPortal>
-          <Popover.Target>
-            <TriggerWrap
-              className={children.props.className}
-              ref={setControl}
-              role="button"
-              onClick={click ? toggle : undefined}
-              onMouseEnter={hover ? open : undefined}
-              onMouseLeave={hover ? close : undefined}
-              onFocus={focus ? open : undefined}
-              onBlur={focus ? open : undefined}>
-              {children}
-            </TriggerWrap>
-          </Popover.Target>
+        <Popover.Dropdown title={title}>
+          <div ref={setDropdown}>{overlay}</div>
+        </Popover.Dropdown>
+      </Popover>
+    </Container>
+  );
+};
 
-          <Popover.Dropdown title={title}>
-            <div ref={setDropdown}>{overlay}</div>
-          </Popover.Dropdown>
-        </Popover>
-      </Container>
-    );
-  },
-);
-
-export default OverlayTrigger;
+export default React.forwardRef(OverlayTrigger);
