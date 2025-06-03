@@ -115,7 +115,7 @@ const FormWrap = ({
   description = null,
   error = null,
   loading = false,
-  onSubmit = () => { },
+  onSubmit = () => {},
   title = null,
 }: FormWrapProps) => {
   const formRef = useRef();
@@ -126,7 +126,6 @@ const FormWrap = ({
 
     return false;
   };
-
 
   useEffect(() => {
     setDisabledButton(loading || disabled);
