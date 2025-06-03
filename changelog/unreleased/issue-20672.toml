@@ -1,0 +1,5 @@
+type="c"
+message="Adds a configurable grace period `static_leader_timeout` for missing leader notification in static mode."
+
+pulls = [""]
+issues = ["20672"]
