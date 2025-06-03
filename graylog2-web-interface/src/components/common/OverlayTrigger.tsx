@@ -48,6 +48,7 @@ const Container = styled.div`
 type OverlayType = {
   hide: () => void;
 };
+
 const OverlayTrigger = (
   {
     children,
