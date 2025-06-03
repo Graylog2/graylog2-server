@@ -17,7 +17,7 @@
 package org.graylog2.lookup.db;
 
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;

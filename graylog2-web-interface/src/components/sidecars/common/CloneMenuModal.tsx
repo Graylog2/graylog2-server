@@ -30,7 +30,7 @@ type CloneMenuModalProps = {
 };
 
 const CloneMenuModal = ({
-  error,
+  error = undefined,
   id,
   showModal,
   onClose,
@@ -38,7 +38,7 @@ const CloneMenuModal = ({
   onChange,
   onSave,
   // TODO: Find out why this is not in use (anymore)
-  onSelect: _onSelect,
+  onSelect: _onSelect = undefined,
 }: CloneMenuModalProps) => (
   <BootstrapModalForm
     show={showModal}

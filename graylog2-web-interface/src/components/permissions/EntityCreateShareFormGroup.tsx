@@ -27,7 +27,7 @@ import type { GranteesList as GranteesListType, SelectedGranteeCapabilities } fr
 import type Grantee from 'logic/permissions/Grantee';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { createGRN } from 'logic/permissions/GRN';
-import { Spinner } from 'components/common';
+import { Section, Spinner } from 'components/common';
 
 import type { SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -135,7 +135,7 @@ const EntityCreateShareFormGroup = ({
   };
 
   return (
-    <>
+    <Section title="">
       {entityShareState ? (
         <>
           <ShareFormSection>
@@ -187,7 +187,7 @@ const EntityCreateShareFormGroup = ({
       ) : (
         <Spinner />
       )}
-    </>
+    </Section>
   );
 };
 

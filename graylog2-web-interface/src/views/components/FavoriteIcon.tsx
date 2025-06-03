@@ -35,7 +35,7 @@ type Props = {
   className?: string;
 };
 
-const FavoriteIcon = ({ isFavorite, grn, onChange, className }: Props) => {
+const FavoriteIcon = ({ isFavorite, grn, onChange, className = undefined }: Props) => {
   const { putItem, deleteItem } = useFavoriteItemMutation();
   const onClick = useCallback(() => {
     if (isFavorite) {

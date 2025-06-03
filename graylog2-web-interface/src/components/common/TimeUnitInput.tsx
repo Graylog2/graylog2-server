@@ -149,6 +149,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     value: undefined,
     unit: 'SECONDS',
     units: defaultUnits,
+    id: undefined,
     label: '',
     help: '',
     name: null,
@@ -161,6 +162,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     hideCheckbox: false,
     pullRight: false,
     clearable: false,
+    type: undefined,
   };
 
   constructor(props) {
