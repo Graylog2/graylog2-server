@@ -27,6 +27,8 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,6 +38,7 @@ public class PerformSearch extends Action {
     public static final String NAME = "perform_search";
     public static final String FIELD_USE_SAVED_SEARCH = "use_saved_search";
     public static final String FIELD_SAVED_SEARCH = "saved_search";
+    public static final String FIELD_PARAMETERS = "parameters";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
@@ -69,6 +72,10 @@ public class PerformSearch extends Action {
         public abstract String savedSearch();
 
         @Nullable
+        @JsonProperty(FIELD_PARAMETERS)
+        public abstract Map<String, String> parameters();
+
+        @Nullable
         @JsonProperty(FIELD_QUERY)
         public abstract String query();
 
@@ -97,6 +104,9 @@ public class PerformSearch extends Action {
             @JsonProperty(FIELD_SAVED_SEARCH)
             public abstract Builder savedSearch(String savedSearch);
 
+            @JsonProperty(FIELD_PARAMETERS)
+            public abstract Builder parameters(Map<String, String> parameters);
+
             @JsonProperty(FIELD_QUERY)
             public abstract Builder query(String query);
 
@@ -110,12 +120,16 @@ public class PerformSearch extends Action {
             public static Builder create() {
                 return new AutoValue_PerformSearch_Config.Builder()
                         .type(NAME)
-                        .useSavedSearch(false);
+                        .useSavedSearch(false)
+                        .parameters(Map.of());
             }
 
             public Config build() {
                 if (useSavedSearch() == null) {
                     useSavedSearch(false);
+                }
+                if (parameters() == null) {
+                    parameters(Collections.emptyMap());
                 }
                 return autoBuild();
             }
@@ -123,6 +137,8 @@ public class PerformSearch extends Action {
             abstract Config autoBuild();
 
             abstract Boolean useSavedSearch();
+
+            abstract Map<String, String> parameters();
         }
 
     }
