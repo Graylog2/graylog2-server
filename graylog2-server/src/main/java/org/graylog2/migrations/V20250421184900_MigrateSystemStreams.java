@@ -16,10 +16,10 @@
  */
 package org.graylog2.migrations;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
