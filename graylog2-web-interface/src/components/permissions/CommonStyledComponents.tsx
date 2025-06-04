@@ -89,6 +89,7 @@ export const GranteeListItemActions = styled.div(
 
 export const ShareFormSection = styled.div(
   ({ theme }) => css`
+    width: inherit;
     margin-bottom: ${theme.spacings.sm};
 
     &:last-child {
@@ -99,6 +100,7 @@ export const ShareFormSection = styled.div(
 
 export const GranteesSelectorHeadline = styled.h5(
   ({ theme }) => css`
+    font-weight: bold;
     margin-bottom: ${theme.spacings.xs};
   `,
 );

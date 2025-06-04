@@ -34,7 +34,7 @@ const ExternalLinkButton = ({
   className = '',
   disabled = false,
   iconName = 'open_in_new',
-  children,
+  children = undefined,
   ...props
 }: Props) => (
   <Button bsStyle={bsStyle} target={target} className={className} disabled={disabled} {...props}>

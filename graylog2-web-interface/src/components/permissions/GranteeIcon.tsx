@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 import styled, { css } from 'styled-components';
 
 import type Grantee from 'logic/permissions/Grantee';
@@ -36,7 +35,7 @@ const Container = styled.div(
 );
 
 type Props = {
-  type: $PropertyType<Grantee, 'type'>;
+  type: Grantee['type'];
 };
 
 const _iconName = (type) => {

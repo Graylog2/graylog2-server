@@ -21,9 +21,9 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Manage pipelines', path: Routes.SYSTEM.PIPELINES.OVERVIEW, exactPathMatch: true },
-  { title: 'Manage rules', path: Routes.SYSTEM.PIPELINES.RULES },
-  { title: 'Simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
+  { description: 'Manage pipelines', path: Routes.SYSTEM.PIPELINES.OVERVIEW, exactPathMatch: true },
+  { description: 'Manage rules', path: Routes.SYSTEM.PIPELINES.RULES },
+  { description: 'Simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
 ];
 
 const EventsPageNavigation = () => (

@@ -16,15 +16,20 @@
  */
 import * as React from 'react';
 
-import usePluginEntities from 'hooks/usePluginEntities';
-import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import { Panel } from 'components/bootstrap';
 
-const PluggableEventProceduresPage = () => {
-  const pluggableEventProcedures = usePluginEntities('eventProcedures');
+import styles from './FilterPreview.css';
 
-  const EventProceduresPage = pluggableEventProcedures[0]?.EventProcedures;
+type Props = React.PropsWithChildren<{
+  hasError?: boolean;
+}>;
+const FilterPreviewResults = ({ children = undefined, hasError = false }: Props) => (
+  <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
+    <Panel.Heading>
+      <Panel.Title>Filter Preview</Panel.Title>
+    </Panel.Heading>
+    <Panel.Body>{children}</Panel.Body>
+  </Panel>
+);
 
-  return <EventProceduresPage navigationComponent={<EventsPageNavigation />} useCoreRoutes />;
-};
-
-export default PluggableEventProceduresPage;
+export default FilterPreviewResults;
