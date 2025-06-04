@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-/* eslint-disable import/prefer-default-export */
-
 import { Map } from 'immutable';
 
 import Query from 'views/logic/queries/Query';

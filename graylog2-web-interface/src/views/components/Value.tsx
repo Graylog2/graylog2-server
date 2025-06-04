@@ -84,18 +84,22 @@ const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit =
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit = undefined }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) =>
-      interactive ? (
-        <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
-      ) : (
-        <span>
-          <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={type} unit={unit} />
-        </span>
-      )
-    }
-  </InteractiveContext.Consumer>
-);
+const Value = ({ field, value, render = defaultRenderer, type, unit = undefined }: Props) => {
+  const _type = type ?? FieldType.Unknown;
+
+  return (
+    <InteractiveContext.Consumer>
+      {(interactive) =>
+        interactive ? (
+          <InteractiveValue field={field} value={value} render={render} type={_type} unit={unit} />
+        ) : (
+          <span>
+            <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={_type} unit={unit} />
+          </span>
+        )
+      }
+    </InteractiveContext.Consumer>
+  );
+};
 
 export default Value;
