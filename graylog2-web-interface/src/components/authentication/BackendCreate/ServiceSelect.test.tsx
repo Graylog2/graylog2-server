@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import Routes from 'routing/Routes';
@@ -37,13 +37,11 @@ describe('ServiceSelect', () => {
   });
 
   it('should redirect correctly after selecting LDAP', async () => {
-    const { getByLabelText, getByRole } = render(<ServiceSelect />);
+    render(<ServiceSelect />);
 
-    const serviceSelect = getByLabelText('Select a service');
-    const submitButton = getByRole('button', { name: 'Get started' });
-    await selectEvent.openMenu(serviceSelect);
-    await selectEvent.select(serviceSelect, 'LDAP');
+    await selectEvent.selectOption('Select a service', 'LDAP');
 
+    const submitButton = await screen.findByRole('button', { name: 'Get started' });
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
@@ -53,13 +51,11 @@ describe('ServiceSelect', () => {
   });
 
   it('should redirect correctly after selecting active directory', async () => {
-    const { getByLabelText, getByRole } = render(<ServiceSelect />);
+    render(<ServiceSelect />);
 
-    const serviceSelect = getByLabelText('Select a service');
-    const submitButton = getByRole('button', { name: 'Get started' });
-    await selectEvent.openMenu(serviceSelect);
-    await selectEvent.select(serviceSelect, 'Active Directory');
+    await selectEvent.selectOption('Select a service', 'Active Directory');
 
+    const submitButton = await screen.findByRole('button', { name: 'Get started' });
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));

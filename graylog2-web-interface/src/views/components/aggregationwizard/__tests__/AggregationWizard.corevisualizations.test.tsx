@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
@@ -66,21 +66,9 @@ const expectSubmitButtonToBeDisabled = async () => {
   });
 };
 
-const expectSubmitButtonNotToBeDisabled = async () => {
-  expect(await submitButton()).not.toBeDisabled();
-};
+const expectSubmitButtonNotToBeDisabled = () => waitFor(async () => expect(await submitButton()).not.toBeDisabled());
 
 const visualizationSelect = async () => screen.findByLabelText('Select visualization type');
-
-const selectOption = async (ariaLabel: string, option: string) => {
-  const select = await screen.findByLabelText(ariaLabel);
-
-  await selectEvent.openMenu(select);
-
-  await act(async () => {
-    await selectEvent.select(select, option);
-  });
-};
 
 describe('AggregationWizard/Core Visualizations', () => {
   useViewsPlugin();
@@ -92,15 +80,15 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await selectEvent.openMenu(await visualizationSelect());
 
-      await screen.findByText('Area Chart');
-      await screen.findByText('Bar Chart');
-      await screen.findAllByText('Data Table');
-      await screen.findByText('Heatmap');
-      await screen.findByText('Line Chart');
-      await screen.findByText('Pie Chart');
-      await screen.findByText('Scatter Plot');
-      await screen.findByText('Single Number');
-      await screen.findByText('World Map');
+      selectEvent.findOption('Area Chart');
+      selectEvent.findOption('Bar Chart');
+      selectEvent.findOption('Data Table');
+      selectEvent.findOption('Heatmap');
+      selectEvent.findOption('Line Chart');
+      selectEvent.findOption('Pie Chart');
+      selectEvent.findOption('Scatter Plot');
+      selectEvent.findOption('Single Number');
+      selectEvent.findOption('World Map');
     },
     testTimeout,
   );
@@ -116,9 +104,8 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={areaChartConfig} />);
 
-      await selectOption('Select visualization type', 'Area Chart');
-
-      await selectOption('Select Interpolation', 'step-after');
+      await selectEvent.selectOption('Select visualization type', 'Area Chart');
+      await selectEvent.selectOption('Select Interpolation', 'step-after');
       await expectSubmitButtonNotToBeDisabled();
 
       userEvent.click(await submitButton());
@@ -148,9 +135,9 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={barChartConfig} />);
 
-      await selectOption('Select visualization type', 'Bar Chart');
+      await selectEvent.selectOption('Select visualization type', 'Bar Chart');
+      await selectEvent.selectOption('Select Mode', 'Stack');
 
-      await selectOption('Select Mode', 'Stack');
       await expectSubmitButtonNotToBeDisabled();
 
       userEvent.click(await submitButton());
@@ -180,9 +167,8 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={lineChartConfig} />);
 
-      await selectOption('Select visualization type', 'Line Chart');
-
-      await selectOption('Select Interpolation', 'spline');
+      await selectEvent.selectOption('Select visualization type', 'Line Chart');
+      await selectEvent.selectOption('Select Interpolation', 'spline');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -214,7 +200,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={timelineConfig} />);
 
-      await selectOption('Select visualization type', 'Line Chart');
+      await selectEvent.selectOption('Select visualization type', 'Line Chart');
 
       userEvent.click(await screen.findByRole('checkbox', { name: /show event annotations/i }));
 
@@ -245,7 +231,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={heatMapConfig} />);
 
-      await selectOption('Select visualization type', 'Heatmap');
+      await selectEvent.selectOption('Select visualization type', 'Heatmap');
 
       const useSmallestAsDefault = await screen.findByRole('checkbox', { name: 'Use smallest as default' });
       userEvent.click(useSmallestAsDefault);
@@ -278,7 +264,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} />);
 
-      await selectOption('Select visualization type', 'Single Number');
+      await selectEvent.selectOption('Select visualization type', 'Single Number');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -286,7 +272,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonToBeDisabled();
 
-      await selectOption('Select Trend Preference', 'Higher');
+      await selectEvent.selectOption('Select Trend Preference', 'Higher');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -319,7 +305,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard config={areaChart} onChange={onChange} />);
 
-      await selectOption('Select visualization type', 'Data Table');
+      await selectEvent.selectOption('Select visualization type', 'Data Table');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -351,7 +337,7 @@ describe('AggregationWizard/Core Visualizations', () => {
       async ({ visualization, error }: { visualization: string; error: string }) => {
         render(<SimpleAggregationWizard />);
 
-        await selectOption('Select visualization type', visualization);
+        await selectEvent.selectOption('Select visualization type', visualization);
 
         await expectSubmitButtonToBeDisabled();
 

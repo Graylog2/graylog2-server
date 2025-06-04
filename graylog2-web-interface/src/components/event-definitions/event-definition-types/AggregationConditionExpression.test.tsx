@@ -405,7 +405,6 @@ describe('AggregationConditionExpression', () => {
 
       const select = (await screen.findAllByLabelText('Boolean Operator'))[1];
 
-      await selectEvent.openMenu(select);
       await selectEvent.select(select, 'all');
 
       await waitFor(() => {
@@ -449,8 +448,6 @@ describe('AggregationConditionExpression', () => {
       );
 
       const select = (await screen.findAllByLabelText('Boolean Operator'))[0];
-
-      await selectEvent.openMenu(select);
       await selectEvent.select(select, 'any');
 
       await waitFor(() => {
@@ -476,7 +473,6 @@ describe('AggregationConditionExpression', () => {
 
       expect(screen.queryByText('all')).not.toBeInTheDocument();
 
-      await selectEvent.openMenu(select);
       await selectEvent.select(select, 'all');
 
       await screen.findByText('all');

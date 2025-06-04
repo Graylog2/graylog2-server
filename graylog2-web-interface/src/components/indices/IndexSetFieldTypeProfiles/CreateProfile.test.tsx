@@ -34,12 +34,6 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
-
 describe('CreateProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
   const editMock = jest.fn(() => Promise.resolve());
@@ -86,18 +80,16 @@ describe('CreateProfile', () => {
 
     await userEvent.click(addMappingButton);
 
-    const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);
-    const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
-    const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByTitle(/create profile/i);
 
     fireEvent.change(name, { target: { value: 'Profile new' } });
     fireEvent.change(description, { target: { value: 'Profile description' } });
-    await selectItem(fieldFirst, 'date');
-    await selectItem(typeFirst, 'String type');
-    await selectItem(fieldSecond, 'http_method');
-    await selectItem(typeSecond, 'String type');
+
+    await selectEvent.selectOption('select customFieldMappings.0.field', 'date');
+    await selectEvent.selectOption('select customFieldMappings.0.type', 'String type');
+    await selectEvent.selectOption('select customFieldMappings.1.field', 'http_method');
+    await selectEvent.selectOption('select customFieldMappings.1.type', 'String type');
+
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);
 

@@ -63,7 +63,7 @@ const submitWidgetConfigForm = async () => {
   await userEvent.click(applyButton);
 };
 
-const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
+const selectMetric = async (functionName: string, fieldName: string, elementIndex = 0) => {
   const newFunctionSelect = screen.getAllByLabelText('Select a function')[elementIndex];
   const newFieldSelect = screen.getAllByLabelText('Select a field')[elementIndex];
 

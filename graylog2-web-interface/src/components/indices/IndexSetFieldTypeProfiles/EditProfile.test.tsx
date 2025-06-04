@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, act, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
@@ -34,14 +34,6 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutation
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
-
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  await act(async () => {
-    await selectEvent.openMenu(select);
-  });
-
-  return selectEvent.select(select, option);
-};
 
 describe('EditProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
@@ -82,13 +74,12 @@ describe('EditProfile', () => {
       name: /name/i,
     });
 
-    const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);
-    const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
     const submitButton = await screen.findByTitle(/update profile/i);
 
     fireEvent.change(name, { target: { value: 'Profile 1 new name' } });
-    await selectItem(fieldFirst, 'date');
-    await selectItem(typeFirst, 'String type');
+
+    await selectEvent.selectOption('select customFieldMappings.0.field', 'date');
+    await selectEvent.selectOption('select customFieldMappings.0.type', 'String type');
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);
 
@@ -114,12 +105,11 @@ describe('EditProfile', () => {
 
     await userEvent.click(addMappingButton);
 
-    const fieldThird = await screen.findByLabelText(/select customFieldMappings.2.field/i);
-    const typeThird = await screen.findByLabelText(/select customFieldMappings.2.type/i);
     const submitButton = await screen.findByTitle(/update profile/i);
 
-    await selectItem(fieldThird, 'date');
-    await selectItem(typeThird, 'String type');
+    await selectEvent.selectOption('select customFieldMappings.2.field', 'date');
+    await selectEvent.selectOption('select customFieldMappings.2.type', 'String type');
+
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);
 

@@ -162,8 +162,6 @@ const getStreamCreateFormFields = async () => {
     name: /Description/i,
   });
 
-  const indexSetSelect = await screen.findByLabelText('Select Index Set');
-
   const removeMatchesCheckbox = await screen.findByRole('checkbox', {
     name: /Remove matches from/i,
   });
@@ -179,7 +177,6 @@ const getStreamCreateFormFields = async () => {
   return {
     titleInput,
     descriptionInput,
-    indexSetSelect,
     removeMatchesCheckbox,
     newPipelineCheckbox,
     submitButton,
@@ -248,14 +245,13 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/Default Stream/i);
-
+        const streamSelect = await selectEvent.findSelectInput('Default Stream');
         await selectEvent.openMenu(streamSelect);
 
-        const alohoOption = await screen.findByText(/Aloho/i);
+        await selectEvent.findOption('Aloho');
+
         const moraOption = screen.queryByText(/Mora/i);
 
-        expect(alohoOption).toBeInTheDocument();
         expect(moraOption).not.toBeInTheDocument();
       });
 
@@ -275,14 +271,13 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/Default Stream/i);
-
+        const streamSelect = await selectEvent.findSelectInput('Default Stream');
         await selectEvent.openMenu(streamSelect);
 
-        const moraOption = await screen.findByText(/Mora/i);
+        await selectEvent.findOption('Mora');
+
         const alohoOption = screen.queryByText(/Aloho/i);
 
-        expect(moraOption).toBeInTheDocument();
         expect(alohoOption).not.toBeInTheDocument();
       });
 
@@ -302,10 +297,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/Default Stream/i);
-
-        await selectEvent.openMenu(streamSelect);
-        await selectEvent.select(streamSelect, 'Aloho');
+        await selectEvent.selectOption('Default Stream', 'Aloho');
       });
 
       it('should show a warning if the selected stream has connected pipelines', async () => {
@@ -331,11 +323,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/Default Stream/i);
-
-        await selectEvent.openMenu(streamSelect);
-
-        await selectEvent.select(streamSelect, 'Aloho');
+        await selectEvent.selectOption('Default Stream', 'Aloho');
 
         const warning = await screen.findByText(/Pipelines connected to target Stream/i);
         const warningPipeline1 = await screen.findByText(/Pipeline1/i);
@@ -372,12 +360,13 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
+      const { titleInput, descriptionInput, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
         await getStreamCreateFormFields();
 
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Nox');
+
+      await selectEvent.selectOption('Select an index set', 'Nox');
+
       fireEvent.click(removeMatchesCheckbox);
       fireEvent.click(newPipelineCheckbox);
 
@@ -399,12 +388,12 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
-      const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
+      const { titleInput, descriptionInput } = await getStreamCreateFormFields();
 
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Default');
+
+      await selectEvent.selectOption('Select an index set', 'Default');
 
       expect(await screen.findByText(/You have selected the Default Index Set./i)).toBeInTheDocument();
     });
@@ -420,12 +409,12 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
-      const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
+      const { titleInput, descriptionInput } = await getStreamCreateFormFields();
 
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Nox');
+
+      await selectEvent.selectOption('Select an index set', 'Nox');
 
       await screen.findByText(/Selected index set already associated with another stream/i);
     });

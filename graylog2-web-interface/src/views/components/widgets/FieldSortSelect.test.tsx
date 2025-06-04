@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import selectEvent from 'helpers/selectEvent';
@@ -46,13 +46,7 @@ describe('FieldSortSelect', () => {
     const onChangeStub = jest.fn();
     render(<FieldSortSelect fields={fields} onChange={onChangeStub} sort={sort} />);
 
-    const fieldSelect = await screen.findByLabelText('Select field for sorting');
-
-    await act(async () => {
-      await selectEvent.openMenu(fieldSelect);
-    });
-
-    await selectEvent.select(fieldSelect, 'date');
+    await selectEvent.selectOption('Select field for sorting', 'date');
 
     const updateSort = [new SortConfig('pivot', 'date', Direction.Ascending)];
     await waitFor(() => expect(onChangeStub).toHaveBeenCalledTimes(1));

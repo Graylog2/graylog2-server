@@ -233,9 +233,6 @@ describe('UrlWhitelistForm', () => {
 
       const row = screen.getByRole('row', { name: /3/i });
       const select = within(row).getByText(/exact match/i);
-
-      await selectEvent.openMenu(select);
-
       await selectEvent.select(select, 'Regex');
 
       await screen.findByText(/not a valid java regular expression/i);

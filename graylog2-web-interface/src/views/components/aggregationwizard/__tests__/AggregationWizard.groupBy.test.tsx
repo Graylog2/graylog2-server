@@ -59,8 +59,8 @@ const addGrouping = async () => {
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
-  const grouoingContainer = await screen.findByTestId(`grouping-${groupingIndex}`);
-  const fieldSelection = within(grouoingContainer).getByLabelText(fieldSelectLabel);
+  const groupingContainer = await screen.findByTestId(`grouping-${groupingIndex}`);
+  const fieldSelection = within(groupingContainer).getByLabelText(fieldSelectLabel);
 
   await act(async () => {
     await selectEvent.openMenu(fieldSelection);
