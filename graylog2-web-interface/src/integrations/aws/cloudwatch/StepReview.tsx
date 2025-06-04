@@ -244,15 +244,15 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
         </Subheader>
         <ReviewItems>
           <li>
-            <strong>Stream</strong>
+            <strong>Kinesis Stream</strong>
             <span>{awsCloudWatchKinesisStream.value}</span>
           </li>
           <li>
-            <strong>Stream ARN</strong>
+            <strong>Kinesis Stream ARN</strong>
             <span>
-              {awsCloudwatchKinesisStreamArn.startsWith("ERROR:") ? (
+              {awsCloudwatchKinesisStreamArn.startsWith("Error:") ? (
                 <ArnErrorMessage>
-                  {awsCloudwatchKinesisStreamArn.replace("ERROR: ", "")}
+                  {awsCloudwatchKinesisStreamArn.replace("Error: ", "")}
                 </ArnErrorMessage>
               ) : (
                 awsCloudwatchKinesisStreamArn

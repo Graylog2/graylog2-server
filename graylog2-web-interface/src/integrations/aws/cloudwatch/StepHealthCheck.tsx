@@ -101,7 +101,6 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   useEffect(() => {
     if (!logData) {
       checkForLogs();
-
     }
   }, [checkForLogs, logData]);
 

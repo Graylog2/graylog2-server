@@ -31,15 +31,8 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-import static org.graylog.integrations.aws.transports.KinesisTransport.CK_KINESIS_STREAM_ARN;
-
 public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "CloudWatchRawLog";
-    public static final String FIELD_SUBSCRIPTION_FILTERS = "aws_subscription_filters";
-    public static final String FIELD_STREAM_ARN = "aws_kinesis_stream_arn";
-    public static final String SOURCE = "aws-kinesis-raw-logs";
-    public static final String FIELD_MESSAGE_TYPE = "aws_kinesis_message_type";
-    private static final String FIELD_OWNER = "aws_owner";
     private final MessageFactory messageFactory;
 
     @Inject
@@ -52,20 +45,12 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public Optional<Message> decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
         try {
             final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, SOURCE);
-            final String streamArn = configuration.getString(CK_KINESIS_STREAM_ARN);
             Message result = messageFactory.createMessage(
                     logEvent.message(),
                     source,
                     logEvent.timestamp()
             );
-            result.addField(FIELD_OWNER, logEvent.owner());
-            result.addField(FIELD_KINESIS_STREAM, logEvent.kinesisStream());
-            result.addField(FIELD_LOG_GROUP, logEvent.logGroup());
-            result.addField(FIELD_LOG_STREAM, logEvent.logStream());
-            result.addField(FIELD_MESSAGE_TYPE, logEvent.messageType());
-            result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
-            result.addField(FIELD_STREAM_ARN, streamArn);
-
+            setCommonFields(logEvent, result);
             return Optional.of(result);
         } catch (Exception e) {
             throw new RuntimeException("Could not deserialize AWS FlowLog record.", e);
