@@ -22,16 +22,20 @@ import NotificationsFactory from 'components/notifications/NotificationsFactory'
 import type { NotificationType } from 'components/notifications/types';
 import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
+type Type = Parameters<typeof SystemNotificationMessage.renderHtmlWithKey>[0];
+
+const fetchNotificationMessage = (notification: NotificationType) => {
+  const values = NotificationsFactory.getValuesForNotification(notification);
+  const type = notification.type.toLocaleUpperCase() as Type;
+
+  return notification.key
+    ? SystemNotificationMessage.renderHtmlWithKey(type, notification.key, values)
+    : SystemNotificationMessage.renderHtml(type, values);
+};
 const useNotificationMessage = (notification: NotificationType) => {
   const { data } = useQuery({
     queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', notification.type],
-    queryFn: () =>
-      SystemNotificationMessage.renderHtmlWithKey(
-        // @ts-expect-error Should be fixed
-        notification.type.toLocaleUpperCase(),
-        notification.key,
-        NotificationsFactory.getValuesForNotification(notification),
-      ),
+    queryFn: () => fetchNotificationMessage(notification),
   });
 
   return data;
