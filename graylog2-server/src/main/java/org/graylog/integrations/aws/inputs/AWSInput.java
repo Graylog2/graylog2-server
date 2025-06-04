@@ -205,7 +205,7 @@ public class AWSInput extends MessageInput {
                 CK_OVERRIDE_SOURCE,
                 "Override Source",
                 "",
-                "The source is set to '%s' by default. Set this if you want to override it with a custom value.".formatted(KinesisRawLogCodec.SOURCE),
+                "The message source is set to '%s' by default. If desired, you may override it with a custom value.".formatted(KinesisRawLogCodec.SOURCE),
                 ConfigurationField.Optional.OPTIONAL);
     }
 

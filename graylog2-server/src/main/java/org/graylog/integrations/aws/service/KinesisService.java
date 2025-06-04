@@ -34,8 +34,8 @@ import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.CreateRolePermissionRequest;
-import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
+import org.graylog.integrations.aws.resources.requests.KinesisRequest;
 import org.graylog.integrations.aws.resources.responses.CreateRolePermissionResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisNewStreamResponse;
@@ -136,7 +136,7 @@ public class KinesisService {
      * @return a {@code KinesisHealthCheckResponse}, which indicates the type of detected message and a sample parsed
      * message.
      */
-    public KinesisHealthCheckResponse healthCheck(KinesisHealthCheckRequest request) throws ExecutionException, IOException {
+    public KinesisHealthCheckResponse healthCheck(KinesisRequest request) throws ExecutionException, IOException {
 
         LOG.debug("Executing healthCheck");
         LOG.debug("Requesting a list of streams to find out if the indicated stream exists.");
@@ -229,7 +229,7 @@ public class KinesisService {
      * message.
      * @see <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"/>
      */
-    private KinesisHealthCheckResponse handleCompressedMessages(KinesisHealthCheckRequest request, byte[] payloadBytes) throws IOException {
+    private KinesisHealthCheckResponse handleCompressedMessages(KinesisRequest request, byte[] payloadBytes) throws IOException {
         LOG.debug("The supplied payload is GZip compressed. Proceeding to decompress.");
 
         // Assume that the payload is from CloudWatch.
@@ -335,7 +335,7 @@ public class KinesisService {
      * @return A {@code KinesisHealthCheckResponse} with the fully parsed message and type.
      */
     private KinesisHealthCheckResponse detectAndParseMessage(String logMessage, DateTime timestamp, String kinesisStreamName,
-                                                             String logGroupName, String logStreamName, boolean compressed, KinesisHealthCheckRequest request) {
+                                                             String logGroupName, String logStreamName, boolean compressed, KinesisRequest request) {
 
         LOG.debug("Attempting to detect the type of log message. message [{}] stream [{}] log group [{}].",
                 logMessage, kinesisStreamName, logGroupName);
@@ -543,7 +543,7 @@ public class KinesisService {
         return iamClient.getRole(r -> r.roleName(roleName)).role().arn();
     }
 
-    public String getStreamArn(KinesisHealthCheckRequest arnRequest) {
+    public String getStreamArn(KinesisRequest arnRequest) {
         try (KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, arnRequest)) {
             DescribeStreamRequest request = DescribeStreamRequest.builder()
                     .streamName(arnRequest.streamName())
@@ -553,8 +553,8 @@ public class KinesisService {
             StreamDescription description = response.streamDescription();
             return description.streamARN();
         } catch (Exception e) {
-            LOG.error("Failed to get stream ARN for stream: [{}]", arnRequest.streamName());
-            return "Error: Failed to get stream ARN. Please ensure the IAM role includes the 'kinesis:DescribeStream' permission.";
+            throw new IllegalArgumentException("Failed to get stream ARN. Please " +
+                    "ensure the IAM role includes the 'kinesis:DescribeStream' permission.", e);
         }
     }
 }

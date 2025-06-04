@@ -60,7 +60,7 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         value={overrideSource?.value}
         onChange={onChange}
         label="Override Source (optional)"
-        help="The source is set to the aws-kinesis-raw-logs by default. Set this if you want to override it with a custom value."
+        help="The message source is set to aws-kinesis-raw-logs by default. If desired, you may override it with a custom value."
       />
 
       <Input

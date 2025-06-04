@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws.codecs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.plugin.Message;
@@ -74,7 +75,9 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
         result.addField(FIELD_KINESIS_STREAM_ARN, configuration.getString(KinesisTransport.CK_KINESIS_STREAM_ARN));
         result.addField(FIELD_OWNER, logEvent.owner());
         result.addField(FIELD_MESSAGE_TYPE, logEvent.messageType());
-        result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
+        if (CollectionUtils.isNotEmpty(logEvent.subscriptionFilters())) {
+            result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
+        }
     }
 
     @Nonnull

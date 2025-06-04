@@ -250,9 +250,9 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
           <li>
             <strong>Kinesis Stream ARN</strong>
             <span>
-              {awsCloudwatchKinesisStreamArn.startsWith("Error:") ? (
+              {!awsCloudwatchKinesisStreamArn ? (
                 <ArnErrorMessage>
-                  {awsCloudwatchKinesisStreamArn.replace("Error: ", "")}
+                  Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream permission.
                 </ArnErrorMessage>
               ) : (
                 awsCloudwatchKinesisStreamArn

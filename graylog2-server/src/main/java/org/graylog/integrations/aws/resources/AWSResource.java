@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -38,7 +39,7 @@ import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
-import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
+import org.graylog.integrations.aws.resources.requests.KinesisRequest;
 import org.graylog.integrations.aws.resources.responses.CreateLogSubscriptionResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
@@ -54,6 +55,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.resources.system.inputs.AbstractInputsResource;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.utilities.ExceptionUtils;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -113,8 +115,13 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @ApiOperation(value = "Get stream ARN for the specified stream and region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisHealthCheckRequest request) {
-        String response = kinesisService.getStreamArn(request);
+    public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest request) {
+        String response;
+        try {
+            response = kinesisService.getStreamArn(request);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(ExceptionUtils.formatMessageCause(e));
+        }
         final CreateLogSubscriptionResponse createLogSubscriptionResponse = CreateLogSubscriptionResponse.create(response);
         return Response.ok().entity(createLogSubscriptionResponse).build();
     }
@@ -128,7 +135,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     )
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisHealthCheckRequest heathCheckRequest) throws ExecutionException, IOException {
+    public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest heathCheckRequest) throws ExecutionException, IOException {
 
         KinesisHealthCheckResponse response = kinesisService.healthCheck(heathCheckRequest);
         return Response.accepted().entity(response).build();

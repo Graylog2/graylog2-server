@@ -22,7 +22,7 @@ import org.graylog.integrations.aws.AWSLogMessage;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.AWSTestingUtils;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
-import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
+import org.graylog.integrations.aws.resources.requests.KinesisRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisNewStreamResponse;
@@ -193,7 +193,7 @@ public class KinesisServiceTest {
                 .thenReturn(GetRecordsResponse.builder().records(record).millisBehindLatest(10000L).build())
                 .thenReturn(GetRecordsResponse.builder().records(record).millisBehindLatest(0L).build());
 
-        KinesisHealthCheckRequest request = KinesisHealthCheckRequest.builder()
+        KinesisRequest request = KinesisRequest.builder()
                 .region(Region.EU_WEST_1.id())
                 .awsAccessKeyId("a-key")
                 .awsSecretAccessKey(encryptedValue)
@@ -222,7 +222,7 @@ public class KinesisServiceTest {
         when(kinesisClient.getRecords(isA(GetRecordsRequest.class)))
                 .thenReturn(GetRecordsResponse.builder().records(new ArrayList<>()).millisBehindLatest(0L).build());
 
-        KinesisHealthCheckRequest request = KinesisHealthCheckRequest.builder()
+        KinesisRequest request = KinesisRequest.builder()
                 .region(TEST_REGION)
                 .awsAccessKeyId("dummy-access-key")
                 .awsSecretAccessKey(encryptedValue)
@@ -231,7 +231,7 @@ public class KinesisServiceTest {
 
         KinesisHealthCheckResponse response = kinesisService.healthCheck(request);
 
-        assertEquals(AWSMessageType.NONE, response.inputType());
+        assertEquals(AWSMessageType.KINESIS_RAW, response.inputType());
         assertNotNull(response.messageFields());
         assertEquals(0, response.messageFields().size());
     }
