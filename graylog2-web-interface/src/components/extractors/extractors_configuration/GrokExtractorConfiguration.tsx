@@ -20,7 +20,7 @@ import { Icon } from 'components/common';
 import { Row, Col, ControlLabel, Button, Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
@@ -80,7 +80,7 @@ class GrokExtractorConfiguration extends React.Component<
       onExtractorPreviewLoad(undefined);
       const newConfig = configuration;
 
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      newConfig[key] = getValueFromInput(event.target);
       onChange(newConfig);
     };
   };
