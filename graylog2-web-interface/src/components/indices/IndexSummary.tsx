@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Label } from 'components/bootstrap';
+import { Label, Button } from 'components/bootstrap';
 import { RelativeTime, Icon } from 'components/common';
 import IndexSizeSummary from 'components/indices/IndexSizeSummary';
 
@@ -128,7 +128,7 @@ class IndexSummary extends React.Component<Props, { showDetails: boolean }> {
 
   _toggleShowDetails = (event) => {
     event.preventDefault();
-    this.setState({ showDetails: !this.state.showDetails });
+    this.setState((prevState) => ({ showDetails: !prevState.showDetails }));
   };
 
   render() {
@@ -140,9 +140,9 @@ class IndexSummary extends React.Component<Props, { showDetails: boolean }> {
           {this.props.name}{' '}
           <small>
             {this._formatLabels(index)} {this._formatIndexRange()} <IndexSizeSummary index={index} />
-            <a onClick={this._toggleShowDetails} href="#">
+            <Button onClick={this._toggleShowDetails} bsStyle="link">
               {this._formatShowDetailsLink()}
-            </a>
+            </Button>
           </small>
         </h2>
 

@@ -20,34 +20,25 @@ import capitalize from 'lodash/capitalize';
 import { ButtonGroup, Col } from 'components/bootstrap';
 import { LogLevelDropdown } from 'components/loggers';
 
-type LoggingSubsystemProps = {
+type Props = {
   name: string;
   nodeId: string;
   subsystem: any;
 };
 
-class LoggingSubsystem extends React.Component<
-  LoggingSubsystemProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    return (
-      <div className="subsystem-row">
-        <Col md={6} className="subsystem" style={{ marginBottom: '10px' }}>
-          <h3 className="u-light">
-            Subsystem: {capitalize(this.props.name)}
-            <ButtonGroup className="pull-right">
-              <LogLevelDropdown nodeId={this.props.nodeId} name={this.props.name} subsystem={this.props.subsystem} />
-            </ButtonGroup>
-          </h3>
-          {this.props.subsystem.description}
-          <br style={{ clear: 'both' }} />
-        </Col>
-      </div>
-    );
-  }
-}
+const LoggingSubsystem = ({ name, nodeId, subsystem }: Props) => (
+  <div className="subsystem-row">
+    <Col md={6} className="subsystem" style={{ marginBottom: '10px' }}>
+      <h3 className="u-light">
+        Subsystem: {capitalize(name)}
+        <ButtonGroup className="pull-right">
+          <LogLevelDropdown nodeId={nodeId} name={name} subsystem={subsystem} />
+        </ButtonGroup>
+      </h3>
+      {subsystem.description}
+      <br style={{ clear: 'both' }} />
+    </Col>
+  </div>
+);
 
 export default LoggingSubsystem;

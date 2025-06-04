@@ -33,19 +33,13 @@ class GrokPatternInput extends React.Component<
     [key: string]: any;
   }
 > {
+  private patternInput: Input;
+
   static defaultProps = {
     pattern: '',
     patterns: [],
     onPatternChange: () => {},
     className: '',
-  };
-
-  shownListItems = [];
-
-  _onPatternChange = (e) => {
-    const { onPatternChange } = this.props;
-
-    onPatternChange(e.target.value);
   };
 
   _addToPattern = (name) => {
@@ -56,12 +50,14 @@ class GrokPatternInput extends React.Component<
     onPatternChange(newPattern);
   };
 
-  private patternInput: Input;
+  _onPatternChange = (e) => {
+    const { onPatternChange } = this.props;
+
+    onPatternChange(e.target.value);
+  };
 
   render() {
     const { className, patterns, pattern } = this.props;
-
-    this.shownListItems = [];
 
     return (
       <Row className={className}>
