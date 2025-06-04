@@ -53,7 +53,7 @@ public class AWSCodecTest {
 
         DateTime timestamp = DateTime.now(DateTimeZone.UTC);
         KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create("a-stream", "log-group", "log-stream", timestamp,
-                "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK", "123456789", "", "Kinesis Raw", new ArrayList<>());
+                "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK", "123456789", "", new ArrayList<>());
 
         Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(kinesisLogEntry))).get();
         Assert.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
@@ -88,13 +88,13 @@ public class AWSCodecTest {
 
         final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
         final KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create("a-stream", "log-group", "log-stream", timestamp,
-                "This a raw message", "123456789", "", "Kinesis Raw", new ArrayList<>());
+                "This a raw message", "123456789", "", new ArrayList<>());
 
         Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(kinesisLogEntry))).get();
         Assert.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
         Assert.assertEquals("log-stream", message.getField(AbstractKinesisCodec.FIELD_LOG_STREAM));
         Assert.assertEquals("a-stream", message.getField(AbstractKinesisCodec.FIELD_KINESIS_STREAM));
-        Assert.assertEquals("123456789",message.getField("aws_owner"));
+        Assert.assertEquals("123456789", message.getField("aws_owner"));
         Assert.assertEquals("aws-kinesis-raw-logs", message.getField("source"));
         Assert.assertEquals("This a raw message", message.getField("message"));
         Assert.assertEquals(timestamp, message.getTimestamp());

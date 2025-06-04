@@ -48,8 +48,8 @@ public class FlowLogMessageTest {
         };
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create("kinesisStream", "helloGroup", "helloStream",
-                                                                DateTime.now(DateTimeZone.UTC),
-                                                                String.join(" ", strings),"123456789",TEST_STREAM_ARN,"Kinesis Raw",new ArrayList<>());
+                DateTime.now(DateTimeZone.UTC),
+                String.join(" ", strings), "123456789", TEST_STREAM_ARN, new ArrayList<>());
         final FlowLogMessage m = FlowLogMessage.fromLogEvent(logEvent);
 
         assertEquals(m.getDestinationPort(), 0);
@@ -79,7 +79,7 @@ public class FlowLogMessageTest {
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create("kinesisStream", "helloGroup", "helloStream",
                 DateTime.now(DateTimeZone.UTC),
-                String.join(" ", strings),"123456789",TEST_STREAM_ARN,"Kinesis Raw",new ArrayList<>());
+                String.join(" ", strings), "123456789", TEST_STREAM_ARN, new ArrayList<>());
         final FlowLogMessage m = FlowLogMessage.fromLogEvent(logEvent);
 
         assertEquals(m.getBytes(), 0);

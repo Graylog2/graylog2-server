@@ -138,7 +138,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
-        assertEquals(21, fields.size());
+        assertEquals(23, fields.size());
         assertEquals(6, fields.get("protocol_number"));
         assertEquals("TCP", fields.get("protocol"));
         assertEquals(1L, fields.get("packets"));
