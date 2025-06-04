@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 import { Collapse } from '@mantine/core';
+
+import useDisclosure from 'util/hooks/useDisclosure';
 
 import Icon from './Icon';
 

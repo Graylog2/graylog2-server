@@ -29,9 +29,9 @@ type VersionCheckType = {
 export const fetchSearchVersionCheck = ({ queryKey }): Promise<VersionCheckType> => {
   const [, /* queryName */ { distribution, version }] = queryKey;
 
-  return fetch(
-    'GET',
-    qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url),
+  return defaultOnError(
+    fetch('GET', qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url)),
+    'Could not fetch override data',
   );
 };
 

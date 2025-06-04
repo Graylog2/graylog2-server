@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Row, Col, Input } from 'components/bootstrap';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 
 type SplitAndCountConverterConfigurationProps = {
   type: string;
@@ -45,7 +45,7 @@ class SplitAndCountConverterConfiguration extends React.Component<
   _toggleConverter = (event) => {
     let converter;
 
-    if (FormUtils.getValueFromInput(event.target) === true) {
+    if (getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
@@ -55,7 +55,7 @@ class SplitAndCountConverterConfiguration extends React.Component<
   _onChange = (key) => (event) => {
     const newConfig = this.props.configuration;
 
-    newConfig[key] = FormUtils.getValueFromInput(event.target);
+    newConfig[key] = getValueFromInput(event.target);
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
   };
 
