@@ -235,7 +235,7 @@ describe('EventDefinitionFormContainer', () => {
         ({
           'views.components.eventProcedureSummary': [],
           'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
-        })[entityKey],
+        })[entityKey] ?? [],
     );
   });
 
