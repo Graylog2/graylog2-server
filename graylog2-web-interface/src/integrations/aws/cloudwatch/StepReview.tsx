@@ -138,7 +138,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
       kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
-      override_source: overrideSource,
+      override_source: overrideSource?.value ?? '',
     },
   );
 
