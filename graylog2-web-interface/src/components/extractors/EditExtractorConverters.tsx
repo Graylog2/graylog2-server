@@ -247,7 +247,7 @@ class EditExtractorConverters extends React.Component<
           // eslint-disable-next-line no-console
           console.warn(`Converter type ${converterType} is not supported.`);
 
-          return <></>;
+          return null;
       }
     });
 

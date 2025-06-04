@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import type { $PropertyType } from 'utility-types';
+import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -27,7 +27,7 @@ import type { GranteesList as GranteesListType, SelectedGranteeCapabilities } fr
 import type Grantee from 'logic/permissions/Grantee';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { createGRN } from 'logic/permissions/GRN';
-import { Spinner } from 'components/common';
+import { Section, Spinner } from 'components/common';
 
 import type { SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -45,20 +45,16 @@ import EntityShareValidationsDependencies from './EntityShareValidationsDependen
 
 type Props = {
   description: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityType: SharedEntity['type'];
+  entityTitle?: SharedEntity['title'];
   entityId?: string;
   entityTypeTitle?: string | null | undefined;
+  defaultSharePayload?: EntitySharePayload;
   onSetEntityShare: (payload: EntitySharePayload) => void;
+  dependenciesGRN?: Array<GRN>;
 };
 
-const _renderGranteesSelectOption = ({
-  label,
-  granteeType,
-}: {
-  label: string;
-  granteeType: $PropertyType<Grantee, 'type'>;
-}) => (
+const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; granteeType: Grantee['type'] }) => (
   <GranteesSelectOption>
     <StyledGranteeIcon type={granteeType} />
     {label}
@@ -72,10 +68,12 @@ const getAvailableGrantee = (grantees: GranteesListType, selected: SelectedGrant
 const EntityCreateShareFormGroup = ({
   description,
   entityType,
-  entityTitle,
+  entityTitle = '',
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',
+  dependenciesGRN = null,
+  defaultSharePayload = undefined,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
@@ -84,8 +82,8 @@ const EntityCreateShareFormGroup = ({
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityType, entityTitle, entityGRN]);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
@@ -99,10 +97,12 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
+      prepare_request: dependenciesGRN
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
-      onSetEntityShare(payload);
+      onSetEntityShare({ selected_grantee_capabilities: newSelectedCapabilities });
+
       resetSelection();
       setDisableSubmit(false);
 
@@ -115,12 +115,15 @@ const EntityCreateShareFormGroup = ({
 
     setDisableSubmit(true);
 
+    const prepare_request = isEmpty(newSelectedGranteeCapabilities) ? null: dependenciesGRN;
+
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
+      prepare_request,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
-      onSetEntityShare(payload);
+      onSetEntityShare({ selected_grantee_capabilities: newSelectedGranteeCapabilities });
       setDisableSubmit(false);
 
       return response;
@@ -132,7 +135,7 @@ const EntityCreateShareFormGroup = ({
   };
 
   return (
-    <>
+    <Section title="">
       {entityShareState ? (
         <>
           <ShareFormSection>
@@ -184,7 +187,7 @@ const EntityCreateShareFormGroup = ({
       ) : (
         <Spinner />
       )}
-    </>
+    </Section>
   );
 };
 

@@ -120,7 +120,7 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
   `;
 });
 
-const ProgressBar = ({ bars = [DEFAULT_BAR], className }: ProgressBarProps) => (
+const ProgressBar = ({ bars = [DEFAULT_BAR], className = undefined }: ProgressBarProps) => (
   <ProgressWrap className={className}>
     {bars.map((bar, index) => {
       const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };

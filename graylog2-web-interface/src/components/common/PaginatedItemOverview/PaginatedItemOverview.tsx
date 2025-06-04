@@ -62,12 +62,12 @@ export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], q
 
 const PaginatedItemOverview = ({
   onLoad,
-  overrideList,
-  onDeleteItem,
-  queryHelper,
+  overrideList = undefined,
+  onDeleteItem = undefined,
+  queryHelper = undefined,
   noDataText = 'No items found to display.',
   resultsWrapperComponent: ResultsWrapperComponent = ({ children }) => <div>{children}</div>,
-  overrideItemComponent: OverrideItemComponent,
+  overrideItemComponent: OverrideItemComponent = undefined,
 }: Props) => {
   const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);

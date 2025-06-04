@@ -18,7 +18,7 @@ package org.graylog2.database.pagination;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Collation;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;

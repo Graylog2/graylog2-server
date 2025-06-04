@@ -91,7 +91,7 @@ const FailureStreamLink = () => {
 
 const ChangeFieldTypeModal = ({
   show,
-  onSubmitCallback,
+  onSubmitCallback = undefined,
   initialSelectedIndexSets,
   onClose,
   showSelectionTable = true,

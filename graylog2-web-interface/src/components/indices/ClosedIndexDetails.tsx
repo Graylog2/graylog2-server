@@ -31,6 +31,10 @@ class ClosedIndexDetails extends React.Component<
     [key: string]: any;
   }
 > {
+  static defaultProps = {
+    indexRange: undefined,
+  };
+
   _onReopen = () => {
     IndicesActions.reopen(this.props.indexName);
   };

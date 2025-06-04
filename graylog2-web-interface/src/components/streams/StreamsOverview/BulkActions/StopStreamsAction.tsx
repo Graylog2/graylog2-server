@@ -31,7 +31,7 @@ type Props = {
   refetchStreams: () => void;
 };
 
-const StopStreamsAction = ({ handleFailures, refetchStreams, descriptor, onSelect }: Props) => {
+const StopStreamsAction = ({ handleFailures, refetchStreams, descriptor, onSelect = undefined }: Props) => {
   const { selectedEntities } = useSelectedEntities();
   const onStopStreams = useCallback(() => {
     if (typeof onSelect === 'function') {

@@ -56,7 +56,7 @@ const TableRow = <Entity extends EntityBase, Meta>({
   displaySelect,
   displayActions,
   entity,
-  actions,
+  actions = undefined,
   index,
   actionsRef,
   entityAttributesAreCamelCase,
