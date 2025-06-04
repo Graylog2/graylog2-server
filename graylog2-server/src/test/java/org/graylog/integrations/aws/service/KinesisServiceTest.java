@@ -138,7 +138,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
-        assertEquals(23, fields.size());
+        assertEquals(22, fields.size());
         assertEquals(6, fields.get("protocol_number"));
         assertEquals("TCP", fields.get("protocol"));
         assertEquals(1L, fields.get("packets"));
@@ -154,7 +154,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_RAW, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
-        assertEquals(9, fields.size());
+        assertEquals(8, fields.size());
     }
 
     @Test
@@ -167,7 +167,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_RAW, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(new DateTime("2000-01-01T01:01:01.000Z", DateTimeZone.UTC), fields.get("timestamp"));
-        assertEquals(8, fields.size());
+        assertEquals(7, fields.size());
     }
 
     private KinesisHealthCheckResponse executeHealthCheckTest(byte[] payloadData, Instant recordArrivalTime) throws IOException, ExecutionException {
