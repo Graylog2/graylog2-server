@@ -22,17 +22,15 @@ type Props = {
   failure: any;
 };
 
-const IndexerFailure = ({ failure }: Props) => {
-  return (
-    <tr>
-      <td>
-        <RelativeTime dateTime={failure.timestamp} />
-      </td>
-      <td>{failure.index}</td>
-      <td>{failure.letter_id}</td>
-      <td>{failure.message}</td>
-    </tr>
-  );
-};
+const IndexerFailure = ({ failure }: Props) => (
+  <tr>
+    <td>
+      <RelativeTime dateTime={failure.timestamp} />
+    </td>
+    <td>{failure.index}</td>
+    <td>{failure.letter_id}</td>
+    <td>{failure.message}</td>
+  </tr>
+);
 
 export default IndexerFailure;

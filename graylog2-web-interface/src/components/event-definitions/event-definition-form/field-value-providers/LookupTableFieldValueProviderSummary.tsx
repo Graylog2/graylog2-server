@@ -23,7 +23,7 @@ import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
 type Props = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
-const LookupTableFieldValueProviderSummary = (props: Props) => {
+const LookupTableFieldValueProviderSummary = ({ ...props }: Props) => {
   const provider = props.config.providers[0];
 
   return (
