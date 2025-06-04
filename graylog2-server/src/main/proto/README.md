@@ -11,7 +11,7 @@ Along with our own protobuf specs, we maintain a copy of the protobuf specs from
 These are required as dependencies for the `otel-raw-journal-record.proto` spec.
 
 To update the opentelemetry specs, find the desired version at the [available releases](https://github.com/open-telemetry/opentelemetry-proto/releases)
-page and then run the `update_otlp_proto.sh` script.
+page and then run the `update_otel_proto.sh` script.
 
 This will download the release archive and extract the `.proto` files into `./opentelemetry`, maintaining the directory
 structure.
