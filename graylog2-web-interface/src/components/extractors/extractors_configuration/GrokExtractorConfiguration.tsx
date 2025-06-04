@@ -27,7 +27,7 @@ import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 import Style from './GrokExtractorConfiguration.css';
 
-type GrokExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
@@ -35,19 +35,23 @@ type GrokExtractorConfigurationProps = {
 };
 
 class GrokExtractorConfiguration extends React.Component<
-  GrokExtractorConfigurationProps,
+  Props,
   {
-    [key: string]: any;
+    trying: boolean;
+    patterns: Array<any>;
   }
 > {
   static defaultProps = {
     exampleMessage: undefined,
   };
 
-  state = {
-    trying: false,
-    patterns: [],
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+      patterns: [],
+    };
+  }
 
   componentDidMount() {
     this.loadData();
