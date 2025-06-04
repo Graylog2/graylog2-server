@@ -47,9 +47,7 @@ public enum AWSMessageType {
     KINESIS_CLOUDWATCH_FLOW_LOGS(Source.KINESIS, "Kinesis CloudWatch Flow Log", KinesisCloudWatchFlowLogCodec.NAME,
             KinesisCloudWatchFlowLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
 
-    UNKNOWN(),
-    NONE(Source.KINESIS, "None", KinesisRawLogCodec.NAME,
-            KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class);
+    UNKNOWN();
 
     private Source source;
     private String label;
@@ -112,6 +110,6 @@ public enum AWSMessageType {
      */
     public static List<AWSMessageType> getMessageTypes() {
 
-        return Arrays.stream(values()).filter(m -> !(m.equals(UNKNOWN) || m.equals(NONE))).collect(Collectors.toList());
+        return Arrays.stream(values()).filter(m -> !(m.equals(UNKNOWN))).collect(Collectors.toList());
     }
 }

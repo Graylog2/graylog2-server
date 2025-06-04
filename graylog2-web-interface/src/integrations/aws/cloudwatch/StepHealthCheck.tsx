@@ -155,15 +155,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
   const bsStyle = knownLog ? 'success' : 'warning';
   const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
-
-  const getLogType = () => {
-    if (knownLog) return `a ${logTypeLabel}`;
-    if (logTypeLabel === 'None') return logData.additional;
-
-    return 'an unknown message type.';
-  };
-
-  const logType = getLogType();
+  const logType = knownLog ? `a ${logTypeLabel} message type` : `an unknown message type (${logTypeLabel})`;
 
   const handleSubmit = () => {
     onSubmit();
@@ -188,7 +180,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
           <Notice>
             <Icon name={iconName} size="2x" />
             <span>
-              {acknowledgment} looks like <em>{logType}</em>
+              {acknowledgment} looks like <em>{logType}</em>.
             </span>
           </Notice>
         }>
@@ -201,7 +193,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
         id="awsCloudWatchLog"
         type="textarea"
         label="Formatted Log Message"
-        value={logTypeLabel === 'None' ? 'No Messages' : logData.message}
+        value={logData.message || "No messages found in stream."}
         rows={10}
         disabled
       />

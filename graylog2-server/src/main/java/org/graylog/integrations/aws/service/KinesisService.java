@@ -159,7 +159,7 @@ public class KinesisService {
         if (records.isEmpty()) {
             LOG.warn("The Kinesis stream [{}] is empty. Proceeding with setup at the user's own risk.", request.streamName());
             return KinesisHealthCheckResponse.create(
-                    AWSMessageType.NONE,
+                    AWSMessageType.KINESIS_RAW,
                     String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()),
                     new HashMap<>()
             );
