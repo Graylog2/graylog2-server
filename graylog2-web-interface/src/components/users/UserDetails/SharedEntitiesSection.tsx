@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
-import type { $PropertyType } from 'utility-types';
 
 import SharedEntitiesOverview from 'components/permissions/SharedEntitiesOverview';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -24,7 +23,7 @@ import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  userId: $PropertyType<User, 'id'>;
+  userId: User['id'];
 };
 
 const SharedEntitiesSection = ({ userId }: Props) => {

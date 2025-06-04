@@ -26,7 +26,7 @@ user needs the report creator role from now on to create reports.
 
 ## Java API Changes
 
-- tbd
+- Database consumers are now using our custom MongoDB collection interface `org.graylog2.database.MongoCollection` instead of `com.mongodb.client.MongoCollection`.
 
 ## REST API Endpoint Changes
 

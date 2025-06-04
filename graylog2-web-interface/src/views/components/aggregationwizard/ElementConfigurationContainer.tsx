@@ -71,31 +71,29 @@ type Props = {
   testIdPrefix?: string;
 };
 
-const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      children,
-      onRemove,
-      testIdPrefix = 'configuration',
-      dragHandleProps,
-      className,
-      draggableProps,
-      elementTitle,
-    }: Props,
-    ref,
-  ) => (
-    <Container className={className} ref={ref} {...(draggableProps ?? {})}>
-      <ElementActions>
-        {dragHandleProps && (
-          <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-            <Icon size="sm" name="drag_indicator" />
-          </DragHandle>
-        )}
-        {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
-      </ElementActions>
-      <ElementConfiguration>{children}</ElementConfiguration>
-    </Container>
-  ),
+const ElementConfigurationContainer = (
+  {
+    children,
+    onRemove = undefined,
+    testIdPrefix = 'configuration',
+    dragHandleProps = undefined,
+    className = undefined,
+    draggableProps = undefined,
+    elementTitle,
+  }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+    <ElementActions>
+      {dragHandleProps && (
+        <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
+          <Icon size="sm" name="drag_indicator" />
+        </DragHandle>
+      )}
+      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
+    </ElementActions>
+    <ElementConfiguration>{children}</ElementConfiguration>
+  </Container>
 );
 
-export default ElementConfigurationContainer;
+export default forwardRef(ElementConfigurationContainer);

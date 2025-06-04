@@ -17,7 +17,7 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.annotation.Nullable;

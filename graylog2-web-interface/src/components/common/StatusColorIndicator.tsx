@@ -41,7 +41,7 @@ const StyledIndicator = styled(Indicator)<{ color: ColorVariant }>(
 
 const StatusColorIndicator = ({
   bsStyle = 'gray',
-  'data-testid': dataTestid,
+  'data-testid': dataTestid = undefined,
   className = '',
   children = undefined,
   radius = 0,

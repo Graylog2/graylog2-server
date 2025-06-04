@@ -15,17 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 
 import { Select } from 'components/common';
 import type { CapabilityType } from 'logic/permissions/types';
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 
 type Props = {
-  onChange: (id: $PropertyType<CapabilityType, 'id'>) => void;
+  onChange: (id: CapabilityType['id']) => void;
   capabilities: CapabilitiesList;
   title?: string;
-  value: $PropertyType<CapabilityType, 'id'>;
+  value: CapabilityType['id'];
 };
 
 const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
