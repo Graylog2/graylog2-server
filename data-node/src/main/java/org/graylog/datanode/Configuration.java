@@ -129,7 +129,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Documentation(visible = false)
     @Parameter(value = "native_lib_dir", required = true)
-    private Path nativeLibDir = Path.of("native_libs");
+    private String nativeLibDir = "native_libs";
 
     @Documentation("How many log entries of the opensearch process should Datanode hold in memory and make accessible via API calls.")
     @Parameter(value = "process_logs_buffer_size")
@@ -512,7 +512,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     }
 
     public Path getNativeLibDir() {
-        return nativeLibDir;
+        return getOpensearchConfigLocation().resolve(Path.of(nativeLibDir));
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

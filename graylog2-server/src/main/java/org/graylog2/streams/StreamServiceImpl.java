@@ -382,7 +382,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         super.destroy(stream);
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
-        clusterEventBus.post(StreamDeletedEvent.create(streamId));
+        clusterEventBus.post(new StreamDeletedEvent(streamId, stream.getTitle()));
         entityOwnershipService.unregisterStream(streamId);
     }
 
