@@ -14,45 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import useFeature from 'hooks/useFeature';
-import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import {
-  generateMappersForYAxis,
-  getBarChartTraceOffsetSettings,
-} from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { getBarChartTraceOffsetGroup } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
-import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 
 const useBarChartDataSettingsWithCustomUnits = ({
   config,
   barmode,
-  effectiveTimerange,
 }: {
   config: AggregationWidgetConfig;
   barmode?: BarMode;
-  effectiveTimerange: AbsoluteTimeRange;
 }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
-  const widgetUnits = useWidgetUnits(config);
-  const { fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(
-    () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
-    [config.series, widgetUnits],
-  );
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
 
   return useCallback(
     ({
       values,
       idx,
-      total,
-      xAxisItemsLength,
       fullPath,
       name,
     }: {
@@ -66,25 +51,13 @@ const useBarChartDataSettingsWithCustomUnits = ({
     }): Partial<ChartDefinition> => {
       if (!unitFeatureEnabled) return {};
 
-      const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
       const {
         y: convertedValues,
         yaxis,
         ...hoverTemplateSettings
       } = getChartDataSettingsWithCustomUnits({ name, fullPath, values });
-      const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
-      const totalAxis = Object.keys(unitTypeMapper).length;
 
-      const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
-        yaxis,
-        totalAxis,
-        axisNumber,
-        traceIndex: idx,
-        totalTraces: total,
-        effectiveTimerange,
-        isTimeline: config.isTimeline,
-        xAxisItemsLength: xAxisItemsLength,
-      });
+      const offsetSettings = getBarChartTraceOffsetGroup(barmode, yaxis, idx);
 
       return {
         yaxis,
@@ -94,16 +67,7 @@ const useBarChartDataSettingsWithCustomUnits = ({
         ...offsetSettings,
       };
     },
-    [
-      barmode,
-      config.isTimeline,
-      config.series,
-      effectiveTimerange,
-      fieldNameToAxisCountMapper,
-      getChartDataSettingsWithCustomUnits,
-      unitFeatureEnabled,
-      unitTypeMapper,
-    ],
+    [barmode, getChartDataSettingsWithCustomUnits, unitFeatureEnabled],
   );
 };
 

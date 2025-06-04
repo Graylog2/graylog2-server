@@ -107,7 +107,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
     };
     asMock(chartLayoutGenerators.generateMappersForYAxis).mockReturnValue(mappers);
 
-    asMock(chartLayoutGenerators.getBarChartTraceOffsetSettings).mockReturnValue({
+    asMock(chartLayoutGenerators.getBarChartTraceOffsetGroup).mockReturnValue({
       offsetgroup: 1,
       width: 0.25,
       offset: -0.375,
@@ -149,7 +149,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
     expect(useChartDataSettingsWithCustomUnits).toHaveBeenCalledWith({ config: testConfig });
     expect(getFieldNameFromTrace).toHaveBeenCalledWith({ series: testConfig.series, fullPath: 'Name1' });
 
-    expect(chartLayoutGenerators.getBarChartTraceOffsetSettings).toHaveBeenCalledWith('group', {
+    expect(chartLayoutGenerators.getBarChartTraceOffsetGroup).toHaveBeenCalledWith('group', {
       yaxis: 'y1',
       totalAxis: 4,
       axisNumber: 1,
