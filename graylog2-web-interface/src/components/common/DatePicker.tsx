@@ -79,7 +79,7 @@ type Props = {
   showOutsideDays?: boolean;
 };
 
-const DatePicker = ({ date, fromDate, onChange, showOutsideDays = false }: Props) => {
+const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOutsideDays = false }: Props) => {
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(

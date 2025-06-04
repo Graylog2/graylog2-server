@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 
 import { LinkContainer } from 'components/common/router';
 import type Role from 'logic/roles/Role';
@@ -23,7 +22,7 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 
 type Props = {
-  roleId: $PropertyType<Role, 'id'>;
+  roleId: Role['id'];
 };
 
 const RoleActionLinks = ({ roleId }: Props) => (

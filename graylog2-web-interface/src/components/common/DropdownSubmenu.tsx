@@ -72,7 +72,7 @@ const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<
   `,
 );
 
-const DropdownSubmenu = ({ children, left = false, title }: Props) => (
+const DropdownSubmenu = ({ children, left = false, title = undefined }: Props) => (
   <MenuItem>
     <StyledSubmenu $left={left} as="div">
       {title} <Caret />

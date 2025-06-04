@@ -162,10 +162,10 @@ const ListWithOwnState = ({
 const PaginatedList = ({
   activePage = 1,
   children,
-  className,
+  className = undefined,
   hideFirstAndLastPageLinks = false,
   hidePreviousAndNextPageLinks = false,
-  onChange,
+  onChange = undefined,
   pageSize = DEFAULT_PAGE_SIZES[0],
   pageSizes = DEFAULT_PAGE_SIZES,
   showPageSizeSelect = true,

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useMemo } from 'react';
 
 // TODO: Fix typing
 export const AdvancedOptionsContext = createContext<any>(undefined);
@@ -26,16 +26,15 @@ type AdvancedOptionsProviderProps = {
 export const AdvancedOptionsProvider = ({ children }: AdvancedOptionsProviderProps) => {
   const [isAdvancedOptionsVisible, setAdvancedOptionsVisibility] = useState(false);
   const [isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility] = useState(false);
-
-  return (
-    <AdvancedOptionsContext.Provider
-      value={{
-        isAdvancedOptionsVisible,
-        isAWSCustomEndpointsVisible,
-        setAdvancedOptionsVisibility,
-        setAWSCustomEndpointsVisibility,
-      }}>
-      {children}
-    </AdvancedOptionsContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      isAdvancedOptionsVisible,
+      isAWSCustomEndpointsVisible,
+      setAdvancedOptionsVisibility,
+      setAWSCustomEndpointsVisibility,
+    }),
+    [isAWSCustomEndpointsVisible, isAdvancedOptionsVisible],
   );
+
+  return <AdvancedOptionsContext.Provider value={contextValue}>{children}</AdvancedOptionsContext.Provider>;
 };

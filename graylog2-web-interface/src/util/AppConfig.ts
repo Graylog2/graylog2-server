@@ -16,6 +16,8 @@
  */
 import * as Immutable from 'immutable';
 
+import type { Notifications } from 'theme/types';
+
 declare global {
   const DEVELOPMENT: boolean | undefined;
   const FEATURES: string | undefined;
@@ -50,6 +52,9 @@ export type Branding = {
   help_url?: string;
   footer?: { enabled: boolean };
   resources?: BrandingResources;
+  features?: {
+    ai_investigation_report?: { enabled?: boolean };
+  };
 };
 
 export type AppConfigs = {
@@ -124,7 +129,7 @@ const AppConfig = {
     return appConfig()?.telemetry;
   },
 
-  publicNotifications() {
+  publicNotifications(): Notifications {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
