@@ -111,17 +111,17 @@ const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] a
  * Letting the component handle its own internal state may lead to weird errors while typing.
  */
 type Props = {
-  annotations: Array<IAnnotation>;
+  annotations?: Array<IAnnotation>;
   focus?: boolean;
   fontSize?: number;
   height?: number;
   width?: number;
   id: string;
   innerRef?: React.MutableRefObject<AceEditor>;
-  mode: (typeof availableModes)[number];
-  onLoad: () => void;
-  onChange: () => void;
-  onBlur: () => void;
+  mode?: (typeof availableModes)[number];
+  onLoad?: () => void;
+  onChange?: () => void;
+  onBlur?: () => void;
   readOnly?: boolean;
   resizable?: boolean;
   toolbar?: boolean;
