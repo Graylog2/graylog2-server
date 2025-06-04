@@ -274,7 +274,7 @@ export const LookupTableDataAdaptersStore = singletonStore('core.LookupTableData
 
         try {
           errorMessage = error.additional.body.message;
-        } catch (e) {
+        } catch (_e) {
           errorMessage = error.message;
         }
 

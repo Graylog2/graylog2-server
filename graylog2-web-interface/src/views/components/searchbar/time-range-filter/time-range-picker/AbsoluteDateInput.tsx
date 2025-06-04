@@ -45,7 +45,7 @@ const AbsoluteDateInput = ({
   onChange = () => {},
   value = '',
   hasError = false,
-  className,
+  className = undefined,
 }: Props) => {
   const { formatTime } = useUserDateTime();
   const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));

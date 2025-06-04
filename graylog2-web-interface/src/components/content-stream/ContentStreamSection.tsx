@@ -60,8 +60,8 @@ const ContentStreamSection = () => {
   }
 
   const updateContentStreamSettings = async ({
-    enableContentStream,
-    enableRelease,
+    enableContentStream = undefined,
+    enableRelease = undefined,
   }: {
     enableContentStream?: boolean;
     enableRelease?: boolean;
