@@ -89,21 +89,13 @@ describe('StreamModal', () => {
       name: /description/i,
     });
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
     expect(title).toHaveValue(exampleStream.title);
     expect(description).toHaveValue(exampleStream.description);
 
     await userEvent.type(title, ' and further title');
     await userEvent.type(description, ' and further description');
 
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(indexSetSelect, 'Example Index Set');
-    });
+    await selectEvent.selectOption('Index Set', 'Example Index Set');
 
     await screen.findByText('Example Index Set');
 
@@ -146,15 +138,7 @@ describe('StreamModal', () => {
     userEvent.type(title, 'New title');
     userEvent.type(description, 'New description');
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(indexSetSelect, 'Example Index Set');
-    });
+    await selectEvent.selectOption('Index Set', 'Example Index Set');
 
     const granteesSelect = await screen.findByLabelText('Search for users and teams');
 

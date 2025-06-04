@@ -42,7 +42,7 @@ describe('<ListField>', () => {
     render(<SUT />);
 
     const fieldLabel = await screen.findByText(`${listField.human_name} (optional)`);
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
+    const select = await selectEvent.findSelectInput(listField.human_name);
 
     expect(fieldLabel).toBeInTheDocument();
     expect(select).toBeInTheDocument();
@@ -51,14 +51,14 @@ describe('<ListField>', () => {
   it('should display options from attributes', async () => {
     render(<SUT />);
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
-
     expect(screen.queryByText('uno')).not.toBeInTheDocument();
     expect(screen.queryByText('dos')).not.toBeInTheDocument();
 
+    const select = await selectEvent.findSelectInput(listField.human_name);
     await selectEvent.openMenu(select);
 
-    expect(await screen.findByText('uno')).toBeInTheDocument();
+    await selectEvent.findOption('uno');
+
     expect(screen.getByText('dos')).toBeInTheDocument();
   });
 
@@ -74,8 +74,7 @@ describe('<ListField>', () => {
 
     render(<SUT onChange={updateFunction} />);
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
-
+    const select = await selectEvent.findSelectInput(listField.human_name);
     await selectEvent.select(select, ['uno', 'dos']);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['one', 'two']));
   });
@@ -95,8 +94,7 @@ describe('<ListField>', () => {
 
     render(<SUT field={creatableListField} onChange={updateFunction} />);
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
-
+    const select = await selectEvent.findSelectInput(listField.human_name);
     await selectEvent.create(select, 'three');
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['three']));
   });

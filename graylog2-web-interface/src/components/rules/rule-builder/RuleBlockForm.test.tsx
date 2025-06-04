@@ -58,14 +58,15 @@ describe('RuleBlockForm', () => {
     jest.clearAllMocks();
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('renders a select with all functions as options', async () => {
     render(comp());
 
-    const select = await screen.findByRole('combobox');
+    const select = await selectEvent.findSelectInput('Add action');
 
     await selectEvent.openMenu(select);
 
-    options.forEach((option) => expect(screen.getByText(option.label)).toBeInTheDocument());
+    await Promise.all(options.map((option) => selectEvent.findOption(option.label)));
   });
 
   it('calls onSelect handler when selecting an option', async () => {

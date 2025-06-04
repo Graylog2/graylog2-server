@@ -17,6 +17,7 @@
 
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
+import { screen } from 'wrappedTestingLibrary';
 
 /*
  * This file contains helper methods, which replace the `react-select-event` methods.
@@ -34,4 +35,20 @@ const customCreate = (element: HTMLElement, option: string) =>
 const customSelect = (element: HTMLElement, optionOrOptions: string | Array<string> | RegExp) =>
   selectEvent.select(element, optionOrOptions, { container: document.body });
 
-export default { clearAll, openMenu: selectEvent.openMenu, create: customCreate, select: customSelect };
+const findSelectInput = (name: string) => screen.findByRole('combobox', { name: new RegExp(name, 'i') });
+const findOption = async (name: string | RegExp) => screen.findByRole('option', { name: new RegExp(name, 'i') });
+
+const selectOption = async (selectName: string, optionName: string | RegExp) => {
+  const input = await findSelectInput(selectName);
+  userEvent.type(input, `${optionName}{enter}`);
+};
+
+export default {
+  clearAll,
+  openMenu: selectEvent.openMenu,
+  create: customCreate,
+  select: customSelect,
+  selectOption,
+  findSelectInput,
+  findOption,
+};
