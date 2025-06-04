@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToBase10Conversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -234,6 +235,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(HexToBase10Conversion.NAME, new HexToBase10Conversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());
@@ -1802,5 +1804,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    void hexToBase10Conversion() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("0x17B90004")).isEqualTo(123);
     }
 }

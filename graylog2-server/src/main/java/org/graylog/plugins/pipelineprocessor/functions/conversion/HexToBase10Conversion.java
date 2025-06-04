@@ -7,42 +7,57 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import java.math.BigInteger;
+
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.floating;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
-public class HexToBase10Conversion extends AbstractFunction<String> {
+public class HexToBase10Conversion extends AbstractFunction<Long> {
 
-    public static final String NAME = "hex_to_dec";
+    public static final String NAME = "hex_to_double";
 
-    private final ParameterDescriptor<String, String> hexParam;
+    private static final String VALUE = "value";
+    private static final String DEFAULT = "default";
+    private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Long, Long> defaultParam;
 
-    public HexToBase10Conversion(ParameterDescriptor<String, String> hexParam) {
-        this.hexParam = string("hex").ruleBuilderVariable().description("The hexadecimal string to convert").build();
+    public HexToBase10Conversion() {
+        valueParam = object(VALUE).ruleBuilderVariable().description("Value to convert").build();
+        defaultParam = integer(DEFAULT).optional().allowNegatives(false).description("Used when 'value' is null, defaults to 0").build();
     }
 
     @Override
-    public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String hex = hexParam.required(args, context);
-        if (hex == null) {
-            return null;
+    public Long evaluate(FunctionArgs args, EvaluationContext context) {
+        final Object evaluated = valueParam.required(args, context);
+        final Long defaultValue = defaultParam.optional(args, context).orElse(0L);
+
+        if (evaluated != null) {
+            final String s = String.valueOf(evaluated);
+            try {
+                final BigInteger bi = new BigInteger(s.replace("0x", ""), 16);
+                return bi.longValue();
+            } catch (NumberFormatException ignored) {
+            }
         }
-        try {
-            return String.valueOf(Integer.parseInt(hex.replace("0x", ""), 16));
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Invalid hexadecimal input: " + hex, e);
-        }
+
+        return defaultValue;
     }
 
     @Override
-    public FunctionDescriptor<String> descriptor() {
-        return FunctionDescriptor.<String>builder()
+    public FunctionDescriptor<Long> descriptor() {
+        return FunctionDescriptor.<Long>builder()
                 .name(NAME)
-                .description("Converts a hexadecimal string to its decimal (base 10) integer representation.")
-                .params(of(hexParam))
-                .returnType(String.class)
+                .returnType(Long.class)
+                .params(of(
+                        valueParam,
+                        defaultParam
+                ))
+                .description("Converts a hexadecimal string to its decimal (base 10) representation.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to decimal")
-                .ruleBuilderTitle("Convert '${hex}' to decimal")
+                .ruleBuilderTitle("Convert '${value}' to decimal")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
