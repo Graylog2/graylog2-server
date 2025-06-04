@@ -158,7 +158,8 @@ const getUnitLayoutWithData = (
 type SeriesName = string;
 type AxisName = string;
 
-const getWidth = (total: number, offsetMultiplier: number) => (total <= 1 ? undefined : offsetMultiplier / total);
+const getWidth = (total: number, offsetMultiplier: number | undefined) =>
+  total <= 1 || !offsetMultiplier ? undefined : offsetMultiplier / total;
 
 const getOffset = (offsetNumber: number, totalOffsets: number, offsetMultiplier: number) => {
   const width = getWidth(totalOffsets, offsetMultiplier);
@@ -206,7 +207,7 @@ export const getBarChartTraceOffsetSettings = (
   const offsetMultiplier =
     xAxisItemsLength && isTimeline && effectiveTimerange
       ? moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength
-      : 1;
+      : undefined;
 
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
     const width = getWidth(totalAxis, offsetMultiplier);
