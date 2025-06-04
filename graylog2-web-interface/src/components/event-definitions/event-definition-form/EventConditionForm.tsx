@@ -75,7 +75,7 @@ const EventConditionForm = ({
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+  const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes') ?? [];
 
   const getConditionPlugin = useCallback(
     (type: string) => {
