@@ -70,8 +70,6 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
   };
 
-  _onChange = (key) => (event) => this._updateConfigValue(key, getValueFromInput(event.target));
-
   _onSelect = (key) => (value) => this._updateConfigValue(key, value);
 
   render() {

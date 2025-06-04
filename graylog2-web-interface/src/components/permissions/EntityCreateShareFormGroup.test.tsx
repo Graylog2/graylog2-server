@@ -118,6 +118,7 @@ describe('EntityCreateShareFormGroup', () => {
         selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
           [everyone.id]: viewer.id,
         }),
+        prepare_request: null,
       });
     });
     await waitFor(() => {
