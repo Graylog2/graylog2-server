@@ -19,7 +19,7 @@ import React from 'react';
 import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 type Configuration = {
@@ -83,7 +83,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
       this.props.onExtractorPreviewLoad(undefined);
       const newConfig = this.state.configuration;
 
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      newConfig[key] = getValueFromInput(event.target);
       this.props.onChange(newConfig);
     };
   }

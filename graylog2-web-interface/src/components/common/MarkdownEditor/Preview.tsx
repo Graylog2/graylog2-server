@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Markdown, Icon } from 'components/common';
+import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
@@ -40,18 +40,13 @@ const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBor
   width: 100%;
 `;
 
-const ExpandIcon = styled(Icon)`
+const ExpandIconButton = styled(IconButton)`
   position: absolute;
   bottom: 0;
   right: 0;
   padding: 8px 16px;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.input.placeholder};
   z-index: 10;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.global.textDefault};
-  }
 `;
 
 const MarkdownStyles = styled.div`
@@ -129,7 +124,7 @@ function Preview({ value, height = 100, show, withFullView = false, noBackground
         <MarkdownStyles>
           <Markdown text={value} />
         </MarkdownStyles>
-        {withFullView && <ExpandIcon name="expand_content" size="sm" onClick={() => setFullView(true)} />}
+        {withFullView && <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />}
         <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
       </Container>
     )

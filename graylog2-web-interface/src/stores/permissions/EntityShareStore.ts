@@ -83,6 +83,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore('permissions.Entit
       const url = entityGRN
         ? ApiRoutes.EntityShareController.prepare(entityGRN).url
         : ApiRoutes.EntityShareController.prepareEntityCreate().url;
+
       const promise = fetch('POST', qualifyUrl(url), JSON.stringify(payload)).then(this._handleResponse);
 
       EntityShareActions.prepare.promise(promise);
