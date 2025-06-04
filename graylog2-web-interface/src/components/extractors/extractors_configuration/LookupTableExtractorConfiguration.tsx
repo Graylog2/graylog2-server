@@ -21,7 +21,6 @@ import { Select, Spinner, Icon } from 'components/common';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
-import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
