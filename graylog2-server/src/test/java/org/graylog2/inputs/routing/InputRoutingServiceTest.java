@@ -165,7 +165,7 @@ class InputRoutingServiceTest {
         inputRoutingService.handleInputRenamed(new InputRenamedEvent(INPUT_ID, INPUT_NAME, INPUT_NEW_NAME));
 
         verify(ruleService).save(argThat(ruleDao1 -> ruleDao1.source().contains(INPUT_NEW_NAME)), anyBoolean());
-        verify(ruleService, times(1)).save(any(), anyBoolean());
+        verify(ruleService).save(any(), anyBoolean());
     }
 
     @Test
@@ -179,7 +179,7 @@ class InputRoutingServiceTest {
         inputRoutingService.handleStreamRenamed(new StreamRenamedEvent(STREAM_ID, STREAM_NAME, STREAM_NEW_NAME));
 
         verify(ruleService).save(argThat(ruleDao1 -> ruleDao1.source().contains(STREAM_NEW_NAME)), anyBoolean());
-        verify(ruleService, times(1)).save(any(), anyBoolean());
+        verify(ruleService).save(any(), anyBoolean());
     }
 
     @Test

@@ -127,13 +127,13 @@ public class InputRoutingService {
     }
 
     // Create a human-readable name for a routing rule
-    private String getSystemRuleName(String inputName, String inputId, String streamName) {
+    private static String getSystemRuleName(String inputName, String inputId, String streamName) {
         return GL_ROUTING_RULE_PREFIX + sanitize(inputName)
                 + "[" + inputId + "]_to_"
                 + sanitize(streamName);
     }
 
-    private String sanitize(String s) {
+    private static String sanitize(String s) {
         return s.replace('\"', '*')
                 .replace('\\', '*');
     }
@@ -152,31 +152,32 @@ public class InputRoutingService {
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
-        Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
-        if (matcher.matches()) {
-            String inputName = matcher.group(1); // "input"
-            String inputId = matcher.group(2); // "123"
-            String streamName = matcher.group(3); // "stream"
-
-            if (inputName.equals(oldInputName)) {
-                return getSystemRuleName(newInputName, inputId, streamName);
-            }
+        RuleNameParsed ruleNameParsed = RuleNameParsed.create(ruleName);
+        if (ruleNameParsed.inputName().equals(oldInputName)) {
+            return getSystemRuleName(newInputName, ruleNameParsed.inputId(), ruleNameParsed.streamName());
         }
-        throw new IllegalArgumentException("Unexpected rule name not matching naming pattern: " + ruleName);
+        throw new IllegalArgumentException(f("Unexpected rule name %s not matching input name %s", ruleName, oldInputName));
     }
 
     private String replaceStreamName(String ruleName, String oldStreamName, String newStreamName) {
-        Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
-        if (matcher.matches()) {
-            String inputName = matcher.group(1); // "input"
-            String inputId = matcher.group(2); // "123"
-            String streamName = matcher.group(3); // "stream"
-
-            if (streamName.equals(oldStreamName)) {
-                return getSystemRuleName(inputName, inputId, newStreamName);
-            }
+        RuleNameParsed ruleNameParsed = RuleNameParsed.create(ruleName);
+        if (ruleNameParsed.streamName().equals(oldStreamName)) {
+            return getSystemRuleName(ruleNameParsed.inputName(), ruleNameParsed.inputId(), newStreamName);
         }
-        throw new IllegalArgumentException("Unexpected rule name not matching naming pattern: " + ruleName);
+        throw new IllegalArgumentException(f("Unexpected rule name %s not matching stream name %s", ruleName, oldStreamName));
+    }
+
+    record RuleNameParsed(String inputName, String inputId, String streamName) {
+        static RuleNameParsed create(String ruleName) {
+            Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
+            if (matcher.matches()) {
+                String inputName = matcher.group(1);
+                String inputId = matcher.group(2);
+                String streamName = matcher.group(3);
+                return new RuleNameParsed(inputName, inputId, streamName);
+            }
+            throw new IllegalArgumentException("Unexpected rule name not matching naming pattern: " + ruleName);
+        }
     }
 
     /**
