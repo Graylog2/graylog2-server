@@ -68,7 +68,7 @@ const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit =
     [render],
   );
   const Component = useCallback(
-    ({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />,
+    ({ value: componentValue }: { value: any }) => <RenderComponent field={field} value={componentValue} />,
     [RenderComponent, field],
   );
   const element = (
