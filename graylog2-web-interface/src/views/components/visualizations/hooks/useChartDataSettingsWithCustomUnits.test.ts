@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import { act } from '@testing-library/react-hooks';
+import { act } from 'wrappedTestingLibrary/hooks';
 
 import useFeature from 'hooks/useFeature';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
