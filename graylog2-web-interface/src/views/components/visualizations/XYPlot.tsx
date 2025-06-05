@@ -18,7 +18,6 @@
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
-import moment from 'moment';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -28,9 +27,10 @@ import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYV
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
+import getAdjustedTimeRange from 'views/components/visualizations/utils/getAdjustedTimeRange';
 
-import GenericPlot from './GenericPlot';
 import type { ChartConfig, PlotLayout } from './GenericPlot';
+import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
 
 type GenericPlotProps = React.ComponentProps<typeof GenericPlot>;
@@ -77,48 +77,6 @@ const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
   line: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
-type RangeProps = { minX: string; maxX: string };
-const adjustRangeWithStep = ({ minX, maxX }: RangeProps, itemsLength: number, chartsLength: number): RangeProps => {
-  const minMoment = moment(minX);
-  const maxMoment = moment(maxX);
-
-  const durationMs = maxMoment.diff(minMoment);
-  const stepDurationMs = durationMs / itemsLength;
-
-  const delta = 1 / (2 * chartsLength);
-  console.log({ delta, stepDurationMs });
-  const adjustedMinX = minMoment.clone().subtract(stepDurationMs * delta, 'milliseconds');
-  const adjustedMaxX = maxMoment.clone().add(stepDurationMs * (1 - delta), 'milliseconds');
-
-  return {
-    minX: adjustedMinX.format(),
-    maxX: adjustedMaxX.format(),
-  };
-};
-
-const findDateRange = (chartDataArray: Array<{ x: Array<string> }>): RangeProps => {
-  // Flatten all date strings from the 'x' arrays
-  const allDates = chartDataArray.flatMap((data) => data.x || []);
-
-  if (allDates.length === 0) {
-    throw new Error('No date values found in the ChartData array');
-  }
-
-  let earliest = moment(allDates[0]);
-  let latest = moment(allDates[0]);
-
-  allDates.forEach((dateStr) => {
-    const current = moment(dateStr);
-    if (current.isBefore(earliest)) earliest = current;
-    if (current.isAfter(latest)) latest = current;
-  });
-
-  return {
-    minX: earliest.format(), // keeps original timezone
-    maxX: latest.format(),
-  };
-};
-
 const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
@@ -131,7 +89,7 @@ const XYPlot = ({
   onZoom = undefined,
   onClickMarker = undefined,
 }: Props) => {
-  const { userTimezone } = useUserDateTime();
+  const { formatTime, userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
   const defaultLayout: Partial<PlotLayout> = {
     yaxis,
@@ -154,9 +112,12 @@ const XYPlot = ({
   );
 
   if (config.isTimeline && effectiveTimerange) {
-    console.log({ chartData });
+    const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
+    const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
+
     const xValues = chartData?.[0]?.x;
-    const { minX, maxX } = adjustRangeWithStep(findDateRange(chartData), xValues.length, chartData.length);
+    const { minX, maxX } = getAdjustedTimeRange(chartData, normalizedFrom, normalizedTo, xValues.length);
+
     layout.xaxis = merge(layout.xaxis, {
       range: [minX, maxX],
       type: 'date',
@@ -168,7 +129,6 @@ const XYPlot = ({
       type: config.sort.length > 0 ? 'category' : undefined,
     });
   }
-  console.log({ layout });
 
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
