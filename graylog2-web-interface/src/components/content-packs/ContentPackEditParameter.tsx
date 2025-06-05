@@ -85,10 +85,7 @@ class ContentPackEditParameter extends React.Component<
   };
 
   _updateField = (name: string, value: any) => {
-    const updatedParameter = ObjectUtils.clone(this.state.newParameter);
-
-    updatedParameter[name] = value;
-    this.setState((parameter) => ({ newParameter: { ...parameter, [name]: value } }));
+    this.setState((parameter) => ({ newParameter: { ...parameter.newParameter, [name]: value } }));
   };
 
   _bindValue = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +131,7 @@ class ContentPackEditParameter extends React.Component<
         }
 
         case 'double': {
-          if (Number.isNaN(value)) {
+          if (Number.isNaN(Number.parseFloat(value))) {
             this.setState({ defaultValueError: 'This is not a double value.' });
 
             return false;
