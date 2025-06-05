@@ -64,6 +64,8 @@ jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
   }),
 }));
 
+jest.mock('components/navigation/NotificationBadge', () => () => null);
+
 const AppRouterWithContext = () => (
   <HotkeysProvider>
     <DefaultProviders>
