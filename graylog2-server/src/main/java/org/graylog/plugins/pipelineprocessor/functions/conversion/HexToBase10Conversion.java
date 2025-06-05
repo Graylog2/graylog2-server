@@ -8,9 +8,13 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HexFormat;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.floating;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
@@ -33,14 +37,14 @@ public class HexToBase10Conversion extends AbstractFunction<Long> {
         final Object evaluated = valueParam.required(args, context);
         final Long defaultValue = defaultParam.optional(args, context).orElse(0L);
 
-        if (evaluated != null) {
-            final String s = String.valueOf(evaluated);
-            try {
-                final BigInteger bi = new BigInteger(s.replace("0x", ""), 16);
-                return bi.longValue();
-            } catch (NumberFormatException ignored) {
-            }
-        }
+//        if (evaluated != null) {
+//            final String s = String.valueOf(evaluated);
+//            try {
+//                final byte[] hexBytes = HexFormat.of().parseHex(s);
+//                return IntStream.range(0, hexBytes.length).asLongStream().boxed().toList();
+//            } catch (NumberFormatException ignored) {
+//            }
+//        }
 
         return defaultValue;
     }
