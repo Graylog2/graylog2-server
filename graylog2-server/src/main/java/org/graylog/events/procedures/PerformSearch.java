@@ -27,6 +27,8 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,7 +36,9 @@ import java.util.Set;
  */
 public class PerformSearch extends Action {
     public static final String NAME = "perform_search";
+    public static final String FIELD_USE_SAVED_SEARCH = "use_saved_search";
     public static final String FIELD_SAVED_SEARCH = "saved_search";
+    public static final String FIELD_PARAMETERS = "parameters";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
@@ -60,8 +64,16 @@ public class PerformSearch extends Action {
         public abstract String type();
 
         @Nullable
+        @JsonProperty(FIELD_USE_SAVED_SEARCH)
+        public abstract Boolean useSavedSearch();
+
+        @Nullable
         @JsonProperty(FIELD_SAVED_SEARCH)
         public abstract String savedSearch();
+
+        @Nullable
+        @JsonProperty(FIELD_PARAMETERS)
+        public abstract Map<String, String> parameters();
 
         @Nullable
         @JsonProperty(FIELD_QUERY)
@@ -86,8 +98,14 @@ public class PerformSearch extends Action {
             @JsonProperty(TYPE_FIELD)
             public abstract Builder type(String type);
 
+            @JsonProperty(value = FIELD_USE_SAVED_SEARCH)
+            public abstract Builder useSavedSearch(Boolean useSavedSearch);
+
             @JsonProperty(FIELD_SAVED_SEARCH)
             public abstract Builder savedSearch(String savedSearch);
+
+            @JsonProperty(FIELD_PARAMETERS)
+            public abstract Builder parameters(Map<String, String> parameters);
 
             @JsonProperty(FIELD_QUERY)
             public abstract Builder query(String query);
@@ -100,10 +118,27 @@ public class PerformSearch extends Action {
 
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_PerformSearch_Config.Builder().type(NAME);
+                return new AutoValue_PerformSearch_Config.Builder()
+                        .type(NAME)
+                        .useSavedSearch(false)
+                        .parameters(Map.of());
             }
 
-            public abstract Config build();
+            public Config build() {
+                if (useSavedSearch() == null) {
+                    useSavedSearch(false);
+                }
+                if (parameters() == null) {
+                    parameters(Collections.emptyMap());
+                }
+                return autoBuild();
+            }
+
+            abstract Config autoBuild();
+
+            abstract Boolean useSavedSearch();
+
+            abstract Map<String, String> parameters();
         }
 
     }

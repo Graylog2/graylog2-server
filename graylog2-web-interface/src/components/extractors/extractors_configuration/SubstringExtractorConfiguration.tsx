@@ -21,7 +21,7 @@ import { Button, Col, Row, Input } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 type Config = {
@@ -58,7 +58,7 @@ const SubstringExtractorConfiguration = ({
     onExtractorPreviewLoad(undefined);
     const newConfig = {
       ...configuration,
-      [key]: FormUtils.getValueFromInput(event.target),
+      [key]: getValueFromInput(event.target),
     };
     setConfig(newConfig);
     onChange(newConfig);

@@ -38,14 +38,14 @@ public enum AWSMessageType {
      * A raw string stored in CloudWatch or Kinesis.
      */
     KINESIS_RAW(Source.KINESIS, "Kinesis Raw", KinesisRawLogCodec.NAME,
-                KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
+            KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
 
     KINESIS_CLOUDWATCH_RAW(Source.KINESIS, "Kinesis CloudWatch Raw", KinesisRawLogCodec.NAME,
-                           KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
+            KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
 
     // Flow Logs delivered to Kinesis via CloudWatch subscriptions.
     KINESIS_CLOUDWATCH_FLOW_LOGS(Source.KINESIS, "Kinesis CloudWatch Flow Log", KinesisCloudWatchFlowLogCodec.NAME,
-                                 KinesisCloudWatchFlowLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
+            KinesisCloudWatchFlowLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
 
     UNKNOWN();
 
@@ -110,6 +110,6 @@ public enum AWSMessageType {
      */
     public static List<AWSMessageType> getMessageTypes() {
 
-        return Arrays.stream(values()).filter(m -> !m.equals(UNKNOWN)).collect(Collectors.toList());
+        return Arrays.stream(values()).filter(m -> !(m.equals(UNKNOWN))).collect(Collectors.toList());
     }
 }

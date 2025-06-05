@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
@@ -85,7 +85,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     const nextState: EditExtractorState = {};
     const { updatedExtractor } = this.state;
 
-    updatedExtractor[key] = FormUtils.getValueFromInput(event.target);
+    updatedExtractor[key] = getValueFromInput(event.target);
     nextState.updatedExtractor = updatedExtractor;
 
     // Reset result of testing condition after a change in the input
