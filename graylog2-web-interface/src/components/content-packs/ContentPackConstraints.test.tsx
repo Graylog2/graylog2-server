@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 
 describe('<ContentPackConstraints />', () => {
-  it('should render with new constraints without forced fulfillment', () => {
+  it('should render with new constraints without forced fulfillment', async () => {
     const constraints = [
       {
         type: 'server-version',
@@ -32,12 +32,12 @@ describe('<ContentPackConstraints />', () => {
         version: '>=3.0.0-alpha.2',
       },
     ];
-    const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
+    render(<ContentPackConstraints constraints={constraints} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/constraints/i);
   });
 
-  it('should render with new constraints with forced fulfillment', () => {
+  it('should render with new constraints with forced fulfillment', async () => {
     const constraints = [
       {
         type: 'server-version',
@@ -49,12 +49,12 @@ describe('<ContentPackConstraints />', () => {
         version: '>=3.0.0-alpha.2',
       },
     ];
-    const wrapper = mount(<ContentPackConstraints constraints={constraints} isFulfilled />);
+    render(<ContentPackConstraints constraints={constraints} isFulfilled />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/constraints/i);
   });
 
-  it('should render with created constraints', () => {
+  it('should render with created constraints', async () => {
     const constraints = [
       {
         constraint: {
@@ -72,8 +72,8 @@ describe('<ContentPackConstraints />', () => {
         fulfilled: false,
       },
     ];
-    const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
+    render(<ContentPackConstraints constraints={constraints} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/constraints/i);
   });
 });

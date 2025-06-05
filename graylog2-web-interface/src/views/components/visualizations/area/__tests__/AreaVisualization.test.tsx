@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -26,12 +26,14 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import AppConfig from 'util/AppConfig';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import asMock from 'helpers/mocking/AsMock';
+import GenericPlot from 'views/components/visualizations/GenericPlot';
 
 import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixtures';
 
 import OriginalAreaVisualization from '../AreaVisualization';
 
-jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
+jest.mock('../../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -53,6 +55,7 @@ describe('AreaVisualization', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    asMock(GenericPlot).mockClear();
     AppConfig.isFeatureEnabled = jest.fn(() => false);
   });
 
@@ -64,7 +67,7 @@ describe('AreaVisualization', () => {
       .series([Series.forFunction('avg(nf_bytes)'), Series.forFunction('sum(nf_pkts)')])
       .build();
 
-    const wrapper = mount(
+    render(
       <AreaVisualization
         config={config}
         data={simpleChartData}
@@ -78,47 +81,46 @@ describe('AreaVisualization', () => {
       />,
     );
 
-    const genericPlot = wrapper.find('GenericPlot');
-
-    expect(genericPlot).toHaveProp(
-      'layout',
+    expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
-        xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
-        legend: { y: -0.14 },
+        layout: expect.objectContaining({
+          xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
+          legend: { y: -0.14 },
+        }),
+        chartData: [
+          {
+            type: 'scatter',
+            name: 'avg(nf_bytes)',
+            x: [
+              '2019-11-28T16:21:00.000+01:00',
+              '2019-11-28T16:22:00.000+01:00',
+              '2019-11-28T16:23:00.000+01:00',
+              '2019-11-28T16:24:00.000+01:00',
+              '2019-11-28T16:25:00.000+01:00',
+            ],
+            y: [24558.239393939395, 3660.5666666666666, 49989.69, 2475.225, 10034.822222222223],
+            fill: 'tozeroy',
+            line: { shape: 'linear' },
+            originalName: 'avg(nf_bytes)',
+          },
+          {
+            type: 'scatter',
+            name: 'sum(nf_pkts)',
+            x: [
+              '2019-11-28T16:21:00.000+01:00',
+              '2019-11-28T16:22:00.000+01:00',
+              '2019-11-28T16:23:00.000+01:00',
+              '2019-11-28T16:24:00.000+01:00',
+              '2019-11-28T16:25:00.000+01:00',
+            ],
+            y: [14967, 1239, 20776, 1285, 4377],
+            fill: 'tozeroy',
+            line: { shape: 'linear' },
+            originalName: 'sum(nf_pkts)',
+          },
+        ],
       }),
+      {},
     );
-
-    expect(genericPlot).toHaveProp('chartData', [
-      {
-        type: 'scatter',
-        name: 'avg(nf_bytes)',
-        x: [
-          '2019-11-28T16:21:00.000+01:00',
-          '2019-11-28T16:22:00.000+01:00',
-          '2019-11-28T16:23:00.000+01:00',
-          '2019-11-28T16:24:00.000+01:00',
-          '2019-11-28T16:25:00.000+01:00',
-        ],
-        y: [24558.239393939395, 3660.5666666666666, 49989.69, 2475.225, 10034.822222222223],
-        fill: 'tozeroy',
-        line: { shape: 'linear' },
-        originalName: 'avg(nf_bytes)',
-      },
-      {
-        type: 'scatter',
-        name: 'sum(nf_pkts)',
-        x: [
-          '2019-11-28T16:21:00.000+01:00',
-          '2019-11-28T16:22:00.000+01:00',
-          '2019-11-28T16:23:00.000+01:00',
-          '2019-11-28T16:24:00.000+01:00',
-          '2019-11-28T16:25:00.000+01:00',
-        ],
-        y: [14967, 1239, 20776, 1285, 4377],
-        fill: 'tozeroy',
-        line: { shape: 'linear' },
-        originalName: 'sum(nf_pkts)',
-      },
-    ]);
   });
 });

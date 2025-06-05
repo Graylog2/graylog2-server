@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 
 describe('<ContentPackDetails />', () => {
-  it('should render with content pack', () => {
+  it('should render with content pack', async () => {
     const contentPack = ContentPack.builder()
       .id('1')
       .name('UFW Grok Patterns')
@@ -30,13 +30,14 @@ describe('<ContentPackDetails />', () => {
       .vendor('graylog.com')
       .url('http://www.graylog.com')
       .build();
-    const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+    render(<ContentPackDetails contentPack={contentPack} />);
 
-    expect(wrapper.find('[href="http://www.graylog.com"]')).toHaveLength(1);
-    expect(wrapper).toExist();
+    const vendorLink = await screen.findByRole('link', { name: /graylog/i });
+
+    expect(vendorLink).toHaveAttribute('href', 'http://www.graylog.com');
   });
 
-  it('should render with content pack without a description', () => {
+  it('should render with content pack without a description', async () => {
     const contentPack = {
       id: '1',
       title: 'UFW Grok Patterns',
@@ -48,12 +49,12 @@ describe('<ContentPackDetails />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+    render(<ContentPackDetails contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('This is a summary');
   });
 
-  it('should not render an anchor if URL protocol is not accepted', () => {
+  it('should not render an anchor if URL protocol is not accepted', async () => {
     const contentPack = {
       id: '1',
       title: 'UFW Grok Patterns',
@@ -65,12 +66,13 @@ describe('<ContentPackDetails />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+    render(<ContentPackDetails contentPack={contentPack} />);
+    await screen.findByText('This is a summary');
 
-    expect(wrapper.find('[href="thisurlisgreat"]')).toHaveLength(0);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('should sanitize generated HTML from Markdown', () => {
+  it('should sanitize generated HTML from Markdown', async () => {
     const contentPack = {
       id: '1',
       title: 'UFW Grok Patterns',
@@ -83,11 +85,10 @@ describe('<ContentPackDetails />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
-    const descriptionContainer = wrapper.find('[dangerouslySetInnerHTML]');
+    render(<ContentPackDetails contentPack={contentPack} />);
+    const maliciousLink: HTMLAnchorElement = await screen.findByText('click me');
 
-    expect(descriptionContainer).toHaveLength(1);
     // eslint-disable-next-line no-script-url
-    expect(descriptionContainer.html()).not.toContain('javascript:alert(123)');
+    expect(maliciousLink.href).not.toContain('javascript:alert(123)');
   });
 });
