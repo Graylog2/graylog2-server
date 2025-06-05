@@ -38,7 +38,7 @@ describe('GenericPlot', () => {
   describe('adds onRelayout handler', () => {
     it('calling onZoom prop if axis have changed', async () => {
       asMock(AsyncPlot).mockImplementation(({ onRelayout }) => (
-        <button type="button" onClick={() => onRelayout({ 'xaxis.range[0]': 'foo', 'xaxis.range[1]': 'bar' })}>
+        <button type="button" onClick={() => onRelayout({ 'xaxis.range[0]': 23, 'xaxis.range[1]': 42 })}>
           Zoom
         </button>
       ));
@@ -49,7 +49,7 @@ describe('GenericPlot', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Zoom' }));
 
       expect(onZoom).toHaveBeenCalled();
-      expect(onZoom).toHaveBeenCalledWith('foo', 'bar');
+      expect(onZoom).toHaveBeenCalledWith(23, 42);
     });
 
     it('not calling onZoom prop if axis have not changed', async () => {
