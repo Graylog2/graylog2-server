@@ -131,10 +131,12 @@ public class AWSService {
         configuration.put(AWSInput.CK_DYNAMODB_ENDPOINT, request.dynamodbEndpoint());
         configuration.put(AWSInput.CK_IAM_ENDPOINT, request.iamEndpoint());
         configuration.put(AWSInput.CK_KINESIS_ENDPOINT, request.kinesisEndpoint());
+        configuration.put(AWSInput.CK_OVERRIDE_SOURCE, request.overrideSource());
 
         AWSMessageType inputType = AWSMessageType.valueOf(request.awsMessageType());
         if (inputType.isKinesis()) {
             configuration.put(KinesisTransport.CK_KINESIS_STREAM_NAME, request.streamName());
+            configuration.put(KinesisTransport.CK_KINESIS_STREAM_ARN, request.streamArn());
             configuration.put(KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE, request.batchSize());
         } else {
             throw new Exception("The specified input type is not supported.");
