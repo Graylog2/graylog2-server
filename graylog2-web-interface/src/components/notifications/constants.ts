@@ -14,23 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-import RelativeTime from 'components/common/RelativeTime';
-
-type Props = {
-  failure: any;
-};
-
-const IndexerFailure = ({ failure }: Props) => (
-  <tr>
-    <td>
-      <RelativeTime dateTime={failure.timestamp} />
-    </td>
-    <td>{failure.index}</td>
-    <td>{failure.letter_id}</td>
-    <td>{failure.message}</td>
-  </tr>
-);
-
-export default IndexerFailure;
+// eslint-disable-next-line import/prefer-default-export
+export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;

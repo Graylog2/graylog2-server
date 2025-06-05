@@ -14,23 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import RelativeTime from 'components/common/RelativeTime';
+import { SystemNotifications } from '@graylog/server-api';
 
-type Props = {
-  failure: any;
+import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
+
+const POLL_INTERVAL = 3000;
+
+const useNotifications = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: NOTIFICATIONS_QUERY_KEY,
+    queryFn: SystemNotifications.listNotifications,
+    refetchInterval: POLL_INTERVAL,
+  });
+
+  return { data, isLoading };
 };
-
-const IndexerFailure = ({ failure }: Props) => (
-  <tr>
-    <td>
-      <RelativeTime dateTime={failure.timestamp} />
-    </td>
-    <td>{failure.index}</td>
-    <td>{failure.letter_id}</td>
-    <td>{failure.message}</td>
-  </tr>
-);
-
-export default IndexerFailure;
+export default useNotifications;
