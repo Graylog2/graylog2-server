@@ -201,7 +201,11 @@ class ContentPackEditParameter extends React.Component<
       <div>
         <h2>{header}</h2>
         <br />
-        <form className="parameter-form" id="parameter-form" onSubmit={this.addNewParameter}>
+        <form
+          className="parameter-form"
+          id="parameter-form"
+          data-testid="parameter-form"
+          onSubmit={this.addNewParameter}>
           <fieldset>
             <Input
               ref={(node) => {
