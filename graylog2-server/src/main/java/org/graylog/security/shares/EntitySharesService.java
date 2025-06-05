@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -156,7 +157,7 @@ public class EntitySharesService {
      * This method is used for generic sharing operations where the entity is not known yet - active shares and
      * dependencies are always null.
      */
-    public EntityShareResponse prepareShare(User sharingUser) {
+    public EntityShareResponse prepareShare(User sharingUser, Optional<ImmutableMap<GRN, Capability>> selectedGranteeCapabilities) {
         requireNonNull(sharingUser, "sharingUser cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
@@ -168,7 +169,7 @@ public class EntitySharesService {
                 .availableGrantees(modifiableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(ImmutableSet.of())
-                .selectedGranteeCapabilities(ImmutableMap.of())
+                .selectedGranteeCapabilities(selectedGranteeCapabilities.orElse(ImmutableMap.of()))
                 .validationResult(new ValidationResult())
                 .build();
     }
@@ -183,7 +184,7 @@ public class EntitySharesService {
     public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
         requireNonNull(entityGRNs, "entityGRNs cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        final EntityShareResponse response = prepareShare(sharingUser);
+        final EntityShareResponse response = prepareShare(sharingUser, Optional.empty());
 
         return response.toBuilder()
                 .missingPermissionsOnDependencies(missingPermissions(

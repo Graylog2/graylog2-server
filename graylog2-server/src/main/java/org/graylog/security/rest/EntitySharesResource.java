@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog.security.shares.EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES;
@@ -146,7 +147,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
                 return entitySharesService.prepareShare(request.dependentEntityGRNs(), getCurrentUser());
             }
         } else {
-            return entitySharesService.prepareShare(getCurrentUser());
+            return entitySharesService.prepareShare(getCurrentUser(), Optional.ofNullable(request.selectedGranteeCapabilities()));
         }
     }
 
