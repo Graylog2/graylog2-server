@@ -50,7 +50,7 @@ class ContentPackEditParameter extends React.Component<
 
   private titleInput: Input;
 
-  constructor(props) {
+  constructor(props: ContentPackEditParameterProps) {
     super(props);
 
     this.state = {
@@ -62,7 +62,7 @@ class ContentPackEditParameter extends React.Component<
     };
   }
 
-  addNewParameter = (e) => {
+  addNewParameter = (e: React.FormEvent<HTMLFormElement>) => {
     if (e) {
       e.preventDefault();
     }
@@ -84,46 +84,16 @@ class ContentPackEditParameter extends React.Component<
     this.setState({ newParameter: ObjectUtils.clone(ContentPackEditParameter.emptyParameter) });
   };
 
-  _updateField = (name, value) => {
+  _updateField = (name: string, value: any) => {
     const updatedParameter = ObjectUtils.clone(this.state.newParameter);
 
     updatedParameter[name] = value;
-    this.setState({ newParameter: updatedParameter });
+    this.setState((parameter) => ({ newParameter: { ...parameter, [name]: value } }));
   };
 
-  _bindValue = (event) => {
+  _bindValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
   };
-
-  _validateParameter() {
-    const param = this.state.newParameter;
-
-    if (!param.name) {
-      this.setState({ nameError: 'Name must be set.' });
-
-      return false;
-    }
-
-    this.setState({ nameError: undefined });
-
-    if (!param.title) {
-      this.setState({ titleError: 'Title must be set.' });
-
-      return false;
-    }
-
-    this.setState({ titleError: undefined });
-
-    if (!param.description) {
-      this.setState({ descrError: 'Description must be set.' });
-
-      return false;
-    }
-
-    this.setState({ descrError: undefined });
-
-    return this._validateDefaultValue() && this._validateName();
-  }
 
   _validateName = () => {
     const value = this.state.newParameter.name;
@@ -164,7 +134,7 @@ class ContentPackEditParameter extends React.Component<
         }
 
         case 'double': {
-          if (isNaN(value)) {
+          if (Number.isNaN(value)) {
             this.setState({ defaultValueError: 'This is not a double value.' });
 
             return false;
@@ -192,6 +162,36 @@ class ContentPackEditParameter extends React.Component<
 
     return true;
   };
+
+  _validateParameter() {
+    const param = this.state.newParameter;
+
+    if (!param.name) {
+      this.setState({ nameError: 'Name must be set.' });
+
+      return false;
+    }
+
+    this.setState({ nameError: undefined });
+
+    if (!param.title) {
+      this.setState({ titleError: 'Title must be set.' });
+
+      return false;
+    }
+
+    this.setState({ titleError: undefined });
+
+    if (!param.description) {
+      this.setState({ descrError: 'Description must be set.' });
+
+      return false;
+    }
+
+    this.setState({ descrError: undefined });
+
+    return this._validateDefaultValue() && this._validateName();
+  }
 
   render() {
     const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
