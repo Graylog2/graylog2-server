@@ -15,19 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { Result, RowInner } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import OriginalAggregationBuilder from './AggregationBuilder';
-import EmptyAggregationContent from './EmptyAggregationContent';
 
 import OnVisualizationConfigChangeContext from '../aggregationwizard/OnVisualizationConfigChangeContext';
 
-const mockDummyVisualization = () => 'dummy-visualization';
+const mockDummyVisualization = ({
+  data,
+  effectiveTimerange,
+  onChange,
+}: {
+  data: { [_key: string]: Result };
+  effectiveTimerange: TimeRange;
+  onChange: () => void;
+}) => (
+  <span>
+    Dummy Visualization: {data.chart?.[0]?.value} Effective Timerange: {effectiveTimerange}
+    <button type="button" onClick={onChange}>
+      Change something
+    </button>
+  </span>
+);
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
@@ -69,8 +85,8 @@ const dataPoint: RowInner = { value: 3.1415926, source: 'row-inner', key: ['pi']
 describe('AggregationBuilder', () => {
   const rowPivot = Pivot.createValues(['field']);
 
-  it('does render empty result widget when no documents were in result and is edit', () => {
-    const wrapper = mount(
+  it('does render empty result widget when no documents were in result and is edit', async () => {
+    render(
       <AggregationBuilder
         data={{ chart: { total: 0 } }}
         editing
@@ -78,60 +94,51 @@ describe('AggregationBuilder', () => {
       />,
     );
 
-    expect(wrapper.find(EmptyAggregationContent)).toHaveLength(1);
-    expect(wrapper.find(EmptyAggregationContent)).toHaveProp('editing', true);
+    await screen.findByText(/You are now editing the widget./i);
   });
 
-  it('renders dummy component with rows from data', () => {
-    const wrapper = mount(
+  it('renders dummy component with rows from data', async () => {
+    render(
       <AggregationBuilder
         config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
         data={{ chart: { total: 42, rows: [dataPoint] } }}
       />,
     );
 
-    expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
-    expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
-
-    const dummyVisualization = wrapper.find(mockDummyVisualization);
-
-    expect(dummyVisualization).toHaveLength(1);
-    expect(dummyVisualization).toHaveProp('data', {
-      chart: [{ value: 3.1415926, source: 'row-inner', key: ['pi'], rollup: false }],
-    });
+    await screen.findByText(/dummy visualization/i);
+    await screen.findByText(new RegExp(dataPoint.value));
   });
 
-  it('passes through onVisualizationConfigChange to visualization', () => {
+  it('passes through onVisualizationConfigChange to visualization', async () => {
     const onVisualizationConfigChange = jest.fn();
-    const wrapper = mount(
+    render(
       <OnVisualizationConfigChangeContext.Provider value={onVisualizationConfigChange}>
         <AggregationBuilder
           config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
-          data={{ chart: { total: 42, rows: [{ value: 3.1415926, source: 'row-inner', key: ['pi'], rollup: false }] } }}
+          data={{ chart: { total: 42, rows: [dataPoint] } }}
         />
       </OnVisualizationConfigChangeContext.Provider>,
     );
 
-    expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
+    await screen.findByText(/dummy visualization/i);
 
-    const dummyVisualization = wrapper.find(mockDummyVisualization);
+    await userEvent.click(await screen.findByRole('button', { name: 'Change something' }));
 
-    expect(dummyVisualization).toHaveProp('onChange', onVisualizationConfigChange);
+    expect(onVisualizationConfigChange).toHaveBeenCalled();
   });
 
-  it('renders EmptyAggregationContent if the AggregationWidgetConfig is empty', () => {
-    const wrapper = mount(
+  it('renders EmptyAggregationContent if the AggregationWidgetConfig is empty', async () => {
+    render(
       <AggregationBuilder
         config={AggregationWidgetConfig.builder().visualization('dummy').build()}
         data={{ chart: { total: 42, rows: [dataPoint] } }}
       />,
     );
 
-    expect(wrapper.find(EmptyAggregationContent)).toHaveLength(1);
-    expect(wrapper.find(EmptyAggregationContent)).toHaveProp('editing', false);
+    await screen.findByText(/Empty Aggregation/i);
   });
 
-  it('falls back to retrieving effective timerange from first result if no `chart` result present', () => {
+  it('falls back to retrieving effective timerange from first result if no `chart` result present', async () => {
     const data = {
       '524d182c-8e32-4372-b30d-a40d99efe55d': {
         total: 42,
@@ -139,14 +146,13 @@ describe('AggregationBuilder', () => {
         effective_timerange: 42,
       },
     };
-    const wrapper = mount(
+    render(
       <AggregationBuilder
         config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
         data={data}
       />,
     );
-    const dummyVisualization = wrapper.find(mockDummyVisualization);
 
-    expect(dummyVisualization).toHaveProp('effectiveTimerange', 42);
+    await screen.findByText(/effective timerange: 42/i);
   });
 });
