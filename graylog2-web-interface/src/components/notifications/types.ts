@@ -14,23 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { SystemNotifications } from '@graylog/server-api';
 
-import RelativeTime from 'components/common/RelativeTime';
-
-type Props = {
-  failure: any;
-};
-
-const IndexerFailure = ({ failure }: Props) => (
-  <tr>
-    <td>
-      <RelativeTime dateTime={failure.timestamp} />
-    </td>
-    <td>{failure.index}</td>
-    <td>{failure.letter_id}</td>
-    <td>{failure.message}</td>
-  </tr>
-);
-
-export default IndexerFailure;
+type Depromise<T> = T extends Promise<infer R> ? R : never;
+export type NotificationType = Depromise<
+  ReturnType<(typeof SystemNotifications)['listNotifications']>
+>['notifications'][number];

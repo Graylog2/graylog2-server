@@ -24,7 +24,7 @@ import UserNotification from 'util/UserNotification';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
-type LookupTableExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
@@ -32,19 +32,23 @@ type LookupTableExtractorConfigurationProps = {
 };
 
 class LookupTableExtractorConfiguration extends React.Component<
-  LookupTableExtractorConfigurationProps,
+  Props,
   {
-    [key: string]: any;
+    trying: boolean;
+    lookupTables: any;
   }
 > {
   static defaultProps = {
     exampleMessage: '',
   };
 
-  state = {
-    trying: false,
-    lookupTables: undefined,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+      lookupTables: undefined,
+    };
+  }
 
   componentDidMount() {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box

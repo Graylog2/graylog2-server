@@ -18,6 +18,7 @@ package org.graylog.integrations.aws.transports;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
@@ -26,8 +27,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -74,7 +73,6 @@ public class KinesisPayloadDecoder {
      * @throws IOException
      */
     List<KinesisLogEntry> processMessages(final byte[] payloadBytes, Instant approximateArrivalTimestamp) throws IOException {
-
         // This method will be called from a codec, and therefore will not perform any detection. It will rely
         // exclusively on the AWSMessageType detected in the setup HealthCheck.
         // If a user needs to change the type of data stored in a stream, they will need to set the integration up again.
@@ -86,7 +84,12 @@ public class KinesisPayloadDecoder {
                         return KinesisLogEntry.create(kinesisStream,
                                 // Use the log group and stream returned from CloudWatch.
                                 logSubscriptionData.logGroup(),
-                                logSubscriptionData.logStream(), timestamp, le.message());
+                                logSubscriptionData.logStream(),
+                                timestamp,
+                                le.message(),
+                                logSubscriptionData.owner(),
+                                logSubscriptionData.messageType(),
+                                logSubscriptionData.subscriptionFilters());
                     })
                     .collect(Collectors.toList());
         } else if (awsMessageType == AWSMessageType.KINESIS_RAW) {
@@ -94,7 +97,7 @@ public class KinesisPayloadDecoder {
             final DateTime timestamp = new DateTime(approximateArrivalTimestamp.toEpochMilli(), DateTimeZone.UTC);
             final KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create(kinesisStream,
                     "", "",
-                    timestamp, new String(payloadBytes, StandardCharsets.UTF_8));
+                    timestamp, new String(payloadBytes, StandardCharsets.UTF_8), "", awsMessageType.getLabel(), new ArrayList<>());
             return Collections.singletonList(kinesisLogEntry);
         } else {
             LOG.error("The AWSMessageType [{}] is not supported by the KinesisTransport", awsMessageType);

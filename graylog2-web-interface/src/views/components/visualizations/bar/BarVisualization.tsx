@@ -134,7 +134,6 @@ const BarVisualization = makeVisualization(
 
     const getBarChartDataSettingsWithCustomUnits = useBarChartDataSettingsWithCustomUnits({
       config,
-      effectiveTimerange,
       barmode,
     });
 
