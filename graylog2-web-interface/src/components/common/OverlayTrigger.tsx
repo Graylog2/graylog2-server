@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 
+import useDisclosure from 'util/hooks/useDisclosure';
 import Popover from 'components/common/Popover';
 import useClickOutside from 'hooks/useClickOutside';
 

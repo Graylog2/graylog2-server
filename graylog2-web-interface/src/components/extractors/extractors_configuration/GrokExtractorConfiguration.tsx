@@ -20,14 +20,14 @@ import { Icon } from 'components/common';
 import { Row, Col, ControlLabel, Button, Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 import Style from './GrokExtractorConfiguration.css';
 
-type GrokExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
@@ -35,19 +35,23 @@ type GrokExtractorConfigurationProps = {
 };
 
 class GrokExtractorConfiguration extends React.Component<
-  GrokExtractorConfigurationProps,
+  Props,
   {
-    [key: string]: any;
+    trying: boolean;
+    patterns: Array<any>;
   }
 > {
   static defaultProps = {
     exampleMessage: undefined,
   };
 
-  state = {
-    trying: false,
-    patterns: [],
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+      patterns: [],
+    };
+  }
 
   componentDidMount() {
     this.loadData();
@@ -80,7 +84,7 @@ class GrokExtractorConfiguration extends React.Component<
       onExtractorPreviewLoad(undefined);
       const newConfig = configuration;
 
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      newConfig[key] = getValueFromInput(event.target);
       onChange(newConfig);
     };
   };

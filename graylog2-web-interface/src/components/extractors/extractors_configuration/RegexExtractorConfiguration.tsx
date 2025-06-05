@@ -21,35 +21,33 @@ import { Row, Col, Button, Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
-type RegexExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
 };
 
-class RegexExtractorConfiguration extends React.Component<
-  RegexExtractorConfigurationProps,
-  {
-    [key: string]: any;
-  }
-> {
+class RegexExtractorConfiguration extends React.Component<Props, { trying: boolean }> {
   static defaultProps = {
     exampleMessage: undefined,
   };
 
-  state = {
-    trying: false,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+    };
+  }
 
   _onChange = (key) => (event) => {
     this.props.onExtractorPreviewLoad(undefined);
     const newConfig = this.props.configuration;
 
-    newConfig[key] = FormUtils.getValueFromInput(event.target);
+    newConfig[key] = getValueFromInput(event.target);
     this.props.onChange(newConfig);
   };
 
