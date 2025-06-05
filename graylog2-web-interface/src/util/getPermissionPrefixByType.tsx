@@ -15,17 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import PermissionsBinder from 'logic/permissions/PermissionsBinder';
+import PrefixMapperBinder from 'logic/permissions/PrefixMapperBinder';
 
 const assertUnreachable = (type: string): never => {
   throw new Error(`Can't find prefix for type: ${type ?? '(undefined)'}`);
 };
 
-const getPermissionPrefixByType = (type: string, id: string, throwErrorOnUnknown = true) => {
-  const check = PermissionsBinder.check(type, id);
-  if (check) return check;
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`;
-};
+const getPermissionPrefixByType = (type: string, id: string, throwErrorOnUnknown = true) =>
+  PrefixMapperBinder.mapToPrefix(type, id) ||
+  (throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`);
 
 export default getPermissionPrefixByType;

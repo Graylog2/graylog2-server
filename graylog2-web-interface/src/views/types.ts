@@ -63,7 +63,7 @@ import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
-import type { PermissionChecker } from 'logic/permissions/PermissionsBinder';
+import type { PrefixMapper } from 'logic/permissions/PrefixMapperBinder';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -617,6 +617,6 @@ declare module 'graylog-web-plugin/plugin' {
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: LicenseCheck;
-    entityPermissionChecker?: PermissionChecker;
+    prefixMapper?: PrefixMapper;
   }
 }

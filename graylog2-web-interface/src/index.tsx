@@ -23,7 +23,7 @@ import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
-import StandardPermissions from 'logic/permissions/StandardPermissions';
+import StandardPrefixMapper from 'logic/permissions/StandardPrefixMapper';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
@@ -46,7 +46,7 @@ import '@mantine/notifications/styles.css';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
-PluginStore.register(new PluginManifest({}, StandardPermissions));
+PluginStore.register(new PluginManifest({}, StandardPrefixMapper));
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
 PluginStore.register(new PluginManifest({}, AwsBindings));

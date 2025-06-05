@@ -1,7 +1,7 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import type { PermissionChecker } from 'logic/permissions/PermissionsBinder';
-import PermissionsBinder from 'logic/permissions/PermissionsBinder';
+import type { PrefixMapper } from 'logic/permissions/PrefixMapperBinder';
+import PrefixMapperBinder from 'logic/permissions/PrefixMapperBinder';
 
 const supportedTypes = new Set([
   'user',
@@ -22,21 +22,21 @@ const typePrefixCornerCasesMap = {
   search: 'view:',
 };
 
-const permissions: PermissionChecker = {
-  checkWithID(_type: string, _id: string): string | undefined {
+const mapper: PrefixMapper = {
+  mapForIdAndType(_id: string, _type: string): string | undefined {
     return undefined;
   },
-  check(type: string): string | undefined {
+  mapForType(type: string): string | undefined {
     if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s:`;
 
     return undefined;
   },
 };
 
-PermissionsBinder.register(permissions);
+PrefixMapperBinder.register(mapper);
 
-const standardPermissions: PluginExports = {
-  entityPermissionChecker: permissions,
+const standardPrefixMapper: PluginExports = {
+  prefixMapper: mapper,
 };
 
-export default standardPermissions;
+export default standardPrefixMapper;
