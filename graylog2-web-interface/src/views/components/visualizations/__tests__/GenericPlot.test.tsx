@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { HTMLAttributes } from 'enzyme';
-import { mount } from 'wrappedEnzyme';
-import type { PlotParams } from 'react-plotly.js';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import ColorMapper from 'views/components/visualizations/ColorMapper';
+import AsyncPlot from 'views/components/visualizations/plotly/AsyncPlot';
+import asMock from 'helpers/mocking/AsMock';
 
 import ChartColorContext from '../ChartColorContext';
 import type { ChartConfig } from '../GenericPlot';
@@ -30,36 +31,38 @@ import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 // without CurrentUser & UserPreferences
 jest.mock('components/bootstrap/Popover');
 
-jest.mock(
-  'views/components/visualizations/plotly/AsyncPlot',
-  // eslint-disable-next-line global-require
-  () => require('views/components/visualizations/plotly/Plot').default,
-);
+jest.mock('views/components/visualizations/plotly/AsyncPlot', () => jest.fn());
 jest.mock('components/common/ColorPicker', () => 'color-picker');
 
 describe('GenericPlot', () => {
   describe('adds onRelayout handler', () => {
-    it('calling onZoom prop if axis have changed', () => {
+    it('calling onZoom prop if axis have changed', async () => {
+      asMock(AsyncPlot).mockImplementation(({ onRelayout }) => (
+        <button type="button" onClick={() => onRelayout({ 'xaxis.range[0]': 'foo', 'xaxis.range[1]': 'bar' })}>
+          Zoom
+        </button>
+      ));
+
       const onZoom = jest.fn();
-      const wrapper = mount(<GenericPlot chartData={[]} onZoom={onZoom} />);
+      render(<GenericPlot chartData={[]} onZoom={onZoom} />);
 
-      const plot = wrapper.find('PlotlyComponent');
-      const { onRelayout } = plot.get(0).props;
-
-      onRelayout({ 'xaxis.range[0]': 'foo', 'xaxis.range[1]': 'bar' });
+      await userEvent.click(await screen.findByRole('button', { name: 'Zoom' }));
 
       expect(onZoom).toHaveBeenCalled();
       expect(onZoom).toHaveBeenCalledWith('foo', 'bar');
     });
 
-    it('not calling onZoom prop if axis have not changed', () => {
+    it('not calling onZoom prop if axis have not changed', async () => {
+      asMock(AsyncPlot).mockImplementation(({ onRelayout }) => (
+        <button type="button" onClick={() => onRelayout({ autosize: true })}>
+          Zoom
+        </button>
+      ));
+
       const onZoom = jest.fn();
-      const wrapper = mount(<GenericPlot chartData={[]} onZoom={onZoom} />);
+      render(<GenericPlot chartData={[]} onZoom={onZoom} />);
 
-      const plot = wrapper.find('PlotlyComponent');
-      const { onRelayout } = plot.get(0).props;
-
-      onRelayout({ autosize: true });
+      await userEvent.click(await screen.findByRole('button', { name: 'Zoom' }));
 
       expect(onZoom).not.toHaveBeenCalled();
     });
@@ -67,49 +70,69 @@ describe('GenericPlot', () => {
 
   describe('layout handling', () => {
     it('configures legend to be displayed horizontally', () => {
-      const wrapper = mount(<GenericPlot chartData={[]} />);
+      render(<GenericPlot chartData={[]} />);
 
-      const plot = wrapper.find('PlotlyComponent');
-      const generatedLayout = plot.get(0).props.layout;
-
-      expect(generatedLayout.legend.orientation).toEqual('h');
+      expect(AsyncPlot).toHaveBeenCalledWith(
+        expect.objectContaining({
+          layout: expect.objectContaining({
+            legend: expect.objectContaining({
+              orientation: 'h',
+            }),
+          }),
+        }),
+        {},
+      );
     });
 
     it('merges in passed layout property', () => {
       const layout = { height: 1000 };
-      const wrapper = mount(<GenericPlot chartData={[]} layout={layout} />);
+      render(<GenericPlot chartData={[]} layout={layout} />);
 
-      const plot = wrapper.find('PlotlyComponent');
-      const generatedLayout = plot.get(0).props.layout;
-
-      expect(generatedLayout.height).toEqual(1000);
-      expect(generatedLayout.autosize).toEqual(true);
+      expect(AsyncPlot).toHaveBeenCalledWith(
+        expect.objectContaining({
+          layout: expect.objectContaining({
+            height: 1000,
+            autosize: true,
+          }),
+        }),
+        {},
+      );
     });
 
     it('configures resize handler to be used', () => {
-      const wrapper = mount(<GenericPlot chartData={[]} />);
+      render(<GenericPlot chartData={[]} />);
 
-      const plot = wrapper.find('PlotlyComponent');
-
-      expect(plot).toHaveProp('useResizeHandler', true);
+      expect(AsyncPlot).toHaveBeenCalledWith(
+        expect.objectContaining({
+          useResizeHandler: true,
+        }),
+        {},
+      );
     });
   });
 
   it('disables modebar', () => {
-    const wrapper = mount(<GenericPlot chartData={[]} />);
+    render(<GenericPlot chartData={[]} />);
 
-    const plot = wrapper.find('PlotlyComponent');
-    const generatedConfig = plot.get(0).props.config;
-
-    expect(generatedConfig.displayModeBar).toEqual(false);
+    expect(AsyncPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          displayModeBar: false,
+        }),
+      }),
+      {},
+    );
   });
 
   it('passes chart data to plot component', () => {
-    const wrapper = mount(<GenericPlot chartData={[{ x: 23 }, { x: 42 }]} />);
+    render(<GenericPlot chartData={[{ x: 23 }, { x: 42 }]} />);
 
-    const plot = wrapper.find('PlotlyComponent');
-
-    expect(plot).toHaveProp('data', [{ x: 23 }, { x: 42 }]);
+    expect(AsyncPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: [{ x: 23 }, { x: 42 }],
+      }),
+      {},
+    );
   });
 
   it('extracts series color from context', () => {
@@ -117,8 +140,8 @@ describe('GenericPlot', () => {
       colors: ColorMapper.builder().set('count()', '#783a8e').build(),
       setColor: jest.fn(),
     };
-    const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
-    const wrapper = mount(
+    const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.name) } });
+    render(
       <ChartColorContext.Provider value={lens}>
         <GenericPlot
           chartData={[
@@ -130,15 +153,31 @@ describe('GenericPlot', () => {
       </ChartColorContext.Provider>,
     );
 
-    const { data: newChartData } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & { data: ChartConfig[] };
-
-    expect(newChartData.find((chart) => chart.name === 'count()').marker.color).toEqual('#783a8e');
-    expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toEqual('#fd9e48');
+    expect(AsyncPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: [
+          { 'marker': { 'color': '#783a8e' }, 'name': 'count()', 'outsidetextfont': { 'color': '#252D47' }, 'x': 23 },
+          {
+            'marker': { 'color': '#fd9e48' },
+            'name': 'sum(bytes)',
+            'outsidetextfont': { 'color': '#252D47' },
+            'x': 42,
+          },
+        ],
+      }),
+      {},
+    );
   });
 
   it('calls render completion callback after plotting', () => {
+    asMock(AsyncPlot).mockImplementation(({ onAfterPlot }) => {
+      onAfterPlot();
+
+      return <span>Graph</span>;
+    });
+
     const onRenderComplete = jest.fn();
-    const wrapper = mount(
+    render(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <GenericPlot
           chartData={[
@@ -148,9 +187,6 @@ describe('GenericPlot', () => {
         />
       </RenderCompletionCallback.Provider>,
     );
-    const { onAfterPlot } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & PlotParams;
-
-    onAfterPlot();
 
     expect(onRenderComplete).toHaveBeenCalled();
   });
