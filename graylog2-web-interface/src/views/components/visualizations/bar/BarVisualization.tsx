@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import type { Layout } from 'plotly.js';
-import moment from 'moment/moment';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -52,37 +51,12 @@ const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({
   marker: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
-const findDateRange = (chartDataArray: Array<{ x: Array<string> }>): RangeProps => {
-  // Flatten all date strings from the 'x' arrays
-  const allDates = chartDataArray.flatMap((data) => data.x || []);
-
-  if (allDates.length === 0) {
-    throw new Error('No date values found in the ChartData array');
-  }
-
-  let earliest = moment(allDates[0]);
-  let latest = moment(allDates[0]);
-
-  allDates.forEach((dateStr) => {
-    const current = moment(dateStr);
-    if (current.isBefore(earliest)) earliest = current;
-    if (current.isAfter(latest)) latest = current;
-  });
-
-  return {
-    minX: earliest.format(), // keeps original timezone
-    maxX: latest.format(),
-  };
-};
-
 const defineSingleDateBarWidth = (
   chartDataResult: ChartDefinition[],
   config: AggregationWidgetConfig,
-  // timeRangeFrom: string,
-  // timeRangeTo: string,
+  timeRangeFrom: string,
+  timeRangeTo: string,
 ) => {
-  console.log('defineSingleDateBarWidth', { chartDataResult });
-  const { minX: timeRangeFrom, maxX: timeRangeTo } = findDateRange(chartDataResult);
   const barWidth = 0.03; // width in percentage, relative to chart width
   const minXUnits = 30;
 
