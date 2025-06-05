@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { act } from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
@@ -51,42 +52,62 @@ describe('<ContentPackInstall />', () => {
     .entities([entity])
     .build();
 
-  it('should render a install', () => {
-    const wrapper = mount(<ContentPackInstall contentPack={contentPack} />);
+  it('should render a install', async () => {
+    render(<ContentPackInstall contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/install comment/i);
   });
 
-  it('should call install when called', () => {
+  it('should call install when called', async () => {
     const installFn = jest.fn((id, rev, param) => {
       expect(id).toBe(1);
       expect(rev).toBe(2);
       expect(param).toEqual({ comment: 'Test', parameters: { PARAM: { '@type': 'string', '@value': 'parameter' } } });
     });
+    let instance = null;
 
-    const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
+    render(
+      <ContentPackInstall
+        ref={(_instance) => {
+          instance = _instance;
+        }}
+        contentPack={contentPack}
+        onInstall={installFn}
+      />,
+    );
+    await screen.findByText(/install comment/i);
 
-    wrapper.find('input#comment').simulate('change', { target: { value: 'Test' } });
+    const commentInput = await screen.findByRole('textbox', { name: /comment/i });
+    await userEvent.type(commentInput, 'Test');
 
     act(() => {
-      (wrapper.instance() as ContentPackInstall).onInstall();
+      (instance as ContentPackInstall).onInstall();
     });
 
     expect(installFn.mock.calls.length).toBe(1);
   });
 
-  it('should not call install when parameter is missing', () => {
+  it('should not call install when parameter is missing', async () => {
     const installFn = jest.fn();
+    let instance = null;
 
-    const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
+    render(
+      <ContentPackInstall
+        ref={(_instance) => {
+          instance = _instance;
+        }}
+        contentPack={contentPack}
+        onInstall={installFn}
+      />,
+    );
 
-    wrapper
-      .find('input')
-      .at(1)
-      .simulate('change', { target: { value: '' } });
+    await screen.findByText(/install comment/i);
+
+    const commentInput = await screen.findByRole('textbox', { name: /parameter/i });
+    await userEvent.clear(commentInput);
 
     act(() => {
-      (wrapper.instance() as ContentPackInstall).onInstall();
+      (instance as ContentPackInstall).onInstall();
     });
 
     expect(installFn.mock.calls.length).toBe(0);
