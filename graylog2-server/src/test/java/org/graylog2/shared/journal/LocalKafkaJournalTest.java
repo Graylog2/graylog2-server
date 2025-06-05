@@ -44,6 +44,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -75,6 +76,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class LocalKafkaJournalTest {
     @Rule
@@ -536,6 +540,50 @@ public class LocalKafkaJournalTest {
         assertThat(entriesFromFirstSegment).hasSize(24);
         final List<Journal.JournalReadEntry> entriesFromSecondSegment = journal.read(25);
         assertThat(entriesFromSecondSegment).hasSize(25);
+    }
+
+    @Test
+    public void noRetryOnShutdown() throws Exception {
+        final Size segmentSize = Size.kilobytes(1L);
+        final LocalKafkaJournal journal = new LocalKafkaJournal(journalDirectory.toPath(),
+                scheduler,
+                segmentSize,
+                Duration.standardHours(1),
+                Size.kilobytes(10L),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                100,
+                new MetricRegistry(),
+                serverStatus);
+
+        // this will create two segments, each containing 25 messages
+        createBulkChunks(journal, segmentSize, 2);
+
+        final Path firstSegmentPath =
+                Paths.get(journalDirectory.getAbsolutePath(), "messagejournal-0", "00000000000000000000.log");
+
+        assertThat(firstSegmentPath).isRegularFile();
+
+        // truncate the first segment so that the last message is cut off
+        final File firstSegment = firstSegmentPath.toFile();
+        try (FileChannel channel = new FileOutputStream(firstSegment, true).getChannel()) {
+            channel.truncate(firstSegment.length() - 1);
+        }
+
+        final List<Journal.JournalReadEntry> entriesFromFirstSegment = journal.read(25);
+        assertThat(entriesFromFirstSegment).hasSize(24);
+
+        // Trigger a shutdown of the journal.
+        journal.triggerShutDown();
+
+        final LocalKafkaJournal journalSpy = Mockito.spy(journal);
+        final List<Journal.JournalReadEntry> entriesFromSecondSegment = journalSpy.read(25);
+
+        // When the journal is shut down, we don't want to enter the retry loop in the read method.
+        assertThat(entriesFromSecondSegment).isEmpty();
+        verify(journalSpy, times(1)).read(25);
+        verify(journalSpy, times(1)).read(anyLong(), anyLong());
     }
 
     /**
