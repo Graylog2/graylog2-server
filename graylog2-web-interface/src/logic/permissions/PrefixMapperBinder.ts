@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { singleton } from 'logic/singleton';
+import standardPrefixMapper from 'logic/permissions/StandardPrefixMapper';
 
 export interface PrefixMapper {
   mapForIdAndType(id: string, type: string): string | undefined;
@@ -22,7 +23,7 @@ export interface PrefixMapper {
 }
 
 class PrefixMapperBinder {
-  static __registrations: Array<PrefixMapper> = [];
+  static __registrations: Array<PrefixMapper> = [standardPrefixMapper];
 
   static register(implementingClass: PrefixMapper) {
     this.__registrations.push(implementingClass);

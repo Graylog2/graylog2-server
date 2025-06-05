@@ -14,10 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PluginExports } from 'graylog-web-plugin/plugin';
-
 import type { PrefixMapper } from 'logic/permissions/PrefixMapperBinder';
-import PrefixMapperBinder from 'logic/permissions/PrefixMapperBinder';
 
 const supportedTypes = new Set([
   'user',
@@ -38,7 +35,7 @@ const typePrefixCornerCasesMap = {
   search: 'view:',
 };
 
-const mapper: PrefixMapper = {
+const standardPrefixMapper: PrefixMapper = {
   mapForIdAndType(_id: string, _type: string): string | undefined {
     return undefined;
   },
@@ -47,12 +44,6 @@ const mapper: PrefixMapper = {
 
     return undefined;
   },
-};
-
-PrefixMapperBinder.register(mapper);
-
-const standardPrefixMapper: PluginExports = {
-  prefixMapper: mapper,
 };
 
 export default standardPrefixMapper;
