@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import type { HTMLAttributes } from 'enzyme';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
