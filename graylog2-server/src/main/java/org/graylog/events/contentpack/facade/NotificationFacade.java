@@ -18,6 +18,7 @@ package org.graylog.events.contentpack.facade;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.events.contentpack.entities.NotificationEntity;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
@@ -37,8 +38,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
@@ -125,8 +124,10 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return notificationService.streamAll()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        try (var stream = notificationService.streamAll()) {
+            return stream
+                    .map(this::createExcerpt)
+                    .collect(Collectors.toSet());
+        }
     }
 }

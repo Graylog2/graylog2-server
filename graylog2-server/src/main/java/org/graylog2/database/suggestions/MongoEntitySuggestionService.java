@@ -18,6 +18,7 @@ package org.graylog2.database.suggestions;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -82,25 +83,34 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
         final var skip = Math.max(0, (page - 1) * perPage - fixNumberOfItemsToReadFromDB);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
-        final var documents = userCanReadAllEntities
+
+        final List<EntitySuggestion> suggestions;
+        try (final var documents = userCanReadAllEntities
                 ? mongoPaginate(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission);
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission)) {
 
-        final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
+            final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
 
-        final Stream<EntitySuggestion> suggestionsFromDB = documents
-                .map(doc ->
-                        new EntitySuggestion(
-                                doc.getObjectId(ID_FIELD).toString(),
-                                doc.getString(valueColumn)
-                        )
-                );
+            final Stream<EntitySuggestion> suggestionsFromDB = documents
+                    .map(doc ->
+                            new EntitySuggestion(
+                                    doc.getObjectId(ID_FIELD).toString(),
+                                    doc.getString(valueColumn)
+                            )
+                    );
 
-        final List<EntitySuggestion> suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
+            suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
+        }
+        ;
 
-        final long total = userCanReadAllEntities
-                ? mongoCollection.countDocuments(bsonFilter)
-                : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count();
+        final long total;
+        if (userCanReadAllEntities) {
+            total = mongoCollection.countDocuments(bsonFilter);
+        } else {
+            try (var stream = MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD)))) {
+                total = stream.filter(checkPermission).count();
+            }
+        }
 
         return new EntitySuggestionResponse(suggestions,
                 PaginatedList.PaginationInfo.create((int) total,
@@ -109,6 +119,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         perPage));
     }
 
+    @MustBeClosed
     private Stream<Document> paginateWithPermissionCheck(FindIterable<Document> result, int limit, int skip, Predicate<Document> checkPermission) {
         return MongoUtils.stream(result)
                 .filter(checkPermission)
@@ -116,6 +127,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .skip(skip);
     }
 
+    @MustBeClosed
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
     }

@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchPermissions;
@@ -23,8 +24,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
-
-import jakarta.inject.Inject;
 
 import java.util.HashSet;
 import java.util.List;
@@ -66,9 +65,11 @@ public class SearchDomain {
     }
 
     public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
-        return dbService.streamAll()
-                .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
-                .collect(Collectors.toList());
+        try (var stream = dbService.streamAll()) {
+            return stream
+                    .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
+                    .collect(Collectors.toList());
+        }
     }
 
     public Search saveForUser(Search search, SearchUser searchUser) {
