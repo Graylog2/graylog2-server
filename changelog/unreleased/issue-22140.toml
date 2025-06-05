@@ -1,0 +1,5 @@
+type = "f"
+message = "Allow the source field to be overridden for the Kinesis/Cloudwatch input."
+
+issues = ["22140"]
+pulls = ["22370"]
