@@ -16,11 +16,13 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+import * as Immutable from 'immutable';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { Result, RowInner } from 'views/logic/searchtypes/pivot/PivotHandler';
 
-import AggregationBuilder from './AggregationBuilder';
+import OriginalAggregationBuilder from './AggregationBuilder';
 import EmptyAggregationContent from './EmptyAggregationContent';
 
 import OnVisualizationConfigChangeContext from '../aggregationwizard/OnVisualizationConfigChangeContext';
@@ -39,16 +41,40 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
+type OriginalProps = React.ComponentProps<typeof OriginalAggregationBuilder>;
+const AggregationBuilder = ({
+  data,
+  editing = false,
+  ...props
+}: {
+  config: OriginalProps['config'];
+  editing?: OriginalProps['editing'];
+  data: { [_key: string]: Partial<Result> };
+}) => (
+  <OriginalAggregationBuilder
+    id="test-widget"
+    editing={editing}
+    queryId="foobar"
+    width={640}
+    height={480}
+    setLoadingState={() => {}}
+    fields={Immutable.List()}
+    data={data as OriginalProps['data']}
+    {...props}
+  />
+);
+
+const dataPoint: RowInner = { value: 3.1415926, source: 'row-inner', key: ['pi'], rollup: false };
+
 describe('AggregationBuilder', () => {
   const rowPivot = Pivot.createValues(['field']);
 
   it('does render empty result widget when no documents were in result and is edit', () => {
     const wrapper = mount(
       <AggregationBuilder
-        data={{ total: 0 }}
+        data={{ chart: { total: 0 } }}
         editing
         config={AggregationWidgetConfig.builder().visualization('dummy').build()}
-        fields={{}}
       />,
     );
 
@@ -60,8 +86,7 @@ describe('AggregationBuilder', () => {
     const wrapper = mount(
       <AggregationBuilder
         config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
-        fields={{}}
-        data={{ chart: { total: 42, rows: [{ value: 3.1415926 }] } }}
+        data={{ chart: { total: 42, rows: [dataPoint] } }}
       />,
     );
 
@@ -71,7 +96,9 @@ describe('AggregationBuilder', () => {
     const dummyVisualization = wrapper.find(mockDummyVisualization);
 
     expect(dummyVisualization).toHaveLength(1);
-    expect(dummyVisualization).toHaveProp('data', { chart: [{ value: 3.1415926 }] });
+    expect(dummyVisualization).toHaveProp('data', {
+      chart: [{ value: 3.1415926, source: 'row-inner', key: ['pi'], rollup: false }],
+    });
   });
 
   it('passes through onVisualizationConfigChange to visualization', () => {
@@ -80,8 +107,7 @@ describe('AggregationBuilder', () => {
       <OnVisualizationConfigChangeContext.Provider value={onVisualizationConfigChange}>
         <AggregationBuilder
           config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
-          fields={{}}
-          data={{ total: 42, rows: [{ value: 3.1415926 }] }}
+          data={{ chart: { total: 42, rows: [{ value: 3.1415926, source: 'row-inner', key: ['pi'], rollup: false }] } }}
         />
       </OnVisualizationConfigChangeContext.Provider>,
     );
@@ -97,8 +123,7 @@ describe('AggregationBuilder', () => {
     const wrapper = mount(
       <AggregationBuilder
         config={AggregationWidgetConfig.builder().visualization('dummy').build()}
-        fields={{}}
-        data={{ total: 42, rows: [{ value: 3.1415926 }] }}
+        data={{ chart: { total: 42, rows: [dataPoint] } }}
       />,
     );
 
@@ -110,14 +135,13 @@ describe('AggregationBuilder', () => {
     const data = {
       '524d182c-8e32-4372-b30d-a40d99efe55d': {
         total: 42,
-        rows: [{ value: 3.1415926 }],
+        rows: [dataPoint],
         effective_timerange: 42,
       },
     };
     const wrapper = mount(
       <AggregationBuilder
         config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
-        fields={{}}
         data={data}
       />,
     );
