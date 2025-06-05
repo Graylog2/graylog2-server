@@ -42,7 +42,7 @@ jest.mock('../MapVisualization', () =>
   }),
 );
 
-type MapVisualizationProps = HTMLAttributes & {
+type MapVisualizationProps = {
   onChange: (viewPort: MockViewport) => void;
   onRenderComplete: () => void;
 };
