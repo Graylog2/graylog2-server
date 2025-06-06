@@ -14,17 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { singleton } from 'logic/singleton';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
-
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
-export type ChartColorContextType = { colors: ChartColorMap; setColor: ChangeColorFunction };
-
-const ChartColorContext = React.createContext<ChartColorContextType>({
-  colors: ColorMapper.create(),
-  setColor: () => Promise.resolve([]),
-});
-export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
+// eslint-disable-next-line import/prefer-default-export
+export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
