@@ -1,6 +1,0 @@
-rule "hex_to_double"
-  when true
-then
-  set_field(field: "0x17B90004", value: hex_to_double(value: "0x17B90004"));
-  trigger_test();
-end

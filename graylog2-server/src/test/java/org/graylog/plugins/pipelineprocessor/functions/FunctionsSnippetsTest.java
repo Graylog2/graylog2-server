@@ -36,7 +36,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
-import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToBase10Conversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToDecimalConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -235,7 +235,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
-        functions.put(HexToBase10Conversion.NAME, new HexToBase10Conversion());
+        functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());
@@ -1807,11 +1807,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    void hexToBase10Conversion() {
+    void hexToDecimalConversion() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();
-        assertThat(message.getField("0x17B90004")).isEqualTo(123);
+        assertThat(message.getField("0x17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("0x117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("not_hex")).isEqualTo(null);
     }
 }
