@@ -74,9 +74,9 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
     }
 
     private String errorWithJsonPath(final JsonMappingException e, String path, int lineNr, int columnNr) {
-        final var location = "[" + lineNr + ", " + columnNr + "]";
+        final var location = lineNr >= 0 && columnNr >= 0 ? "[" + lineNr + ", " + columnNr + "]" : "";
         final var quotedPath = "\"" + path + "\"";
-        final var messagePrefix = "Error at " + quotedPath + " " + location;
+        final var messagePrefix = "Error at " + quotedPath + (location.isEmpty() ? "" : " " + location);
 
 
         if (e instanceof PropertyBindingException propertyBindingException) {
