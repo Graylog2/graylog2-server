@@ -50,7 +50,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -253,7 +252,7 @@ class EntitySharesServiceTest {
         final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(Grantee.createUser(janeGRN, "jane"));
         when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(user, Optional.empty());
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(user, ImmutableMap.of());
 
         assertThat(entityShareResponse.activeShares()).isEmpty();
         assertThat(entityShareResponse.availableGrantees()).hasSize(1);

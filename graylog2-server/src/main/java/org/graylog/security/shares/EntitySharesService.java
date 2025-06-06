@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -157,8 +156,9 @@ public class EntitySharesService {
      * This method is used for generic sharing operations where the entity is not known yet - active shares and
      * dependencies are always null.
      */
-    public EntityShareResponse prepareShare(User sharingUser, Optional<ImmutableMap<GRN, Capability>> selectedGranteeCapabilities) {
+    public EntityShareResponse prepareShare(User sharingUser, ImmutableMap<GRN, Capability> selectedGranteeCapabilities) {
         requireNonNull(sharingUser, "sharingUser cannot be null");
+        requireNonNull(selectedGranteeCapabilities, "selectedGranteeCapabilities cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser);
@@ -169,7 +169,7 @@ public class EntitySharesService {
                 .availableGrantees(modifiableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(ImmutableSet.of())
-                .selectedGranteeCapabilities(selectedGranteeCapabilities.orElse(ImmutableMap.of()))
+                .selectedGranteeCapabilities(selectedGranteeCapabilities)
                 .validationResult(new ValidationResult())
                 .build();
     }
@@ -184,7 +184,7 @@ public class EntitySharesService {
     public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
         requireNonNull(entityGRNs, "entityGRNs cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        final EntityShareResponse response = prepareShare(sharingUser, Optional.empty());
+        final EntityShareResponse response = prepareShare(sharingUser, ImmutableMap.of());
 
         return response.toBuilder()
                 .missingPermissionsOnDependencies(missingPermissions(
