@@ -75,6 +75,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import static org.graylog2.rest.helpers.DatabaseIdParser.safeParseObjectId;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.streams.StreamImpl.FIELD_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
@@ -181,11 +182,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public Stream load(String id) throws NotFoundException {
-        try {
-            return load(new ObjectId(id));
-        } catch (IllegalArgumentException e) {
-            throw new NotFoundException("Stream <" + id + "> not found!");
-        }
+        return load(safeParseObjectId(id));
     }
 
     @Override
