@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -75,7 +76,8 @@ public class ViewServiceTest {
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),
                 mock(ViewSummaryService.class),
-                mongoCollections);
+                mongoCollections,
+                new IgnoreSearchFilters());
         this.searchUser = TestSearchUser.builder().build();
     }
 
