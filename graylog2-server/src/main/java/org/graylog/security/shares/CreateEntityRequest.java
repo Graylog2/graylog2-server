@@ -16,9 +16,11 @@
  */
 package org.graylog.security.shares;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.Valid;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
@@ -26,7 +28,11 @@ import java.util.Optional;
 
 @AutoValue
 @WithBeanGetter
+@JsonAutoDetect
 public abstract class CreateEntityRequest<T> {
+    // Avoids error: "HV000131: A method return value must not be marked for cascaded validation more than once in a class hierarchy"
+    @AutoValue.CopyAnnotations(exclude = Valid.class)
+    @Valid
     @JsonProperty("entity")
     public abstract T entity();
 
@@ -36,6 +42,6 @@ public abstract class CreateEntityRequest<T> {
     @JsonCreator
     public static <T> CreateEntityRequest<T> create(@JsonProperty("entity") T entity,
                                                     @JsonProperty("share_request") @Nullable EntityShareRequest shareRequest) {
-        return new AutoValue_CreateEntityRequest(entity, Optional.ofNullable(shareRequest));
+        return new AutoValue_CreateEntityRequest<>(entity, Optional.ofNullable(shareRequest));
     }
 }
