@@ -27,8 +27,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 
 import java.util.List;
 
-// TODO:fix the test
-//@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),})
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),})
 public class DatanodeRollingUpgradeIT {
 
     private final GraylogApis apis;
@@ -37,7 +36,7 @@ public class DatanodeRollingUpgradeIT {
         this.apis = apis;
     }
 
-   //@ContainerMatrixTest
+    @ContainerMatrixTest
     public void testClusterStatus() {
         final GraylogApiResponse response = getDatanodeClusterStatus();
 
