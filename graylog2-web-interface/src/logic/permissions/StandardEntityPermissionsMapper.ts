@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PrefixMapper } from 'logic/permissions/PrefixMapperBinder';
+import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 
 const supportedTypes = new Set([
   'user',
@@ -35,7 +35,7 @@ const typePrefixCornerCasesMap = {
   search: 'view:',
 };
 
-const standardPrefixMapper: PrefixMapper = {
+const standardEntityPermissionsMapper: EntityPermissionsMapper = {
   mapForIdAndType(_id: string, _type: string): string | undefined {
     return undefined;
   },
@@ -46,4 +46,4 @@ const standardPrefixMapper: PrefixMapper = {
   },
 };
 
-export default standardPrefixMapper;
+export default standardEntityPermissionsMapper;

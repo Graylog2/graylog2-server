@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { singleton } from 'logic/singleton';
-import standardPrefixMapper from 'logic/permissions/StandardPrefixMapper';
+import standardMapper from 'logic/permissions/StandardEntityPermissionsMapper';
 
-export interface PrefixMapper {
+export interface EntityPermissionsMapper {
   mapForIdAndType(id: string, type: string): string | undefined;
   mapForType(type: string): string | undefined;
 }
 
-class PrefixMapperBinder {
-  static __registrations: Array<PrefixMapper> = [standardPrefixMapper];
+class EntityPermissionsMapperBinder {
+  static __registrations: Array<EntityPermissionsMapper> = [standardMapper];
 
-  static register(implementingClass: PrefixMapper) {
+  static register(implementingClass: EntityPermissionsMapper) {
     this.__registrations.push(implementingClass);
   }
 
@@ -41,8 +41,11 @@ class PrefixMapperBinder {
   }
 }
 
-const SingletonPrefixMapperBinder = singleton('logic.prefixmapper.binder', () => PrefixMapperBinder);
+const SingletonEntityPermissionsMapperBinder = singleton(
+  'logic.entitypermissionsmapper.binder',
+  () => EntityPermissionsMapperBinder,
+);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-type SingletonPrefixMapperBinder = InstanceType<typeof PrefixMapperBinder>;
+type SingletonEntityPermissionsMapperBinder = InstanceType<typeof EntityPermissionsMapperBinder>;
 
-export default SingletonPrefixMapperBinder;
+export default SingletonEntityPermissionsMapperBinder;
