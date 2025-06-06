@@ -58,12 +58,8 @@ const TokenActions = ({ userId, tokenId, tokenName, onDeleteCallback = () => {} 
         </ConfirmDialog>
       )}
 
-      <ButtonToolbar className='pull-right'>
-        <Button
-          bsSize="xs"
-          disabled={isDeleting}
-          bsStyle="danger"
-          onClick={onDelete}>
+      <ButtonToolbar className="pull-right">
+        <Button bsSize="xs" disabled={isDeleting} bsStyle="danger" onClick={onDelete}>
           Delete
         </Button>
       </ButtonToolbar>

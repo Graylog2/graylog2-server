@@ -116,7 +116,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     awsEndpointDynamoDB = { value: undefined },
     awsEndpointIAM = { value: undefined },
     awsEndpointKinesis = { value: undefined },
-    overrideSource = {value: undefined},
+    overrideSource = { value: undefined },
   } = formData;
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
@@ -251,7 +251,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <span>
               {!awsCloudwatchKinesisStreamArn ? (
                 <ArnErrorMessage>
-                  Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream permission.
+                  Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream
+                  permission.
                 </ArnErrorMessage>
               ) : (
                 awsCloudwatchKinesisStreamArn
@@ -287,10 +288,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
               <Icon name={addPrefix ? 'check_circle' : 'cancel'} />
             </span>
           </li>
-          {overrideSource.value && (<li>
-            <strong>Override Source</strong>
-            <span>{overrideSource.value}</span>
-          </li>)}
+          {overrideSource.value && (
+            <li>
+              <strong>Override Source</strong>
+              <span>{overrideSource.value}</span>
+            </li>
+          )}
         </ReviewItems>
 
         <Subheader>Formatting</Subheader>

@@ -62,10 +62,8 @@ describe('<GrokPatternFilter />', () => {
 
     userEvent.type(patternFilter, 'COMMON');
 
-    await waitFor(async () => {
-      const buttons = await screen.findAllByRole('button', { name: 'Add' });
+    const buttons = await screen.findAllByRole('button', { name: 'Add' });
 
-      expect(buttons).toHaveLength(1);
-    });
+    expect(buttons).toHaveLength(1);
   });
 });

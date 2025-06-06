@@ -32,7 +32,11 @@ const EnterprisePage = () => {
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
 
-  const title = (<><UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise</>);
+  const title = (
+    <>
+      <UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise
+    </>
+  );
 
   if (!nodes) {
     return <Spinner />;
