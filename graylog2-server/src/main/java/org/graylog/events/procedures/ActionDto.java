@@ -24,11 +24,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonDeserialize(builder = ActionDto.Builder.class)
 public abstract class ActionDto {
-    public static final String TITLE_FIELD = "title";
     public static final String CONFIG_FIELD = "config";
-
-    @JsonProperty(TITLE_FIELD)
-    public abstract String title();
 
     @JsonProperty(CONFIG_FIELD)
     public abstract ActionConfig config();
@@ -41,9 +37,6 @@ public abstract class ActionDto {
 
     @AutoValue.Builder
     public abstract static class Builder {
-
-        @JsonProperty(TITLE_FIELD)
-        public abstract Builder title(String title);
 
         @JsonProperty(CONFIG_FIELD)
         public abstract Builder config(ActionConfig config);
