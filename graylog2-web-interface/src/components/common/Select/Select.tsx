@@ -240,6 +240,7 @@ export type Props<OptionValue> = {
   ignoreAccents?: boolean;
   inputId?: string;
   inputProps?: { [key: string]: any };
+  isLoading?: boolean;
   matchProp?: 'any' | 'label' | 'value';
   multi?: boolean;
   maxMenuHeight?: number;
@@ -323,6 +324,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     inputId: undefined,
     onBlur: undefined,
     inputProps: undefined,
+    isLoading: undefined,
     matchProp: 'any',
     multi: false,
     menuIsOpen: undefined,
