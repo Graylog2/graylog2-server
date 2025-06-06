@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 
@@ -31,13 +31,13 @@ describe('StreamsFilter', () => {
     ];
     render(<StreamsFilter streams={streams} onChange={() => {}} />);
 
-    const select = await screen.findByLabelText(/select streams/i);
+    const select = await selectEvent.findSelectInput('select streams');
 
     selectEvent.openMenu(select);
 
-    await screen.findByText('101 Stream');
-    await screen.findByText('another Stream');
-    await screen.findByText('One Stream');
-    await screen.findByText('Yet another Stream');
+    await selectEvent.findOption('101 Stream');
+    await selectEvent.findOption('another Stream');
+    await selectEvent.findOption('One Stream');
+    await selectEvent.findOption('Yet another Stream');
   });
 });

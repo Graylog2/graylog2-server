@@ -17,7 +17,7 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import type { Matcher } from 'wrappedTestingLibrary';
-import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
+import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
@@ -71,16 +71,7 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
   const sortFieldSelect = within(httpMethodSortContainer).getByLabelText('Select field for sorting');
   const sortDirectionSelect = within(httpMethodSortContainer).getByLabelText('Select direction for sorting');
 
-  await act(async () => {
-    await selectEvent.openMenu(sortFieldSelect);
-  });
-
   await selectEvent.select(sortFieldSelect, option);
-
-  await act(async () => {
-    await selectEvent.openMenu(sortDirectionSelect);
-  });
-
   await selectEvent.select(sortDirectionSelect, 'Descending');
 
   await within(httpMethodSortContainer).findByText('Descending');

@@ -261,15 +261,7 @@ describe('Aggregation Widget', () => {
         const nameInput = await screen.findByLabelText(/Name/);
         await userEvent.type(nameInput, 'Metric name');
 
-        const metricFieldSelect = await screen.findByLabelText('Select a function');
-
-        await act(async () => {
-          await selectEvent.openMenu(metricFieldSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count');
-        });
+        await selectEvent.selectOption('Select a function', 'Count');
 
         await findWidgetConfigSubmitButton();
 
