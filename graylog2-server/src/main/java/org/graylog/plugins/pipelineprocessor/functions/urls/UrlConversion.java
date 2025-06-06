@@ -26,6 +26,11 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 
 import java.util.Optional;
 
+/**
+ * Converts a value to a valid URL using its string representation.
+ * If the input is null or malformed, return a null or a default URL.
+ * An exception will be thrown if the default URL is malformed, since that is a pipeline coding error.
+ */
 public class UrlConversion extends AbstractFunction<URL> {
 
     public static final String NAME = "to_url";
@@ -37,21 +42,28 @@ public class UrlConversion extends AbstractFunction<URL> {
     public URL evaluate(FunctionArgs args, EvaluationContext context) {
         final String urlString = String.valueOf(urlParam.required(args, context));
         try {
-            return new URL(urlString);
+            return parseUrl(urlString);
         } catch (IllegalArgumentException e) {
             log.debug(context.pipelineErrorMessage("Unable to parse URL for string " + urlString), e);
-
             final Optional<String> defaultUrl = defaultParam.optional(args, context);
-            if (!defaultUrl.isPresent()) {
+            if (defaultUrl.isEmpty()) {
                 return null;
             }
             try {
-                return new URL(defaultUrl.get());
+                return parseUrl(defaultUrl.get());
             } catch (IllegalArgumentException e1) {
                 log.warn(context.pipelineErrorMessage("Parameter `default` for to_url() is not a valid URL: " + defaultUrl.get()));
                 throw Throwables.propagate(e1);
             }
         }
+    }
+
+    private static URL parseUrl(String urlString) {
+        final URL url = new URL(urlString);
+        if (!url.hasParsedUrl()) {
+            throw new IllegalArgumentException("Could not parse a valid URL from: " + urlString);
+        }
+        return url;
     }
 
     @Override
