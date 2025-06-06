@@ -82,6 +82,7 @@ public class WebInterfaceAssetsResource {
 
     @Path(ASSETS_PREFIX + "/" + FAVICON)
     @GET
+    @NoPermissionCheckRequired
     public Response getFavicon(@Context ContainerRequest request) {
         final var resourceFile = customizationConfig.favicon()
                 .map(favicon -> ResourceFileReader.ResourceFile.create(null, favicon))
@@ -111,6 +112,7 @@ public class WebInterfaceAssetsResource {
 
     @Path(ASSETS_PREFIX + "/plugin/{plugin}/{filename}")
     @GET
+    @NoPermissionCheckRequired
     public Response get(@Context Request request,
                         @Context HttpHeaders headers,
                         @PathParam("plugin") String pluginName,
