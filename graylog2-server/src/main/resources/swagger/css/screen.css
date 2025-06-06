@@ -1715,3 +1715,17 @@ pre code {
     font-size: 12px;
     color: #ccc;
 }
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #856404;
+    cursor: pointer;
+  }
+
+  .close-btn:hover {
+    color: #000;
+  }
