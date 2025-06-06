@@ -149,7 +149,8 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
                 return entitySharesService.prepareShare(request.dependentEntityGRNs(), getCurrentUser());
             }
         } else {
-            return entitySharesService.prepareShare(getCurrentUser());
+            return entitySharesService.prepareShare(getCurrentUser(),
+                    request.selectedGranteeCapabilities() == null ? ImmutableMap.of() : request.selectedGranteeCapabilities());
         }
     }
 
