@@ -21,8 +21,7 @@ const assertUnreachable = (type: string): never => {
   throw new Error(`Can't find prefix for type: ${type ?? '(undefined)'}`);
 };
 
-const getPermissionPrefixByType = (type: string, id: string, throwErrorOnUnknown = true) =>
-  EntityPermissionsMapperBinder.mapToPrefix(type, id) ||
-  (throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`);
+const getPermissionPrefixByType = (type: string, id: string) =>
+  EntityPermissionsMapperBinder.mapToPrefix(type, id) || assertUnreachable(type);
 
 export default getPermissionPrefixByType;
