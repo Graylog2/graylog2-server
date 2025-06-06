@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -25,7 +25,7 @@ type Options = {
   enabled: boolean;
 };
 
-export const fetchEventDefinitions = (searchParams: SearchParams) =>
+export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> =>
   EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
@@ -35,7 +35,7 @@ export const fetchEventDefinitions = (searchParams: SearchParams) =>
     attributes,
   }));
 
-export const fetchEventDefinition = (eventDefinitionId: string) =>
+export const fetchEventDefinition = (eventDefinitionId: string): Promise<any> =>
   EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
     eventDefinition: event_definition,
     context: context,
@@ -51,13 +51,16 @@ type EventDefinitionResult = {
 };
 
 export const useGetEventDefinition = (eventDefinitionId: string) => {
-  const { data, isFetching } = useQuery<any, Error>(['get-event-definition', eventDefinitionId], () =>
-    defaultOnError(
-      fetchEventDefinition(eventDefinitionId),
-      'Loading Event Definition failed with status',
-      'Could not load Event definition',
-    ),
-  );
+  const { data, isFetching } = useQuery({
+    queryKey: ['get-event-definition', eventDefinitionId],
+
+    queryFn: () =>
+      defaultOnError(
+        fetchEventDefinition(eventDefinitionId),
+        'Loading Event Definition failed with status',
+        'Could not load Event definition',
+      ),
+  });
 
   return {
     data: isFetching ? null : data,
@@ -65,27 +68,19 @@ export const useGetEventDefinition = (eventDefinitionId: string) => {
   };
 };
 
-const useEventDefinitions = (
-  searchParams: SearchParams,
-  { enabled }: Options = { enabled: true },
-): {
-  data: EventDefinitionResult | undefined;
-  refetch: () => void;
-  isInitialLoading: boolean;
-} => {
-  const { data, refetch, isInitialLoading } = useQuery<EventDefinitionResult>(
-    keyFn(searchParams),
-    () =>
+const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }) => {
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
+
+    queryFn: () =>
       defaultOnError(
         fetchEventDefinitions(searchParams),
         'Loading Event Definitions failed with status',
         'Could not load Event definition',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data,

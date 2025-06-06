@@ -31,12 +31,13 @@ const useTriggerMigrationState = (): {
   const queryClient = useQueryClient();
   const {
     mutateAsync: onTriggerNextState,
-    isLoading: isLoadingNextMigrationState,
+    isPending: isLoadingNextMigrationState,
     error,
     isError,
-  } = useMutation(Migration.trigger, {
+  } = useMutation({
+    mutationFn: Migration.trigger,
     onSuccess: () => {
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
     onError: (err: Error) => UserNotification.error(err.message),
   });

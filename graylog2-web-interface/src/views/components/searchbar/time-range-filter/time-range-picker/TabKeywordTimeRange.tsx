@@ -63,14 +63,12 @@ const TimePreview = ({ dateTime, isLoading }: { dateTime: string; isLoading: boo
 };
 
 const useKeywordPreview = (keyword: string, userTZ: string) => {
-  const { data, isFetching } = useQuery(
-    ['time-range', 'validation', 'keyword', keyword],
-    () => debouncedTestNaturalDate(keyword, userTZ),
-    {
-      retry: 0,
-      enabled: !!trim(keyword),
-    },
-  );
+  const { data, isFetching } = useQuery({
+    queryKey: ['time-range', 'validation', 'keyword', keyword],
+    queryFn: () => debouncedTestNaturalDate(keyword, userTZ),
+    retry: 0,
+    enabled: !!trim(keyword),
+  });
 
   return { data, isFetching };
 };

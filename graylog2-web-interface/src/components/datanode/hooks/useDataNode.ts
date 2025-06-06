@@ -31,14 +31,13 @@ const useDataNode = (
   isInitialLoading: boolean;
   error: any;
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery(
-    ['datanode'],
-    () => defaultOnError(fetchDataNode(datanodeId), 'Loading Data Node failed with status', 'Could not load Data Node'),
-    {
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
-    },
-  );
+  const { data, refetch, isInitialLoading, error } = useQuery({
+    queryKey: ['datanode'],
+    queryFn: () =>
+      defaultOnError(fetchDataNode(datanodeId), 'Loading Data Node failed with status', 'Could not load Data Node'),
+    notifyOnChangeProps: ['data', 'error'],
+    refetchInterval: 5000,
+  });
 
   return {
     data,

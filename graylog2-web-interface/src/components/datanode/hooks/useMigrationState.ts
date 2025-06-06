@@ -32,15 +32,13 @@ const useMigrationState = (args?: {
   currentStep: MigrationState;
   isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery<MigrationState, Error>(
-    MIGRATION_STATE_QUERY_KEY,
-    () => onError(Migration.status(), (error: Error) => UserNotification.error(error.message)),
-    {
-      enabled: args?.enabled ?? true,
-      retry: 2,
-      refetchInterval: args?.refetchInterval ?? false,
-    },
-  );
+  const { data, isLoading } = useQuery({
+    queryKey: MIGRATION_STATE_QUERY_KEY,
+    queryFn: () => onError(Migration.status(), (error: Error) => UserNotification.error(error.message)),
+    enabled: args?.enabled ?? true,
+    retry: 2,
+    refetchInterval: args?.refetchInterval ?? false,
+  });
 
   return {
     currentStep: data,
