@@ -275,6 +275,7 @@ public class AuthzRolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Delete a role")
+    @InlinePermissionCheck
     public void delete(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         checkPermission(RestPermissions.ROLES_DELETE, roleId);
         final AuthzRoleDTO roleDTO = authzRolesService.get(roleId).orElseThrow(
