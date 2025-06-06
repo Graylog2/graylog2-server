@@ -17,11 +17,9 @@
 package org.graylog.plugins.views.search.views;
 
 import com.google.common.base.Functions;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
-import org.graylog.plugins.views.search.Search;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Map;
@@ -39,17 +37,22 @@ public class QualifyingViewsService {
     }
 
     public Collection<ViewParameterSummaryDTO> forValue() {
-        final Set<String> searches = viewService.streamAll()
-                .map(ViewDTO::searchId)
-                .collect(Collectors.toSet());
+        final Set<String> searches;
+        try (var stream = viewService.streamAll()) {
+            searches = stream
+                    .map(ViewDTO::searchId)
+                    .collect(Collectors.toSet());
+        }
         final Map<String, Search> qualifyingSearches = this.searchDbService.findByIds(searches).stream()
                 .filter(search -> !search.parameters().isEmpty())
                 .collect(Collectors.toMap(Search::id, Functions.identity()));
 
-        return viewService.streamAll()
-                .filter(view -> qualifyingSearches.keySet().contains(view.searchId()))
-                .map(view -> ViewParameterSummaryDTO.create(view, qualifyingSearches.get(view.searchId())))
-                .collect(Collectors.toSet());
+        try (var stream = viewService.streamAll()) {
+            return stream
+                    .filter(view -> qualifyingSearches.containsKey(view.searchId()))
+                    .map(view -> ViewParameterSummaryDTO.create(view, qualifyingSearches.get(view.searchId())))
+                    .collect(Collectors.toSet());
+        }
     }
 
 }

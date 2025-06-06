@@ -20,12 +20,12 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.errorprone.annotations.MustBeClosed;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.security.events.AuthServiceBackendDeletedEvent;
 import org.graylog.security.events.AuthServiceBackendSavedEvent;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -139,6 +139,7 @@ public class DBAuthServiceBackendService {
         return MongoUtils.stream(collection.find());
     }
 
+    @MustBeClosed
     public Stream<AuthServiceBackendDTO> streamByIds(Set<String> idSet) {
         return MongoUtils.stream(collection.find(stringIdsIn(idSet)));
     }
