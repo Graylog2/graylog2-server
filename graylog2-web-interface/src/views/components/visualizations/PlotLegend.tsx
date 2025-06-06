@@ -227,7 +227,13 @@ const NoninteractiveLegend = ({ config, fieldTypes, labels, labelFields }: Legen
           return { label, field, type: fieldType };
         });
 
-        return <LegendEntry labelsWithField={labelsWithField} value={value} />;
+        return (
+          <LegendEntry
+            key={`legend-entry-${labelsWithField}-${value}`}
+            labelsWithField={labelsWithField}
+            value={value}
+          />
+        );
       })}
     </FlexLegendContainer>
   );

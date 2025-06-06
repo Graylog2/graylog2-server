@@ -38,7 +38,7 @@ const sortNavigationItems = <T extends Item>(navigationItems: Array<T>) => {
   const afterItems = navigationItems.filter((item) => !!item.position?.after);
   const lastItems = navigationItems.filter((item) => !!item.position?.last);
 
-  return [...sortInAfterItems<T>(withoutPositionItems, afterItems), ...lastItems];
+  return [...sortInAfterItems<T>(withoutPositionItems, afterItems), ...lastItems] as T[];
 };
 
 export default sortNavigationItems;
