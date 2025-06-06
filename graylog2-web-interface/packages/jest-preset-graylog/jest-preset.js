@@ -18,9 +18,7 @@ const { applyTimeoutMultiplier } = require('./lib/timeouts');
 
 module.exports = {
   rootDir: '../../',
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-  ],
+  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
   setupFiles: [
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
@@ -33,34 +31,23 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-styled-components.js'),
     'jest-canvas-mock',
   ],
-  setupFilesAfterEnv: [
-    'jest-enzyme',
-  ],
-  moduleDirectories: [
-    'src',
-    'test',
-    'node_modules',
-  ],
-  moduleFileExtensions: [
-    'ts',
-    'tsx',
-    'js',
-    'jsx',
-  ],
+  moduleDirectories: ['src', 'test', 'node_modules'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   moduleNameMapper: {
     '^file-loader(\\?esModule=false)?!(.+)$': '$2',
     '(\\.lazy|leaflet)\\.css$': require.resolve('./lib/mocking/useable-css-proxy.js'),
     '\\.(css|less)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./lib/mocking/fileMock.js'),
+    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
+      require.resolve('./lib/mocking/fileMock.js'),
     '^@graylog/server-api(.*)$': '<rootDir>/target/api$1',
   },
   testEnvironment: 'jsdom',
-  testPathIgnorePatterns: [
-    '.fixtures.[jt]s$',
-  ],
+  testPathIgnorePatterns: ['.fixtures.[jt]s$'],
   testTimeout: applyTimeoutMultiplier(5000),
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce)/)'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce)/)',
+  ],
 };

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import asMock from 'helpers/mocking/AsMock';
@@ -40,7 +40,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   it('return data with conditions part when function, field and value exist', async () => {
     Store.set('session-id', urlConfigWithAgg);
 
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -91,7 +91,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   it('return data with conditions part when only function and value exist', async () => {
     Store.set('session-id', urlConfigWithFunctionAgg);
 
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -140,7 +140,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
 
   it('return data without conditions part when function not exist', async () => {
     Store.set('session-id', urlConfigWithoutAgg);
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -170,7 +170,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   it('return hasUrlConfig when no url config data', async () => {
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() =>
       expect(result.current).toEqual({

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { OrderedMap } from 'immutable';
 import { defaultTimezone } from 'defaultMockValues';
 import * as React from 'react';
@@ -47,7 +47,7 @@ describe('useFiltersWithTitle', () => {
   );
 
   it('fetches titles only for filters related to attributes which have a related collection', async () => {
-    const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
+    const { result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
     await waitFor(() => expect(result.current.isInitialLoading).toBe(true));
 
@@ -70,7 +70,7 @@ describe('useFiltersWithTitle', () => {
         not_permitted_to_view: ['index_set_id_2'],
       }),
     );
-    const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
+    const { result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
     await waitFor(() =>
       expect(result.current.data).toEqual(

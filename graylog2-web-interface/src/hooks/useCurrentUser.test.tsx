@@ -33,10 +33,8 @@ describe('useCurrentUser', () => {
   });
 
   it('should throw error when being used outside of CurrentUserContext.Provider', () => {
-    const result = renderHook(() => useCurrentUser());
-
-    expect(result.result.error).toEqual(
-      new Error('useCurrentUser hook needs to be used inside CurrentUserContext.Provider'),
+    expect(() => renderHook(() => useCurrentUser())).toThrow(
+      'useCurrentUser hook needs to be used inside CurrentUserContext.Provider',
     );
   });
 });

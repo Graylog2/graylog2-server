@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
@@ -89,7 +89,7 @@ describe('useFieldTypeUsages custom hook', () => {
 
   it('Test return initial data and take from fetch', async () => {
     asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.resolve(mockFieldTypeUsages));
-    const { result, waitFor } = renderUseFieldTypeUsagesHook();
+    const { result } = renderUseFieldTypeUsagesHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
@@ -111,7 +111,7 @@ describe('useFieldTypeUsages custom hook', () => {
   it('Test trigger notification on fail', async () => {
     asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseFieldTypeUsagesHook();
+    const { result } = renderUseFieldTypeUsagesHook();
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isLoading);

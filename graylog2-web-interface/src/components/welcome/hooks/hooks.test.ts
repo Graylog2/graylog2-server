@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -92,7 +92,7 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockLastOpened));
-      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), {
+      const { result } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
 
@@ -106,7 +106,7 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), {
+      const { result } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
 
@@ -129,7 +129,7 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockFavoriteItems));
-      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), {
+      const { result } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
 
@@ -143,7 +143,7 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), {
+      const { result } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
 
@@ -166,7 +166,7 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockedRecentActivityResponse));
-      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
+      const { result } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
 
@@ -180,7 +180,7 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
+      const { result } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
 
