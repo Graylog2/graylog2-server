@@ -49,10 +49,10 @@ const ExpandIconButton = styled(IconButton)`
   z-index: 10;
 `;
 
-const MarkdownStyles = styled.div`
+const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
   overflow: hidden auto;
   height: 100%;
-  padding: 0 8px;
+  padding: 0 ${({ $noPadding }) => ($noPadding ? '0' : '8px')};
 
   container-type: inline-size;
 
@@ -113,18 +113,29 @@ type Props = {
   withFullView?: boolean;
   noBackground?: boolean;
   noBorder?: boolean;
+  noPadding?: boolean;
 };
 
-function Preview({ value, height = 100, show, withFullView = false, noBackground = false, noBorder = false }: Props) {
+function Preview({
+  value,
+  height = 100,
+  show,
+  withFullView = false,
+  noBackground = false,
+  noBorder = false,
+  noPadding = false,
+}: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
   return (
     show && (
       <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
-        <MarkdownStyles>
+        <MarkdownStyles $noPadding={noPadding}>
           <Markdown text={value} />
         </MarkdownStyles>
-        {withFullView && <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />}
+        {withFullView && (
+          <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />
+        )}
         <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
       </Container>
     )
