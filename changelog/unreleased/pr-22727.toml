@@ -1,5 +1,0 @@
-type = "f"
-message = "Fixes links into the security app for Last Opened and Favourites."
-
-issues = ["graylog-plugin-enterprise#10894"]
-pulls = ["22727"]
