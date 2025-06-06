@@ -17,6 +17,7 @@
 
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
+import cloneDeep from 'lodash/cloneDeep';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -26,9 +27,10 @@ import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYV
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
+import getAdjustedPlotTimelineRange from 'views/components/visualizations/utils/getAdjustedPlotTimelineRange';
 
-import GenericPlot from './GenericPlot';
 import type { ChartConfig, PlotLayout } from './GenericPlot';
+import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
 
 type GenericPlotProps = React.ComponentProps<typeof GenericPlot>;
@@ -98,7 +100,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = cloneDeep({ ...defaultLayout, ...plotLayout });
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
@@ -113,8 +115,10 @@ const XYPlot = ({
     const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
     const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
 
+    const { minX, maxX } = getAdjustedPlotTimelineRange(chartData, normalizedFrom, normalizedTo);
+
     layout.xaxis = merge(layout.xaxis, {
-      range: [normalizedFrom, normalizedTo],
+      range: [minX, maxX],
       type: 'date',
     });
   } else {
