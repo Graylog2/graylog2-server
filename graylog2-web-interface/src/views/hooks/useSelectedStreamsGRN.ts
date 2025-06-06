@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import * as Immutable from "immutable";
+import * as Immutable from 'immutable';
 
-import useQueryFilters from "views/logic/queries/useQueryFilters";
-import {filtersToStreamSet} from "views/logic/queries/Query";
-import {createGRN} from "logic/permissions/GRN";
-import useCurrentQuery from "views/logic/queries/useCurrentQuery";
+import useQueryFilters from 'views/logic/queries/useQueryFilters';
+import { filtersToStreamSet } from 'views/logic/queries/Query';
+import { createGRN } from 'logic/permissions/GRN';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 const useSelectedStreamsGRN = (): { selectedStreamsGRN: Array<string> } => {
   const queryFilters = useQueryFilters();
@@ -28,7 +28,7 @@ const useSelectedStreamsGRN = (): { selectedStreamsGRN: Array<string> } => {
   const streams = filtersToStreamSet(queryFilters.get(currentQuery.id, Immutable.Map())).toJS();
   const selectedStreamsGRN = streams?.map((stream: string) => createGRN('stream', stream));
 
-  return { selectedStreamsGRN }
-}
+  return { selectedStreamsGRN };
+};
 
 export default useSelectedStreamsGRN;

@@ -153,7 +153,8 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
                       userId={currentUser.id}
                       tokenId={token.id}
                       tokenName={token.name}
-                      onDeleteCallback={onDelete} />
+                      onDeleteCallback={onDelete}
+                    />
                   </td>
                 </tr>
               );

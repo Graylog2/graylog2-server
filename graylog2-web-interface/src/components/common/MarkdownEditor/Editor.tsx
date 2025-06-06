@@ -112,7 +112,14 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
           />
         )}
         <Preview value={localValue} height={height} show={showPreview} />
-        <ExpandIconButton data-testid="expand-icon" name="expand_content" title="Expand Preview" onClick={() => handleOnFullMode(true)} size="sm" aria-label="Expand preview" />
+        <ExpandIconButton
+          data-testid="expand-icon"
+          name="expand_content"
+          title="Expand Preview"
+          onClick={() => handleOnFullMode(true)}
+          size="sm"
+          aria-label="Expand preview"
+        />
       </div>
       {fullView && (
         <EditorModal

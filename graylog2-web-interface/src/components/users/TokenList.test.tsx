@@ -50,13 +50,12 @@ const TokenList = (props: Optional<React.ComponentProps<typeof OriginalTokenList
   <OriginalTokenList onCreate={async () => tokens[0]} {...props} />
 );
 
-const deleteToken =  jest.fn(() => Promise.resolve());
+const deleteToken = jest.fn(() => Promise.resolve());
 
 jest.mock('components/users/UsersTokenManagement/hooks/useDeleteTokenMutation', () => ({
   __esModule: true,
   default: jest.fn(() => ({ deleteToken: jest.fn(() => Promise.resolve()) })),
 }));
-
 
 describe('<TokenList />', () => {
   beforeAll(() => {
@@ -143,11 +142,11 @@ describe('<TokenList />', () => {
 
   it('should delete a token', async () => {
     const onDeleteFn = jest.fn();
-    render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn}/>);
+    render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn} />);
 
     (await screen.findAllByRole('button', { name: 'Delete' }))[0].click();
     await screen.findByRole('heading', {
-      name: /deleting token/i
+      name: /deleting token/i,
     });
 
     userEvent.click(await screen.findByRole('button', { name: /Confirm/i }));
@@ -158,7 +157,7 @@ describe('<TokenList />', () => {
 
     await waitFor(() => {
       expect(onDeleteFn).toHaveBeenCalledTimes(1);
-    })
+    });
   });
 
   it('show include token last access time', async () => {
