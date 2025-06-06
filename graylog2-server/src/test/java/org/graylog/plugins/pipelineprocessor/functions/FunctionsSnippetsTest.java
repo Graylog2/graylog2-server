@@ -47,6 +47,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.FieldValueType;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
@@ -245,6 +246,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
         functions.put(RemoveStringFieldsByValue.NAME, new RemoveStringFieldsByValue());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
+        functions.put(FieldValueType.NAME, new FieldValueType());
 
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage(messageFactory));
@@ -1802,5 +1804,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    public void fieldValueType() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
+        // Add a random field type we don't explicitly handle.
+        message.addField("unmapped_type_field", rule);
+        evaluateRule(rule, message);
+
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("unmapped_type_field_type")).isEqualTo("autovalue_rule");
+        assertThat(message.getField("null_type")).isEqualTo("null");
+        assertThat(message.getField("boolean_type")).isEqualTo(FieldValueType.Type.BOOLEAN.getName());
+        assertThat(message.getField("string_type")).isEqualTo(FieldValueType.Type.STRING.getName());
+        assertThat(message.getField("double_type")).isEqualTo(FieldValueType.Type.DOUBLE.getName());
+        assertThat(message.getField("long_type")).isEqualTo(FieldValueType.Type.LONG.getName());
+        assertThat(message.getField("list_type")).isEqualTo(FieldValueType.Type.LIST.getName());
+        assertThat(message.getField("map_type")).isEqualTo(FieldValueType.Type.MAP.getName());
+        assertThat(message.getField("value_node_type")).isEqualTo(FieldValueType.Type.VALUE_NODE.getName());
+        assertThat(message.getField("array_node_type")).isEqualTo(FieldValueType.Type.ARRAY_NODE.getName());
+        assertThat(message.getField("object_node_type")).isEqualTo(FieldValueType.Type.OBJECT_NODE.getName());
     }
 }
