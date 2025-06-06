@@ -291,7 +291,9 @@ const RuleBuilder = () => {
         },
       );
 
-      await updateRule(rule);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _scope , ...updatedRule } = rule;
+      await updateRule(updatedRule);
       if (closeAfter) handleCancel();
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_RULE_CLICKED, {
