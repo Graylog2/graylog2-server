@@ -44,6 +44,7 @@ const DeletionRetentionStrategyConfiguration = ({ updateConfig }: DeletionRetent
         label="Max number of indices"
         onChange={_onInputUpdate('max_number_of_indices')}
         value={maxNumberOfIndices}
+        min={1}
         help={
           <span>
             Maximum number of indices to keep before <strong>deleting</strong> the oldest ones
