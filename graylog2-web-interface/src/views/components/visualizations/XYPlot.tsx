@@ -27,7 +27,7 @@ import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYV
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import getAdjustedTimeRange from 'views/components/visualizations/utils/getAdjustedTimeRange';
+import getAdjustedPlotTimelineRange from 'views/components/visualizations/utils/getAdjustedPlotTimelineRange';
 
 import type { ChartConfig, PlotLayout } from './GenericPlot';
 import GenericPlot from './GenericPlot';
@@ -115,8 +115,7 @@ const XYPlot = ({
     const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
     const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
 
-    const xValues = chartData?.[0]?.x;
-    const { minX, maxX } = getAdjustedTimeRange(chartData, normalizedFrom, normalizedTo, xValues.length);
+    const { minX, maxX } = getAdjustedPlotTimelineRange(chartData, normalizedFrom, normalizedTo);
 
     layout.xaxis = merge(layout.xaxis, {
       range: [minX, maxX],
