@@ -27,5 +27,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record GetTaskResponse(@JsonProperty("completed") boolean completed, @JsonProperty("task") Task task,
-                              @JsonProperty("error") TaskError error) {
+                              @JsonProperty("error") TaskError error, @JsonProperty("response") GetTaskSearchResponse response) {
 }

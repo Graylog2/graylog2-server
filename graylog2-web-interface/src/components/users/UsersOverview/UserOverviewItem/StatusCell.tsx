@@ -16,20 +16,21 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
 import { Icon } from 'components/common';
 import Tooltip from 'components/common/Tooltip';
 
 type Props = {
-  authServiceEnabled: $PropertyType<UserOverview, 'authServiceEnabled'>,
-  accountStatus: $PropertyType<UserOverview, 'accountStatus'>,
+  authServiceEnabled: UserOverview['authServiceEnabled'];
+  accountStatus: UserOverview['accountStatus'];
 };
 
-const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-`);
+const Wrapper = styled.div<{ $enabled: boolean }>(
+  ({ theme, $enabled }) => css`
+    color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
+  `,
+);
 
 const Td = styled.td`
   width: 35px;
@@ -38,7 +39,15 @@ const Td = styled.td`
 
 const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
   <Td>
-    <Tooltip withArrow position="right" label={<>{`User is ${accountStatus}`}{!authServiceEnabled ? ' (authentication service is disabled)' : ''}</>}>
+    <Tooltip
+      withArrow
+      position="right"
+      label={
+        <>
+          {`User is ${accountStatus}`}
+          {!authServiceEnabled ? ' (authentication service is disabled)' : ''}
+        </>
+      }>
       <Wrapper $enabled={authServiceEnabled && accountStatus === 'enabled'}>
         <Icon name={accountStatus === 'enabled' ? 'check_circle' : 'cancel'} />
       </Wrapper>

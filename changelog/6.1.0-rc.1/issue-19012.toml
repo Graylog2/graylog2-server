@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing 'unknown format' error on sidecar overview page."
+
+issues = ["19012"]
+pulls = ["19128"]

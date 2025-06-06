@@ -19,20 +19,22 @@ import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetForma
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-const isAggregationWidgetConfig = (config: WidgetConfig): config is AggregationWidgetConfig => config && 'formattingSettings' in config;
+const isAggregationWidgetConfig = (config: WidgetConfig): config is AggregationWidgetConfig =>
+  config && 'formattingSettings' in config;
 
 type Color = string;
 
 export type ColorRule = {
-  widgetId: string,
-  name: string,
-  color: Color,
+  widgetId: string;
+  name: string;
+  color: Color;
 };
 
 const useColorRules = () => {
   const widgets = useWidgets();
 
-  return widgets.valueSeq()
+  return widgets
+    .valueSeq()
     .toArray()
     .flatMap((widget) => {
       const { config } = widget;
@@ -41,7 +43,7 @@ const useColorRules = () => {
       if (isAggregationWidgetConfig(config)) {
         const { chartColors = {} } = config.formattingSettings ?? WidgetFormattingSettings.empty();
 
-        return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value } as ColorRule));
+        return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value }) as ColorRule);
       }
 
       return [];

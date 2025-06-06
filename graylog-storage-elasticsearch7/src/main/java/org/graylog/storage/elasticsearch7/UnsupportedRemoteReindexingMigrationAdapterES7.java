@@ -16,16 +16,25 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
+import java.util.Optional;
 
 public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteReindexingMigrationAdapter {
 
     public static final String UNSUPPORTED_MESSAGE = "This operation should never be called. We remote-reindex into the DataNode that contains OpenSearch. This adapter only exists for API completeness";
+
+    @Override
+    public boolean isMigrationRunning(IndexSet indexSet) {
+        return false; // we'll never run a remote reindex migration against elasticsearch target. It's always OS in datanode.
+    }
 
     @Override
     public String start(RemoteReindexRequest request) {
@@ -33,12 +42,17 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
     }
 
     @Override
-    public RemoteReindexMigration status(String migrationID) {
+    public RemoteReindexMigration status(@Nonnull String migrationID) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
     @Override
-    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password) {
+    public IndexerConnectionCheckResult checkConnection(@Nonnull URI uri, @Nullable String username, @Nullable String password, @Nullable String allowlist, boolean trustUnknownCerts) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return Optional.empty();
     }
 }

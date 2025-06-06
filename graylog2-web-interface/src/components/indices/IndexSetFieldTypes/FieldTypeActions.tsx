@@ -24,63 +24,67 @@ import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/Chang
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
-  fieldType: IndexSetFieldType,
-  indexSetId: string,
-  onSubmitCallback: (props: FieldTypePutResponse) => void,
-}
+  fieldType: IndexSetFieldType;
+  indexSetId: string;
+  onSubmitCallback: (props: FieldTypePutResponse, refetchFieldTypes: () => void) => void;
+};
 
 const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
+  const { refetch: refetchFieldTypes } = useTableFetchContext();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
   const toggleEditModal = () => setShowEditModal((cur) => !cur);
   const showResetButton = hasOverride(fieldType);
+  const productName = useProductName();
 
   return (
     <>
-      <Button onClick={toggleEditModal}
-              role="button"
-              bsSize="xsmall"
-              disabled={fieldType.isReserved}
-              title={`Edit field type for ${fieldType.fieldName}`}
-              tabIndex={0}>
-        Edit {
-        fieldType.isReserved && (
+      <Button
+        onClick={toggleEditModal}
+        role="button"
+        bsSize="xsmall"
+        disabled={fieldType.isReserved}
+        title={`Edit field type for ${fieldType.fieldName}`}
+        tabIndex={0}>
+        Edit{' '}
+        {fieldType.isReserved && (
           <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
             We use reserved fields internally and expect a certain structure from them. Changing the field type for
-            reserved fields might impact the stability of Graylog
+            reserved fields might impact the stability of {productName}
           </HoverForHelp>
-        )
-      }
+        )}
       </Button>
       {showResetButton && (
-        <Button onClick={toggleResetModal}
-                role="button"
-                bsSize="xsmall"
-                title="Reset custom type"
-                tabIndex={0}>
+        <Button onClick={toggleResetModal} role="button" bsSize="xsmall" title="Reset custom type" tabIndex={0}>
           Reset
         </Button>
       )}
       {showResetModal && (
-        <IndexSetCustomFieldTypeRemoveModal show
-                                            fields={[fieldType.fieldName]}
-                                            onClose={toggleResetModal}
-                                            indexSetIds={[indexSetId]} />
+        <IndexSetCustomFieldTypeRemoveModal
+          show
+          fields={[fieldType.fieldName]}
+          onClose={toggleResetModal}
+          indexSetIds={[indexSetId]}
+        />
       )}
       {showEditModal && (
-        <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}
-                              initialData={{
-                                fieldName: fieldType.fieldName,
-                                type: fieldType.type,
-                              }}
-                              onClose={toggleEditModal}
-                              show
-                              showSelectionTable={false}
-                              onSubmitCallback={onSubmitCallback}
-                              showFieldSelect={false} />
+        <ChangeFieldTypeModal
+          initialSelectedIndexSets={[indexSetId]}
+          initialData={{
+            fieldName: fieldType.fieldName,
+            type: fieldType.type,
+          }}
+          onClose={toggleEditModal}
+          show
+          showSelectionTable={false}
+          onSubmitCallback={(newFieldType) => onSubmitCallback(newFieldType, refetchFieldTypes)}
+          showFieldSelect={false}
+        />
       )}
     </>
   );

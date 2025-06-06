@@ -18,6 +18,7 @@ package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
@@ -42,5 +43,4 @@ public abstract class ServerNodeDto extends NodeDto {
         public abstract ServerNodeDto build();
 
     }
-
 }

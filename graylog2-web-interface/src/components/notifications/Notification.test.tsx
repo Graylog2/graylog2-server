@@ -15,73 +15,42 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, act, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
-import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import useNotificationMessage from 'components/notifications/useNotificationMessage';
 
 import Notification from './Notification';
 
 const notificationMessageFixture = {
   title: 'There is a node without any running inputs\n\n',
-  description: '\n<span>\nThere is a node without any running inputs. This means that you are not receiving any messages from this\nnode at this point in time. This is most probably an indication of an error or misconfiguration.\n         You can click <a href="/system/inputs" target="_blank" rel="noreferrer">here</a> to solve this.\n</span>\n',
+  description:
+    '\n<span>\nThere is a node without any running inputs. This means that you are not receiving any messages from this\nnode at this point in time. This is most probably an indication of an error or misconfiguration.\n         You can click <a href="/system/inputs" target="_blank" rel="noreferrer">here</a> to solve this.\n</span>\n',
 };
 const notificationFixture = {
+  id: 'deadbeef',
+  details: {},
+  validations: {},
+  fields: {},
   severity: 'urgent',
   type: 'no_input_running',
   key: 'test',
   timestamp: '2022-12-12T10:55:55.014Z',
   node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
-};
+} as const;
 
-jest.mock('stores/notifications/NotificationsStore', () => ({
-  NotificationsStore: MockStore(
-    ['getInitialState', jest.fn(() => ({
-      messages: {},
-    }))],
-  ),
-  NotificationsActions: {
-    getInitialState: jest.fn(),
-    getHtmlMessage: jest.fn(() => Promise.resolve(notificationMessageFixture)),
-  },
-}
-));
+jest.mock('components/notifications/useNotificationMessage');
 
 describe('<Notification>', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.useRealTimers();
+  beforeEach(() => {
+    asMock(useNotificationMessage).mockReturnValue(notificationMessageFixture);
   });
 
-  test('should render Notification', async () => {
+  test('it render notification message', async () => {
     render(<Notification notification={notificationFixture} />);
 
-    await screen.findByText(/loading\.\.\./i);
-
-    await waitFor(() => expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(notificationFixture.type, notificationFixture.key, NotificationsFactory.getValuesForNotification(notificationFixture)));
-  });
-
-  test('should render notification message', async () => {
-    jest.useFakeTimers();
-
-    asMock(NotificationsStore.getInitialState).mockReturnValue({
-      messages: { [`${notificationFixture.type}-${notificationFixture.key}`]: notificationMessageFixture },
-      total: 1,
-      notifications: [notificationFixture],
-    });
-
-    render(<Notification notification={notificationFixture} />);
-
-    act(() => {
-      jest.advanceTimersByTime(100);
-    });
-
-    const alert = screen.getByRole('alert', {
+    await screen.findByRole('alert', {
       name: /there is a node without any running inputs/i,
     });
-
-    await waitFor(() => expect(alert).toBeInTheDocument());
   });
 });

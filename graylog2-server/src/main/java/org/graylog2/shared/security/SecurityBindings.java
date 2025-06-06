@@ -26,7 +26,6 @@ import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.UserSessionTerminationService;
-import org.graylog2.security.encryption.EncryptedValueService;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -34,7 +33,6 @@ import javax.net.ssl.X509TrustManager;
 public class SecurityBindings extends PluginModule {
     @Override
     protected void configure() {
-        bind(EncryptedValueService.class).asEagerSingleton();
         bind(Permissions.class).asEagerSingleton();
         bind(SessionCreator.class).in(Scopes.SINGLETON);
         addPermissions(RestPermissions.class);

@@ -48,13 +48,14 @@ const verbalMatchingType = (matchingType: 'OR' | 'AND') => {
 };
 
 type Props = {
-  stream: Stream
-}
+  stream: Stream;
+};
 
 const ExpandedRulesSection = ({ stream }: Props) => (
   <>
     <p>
-      Must match {verbalMatchingType(stream.matching_type)} of the {stream.rules.length} configured stream <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
+      Must match {verbalMatchingType(stream.matching_type)} of the {stream.rules.length} configured stream{' '}
+      <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
     </p>
     <StreamRuleList stream={stream} />
   </>

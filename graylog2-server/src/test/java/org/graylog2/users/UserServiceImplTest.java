@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -86,22 +87,24 @@ public class UserServiceImplTest {
     private EventBus serverEventBus;
     @Mock
     private PermissionAndRoleResolver permissionAndRoleResolver;
+    @Mock
+    private ClusterConfigService configService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.mongoConnection = mongodb.mongoConnection();
         this.configuration = new Configuration();
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
-        this.userFactory = new UserImplFactory(configuration, permissions);
+        this.userFactory = new UserImplFactory(configuration, permissions, configService);
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
                 userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
 
-        when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
+        lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoad() throws Exception {
+    public void testLoad() {
         final User user = userService.load("user1");
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("user1");
@@ -110,7 +113,7 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoadByUserId() throws Exception {
+    public void testLoadByUserId() {
         final User user = userService.loadById("54e3deadbeefdeadbeef0001");
         assertThat(user).isNotNull();
         assertThat(user.getId()).isEqualTo("54e3deadbeefdeadbeef0001");
@@ -120,7 +123,7 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoadByUserIds() throws Exception {
+    public void testLoadByUserIds() {
         final List<User> users = userService.loadByIds(ImmutableSet.of(
                 "54e3deadbeefdeadbeef0001",
                 "54e3deadbeefdeadbeef0002",
@@ -144,7 +147,7 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoadByUserIdsWithAdminOnly() throws Exception {
+    public void testLoadByUserIdsWithAdminOnly() {
         final List<User> users = userService.loadByIds(ImmutableSet.of(
                 UserImpl.LocalAdminUser.LOCAL_ADMIN_ID
         ));
@@ -158,13 +161,13 @@ public class UserServiceImplTest {
 
     @Test(expected = RuntimeException.class)
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoadDuplicateUser() throws Exception {
+    public void testLoadDuplicateUser() {
         userService.load("user-duplicate");
     }
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoadByAuthServiceUidOrUsername() throws Exception {
+    public void testLoadByAuthServiceUidOrUsername() {
         final Optional<User> byAuthServiceUid = userService.loadByAuthServiceUidOrUsername("NmIxY2E3ZWQtMTk3NC00NGM4LTkwOTYtN2Q3OTBlM2Y2MjRmCg==", "external-user1");
 
         assertThat(byAuthServiceUid).get().satisfies(user -> {
@@ -196,7 +199,7 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testDeleteByName() throws Exception {
+    public void testDeleteByName() {
         assertThat(userService.delete("user1")).isEqualTo(1);
         assertThat(userService.delete("user-duplicate")).isEqualTo(2);
         assertThat(userService.delete("user-does-not-exist")).isEqualTo(0);
@@ -204,7 +207,7 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testDeleteById() throws Exception {
+    public void testDeleteById() {
         assertThat(userService.deleteById("54e3deadbeefdeadbeef0001")).isEqualTo(1);
         assertThat(userService.deleteById("54e3deadbeefdeadbeef0003")).isEqualTo(1);
         assertThat(userService.deleteById("00000eadbeefdeadbee00000")).isEqualTo(0);
@@ -212,13 +215,15 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testLoadAll() throws Exception {
+    public void testLoadAll() {
         assertThat(userService.loadAll()).hasSize(5);
     }
 
     @Test
     public void testSave() throws Exception {
-        final User user = userService.create();
+        final UserImpl user = (UserImpl) userService.create();
+        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
         user.setName("TEST");
         user.setFullName("TEST");
         user.setEmail("test@example.com");
@@ -239,7 +244,9 @@ public class UserServiceImplTest {
 
     @Test
     public void testSaveNoFullNameSuccess() throws Exception {
-        final User user = userService.create();
+        final UserImpl user = (UserImpl) userService.create();
+        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
         user.setName("TEST");
         user.setEmail("test@example.com");
         user.setTimeZone(DateTimeZone.UTC);
@@ -250,7 +257,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testGetAdminUser() throws Exception {
+    public void testGetAdminUser() {
         assertThat(userService.getAdminUser().getName()).isEqualTo(configuration.getRootUsername());
         assertThat(userService.getAdminUser().getEmail()).isEqualTo(configuration.getRootEmail());
         assertThat(userService.getAdminUser().getTimeZone()).isEqualTo(configuration.getRootTimeZone());
@@ -258,7 +265,7 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testCount() throws Exception {
+    public void testCount() {
         assertThat(userService.count()).isEqualTo(5L);
     }
 
@@ -266,27 +273,29 @@ public class UserServiceImplTest {
         private final Configuration configuration;
         private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
+        private final ClusterConfigService configService;
 
-        public UserImplFactory(Configuration configuration, Permissions permissions) {
+        public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
             this.configuration = configuration;
             this.permissions = permissions;
+            this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
         }
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, id, fields);
         }
 
         @Override
         public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
-            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, mock(ClusterConfigService.class), adminRoleObjectId);
+            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, configService, adminRoleObjectId);
         }
     }
 
@@ -301,7 +310,7 @@ public class UserServiceImplTest {
 
     @Test
     public void testGetRoleNames() throws Exception {
-        final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions);
+        final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions, configService);
         final UserImpl user = factory.create(new HashMap<>());
         final Role role = createRole("Foo");
 
@@ -320,17 +329,19 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testGetPermissionsForUser() throws Exception {
+    public void testGetPermissionsForUser() {
         final InMemoryRolePermissionResolver permissionResolver = mock(InMemoryRolePermissionResolver.class);
         final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
         final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService,
                 accessTokenService, userFactory, permissionResolver,
                 serverEventBus, grnRegistry, permissionAndRoleResolver);
 
-        final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions);
+        final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions, configService);
         final UserImpl user = factory.create(new HashMap<>());
         user.setName("user");
         final Role role = createRole("Foo");
+
+        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         user.setRoleIds(Collections.singleton(role.getId()));
         user.setPermissions(Collections.singletonList("hello:world"));
@@ -349,6 +360,6 @@ public class UserServiceImplTest {
 
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof CaseSensitiveWildcardPermission ? p.toString() : p).collect(Collectors.toSet()))
                 .containsExactlyInAnyOrder("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
-                        "users:tokencreate:user", "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
+                        "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
     }
 }

@@ -20,11 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class SavedSearch {
+public abstract class SavedSearch implements MongoEntity {
     public abstract String id();
     public abstract String title();
     public abstract Query query();

@@ -25,11 +25,13 @@ import BooleanField from './BooleanField';
 
 describe('<BooleanField>', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof BooleanField>>) => (
-    <BooleanField field={booleanField}
-                  onChange={() => {}}
-                  title="example_boolean_field"
-                  typeName="boolean"
-                  {...props} />
+    <BooleanField
+      field={booleanField}
+      onChange={() => {}}
+      title="example_boolean_field"
+      typeName="boolean"
+      {...props}
+    />
   );
 
   afterEach(() => {

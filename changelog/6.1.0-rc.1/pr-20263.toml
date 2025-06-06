@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed issue where grok_exists pipeline rule would return true for substrings of pattern names."
+
+issues = ["20264"]
+pulls = ["20263"]

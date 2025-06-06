@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
+import java.util.Set;
 
 public interface Event extends Indexable {
     @Override
@@ -105,6 +106,8 @@ public interface Event extends Indexable {
     OptionalDouble getScore(String name);
 
     void setScore(String name, double riskScore);
+
+    void addAssociatedAssets(Set<String> associatedAssets);
 
     EventDto toDto();
 

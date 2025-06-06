@@ -17,79 +17,128 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Col, Row, Panel } from 'components/bootstrap';
+import { Col, Row, Panel, Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
-import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
+import AppConfig from 'util/AppConfig';
+import useProductName from 'brand-customization/useProductName';
+
+import useIsElasticsearch from '../hooks/useIsElasticsearch';
 
 const Headline = styled.h2`
   margin-top: 5px;
   margin-bottom: 10px;
 `;
 
-export const StyledPanel = styled(Panel)<{ bsStyle: string }>(({ bsStyle = 'default', theme }) => css`
-  &.panel {
-    background-color: ${theme.colors.global.contentBackground};
+export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
+  ({ bsStyle = 'default', theme }) => css`
+    &.panel {
+      background-color: ${theme.colors.global.contentBackground};
 
-    .panel-heading {
-      color: ${theme.colors.variant.darker[bsStyle]};
+      .panel-heading {
+        color: ${theme.colors.variant.darker[bsStyle]};
+      }
     }
-  }
-`);
+  `,
+);
 
 const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
-  <Row>
-    <Col md={6}>
-      <MigrationError errorMessage={currentStep.error_message} />
-      <Headline>Data Nodes Migration</Headline>
-      <p>
-        The Graylog Data Node is a management component designed to configure and optimize OpenSearch for use with Graylog, reducing administrative overhead and simplifying future updates.
-      </p>
-      <p>Deployments earlier than v5.2 or that opted to not install with a Data Node will need to migrate the message databases to Data Nodes.</p>
-      <p>
-        This migration tool will check the compatibility of your components and guide you through to migrate your existing OpenSearch data to a Data Node.<br />
-      </p>
-      <p>Migrating to Data Node will require some steps to be performed on the OS, within your current OS/ES cluster, and in your configuration files.</p>
-      <p>You can get more information on the Data Node migration <DocumentationLink page="graylog-data-node" text="documentation" />.</p>
-      <br />
-      <MigrationDatanodeList />
-      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
-    </Col>
-    <Col md={6}>
-      <StyledHelpPanel bsStyle="info">
-        <Panel.Heading>
-          <Panel.Title componentClass="h3"><Icon name="info" /> Migrating Elasticsearch 7.10</Panel.Title>
-        </Panel.Heading>
-        <Panel.Body>
-          <p>Migration from <code>Elasticsearch 7.10</code> needs an additional step. ES 7.10 does not understand JWT
-            authentication.
-            So you will need to first migrate to OpenSearch before running the update of the security information. Please find more information in our <DocumentationLink page="graylog-data-node" text="documentation" />.
-          </p>
-          <h5>Migrating an OpenSearch Cluster</h5>
-          <p>
-            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform an In-Place migration of your existing cluster into the Data Node, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
-          </p>
-          <p>
-            Enable JWT authentication in <code>opensearch-security/config.yml</code> (section <code>jwt_auth_domain</code>, <code>http_enabled: true</code>, <code>transport_enabled: true</code>)
-            Add the signing key by converting the <code>GRAYLOG_PASSWORD_SECRET</code> to <code>base64</code> e.g. by doing <code>echo `&quot;`The password secret you chose`&quot;` | base64</code> and put it into the <code>signing_key</code> line
-          </p>
-          <h5>Usage of certificates</h5>
-          <p>
-            If your existing cluster uses certificates, by default these will get replaced with the Graylog CA and automatically generated certificates during provisioning of the Data Nodes. If you have to reuse your own certificates, please read the <DocumentationLink page="graylog-data-node" text="documentation" /> on how to include your own CA/certificates in Graylog/DataNode
-          </p>
-        </Panel.Body>
-      </StyledHelpPanel>
-      <InPlaceMigrationInfo />
-    </Col>
-  </Row>
-);
+const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const isElasticsearch = useIsElasticsearch();
+  const isRemoteReindexingEnabled = AppConfig.isFeatureEnabled('remote_reindex_migration');
+  const productName = useProductName();
+
+  return (
+    <Row>
+      <Col md={isRemoteReindexingEnabled ? 6 : 12}>
+        {isElasticsearch && !isRemoteReindexingEnabled && (
+          <Alert bsStyle="warning">
+            Incompatible search backend. Please upgrade to OpenSearch to be able to use the migration wizard.
+          </Alert>
+        )}
+        <MigrationError errorMessage={currentStep.error_message} />
+        <Headline>Data Nodes Migration</Headline>
+        <p>
+          The {productName} Data Node is a management component designed to configure and optimize OpenSearch for use
+          with {productName}, reducing administrative overhead and simplifying future updates.
+        </p>
+        <p>
+          Deployments earlier than v5.2 or that opted to not install with a Data Node will need to migrate the message
+          databases to Data Nodes.
+        </p>
+        <p>
+          This migration tool will check the compatibility of your components and guide you through to migrate your
+          existing OpenSearch data to a Data Node.
+          <br />
+        </p>
+        <p>
+          Migrating to Data Node will require some steps to be performed on the OS, within your current OS/ES cluster,
+          and in your configuration files.
+        </p>
+        <p>
+          You can get more information on the Data Node migration{' '}
+          <DocumentationLink page="graylog-data-node" text="documentation" />.
+        </p>
+        <br />
+        <MigrationDatanodeList />
+        {!(isElasticsearch && !isRemoteReindexingEnabled) && (
+          <MigrationStepTriggerButtonToolbar
+            hidden={hideActions}
+            nextSteps={currentStep.next_steps}
+            onTriggerStep={onTriggerStep}
+          />
+        )}
+      </Col>
+      {isRemoteReindexingEnabled && (
+        <Col md={6}>
+          <StyledHelpPanel bsStyle="info">
+            <Panel.Heading>
+              <Panel.Title componentClass="h3">
+                <Icon name="info" /> Methods for migration
+              </Panel.Title>
+            </Panel.Heading>
+            <Panel.Body>
+              <p>
+                During the migration, you can choose between two options for migrating your existing ElasticSearch or
+                OpenSearch data to the data nodes. You should choose between them based on your individual prerequisites
+                and requirements.
+              </p>
+              <p>
+                If you are already running <code>OpenSearch (1.x or 2.x)</code> as your search backend, you can choose{' '}
+                <code>in-place migration</code>. In this migration scenario, the data node’s OpenSearch will use the
+                existing data directory of OpenSearch to serve all data previously available in your existing
+                OpenSearch. This is the recommended method if you want to quickly migrate to data node.
+              </p>
+              <p>
+                If you want to selectively migrate data (e.g. if you use your search backend non-exclusively for{' '}
+                {productName}), you should choose the <code>remote reindexing migration</code>. In this scenario, all
+                data will be copied from your existing search backend to data node’s OpenSearch. Depending on your
+                setup, this can take some time and imposes additional disk space for the copied data to be available.
+                During the remote reindexing, {productName} is ingesting data into data node and can be used, but will
+                only serve the data from the old search backend as it becomes available.
+              </p>
+              <p>
+                If you are running <code>ElasticSearch</code> as your search backend{' '}
+                <code>remote reindexing migration</code> will automatically be chosen.
+              </p>
+              <p>
+                If you don’t plan to migrate any existing data or only want to migrate a small subset of data we
+                recommend you choose the remote reindexing migration and either skip the data migration or choose only
+                the selected indices for migration.
+              </p>
+            </Panel.Body>
+          </StyledHelpPanel>
+        </Col>
+      )}
+    </Row>
+  );
+};
 
 export default MigrationWelcomeStep;

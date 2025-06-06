@@ -66,4 +66,11 @@ export const customRole = Role.builder()
   .readOnly(false)
   .build();
 
-export const rolesList = Immutable.List<Role>([manager, alertsManager, viewsManager, reader, reportCreator, customRole]);
+export const rolesList = Immutable.List<Role>([
+  manager,
+  alertsManager,
+  viewsManager,
+  reader,
+  reportCreator,
+  customRole,
+]);

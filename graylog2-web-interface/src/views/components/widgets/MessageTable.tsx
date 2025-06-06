@@ -15,17 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import { useContext, useState, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
@@ -33,79 +31,83 @@ import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+const Table = styled.table(
+  ({ theme }) => css`
+    position: relative;
+    font-size: ${theme.fonts.size.small};
+    margin: 0;
+    border-collapse: collapse;
+    width: 100%;
+    word-break: break-all;
 
-const Table = styled.table(({ theme }) => css`
-  position: relative;
-  font-size: ${theme.fonts.size.small};
-  margin: 0;
-  border-collapse: collapse;
-  width: 100%;
-  word-break: break-all;
-
-  > tbody > tr > td {
-    border-color: ${theme.colors.table.row.border};
-  }
-
-  @media print {
-    font-size: ${theme.fonts.size.body};
-    padding-left: 0;
-    min-width: 50%;
-
-    th {
-      font-weight: bold !important;
-      font-size: inherit !important;
-      white-space: break-spaces !important;
-      word-break: break-all !important;
+    > tbody > tr > td {
+      border-color: ${theme.colors.table.row.divider};
     }
 
-    th,
-    td {
-      border: 1px ${theme.colors.gray[80]} solid !important;
-      left: 0;
-      padding: 5px !important;
-      position: static;
+    @media print {
+      font-size: ${theme.fonts.size.body};
+      padding-left: 0;
+      min-width: 50%;
+
+      th {
+        font-weight: bold !important;
+        font-size: inherit !important;
+        white-space: break-spaces !important;
+        word-break: break-all !important;
+      }
+
+      th,
+      td {
+        border: 1px ${theme.colors.gray[80]} solid !important;
+        left: 0;
+        padding: 5px !important;
+        position: static;
+      }
     }
-  }
-`);
+  `,
+);
 
-const TableWrapper = styled.div(({ theme }) => css`
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
+const TableWrapper = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 
-  /* Fixes overflow of children with position: fixed */
-  clip-path: inset(0 0 0 0);
+    /* Fixes overflow of children with position: fixed */
+    clip-path: inset(0 0 0 0);
 
-  @media screen and (max-width: ${theme.breakpoints.max.md}) {
-    &.table-responsive {
-      overflow-y: auto;
+    @media screen and (max-width: ${theme.breakpoints.max.md}) {
+      &.table-responsive {
+        overflow-y: auto;
+      }
     }
-  }
-`);
+  `,
+);
 
 type Props = {
-  activeQueryId: string,
-  config: MessagesWidgetConfig,
-  fields: Immutable.List<FieldTypeMapping>,
-  messages: Array<BackendMessage>,
-  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>,
-  scrollContainerRef: React.MutableRefObject<HTMLDivElement>,
-  setLoadingState: (loading: boolean) => void,
+  activeQueryId: string;
+  config: MessagesWidgetConfig;
+  fields: Immutable.List<FieldTypeMapping>;
+  messages: Array<BackendMessage>;
+  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>;
+  scrollContainerRef: React.MutableRefObject<HTMLDivElement>;
+  setLoadingState: (loading: boolean) => void;
 };
 
-const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => ((fields
-  && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
+const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
+  ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
 
-const _getFormattedMessages = (messages): Array<Message> => messages.map((m) => ({
-  fields: m.message,
-  formatted_fields: MessageFieldsFilter.filterFields(m.message),
-  id: m.message._id,
-  index: m.index,
-  highlight_ranges: m.highlight_ranges,
-  decoration_stats: m.decoration_stats,
-}));
+const _getFormattedMessages = (messages: Array<BackendMessage>): Array<Message> =>
+  messages.map((m) => ({
+    fields: m.message,
+    formatted_fields: MessageFieldsFilter.filterFields(m.message),
+    id: m.message._id,
+    index: m.index,
+    highlight_ranges: m.highlight_ranges,
+    decoration_stats: m.decoration_stats,
+  }));
 
 const _toggleMessageDetail = (
   id: string,
@@ -125,12 +127,27 @@ const _toggleMessageDetail = (
   setExpandedMessages(newSet);
 };
 
-const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState, scrollContainerRef }: Props) => {
+const MessageTable = ({
+  fields,
+  activeQueryId,
+  messages,
+  config,
+  onSortChange,
+  setLoadingState,
+  scrollContainerRef,
+}: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
-  const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages, stopAutoRefresh), [expandedMessages, stopAutoRefresh]);
+  const interactive = useContext(InteractiveContext);
+  const toggleDetail = useMemo(
+    () =>
+      interactive
+        ? (id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages, stopAutoRefresh)
+        : () => {},
+    [expandedMessages, interactive, stopAutoRefresh],
+  );
 
   return (
     <MessageTableProviders>
@@ -138,58 +155,52 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
         <Table className="table table-condensed">
           <TableHead>
             <tr>
-              {selectedFields.toSeq().map((selectedFieldName) => {
-                const type = _fieldTypeFor(selectedFieldName, fields);
-                const isCompound = type.isCompound();
+              {selectedFields
+                .toSeq()
+                .map((selectedFieldName) => {
+                  const type = _fieldTypeFor(selectedFieldName, fields);
+                  const isCompound = type.isCompound();
 
-                return (
-                  <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
-                    <Field type={type}
-                           name={selectedFieldName}
-                           queryId={activeQueryId}>
-                      {selectedFieldName}
-                    </Field>
-                    <InteractiveContext.Consumer>
-                      {(interactive) => (interactive && !isCompound && (
-                        <FieldSortIcon fieldName={selectedFieldName}
-                                       onSortChange={onSortChange}
-                                       setLoadingState={setLoadingState}
-                                       config={config} />
-                      ))}
-                    </InteractiveContext.Consumer>
-                  </TableHeaderCell>
-                );
-              }).toArray()}
+                  return (
+                    <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
+                      <Field type={type} name={selectedFieldName} queryId={activeQueryId}>
+                        {selectedFieldName}
+                      </Field>
+                      {interactive && !isCompound && (
+                        <FieldSortIcon
+                          fieldName={selectedFieldName}
+                          onSortChange={onSortChange}
+                          setLoadingState={setLoadingState}
+                          config={config}
+                        />
+                      )}
+                    </TableHeaderCell>
+                  );
+                })
+                .toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {
             const messageKey = `${message.index}-${message.id}`;
 
             return (
-              <MessageTableEntry fields={fields}
-                                 key={messageKey}
-                                 message={message}
-                                 config={config}
-                                 showMessageRow={config?.showMessageRow}
-                                 selectedFields={selectedFields}
-                                 expanded={expandedMessages.contains(messageKey)}
-                                 toggleDetail={toggleDetail}
-                                 expandAllRenderAsync={false} />
+              <MessageTableEntry
+                fields={fields}
+                key={messageKey}
+                message={message}
+                config={config}
+                showMessageRow={config?.showMessageRow}
+                selectedFields={selectedFields}
+                expanded={expandedMessages.contains(messageKey)}
+                toggleDetail={toggleDetail}
+                expandAllRenderAsync={false}
+              />
             );
           })}
         </Table>
       </TableWrapper>
     </MessageTableProviders>
   );
-};
-
-MessageTable.propTypes = {
-  activeQueryId: PropTypes.string.isRequired,
-  config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  setLoadingState: PropTypes.func.isRequired,
 };
 
 export default React.memo(MessageTable);

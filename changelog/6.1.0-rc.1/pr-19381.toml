@@ -1,0 +1,5 @@
+type = "Added"
+message = "Add possibility to select an index set template when creating an index set."
+
+issues = ["19075"]
+pulls = ["19381", "graylog-plugin-enterprise#7363"]

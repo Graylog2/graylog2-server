@@ -1,0 +1,4 @@
+type = "c"
+message = "Refer to official AWS Kinesis/Cloudwatch input for permissions on first page of input setup."
+
+pulls = ["21755"]

@@ -70,6 +70,15 @@ public class FailureBatch {
     }
 
     /**
+     * @param inputFailures a list of input failures to include in this batch
+     * @return a batch of input failures
+     * @throws IllegalArgumentException if not all failures are instances of {@link InputFailure}
+     */
+    public static FailureBatch inputFailureBatch(List<InputFailure> inputFailures) {
+        return new FailureBatch(inputFailures, InputFailure.class);
+    }
+
+    /**
      * @return a list of failures within the batch. The returned collection is immutable.
      */
     public List<? extends Failure> getFailures() {
@@ -102,6 +111,13 @@ public class FailureBatch {
      */
     public boolean containsProcessingFailures() {
         return getFailureClass().equals(ProcessingFailure.class);
+    }
+
+    /**
+     * @return true if the batch contains input failures.
+     */
+    public boolean containsInputFailures() {
+        return getFailureClass().equals(InputFailure.class);
     }
 
     @Override

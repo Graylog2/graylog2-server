@@ -15,29 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 
 export type TrendPreference = 'LOWER' | 'NEUTRAL' | 'HIGHER';
 
 type InternalState = {
-  trend: boolean,
-  trendPreference: TrendPreference,
+  trend: boolean;
+  trendPreference: TrendPreference;
 };
 
 export type NumberVisualizationConfigJSON = {
-  trend: boolean,
-  trend_preference: TrendPreference,
+  trend: boolean;
+  trend_preference: TrendPreference;
 };
 
 export default class NumberVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
 
-  constructor(
-    trend: $PropertyType<InternalState, 'trend'>,
-    trendPreference: $PropertyType<InternalState, 'trendPreference'>,
-  ) {
+  constructor(trend: InternalState['trend'], trendPreference: InternalState['trendPreference']) {
     super();
     this._value = { trend, trendPreference };
   }
@@ -55,10 +51,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(
-    trend: $PropertyType<InternalState, 'trend'> = false,
-    lowerIsBetter: $PropertyType<InternalState, 'trendPreference'> = 'NEUTRAL',
-  ) {
+  static create(trend: InternalState['trend'] = false, lowerIsBetter: InternalState['trendPreference'] = 'NEUTRAL') {
     return new NumberVisualizationConfig(trend, lowerIsBetter);
   }
 
@@ -95,11 +88,11 @@ class Builder {
     this.value = value;
   }
 
-  trend(value: $PropertyType<InternalState, 'trend'>) {
+  trend(value: InternalState['trend']) {
     return new Builder(this.value.set('trend', value));
   }
 
-  trendPreference(value: $PropertyType<InternalState, 'trendPreference'>): Builder {
+  trendPreference(value: InternalState['trendPreference']): Builder {
     return new Builder(this.value.set('trendPreference', value));
   }
 

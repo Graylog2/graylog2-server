@@ -16,11 +16,11 @@
  */
 package org.graylog2.contentpacks.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog2.contentpacks.model.constraints.Constraint;
 
-import java.util.Set;
+import java.net.URI;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = Versioned.FIELD_META_VERSION, defaultImpl = LegacyContentPack.class)
 @JsonSubTypes({
@@ -30,4 +30,19 @@ import java.util.Set;
 public interface ContentPack extends Identified, Revisioned, Versioned {
     interface ContentPackBuilder<SELF> extends IdBuilder<SELF>, RevisionBuilder<SELF>, VersionBuilder<SELF> {
     }
+
+    @JsonProperty
+    String name();
+
+    @JsonProperty
+    String description();
+
+    @JsonProperty
+    String summary();
+
+    @JsonProperty
+    URI url();
+
+    @JsonProperty
+    String vendor();
 }

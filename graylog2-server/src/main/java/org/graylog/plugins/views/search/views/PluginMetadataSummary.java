@@ -68,6 +68,6 @@ public abstract class PluginMetadataSummary {
             @JsonProperty("version") String version,
             @JsonProperty("description") String description
     ) {
-        return new AutoValue_PluginMetadataSummary(uniqueId, name, author, url, Version.valueOf(version), description);
+        return new AutoValue_PluginMetadataSummary(uniqueId, name, author, url, Version.parse(version), description);
     }
 }

@@ -1,0 +1,5 @@
+type = "f"
+message = "Add default auto refresh config on events and alerts page"
+
+issues = ["21350"]
+pulls = ["21351"]

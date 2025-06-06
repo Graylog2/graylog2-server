@@ -1,0 +1,530 @@
+openapi: "3.1.0"
+info:
+  title: "Stream Destination Filters"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8080/api"
+
+paths:
+  /streams/{streamId}/destinations/filters:
+    parameters:
+      - in: "path"
+        name: "streamId"
+        description: "The stream ID"
+        schema:
+          type: "string"
+        required: true
+
+    get:
+      summary: "Get available filters for stream"
+      parameters:
+        - $ref: "#/components/parameters/query"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+      responses:
+        200:
+          description: "Available filters"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationInfo"
+                  - type: "object"
+                    properties:
+                      elements:
+                        $ref: "#/components/schemas/StreamDestinationFilterRule"
+
+    post:
+      summary: "Create new filter rule for stream"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StreamDestinationFilterRule"
+      responses:
+        200:
+          description: "Newly created filter rule"
+          content:
+            application/json:
+              schema:
+                properties:
+                  filter:
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
+
+  /streams/{streamId}/destinations/target/{targetId}/filters:
+    parameters:
+      - in: "path"
+        name: "streamId"
+        description: "The stream ID"
+        schema:
+          type: "string"
+        required: true
+      - in: "path"
+        name: "targetId"
+        description: "The target ID"
+        schema:
+          type: "string"
+        required: true
+
+    get:
+      summary: "Get available filters for stream and target"
+      parameters:
+        - $ref: "#/components/parameters/query"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+      responses:
+        200:
+          description: "Available filters"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationInfo"
+                  - type: "object"
+                    properties:
+                      elements:
+                        $ref: "#/components/schemas/StreamDestinationFilterRule"
+
+  /streams/{streamId}/destinations/filters/{filterId}:
+    parameters:
+      - in: "path"
+        name: "streamId"
+        description: "The stream ID"
+        schema:
+          type: "string"
+        required: true
+      - in: "path"
+        name: "filterId"
+        description: "The stream destination filter ID"
+        schema:
+          type: "string"
+        required: true
+
+    get:
+      summary: "Get stream destination filter"
+      responses:
+        200:
+          description: "The stream destination filter"
+          content:
+            application/json:
+              schema:
+                properties:
+                  filter:
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
+
+    put:
+      summary: "Update stream destination filter"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StreamDestinationFilterRule"
+      responses:
+        200:
+          description: "The updated stream destination filter"
+          content:
+            application/json:
+              schema:
+                properties:
+                  filter:
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
+
+    delete:
+      summary: "Delete stream destination filter"
+      responses:
+        200:
+          description: "The deleted stream destination filter"
+          content:
+            application/json:
+              schema:
+                properties:
+                  filter:
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
+
+  /streams/destinations/filters/builder/conditions:
+    get:
+      summary: "Return available conditions"
+      responses:
+        200:
+          description: "Conditions"
+          content:
+            application/json:
+              schema:
+                properties:
+                  conditions:
+                    type: "array"
+                    conditions:
+                      $ref: "#/components/schemas/RuleBuilderFunction"
+
+  /streams/destinations/filters/builder/validate:
+    post:
+      summary: "Validates the given rule builder"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RuleBuilderDTO"
+      responses:
+        200:
+          description: "Validated rule builder"
+          content:
+            application/json:
+              schema:
+                properties:
+                  rule_builder:
+                    $ref: "#/components/schemas/RuleBuilderDTO"
+
+  /streams/destinations/filters/builder/simulate:
+    post:
+      summary: "Run the simulator for the given rule and message"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "message"
+                - "rule_builder_dto"
+              properties:
+                message:
+                  type: "string"
+                rule_builder_dto:
+                  $ref: "#/components/schemas/RuleBuilderDTO"
+      responses:
+        200:
+          description: "Simulator result"
+          content:
+            application/json:
+              schema:
+                properties:
+                  result:
+                    type: "object"
+                    default:
+                      source: "localhost"
+                      timestamp: "2024-06-25T12:23:00.000Z"
+                      message: "A message"
+
+components:
+  parameters:
+    page:
+      in: "query"
+      name: "page"
+      description: "The page to return"
+      required: false
+      schema:
+        type: "integer"
+        default: 1
+    per_page:
+      in: "query"
+      name: "per_page"
+      description: "The number of items per page"
+      required: false
+      schema:
+        type: "integer"
+        default: 20
+    query:
+      in: "query"
+      name: "query"
+      description: "The filter query"
+      required: false
+      schema:
+        type: "string"
+        default: ""
+    sort:
+      in: "query"
+      name: "sort"
+      description: "The field to sort on"
+      required: false
+      schema:
+        type: "string"
+        default: "title"
+    order:
+      in: "query"
+      name: "order"
+      description: "The sort order"
+      required: false
+      schema:
+        type: "string"
+        default: "ASC"
+        enum:
+          - "ASC"
+          - "DESC"
+
+  schemas:
+    ##########################################################################################################
+    ## New types
+    ##########################################################################################################
+    StreamDestinationFilterRule:
+      type: "object"
+      required:
+        - "id"
+        - "stream_id"
+        - "destination_type"
+        - "title"
+        - "rule"
+      properties:
+        id:
+          type: "string"
+          description: "The database ID"
+        stream_id:
+          type: "string"
+          description: "The associated stream ID"
+        destination_type:
+          type: "string"
+          description: "The destination type"
+          enum:
+            - "indexer"
+            - "data-warehouse"
+        title:
+          type: "string"
+          description: "The filter title"
+        description:
+          type: "string"
+          description: "The filter description"
+        status:
+          type: "string"
+          description: "The filter status"
+          enum:
+            - "enabled"
+            - "disabled"
+        rule:
+          $ref: "#/components/schemas/RuleBuilder"
+      example:
+        id: "6666dadd4dfc4e7c263a7900"
+        stream_id: "6666df991ca760793bf0fd56"
+        destination_type: "indexer"
+        title: "Skip debug messages"
+        status: "enabled"
+        rule:
+          operator: "OR"
+          conditions:
+            - id: "condition-1"
+              function: "has_field"
+              params:
+                field: "is_debug"
+              negate: false
+            - id: "condition-2"
+              function: "has_field"
+              params:
+                field: "msg_is_debug"
+              negate: false
+
+    ##########################################################################################################
+    ## Existing types
+    ##########################################################################################################
+    RuleBuilderFunction:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        pure:
+          type: "boolean"
+        return_type:
+          type: "string"
+        params:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/RuleBuilderFunctionParam"
+        rule_builder_enabled:
+          type: "boolean"
+        rule_builder_title:
+          type: "string"
+        rule_builder_name:
+          type: "string"
+      example:
+        name: "set_field"
+        description: ""
+        pure: false
+        return_type: "java.lang.Void"
+        params:
+          - name: "field"
+            description: "the new field name"
+            type: "java.lang.String"
+            transformed_type: "java.lang.String"
+            optional: false
+            default_value: null
+            rule_builder_variable: false
+            allow_negatives: false
+
+    RuleBuilderFunctionParam:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        type:
+          type: "string"
+        transformed_type:
+          type: "string"
+        optional:
+          type: "boolean"
+        default_value:
+          type: "string"
+        rule_builder_variable:
+          type: "boolean"
+        allow_negatives:
+          type: "boolean"
+      example:
+        name: "field"
+        description: "the new field name"
+        type: "java.lang.String"
+        transformed_type: "java.lang.String"
+        optional: false
+        default_value: null
+        rule_builder_variable: false
+        allow_negatives: false
+
+    RuleBuilderDTO:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        title:
+          type: "string"
+        description:
+          type: "string"
+        source:
+          type: "string"
+        rule_builder:
+          $ref: "#/components/schemas/RuleBuilder"
+        simulator_message:
+          type: "string"
+        created_at:
+          type: "string"
+          format: "date-time"
+        modified_at:
+          type: "string"
+          format: "date-time"
+
+    RuleBuilder:
+      type: "object"
+      properties:
+        operator:
+          type: "string"
+          description: "The operator to use to evaluate the conditions"
+          default: "AND"
+          enum:
+            - "AND"
+            - "OR"
+        conditions:
+          type: "array"
+          description: "The conditions array"
+          items:
+            $ref: "#/components/schemas/RuleBuilderStep"
+
+    RuleBuilderStep:
+      type: "object"
+      required:
+        - "id"
+        - "function"
+        - "parameters"
+      properties:
+        id:
+          type: "string"
+          description: "The condition ID"
+        function:
+          type: "string"
+          description: "The function name"
+        params:
+          type: "object"
+          description: "The named function parameters"
+        negate:
+          type: "boolean"
+          description: "Whether to negate the condition"
+          default: false
+        operator:
+          type: "string"
+          description: "The operator to use to evaluate the nested conditions"
+          default: "AND"
+          enum:
+            - "AND"
+            - "OR"
+        conditions:
+          type: "array"
+          description: "The nested conditions array"
+          items:
+            $ref: "#/components/schemas/RuleBuilderStep"
+      example:
+        id: "condition-1"
+        function: "has_field"
+        params:
+          field: "source"
+        negate: false
+        operator: "AND"
+        conditions: []
+
+    PaginationInfo:
+      type: "object"
+      properties:
+        attributes:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+                default: "title"
+              title:
+                type: "string"
+                default: "The Title"
+              sortable:
+                type: "boolean"
+                default: true
+              searchable:
+                type: "boolean"
+                default: true
+              hidden:
+                type: "boolean"
+                default: false
+        defaults:
+          type: "object"
+          properties:
+            sort:
+              type: "object"
+              properties:
+                id:
+                  type: "string"
+                  default: "title"
+                direction:
+                  type: "string"
+                  default: "ASC"
+                  enum:
+                    - "ASC"
+                    - "DESC"
+        query:
+          type: "string"
+        pagination:
+          type: "object"
+          properties:
+            total:
+              type: "number"
+              default: 0
+            count:
+              type: "number"
+              default: 0
+            page:
+              type: "number"
+              default: 0
+            per_page:
+              type: "number"
+              default: 20
+        total:
+          type: "number"
+          default: 0
+        sort:
+          type: "string"
+          default: "title"
+        order:
+          type: "string"
+          default: "asc"

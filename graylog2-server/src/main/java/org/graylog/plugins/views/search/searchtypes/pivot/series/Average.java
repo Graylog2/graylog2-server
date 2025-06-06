@@ -81,7 +81,6 @@ public abstract class Average implements SeriesSpec, HasField {
 
         abstract Optional<String> id();
         abstract String field();
-
         abstract Boolean wholeNumber();
         abstract Average autoBuild();
 

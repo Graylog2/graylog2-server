@@ -19,4 +19,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { selectActiveViewState } from 'views/logic/slices/viewSelectors';
 
 // eslint-disable-next-line import/prefer-default-export
-export const selectHighlightingRules = createSelector(selectActiveViewState, (viewState) => viewState?.formatting?.highlighting ?? []);
+export const selectHighlightingRules = createSelector(
+  selectActiveViewState,
+  (viewState) => viewState?.formatting?.highlighting ?? [],
+);

@@ -14,7 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { BooleanField, DropdownField, ListField, NumberField, TextField } from 'components/configurationforms/types';
+import type {
+  BooleanField,
+  DropdownField,
+  ListField,
+  NumberField,
+  TextField,
+} from 'components/configurationforms/types';
 
 export const numberField: NumberField = {
   additional_info: {},

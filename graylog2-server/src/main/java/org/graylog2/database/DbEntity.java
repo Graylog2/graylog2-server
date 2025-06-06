@@ -17,12 +17,19 @@
 package org.graylog2.database;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to mark a class as a database entity.
+ * <p>
+ * <strong>Bindings need to be added explicitly with {@code org.graylog2.plugin.PluginModule#addDbEntities}</strong>.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Repeatable(DbEntities.class)
 public @interface DbEntity {
     String collection();
 

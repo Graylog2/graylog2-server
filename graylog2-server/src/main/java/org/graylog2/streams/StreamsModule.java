@@ -16,12 +16,14 @@
  */
 package org.graylog2.streams;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
+import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.streams.filters.DestinationFilterCreationValidator;
 import org.graylog2.streams.input.StreamRuleInputsProvider;
 import org.graylog2.streams.input.StreamRuleServerInputsProvider;
 
-public class StreamsModule extends AbstractModule {
+public class StreamsModule extends Graylog2Module {
 
     @Override
     protected void configure() {
@@ -30,5 +32,10 @@ public class StreamsModule extends AbstractModule {
 
         Multibinder<StreamRuleInputsProvider> uriBinder = Multibinder.newSetBinder(binder(), StreamRuleInputsProvider.class);
         uriBinder.addBinding().to(StreamRuleServerInputsProvider.class);
+
+        // The Set<StreamDeletionGuard> binder must be explicitly initialized to avoid an initialization error when
+        // no values are bound.
+        streamDeletionGuardBinder();
+        OptionalBinder.newOptionalBinder(binder(), DestinationFilterCreationValidator.class);
     }
 }

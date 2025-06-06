@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed error when the string_array_add function is supplied a null value."
+
+pulls = ["19439"]
+issues = ["graylog-plugin-enterprise#7262"]

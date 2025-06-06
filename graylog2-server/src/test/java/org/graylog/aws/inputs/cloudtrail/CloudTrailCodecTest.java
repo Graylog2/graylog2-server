@@ -67,7 +67,7 @@ public class CloudTrailCodecTest {
                 "\"eventType\": \"AwsConsoleSignIn\",\n" +
                 "\"recipientAccountId\": \"1111122221111\"\n" +
                 "}").getBytes(StandardCharsets.UTF_8));
-        Message message = codec.decode(rawMessage);
+        Message message = codec.decodeSafe(rawMessage).get();
         String additional_event_data = message.getField("additional_event_data").toString();
 
         assertTrue(additional_event_data.contains("MFAUsed=Yes"));
@@ -104,7 +104,7 @@ public class CloudTrailCodecTest {
                 "\"eventType\": \"AwsConsoleSignIn\",\n" +
                 "\"recipientAccountId\": \"1111122221111\"\n" +
                 "}").getBytes(StandardCharsets.UTF_8));
-        Message message = codec.decode(rawMessage);
+        Message message = codec.decodeSafe(rawMessage).get();
         assertNull(message.getField("additional_event_data"));
     }
 }

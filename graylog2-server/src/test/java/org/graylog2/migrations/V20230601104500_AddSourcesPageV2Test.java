@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -30,6 +31,7 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -68,11 +70,14 @@ class V20230601104500_AddSourcesPageV2Test {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private Configuration configuration;
+
     private V20230601104500_AddSourcesPageV2 migration;
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null);
+            super(null, null, Map.of(), null, null, null);
         }
 
         @Override
@@ -103,10 +108,11 @@ class V20230601104500_AddSourcesPageV2Test {
         var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         var mongoConnection = mongodb.mongoConnection();
         ContentPackPersistenceService contentPackPersistenceService = new ContentPackPersistenceService(mapperProvider, mongoConnection, streamService);
-        ContentPackInstallationPersistenceService contentPackInstallationPersistenceService = new ContentPackInstallationPersistenceService(mapperProvider, mongoConnection);
+        ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
+                new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
         ContentPackService contentPackService = new TestContentPackService();
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
-                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService);
+                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService, configuration);
     }
 
     @Test
@@ -123,6 +129,7 @@ class V20230601104500_AddSourcesPageV2Test {
     void freshInstallInstallsNewSourcesPage() {
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();
@@ -138,6 +145,7 @@ class V20230601104500_AddSourcesPageV2Test {
         previousMigrationHasRun();
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();

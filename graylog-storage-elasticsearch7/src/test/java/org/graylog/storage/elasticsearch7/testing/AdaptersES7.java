@@ -77,7 +77,6 @@ public class AdaptersES7 implements Adapters {
                 new ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new CatApi(objectMapper, client),
                 new ClusterStateApi(objectMapper, client),
-                objectMapper,
                 new ComposableIndexTemplateAdapter(client, objectMapper)
         );
     }

@@ -23,6 +23,9 @@ import javax.annotation.Nonnull;
 
 public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
 
+    String FAILURE_TEMPLATE_TYPE = "failures";
+    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
+
     @Nonnull
     T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
             throws IgnoreIndexTemplate;

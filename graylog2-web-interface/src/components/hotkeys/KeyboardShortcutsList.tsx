@@ -35,16 +35,25 @@ const KeyboardShortcutsList = () => {
       <StyledSectionGrid>
         {Object.entries(hotKeysCollections).map(([scope, collection]: [ScopeName, HotkeyCollection]) => {
           const { title, description, actions } = collection;
-          const sectionActions = Object.entries(actions).map(([actionKey, { description: keyDescription, keys, displayKeys }]) => ({
-            isEnabled: true,
-            splitKey: DEFAULT_SPLIT_KEY,
-            combinationKey: DEFAULT_COMBINATION_KEY,
-            reactKey: actionKey,
-            keyDescription,
-            keys: displayKeys ?? keys,
-          }));
+          const sectionActions = Object.entries(actions).map(
+            ([actionKey, { description: keyDescription, keys, displayKeys }]) => ({
+              isEnabled: true,
+              splitKey: DEFAULT_SPLIT_KEY,
+              combinationKey: DEFAULT_COMBINATION_KEY,
+              reactKey: actionKey,
+              keyDescription,
+              keys: displayKeys ?? keys,
+            }),
+          );
 
-          return <HotkeyCollectionSection key={scope} title={title} description={description} sectionActions={sectionActions} />;
+          return (
+            <HotkeyCollectionSection
+              key={scope}
+              title={title}
+              description={description}
+              sectionActions={sectionActions}
+            />
+          );
         })}
       </StyledSectionGrid>
     </div>

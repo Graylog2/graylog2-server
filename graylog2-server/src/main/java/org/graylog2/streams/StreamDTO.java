@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
@@ -32,12 +32,13 @@ import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
-public abstract class StreamDTO {
+public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -54,10 +55,8 @@ public abstract class StreamDTO {
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
+    public static final String FIELD_CATEGORIES = "categories";
     public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
-
-    @JsonProperty("id")
-    public abstract String id();
 
     @JsonProperty(FIELD_CREATOR_USER_ID)
     public abstract String creatorUserId();
@@ -114,6 +113,10 @@ public abstract class StreamDTO {
     @JsonProperty(FIELD_IS_EDITABLE)
     public abstract boolean isEditable();
 
+    @JsonProperty(FIELD_CATEGORIES)
+    @Nullable
+    public abstract List<String> categories();
+
     public abstract Builder toBuilder();
 
     static Builder builder() {
@@ -121,18 +124,16 @@ public abstract class StreamDTO {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<StreamDTO, Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
                     .matchingType(DEFAULT_MATCHING_TYPE.toString())
                     .isDefault(false)
                     .isEditable(false)
-                    .removeMatchesFromDefaultStream(false);
+                    .removeMatchesFromDefaultStream(false)
+                    .categories(List.of());
         }
-
-        @JsonProperty(FIELD_ID)
-        public abstract Builder id(String id);
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
@@ -181,6 +182,9 @@ public abstract class StreamDTO {
         @JsonProperty(FIELD_IS_EDITABLE)
         public abstract Builder isEditable(boolean isEditable);
 
+        @JsonProperty(FIELD_CATEGORIES)
+        public abstract Builder categories(List<String> categories);
+
         public abstract String id();
 
         public abstract StreamDTO autoBuild();
@@ -189,23 +193,5 @@ public abstract class StreamDTO {
             isEditable(Stream.streamIsEditable(id()));
             return autoBuild();
         }
-    }
-
-    public static StreamDTO fromDocument(Document document) {
-        return StreamDTO.builder()
-                .id(document.getObjectId(FIELD_ID).toHexString())
-                .title(document.getString(FIELD_TITLE))
-                .description(document.getString(FIELD_DESCRIPTION))
-                .matchingType(document.get(FIELD_MATCHING_TYPE, DEFAULT_MATCHING_TYPE.toString()))
-                .createdAt(document.getDate(FIELD_CREATED_AT))
-                .contentPack(document.getString(FIELD_CONTENT_PACK))
-                .isEditable(document.getBoolean(FIELD_IS_EDITABLE, true))
-                .isDefault(document.getBoolean(FIELD_DEFAULT_STREAM))
-                .disabled(document.getBoolean(FIELD_DISABLED))
-                .removeMatchesFromDefaultStream(document.getBoolean(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM))
-                .creatorUserId(document.getString(FIELD_CREATOR_USER_ID))
-                .indexSetId(document.getString(FIELD_INDEX_SET_ID))
-                .outputs(document.getList(FIELD_OUTPUTS, ObjectId.class))
-                .build();
     }
 }

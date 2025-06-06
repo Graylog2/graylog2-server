@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
@@ -26,7 +26,6 @@ import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.td`
-  float: right;
   text-align: right;
 
   .btn-toolbar {
@@ -39,81 +38,72 @@ const ActionsRef = styled.div`
 `;
 
 type Props<Entity extends EntityBase> = {
-  actionsRef: React.RefObject<HTMLDivElement>
-  columns: Array<Column>,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
-  displaySelect: boolean,
-  displayActions: boolean,
-  entity: Entity,
-  index: number,
-  rowActions?: (entity: Entity) => React.ReactNode,
-  entityAttributesAreCamelCase: boolean,
-  isEntitySelectable: (entity: Entity) => boolean,
+  actionsRef: React.RefObject<HTMLDivElement>;
+  columns: Array<Column>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
+  displaySelect: boolean;
+  displayActions: boolean;
+  entity: Entity;
+  index: number;
+  actions?: (entity: Entity) => React.ReactNode;
+  entityAttributesAreCamelCase: boolean;
+  isEntitySelectable: (entity: Entity) => boolean;
 };
 
-const TableRow = <Entity extends EntityBase>({
+const TableRow = <Entity extends EntityBase, Meta>({
   columns,
   columnRenderersByAttribute,
   displaySelect,
   displayActions,
   entity,
-  rowActions,
+  actions = undefined,
   index,
   actionsRef,
   entityAttributesAreCamelCase,
   isEntitySelectable,
 }: Props<Entity>) => {
-  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const { toggleEntitySelect, selectedEntities } = useSelectedEntities();
   const isSelected = !!selectedEntities?.includes(entity.id);
-  const toggleRowSelect = useCallback(() => {
-    setSelectedEntities(((cur) => {
-      if (cur.includes(entity.id)) {
-        return cur.filter((id) => id !== entity.id);
-      }
-
-      return [...cur, entity.id];
-    }));
-  }, [entity.id, setSelectedEntities]);
-
-  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
-
-  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
-
+  const actionButtons = displayActions ? <ButtonToolbar>{actions(entity)}</ButtonToolbar> : null;
+  const isSelectDisabled = useMemo(
+    () => !(displaySelect && isEntitySelectable(entity)),
+    [displaySelect, entity, isEntitySelectable],
+  );
   const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
 
   return (
     <tr>
       {displaySelect && (
         <td aria-label="Select cell">
-          <RowCheckbox onChange={toggleRowSelect}
-                       title={title}
-                       checked={isSelected}
-                       disabled={isSelectDisabled}
-                       aria-label={title} />
+          <RowCheckbox
+            onChange={() => toggleEntitySelect(entity.id)}
+            title={title}
+            checked={isSelected}
+            disabled={isSelectDisabled}
+            aria-label={title}
+          />
         </td>
       )}
       {columns.map((column) => {
         const columnRenderer = columnRenderersByAttribute[column.id];
 
         return (
-          <TableCell columnRenderer={columnRenderer}
-                     entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                     entity={entity}
-                     column={column}
-                     key={`${entity.id}-${column.id}`} />
+          <TableCell<Entity, Meta>
+            columnRenderer={columnRenderer}
+            entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+            entity={entity}
+            column={column}
+            key={`${entity.id}-${column.id}`}
+          />
         );
       })}
       {displayActions ? (
         <ActionsCell>
-          {index === 0 ? <ActionsRef ref={actionsRef}>{actionButtons}</ActionsRef> : actionButtons}
+          <ActionsRef ref={index === 0 ? actionsRef : undefined}>{actionButtons}</ActionsRef>
         </ActionsCell>
       ) : null}
     </tr>
   );
 };
 
-TableRow.defaultProps = {
-  rowActions: undefined,
-};
-
-export default React.memo(TableRow);
+export default React.memo(TableRow) as typeof TableRow;

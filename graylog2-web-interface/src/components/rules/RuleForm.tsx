@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
@@ -28,7 +27,8 @@ import PipelinesUsingRule from './PipelinesUsingRule';
 import RuleSimulation from './RuleSimulation';
 
 type Props = {
-  create: boolean,
+  create?: boolean;
+  isManaged?: boolean;
 };
 
 const StyledContainer = styled.div`
@@ -49,7 +49,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-const RuleForm = ({ create }: Props) => {
+const RuleForm = ({ create = false, isManaged = false }: Props) => {
   const {
     description,
     handleDescription,
@@ -108,34 +108,42 @@ const RuleForm = ({ create }: Props) => {
       <fieldset>
         <FormGroup id="ruleTitleInformation">
           <ControlLabel>Title</ControlLabel>
-          <FormControl.Static>You can set the rule title in the rule source. See the quick reference for more information.</FormControl.Static>
+          <FormControl.Static>
+            You can set the rule title in the rule source. See the quick reference for more information.
+          </FormControl.Static>
         </FormGroup>
 
         {isDirty && (
           <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
 
-        <Input type="textarea"
-               id="description"
-               label="Description"
-               value={description}
-               onChange={handleDescriptionChange}
-               autoFocus
-               rows={1}
-               help="Rule description (optional)." />
+        <Input
+          type="textarea"
+          id="description"
+          label="Description"
+          value={description}
+          onChange={handleDescriptionChange}
+          autoFocus
+          rows={1}
+          help="Rule description (optional)."
+        />
 
         <PipelinesUsingRule create={create} />
 
-        <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information." error={errorMessage}>
-          {/* TODO: Figure out issue with props */}
-          {/* @ts-ignore */}
+        <Input
+          id="rule-source-editor"
+          label="Rule source"
+          help="Rule source, see quick reference for more information."
+          error={errorMessage}>
           <StyledContainer>
-            <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
-                              mode="pipeline"
-                              onLoad={onAceLoaded}
-                              onChange={handleSourceChange}
-                              value={ruleSource}
-                              innerRef={ruleSourceRef} />
+            <SourceCodeEditor
+              id={`source${create ? '-create' : '-edit'}`}
+              mode="pipeline"
+              onLoad={onAceLoaded}
+              onChange={handleSourceChange}
+              value={ruleSource}
+              innerRef={ruleSourceRef}
+            />
           </StyledContainer>
         </Input>
 
@@ -144,25 +152,22 @@ const RuleForm = ({ create }: Props) => {
 
       <Row>
         <Col md={12}>
-          <FormSubmit submitButtonText={create ? 'Create rule' : 'Update rule & close'}
-                      centerCol={!create && (
-                        <Button type="button" bsStyle="info" onClick={handleApply}>
-                          Update rule
-                        </Button>
-                      )}
-                      onCancel={handleCancel} />
+          <FormSubmit
+            submitButtonText={create ? 'Create rule' : 'Update rule & close'}
+            disabledSubmit={isManaged}
+            centerCol={
+              !create && (
+                <Button type="button" bsStyle="info" disabled={isManaged} onClick={handleApply}>
+                  Update rule
+                </Button>
+              )
+            }
+            onCancel={handleCancel}
+          />
         </Col>
       </Row>
     </form>
   );
-};
-
-RuleForm.propTypes = {
-  create: PropTypes.bool,
-};
-
-RuleForm.defaultProps = {
-  create: false,
 };
 
 export default RuleForm;

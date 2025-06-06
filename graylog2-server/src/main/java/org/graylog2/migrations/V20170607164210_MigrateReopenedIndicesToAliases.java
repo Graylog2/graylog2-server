@@ -39,7 +39,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.storage.SearchVersion.Distribution.*;
+import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
+import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {

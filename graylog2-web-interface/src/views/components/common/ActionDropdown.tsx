@@ -15,40 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
 import StopPropagation from 'views/components/common/StopPropagation';
 
 type Props = {
-  children: React.ReactNode,
-  element: React.ReactNode,
-  'data-testid'?: string
+  children: React.ReactNode;
+  element: React.ReactNode;
+  'data-testid'?: string;
+  header?: string;
 };
 
-const ActionDropdown = ({ children, element, 'data-testid': dataTestid }: Props) => (
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefined, header = 'Actions' }: Props) => (
   <StopPropagation data-testid={dataTestid}>
-    <Menu position="bottom" withinPortal>
-      <Menu.Target>
-        {element}
-      </Menu.Target>
+    <Menu position="bottom" withinPortal zIndex={1051}>
+      <Menu.Target>{element}</Menu.Target>
       <Menu.Dropdown>
-        <MenuItem header>Actions</MenuItem>
+        <MenuItem header>{header}</MenuItem>
         {children}
       </Menu.Dropdown>
     </Menu>
   </StopPropagation>
 );
-
-ActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-  element: PropTypes.node.isRequired,
-  'data-testid': PropTypes.string,
-};
-
-ActionDropdown.defaultProps = {
-  'data-testid': undefined,
-};
 
 export default ActionDropdown;

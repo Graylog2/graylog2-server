@@ -63,6 +63,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
+    public static final String FIELD_CATEGORIES = "categories";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final List<StreamRule> streamRules;
@@ -154,6 +155,17 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> getCategories() {
+        return (List<String>) fields.get(FIELD_CATEGORIES);
+    }
+
+    @Override
+    public void setCategories(List<String> categories) {
+        fields.put(FIELD_CATEGORIES, categories);
+    }
+
+    @Override
     public Boolean isPaused() {
         Boolean disabled = getDisabled();
         return disabled != null && disabled;
@@ -189,6 +201,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.put(FIELD_DEFAULT_STREAM, isDefaultStream());
         result.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, getRemoveMatchesFromDefaultStream());
         result.put(FIELD_INDEX_SET_ID, getIndexSetId());
+        result.put(FIELD_CATEGORIES, getCategories());
         return result;
     }
 

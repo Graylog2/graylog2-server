@@ -30,35 +30,40 @@ import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 import HTTPJSONPathAdapterSummary from './HTTPJSONPathAdapterSummary';
 import HTTPJSONPathAdapterDocumentation from './HTTPJSONPathAdapterDocumentation';
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableAdapters: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'csvfile',
-      displayName: 'CSV File',
-      formComponent: CSVFileAdapterFieldSet,
-      summaryComponent: CSVFileAdapterSummary,
-      documentationComponent: CSVFileAdapterDocumentation,
+      lookupTableAdapters: [
+        {
+          type: 'csvfile',
+          displayName: 'CSV File',
+          formComponent: CSVFileAdapterFieldSet,
+          summaryComponent: CSVFileAdapterSummary,
+          documentationComponent: CSVFileAdapterDocumentation,
+        },
+        {
+          type: 'dnslookup',
+          displayName: 'DNS Lookup',
+          formComponent: DnsAdapterFieldSet,
+          summaryComponent: DnsAdapterSummary,
+          documentationComponent: DnsAdapterDocumentation,
+        },
+        {
+          type: 'dsvhttp',
+          displayName: 'DSV File from HTTP',
+          formComponent: DSVHTTPAdapterFieldSet,
+          summaryComponent: DSVHTTPAdapterSummary,
+          documentationComponent: DSVHTTPAdapterDocumentation,
+        },
+        {
+          type: 'httpjsonpath',
+          displayName: 'HTTP JSONPath',
+          formComponent: HTTPJSONPathAdapterFieldSet,
+          summaryComponent: HTTPJSONPathAdapterSummary,
+          documentationComponent: HTTPJSONPathAdapterDocumentation,
+        },
+      ],
     },
-    {
-      type: 'dnslookup',
-      displayName: 'DNS Lookup',
-      formComponent: DnsAdapterFieldSet,
-      summaryComponent: DnsAdapterSummary,
-      documentationComponent: DnsAdapterDocumentation,
-    },
-    {
-      type: 'dsvhttp',
-      displayName: 'DSV File from HTTP',
-      formComponent: DSVHTTPAdapterFieldSet,
-      summaryComponent: DSVHTTPAdapterSummary,
-      documentationComponent: DSVHTTPAdapterDocumentation,
-    },
-    {
-      type: 'httpjsonpath',
-      displayName: 'HTTP JSONPath',
-      formComponent: HTTPJSONPathAdapterFieldSet,
-      summaryComponent: HTTPJSONPathAdapterSummary,
-      documentationComponent: HTTPJSONPathAdapterDocumentation,
-    },
-  ],
-}));
+  ),
+);

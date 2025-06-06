@@ -60,7 +60,7 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
 
     @Override
     public void rotate(IndexSet indexSet) {
-        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiering();
+        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTieringConfig();
         Preconditions.checkNotNull(dataTieringConfig);
         DataTierRotation dataTierRotation = dataTierRotationFactory.create(toIndexLifetimeConfig(dataTieringConfig));
         dataTierRotation.rotate(indexSet);
@@ -68,7 +68,7 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
 
     @Override
     public void retain(IndexSet indexSet) {
-        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiering();
+        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTieringConfig();
         Preconditions.checkNotNull(dataTieringConfig);
         if (dataTieringConfig instanceof FallbackDataTieringConfig) {
             LOG.warn("An enterprise data tier configuration is used for index '{}', enterprise properties are ignored! " +

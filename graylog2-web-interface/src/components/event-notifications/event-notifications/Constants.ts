@@ -16,10 +16,11 @@
  */
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'event_notifications';
 export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'type', 'created_at'],
-  columnsOrder: ['title', 'description', 'type', 'created_at'],
+  entityTableId: 'event_notifications',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ['title', 'description', 'type', 'created_at'],
 };
+
+export const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at'];

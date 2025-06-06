@@ -15,15 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
-import type {
-  GranteeType,
-  CapabilityType,
-  SharedEntityType,
-  ActiveShareType,
-  GRN,
-} from 'logic/permissions/types';
+import type { GranteeType, CapabilityType, SharedEntityType, ActiveShareType, GRN } from 'logic/permissions/types';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 import Capability from './Capability';
@@ -37,9 +30,9 @@ import ValidationResult from './ValidationResult';
 
 export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;
-export type ActiveShares = Immutable.List<ActiveShare>;
+export type ActiveShares = Immutable.List<ActiveShare> | null;
 export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
-export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
+export type SelectedGranteeCapabilities = Immutable.Map<GranteeType['id'], CapabilityType['id']>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
 const _missingDependenciesFromJSON = (missingDependenciesJSON): Immutable.Map<string, Immutable.List<SharedEntity>> => {
@@ -47,63 +40,78 @@ const _missingDependenciesFromJSON = (missingDependenciesJSON): Immutable.Map<st
 
   Object.keys(missingDependenciesJSON).forEach((granteeGRN) => {
     const dependencyList = missingDependenciesJSON[granteeGRN];
-    missingDependencies = missingDependencies.set(granteeGRN, dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)));
+    missingDependencies = missingDependencies.set(
+      granteeGRN,
+      dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)),
+    );
   });
 
   return missingDependencies;
 };
 
-const _sortAndOrderGrantees = <T extends GranteeInterface>(grantees: Immutable.List<T>, activeShares?: ActiveShares | undefined | null): Immutable.List<T> => {
+const _sortAndOrderGrantees = <T extends GranteeInterface>(
+  grantees: Immutable.List<T>,
+  activeShares?: ActiveShares | undefined | null,
+): Immutable.List<T> => {
   const granteesByType = grantees
-    .filter((grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0)
+    .filter(
+      (grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0,
+    )
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
     .groupBy((grantee) => grantee.type);
   const newGrantees = grantees
-    .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1)
+    .filter(
+      (grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1,
+    )
     .reverse();
 
-  return Immutable.List<T>().concat(
-    newGrantees,
-    granteesByType.get('error'),
-    granteesByType.get('global'),
-    granteesByType.get('team'),
-    granteesByType.get('user'),
-  ).filter((grantee) => !!grantee).toList();
+  return Immutable.List<T>()
+    .concat(
+      newGrantees,
+      granteesByType.get('error'),
+      granteesByType.get('global'),
+      granteesByType.get('team'),
+      granteesByType.get('user'),
+    )
+    .filter((grantee) => !!grantee)
+    .toList();
 };
 
 type InternalState = {
-  entity: GRN,
-  availableGrantees: GranteesList,
-  availableCapabilities: CapabilitiesList,
-  activeShares: ActiveShares,
-  selectedGranteeCapabilities: SelectedGranteeCapabilities,
-  missingDependencies: MissingDependencies,
-  validationResults: ValidationResult,
+  entity: GRN;
+  availableGrantees: GranteesList;
+  availableCapabilities: CapabilitiesList;
+  activeShares: ActiveShares;
+  selectedGranteeCapabilities: SelectedGranteeCapabilities;
+  missingDependencies: MissingDependencies;
+  validationResults: ValidationResult;
 };
 
 export type EntityShareStateJson = {
-  entity: $PropertyType<InternalState, 'entity'>,
-  available_grantees: Array<GranteeType>,
-  available_capabilities: Array<CapabilityType>,
-  active_shares: Array<ActiveShareType>,
-  selected_grantee_capabilities: {
-    [grantee: string]: $PropertyType<Capability, 'id'>,
-  } | {},
-  missing_permissions_on_dependencies: {[key: string]: Array<SharedEntityType>},
-  validation_result: ValidationResultJSON,
+  entity: InternalState['entity'];
+  available_grantees: Array<GranteeType>;
+  available_capabilities: Array<CapabilityType>;
+  active_shares: Array<ActiveShareType>;
+  selected_grantee_capabilities:
+    | {
+        [grantee: string]: Capability['id'];
+      }
+    | {};
+  missing_permissions_on_dependencies: { [key: string]: Array<SharedEntityType> };
+  validation_result: ValidationResultJSON;
 };
 
 export default class EntityShareState {
   _value: InternalState;
 
   constructor(
-    entity: $PropertyType<InternalState, 'entity'>,
-    availableGrantees: $PropertyType<InternalState, 'availableGrantees'>,
-    availableCapabilities: $PropertyType<InternalState, 'availableCapabilities'>,
-    activeShares: $PropertyType<InternalState, 'activeShares'>,
-    selectedGranteeCapabilities: $PropertyType<InternalState, 'selectedGranteeCapabilities'>,
-    missingDependencies: $PropertyType<InternalState, 'missingDependencies'>,
-    validationResults: $PropertyType<InternalState, 'validationResults'>,
+    entity: InternalState['entity'],
+    availableGrantees: InternalState['availableGrantees'],
+    availableCapabilities: InternalState['availableCapabilities'],
+    activeShares: InternalState['activeShares'],
+    selectedGranteeCapabilities: InternalState['selectedGranteeCapabilities'],
+    missingDependencies: InternalState['missingDependencies'],
+    validationResults: InternalState['validationResults'],
   ) {
     this._value = {
       entity,
@@ -116,46 +124,49 @@ export default class EntityShareState {
     };
   }
 
-  get entity(): $PropertyType<InternalState, 'entity'> {
+  get entity(): InternalState['entity'] {
     return this._value.entity;
   }
 
-  get availableGrantees(): $PropertyType<InternalState, 'availableGrantees'> {
+  get availableGrantees(): InternalState['availableGrantees'] {
     return this._value.availableGrantees;
   }
 
-  get availableCapabilities(): $PropertyType<InternalState, 'availableCapabilities'> {
+  get availableCapabilities(): InternalState['availableCapabilities'] {
     return this._value.availableCapabilities;
   }
 
-  get activeShares(): $PropertyType<InternalState, 'activeShares'> {
+  get activeShares(): InternalState['activeShares'] {
     return this._value.activeShares;
   }
 
-  get selectedGranteeCapabilities(): $PropertyType<InternalState, 'selectedGranteeCapabilities'> {
+  get selectedGranteeCapabilities(): InternalState['selectedGranteeCapabilities'] {
     return this._value.selectedGranteeCapabilities;
   }
 
-  get missingDependencies(): $PropertyType<InternalState, 'missingDependencies'> {
+  get missingDependencies(): InternalState['missingDependencies'] {
     return this._value.missingDependencies;
   }
 
-  get validationResults(): $PropertyType<InternalState, 'validationResults'> {
+  get validationResults(): InternalState['validationResults'] {
     return this._value.validationResults;
   }
 
   get selectedGrantees() {
     const _userLookup = (userId: GRN) => this._value.availableGrantees.find((grantee) => grantee.id === userId);
 
-    const granteesWithCapabilities: Immutable.List<SelectedGrantee> = this._value.selectedGranteeCapabilities.entrySeq().map(([granteeId, roleId]) => {
-      const grantee = _userLookup(granteeId);
+    const granteesWithCapabilities: Immutable.List<SelectedGrantee> = this._value.selectedGranteeCapabilities
+      .entrySeq()
+      .map(([granteeId, roleId]) => {
+        const grantee = _userLookup(granteeId);
 
-      if (!grantee) {
-        return SelectedGrantee.create(granteeId, `not found ${granteeId} (error)`, 'error', roleId);
-      }
+        if (!grantee) {
+          return SelectedGrantee.create(granteeId, `not found ${granteeId} (error)`, 'error', roleId);
+        }
 
-      return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
-    }).toList();
+        return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
+      })
+      .toList();
 
     return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities, this._value.activeShares);
   }
@@ -172,15 +183,17 @@ export default class EntityShareState {
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      entity,
-      availableGrantees,
-      availableCapabilities,
-      activeShares,
-      selectedGranteeCapabilities,
-      missingDependencies,
-      validationResults,
-    }));
+    return new Builder(
+      Immutable.Map({
+        entity,
+        availableGrantees,
+        availableCapabilities,
+        activeShares,
+        selectedGranteeCapabilities,
+        missingDependencies,
+        validationResults,
+      }),
+    );
   }
 
   toJSON() {
@@ -249,31 +262,31 @@ class Builder {
     this.value = value;
   }
 
-  entity(value: $PropertyType<InternalState, 'entity'>): Builder {
+  entity(value: InternalState['entity']): Builder {
     return new Builder(this.value.set('entity', value));
   }
 
-  availableGrantees(value: $PropertyType<InternalState, 'availableGrantees'>): Builder {
+  availableGrantees(value: InternalState['availableGrantees']): Builder {
     return new Builder(this.value.set('availableGrantees', value));
   }
 
-  availableCapabilities(value: $PropertyType<InternalState, 'availableCapabilities'>): Builder {
+  availableCapabilities(value: InternalState['availableCapabilities']): Builder {
     return new Builder(this.value.set('availableCapabilities', value));
   }
 
-  activeShares(value: $PropertyType<InternalState, 'activeShares'>): Builder {
+  activeShares(value: InternalState['activeShares']): Builder {
     return new Builder(this.value.set('activeShares', value));
   }
 
-  selectedGranteeCapabilities(value: $PropertyType<InternalState, 'selectedGranteeCapabilities'>): Builder {
+  selectedGranteeCapabilities(value: InternalState['selectedGranteeCapabilities']): Builder {
     return new Builder(this.value.set('selectedGranteeCapabilities', value));
   }
 
-  missingDependencies(value: $PropertyType<InternalState, 'missingDependencies'>): Builder {
+  missingDependencies(value: InternalState['missingDependencies']): Builder {
     return new Builder(this.value.set('missingDependencies', value));
   }
 
-  validationResults(value: $PropertyType<InternalState, 'validationResults'>): Builder {
+  validationResults(value: InternalState['validationResults']): Builder {
     return new Builder(this.value.set('validationResults', value));
   }
 

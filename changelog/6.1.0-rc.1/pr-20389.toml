@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed issue where invalid JSON characters being unescaped broke TeamsNotificationV2 notifications."
+
+pulls = ["20389"]

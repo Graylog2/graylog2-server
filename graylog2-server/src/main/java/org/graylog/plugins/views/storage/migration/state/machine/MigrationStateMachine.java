@@ -29,6 +29,8 @@ public interface MigrationStateMachine {
 
     List<MigrationStep> nextSteps();
 
+    void saveContext();
+
     MigrationStateMachineContext getContext();
 
     String serialize();

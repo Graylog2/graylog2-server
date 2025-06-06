@@ -42,6 +42,7 @@ public abstract class AggregationWidget implements ViewWidget {
     private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -71,6 +72,11 @@ public abstract class AggregationWidget implements ViewWidget {
 
     @JsonProperty(FIELD_STREAMS)
     Set<String> streams() {
+        return Collections.emptySet();
+    }
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    Set<String> streamCategories() {
         return Collections.emptySet();
     }
 

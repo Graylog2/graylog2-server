@@ -20,7 +20,6 @@ import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import org.graylog.plugins.views.storage.migration.state.InMemoryStateMachinePersistence;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsImpl;
 import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,16 +39,18 @@ class MigrationStateMachineImplTest {
     MigrationActions migrationActions;
     InMemoryStateMachinePersistence persistenceService = new InMemoryStateMachinePersistence();
     MigrationStateMachine migrationStateMachine;
+    private MigrationStateMachineContext context;
 
     @BeforeEach
     public void setUp() {
-        migrationActions = new TestMigrationActions();
+        context = new MigrationStateMachineContext();
+        migrationActions = new TestMigrationActions(context);
     }
 
     @Test
     public void smReturnsResultState() {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {});
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of());
         assertThat(context.hasErrors()).isFalse();
         assertThat(context.state()).isEqualTo(RESULT_STATE);
@@ -61,7 +62,7 @@ class MigrationStateMachineImplTest {
             assertThat(context.getActionArgument("arg1", String.class)).isEqualTo("v1");
             assertThat(context.getActionArgument("arg2", Integer.class)).isEqualTo(2);
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of(
                 "arg1", "v1", "arg2", 2
         ));
@@ -74,7 +75,7 @@ class MigrationStateMachineImplTest {
             int i = context.getActionArgument("k1", Integer.class);
             context.addExtendedState("r1", ++i);
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", 1));
         assertThat(context.hasErrors()).isFalse();
         assertThat(migrationStateMachine.getContext().getExtendedState("r1")).isEqualTo(2);
@@ -85,7 +86,7 @@ class MigrationStateMachineImplTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
             context.getActionArgument("away", String.class);
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, null);
         assertThat(context.hasErrors()).isTrue();
         assertThat(context.errorMessage()).isEqualTo("Missing arguments for step SELECT_MIGRATION");
@@ -96,7 +97,7 @@ class MigrationStateMachineImplTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
             context.getActionArgument("away", String.class);
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", "v1"));
         assertThat(context.hasErrors()).isTrue();
         assertThat(context.errorMessage()).isEqualTo("Missing argument away for step SELECT_MIGRATION");
@@ -107,7 +108,7 @@ class MigrationStateMachineImplTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
             context.getActionArgument("k1", Integer.class);
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", "v1"));
         assertThat(context.hasErrors()).isTrue();
         assertThat(context.errorMessage()).isEqualTo("Argument k1 must be of type class java.lang.Integer");
@@ -119,7 +120,7 @@ class MigrationStateMachineImplTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
             throw new RuntimeException(errorMessage);
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of());
         assertThat(context.hasErrors()).isTrue();
         assertThat(context.errorMessage()).isEqualTo(errorMessage);
@@ -130,7 +131,7 @@ class MigrationStateMachineImplTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
             throw new RuntimeException();
         });
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, persistenceService, context);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of());
         assertThat(context.hasErrors()).isTrue();
         assertThat(context.state()).isEqualTo(INITIAL_STATE);
@@ -149,8 +150,12 @@ class MigrationStateMachineImplTest {
 
     private static class TestMigrationActions extends MigrationActionsAdapter {
 
+        public TestMigrationActions(MigrationStateMachineContext context) {
+            super(context);
+        }
+
         public void runTestFunction(Consumer<MigrationStateMachineContext> testFunction) {
-            testFunction.accept(getStateMachineContext());
+            testFunction.accept(super.context);
         }
 
     }

@@ -15,19 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import type { Moment } from 'moment';
 
 import { relativeDifference, adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime?: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment;
 };
 
 /**
  * This component receives any date time and displays the relative time until now in a human-readable format.
  */
-const RelativeTime = ({ dateTime: dateTimeProp }: Props) => {
+const RelativeTime = ({ dateTime: dateTimeProp = undefined }: Props) => {
   const dateTime = dateTimeProp ?? new Date();
   const relativeTime = relativeDifference(dateTime);
   const dateTimeString = adjustFormat(dateTime, 'internal');
@@ -37,19 +36,6 @@ const RelativeTime = ({ dateTime: dateTimeProp }: Props) => {
       {relativeTime}
     </time>
   );
-};
-
-RelativeTime.propTypes = {
-  /**
-   * Date time to be displayed in the component. You can provide an ISO
-   * 8601 string, a JS native `Date` object, a moment `Date` object, or
-   * a number containing seconds after UNIX epoch.
-   */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
-};
-
-RelativeTime.defaultProps = {
-  dateTime: undefined,
 };
 
 export default RelativeTime;

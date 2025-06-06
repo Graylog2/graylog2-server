@@ -51,6 +51,7 @@ public abstract class EventDto {
     public static final String FIELD_KEY = "key";
     public static final String FIELD_PRIORITY = "priority";
     public static final String FIELD_SCORES = "scores";
+    public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
     public static final String FIELD_FIELDS = "fields";
     private static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     public static final String FIELD_REPLAY_INFO = "replay_info";
@@ -104,6 +105,9 @@ public abstract class EventDto {
     @JsonProperty(FIELD_SCORES)
     public abstract Map<String, Double> scores();
 
+    @JsonProperty(FIELD_ASSOCIATED_ASSETS)
+    public abstract Set<String> associatedAssets();
+
     @JsonProperty(FIELD_ALERT)
     public abstract boolean alert();
 
@@ -131,7 +135,8 @@ public abstract class EventDto {
             return new AutoValue_EventDto.Builder()
                     .sourceStreams(ImmutableSet.of())
                     .groupByFields(ImmutableMap.of())
-                    .scores(ImmutableMap.of());
+                    .scores(ImmutableMap.of())
+                    .associatedAssets(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -185,6 +190,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_SCORES)
         public abstract Builder scores(Map<String, Double> scores);
+
+        @JsonProperty(FIELD_ASSOCIATED_ASSETS)
+        public abstract Builder associatedAssets(Set<String> associatedAssets);
 
         @JsonProperty(FIELD_ALERT)
         public abstract Builder alert(boolean alert);

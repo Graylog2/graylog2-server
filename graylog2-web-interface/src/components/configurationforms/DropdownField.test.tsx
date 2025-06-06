@@ -25,12 +25,14 @@ import DropdownField from './DropdownField';
 
 describe('<DropdownField>', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof DropdownField>>) => (
-    <DropdownField field={dropdownField}
-                   onChange={() => {}}
-                   title="example_dropdown_field"
-                   typeName="dropdown"
-                   autoFocus={false}
-                   {...props} />
+    <DropdownField
+      field={dropdownField}
+      onChange={() => {}}
+      title="example_dropdown_field"
+      typeName="dropdown"
+      autoFocus={false}
+      {...props}
+    />
   );
 
   afterEach(() => {
@@ -40,12 +42,10 @@ describe('<DropdownField>', () => {
   it('should render an empty field', () => {
     render(<SUT />);
 
-    const fieldLabel = screen.getByText(dropdownField.human_name, { exact: true });
-    const optionalMarker = screen.getByText(/(optional)/);
+    const fieldLabel = screen.getByText(`${dropdownField.human_name} (optional)`);
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
-    expect(optionalMarker).toBeInTheDocument();
     expect(select).toBeInTheDocument();
 
     const selectedValue = Object.keys(dropdownField.attributes.values)[0];
@@ -64,10 +64,7 @@ describe('<DropdownField>', () => {
   });
 
   it('should render a required field', () => {
-    render(
-      <SUT field={requiredDropdownField}
-           addPlaceholder />,
-    );
+    render(<SUT field={requiredDropdownField} addPlaceholder />);
 
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 

@@ -19,7 +19,7 @@ package org.graylog2.indexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
@@ -37,7 +37,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
-    public Template toTemplate(final TemplateIndexSetConfig indexSetConfig,
+    public Template toTemplate(final IndexSetMappingTemplate indexSetConfig,
                                final Long order) {
         return messageTemplate(indexSetConfig.indexWildcard(),
                 indexSetConfig.indexAnalyzer(),
@@ -57,12 +57,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                                     final CustomFieldMappings customFieldMappings) {
         var settings = new Template.Settings(Map.of(
                 "index", Map.of(
-                        "analysis", Map.of("analyzer", analyzerKeyword())
+                        "analysis", analysisSettings()
                 )
         ));
         var mappings = mapping(analyzer, customFieldMappings);
 
         return createTemplate(indexPattern, order, settings, mappings);
+    }
+
+    public Map<String, Object> analysisSettings() {
+        return Map.of("analyzer", analyzerKeyword());
     }
 
     Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
@@ -110,6 +114,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
+                .put(Message.FIELD_GL2_ORIGINAL_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
                 .put(FIELD_GL2_MESSAGE_ID, notAnalyzedString())

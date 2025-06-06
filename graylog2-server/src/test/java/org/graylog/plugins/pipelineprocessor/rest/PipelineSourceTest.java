@@ -36,6 +36,7 @@ public class PipelineSourceTest {
         final StageSource stageSource = StageSource.create(23, Stage.Match.ALL, Collections.singletonList("some-rule"));
         final PipelineSource pipelineSource = PipelineSource.create(
                 "id",
+                "DEFAULT",
                 "title",
                 "description",
                 "source",

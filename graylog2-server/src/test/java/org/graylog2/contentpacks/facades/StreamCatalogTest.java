@@ -38,7 +38,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -107,7 +106,7 @@ public class StreamCatalogTest {
                 indexSetService,
                 mongoIndexSetFactory,
                 entityOwnershipService,
-                clusterEventBus);
+                clusterEventBus, Set.of());
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

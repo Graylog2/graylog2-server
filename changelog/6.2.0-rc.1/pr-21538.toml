@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Upgrade AWS Kinesis client libary to version 6.1.0 to fix potential shard processing issues."
+
+issues = ["21451"]
+pulls = ["21538"]

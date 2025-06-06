@@ -18,19 +18,40 @@ import type * as React from 'react';
 
 import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
 import type Widget from 'views/logic/widgets/Widget';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 
 export type Contexts = {
-  widgetFocusContext: WidgetFocusContextType,
+  widgetFocusContext: WidgetFocusContextType;
 };
 
-export type WidgetAction = (w: Widget, contexts: Contexts) => (dispatch: AppDispatch, getState: GetState) => Promise<unknown>;
+export type WidgetAction = (
+  w: Widget,
+  contexts: Contexts,
+) => (dispatch: ViewsDispatch, getState: GetState) => Promise<unknown>;
 
-export type WidgetActionType = {
-  type: string,
-  title: (w: Widget) => React.ReactNode,
-  isHidden?: (w: Widget) => boolean,
-  action: WidgetAction,
-  disabled?: () => boolean,
+type WidgetActionPositionType = 'menu' | 'dropdown';
+
+type WidgetBaseActionType = {
+  type: string;
+  isHidden?: (w: Widget) => boolean;
+  disabled?: () => boolean;
 };
+
+type WidgetDropdownActionType = {
+  title: (w: Widget) => React.ReactNode;
+  action: WidgetAction;
+  position?: WidgetActionPositionType;
+  component?: never;
+};
+
+export type WidgetMenuActionComponentProps = { disabled?: boolean; widget: Widget; contexts?: Contexts };
+
+export type WidgetMenuActionType = {
+  component: React.ComponentType<WidgetMenuActionComponentProps>;
+  position: WidgetActionPositionType;
+  title?: never;
+  action?: never;
+};
+
+export type WidgetActionType = (WidgetDropdownActionType | WidgetMenuActionType) & WidgetBaseActionType;

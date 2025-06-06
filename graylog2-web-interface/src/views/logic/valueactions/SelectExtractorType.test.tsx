@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { AdditionalContext } from 'views/logic/ActionContext';
 
 import SelectExtractorType from './SelectExtractorType';
@@ -50,7 +50,7 @@ describe('SelectExtractorType', () => {
       </AdditionalContext.Provider>,
     );
 
-    await screen.findByRole('heading', { name: /select extractor type/i, hidden: true });
+    await screen.findByRole('heading', { name: /select extractor type/i });
   });
 
   it('should select a extractor and open a new window', async () => {
@@ -64,7 +64,7 @@ describe('SelectExtractorType', () => {
     await selectEvent.openMenu(extractorType);
     await selectEvent.select(extractorType, 'Grok pattern');
 
-    await userEvent.click(await screen.findByRole('button', { name: /submit/i, hidden: true }));
+    await userEvent.click(await screen.findByRole('button', { name: /submit/i }));
 
     expect(window.open).toHaveBeenCalled();
     expect(focus).toHaveBeenCalled();

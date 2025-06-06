@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.ImmutableMessage.wrap;
 import static org.graylog2.indexer.messages.IndexingError.Type.IndexBlocked;
 import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
 import static org.mockito.ArgumentMatchers.any;
@@ -89,9 +90,9 @@ public class MessagesTest {
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.empty());
         final IndexSet indexSet = mock(IndexSet.class);
         final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(messageWithSize(17), indexSet),
-                new MessageWithIndex(messageWithSize(23), indexSet),
-                new MessageWithIndex(messageWithSize(42), indexSet)
+                new MessageWithIndex(wrap(messageWithSize(17)), indexSet),
+                new MessageWithIndex(wrap(messageWithSize(23)), indexSet),
+                new MessageWithIndex(wrap(messageWithSize(42)), indexSet)
         );
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
@@ -105,9 +106,9 @@ public class MessagesTest {
     public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
         final IndexSet indexSet = mock(IndexSet.class);
         final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(messageWithSize(17), indexSet),
-                new MessageWithIndex(messageWithSize(23), indexSet),
-                new MessageWithIndex(messageWithSize(42), indexSet)
+                new MessageWithIndex(wrap(messageWithSize(17)), indexSet),
+                new MessageWithIndex(wrap(messageWithSize(23)), indexSet),
+                new MessageWithIndex(wrap(messageWithSize(42)), indexSet)
         );
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 

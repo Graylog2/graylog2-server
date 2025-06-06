@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
@@ -37,8 +36,12 @@ import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.scheduler.schedule.CronJobSchedule;
+import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -70,16 +73,21 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
     private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     private static final String FIELD_GROUP_BY = "group_by";
     static final String FIELD_SERIES = "series";
     private static final String FIELD_CONDITIONS = "conditions";
     private static final String FIELD_SEARCH_WITHIN_MS = "search_within_ms";
     private static final String FIELD_EXECUTE_EVERY_MS = "execute_every_ms";
+    private static final String FIELD_USE_CRON_SCHEDULING = "use_cron_scheduling";
+    private static final String FIELD_CRON_EXPRESSION = "cron_expression";
+    private static final String FIELD_CRON_TIMEZONE = "cron_timezone";
     private static final String FIELD_EVENT_LIMIT = "event_limit";
 
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
 
+    @Nullable
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
 
@@ -88,6 +96,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_STREAMS)
     public abstract ImmutableSet<String> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract ImmutableSet<String> streamCategories();
 
     @JsonProperty(FIELD_GROUP_BY)
     public abstract List<String> groupBy();
@@ -104,17 +115,22 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
     public abstract long executeEveryMs();
 
+    @JsonProperty(FIELD_USE_CRON_SCHEDULING)
+    public abstract boolean useCronScheduling();
+
+    @Nullable
+    @JsonProperty(FIELD_CRON_EXPRESSION)
+    public abstract String cronExpression();
+
+    @Nullable
+    @JsonProperty(FIELD_CRON_TIMEZONE)
+    public abstract String cronTimezone();
+
     @JsonProperty(FIELD_EVENT_LIMIT)
     public abstract int eventLimit();
 
-
     @Override
     public Set<String> requiredPermissions() {
-        // When there are no streams the event processor will search in all streams so we need to require the
-        // generic stream permission.
-        if (streams().isEmpty()) {
-            return Collections.singleton(RestPermissions.STREAMS_READ);
-        }
         return streams().stream()
                 .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
                 .collect(Collectors.toSet());
@@ -131,7 +147,20 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         final DateTime now = clock.nowUTC();
 
         // We need an initial timerange for the first execution of the event processor
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minus(searchWithinMs()), now);
+        final AbsoluteRange timerange;
+        final JobSchedule schedule;
+        if (useCronScheduling()) {
+            CronJobSchedule cronJobSchedule = CronJobSchedule.builder()
+                    .timezone(cronTimezone())
+                    .cronExpression(cronExpression())
+                    .build();
+            DateTime nextTime = cronJobSchedule.calculateNextTime(now, now, clock).orElse(now);
+            schedule = cronJobSchedule;
+            timerange = AbsoluteRange.create(nextTime.minus(searchWithinMs()), nextTime);
+        } else {
+            schedule = IntervalJobSchedule.builder().interval(executeEveryMs()).unit(TimeUnit.MILLISECONDS).build();
+            timerange = AbsoluteRange.create(now.minus(searchWithinMs()), now);
+        }
 
         final EventProcessorExecutionJob.Config jobDefinitionConfig = EventProcessorExecutionJob.Config.builder()
                 .eventDefinitionId(eventDefinition.id())
@@ -140,10 +169,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 .parameters(AggregationEventProcessorParameters.builder()
                         .timerange(timerange)
                         .build())
-                .build();
-        final IntervalJobSchedule schedule = IntervalJobSchedule.builder()
-                .interval(executeEveryMs())
-                .unit(TimeUnit.MILLISECONDS)
+                .isCron(useCronScheduling())
                 .build();
 
         return Optional.of(EventProcessorSchedulerConfig.create(jobDefinitionConfig, schedule));
@@ -157,7 +183,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .queryParameters(ImmutableSet.of())
                     .filters(Collections.emptyList())
                     .type(TYPE_NAME)
-                    .eventLimit(0);
+                    .useCronScheduling(false)
+                    .eventLimit(0)
+                    .streamCategories(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -171,6 +199,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(Set<String> streamCategories);
 
         @JsonProperty(FIELD_GROUP_BY)
         public abstract Builder groupBy(List<String> groupBy);
@@ -190,6 +221,15 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         @JsonProperty(FIELD_EVENT_LIMIT)
         public abstract Builder eventLimit(Integer eventLimit);
 
+        @JsonProperty(FIELD_USE_CRON_SCHEDULING)
+        public abstract Builder useCronScheduling(boolean useCronScheduling);
+
+        @JsonProperty(FIELD_CRON_EXPRESSION)
+        public abstract Builder cronExpression(String cronExpression);
+
+        @JsonProperty(FIELD_CRON_TIMEZONE)
+        public abstract Builder cronTimezone(String cronTimezone);
+
         public abstract AggregationEventProcessorConfig build();
     }
 
@@ -198,7 +238,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     @Override
-    public ValidationResult validate() {
+    public ValidationResult validate(UserContext userContext) {
         final ValidationResult validationResult = new ValidationResult();
 
         if (searchWithinMs() <= 0) {
@@ -228,6 +268,22 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                         validationResult.addError(FIELD_SERIES, "Aggregation's series of type " + ser.type() + " must contain non-empty value for field");
                     }
                 });
+
+        if (streams().isEmpty() && !userContext.isPermitted(RestPermissions.STREAMS_READ)) {
+            validationResult.addError(FIELD_STREAMS, "At least one stream must have been selected.");
+        }
+
+        if (useCronScheduling()) {
+            if (cronExpression() == null || cronExpression().isEmpty()) {
+                validationResult.addError(FIELD_CRON_EXPRESSION, "Cron expression must not be empty when using cron scheduling");
+            } else {
+                try {
+                    CronUtils.validateExpression(cronExpression());
+                } catch (Exception e) {
+                    validationResult.addError(FIELD_CRON_EXPRESSION, e.getMessage());
+                }
+            }
+        }
 
         return validationResult;
     }
@@ -277,13 +333,18 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
-                .filters(ImmutableList.copyOf(filters()))
+                .queryParameters(queryParameters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(streamRefs)
+                .streamCategories(streamCategories())
                 .groupBy(groupBy())
                 .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(conditions().orElse(null))
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())
+                .useCronScheduling(useCronScheduling())
+                .cronExpression(cronExpression())
+                .cronTimezone(cronTimezone())
                 .eventLimit(eventLimit())
                 .build();
     }
@@ -297,6 +358,11 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+        // attribute is tagged @Nullable, so do a null check first
+        if(queryParameters() != null) {
+            queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+        }
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 
     @Override

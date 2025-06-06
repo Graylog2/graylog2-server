@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Icon, OverlayTrigger, Select, NestedForm } from 'components/common';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, Col, Label, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
@@ -28,70 +27,91 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import Errors from './Errors';
-import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
+import { RuleBuilderTypes } from './types';
 import type { BlockType, RuleBlock, BlockDict, BlockFieldDict, OutputVariables } from './types';
 
 import RuleHelperTable from '../rule-helper/RulerHelperTable';
 
-type Option = { label: string, value: any, description?: string | null };
+type Option = { label: string; value: any; description?: string | null; deprecated?: boolean };
 
 type Props = {
-  existingBlock?: RuleBlock,
-  onAdd: (values: { [key: string]: any }) => void,
-  onCancel: () => void,
-  onSelect: (option: string) => void,
-  onUpdate: (values: { [key: string]: any }, functionName: string) => void,
-  options: Array<Option>,
-  order: number,
-  outputVariableList?: OutputVariables,
-  selectedBlockDict?: BlockDict,
-  type: BlockType,
-}
+  existingBlock?: RuleBlock;
+  onAdd: (values: { [key: string]: any }) => void;
+  onCancel: () => void;
+  onSelect: (option: string) => void;
+  onUpdate: (values: { [key: string]: any }, functionName: string) => void;
+  options: Array<Option>;
+  order: number;
+  outputVariableList?: OutputVariables;
+  selectedBlockDict?: BlockDict;
+  type: BlockType;
+};
 
-const BlockDescription = styled.p(({ theme }) => css`
-  color: ${theme.colors.gray[50]};
-`);
+const BlockDescription = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[50]};
+  `,
+);
 
-const SelectedBlock = styled.div(({ theme }) => css`
-  border-left: 1px solid ${theme.colors.gray['90']};
-  border-right: 1px solid ${theme.colors.gray['90']};
-  border-bottom: 1px solid ${theme.colors.gray['90']};
-  border-radius: 0 0 10px 10px;
-  padding: ${theme.spacings.md};
-`);
+const SelectedBlock = styled.div(
+  ({ theme }) => css`
+    border-left: 1px solid ${theme.colors.gray['90']};
+    border-right: 1px solid ${theme.colors.gray['90']};
+    border-bottom: 1px solid ${theme.colors.gray['90']};
+    border-radius: 0 0 10px 10px;
+    padding: ${theme.spacings.md};
+  `,
+);
 
-const SelectedBlockInfo = styled(Row)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
+const SelectedBlockInfo = styled(Row)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
 
-const OptionTitle = styled.p(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xxs};
-`);
+const OptionTitle = styled.p(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xxs};
+  `,
+);
 
-const SelectRow = styled(Row)(({ theme }) => css`
-  margin-top: ${theme.spacings.xxs};
-  margin-bottom: ${theme.spacings.xxs};
-`);
+const SelectRow = styled(Row)(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.xxs};
+    margin-bottom: ${theme.spacings.xxs};
+  `,
+);
 
-const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
-  color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
-  margin-bottom: ${theme.spacings.xxs};
-  font-size: 0.75rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-`);
+const OptionDescription = styled.p<{ $isSelected: boolean }>(
+  ({ theme, $isSelected }) => css`
+    color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
+    margin-bottom: ${theme.spacings.xxs};
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  `,
+);
+
+const OptionContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const DeprecatedLabel = styled.span`
+  float: right;
+`;
 
 const RuleBlockForm = ({
-  existingBlock,
+  existingBlock = undefined,
   onAdd,
   onCancel,
   onSelect,
   onUpdate,
   options,
   order,
-  outputVariableList,
-  selectedBlockDict,
+  outputVariableList = [],
+  selectedBlockDict = undefined,
   type,
 }: Props) => {
   const [initialValues, setInitialValues] = useState<{}>({});
@@ -104,12 +124,10 @@ const RuleBlockForm = ({
 
     if (selectedBlockDict) {
       selectedBlockDict.params.forEach((param: BlockFieldDict) => {
-        const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
+        const initialBlockValue =
+          existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
 
-        if (
-          initialBlockValue
-          || ((param.type === RuleBuilderTypes.Boolean) && (typeof initialBlockValue === 'boolean'))
-        ) {
+        if (initialBlockValue || (param.type === RuleBuilderTypes.Boolean && typeof initialBlockValue === 'boolean')) {
           newInitialValues[param.name] = initialBlockValue;
         } else {
           newInitialValues[param.name] = param.default_value;
@@ -124,18 +142,23 @@ const RuleBlockForm = ({
     sendTelemetry(
       type === 'condition'
         ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_CONDITION_SELECTED
-        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_ACTION_SELECTED, {
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_ACTION_SELECTED,
+      {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rule-builder',
         app_action_value: `select-${type}`,
         event_details: { option },
-      });
+      },
+    );
 
     resetForm();
     onSelect(option);
   };
 
-  const resetField = (fieldName: string, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void) => {
+  const resetField = (
+    fieldName: string,
+    setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void,
+  ) => {
     setFieldValue(fieldName, null);
   };
 
@@ -144,22 +167,26 @@ const RuleBlockForm = ({
       sendTelemetry(
         type === 'condition'
           ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_CONDITION_CLICKED
-          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_ACTION_CLICKED, {
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_ACTION_CLICKED,
+        {
           app_pathname: getPathnameWithoutId(pathname),
           app_section: 'pipeline-rule-builder',
           app_action_value: `update-${type}-button`,
-        });
+        },
+      );
 
       onUpdate(values, selectedBlockDict?.name);
     } else {
       sendTelemetry(
         type === 'condition'
           ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_CONDITION_CLICKED
-          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_ACTION_CLICKED, {
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_ACTION_CLICKED,
+        {
           app_pathname: getPathnameWithoutId(pathname),
           app_section: 'pipeline-rule-builder',
           app_action_value: `add-${type}-button`,
-        });
+        },
+      );
 
       onAdd(values);
     }
@@ -167,8 +194,17 @@ const RuleBlockForm = ({
 
   const optionRenderer = (option: Option, isSelected: boolean) => (
     <>
-      <OptionTitle>{option.label}</OptionTitle>
-      {option.description && (<OptionDescription $isSelected={isSelected}>{option.description}</OptionDescription>)}
+      <OptionContainer>
+        <OptionTitle>{option.label}</OptionTitle>
+        <span>
+          {option.deprecated && (
+            <Label bsStyle="warning" bsSize="xs">
+              Deprecated
+            </Label>
+          )}
+        </span>
+      </OptionContainer>
+      {option.description && <OptionDescription $isSelected={isSelected}>{option.description}</OptionDescription>}
     </>
   );
 
@@ -180,16 +216,18 @@ const RuleBlockForm = ({
             <NestedForm>
               <SelectRow>
                 <Col md={12}>
-                  <Select id={`existingBlock-select-${type}`}
-                          name={`existingBlock-select-${type}`}
-                          placeholder={`Add ${type}`}
-                          options={options}
-                          optionRenderer={optionRenderer}
-                          clearable={false}
-                          matchProp="label"
-                          autoFocus
-                          onChange={(option: string) => handleChange(option, resetForm)}
-                          value={selectedBlockDict?.name || ''} />
+                  <Select
+                    id={`existingBlock-select-${type}`}
+                    name={`existingBlock-select-${type}`}
+                    placeholder={`Add ${type}`}
+                    options={options}
+                    optionRenderer={optionRenderer}
+                    clearable={false}
+                    matchProp="label"
+                    autoFocus
+                    onChange={(option: string) => handleChange(option, resetForm)}
+                    value={selectedBlockDict?.name || ''}
+                  />
                 </Col>
               </SelectRow>
 
@@ -199,18 +237,30 @@ const RuleBlockForm = ({
                     <Col md={12}>
                       <h5>
                         {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
-                        <OverlayTrigger trigger="click"
-                                        rootClose
-                                        placement="right"
-                                        title="Function Syntax Help"
-                                        width={700}
-                                        overlay={<RuleHelperTable entries={[selectedBlockDict]} expanded={{ [selectedBlockDict.name]: true }} />}>
+                        <OverlayTrigger
+                          trigger="click"
+                          rootClose
+                          placement="right"
+                          title="Function Syntax Help"
+                          width={700}
+                          overlay={
+                            <RuleHelperTable
+                              entries={[selectedBlockDict]}
+                              expanded={{ [selectedBlockDict.name]: true }}
+                            />
+                          }>
                           <Button bsStyle="link">
-                            <Icon name="help"
-                                  title="Function Syntax Help"
-                                  data-testid="funcSyntaxHelpIcon" />
+                            <Icon name="help" title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
+                        {selectedBlockDict.deprecated && (
+                          <DeprecatedLabel>
+                            &nbsp;
+                            <Label bsStyle="warning" bsSize="xs">
+                              Deprecated
+                            </Label>
+                          </DeprecatedLabel>
+                        )}
                       </h5>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
@@ -218,27 +268,29 @@ const RuleBlockForm = ({
 
                   {selectedBlockDict.params.map((param) => (
                     <Row key={`${order}_${param.name}`}>
-                      <RuleBlockFormField param={param}
-                                          functionName={selectedBlockDict.name}
-                                          order={order}
-                                          blockId={existingBlock?.id}
-                                          outputVariableList={outputVariableList}
-                                          blockType={type}
-                                          resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
+                      <RuleBlockFormField
+                        param={param}
+                        functionName={selectedBlockDict.name}
+                        order={order}
+                        blockId={existingBlock?.id}
+                        outputVariableList={outputVariableList}
+                        blockType={type}
+                        resetField={(fieldName) => resetField(fieldName, setFieldValue)}
+                      />
                     </Row>
-                  ),
-                  )}
+                  ))}
 
                   <Errors objectWithErrors={existingBlock} />
-                  <FormSubmit bsSize="small"
-                              disabledSubmit={!isValid}
-                              submitButtonText={existingBlock ? 'Update' : 'Add'}
-                              submitButtonType="submit"
-                              onCancel={() => {
-                                resetForm();
-                                onCancel();
-                              }} />
-
+                  <FormSubmit
+                    bsSize="small"
+                    disabledSubmit={!isValid}
+                    submitButtonText={existingBlock ? 'Update' : 'Add'}
+                    submitButtonType="submit"
+                    onCancel={() => {
+                      resetForm();
+                      onCancel();
+                    }}
+                  />
                 </SelectedBlock>
               )}
             </NestedForm>
@@ -247,30 +299,6 @@ const RuleBlockForm = ({
       </Col>
     </Row>
   );
-};
-
-RuleBlockForm.propTypes = {
-  existingBlock: ruleBlockPropType,
-  onAdd: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string,
-      value: PropTypes.any,
-    }),
-  ).isRequired,
-  order: PropTypes.number.isRequired,
-  outputVariableList: outputVariablesPropType,
-  selectedBlockDict: blockDictPropType,
-  type: PropTypes.oneOf(['action', 'condition']).isRequired,
-};
-
-RuleBlockForm.defaultProps = {
-  existingBlock: undefined,
-  outputVariableList: undefined,
-  selectedBlockDict: undefined,
 };
 
 export default RuleBlockForm;

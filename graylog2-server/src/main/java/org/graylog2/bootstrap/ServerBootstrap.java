@@ -22,29 +22,33 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.util.Types;
+import org.graylog.security.certutil.CertificateAuthorityBindings;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
+import org.graylog2.bootstrap.preflight.PasswordSecretPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
+import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
+import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.configuration.IndexerDiscoveryModule;
-import org.graylog2.configuration.PathConfiguration;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.MessageBindings;
@@ -70,6 +74,7 @@ import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.shared.system.stats.SystemStatsModule;
+import org.graylog2.storage.versionprobe.VersionProbeModule;
 import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,13 +99,16 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
-public abstract class ServerBootstrap extends CmdLineTool {
+public abstract class ServerBootstrap extends AbstractNodeCommand {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
+
+    private final Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
+        this.configuration = configuration;
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog")
@@ -128,20 +136,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart() {
+        super.beforeStart();
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
             savePidFile(getPidFile());
         }
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
-
-        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
     }
 
     @Override
@@ -160,6 +161,17 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
+        preflightCheckModules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                // needed for the ObjectMapperModule, to avoid missing MessageInput.Factory
+                MapBinder.newMapBinder(binder(),
+                        TypeLiteral.get(String.class),
+                        new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
+                        });
+            }
+        });
+        preflightCheckModules.add(new ObjectMapperModule(chainingClassLoader));
 
         if (featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
@@ -172,13 +184,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
-        modules.add(new DataNodeProvisioningBindings());
+        modules.add(new GraylogServerProvisioningBindings());
         modules.add(new PreflightWebModule(configuration));
-        modules.add(new ObjectMapperModule(chainingClassLoader));
         modules.add(new SchedulerBindings());
-        modules.add((binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         final Injector preflightInjector = getPreflightInjector(modules);
+        // explicitly call the PasswordSecretPreflightCheck also when showing preflight web to make sure
+        // data node isn't provisioned with the wrong password_secret
+        preflightInjector.getInstance(PasswordSecretPreflightCheck.class).runCheck();
         GuiceInjectorHolder.setInjector(preflightInjector);
         try {
             doRunWithPreflightInjector(preflightInjector);
@@ -188,6 +201,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private void doRunWithPreflightInjector(Injector preflightInjector) {
+
+        // always run preflight migrations, even if we skip the preflight web later
+        runPreflightMigrations(preflightInjector);
+
         final PreflightBoot preflightBoot = preflightInjector.getInstance(PreflightBoot.class);
 
         if (!preflightBoot.shouldRunPreflightWeb()) {
@@ -195,16 +212,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
 
         LOG.info("Fresh installation detected, starting configuration webserver");
-
-
-        try {
-            if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
-            }
-        } catch (Exception e) {
-            LOG.error("Exception while running migrations", e);
-            System.exit(1);
-        }
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
@@ -241,6 +248,17 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
+    private void runPreflightMigrations(Injector preflightInjector) {
+        try {
+            if (configuration.isLeader() && configuration.runMigrations()) {
+                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
+            }
+        } catch (Exception e) {
+            LOG.error("Exception while running migrations", e);
+            System.exit(1);
+        }
+    }
+
     private void runMongoPreflightCheck() {
         // The MongoDBPreflightCheck is not run via the PreflightCheckService,
         // because it also detects whether we are running on a fresh Graylog installation
@@ -268,25 +286,20 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
+                new VersionProbeModule(),
+                binder -> binder.bind(IndexerHostsAdapter.class).toInstance(List::of),
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new GraylogServerProvisioningBindings(),
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
-                binder -> preflightCheckModules.forEach(binder::install));
-    }
-
-    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
-        // Give netty a better spot than /tmp to unpack its tcnative libraries
-        if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
-        }
-        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
-        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
-            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
-        }
+                new CertificateAuthorityBindings(),
+                (binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader),
+                binder -> preflightCheckModules.forEach(binder::install),
+                this::featureFlagsBinding);
     }
 
     @Override
@@ -425,16 +438,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new MessageBindings());
         result.add(new SecurityBindings());
-        result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());
         result.add(new SharedPeriodicalBindings());
-        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
         result.add(new CertificateRenewalBindings());
-        result.add(new DataNodeProvisioningBindings());
-
+        result.add(new GraylogServerProvisioningBindings());
+        result.add(new CertificateAuthorityBindings());
         return result;
     }
 

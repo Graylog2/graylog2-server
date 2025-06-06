@@ -16,18 +16,20 @@
  */
 package org.graylog2.indexer.migration;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record RemoteReindexIndex(String name, Status status, DateTime created, Duration took,
+public record RemoteReindexIndex(String taskId, String name, Status status, DateTime created, Duration took,
                                  IndexMigrationProgress progress, String errorMsg) {
 
 
     public static RemoteReindexIndex noBackgroundTaskYet(String indexName) {
-        return new RemoteReindexIndex(indexName, Status.NOT_STARTED, null, null, null, null);
+        return new RemoteReindexIndex(null, indexName, Status.NOT_STARTED, null, null, null, null);
     }
 
     public boolean isCompleted() {

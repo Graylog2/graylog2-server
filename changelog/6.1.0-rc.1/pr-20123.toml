@@ -1,0 +1,4 @@
+type = "a"
+message = "Show system notification while remote reindexing during the data node migration."
+
+pulls = ["20123"]

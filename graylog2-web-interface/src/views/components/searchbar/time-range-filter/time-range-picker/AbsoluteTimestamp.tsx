@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
@@ -24,20 +23,22 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import AbsoluteDateInput from './AbsoluteDateInput';
 
 type Props = {
-  disabled: boolean,
-  range: 'to' | 'from',
-  timeRange: AbsoluteTimeRange,
+  disabled?: boolean;
+  range: 'to' | 'from';
+  timeRange: AbsoluteTimeRange;
 };
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.dark.danger};
+    font-size: ${theme.fonts.size.small};
+    font-style: italic;
+    padding: 3px 3px 9px;
+    height: 1.5em;
+  `,
+);
 
-const AbsoluteTimestamp = ({ disabled, timeRange, range }: Props) => (
+const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => {
       const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
@@ -45,10 +46,7 @@ const AbsoluteTimestamp = ({ disabled, timeRange, range }: Props) => (
 
       return (
         <>
-          <AbsoluteDateInput name={name}
-                             disabled={disabled}
-                             value={dateTime}
-                             onChange={_onChange} />
+          <AbsoluteDateInput name={name} disabled={disabled} value={dateTime} onChange={_onChange} />
 
           <ErrorMessage>{error}</ErrorMessage>
         </>
@@ -56,15 +54,5 @@ const AbsoluteTimestamp = ({ disabled, timeRange, range }: Props) => (
     }}
   </Field>
 );
-
-AbsoluteTimestamp.propTypes = {
-  disabled: PropTypes.bool,
-  timeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  range: PropTypes.oneOf(['to', 'from']).isRequired,
-};
-
-AbsoluteTimestamp.defaultProps = {
-  disabled: false,
-};
 
 export default AbsoluteTimestamp;

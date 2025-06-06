@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fixes Recent Activity pagination, so that it does not ignore entries for deleted items."
+
+issues = ["19313"]
+pulls = ["19394"]
+

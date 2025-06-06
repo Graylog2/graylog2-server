@@ -29,4 +29,6 @@ public interface RemoteReindexMigrationService {
     void assignTask(String migrationID, String indexName, String taskId);
 
     void appendLogEntry(String migrationId, LogEntry log);
+
+    Optional<String> getLatestMigrationId();
 }

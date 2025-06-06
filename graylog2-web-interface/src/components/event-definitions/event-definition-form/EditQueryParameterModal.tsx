@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import React from 'react';
 
@@ -23,33 +22,26 @@ import { Button, BootstrapModalForm } from 'components/bootstrap';
 import type { LookupTable } from 'logic/lookup-tables/types';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type { ValidationState } from 'components/common/types';
 
 type Props = {
-  queryParameters: Array<LookupTableParameterJson>,
-  lookupTables: Array<LookupTable>,
-  onChange: (newQueryParameters: Array<LookupTableParameterJson>) => void,
-  queryParameter: LookupTableParameter,
-  embryonic: boolean,
-}
+  queryParameters: Array<LookupTableParameterJson>;
+  lookupTables: Array<LookupTable>;
+  onChange: (newQueryParameters: Array<LookupTableParameterJson>) => void;
+  queryParameter: LookupTableParameter;
+  embryonic: boolean;
+};
 
 type State = {
-  showModal: boolean,
-  queryParameter: LookupTableParameter,
+  showModal: boolean;
+  queryParameter: LookupTableParameter;
   validation: {
-    lookupTable?: string,
-    key?: string,
-  },
-}
+    lookupTable?: string;
+    key?: string;
+  };
+};
 
 class EditQueryParameterModal extends React.Component<Props, State> {
-  static propTypes = {
-    queryParameters: PropTypes.array.isRequired,
-    queryParameter: PropTypes.object.isRequired,
-    lookupTables: PropTypes.array.isRequired,
-    onChange: PropTypes.func.isRequired,
-    embryonic: PropTypes.bool.isRequired,
-  };
-
   constructor(props) {
     super(props);
 
@@ -125,8 +117,8 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     const { queryParameter, validation, showModal } = this.state;
 
     const validationState: {
-      lookupTable?: [string, string],
-      key?: [string, string],
+      lookupTable?: [ValidationState, string];
+      key?: [ValidationState, string];
     } = {
       lookupTable: validation.lookupTable ? ['error', validation.lookupTable] : undefined,
       key: validation.key ? ['error', validation.key] : undefined,
@@ -134,23 +126,25 @@ class EditQueryParameterModal extends React.Component<Props, State> {
 
     return (
       <>
-        <Button bsSize="small"
-                bsStyle={embryonic ? 'primary' : 'info'}
-                onClick={() => this.openModal()}>
-          {queryParameter.name}{embryonic && ': undeclared'}
+        <Button bsSize="small" bsStyle={embryonic ? 'primary' : 'info'} onClick={() => this.openModal()}>
+          {queryParameter.name}
+          {embryonic && ': undeclared'}
         </Button>
 
-        <BootstrapModalForm show={showModal}
-                            title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
-                            data-telemetry-title="Declare Query Parameter from Lookup Table"
-                            onSubmitForm={this._saved}
-                            onCancel={this._cleanState}
-                            submitButtonText="Save">
-          <LookupTableParameterEdit validationState={validationState}
-                                    identifier={queryParameter.name}
-                                    parameter={queryParameter}
-                                    onChange={this.handleParameterChange}
-                                    lookupTables={lookupTables} />
+        <BootstrapModalForm
+          show={showModal}
+          title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
+          data-telemetry-title="Declare Query Parameter from Lookup Table"
+          onSubmitForm={this._saved}
+          onCancel={this._cleanState}
+          submitButtonText="Save">
+          <LookupTableParameterEdit
+            validationState={validationState}
+            identifier={queryParameter.name}
+            parameter={queryParameter}
+            onChange={this.handleParameterChange}
+            lookupTables={lookupTables}
+          />
         </BootstrapModalForm>
       </>
     );

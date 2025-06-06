@@ -23,30 +23,28 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 export type IndexRange = {
-  index_name: string,
-  begin: string,
-  end: string,
-  calculated_at: string,
-  took_ms: number,
+  index_name: string;
+  begin: string;
+  end: string;
+  calculated_at: string;
+  took_ms: number;
 };
 
 type IndexRangesActionsType = {
-  list: () => Promise<unknown>,
-  recalculate: (indexSetId: string) => Promise<unknown>,
-  recalculateIndex: (indexName: string) => Promise<unknown>,
-}
-export const IndexRangesActions = singletonActions(
-  'core.IndexRanges',
-  () => Reflux.createActions<IndexRangesActionsType>({
+  list: () => Promise<unknown>;
+  recalculate: (indexSetId: string) => Promise<unknown>;
+  recalculateIndex: (indexName: string) => Promise<unknown>;
+};
+export const IndexRangesActions = singletonActions('core.IndexRanges', () =>
+  Reflux.createActions<IndexRangesActionsType>({
     list: { asyncResult: true },
     recalculate: { asyncResult: true },
     recalculateIndex: { asyncResult: true },
   }),
 );
 
-export const IndexRangesStore = singletonStore(
-  'core.IndexRanges',
-  () => Reflux.createStore({
+export const IndexRangesStore = singletonStore('core.IndexRanges', () =>
+  Reflux.createStore({
     listenables: [IndexRangesActions],
     indexRanges: undefined,
 
@@ -71,10 +69,12 @@ export const IndexRangesStore = singletonStore(
       const promise = fetch('POST', url);
 
       promise
-        .then(UserNotification.success('Index ranges will be recalculated shortly'))
+        .then(() => UserNotification.success('Index ranges will be recalculated shortly'))
         .catch((error) => {
-          UserNotification.error(`Could not create a job to start index ranges recalculation, reason: ${error}`,
-            'Error starting index ranges recalculation');
+          UserNotification.error(
+            `Could not create a job to start index ranges recalculation, reason: ${error}`,
+            'Error starting index ranges recalculation',
+          );
         });
 
       IndexRangesActions.recalculate.promise(promise);
@@ -84,10 +84,12 @@ export const IndexRangesStore = singletonStore(
       const promise = fetch('POST', url);
 
       promise
-        .then(UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
+        .then(() => UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
         .catch((error) => {
-          UserNotification.error(`Could not create a job to start index ranges recalculation for ${indexName}, reason: ${error}`,
-            `Error starting index ranges recalculation for ${indexName}`);
+          UserNotification.error(
+            `Could not create a job to start index ranges recalculation for ${indexName}, reason: ${error}`,
+            `Error starting index ranges recalculation for ${indexName}`,
+          );
         });
 
       IndexRangesActions.recalculateIndex.promise(promise);

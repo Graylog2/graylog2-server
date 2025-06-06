@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
@@ -30,32 +29,31 @@ const SelectContainer = styled.div`
 `;
 
 type Props = {
-  onChange: (newValue: string) => void,
-  value: string,
-  streams: Array<Stream>,
+  onChange: (newValue: string) => void;
+  value: string;
+  streams: Array<Stream>;
 };
 
 const StreamSelect = ({ onChange, value, streams }: Props) => {
-  const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
-    .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
-    .map(({ title, id }) => ({ label: title, value: id }))];
+  const options = [
+    { label: 'Default Search', value: DEFAULT_SEARCH_ID },
+    ...streams
+      .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
+      .map(({ title, id }) => ({ label: title, value: id })),
+  ];
 
   return (
     <SelectContainer>
-      <Select inputId="streams-filter"
-              onChange={onChange}
-              options={options}
-              clearable={false}
-              placeholder="There are no decorators configured for any stream."
-              value={value} />
+      <Select
+        inputId="streams-filter"
+        onChange={onChange}
+        options={options}
+        clearable={false}
+        placeholder="There are no decorators configured for any stream."
+        value={value}
+      />
     </SelectContainer>
   );
-};
-
-StreamSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-  streams: PropTypes.array.isRequired,
 };
 
 export default StreamSelect;

@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-
 /**
  * Set of callbacks used during the migration in different states.
  */
@@ -41,19 +39,21 @@ public interface MigrationActions {
     boolean renewalPolicyDoesNotExist();
     boolean caAndRenewalPolicyExist();
 
+    boolean compatibleDatanodesRunning();
+
     void provisionDataNodes();
 
     void provisionAndStartDataNodes();
 
     boolean provisioningFinished();
 
+    boolean allDatanodesPrepared();
+
     void startDataNodes();
 
-    boolean dataNodeStartupFinished();
+    boolean allDatanodesAvailable();
 
-    void setStateMachineContext(MigrationStateMachineContext context);
-
-    MigrationStateMachineContext getStateMachineContext();
+    void setPreflightFinished();
 
     void startRemoteReindex();
 
@@ -63,4 +63,13 @@ public interface MigrationActions {
 
     void verifyRemoteIndexerConnection();
 
+    boolean isCompatibleInPlaceMigrationVersion();
+
+    void getElasticsearchHosts();
+
+    void stopDatanodes();
+
+    void finishRemoteReindexMigration();
+
+    boolean isRemoteReindexMigrationEnabled();
 }

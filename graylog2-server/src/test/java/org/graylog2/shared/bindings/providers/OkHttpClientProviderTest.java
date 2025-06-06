@@ -291,11 +291,11 @@ public class OkHttpClientProviderTest {
         final ProxySelectorProvider proxyProvider = new ProxySelectorProvider(server.url("/").uri(), null);
         ProxySelectorProvider spyProxyProvider = Mockito.spy(proxyProvider);
         final OkHttpClientProvider provider = new OkHttpClientProvider(
+                "GraylogTest",
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
-                server.url("/").uri(),
-                null, spyProxyProvider);
+                server.url("/").uri(), null, spyProxyProvider);
 
         OkHttpClientProvider spyClientProvider = Mockito.spy(provider);
 
@@ -310,6 +310,23 @@ public class OkHttpClientProviderTest {
                 .hasSize(1)
                 .first()
                 .matches(proxy -> proxy.equals(testProxy));
+    }
+
+    @Test
+    public void testDefaultUserAgent() throws IOException, InterruptedException {
+        server.enqueue(successfulMockResponse());
+        client(server.url("/").uri()).newCall(request()).execute();
+        final RecordedRequest recordedRequest = server.takeRequest();
+        assertThat(recordedRequest.getHeader(HttpHeaders.USER_AGENT)).isEqualTo("GraylogTest");
+    }
+
+    @Test
+    public void testCustomUserAgent() throws IOException, InterruptedException {
+        server.enqueue(successfulMockResponse());
+        final var request = request().newBuilder().header(HttpHeaders.USER_AGENT, "foo").build();
+        client(server.url("/").uri()).newCall(request).execute();
+        final RecordedRequest recordedRequest = server.takeRequest();
+        assertThat(recordedRequest.getHeader(HttpHeaders.USER_AGENT)).isEqualTo("foo");
     }
 
     private MockResponse successfulMockResponse() {
@@ -334,11 +351,11 @@ public class OkHttpClientProviderTest {
 
     private OkHttpClient client(URI proxyURI) {
         final OkHttpClientProvider provider = new OkHttpClientProvider(
+                "GraylogTest",
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
-                proxyURI,
-                null, new ProxySelectorProvider(proxyURI, null));
+                proxyURI, null, new ProxySelectorProvider(proxyURI, null));
 
         return provider.get();
     }

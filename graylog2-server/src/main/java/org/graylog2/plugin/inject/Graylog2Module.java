@@ -26,8 +26,12 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.graylog.plugins.views.search.db.StaticReferencedSearch;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
@@ -51,26 +55,25 @@ import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
+import org.graylog2.streams.StreamDeletionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.ext.ExceptionMapper;
-
 import java.lang.annotation.Annotation;
+import java.util.Set;
 
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
 
     public static final String SYSTEM_REST_RESOURCES = "systemRestResources";
+    public static final String DB_ENTITIES = "dbEntities";
 
     protected void installTransport(
             MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
@@ -295,6 +298,10 @@ public abstract class Graylog2Module extends AbstractModule {
         }
 
         installOutput(outputMapBinder, target, factoryClass);
+    }
+
+    protected MapBinder<String, FilteredMessageOutput> filteredOutputsMapBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, FilteredMessageOutput.class);
     }
 
     protected Multibinder<PluginPermissions> permissionsBinder() {
@@ -523,4 +530,25 @@ public abstract class Graylog2Module extends AbstractModule {
                                        Class<? extends ViewResolver> resolverClass) {
         viewResolverBinder().addBinding(name).to(resolverClass).asEagerSingleton();
     }
+
+    protected void addStaticReferencedSearch(StaticReferencedSearch referencedSearch) {
+        staticReferencedSearchBinder().addBinding().toInstance(referencedSearch);
+    }
+
+    protected Multibinder<StaticReferencedSearch> staticReferencedSearchBinder() {
+        return Multibinder.newSetBinder(binder(), StaticReferencedSearch.class);
+    }
+
+    protected Multibinder<StreamDeletionGuard> streamDeletionGuardBinder() {
+        return Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
+    }
+
+    protected Multibinder<Class<?>> dbEntitiesBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<>() {}, Names.named(DB_ENTITIES));
+    }
+
+    protected Set<Object> getConfigurationBeans() {
+        return Set.of();
+    }
+
 }

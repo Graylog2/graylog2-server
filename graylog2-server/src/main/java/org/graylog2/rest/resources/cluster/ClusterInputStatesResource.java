@@ -41,6 +41,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
@@ -85,6 +86,18 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @NoPermissionCheckRequired
     public Map<String, Optional<InputCreated>> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.start(inputId)));
+    }
+
+    @PUT
+    @Path("/setup/{inputId}")
+    @Timed
+    @ApiOperation(value = "Switch specified input to setup mode in all nodes")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input."),
+    })
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
+    public Map<String, Optional<InputSetup>> setup(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+        return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.setup(inputId)));
     }
 
     @DELETE

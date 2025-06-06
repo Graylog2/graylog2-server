@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 const DEFAULT_DATA = {
   pagination: {
@@ -29,20 +29,24 @@ const DEFAULT_DATA = {
 };
 
 type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-}
+  page: number;
+  pageSize: number;
+  query: string;
+};
 
 type PaginatedSuggestions = {
-  pagination: { total: number }
-  suggestions: Array<{ id: string, value: string }>,
-}
+  pagination: { total: number };
+  suggestions: Array<{ id: string; value: string }>;
+};
 
-const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams): Promise<PaginatedSuggestions | undefined> => {
+const fetchFilterValueSuggestions = async (
+  collection: string,
+  { query, page, pageSize }: SearchParams,
+  collectionProperty: string = 'title',
+): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
-    column: 'title',
+    column: collectionProperty,
   };
   const url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
 
@@ -53,22 +57,28 @@ const useFilterValueSuggestions = (
   attributeId: string,
   collection: string,
   searchParams: SearchParams,
+  collectionProperty: string,
 ): {
-  data: PaginatedSuggestions | undefined
-  isInitialLoading: boolean
+  data: PaginatedSuggestions | undefined;
+  isInitialLoading: boolean;
 } => {
   if (!collection) {
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
-        'Could not load filter suggestions');
+  const { data, isInitialLoading } = useQuery(
+    ['filters', 'suggestions', searchParams],
+    () =>
+      defaultOnError(
+        fetchFilterValueSuggestions(collection, searchParams, collectionProperty),
+        'Loading suggestions for filter failed with status',
+        'Could not load filter suggestions',
+      ),
+    {
+      retry: 0,
+      keepPreviousData: true,
     },
-    retry: 0,
-    keepPreviousData: true,
-  });
+  );
 
   return {
     data: data ?? DEFAULT_DATA,

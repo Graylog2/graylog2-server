@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import { SystemIndexRanges } from '@graylog/server-api';
+
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 
 const _onRecalculateAllIndexRange = () => {
@@ -29,7 +30,9 @@ const _onRecalculateAllIndexRange = () => {
 const AllIndicesMaintenanceDropdown = () => (
   <ButtonGroup>
     <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-      <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>Cleanup & recalculate all index ranges</MenuItem>
+      <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>
+        Cleanup & recalculate all index ranges
+      </MenuItem>
     </DropdownButton>
   </ButtonGroup>
 );

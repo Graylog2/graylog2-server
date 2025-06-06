@@ -22,15 +22,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotNull;
-
 import java.util.Collections;
 import java.util.Set;
 
@@ -40,7 +39,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @JsonAutoDetect
 @JsonDeserialize(builder = AuthServiceBackendDTO.Builder.class)
 @WithBeanGetter
-public abstract class AuthServiceBackendDTO {
+public abstract class AuthServiceBackendDTO implements BuildableMongoEntity<AuthServiceBackendDTO, AuthServiceBackendDTO.Builder> {
     private static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -94,7 +93,7 @@ public abstract class AuthServiceBackendDTO {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<AuthServiceBackendDTO, Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_AuthServiceBackendDTO.Builder()

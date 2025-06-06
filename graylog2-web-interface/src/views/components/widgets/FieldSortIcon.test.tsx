@@ -30,7 +30,14 @@ describe('FieldSortIcon', () => {
   it('should set descending sort on click, if field sort is not defined', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingState = jest.fn();
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingState} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingState}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort source Descending');
 
@@ -48,7 +55,14 @@ describe('FieldSortIcon', () => {
 
   it('should set ascending sort on click, if field sort is descending', () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="timestamp" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="timestamp"
+        onSortChange={onSortChangeStub}
+        setLoadingState={() => {}}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort timestamp Ascending');
 
@@ -66,7 +80,14 @@ describe('FieldSortIcon', () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingState = jest.fn();
 
-    const { getByTitle } = render(<FieldSortIcon config={initialConfig} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingState} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={initialConfig}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingState}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort source Descending');
 
@@ -85,7 +106,14 @@ describe('FieldSortIcon', () => {
   it('should set loading state while changing sort', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingStateStub = jest.fn();
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingStateStub} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingStateStub}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort source Descending');
 

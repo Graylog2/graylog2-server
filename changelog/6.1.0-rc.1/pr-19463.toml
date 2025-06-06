@@ -1,0 +1,5 @@
+type="a"
+message="Add option to select all fields for messages export widget"
+
+pulls = ["19463"]
+issues=["Graylog2/graylog-plugin-enterprise#5616"]

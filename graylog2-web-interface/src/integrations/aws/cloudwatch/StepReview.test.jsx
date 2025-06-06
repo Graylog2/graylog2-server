@@ -33,7 +33,7 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 describe('<StepReview>', () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it('creates an input as default action', async () => {

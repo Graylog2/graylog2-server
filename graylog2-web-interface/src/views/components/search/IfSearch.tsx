@@ -20,13 +20,12 @@ import View from 'views/logic/views/View';
 import useViewType from 'views/hooks/useViewType';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const IfSearch = ({ children }: Props) => {
   const viewType = useViewType();
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return viewType === View.Type.Search ? <>{children}</> : null;
 };
 

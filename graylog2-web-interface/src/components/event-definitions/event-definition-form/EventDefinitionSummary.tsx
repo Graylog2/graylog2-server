@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
@@ -26,29 +26,46 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
+import usePluginEntities from 'hooks/usePluginEntities';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
+import ShareDetails from './ShareDetails';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: Omit<EventDefinition, 'id'>,
-  notifications: Array<any>,
-  validation: {
+  eventDefinition: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
+  notifications: Array<EventNotification>;
+  validation?: {
     errors: {
-      title?: string,
-    }
-  },
-  currentUser: User,
-}
+      title?: string;
+    };
+  };
+  currentUser: User;
+};
 
-const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
+const EventDefinitionSummary = ({
+  eventDefinition,
+  notifications,
+  validation = { errors: {} },
+  currentUser,
+}: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
+  const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  const {
+    data: { valid: validSecurityLicense },
+  } = pluggableLicenseCheck[0]('/license/security');
 
   useEffect(() => {
     const flipShowValidation = () => {
@@ -70,65 +87,106 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
-        <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
-        <dd>
-          <MarkdownPreview show
-                           withFullView
-                           noBorder
-                           noBackground
-                           value={eventDefinition.remediation_steps || 'No remediation steps given'} />
-        </dd>
+        {validSecurityLicense ? (
+          <>
+            {eventDefinition?.event_procedure ? (
+              <>
+                <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
+                <dd>
+                  {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
+                    <PluggableEventProcedureSummary
+                      eventDefinitionEventProcedure={eventDefinition?.event_procedure}
+                      key={key}
+                    />
+                  ))}
+                </dd>
+              </>
+            ) : (
+              <>
+                <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
+                <p>This Event does not have any Event Procedures.</p>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
+            <dd>
+              <MarkdownPreview
+                show
+                withFullView
+                noBorder
+                noBackground
+                value={eventDefinition.remediation_steps || 'No remediation steps given'}
+              />
+            </dd>
+          </>
+        )}
       </dl>
     </>
   );
 
-  const getPlugin = (name, type) => {
+  const getPlugin = <T extends 'eventDefinitionTypes' | 'fieldValueProviders' | 'eventNotificationTypes'>(
+    name: T,
+    type: string,
+  ): PluginExports[T][number] => {
     if (type === undefined) {
-      return {};
+      return undefined;
     }
 
-    return PluginStore.exports(name).find((edt) => edt.type === type) || {};
+    return PluginStore.exports(name).find((edt) => edt.type === type);
   };
 
-  const renderCondition = (config) => {
+  const renderCondition = (config: EventDefinition['config'], definitionId: string) => {
     const conditionPlugin = getPlugin('eventDefinitionTypes', config.type);
-    const component = (conditionPlugin.summaryComponent
-      ? React.createElement(conditionPlugin.summaryComponent, {
+    const component = conditionPlugin?.summaryComponent ? (
+      React.createElement(conditionPlugin.summaryComponent, {
         config,
         currentUser,
+        definitionId,
       })
-      : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
+    ) : (
+      <p>
+        Condition plugin <em>{config.type}</em> does not provide a summary.
+      </p>
     );
 
     return (
       <>
-        <h3 className={commonStyles.title}>{conditionPlugin.displayName || config.type}</h3>
+        <h3 className={commonStyles.title}>{conditionPlugin?.displayName || config.type}</h3>
         {component}
       </>
     );
   };
 
-  const renderField = (fieldName, config, keys) => {
+  const renderField = (fieldName: string, config: EventDefinition['field_spec'][string], keys: string[]) => {
     if (!config.providers || config.providers.length === 0) {
       return <span key={fieldName}>No field value provider configured.</span>;
     }
 
-    const provider = config.providers[0] || {};
-    const fieldProviderPlugin = getPlugin('fieldValueProviders', provider.type);
+    const provider = config.providers[0];
+    const fieldProviderPlugin = getPlugin('fieldValueProviders', provider?.type);
 
-    return (fieldProviderPlugin.summaryComponent
-      ? React.createElement(fieldProviderPlugin.summaryComponent, {
+    return fieldProviderPlugin?.summaryComponent ? (
+      React.createElement(fieldProviderPlugin.summaryComponent, {
         fieldName,
         config,
-        keys: keys,
+        keys,
         key: fieldName,
         currentUser,
       })
-      : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
+    ) : (
+      <p key={fieldName}>
+        Provider plugin <em>{provider.type}</em> does not provide a summary.
+      </p>
     );
   };
 
-  const renderFieldList = (fieldNames, fields, keys) => (
+  const renderFieldList = (
+    fieldNames: string[],
+    fields: EventDefinition['field_spec'],
+    keys: EventDefinition['key_spec'],
+  ) => (
     <>
       <dl>
         <dt>Keys</dt>
@@ -138,20 +196,22 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     </>
   );
 
-  const renderFields = (fields, keys) => {
+  const renderFields = (fields: EventDefinition['field_spec'], keys: EventDefinition['key_spec']) => {
     const fieldNames = Object.keys(fields);
 
     return (
       <>
         <h3 className={commonStyles.title}>Fields</h3>
-        {fieldNames.length === 0
-          ? <p>No Fields configured for Events based on this Definition.</p>
-          : renderFieldList(fieldNames, fields, keys)}
+        {fieldNames.length === 0 ? (
+          <p>No Fields configured for Events based on this Definition.</p>
+        ) : (
+          renderFieldList(fieldNames, fields, keys)
+        )}
       </>
     );
   };
 
-  const renderNotification = (definitionNotification) => {
+  const renderNotification = (definitionNotification: EventDefinition['notifications'][number]) => {
     const notification = notifications.find((n) => n.id === definitionNotification.notification_id);
 
     let content;
@@ -159,13 +219,16 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     if (notification) {
       const notificationPlugin = getPlugin('eventNotificationTypes', notification.config.type);
 
-      content = (notificationPlugin.summaryComponent
-        ? React.createElement(notificationPlugin.summaryComponent, {
+      content = notificationPlugin.summaryComponent ? (
+        React.createElement(notificationPlugin.summaryComponent, {
           type: notificationPlugin.displayName,
-          notification: notification,
-          definitionNotification: definitionNotification,
+          notification,
+          definitionNotification,
         })
-        : <p>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</p>
+      ) : (
+        <p>
+          Notification plugin <em>{notification.config.type}</em> does not provide a summary.
+        </p>
       );
     } else {
       content = (
@@ -175,24 +238,21 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
       );
     }
 
-    return (
-      <React.Fragment key={definitionNotification.notification_id}>
-        {content}
-      </React.Fragment>
-    );
+    return <React.Fragment key={definitionNotification.notification_id}>{content}</React.Fragment>;
   };
 
   const renderNotificationSettings = (notificationSettings) => {
-    const formattedDuration = moment.duration(notificationSettings.grace_period_ms)
+    const formattedDuration = moment
+      .duration(notificationSettings.grace_period_ms)
       .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
-    const formattedGracePeriod = (notificationSettings.grace_period_ms
+    const formattedGracePeriod = notificationSettings.grace_period_ms
       ? `Grace Period is set to ${formattedDuration}`
-      : 'Grace Period is disabled');
+      : 'Grace Period is disabled';
 
-    const formattedBacklogSize = (notificationSettings.backlog_size
+    const formattedBacklogSize = notificationSettings.backlog_size
       ? `Notifications will include ${notificationSettings.backlog_size} messages`
-      : 'Notifications will not include any messages.');
+      : 'Notifications will not include any messages.';
 
     return (
       <>
@@ -205,34 +265,37 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const renderNotifications = (definitionNotifications, notificationSettings) => {
-    const effectiveDefinitionNotifications = definitionNotifications
-      .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`));
-    const notificationsWithMissingPermissions = definitionNotifications
-      .filter((n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id));
-    const warning = notificationsWithMissingPermissions.length > 0
-      ? (
+  const renderNotifications = (
+    definitionNotifications: EventDefinition['notifications'],
+    notificationSettings: EventDefinition['notification_settings'],
+  ) => {
+    const effectiveDefinitionNotifications = definitionNotifications.filter((n) =>
+      isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`),
+    );
+    const notificationsWithMissingPermissions = definitionNotifications.filter(
+      (n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id),
+    );
+    const warning =
+      notificationsWithMissingPermissions.length > 0 ? (
         <Alert bsStyle="warning">
-          Missing Notifications Permissions for:<br />
+          Missing Notifications Permissions for:
+          <br />
           {notificationsWithMissingPermissions.map((n) => n.notification_id).join(', ')}
         </Alert>
-      )
-      : null;
+      ) : null;
 
     return (
       <>
         <h3 className={commonStyles.title}>Notifications</h3>
-        <p>
-          {warning}
-        </p>
-        {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0
-          ? <p>This Event is not configured to trigger any Notifications.</p>
-          : (
-            <>
-              {renderNotificationSettings(notificationSettings)}
-              {definitionNotifications.map(renderNotification)}
-            </>
-          )}
+        <p>{warning}</p>
+        {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0 ? (
+          <p>This Event is not configured to trigger any Notifications.</p>
+        ) : (
+          <>
+            {renderNotificationSettings(notificationSettings)}
+            {definitionNotifications.map(renderNotification)}
+          </>
+        )}
       </>
     );
   };
@@ -245,40 +308,30 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <h2 className={commonStyles.title}>Event Summary</h2>
         {showValidation && <EventDefinitionValidationSummary validation={validation} />}
         <Row>
-          <Col md={5}>
-            {renderDetails()}
-          </Col>
+          <Col md={5}>{renderDetails()}</Col>
 
           {!isSystemEventDefinition && (
             <Col md={5} mdOffset={1}>
-              {renderCondition(eventDefinition.config)}
+              {renderCondition(eventDefinition.config, eventDefinition.id)}
             </Col>
           )}
         </Row>
         <Row>
           {!isSystemEventDefinition && (
-            <Col md={5}>
-              {renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
-            </Col>
+            <Col md={5}>{renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}</Col>
           )}
           <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
             {renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
           </Col>
         </Row>
+        <Row>
+          <Col md={5}>
+            <ShareDetails shareState={eventDefinition.share_request} />
+          </Col>
+        </Row>
       </Col>
     </Row>
   );
-};
-
-EventDefinitionSummary.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  notifications: PropTypes.array.isRequired,
-  validation: PropTypes.object,
-  currentUser: PropTypes.object.isRequired,
-};
-
-EventDefinitionSummary.defaultProps = {
-  validation: undefined,
 };
 
 export default EventDefinitionSummary;

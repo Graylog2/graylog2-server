@@ -14,29 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 export const DATA_TIERING_TYPE = {
   HOT_ONLY: 'hot_only',
   HOT_WARM: 'hot_warm',
 } as const;
 
-export type DataTieringType = typeof DATA_TIERING_TYPE[keyof typeof DATA_TIERING_TYPE];
+export type DataTieringType = (typeof DATA_TIERING_TYPE)[keyof typeof DATA_TIERING_TYPE];
 
 export type DataTieringConfig = {
-  type: DataTieringType
-  index_lifetime_min: string,
-  index_lifetime_max: string,
-  index_hot_lifetime_min?: string,
-  warm_tier_enabled?: boolean,
-  archive_before_deletion?: boolean,
-  warm_tier_repository_name?: string | null,
-}
+  type: DataTieringType;
+  index_lifetime_min: string;
+  index_lifetime_max: string;
+  index_hot_lifetime_min?: string;
+  warm_tier_enabled?: boolean;
+  archive_before_deletion?: boolean;
+  warm_tier_repository_name?: string | null;
+};
 
 export type DataTieringFormValues = {
-  type: DataTieringType
-  index_lifetime_min: number,
-  index_lifetime_max: number,
-  index_hot_lifetime_min?: number,
-  warm_tier_enabled: boolean,
-  archive_before_deletion: boolean,
-  warm_tier_repository_name?: string | null,
-}
+  type: DataTieringType;
+  index_lifetime_min: number;
+  index_lifetime_max: number;
+  index_hot_lifetime_min?: number;
+  warm_tier_enabled: boolean;
+  archive_before_deletion: boolean;
+  warm_tier_repository_name?: string | null;
+};
+
+export type DataTieringStatus = {
+  has_failed_snapshot: boolean;
+  failed_snapshot_name: string | null;
+};

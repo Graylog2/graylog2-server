@@ -58,6 +58,7 @@ import static org.mockito.Mockito.when;
 public class SearchesCleanUpJobTest {
     public static final String IN_USE_SEARCH_ID = "This search is in use";
     public static final String IN_USE_RESOLVER_SEARCH_ID = "in-use-resolver-search-id";
+    private static final String IN_USE_STATIC_SEARCH_ID = "static-search-id";
 
     @Mock
     private ViewSummaryService viewService;
@@ -69,7 +70,8 @@ public class SearchesCleanUpJobTest {
 
     @BeforeEach
     public void setup() {
-        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4), testViewResolvers());
+        this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),
+                testViewResolvers(), Collections.singleton(new StaticReferencedSearch(IN_USE_STATIC_SEARCH_ID)));
     }
 
     @Test
@@ -136,6 +138,7 @@ public class SearchesCleanUpJobTest {
         verify(searchDbService, times(1)).getExpiredSearches(searchIdsCaptor.capture(), any());
         assertThat(searchIdsCaptor.getValue().contains(IN_USE_SEARCH_ID)).isTrue();
         assertThat(searchIdsCaptor.getValue().contains(IN_USE_RESOLVER_SEARCH_ID)).isTrue();
+        assertThat(searchIdsCaptor.getValue().contains(IN_USE_STATIC_SEARCH_ID)).isTrue();
 
         verify(searchDbService, never()).delete(any());
     }

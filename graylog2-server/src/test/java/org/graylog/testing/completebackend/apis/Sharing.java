@@ -26,6 +26,7 @@ import static io.restassured.RestAssured.given;
 public class Sharing implements GraylogRestApi {
 
     public static final String ENTITY_STREAM = "stream";
+    public static final String ENTITY_REPORT = "report";
     public static final String ENTITY_USER = "user";
 
     public static final String PERMISSION_OWN = "own";

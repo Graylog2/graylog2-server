@@ -20,24 +20,23 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
 import java.util.Collections;
 import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class ClusterEvent {
+public abstract class ClusterEvent implements MongoEntity {
     @Id
     @ObjectId
     @Nullable
@@ -64,7 +63,7 @@ public abstract class ClusterEvent {
 
 
     @JsonCreator
-    public static ClusterEvent create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static ClusterEvent create(@Id @ObjectId @JsonProperty("id") @Nullable String id,
                                       @JsonProperty("timestamp") long timestamp,
                                       @JsonProperty("producer") @Nullable String producer,
                                       @JsonProperty("consumers") @Nullable Set<String> consumers,

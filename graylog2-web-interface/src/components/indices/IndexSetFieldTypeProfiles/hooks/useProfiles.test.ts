@@ -38,7 +38,7 @@ const mockData = {
     sort: {
       id: 'name',
       direction: 'ASC',
-    } as { id: string, direction: 'ASC' | 'DESC'},
+    } as { id: string; direction: 'ASC' | 'DESC' },
   },
   total: 1,
   sort: 'name',
@@ -62,7 +62,13 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const renderUseProfilesHook = () => renderHook(() => useProfiles({ page: 1, query: '', pageSize: 10, sort: { attributeId: 'name', direction: 'asc' } }, { enabled: true }));
+const renderUseProfilesHook = () =>
+  renderHook(() =>
+    useProfiles(
+      { page: 1, query: '', pageSize: 10, sort: { attributeId: 'name', direction: 'asc' } },
+      { enabled: true },
+    ),
+  );
 
 describe('useProfiles custom hook', () => {
   afterEach(() => {
@@ -76,7 +82,10 @@ describe('useProfiles custom hook', () => {
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/paginated?page=1&per_page=10&sort=name&order=asc'));
+    expect(fetch).toHaveBeenCalledWith(
+      'GET',
+      qualifyUrl('/system/indices/index_sets/profiles/paginated?page=1&per_page=10&sort=name&order=asc'),
+    );
 
     expect(result.current.data).toEqual(expectedState);
   });
@@ -93,6 +102,7 @@ describe('useProfiles custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading index field type profiles failed with status: Error: Error',
-      'Could not load index field type profiles');
+      'Could not load index field type profiles',
+    );
   });
 });

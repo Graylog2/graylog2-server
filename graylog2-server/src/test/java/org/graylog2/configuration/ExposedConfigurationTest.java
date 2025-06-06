@@ -91,6 +91,7 @@ public class ExposedConfigurationTest {
                 "  \"inputbuffer_processors\": 2," +
                 "  \"processbuffer_processors\": 5," +
                 "  \"outputbuffer_processors\": 3," +
+                "  \"output_batch_size\": 500," +
                 "  \"processor_wait_strategy\": \"com.lmax.disruptor.BlockingWaitStrategy\"," +
                 "  \"inputbuffer_wait_strategy\": \"com.lmax.disruptor.BlockingWaitStrategy\"," +
                 "  \"inputbuffer_ring_size\": 65536," +
@@ -114,6 +115,7 @@ public class ExposedConfigurationTest {
         assertThat(c.inputBufferProcessors()).isEqualTo(JsonPath.read(json, "$.inputbuffer_processors"));
         assertThat(c.processBufferProcessors()).isEqualTo(JsonPath.read(json, "$.processbuffer_processors"));
         assertThat(c.outputBufferProcessors()).isEqualTo(JsonPath.read(json, "$.outputbuffer_processors"));
+        assertThat(c.outputBatchSize().getAsCount().orElseThrow()).isEqualTo(JsonPath.read(json, "$.output_batch_size"));
         assertThat(c.processorWaitStrategy()).isEqualTo(JsonPath.read(json, "$.processor_wait_strategy"));
         assertThat(c.inputBufferWaitStrategy()).isEqualTo(JsonPath.read(json, "$.inputbuffer_wait_strategy"));
         assertThat(c.inputBufferRingSize()).isEqualTo(JsonPath.read(json, "$.inputbuffer_ring_size"));

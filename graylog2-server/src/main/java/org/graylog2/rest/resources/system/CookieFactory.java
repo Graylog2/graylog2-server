@@ -40,17 +40,21 @@ public class CookieFactory {
     private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final CharMatcher PATH_MATCHER = ascii().and(isNot(';')).and(javaIsoControl().negate());
     private final URI httpExternalUri;
+    private final boolean httpCookieSecureOverride;
+    private final boolean httpCookieSameSiteStrict;
 
     @Inject
     public CookieFactory(HttpConfiguration httpConfiguration) {
         httpExternalUri = httpConfiguration.getHttpExternalUri();
+        httpCookieSecureOverride = httpConfiguration.getHttpCookieSecureOverride();
+        httpCookieSameSiteStrict = httpConfiguration.getHttpCookieSameSiteStrict();
     }
 
-    NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
+    public NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
         return makeCookie(token.getAuthenticationToken(), token.validUntil(), requestContext);
     }
 
-    NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
+    public NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
         return makeCookie("", new Date(), requestContext);
     }
 
@@ -70,9 +74,9 @@ public class CookieFactory {
                 .path(basePath)
                 .maxAge(maxAge)
                 .expiry(validUntil)
-                .secure(isSecure)
+                .secure(isSecure || httpCookieSecureOverride)
                 .httpOnly(true)
-                .sameSite(NewCookie.SameSite.STRICT)
+                .sameSite(httpCookieSameSiteStrict ? NewCookie.SameSite.STRICT : NewCookie.SameSite.NONE)
                 .build();
     }
 

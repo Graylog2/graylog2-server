@@ -25,14 +25,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
+import jakarta.inject.Inject;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
+import org.graylog2.database.utils.MongoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -120,7 +120,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         // We need to retry the update, and stagger them a bit, so no all of the retries attempt it at the same time again.
         // Usually this should succeed the first time, though
         final Retryer<Object> retryer = RetryerBuilder.newBuilder()
-                .retryIfExceptionOfType(DuplicateKeyException.class)
+                .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
                 .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(10))
                 .build();

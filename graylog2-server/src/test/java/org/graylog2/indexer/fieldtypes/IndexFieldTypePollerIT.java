@@ -72,9 +72,9 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
             .shards(1)
             .replicas(0)
             .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+            .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
             .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+            .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
             .indexAnalyzer("standard")
             .indexTemplateName("template-1")
             .indexOptimizationMaxNumSegments(1)
@@ -252,6 +252,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         return List.of(
                 FieldTypeDTO.builder().fieldName("full_message").physicalType("text").build(),
                 FieldTypeDTO.builder().fieldName("gl2_receive_timestamp").physicalType("date").build(),
+                FieldTypeDTO.builder().fieldName("gl2_original_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_processing_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_processing_duration_ms").physicalType("integer").build(),
                 FieldTypeDTO.builder().fieldName("gl2_message_id").physicalType("keyword").build(),

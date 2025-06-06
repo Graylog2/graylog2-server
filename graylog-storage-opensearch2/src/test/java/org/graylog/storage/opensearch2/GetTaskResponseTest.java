@@ -18,11 +18,14 @@ package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 class GetTaskResponseTest {
@@ -74,5 +77,29 @@ class GetTaskResponseTest {
             Assertions.assertThat(m.get("type")).isEqualTo("resource_not_found_exception");
             Assertions.assertThat(m.get("reason")).isEqualTo("task [l9jA-SSXRdm8rye9WK51dg:9575] isn't running and hasn't stored its results");
         });
+    }
+
+
+    @Test
+    void testReponseParsing() throws IOException {
+        final GetTaskResponse response = objectMapper.readValue(getClass().getResourceAsStream("gettaskresponse.json"), GetTaskResponse.class);
+
+        final List<TaskResponseFailure> failures = response.response().failures();
+
+        Assertions.assertThat(failures)
+                .hasSize(1000);
+
+        final List<Pair<String, String>> causes = failures.stream()
+                .map(TaskResponseFailure::cause)
+                .map(f -> Pair.of(f.type(), f.reason()))
+                .distinct()
+                .toList();
+
+        Assertions.assertThat(causes)
+                .hasSize(1)
+                .allSatisfy(f -> {
+                    Assertions.assertThat(f.getKey()).isEqualTo("index_not_found_exception");
+                    Assertions.assertThat(f.getValue()).isEqualTo("no such index [graylog_33]");
+                });
     }
 }

@@ -38,7 +38,7 @@ public class ValidNewMessageField implements Validator {
 
     @Inject
     public ValidNewMessageField(RuleBuilderRegistry ruleBuilderRegistry) {
-        this.actions = ruleBuilderRegistry.actions();
+        this.actions = ruleBuilderRegistry.actionsWithInternal();
     }
 
     @Override

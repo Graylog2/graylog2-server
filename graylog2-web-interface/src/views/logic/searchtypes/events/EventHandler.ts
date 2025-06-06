@@ -19,11 +19,11 @@ import groupBy from 'lodash/groupBy';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
 export type Event = {
-  id: string,
-  timestamp: string,
-  message: string,
-  alert: boolean,
-  streams: Array<string>,
+  id: string;
+  timestamp: string;
+  message: string;
+  alert: boolean;
+  streams: Array<string>;
 };
 
 export type Events = Array<Event>;
@@ -33,15 +33,15 @@ export const EVENT_COLOR = '#d3d3d3';
 type GroupedEvents = { [key: string]: Events };
 
 type Shape = {
-  type: 'line',
-  y0: number,
-  y1: number,
-  x0: string,
-  x1: string,
-  opacity: number,
+  type: 'line';
+  y0: number;
+  y1: number;
+  x0: string;
+  x1: string;
+  opacity: number;
   line?: {
-    color: string,
-  },
+    color: string;
+  };
 };
 
 export type Shapes = Array<Shape>;
@@ -58,11 +58,11 @@ export default {
     type,
     name,
   }: {
-    events: Array<Event>,
-    total_results: number,
-    id: string,
-    type: string,
-    name: string
+    events: Array<Event>;
+    total_results: number;
+    id: string;
+    type: string;
+    name: string;
   }) {
     return {
       events,
@@ -73,7 +73,7 @@ export default {
     };
   },
 
-  toVisualizationData(events: Events, formatTime: TimeFormatter): { eventChartData: ChartDefinition, shapes: Shapes } {
+  toVisualizationData(events: Events, formatTime: TimeFormatter): { eventChartData: ChartDefinition; shapes: Shapes } {
     const groupedEvents: GroupedEvents = groupBy(events, (e) => e.timestamp);
 
     return {

@@ -25,19 +25,17 @@ import WrappingContainer from './WrappingContainer';
 
 configure({ adapter: new Adapter() });
 
-export const shallowWithWrapper = <T, >(Component: React.ReactElement<T>, options: any = {}): ShallowWrapper<T> => shallow(Component, {
-  wrappingComponent: WrappingContainer,
-  ...options,
-});
+export const shallowWithWrapper = <T,>(Component: React.ReactElement<T>, options: any = {}): ShallowWrapper<T> =>
+  shallow(Component, {
+    wrappingComponent: WrappingContainer,
+    ...options,
+  });
 
-export const mountWithWrapper = <T, >(Component: React.ReactElement<T>, options: any = {}): ReactWrapper<T> => mount(Component, {
-  wrappingComponent: WrappingContainer,
-  ...options,
-});
+export const mountWithWrapper = <T,>(Component: React.ReactElement<T>, options: any = {}): ReactWrapper<T> =>
+  mount(Component, {
+    wrappingComponent: WrappingContainer,
+    ...options,
+  });
 
 export * from 'enzyme';
-export {
-  mountWithWrapper as mount,
-  shallowWithWrapper as shallow,
-  mount as mountUnwrapped,
-};
+export { mountWithWrapper as mount, shallowWithWrapper as shallow, mount as mountUnwrapped };

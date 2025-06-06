@@ -16,12 +16,18 @@
  */
 package org.graylog2.indexer.migration;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Collections;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,6 +38,7 @@ import java.util.stream.Collectors;
 /**
  * Caution: this object will be heavily mutated from outside as the migration progresses.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexMigration {
 
@@ -41,10 +48,8 @@ public class RemoteReindexMigration {
 
     private final List<LogEntry> logs;
 
-    @JsonProperty("error")
-    private String error;
-
-    public RemoteReindexMigration(@NotNull String migrationID, List<RemoteReindexIndex> indices, List<LogEntry> logs) {
+    @JsonCreator
+    public RemoteReindexMigration(@JsonProperty("id") @NotNull String migrationID, @JsonProperty("indices") List<RemoteReindexIndex> indices, @JsonProperty("logs") List<LogEntry> logs) {
         this.id = migrationID;
         this.indices = indices;
         this.logs = logs;
@@ -65,6 +70,11 @@ public class RemoteReindexMigration {
 
     @JsonProperty("status")
     public Status status() {
+
+        if (errorFromLogs() != null) {
+            return Status.ERROR;
+        }
+
         if (indices.isEmpty() || indices.stream().allMatch(i -> i.status() == Status.NOT_STARTED)) {
             return Status.NOT_STARTED;
         } else if (indices.stream().allMatch(RemoteReindexIndex::isCompleted)) {
@@ -79,6 +89,18 @@ public class RemoteReindexMigration {
         }
     }
 
+    @JsonProperty("error")
+    @Nullable
+    private String errorFromLogs() {
+        return Optional.ofNullable(logs)
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(l -> l.logLevel() == LogLevel.ERROR)
+                .findFirst()
+                .map(LogEntry::message)
+                .orElse(null);
+    }
+
     /**
      * @return How much of the migration is done, in percent, int value between 0 a 100.
      */
@@ -88,15 +110,23 @@ public class RemoteReindexMigration {
             return 100; // avoid division by zero. No indices == migration is immediately done
         }
 
-        final double indexPortion = 100.0 / indices.size();
-
-        final double overallProgress = indices.stream()
+        final BigDecimal sum = indices.stream()
                 .filter(i -> i.progress() != null)
-                .mapToDouble(i -> i.progress().progressPercent() / 100.0)
-                .map(relativeProgress -> relativeProgress * indexPortion)
-                .sum();
+                .map(RemoteReindexMigration::indexProgress)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return Math.min((int) Math.ceil(overallProgress), 100);
+        return sum.divide(BigDecimal.valueOf(indices.size()), 4, RoundingMode.HALF_UP).scaleByPowerOfTen(2).intValue();
+    }
+
+    /**
+     * @return value between 0 and 1, representing how much percent of the index migration is completed
+     */
+    private static BigDecimal indexProgress(RemoteReindexIndex i) {
+        if (i.isCompleted()) { // no matter if success or error, if the index task is completed, the progress is 100%
+            return BigDecimal.ONE;
+        } else {
+            return i.progress().progress();
+        }
     }
 
     public List<LogEntry> getLogs() {

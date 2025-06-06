@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import OriginalTimeRangePicker from './TimeRangePicker';
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 describe('TimeRangePicker relative time range', () => {
   const defaultProps = {
@@ -90,6 +91,8 @@ describe('TimeRangePicker relative time range', () => {
 
     await userEvent.type(fromRangeValueInput, '{backspace}7');
     await userEvent.type(toRangeValueInput, '{backspace}6');
+
+    await waitFor(() => expect(submitButton).not.toBeDisabled());
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(setCurrentTimeRangeStub).toHaveBeenCalledTimes(1));

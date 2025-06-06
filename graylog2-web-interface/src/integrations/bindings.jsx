@@ -31,13 +31,12 @@ import TeamsNotificationSummary from './event-notifications/event-notification-t
 import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
 import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
-import GreyNoiseCommunityIpLookupAdapterDocumentation
-  from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
+import TeamsNotificationV2Form from './event-notifications/event-notification-types/TeamsNotificationV2Form';
+import TeamsNotificationV2Summary from './event-notifications/event-notification-types/TeamsNotificationV2Summary';
+import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
 const bindings = {
-  routes: [
-    { path: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
-  ],
+  routes: [{ path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp }],
   inputConfiguration: [
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',
@@ -64,11 +63,19 @@ const bindings = {
     },
     {
       type: 'teams-notification-v1',
-      displayName: 'Microsoft Teams Notification',
+      displayName: 'Microsoft Teams Notification (Deprecated - use V2)',
       formComponent: TeamsNotificationForm,
       summaryComponent: TeamsNotificationSummary,
       detailsComponent: TeamsNotificationDetails,
       defaultConfig: TeamsNotificationForm.defaultConfig,
+    },
+    {
+      type: 'teams-notification-v2',
+      displayName: 'Microsoft Teams Notification V2',
+      formComponent: TeamsNotificationV2Form,
+      summaryComponent: TeamsNotificationV2Summary,
+      detailsComponent: TeamsNotificationV2Details,
+      defaultConfig: TeamsNotificationV2Form.defaultConfig,
     },
   ],
   lookupTableAdapters: [
@@ -78,13 +85,6 @@ const bindings = {
       formComponent: GreyNoiseAdapterFieldSet,
       summaryComponent: GreyNoiseAdapterSummary,
       documentationComponent: GreyNoiseAdapterDocumentation,
-    },
-    {
-      type: 'GreyNoise Community IP Lookup',
-      displayName: '[Deprecated] GreyNoise Community IP Lookup',
-      formComponent: GreyNoiseAdapterFieldSet,
-      summaryComponent: GreyNoiseAdapterSummary,
-      documentationComponent: GreyNoiseCommunityIpLookupAdapterDocumentation,
     },
   ],
 };

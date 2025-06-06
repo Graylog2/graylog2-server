@@ -18,6 +18,7 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -29,7 +30,9 @@ import org.mockito.Mockito;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +42,7 @@ import static org.mockito.Mockito.when;
 
 class IndexerDiscoveryProviderTest {
 
+
     @Test
     void testAutomaticDiscovery() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
@@ -46,7 +50,8 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
-                nodes("http://localhost:9200", "http://other:9201")
+                nodes("http://localhost:9200", "http://other:9201"),
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -55,6 +60,29 @@ class IndexerDiscoveryProviderTest {
                 .contains("http://localhost:9200", "http://other:9201");
     }
 
+    @Test
+    void testListeners() {
+        final IndexerDiscoveryListener listener1 = Mockito.mock(IndexerDiscoveryListener.class);
+        final IndexerDiscoveryListener listener2 = Mockito.mock(IndexerDiscoveryListener.class);
+
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                10,
+                Duration.milliseconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes(),
+                new HashSet<>(List.of(listener1, listener2))
+        );
+
+        Assertions.assertThatThrownBy(provider::get)
+                .hasMessageContaining("Unable to retrieve Datanode connection");
+
+        Mockito.verify(listener1, Mockito.times(1)).beforeIndexerDiscovery();
+        Mockito.verify(listener1, Mockito.times(10)).onDiscoveryRetry();
+        Mockito.verify(listener2, Mockito.times(1)).beforeIndexerDiscovery();
+        Mockito.verify(listener2, Mockito.times(10)).onDiscoveryRetry();
+
+    }
 
     @Test
     void testAutomaticDiscoveryOneUnconfigured() {
@@ -63,7 +91,8 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
-                nodes("http://localhost:9200", "") // the second node is not configured yet, has no transport address
+                nodes("http://localhost:9200", ""), // the second node is not configured yet, has no transport address
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -80,7 +109,8 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(null),
-                nodes()
+                nodes(),
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -96,7 +126,8 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.SKIPPED),
-                nodes()
+                nodes(),
+                Collections.emptySet()
         );
 
         Assertions.assertThat(provider.get())
@@ -112,12 +143,46 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED), // preflight correctly finished
-                nodes() // but still no nodes discovered
+                nodes(), // but still no nodes discovered
+                Collections.emptySet()
         );
 
         Assertions.assertThatThrownBy(provider::get)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Unable to retrieve Datanode connection");
+    }
+
+    @Test
+    void testProvisioningWillBeTriggered() {
+        final GraylogCertificateProvisioner provisioner = Mockito.mock(GraylogCertificateProvisioner.class);
+        final org.graylog2.configuration.IndexerDiscoveryListener indexerDiscoveryListener = new IndexerDiscoveryListener() {
+
+            @Override
+            public void beforeIndexerDiscovery() {
+
+            }
+
+            @Override
+            public void onDiscoveryRetry() {
+                provisioner.runProvisioning();
+            }
+        };
+
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                10,
+                Duration.milliseconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes(),
+                Collections.singleton(indexerDiscoveryListener)
+        );
+
+        Assertions.assertThatThrownBy(provider::get)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Unable to retrieve Datanode connection");
+
+        Mockito.verify(provisioner, Mockito.times(10)).runProvisioning();
+
     }
 
     private NodeService<DataNodeDto> nodes(String... transportAddress) {

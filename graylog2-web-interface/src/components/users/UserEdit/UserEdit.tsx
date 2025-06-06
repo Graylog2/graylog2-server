@@ -37,14 +37,15 @@ import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 import SectionGrid from '../../common/Section/SectionGrid';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
-const _updateUser = (data, currentUser, userId, fullName) => UsersDomain.update(userId, data, fullName).then(() => {
-  if (userId === currentUser?.id) {
-    CurrentUserStore.reload();
-  }
-});
+const _updateUser = (data, currentUser, userId, fullName) =>
+  UsersDomain.update(userId, data, fullName).then(() => {
+    if (userId === currentUser?.id) {
+      CurrentUserStore.reload();
+    }
+  });
 
 const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();
@@ -64,17 +65,15 @@ const UserEdit = ({ user }: Props) => {
           {user.external && (
             <SectionComponent title="External User">
               <Alert bsStyle="warning">
-                This user was synced from an external server, therefore neither
-                the profile nor the password can be changed. Please contact your administrator for more information.
+                This user was synced from an external server, therefore neither the profile nor the password can be
+                changed. Please contact your administrator for more information.
               </Alert>
             </SectionComponent>
           )}
           {!user.external && (
-            <ProfileSection user={user}
-                            onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
+            <ProfileSection user={user} onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           )}
-          <SettingsSection user={user}
-                           onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
+          <SettingsSection user={user} onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
             {!user.external && <PasswordSection user={user} />}
           </IfPermitted>
@@ -83,13 +82,12 @@ const UserEdit = ({ user }: Props) => {
         <div>
           <PermissionsUpdateInfo />
           <IfPermitted permissions="users:rolesedit">
-            <RolesSection user={user}
-                          onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
+            <RolesSection user={user} onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           </IfPermitted>
           <IfPermitted permissions="teams:edit">
             <TeamsSection user={user} />
           </IfPermitted>
-          {(currentUser.id === user.id) && (
+          {currentUser.id === user.id && (
             <IfPermitted permissions={`users:edit:${user.username}`}>
               <TelemetrySettingsConfig />
             </IfPermitted>

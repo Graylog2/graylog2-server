@@ -16,5 +16,21 @@
  */
 package org.graylog.security.certutil;
 
-public record KeyPair(java.security.PrivateKey privateKey, java.security.PublicKey publicKey, java.security.cert.X509Certificate certificate) {
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+
+import static org.graylog.security.certutil.CertConstants.PKCS12;
+
+public record KeyPair(java.security.PrivateKey privateKey, java.security.PublicKey publicKey,
+                      java.security.cert.X509Certificate certificate) {
+    public KeyStore toKeystore(String alias, char[] password) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+        KeyStore keystore = KeyStore.getInstance(PKCS12);
+        keystore.load(null, null);
+        keystore.setKeyEntry(alias, privateKey(), password, new Certificate[]{certificate()});
+        return keystore;
+    }
 }

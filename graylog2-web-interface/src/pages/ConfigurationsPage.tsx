@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
 
-import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
@@ -30,7 +29,6 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
@@ -54,16 +52,16 @@ const SubNavIconOpen = styled(Icon)`
 `;
 
 type SectionLinkProps = {
-  name: string,
-  showCaret: boolean,
-}
+  name: string;
+  showCaret: boolean;
+};
 
 const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
   const absolutePath = useResolvedPath(name);
   const location = useLocation();
 
-  const isActive = URI(location.pathname).equals(absolutePath.pathname)
-    || location.pathname.startsWith(absolutePath.pathname);
+  const isActive =
+    URI(location.pathname).equals(absolutePath.pathname) || location.pathname.startsWith(absolutePath.pathname);
 
   return (
     <LinkContainer key={`nav-${name}`} to={name}>
@@ -77,105 +75,96 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
 
 const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();
-  const isCloud = AppConfig.isCloud();
 
   const configurationSections: Array<{
-    name: string,
-    hide?: boolean,
-    SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>,
-    props?: ConfigurationSectionProps,
-    showCaret?: boolean,
-    catchAll?: boolean,
-  }> = useMemo(() => [
-    {
-      name: 'Search',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: SearchesConfig,
-        title: 'Search',
-      },
-    },
-    {
-      name: 'Message Processors',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: MessageProcessorsConfig,
-        title: 'Message Processors',
-      },
-    },
-    {
-      name: 'Sidecars',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: SidecarConfig,
-        title: 'Sidecars',
-      },
-    },
-    {
-      name: 'Events',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: EventsConfig,
-        title: 'Events',
-      },
-
-    },
-    {
-      name: 'URL Whitelist',
-      hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: UrlWhiteListConfig,
-        title: 'URL Whitelist',
-      },
-    },
-    {
-      name: 'Decorators',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: DecoratorsConfig,
-        title: 'Decorators',
-      },
-    },
-    {
-      name: 'Permissions',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: PermissionsConfig,
-        title: 'Permissions',
-      },
-    },
-    {
-      name: 'Index Set Defaults',
-      hide: isCloud,
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: IndexSetsDefaultsConfig,
-        title: 'Index Set Defaults',
-      },
-    },
-    {
-      name: 'Users',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: UserConfig,
-        title: 'Index Set Defaults',
-      },
-    },
-    {
-      name: 'Plugins',
-      SectionComponent: PluginsConfig,
-      showCaret: true,
-      catchAll: true,
-    },
-  ].filter(({ hide }) => !hide), [currentUser?.permissions, isCloud]);
+    name: string;
+    hide?: boolean;
+    SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>;
+    props?: ConfigurationSectionProps;
+    showCaret?: boolean;
+    catchAll?: boolean;
+  }> = useMemo(
+    () =>
+      [
+        {
+          name: 'Search',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: SearchesConfig,
+            title: 'Search',
+          },
+        },
+        {
+          name: 'Message Processors',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: MessageProcessorsConfig,
+            title: 'Message Processors',
+          },
+        },
+        {
+          name: 'Sidecars',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: SidecarConfig,
+            title: 'Sidecars',
+          },
+        },
+        {
+          name: 'Events',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: EventsConfig,
+            title: 'Events',
+          },
+        },
+        {
+          name: 'URL Whitelist',
+          hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: UrlWhiteListConfig,
+            title: 'URL Whitelist',
+          },
+        },
+        {
+          name: 'Decorators',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: DecoratorsConfig,
+            title: 'Decorators',
+          },
+        },
+        {
+          name: 'Permissions',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: PermissionsConfig,
+            title: 'Permissions',
+          },
+        },
+        {
+          name: 'Users',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: UserConfig,
+            title: 'Index Set Defaults',
+          },
+        },
+        {
+          name: 'Plugins',
+          SectionComponent: PluginsConfig,
+          showCaret: true,
+          catchAll: true,
+        },
+      ].filter(({ hide }) => !hide),
+    [currentUser?.permissions],
+  );
 
   return (
     <DocumentTitle title="Configurations">
       <PageHeader title="Configurations">
-        <span>
-          You can configure system settings for different sub systems on this page.
-        </span>
+        <span>You can configure system settings for different sub systems on this page.</span>
       </PageHeader>
 
       <ConfigletRow className="content">
@@ -190,9 +179,11 @@ const ConfigurationsPage = () => {
         <Routes>
           <Route path="/" element={<Navigate to={configurationSections[0].name} replace />} />
           {configurationSections.flatMap(({ catchAll, name, props = {}, SectionComponent }) => (
-            <Route path={catchAll ? `${name}/*` : name}
-                   key={name}
-                   element={<SectionComponent {...props} key={name} />} />
+            <Route
+              path={catchAll ? `${name}/*` : name}
+              key={name}
+              element={<SectionComponent {...props} key={name} />}
+            />
           ))}
         </Routes>
       </ConfigletRow>

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -86,6 +87,7 @@ public abstract class MessageListEntity implements SearchTypeEntity {
                 .limit(150)
                 .offset(0)
                 .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet())
                 .filters(Collections.emptyList())
                 .decorators(Collections.emptyList());
     }
@@ -134,6 +136,10 @@ public abstract class MessageListEntity implements SearchTypeEntity {
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
+        @Override
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
         @JsonProperty
         public abstract Builder limit(int limit);
 
@@ -159,16 +165,25 @@ public abstract class MessageListEntity implements SearchTypeEntity {
         return MessageList.builder()
                 .limit(limit())
                 .streams(mappedStreams(nativeEntities))
+                .streamCategories(streamCategories())
                 .id(id())
                 .offset(offset())
                 .decorators(decorators())
                 .timerange(timerange().orElse(null))
                 .filter(filter())
-                .filters(convertSearchFilters(filters()))
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .name(name().orElse(null))
                 .type(type())
                 .query(query().orElse(null))
                 .sort(sort())
                 .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

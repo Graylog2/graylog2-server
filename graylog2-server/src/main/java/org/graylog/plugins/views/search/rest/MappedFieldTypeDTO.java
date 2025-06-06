@@ -17,22 +17,19 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
-@AutoValue
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
-public abstract class MappedFieldTypeDTO {
-    @JsonProperty("name")
-    public abstract String name();
+public record MappedFieldTypeDTO(@JsonProperty("name") String name,
+                                 @JsonProperty("type") FieldTypes.Type type,
+                                 @JsonProperty("unit") @Nullable UnitId unit
+) {
 
-    @JsonProperty("type")
-    public abstract FieldTypes.Type type();
-
-    @JsonCreator
-    public static MappedFieldTypeDTO create(@JsonProperty("name") String name, @JsonProperty("type") FieldTypes.Type type) {
-        return new AutoValue_MappedFieldTypeDTO(name, type);
+    public static MappedFieldTypeDTO create(String name, FieldTypes.Type type) {
+        return new MappedFieldTypeDTO(name, type, null);
     }
 }

@@ -17,11 +17,9 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
-import type { StepType } from 'components/common/Wizard';
 import type { SelectCallback } from 'components/bootstrap/types';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -38,7 +36,7 @@ const StyledPanelGroup = styled(PanelGroup)`
     background-color: ${(props) => props.theme.colors.global.contentBackground};
 
     .panel-heading {
-      background-color: ${(props) => props.theme.colors.table.row.backgroundAlt};
+      background-color: ${(props) => props.theme.colors.table.row.backgroundStriped};
     }
 
     &:not(:first-child) {
@@ -54,11 +52,11 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 type Props = {
-  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload;
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
-  const [activeKey, setActiveKey] = useState<$PropertyType<StepType, 'key'>>(SERVER_CONFIG_KEY);
+  const [activeKey, setActiveKey] = useState<string>(SERVER_CONFIG_KEY);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 
@@ -67,10 +65,11 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
   }, [stepsState.activeStepKey]);
 
   return (
-    <StyledPanelGroup accordion
-                      activeKey={activeKey}
-                      id="sidebar-server-response"
-                      onSelect={setActiveKey as SelectCallback}>
+    <StyledPanelGroup
+      accordion
+      activeKey={activeKey}
+      id="sidebar-server-response"
+      onSelect={setActiveKey as SelectCallback}>
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Server Connection Check</Panel.Title>

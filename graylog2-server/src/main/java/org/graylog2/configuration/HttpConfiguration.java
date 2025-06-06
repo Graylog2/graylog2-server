@@ -44,7 +44,6 @@ public class HttpConfiguration {
     private static final int GRAYLOG_DEFAULT_PORT = 9000;
 
     public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
-    public static final String PATH_WEB = "";
     public static final String PATH_API = "api/";
 
     @Parameter(value = "http_bind_address", required = true)
@@ -85,6 +84,12 @@ public class HttpConfiguration {
 
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
+
+    @Parameter(value = "http_cookie_secure_override")
+    private boolean httpCookieSecureOverride = false;
+
+    @Parameter(value = "http_cookie_same_site_strict")
+    private boolean httpCookieSameSiteStrict = true;
 
     public HostAndPort getHttpBindAddress() {
         return httpBindAddress
@@ -212,6 +217,14 @@ public class HttpConfiguration {
 
     public String getHttpTlsKeyPassword() {
         return httpTlsKeyPassword;
+    }
+
+    public boolean getHttpCookieSameSiteStrict() {
+        return httpCookieSameSiteStrict;
+    }
+
+    public boolean getHttpCookieSecureOverride() {
+        return httpCookieSecureOverride;
     }
 
     public URI getHttpExternalUri() {

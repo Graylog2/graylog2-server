@@ -27,8 +27,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(name = "search_type", value = SearchTypeError.class),
         @JsonSubTypes.Type(name = "unbound_parameter", value = UnboundParameterError.class),
         @JsonSubTypes.Type(name = "result_window_limit", value = ResultWindowLimitError.class),
+        @JsonSubTypes.Type(name = "search_type_aborted", value = SearchTypeAbortedError.class),
+        @JsonSubTypes.Type(name = "simple_error", value = SimpleSearchError.class),
 })
-@JsonTypeInfo(property = "type", visible = true, use= JsonTypeInfo.Id.NAME)
+@JsonTypeInfo(property = "type", use= JsonTypeInfo.Id.NAME)
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
 public interface SearchError {

@@ -16,9 +16,10 @@
  */
 package org.graylog2.migrations;
 
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import jakarta.inject.Inject;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
@@ -82,7 +83,13 @@ public class MigrationHelpers {
             try {
                 final Role savedRole = roleService.save(fixedRole);
                 return savedRole.getId();
-            } catch (DuplicateKeyException | ValidationException e) {
+            } catch (MongoException e) {
+                if (MongoUtils.isDuplicateKeyError(e)) {
+                    LOG.error("Unable to save fixed '" + roleName + "' role, please restart Graylog to fix this.", e);
+                } else {
+                    throw e;
+                }
+            } catch (ValidationException e) {
                 LOG.error("Unable to save fixed '" + roleName + "' role, please restart Graylog to fix this.", e);
             }
         }

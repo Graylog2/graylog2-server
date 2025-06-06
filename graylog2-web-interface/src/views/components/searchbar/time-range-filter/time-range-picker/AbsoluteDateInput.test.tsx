@@ -33,7 +33,9 @@ const defaultProps = {
 };
 
 describe('AbsoluteDateInput', () => {
-  beforeAll(() => { jest.clearAllMocks(); });
+  beforeAll(() => {
+    jest.clearAllMocks();
+  });
 
   it('renders with minimal props', async () => {
     render(<AbsoluteDateInput {...defaultProps} />);

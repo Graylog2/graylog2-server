@@ -22,6 +22,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Resources;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -40,6 +41,7 @@ import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
+import org.graylog2.bootstrap.preflight.PreflightWebModule;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -87,12 +89,14 @@ public class PreflightAssetsResource {
 
     @Produces(MediaType.TEXT_HTML)
     @GET
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public Response index(@Context Request request) {
         return this.get(request, "index.html");
     }
 
     @Path("/{filename}")
     @GET
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public Response get(@Context Request request, @PathParam("filename") String filename) {
         try {
             final URL resourceUrl = getResourceUri(filename);

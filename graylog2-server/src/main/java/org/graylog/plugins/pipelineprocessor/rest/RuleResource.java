@@ -50,7 +50,6 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -65,7 +64,6 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -103,7 +101,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
-    private final RuleBuilderService ruleBuilderService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -112,9 +109,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         PipelineRuleService pipelineRuleService,
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
-                        PipelineServiceHelper pipelineServiceHelper,
-                        StreamService streamService,
-                        RuleBuilderService ruleBuilderService) {
+                        PipelineServiceHelper pipelineServiceHelper) {
         this.ruleService = ruleService;
         this.ruleSimulator = ruleSimulator;
         this.pipelineService = pipelineService;
@@ -123,11 +118,9 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
-        this.ruleBuilderService = ruleBuilderService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
-
 
     @ApiOperation(value = "Create a processing rule from source", notes = "")
     @POST
@@ -259,7 +252,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         return Map.of("used_in_pipelines", result);
     }
-
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")

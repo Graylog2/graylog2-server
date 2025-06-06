@@ -19,30 +19,34 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.outputs.filter.DefaultFilteredMessage;
+import org.graylog2.outputs.filter.FilteredMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class ElasticSearchOutput implements MessageOutput {
+@Singleton
+public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput {
+    public static final String FILTER_KEY = "indexer";
     private static final String WRITES_METRICNAME = name(ElasticSearchOutput.class, "writes");
     private static final String FAILURES_METRICNAME = name(ElasticSearchOutput.class, "failures");
     private static final String PROCESS_TIME_METRICNAME = name(ElasticSearchOutput.class, "processTime");
@@ -51,28 +55,34 @@ public class ElasticSearchOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
 
     private final Meter writes;
+    private final Meter ignores;
     private final Meter failures;
     private final Timer processTime;
     private final Messages messages;
-    private final Journal journal;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
-    protected final MessageQueueAcknowledger acknowledger;
 
     @Inject
-    public ElasticSearchOutput(MetricRegistry metricRegistry,
-                               Messages messages,
-                               Journal journal,
-                               MessageQueueAcknowledger acknowledger) {
+    public ElasticSearchOutput(MetricRegistry metricRegistry, Messages messages) {
         this.messages = messages;
-        this.journal = journal;
-        this.acknowledger = acknowledger;
         // Only constructing metrics here. write() get's another Core reference. (because this technically is a plugin)
         this.writes = metricRegistry.meter(WRITES_METRICNAME);
         this.failures = metricRegistry.meter(FAILURES_METRICNAME);
         this.processTime = metricRegistry.timer(PROCESS_TIME_METRICNAME);
+        this.ignores = metricRegistry.meter(name(FilteredMessageOutput.class, FILTER_KEY, "ignores"));
 
         // Should be set in initialize once this becomes a real plugin.
         isRunning.set(true);
+    }
+
+    @Override
+    public void writeFiltered(List<FilteredMessage> filteredMessages) throws Exception {
+        final var messages = filteredMessages.stream()
+                .filter(message -> !message.destinations().get(FILTER_KEY).isEmpty())
+                .toList();
+
+        ignores.mark(filteredMessages.size() - messages.size());
+
+        writeMessageEntries(messages);
     }
 
     @Override
@@ -80,19 +90,33 @@ public class ElasticSearchOutput implements MessageOutput {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing message id to [{}]: <{}>", NAME, message.getId());
         }
-        write(Collections.singletonList(message));
+        writeMessageEntries(List.of(DefaultFilteredMessage.forDestinationKeys(message, Set.of(FILTER_KEY))));
     }
 
     @Override
     public void write(List<Message> messageList) throws Exception {
-        throw new UnsupportedOperationException("Method not supported!");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Writing {} messages to [{}]", messageList.size(), NAME);
+        }
+        writeMessageEntries(messageList.stream()
+                .map(message -> DefaultFilteredMessage.forDestinationKeys(message, Set.of(FILTER_KEY)))
+                .collect(Collectors.toList()));
     }
 
-    public IndexingResults writeMessageEntries(List<MessageWithIndex> messageList) {
+    private void writeMessageEntries(List<FilteredMessage> messageList) {
+        // We need to create one message per index set. Use the streams from the filtered targets.
+        final var messagesWithIndex = messageList.stream()
+                .flatMap(message -> message.destinations()
+                        .get(FILTER_KEY)
+                        .stream()
+                        .map(stream -> new MessageWithIndex(message.message(), stream.getIndexSet())))
+                .toList();
+
         if (LOG.isTraceEnabled()) {
-            final String sortedIds = messageList.stream()
+            @SuppressWarnings("deprecation")
+            final String sortedIds = messagesWithIndex.stream()
                     .map(MessageWithIndex::message)
-                    .map(Message::getId)
+                    .map(ImmutableMessage::getId)
                     .sorted(Comparator.naturalOrder())
                     .collect(Collectors.joining(", "));
             LOG.trace("Writing message ids to [{}]: <{}>", NAME, sortedIds);
@@ -101,11 +125,9 @@ public class ElasticSearchOutput implements MessageOutput {
         writes.mark(messageList.size());
         final IndexingResults indexingResults;
         try (final Timer.Context ignored = processTime.time()) {
-            indexingResults = messages.bulkIndex(messageList);
+            indexingResults = messages.bulkIndex(messagesWithIndex);
         }
         failures.mark(indexingResults.errors().size());
-
-        return indexingResults;
     }
 
     @Override

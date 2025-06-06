@@ -21,70 +21,89 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import type { MessageResult, SearchTypeResult, SearchTypeResultTypes } from 'views/types';
+import type { SearchTypeResult, MessageResult, GenericResult } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 type Props = PropsWithChildren & {
-  currentWidgetMapping: SearchTypeIds,
+  currentWidgetMapping: SearchTypeIds;
 };
 
 const TargetContainer = styled.div`
   cursor: pointer;
   display: flex;
-  margin-right: 10px
+  margin-right: 10px;
 `;
 
-const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme }) => css`
-  margin-bottom: 0;
-  background-color: transparent;
+const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(
+  ({ theme }) => css`
+    margin-bottom: 0;
+    background-color: transparent;
 
-  > tbody td {
-    background-color: ${theme.colors.global.contentBackground};
-    color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-  }
-`);
+    > tbody td {
+      background-color: ${theme.colors.global.contentBackground};
+      color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
+    }
+  `,
+);
 
 type WidgetExecutionData = {
-  total: number,
-  duration: number,
-  timestamp: string,
-  effectiveTimerange: SearchTypeResult['effective_timerange'] | MessageResult['effectiveTimerange']
-}
+  total: number;
+  duration: number;
+  timestamp: string;
+  effectiveTimerange: AbsoluteTimeRange;
+};
 
-const StyledIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.gray[60]}
-`);
+const StyledIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
 
-const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData}) => (
+const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData }) => (
   <StyledTable condensed>
     <tbody>
       <tr>
-        <td><i>Executed at:</i></td>
-        <td aria-label="Executed at"><Timestamp dateTime={widgetExecutionData?.timestamp} /></td>
+        <td>
+          <i>Executed at:</i>
+        </td>
+        <td aria-label="Executed at">
+          <Timestamp dateTime={widgetExecutionData?.timestamp} />
+        </td>
       </tr>
       <tr>
-        <td><i>Executed in:</i> </td>
+        <td>
+          <i>Executed in:</i>{' '}
+        </td>
         <td>{numeral(widgetExecutionData?.duration).format('0,0')}ms</td>
       </tr>
       <tr>
-        <td colSpan={2}><i>Effective time range:</i></td>
+        <td colSpan={2}>
+          <i>Effective time range:</i>
+        </td>
       </tr>
       <tr>
         <td>From</td>
-        <td aria-label="Effective time range from"><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" /></td>
+        <td aria-label="Effective time range from">
+          <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" />
+        </td>
       </tr>
       <tr>
         <td>To</td>
-        <td aria-label="Effective time range to"><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" /></td>
+        <td aria-label="Effective time range to">
+          <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" />
+        </td>
       </tr>
       <tr>
-        <td><i>Total results:</i></td>
+        <td>
+          <i>Total results:</i>
+        </td>
         <td>{numeral(widgetExecutionData?.total).format('0,0')}</td>
       </tr>
     </tbody>
@@ -94,20 +113,24 @@ const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecu
 const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Props) => {
   const [open, setOpen] = useState(false);
   const interactive = useContext(InteractiveContext);
-  const result = useAppSelector(selectCurrentQueryResults);
-  const currentWidgetSearchType = useMemo<SearchTypeResultTypes[keyof SearchTypeResultTypes]>(() => {
+  const result = useViewsSelector(selectCurrentQueryResults);
+  const currentWidgetSearchType = useMemo<SearchTypeResult>(() => {
     const searchTypeId = currentWidgetMapping?.toJS()?.[0];
 
     return result?.searchTypes?.[searchTypeId];
   }, [currentWidgetMapping, result?.searchTypes]);
 
-  const widgetExecutionData = useMemo<WidgetExecutionData>(() => ({
-    effectiveTimerange: (currentWidgetSearchType as MessageResult)?.effectiveTimerange || (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
-    total: currentWidgetSearchType?.total,
-    duration: result?.duration,
-    timestamp: result?.timestamp,
-
-  }), [currentWidgetSearchType, result?.duration, result?.timestamp]);
+  const widgetExecutionData = useMemo<WidgetExecutionData>(
+    () => ({
+      effectiveTimerange:
+        (currentWidgetSearchType as MessageResult)?.effectiveTimerange ||
+        (currentWidgetSearchType as GenericResult)?.effective_timerange,
+      total: currentWidgetSearchType?.total,
+      duration: result?.duration,
+      timestamp: result?.timestamp,
+    }),
+    [currentWidgetSearchType, result?.duration, result?.timestamp],
+  );
 
   const onClose = useCallback(() => {
     setOpen(false);
@@ -131,8 +154,9 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
         {isEmpty(result) ? <i>No query executed yet.</i> : <HelpPopover widgetExecutionData={widgetExecutionData} />}
       </Popover.Dropdown>
     </Popover>
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  ) : <>{children}</>;
+  ) : (
+    <>{children}</>
+  );
 };
 
 export default SearchQueryExecutionInfoHelper;

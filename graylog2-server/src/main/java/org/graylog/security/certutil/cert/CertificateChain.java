@@ -16,24 +16,21 @@
  */
 package org.graylog.security.certutil.cert;
 
+import jakarta.annotation.Nullable;
+
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public record CertificateChain(X509Certificate signedCertificate,
-                               List<X509Certificate> caCertificates) {
+                               @Nullable List<X509Certificate> caCertificates) {
 
     public Certificate[] toCertificateChainArray() {
-        if (caCertificates != null) {
-            Certificate[] array = new Certificate[caCertificates.size() + 1];
-            array[0] = signedCertificate;
-            int index = 1;
-            for (X509Certificate caCert : caCertificates) {
-                array[index++] = caCert;
-            }
-            return array;
-        } else {
-            return new Certificate[]{signedCertificate};
-        }
+        List<Certificate> certificates = new ArrayList<>();
+        certificates.add(signedCertificate);
+        Optional.ofNullable(caCertificates).ifPresent(certificates::addAll);
+        return certificates.toArray(new Certificate[0]);
     }
 }

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -36,7 +37,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class Sidecar {
+public abstract class Sidecar implements MongoEntity {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_NODE_ID = "node_id";
@@ -64,10 +65,14 @@ public abstract class Sidecar {
 
         public static Status fromStatusCode(int statusCode) {
             switch (statusCode) {
-                case 0: return RUNNING;
-                case 2: return FAILING;
-                case 3: return STOPPED;
-                default: return UNKNOWN;
+                case 0:
+                    return RUNNING;
+                case 2:
+                    return FAILING;
+                case 3:
+                    return STOPPED;
+                default:
+                    return UNKNOWN;
             }
         }
 
@@ -109,12 +114,19 @@ public abstract class Sidecar {
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder id(String id);
+
         public abstract Builder nodeId(String title);
+
         public abstract Builder nodeName(String title);
+
         public abstract Builder nodeDetails(NodeDetails nodeDetails);
+
         public abstract Builder assignments(List<ConfigurationAssignment> assignments);
+
         public abstract Builder sidecarVersion(String sidecarVersion);
+
         public abstract Builder lastSeen(DateTime lastSeen);
+
         public abstract Sidecar build();
     }
 

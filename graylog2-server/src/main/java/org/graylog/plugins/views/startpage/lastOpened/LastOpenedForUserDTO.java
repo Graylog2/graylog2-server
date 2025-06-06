@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.startpage.lastOpened;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -35,7 +36,7 @@ public record LastOpenedForUserDTO(
         @Nullable
         @JsonProperty(FIELD_ITEMS)
         List<LastOpenedDTO> items
-) {
+) implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_ITEMS = "items";

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.inject.Provider;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
@@ -65,6 +66,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
@@ -151,11 +153,11 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(
-                eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
+        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
+        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService);
+        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityOwnershipService);
     }
 
     @Test
@@ -330,7 +332,7 @@ public class EventDefinitionFacadeTest {
     @Test
     public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
         EventDefinitionFacade testFacade = new EventDefinitionFacade(
-                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService, entityOwnershipService);
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
         when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);
@@ -343,7 +345,10 @@ public class EventDefinitionFacadeTest {
     @Test
     @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void delete() {
-        long countBefore = eventDefinitionService.streamAll().count();
+        long countBefore;
+        try (var stream = eventDefinitionService.streamAll()) {
+            countBefore = stream.count();
+        }
         assertThat(countBefore).isEqualTo(1);
 
         final Optional<EventDefinitionDto> eventDefinitionDto = eventDefinitionService.get(
@@ -351,7 +356,10 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto).isPresent();
         facade.delete(eventDefinitionDto.get());
 
-        long countAfter = eventDefinitionService.streamAll().count();
+        long countAfter;
+        try (var stream = eventDefinitionService.streamAll()) {
+            countAfter = stream.count();
+        }
         assertThat(countAfter).isEqualTo(0);
     }
 

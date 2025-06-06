@@ -20,6 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -57,8 +58,8 @@ public class FavoritesResource {
     @GET
     @ApiOperation("Get the Favorites for the Start Page for the user")
     @InlinePermissionCheck
-    public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+    public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") @Min(1) int page,
+                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") @Min(1) int perPage,
                                                         @ApiParam(name = "type") @QueryParam("type") Optional<String> type,
                                                         @Context SearchUser searchUser) {
         return favoritesService.findFavoritesFor(searchUser, type, page, perPage);

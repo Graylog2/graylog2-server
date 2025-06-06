@@ -16,22 +16,21 @@
  */
 import React, { useEffect } from 'react';
 
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Link } from 'components/common/router';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
-
-import useCurrentUser from '../hooks/useCurrentUser';
+import useProductName from 'brand-customization/useProductName';
 
 const NodeInputsPage = () => {
+  const productName = useProductName();
   const { nodeId } = useParams();
 
-  const currentUser = useCurrentUser();
   const { nodes } = useStore(NodesStore);
   const node = nodes?.[nodeId];
 
@@ -47,18 +46,24 @@ const NodeInputsPage = () => {
     return <Spinner />;
   }
 
-  const title = <span>Inputs of node {node.short_node_id} / {node.hostname}</span>;
+  const title = (
+    <span>
+      Inputs of node {node.short_node_id} / {node.hostname}
+    </span>
+  );
 
   return (
     <DocumentTitle title={`Inputs of node ${node.short_node_id} / ${node.hostname}`}>
       <div>
         <PageHeader title={title}>
           <span>
-            Graylog nodes accept data via inputs. On this page you can see which inputs are running on this specific node.<br />
+            {productName} nodes accept data via inputs. On this page you can see which inputs are running on this
+            specific node.
+            <br />
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} node={node} />
+        <InputsList node={node} />
       </div>
     </DocumentTitle>
   );

@@ -1,0 +1,6 @@
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "added"
+message = "Add Stream destination output filters UI."
+
+issues = ["7427"]
+pulls = ["19846"]

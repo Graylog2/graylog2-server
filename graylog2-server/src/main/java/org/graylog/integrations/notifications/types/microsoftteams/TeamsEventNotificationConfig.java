@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -33,9 +34,6 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.net.URI;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -43,13 +41,14 @@ import java.util.regex.Pattern;
 @AutoValue
 @JsonTypeName(TeamsEventNotificationConfig.TYPE_NAME)
 @JsonDeserialize(builder = TeamsEventNotificationConfig.Builder.class)
+@Deprecated
 public abstract class TeamsEventNotificationConfig implements EventNotificationConfig {
 
     public static final String TYPE_NAME = "teams-notification-v1";
 
     private static final Pattern TEAMS_PATTERN = Pattern.compile("https://.*.webhook.office.com/");
     private static final String DEFAULT_HEX_COLOR = "#ff0500";
-    private static final String DEFAULT_CUSTOM_MESSAGE = "Graylog Teams Notification";
+    private static final String DEFAULT_CUSTOM_MESSAGE = "${product_name} Teams Notification";
     private static final long DEFAULT_BACKLOG_SIZE = 0;
     private static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 

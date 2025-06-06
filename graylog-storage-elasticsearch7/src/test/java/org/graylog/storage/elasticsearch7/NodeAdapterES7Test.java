@@ -56,7 +56,7 @@ class NodeAdapterES7Test {
 
         assertThat(toTest.version())
                 .isNotEmpty()
-                .contains(SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.valueOf("7.10.2")));
+                .contains(SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.parse("7.10.2")));
 
     }
 
@@ -71,7 +71,7 @@ class NodeAdapterES7Test {
 
         assertThat(toTest.version())
                 .isNotEmpty()
-                .contains(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.valueOf("1.3.1")));
+                .contains(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse("1.3.1")));
 
     }
 

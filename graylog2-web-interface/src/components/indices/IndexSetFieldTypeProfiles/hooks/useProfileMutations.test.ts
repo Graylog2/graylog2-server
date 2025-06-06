@@ -58,7 +58,12 @@ describe('useProfileMutations', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully updated.', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith(
+          'Index set field type profile has been successfully updated.',
+          'Success!',
+        ),
+      );
     });
 
     it('should display notification on fail', async () => {
@@ -70,9 +75,12 @@ describe('useProfileMutations', () => {
         result.current.editProfile(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Updating index set field type profile failed with status: Error: Error',
-        'Could not update index set field type profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Updating index set field type profile failed with status: Error: Error',
+          'Could not update index set field type profile',
+        ),
+      );
     });
   });
 
@@ -93,7 +101,12 @@ describe('useProfileMutations', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', postUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully created.', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith(
+          'Index set field type profile has been successfully created.',
+          'Success!',
+        ),
+      );
     });
 
     it('should display notification on fail', async () => {
@@ -105,9 +118,12 @@ describe('useProfileMutations', () => {
         result.current.createProfile(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Creating index set field type profile failed with status: Error: Error',
-        'Could not create index set field type profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Creating index set field type profile failed with status: Error: Error',
+          'Could not create index set field type profile',
+        ),
+      );
     });
   });
 
@@ -125,7 +141,12 @@ describe('useProfileMutations', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('DELETE', deleteUrl));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully deleted.', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith(
+          'Index set field type profile has been successfully deleted.',
+          'Success!',
+        ),
+      );
     });
 
     it('should display notification on fail', async () => {
@@ -137,9 +158,12 @@ describe('useProfileMutations', () => {
         result.current.deleteProfile('111').catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Deleting index set field type profile failed with status: Error: Error',
-        'Could not delete index set field type profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Deleting index set field type profile failed with status: Error: Error',
+          'Could not delete index set field type profile',
+        ),
+      );
     });
   });
 });

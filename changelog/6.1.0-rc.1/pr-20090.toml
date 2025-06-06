@@ -1,0 +1,5 @@
+type = "a"
+message = "Add data node information to support bundle."
+
+pulls = ["20090"]
+issues = ["graylog-plugin-enterprise#7966"]

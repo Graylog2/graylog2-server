@@ -22,16 +22,18 @@ import { Button as MantineButton } from '@mantine/core';
 import type { ButtonProps } from '@mantine/core';
 import type { ComponentPropsWithoutRef, ComponentProps } from 'react';
 
-type StyledMantineButtonProps = ComponentProps<'button'> & ButtonProps & {
-  theme: DefaultTheme,
-};
+type StyledMantineButtonProps = ComponentProps<'button'> &
+  ButtonProps & {
+    theme: DefaultTheme;
+  };
 
-const StyledButton = styled(MantineButton)<React.PropsWithChildren<StyledMantineButtonProps>>(({ theme }: StyledMantineButtonProps) => css`
-  ${theme.components.button}
-`);
+const StyledButton = styled(MantineButton)<React.PropsWithChildren<StyledMantineButtonProps>>(
+  ({ theme }: StyledMantineButtonProps) => css`
+    ${theme.components.button}
+  `,
+);
 
 interface HTMLButtonProps extends ComponentPropsWithoutRef<'button'> {
-  type?: 'submit' | 'button' | 'reset';
   children: React.ReactNode;
 }
 
@@ -41,16 +43,16 @@ interface ReactRouterButtonProps {
   to: string;
 }
 
-export type CustomButtonProps = HTMLButtonProps | ReactRouterButtonProps | StyledMantineButtonProps;
+export type Props = { type?: 'submit' | 'button' | 'reset' } & (
+  | HTMLButtonProps
+  | ReactRouterButtonProps
+  | StyledMantineButtonProps
+);
 
-const Button = forwardRef<HTMLButtonElement, CustomButtonProps>(({ children, ...otherProps }: CustomButtonProps, ref) => (
-  <StyledButton {...otherProps} ref={ref}>
+const Button = ({ type = 'button', children, ...otherProps }: Props, ref: React.ForwardedRef<HTMLButtonElement>) => (
+  <StyledButton type={type} {...otherProps} ref={ref}>
     {children}
   </StyledButton>
-));
+);
 
-Button.defaultProps = {
-  type: 'button',
-};
-
-export default Button;
+export default forwardRef(Button);

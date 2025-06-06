@@ -20,7 +20,7 @@ import { useTheme } from 'styled-components';
 
 type Props = React.ComponentProps<typeof MantineTooltip>;
 
-const Tooltip = (props: Props) => {
+const Tooltip = ({ ...props }: Props) => {
   const theme = useTheme();
   const styles = () => ({
     tooltip: {
@@ -31,7 +31,7 @@ const Tooltip = (props: Props) => {
     },
   });
 
-  return <MantineTooltip styles={styles} {...props} />;
+  return <MantineTooltip zIndex="var(--mantine-z-index-max)" styles={styles} {...props} />;
 };
 
 export default Tooltip;

@@ -21,7 +21,6 @@ import { useEffect, useMemo, useCallback } from 'react';
 
 import type { ScopeName, HotkeyCollections, Options, HotkeysEvent } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -54,60 +53,50 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
 };
 
 export type HotkeysProps = {
-  actionKey: string,
-  callback?: (event: KeyboardEvent, handler: HotkeysEvent) => unknown,
-  scope: ScopeName,
-  options?: Options,
-  dependencies?: Array<unknown>,
-  telemetryAppPathname?: string,
-}
+  actionKey: string;
+  callback?: (event: KeyboardEvent, handler: HotkeysEvent) => unknown;
+  scope: ScopeName;
+  options?: Options;
+  dependencies?: Array<unknown>;
+  telemetryAppPathname?: string;
+};
 
 const useHotkey = <T extends HTMLElement>({
   actionKey,
-  callback,
+  callback = undefined,
   scope,
-  options,
-  dependencies,
-  telemetryAppPathname,
+  options = undefined,
+  dependencies = undefined,
+  telemetryAppPathname = undefined,
 }: HotkeysProps) => {
-  const hasHotkeysFeatureFlag = useFeature('frontend_hotkeys');
-
-  if (!hasHotkeysFeatureFlag) {
-    return null;
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const location = useLocation();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const sendTelemetry = useSendTelemetry();
 
-  const {
-    hotKeysCollections,
-    addActiveHotkey,
-    removeActiveHotkey,
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = useHotkeysContext();
+  const { hotKeysCollections, addActiveHotkey, removeActiveHotkey } = useHotkeysContext();
 
   catchErrors(hotKeysCollections, actionKey, scope);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const mergedOptions = useMemo(() => ({
-    ...defaultOptions,
-    ...options,
-    scopes: scope,
-  }), [options, scope]);
+  const mergedOptions = useMemo(
+    () => ({
+      ...defaultOptions,
+      ...options,
+      scopes: scope,
+    }),
+    [options, scope],
+  );
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const callbackWithTelemetry = useCallback((event: KeyboardEvent, handler: HotkeysEvent) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SHORTCUT_TYPED, {
-      app_pathname: telemetryAppPathname ?? getPathnameWithoutId(location.pathname),
-      event_details: { actionKey, scope, keys: hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys },
-    });
+  const callbackWithTelemetry = useCallback(
+    (event: KeyboardEvent, handler: HotkeysEvent) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SHORTCUT_TYPED, {
+        app_pathname: telemetryAppPathname ?? getPathnameWithoutId(location.pathname),
+        event_details: { actionKey, scope, keys: hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys },
+      });
 
-    callback(event, handler);
-  }, [actionKey, callback, hotKeysCollections, location.pathname, scope, sendTelemetry, telemetryAppPathname]);
+      callback(event, handler);
+    },
+    [actionKey, callback, hotKeysCollections, location.pathname, scope, sendTelemetry, telemetryAppPathname],
+  );
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     addActiveHotkey({
       scope,
@@ -122,7 +111,16 @@ const useHotkey = <T extends HTMLElement>({
     });
 
     return () => removeActiveHotkey({ scope, actionKey });
-  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled, mergedOptions.displayInOverview, mergedOptions.splitKey]);
+  }, [
+    actionKey,
+    addActiveHotkey,
+    scope,
+    removeActiveHotkey,
+    mergedOptions.combinationKey,
+    mergedOptions.enabled,
+    mergedOptions.displayInOverview,
+    mergedOptions.splitKey,
+  ]);
 
   return originalUseHotkeys<T>(
     hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys,

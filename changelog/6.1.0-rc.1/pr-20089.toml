@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix list of dashboards in widget's 'copy to dashboard' dialog to only contain allowed dashboards."
+
+issues=["7331"]
+pulls = ["20089"]

@@ -68,7 +68,6 @@ import org.graylog2.shared.rest.VerboseCsrfProtectionFilter;
 import org.graylog2.shared.rest.XHRFilter;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
-import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonMappingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.MissingStreamPermissionExceptionMapper;
@@ -255,16 +254,11 @@ public class JerseyService extends AbstractIdleService {
 
     private ResourceConfig buildResourceConfig(final boolean enableCors,
                                                final Set<Resource> additionalResources) {
-        final Map<String, String> packagePrefixes = ImmutableMap.of(
-                RESOURCE_PACKAGE_WEB, HttpConfiguration.PATH_WEB,
-                "", HttpConfiguration.PATH_API
-        );
-
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
-                .register(new PrefixAddingModelProcessor(packagePrefixes))
+                .register(new PrefixAddingModelProcessor())
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
                         ShiroSecurityContextFilter.class,
@@ -273,7 +267,6 @@ public class JerseyService extends AbstractIdleService {
                         JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
-                        JacksonPropertyExceptionMapper.class,
                         AnyExceptionClassMapper.class,
                         MissingStreamPermissionExceptionMapper.class,
                         WebApplicationExceptionMapper.class,

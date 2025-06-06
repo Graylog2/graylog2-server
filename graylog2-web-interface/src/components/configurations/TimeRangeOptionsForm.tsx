@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Row, Col, Button } from 'components/bootstrap';
@@ -25,33 +24,24 @@ import ObjectUtils from 'util/ObjectUtils';
 /**
  * Expects `this.props.options` to be an array of period/description objects. `[{period: 'PT1S', description: 'yo'}]`
  */
-type Option = { period: string, description: string };
+type Option = { period: string; description: string };
 type Props = {
-  options?: Array<Option>,
-  title: string,
-  help: React.ReactNode,
-  addButtonTitle?: string,
-  update: (options: Array<Option>) => void,
-  validator: (milliseconds: number, duration: string) => boolean,
+  options?: Array<Option>;
+  title: string;
+  help: React.ReactNode;
+  addButtonTitle?: string;
+  update: (options: Array<Option>) => void;
+  validator: (milliseconds: number, duration: string) => boolean;
 };
 
 class TimeRangeOptionsForm extends React.Component<Props> {
-  static propTypes = {
-    options: PropTypes.array,
-    title: PropTypes.string.isRequired,
-    help: PropTypes.any.isRequired,
-    addButtonTitle: PropTypes.string,
-    update: PropTypes.func.isRequired,
-    validator: PropTypes.func,
-  };
-
   static defaultProps = {
     options: [],
     addButtonTitle: 'Add option',
     validator: () => true,
   };
 
-  _update = (options: { period: string; description: string; }[]) => {
+  _update = (options: { period: string; description: string }[]) => {
     this.props.update(options);
   };
 
@@ -95,49 +85,51 @@ class TimeRangeOptionsForm extends React.Component<Props> {
     this._update(options);
   };
 
-  _buildTimeRangeOptions = () => this.props.options.map((option, idx) => {
-    const { period } = option;
-    const { description } = option;
-    const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'has-error');
+  _buildTimeRangeOptions = () =>
+    this.props.options.map((option, idx) => {
+      const { period } = option;
+      const { description } = option;
+      const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'error');
 
-    return (
-    // eslint-disable-next-line react/no-array-index-key
-      <div key={`timerange-option-${idx}`}>
-        <Row>
-          <Col xs={4}>
-            <div className={`input-group ${errorStyle}`}>
-              <input type="text" className="form-control" value={period} onChange={this._onChange(idx, 'period')} />
-              <span className="input-group-addon">
-                {ISODurationUtils.formatDuration(period, this.props.validator)}
-              </span>
-            </div>
-          </Col>
-          <Col xs={8}>
-            <div className="input-group">
-              <input type="text"
-                     className="form-control"
-                     placeholder="Add description..."
-                     value={description}
-                     onChange={this._onChange(idx, 'description')} />
-              <span className="input-group-addon">
-                <Icon name="delete" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
-              </span>
-            </div>
-          </Col>
-        </Row>
-      </div>
-    );
-  });
+      return (
+        <div key={`timerange-option-${idx}`}>
+          <Row>
+            <Col xs={4}>
+              <div className={`input-group ${errorStyle === 'error' ? 'has-error' : null}`}>
+                <input type="text" className="form-control" value={period} onChange={this._onChange(idx, 'period')} />
+                <span className="input-group-addon">
+                  {ISODurationUtils.formatDuration(period, this.props.validator)}
+                </span>
+              </div>
+            </Col>
+            <Col xs={8}>
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Add description..."
+                  value={description}
+                  onChange={this._onChange(idx, 'description')}
+                />
+                <span className="input-group-addon">
+                  <Icon name="delete" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
+                </span>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      );
+    });
 
   render() {
     return (
       <div className="form-group">
         <label className="control-label">{this.props.title}</label>
         <span className="help-block">{this.props.help}</span>
-        <div className="wrapper">
-          {this._buildTimeRangeOptions()}
-        </div>
-        <Button bsSize="xs" onClick={this._onAdd}>{this.props.addButtonTitle}</Button>
+        <div className="wrapper">{this._buildTimeRangeOptions()}</div>
+        <Button bsSize="xs" onClick={this._onAdd}>
+          {this.props.addButtonTitle}
+        </Button>
       </div>
     );
   }

@@ -22,11 +22,11 @@ import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 
 type InternalState = {
-  axisType: AxisType,
+  axisType: AxisType;
 };
 
 export type ScatterVisualizationConfigJson = {
-  axis_type?: AxisType,
+  axis_type?: AxisType;
 };
 
 export default class ScatterVisualizationConfig extends VisualizationConfig implements XYVisualization {
@@ -63,9 +63,7 @@ export default class ScatterVisualizationConfig extends VisualizationConfig impl
   }
 
   static fromJSON(_type: string, value: ScatterVisualizationConfigJson) {
-    return ScatterVisualizationConfig.create(
-      value?.axis_type ?? DEFAULT_AXIS_TYPE,
-    );
+    return ScatterVisualizationConfig.create(value?.axis_type ?? DEFAULT_AXIS_TYPE);
   }
 }
 
@@ -79,7 +77,7 @@ class Builder {
   }
 
   axisType(value: InternalState['axisType']) {
-    return new Builder((this.value.set('axisType', value)));
+    return new Builder(this.value.set('axisType', value));
   }
 
   build() {

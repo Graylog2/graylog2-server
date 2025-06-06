@@ -17,9 +17,7 @@
 package org.graylog.scheduler.schedule;
 
 import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
-import com.cronutils.parser.CronParser;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -34,11 +32,8 @@ import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
-
-import static com.cronutils.model.CronType.QUARTZ;
 
 @AutoValue
 @JsonTypeName(CronJobSchedule.TYPE_NAME)
@@ -57,25 +52,20 @@ public abstract class CronJobSchedule implements JobSchedule {
     @JsonProperty(value = FIELD_TIMEZONE)
     abstract Optional<String> timezone();
 
-    private static CronParser newCronParser() {
-        return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
-    }
-
     @Override
     public Optional<DateTime> calculateNextTime(DateTime previousExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
-        final Cron cron = newCronParser().parse(cronExpression());
+        final Cron cron = CronUtils.getParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
-        ZonedDateTime zdt = getZonedDateTime(clock);
+        ZonedDateTime zdt = getZonedDateTime(lastNextTime == null ? clock.nowUTC() : lastNextTime);
 
         return executionTime
                 .nextExecution(zdt)
                 .map(this::toDateTime);
     }
 
-    private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
-        final DateTime now = clock.nowUTC();
-        Instant instant = Instant.ofEpochMilli(now.getMillis());
+    private ZonedDateTime getZonedDateTime(DateTime dt) {
+        Instant instant = Instant.ofEpochMilli(dt.getMillis());
         ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE), ZoneId.SHORT_IDS);
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
@@ -85,14 +75,6 @@ public abstract class CronJobSchedule implements JobSchedule {
         return new DateTime(t.toInstant().toEpochMilli(), tz);
     }
 
-    @Override
-    public Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
-        return Optional.of(java.util.Map.of(
-                fieldPrefix + JobSchedule.TYPE_FIELD, type(),
-                fieldPrefix + FIELD_CRON_EXPRESSION, cronExpression(),
-                fieldPrefix + FIELD_TIMEZONE, timezone().orElse(DEFAULT_TIMEZONE) // always store a TZ together with the cron expression
-        ));
-    }
     public static CronJobSchedule.Builder builder() {
         return CronJobSchedule.Builder.create();
     }
@@ -120,17 +102,10 @@ public abstract class CronJobSchedule implements JobSchedule {
             // Make sure the type name is correct!
             type(TYPE_NAME);
             final CronJobSchedule schedule = autoBuild();
-            validateCronExpression(schedule);
+            // make sure that we don't allow any invalid cron expression, as we are accepting plain string that could
+            // contain anything
+            CronUtils.validateExpression(schedule.cronExpression());
             return schedule;
-        }
-
-        /**
-         * make sure that we don't allow any invalid cron expression, as we are accepting plain string
-         * that could contain anything
-         */
-        private void validateCronExpression(CronJobSchedule schedule) {
-            final Cron cron = newCronParser().parse(schedule.cronExpression());
-            cron.validate();
         }
     }
 }

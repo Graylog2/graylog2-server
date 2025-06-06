@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Provider;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
@@ -35,6 +36,7 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -42,6 +44,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -68,6 +71,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class EventDefinitionHandlerTest {
     public final Set<EntityScope> ENTITY_SCOPES = Set.of(new DefaultEntityScope(), new TestEntityScope());
@@ -85,6 +89,9 @@ public class EventDefinitionHandlerTest {
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
+
+    @Mock
+    Provider<EntitySharesService> entitySharesServiceProvider;
 
     private EventDefinitionHandler handler;
     private JobSchedulerTestClock clock;
@@ -107,11 +114,12 @@ public class EventDefinitionHandlerTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
-        this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
-        this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
+        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
+        this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
+        this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
-        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
+        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock);
     }
 
     @Test
@@ -167,6 +175,8 @@ public class EventDefinitionHandlerTest {
 
     @Test
     public void duplicate() {
+        EntitySharesService entitySharesService = mock(EntitySharesService.class);
+        when(entitySharesServiceProvider.get()).thenReturn(entitySharesService);
         final EventDefinitionDto newDto = EventDefinitionDto.builder()
                 .title("Test")
                 .description("A test event definition")
@@ -185,7 +195,7 @@ public class EventDefinitionHandlerTest {
                 .build();
 
         final var existingEvent = eventDefinitionService.save(newDto);
-        final var duplicated = handler.duplicate(existingEvent, Optional.empty());
+        final var duplicated = handler.duplicate(existingEvent, mock(User.class));
         final var saved = eventDefinitionService.get(duplicated.id()).get();
 
         assertThat(saved.title()).startsWith("COPY-");
@@ -227,8 +237,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void update() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -238,7 +248,6 @@ public class EventDefinitionHandlerTest {
                 .executeEveryMs(550000)
                 .searchWithinMs(800000)
                 .build();
-        final EventProcessorExecutionJob.Data existingTriggerData = (EventProcessorExecutionJob.Data) existingTrigger.data().orElseThrow(AssertionError::new);
 
         assertThat(existingDto).isNotNull();
         assertThat(existingJobDefinition).isNotNull();
@@ -281,8 +290,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void updateWithSchedulingDisabled() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -318,8 +327,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors-without-schedule.json")
     public void updateWithSchedulingReEnabled() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final TestEventProcessorConfig existingConfig = (TestEventProcessorConfig) existingDto.config();
@@ -353,16 +362,16 @@ public class EventDefinitionHandlerTest {
         assertThat(jobTriggerService.getOneForJob(newJobDefinition.id()))
                 .isPresent()
                 .hasValueSatisfying(trigger -> {
-            final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
-            assertThat(schedule.interval()).isEqualTo(550000);
-        });
+                    final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
+                    assertThat(schedule.interval()).isEqualTo(550000);
+                });
     }
 
     @Test
     @MongoDBFixtures("event-processors.json")
     public void updateWithErrors() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -442,7 +451,9 @@ public class EventDefinitionHandlerTest {
     public void schedule() {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
         assertThat(jobDefinitionService.streamAll().count()).isEqualTo(0);
-        assertThat(jobTriggerService.all()).isEmpty();
+        try (var stream = jobTriggerService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         handler.schedule("54e3deadbeefdeadbeef0000");
 
@@ -539,10 +550,12 @@ public class EventDefinitionHandlerTest {
         public String getName() {
             return NAME;
         }
+
         @Override
         public boolean isMutable() {
             return false;
         }
+
         @Override
         public boolean isDeletable() {
             return false;

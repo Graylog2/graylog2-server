@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DashboardsPage from './DashboardsPage';
 
-jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => () => ({
   data: {
     pagination: {
       total: 0,
@@ -41,11 +41,12 @@ jest.mock('routing/Routes', () => ({
 describe('DashboardsPage', () => {
   it('should render header and list', async () => {
     render(
-      <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <DefaultQueryParamProvider>
         <DashboardsPage />
-      </QueryParamProvider>);
+      </DefaultQueryParamProvider>,
+    );
 
     await screen.findByRole('heading', { name: /dashboards/i });
-    await screen.findByText('No dashboards have been created yet.');
+    await screen.findByText('No dashboards have been found.');
   });
 });

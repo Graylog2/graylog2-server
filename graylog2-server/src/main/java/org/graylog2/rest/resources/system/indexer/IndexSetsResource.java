@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,16 +45,20 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.IndexSetValidator.Violation;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
@@ -71,13 +75,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets", description = "Index sets", tags = {CLOUD_VISIBLE})
+@Api(value = "System/IndexSets", description = "Index sets")
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
@@ -91,6 +96,8 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
+    private final DataTieringStatusService tieringStatusService;
+    private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -100,7 +107,9 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager) {
+                             final SystemJobManager systemJobManager,
+                             final DataTieringStatusService tieringStatusService,
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -109,6 +118,8 @@ public class IndexSetsResource extends RestResource {
         this.indexSetStatsCreator = indexSetStatsCreator;
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
+        this.tieringStatusService = tieringStatusService;
+        this.openIndexSetFilterFactories = openIndexSetFilterFactories;
     }
 
     @GET
@@ -122,15 +133,20 @@ public class IndexSetsResource extends RestResource {
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit,
                                  @ApiParam(name = "stats", value = "Include index set stats.")
-                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats,
+                                 @ApiParam(name = "only_open", value = "Include only graylog open indices.")
+                                 @QueryParam("only_open") @DefaultValue("false") boolean onlyOpen) {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-        List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
+        Stream<IndexSetConfig> indexSetConfigStream = indexSetService.findAll()
                 .stream()
-                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
-                .toList();
-
-        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()));
+        if (onlyOpen) {
+            for (OpenIndexSetFilterFactory filterFactory : openIndexSetFilterFactories) {
+                indexSetConfigStream = indexSetConfigStream.filter(filterFactory.create());
+            }
+        }
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, indexSetConfigStream.toList());
     }
 
     @GET
@@ -204,9 +220,12 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary get(@ApiParam(name = "id", required = true)
                                @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
+        final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Couldn't find index set with ID <" + id + ">"));
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .map(config -> IndexSetSummary.fromIndexSetConfig(
+                        config, config.equals(defaultIndexSet),
+                        tieringStatusService.getStatus(indexSet, config)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 
@@ -238,9 +257,10 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
         try {
+            checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
             final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig(true);
 
-            final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+            final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
             if (violation.isPresent()) {
                 throw new BadRequestException(violation.get().message());
             }
@@ -248,8 +268,11 @@ public class IndexSetsResource extends RestResource {
             final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
             final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
             return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -278,9 +301,11 @@ public class IndexSetsResource extends RestResource {
             throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
         }
 
+        checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTieringConfig());
+
         final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(id, oldConfig);
 
-        final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+        final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
             throw new BadRequestException(violation.get().message());
         }
@@ -288,6 +313,13 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
 
         return IndexSetSummary.fromIndexSetConfig(savedObject, isDefaultSet);
+    }
+
+    private void checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
+        Violation violation = indexSetValidator.checkDataTieringNotNull(useLegacyRotation, dataTieringConfig);
+        if (violation != null) {
+            throw new BadRequestException(violation.message());
+        }
     }
 
     @PUT

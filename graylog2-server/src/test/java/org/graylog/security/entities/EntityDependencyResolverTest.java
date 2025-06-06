@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.database.MongoCollections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ class EntityDependencyResolverTest {
                MongoJackObjectMapperProvider objectMapperProvider) {
 
         this.grnRegistry = grnRegistry;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, this.grnRegistry);
+        DBGrantService dbGrantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
         this.contentPackService = contentPackService;
         this.grnDescriptorService = grnDescriptorService;
         entityDependencyResolver = new EntityDependencyResolver(contentPackService, grnRegistry, grnDescriptorService, dbGrantService);
@@ -154,5 +155,17 @@ class EntityDependencyResolverTest {
             assertThat(descriptor.owners()).hasSize(1);
             assertThat(descriptor.owners().asList().get(0).grn().toString()).isEqualTo("grn::::user:jane");
         });
+    }
+
+    @Test
+    @DisplayName("Try resolve with an event procedure dependency")
+    void resolveEventProcedureDependency() {
+        final EntityDescriptor definitionDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_DEFINITION_V1).id(ModelId.of("54e3deadbeefdeadbeefafff")).build();
+        final EntityDescriptor procedureDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_PROCEDURE_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
+        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(definitionDescriptor, procedureDescriptor));
+
+        final GRN definitionGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
+        final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(definitionGrn);
+        assertThat(missingDependencies).hasSize(0);
     }
 }

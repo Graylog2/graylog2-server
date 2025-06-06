@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding a Last Updated attribute to views/dashboard that is updated on save and initially initialised from the associated search for existing views."
+
+pulls = ["19830"]

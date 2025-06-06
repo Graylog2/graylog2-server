@@ -16,47 +16,47 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
+import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.mongojack.DBQuery;
-
-import jakarta.inject.Inject;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.rest.models.SortOrder;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> implements ViewUtils<ViewSummaryDTO> {
+public class ViewSummaryService implements ViewUtils<ViewSummaryDTO> {
     private static final String COLLECTION_NAME = "views";
+
     private final MongoCollection<ViewSummaryDTO> collection;
+    private final MongoUtils<ViewSummaryDTO> mongoUtils;
 
     @Inject
-    protected ViewSummaryService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                 MongoCollections mongoCollections) {
-        super(mongoConnection, mongoJackObjectMapperProvider, ViewSummaryDTO.class, COLLECTION_NAME);
-        this.collection = mongoCollections.get(COLLECTION_NAME, ViewSummaryDTO.class);
+    protected ViewSummaryService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, ViewSummaryDTO.class);
+        mongoUtils = mongoCollections.utils(collection);
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(SearchUser searchUser,
                                                                ViewDTO.Type type,
                                                                Bson dbQuery, //query executed on DB level
                                                                Predicate<ViewSummaryDTO> predicate, //predicate executed on code level, AFTER data is fetched
-                                                               String order,
+                                                               SortOrder order,
                                                                String sortField,
                                                                int page,
                                                                int perPage) {
         checkNotNull(sortField);
 
-        var sort = getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT));
+        var sort = order.toBsonSort(sortField, ViewDTO.SECONDARY_SORT);
 
         var query = Filters.and(
                 Filters.or(
@@ -77,7 +77,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
                 .toList()
                 : views;
 
-        final long grandTotal = db.getCount(DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)));
+        final long grandTotal = collection.countDocuments(Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), Filters.not(Filters.exists(ViewDTO.FIELD_TYPE))));
 
         return new PaginatedList<>(paginatedStreams, views.size(), page, perPage, grandTotal);
     }
@@ -85,5 +85,14 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
     @Override
     public MongoCollection<ViewSummaryDTO> collection() {
         return collection;
+    }
+
+    @MustBeClosed
+    public Stream<ViewSummaryDTO> streamAll() {
+        return MongoUtils.stream(collection.find());
+    }
+
+    public Optional<ViewSummaryDTO> get(String id) {
+        return mongoUtils.getById(id);
     }
 }

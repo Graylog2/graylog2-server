@@ -31,16 +31,16 @@ import java.util.Objects;
 
 public class MigrationStateMachineImpl implements MigrationStateMachine {
     private final StateMachine<MigrationState, MigrationStep> stateMachine;
-    private final MigrationActions migrationActions;
     private final DatanodeMigrationPersistence persistenceService;
-    private MigrationStateMachineContext context;
+    private final MigrationStateMachineContext context;
 
-    public MigrationStateMachineImpl(StateMachine<MigrationState, MigrationStep> stateMachine, MigrationActions migrationActions, DatanodeMigrationPersistence persistenceService) {
+    public MigrationStateMachineImpl(
+            StateMachine<MigrationState, MigrationStep> stateMachine,
+            DatanodeMigrationPersistence persistenceService,
+            MigrationStateMachineContext context) {
         this.stateMachine = stateMachine;
-        this.migrationActions = migrationActions;
         this.persistenceService = persistenceService;
-        this.context = persistenceService.getStateMachineContext().orElse(new MigrationStateMachineContext());
-        migrationActions.setStateMachineContext(context);
+        this.context = context;
     }
 
     @Override
@@ -49,16 +49,19 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         if (Objects.nonNull(args) && !args.isEmpty()) {
             context.addActionArguments(step, args);
         }
-        migrationActions.setStateMachineContext(context);
         String errorMessage = null;
         try {
             stateMachine.fire(step);
         } catch (Exception e) {
             errorMessage = Objects.nonNull(e.getMessage()) ? e.getMessage() : e.toString();
         }
-        context = migrationActions.getStateMachineContext();
-        persistenceService.saveStateMachineContext(context);
+        saveContext();
         return new CurrentStateInformation(getState(), nextSteps(), errorMessage, context.getResponse());
+    }
+
+    @Override
+    public void saveContext() {
+        persistenceService.saveStateMachineContext(context);
     }
 
     @Override

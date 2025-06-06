@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
@@ -40,11 +41,7 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Arrays;
@@ -56,8 +53,6 @@ import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilHttp implements CliCommand {
 
-    @Deprecated //no need to have separate alias for both certificates types
-    public static final String DATANODE_KEY_ALIAS = "datanode";
     @Option(name = "--ca", description = "Filename for the CA keystore")
     protected String caKeystoreFilename = "datanode-ca.p12";
 
@@ -153,7 +148,9 @@ public class CertutilHttp implements CliCommand {
 
                 char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD);
 
-                nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
+                // This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+                // not dependent on a specific alias, we can generate a random alphabetic sequence.
+                nodeKeystore.setKeyEntry(RandomStringUtils.secure().nextAlphabetic(10), nodePair.privateKey(), nodeKeystorePassword,
                         new X509Certificate[]{nodePair.certificate(), caKeyPair.certificate()});
 
 
@@ -165,9 +162,6 @@ public class CertutilHttp implements CliCommand {
 
 
                 // TODO: provide good user-friendly error message for each exception type!
-            } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
-                     UnrecoverableKeyException e) {
-                throw new RuntimeException(e);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

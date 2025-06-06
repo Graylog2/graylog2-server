@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
@@ -25,31 +27,32 @@ import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SearchesCleanUpJob extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(SearchesCleanUpJob.class);
 
     private final ViewSummaryService viewSummaryService;
     private final SearchDbService searchDbService;
-    private final Instant mustNotBeOlderThan;
+    private final Duration maximumSearchAge;
     private final Map<String, ViewResolver> viewResolvers;
+    private final Set<StaticReferencedSearch> staticReferencedSearches;
 
     @Inject
     public SearchesCleanUpJob(ViewSummaryService viewSummaryService,
                               SearchDbService searchDbService,
                               @Named("views_maximum_search_age") Duration maximumSearchAge,
-                              Map<String, ViewResolver> viewResolvers) {
+                              Map<String, ViewResolver> viewResolvers,
+                              Set<StaticReferencedSearch> staticReferencedSearches) {
         this.viewSummaryService = viewSummaryService;
         this.searchDbService = searchDbService;
-        this.mustNotBeOlderThan = Instant.now().minus(maximumSearchAge);
+        this.maximumSearchAge = maximumSearchAge;
         this.viewResolvers = viewResolvers;
+        this.staticReferencedSearches = staticReferencedSearches;
     }
 
     @Override
@@ -94,15 +97,19 @@ public class SearchesCleanUpJob extends Periodical {
 
     @Override
     public void doRun() {
+        final Instant mustBeOlderThan = Instant.now().minus(maximumSearchAge);
         searchDbService.getExpiredSearches(findReferencedSearchIds(),
-                mustNotBeOlderThan).forEach(searchDbService::delete);
+                mustBeOlderThan).forEach(searchDbService::delete);
     }
 
     private Set<String> findReferencedSearchIds() {
         final HashSet<String> toKeepViewIds = new HashSet<>();
-        toKeepViewIds.addAll(viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
+        try (final Stream<ViewSummaryDTO> stream = viewSummaryService.streamAll()) {
+            toKeepViewIds.addAll(stream.map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
+        }
         toKeepViewIds.addAll(viewResolvers
                 .values().stream().flatMap(vr -> vr.getSearchIds().stream()).collect(Collectors.toSet()));
+        toKeepViewIds.addAll(staticReferencedSearches.stream().map(StaticReferencedSearch::id).toList());
         return toKeepViewIds;
     }
 }

@@ -49,9 +49,7 @@
           "notes": "",
           "method": "GET",
           "nickname": "getList",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "PaginatedResponse",
           "parameters": [
             {
@@ -83,10 +81,7 @@
               "required": true,
               "paramType": "query",
               "defaultValue": "name",
-              "enum": [
-                "name",
-                "description"
-              ],
+              "enum": ["name", "description"],
               "type": "string"
             },
             {
@@ -95,10 +90,7 @@
               "required": false,
               "paramType": "query",
               "defaultValue": "asc",
-              "enum": [
-                "asc",
-                " desc"
-              ],
+              "enum": ["asc", " desc"],
               "type": "string"
             }
           ],
@@ -114,9 +106,7 @@
           "notes": "",
           "method": "GET",
           "nickname": "getListForUser",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "PaginatedResponse",
           "parameters": [
             {
@@ -155,10 +145,7 @@
               "required": true,
               "paramType": "query",
               "defaultValue": "name",
-              "enum": [
-                "name",
-                "description"
-              ],
+              "enum": ["name", "description"],
               "type": "string"
             },
             {
@@ -167,10 +154,7 @@
               "required": false,
               "paramType": "query",
               "defaultValue": "asc",
-              "enum": [
-                "asc",
-                " desc"
-              ],
+              "enum": ["asc", " desc"],
               "type": "string"
             }
           ],
@@ -186,9 +170,7 @@
           "notes": "",
           "method": "GET",
           "nickname": "get",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "AuthzRoleDTO",
           "parameters": [
             {
@@ -211,9 +193,7 @@
           "notes": "",
           "method": "DELETE",
           "nickname": "delete",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "void",
           "parameters": [
             {
@@ -236,9 +216,7 @@
           "notes": "",
           "method": "DELETE",
           "nickname": "removeUser",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "void",
           "parameters": [
             {
@@ -268,9 +246,7 @@
           "notes": "",
           "method": "GET",
           "nickname": "getUsersForRole",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "PaginatedResponse",
           "parameters": [
             {
@@ -309,11 +285,7 @@
               "required": true,
               "paramType": "query",
               "defaultValue": "name",
-              "enum": [
-                "username",
-                "full_name",
-                "email"
-              ],
+              "enum": ["username", "full_name", "email"],
               "type": "string"
             },
             {
@@ -322,10 +294,7 @@
               "required": false,
               "paramType": "query",
               "defaultValue": "asc",
-              "enum": [
-                "asc",
-                " desc"
-              ],
+              "enum": ["asc", " desc"],
               "type": "string"
             }
           ],
@@ -341,9 +310,7 @@
           "notes": "",
           "method": "PUT",
           "nickname": "addUser",
-          "produces": [
-            "application/json"
-          ],
+          "produces": ["application/json"],
           "type": "void",
           "parameters": [
             {

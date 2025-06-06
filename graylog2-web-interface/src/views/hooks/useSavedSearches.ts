@@ -16,13 +16,13 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -31,22 +31,20 @@ const INITIAL_DATA = {
 };
 
 type PaginatedSearchesResponse = PaginatedListJSON & {
-  elements: Array<ViewJson>,
-  attributes: Array<Attribute>
+  elements: Array<ViewJson>;
+  attributes: Array<Attribute>;
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 const savedSearchesUrl = qualifyUrl('/search/saved');
 
 const fetchSavedSearches = (searchParams: SearchParams) => {
-  const url = PaginationURL(
-    savedSearchesUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(savedSearchesUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
   return fetch<PaginatedSearchesResponse>('GET', qualifyUrl(url)).then(
     ({ elements, attributes, total, count, page, per_page: perPage }) => ({
@@ -57,33 +55,37 @@ const fetchSavedSearches = (searchParams: SearchParams) => {
   );
 };
 
-const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useSavedSearches = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    list: Readonly<Array<View>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>,
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
+    list: Readonly<Array<View>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
-    () => fetchSavedSearches(searchParams),
+    () =>
+      defaultOnError(
+        fetchSavedSearches(searchParams),
+        'Loading saved searches failed with status',
+        'Could not load saved searches',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading saved searches failed with status: ${errorThrown}`,
-          'Could not load saved searches');
-      },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useSavedSearches;

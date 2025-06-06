@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -78,8 +77,16 @@ public class SearchQueryParser {
     private static final Splitter FIELD_VALUE_SPLITTER = Splitter.on(":").limit(2).omitEmptyStrings().trimResults();
     private static final Splitter VALUE_SPLITTER = Splitter.on(",").omitEmptyStrings().trimResults();
 
+    // Pattern to split a search query into individual parsable elements terms.
+    private static final String TERM_SPLIT_PATTERN =
+            "(\\S+:(=|=~|<|<=|>|>=)?'(?:[^'\\\\]|\\\\.)*')|" + // Split field-specific terms with single-quotes: title:'value'
+                    "(\\S+:(=|=~|<|<=|>|>=)?\"(?:[^\"\\\\]|\\\\.)*\")|" + // Split field-specific terms with double-quotes title:"value"
+                    "['\"][^\\\\]*?(?:\\\\.[^\\\\]*)*?['\"]|" + // Split single quoted value: "value one"
+                    "\\S+:(=|=~|<|<=|>|>=)?\\S+|" + // Split field-specific terms without quotes title:value
+                    "\\S+"; // Split the words of any other string value
+
     // This needs to be updated if more operators are added
-    private static final Pattern QUERY_SPLITTER_PATTERN = Pattern.compile("(\\S+:(=|=~|<|<=|>|>=)?'(?:[^'\\\\]|\\\\.)*')|(\\S+:(=|=~|<|<=|>|>=)?\"(?:[^\"\\\\]|\\\\.)*\")|\\S+|\\S+:(=|=~|<|<=|>|>=)?\\S+");
+    private static final Pattern QUERY_SPLITTER_PATTERN = Pattern.compile(TERM_SPLIT_PATTERN);
     private static final String INVALID_ENTRY_MESSAGE = "Chunk [%s] is not a valid entry";
     private static final String QUOTE_REPLACE_REGEX = "^[\"']|[\"']$";
     public static final SearchQueryOperator DEFAULT_STRING_OPERATOR = SearchQueryOperators.REGEXP;
@@ -146,17 +153,11 @@ public class SearchQueryParser {
     }
 
     public SearchQuery parse(String encodedQueryString) {
-        String queryString = encodedQueryString;
-
-        if (Strings.isNullOrEmpty(queryString) || "*".equals(queryString)) {
-            return new SearchQuery(queryString);
+        if (Strings.isNullOrEmpty(encodedQueryString) || "*".equals(encodedQueryString)) {
+            return new SearchQuery(encodedQueryString);
         }
 
-        try {
-            queryString = URLDecoder.decode(encodedQueryString, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            LOG.warn("Could not find correct character set for decoding: {}", e.getMessage());
-        }
+        final var queryString = URLDecoder.decode(encodedQueryString, StandardCharsets.UTF_8);
 
         final Matcher matcher = querySplitterMatcher(requireNonNull(queryString).trim());
         final ImmutableMultimap.Builder<String, FieldValue> builder = ImmutableMultimap.builder();

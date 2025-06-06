@@ -22,9 +22,9 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 type Props = {
-  notification: EventNotification
-  testResults: TestResults
-}
+  notification: EventNotification;
+  testResults: TestResults;
+};
 
 const NotificationTitle = ({ notification, testResults }: Props) => {
   const result = testResults?.[notification.id];

@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
+import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
@@ -41,9 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
@@ -59,7 +57,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class V20180212165000_AddDefaultCollectors extends Migration {
     public static final String BEATS_PREAMBEL = """
-            # Needed for Graylog
+            # Required settings
             fields_under_root: true
             fields.collector_node_id: ${sidecar.nodeName}
             fields.gl2_source_collector: ${sidecar.nodeId}
@@ -120,86 +118,120 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     private void ensureFilebeatCollectorsAndConfig() {
 
-        StringBuilder filebeatConfigBuilder = new StringBuilder(f("""
-                        %s
-                        output.logstash:
-                           hosts: ["${user.graylog_host}:5044"]
-                        path:
-                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
-                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+        final var commonConfig = f("""
+                %s
+                output.logstash:
+                   hosts: ["${user.graylog_host}:5044"]
+                path:
+                   data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
+                   logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
 
-                        filebeat.inputs:
-                        """,
-                BEATS_PREAMBEL));
+                filebeat.inputs:
+
+                - type: filestream
+                  id: snort-filestream
+                  enabled: true
+                  paths:
+                    - /var/log/snort/alert_json.txt
+                    - /var/log/snort/appid-output.json
+                  parsers:
+                    - ndjson:
+                        target: "snort3"
+                        add_error_key: true
+                        overwrite_keys: true
+                  fields:
+                    event_source_product: snort3
+
+                - type: filestream
+                  id: zeek-filestream
+                  enabled: true
+                  paths:
+                    - /opt/zeek/logs/current
+                  parsers:
+                    - ndjson:
+                        target: "zeek"
+                        add_error_key: true
+                        overwrite_keys: true
+                  fields:
+                    event_source_product: zeek
+                """, BEATS_PREAMBEL);
 
         String apacheConfigType = """
+
                 - type: filestream
                   id: apache-filestream
                   enabled: true
                   %s
                   fields_under_root: true
                   fields:
-                      event_source_product: apache_httpd""";
+                      event_source_product: apache_httpd
+                """;
 
-        ensureFilebeatCollector(OS_LINUX, "/usr/lib/graylog-sidecar/filebeat", filebeatConfigBuilder
-                .append("""
-
-                        - type: filestream
-                          id: snort-filestream
-                          enabled: true
-                          paths:
-                            - /var/log/snort/alert_json.txt
-                            - /var/log/snort/appid-output.json
-                          parsers:
-                            - ndjson:
-                                target: "snort3"
-                                add_error_key: true
-                                overwrite_keys: true
-                          fields:
-                            event_source_product: snort3
-                        """)
-                .append("""
-
-                        - type: filestream
-                          id: zeek-filestream
-                          enabled: true
-                          paths:
-                            - /opt/zeek/logs/current
-                          parsers:
-                            - ndjson:
-                                target: "zeek"
-                                add_error_key: true
-                                overwrite_keys: true
-                          fields:
-                            event_source_product: zeek
-                        """)
-                .append(f(apacheConfigType, """
+        ensureCollector(
+                "filebeat",
+                "exec",
+                OS_LINUX,
+                "/usr/lib/graylog-sidecar/filebeat",
+                "-c  %s",
+                "test config -c %s",
+                commonConfig + f(apacheConfigType, """
                         paths:
                           - /var/log/apache2/access.log
                           - /var/log/apache2/error.log
                           - /var/log/httpd/access_log
-                          - /var/log/httpd/error_log
-                        """))
-                .toString()
+                          - /var/log/httpd/error_log"""
+                )
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-linux-default", collector));
 
-        ensureFilebeatCollector(OS_FREEBSD, "/usr/share/filebeat/bin/filebeat", filebeatConfigBuilder
-                .append(f(apacheConfigType, """
+        ensureCollector(
+                "filebeat",
+                "exec",
+                OS_FREEBSD,
+                "/usr/share/filebeat/bin/filebeat",
+                "-c  %s",
+                "test config -c %s",
+                commonConfig + f(apacheConfigType, """
                         paths:
                           - /var/log/httpd-access.log
-                          - /var/log/httpd-error.log
-                        """))
-                .toString()
+                          - /var/log/httpd-error.log""")
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-freebsd-default", collector));
 
-        ensureFilebeatCollector(OS_DARWIN, "/usr/share/filebeat/bin/filebeat", filebeatConfigBuilder
-                .append(f(apacheConfigType, """
+        ensureCollector(
+                "filebeat",
+                "exec",
+                OS_DARWIN,
+                "/usr/share/filebeat/bin/filebeat",
+                "-c  %s",
+                "test config -c %s",
+                commonConfig + f(apacheConfigType, """
                         paths:
                           - /etc/httpd/log/access_log
-                          - /etc/httpd/log/error_log
-                        """))
-                .toString()
+                          - /etc/httpd/log/error_log""")
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-darwin-default", collector));
+
+        ensureCollector(
+                "filebeat",
+                "svc",
+                OS_WINDOWS,
+                "C:\\Program Files\\Graylog\\sidecar\\filebeat.exe",
+                "-c \"%s\"",
+                "test config -c \"%s\"",
+                f("""
+                                %s
+                                output.logstash:
+                                   hosts: ["${user.graylog_host}:5044"]
+                                path:
+                                   data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\filebeat\"}\\data
+                                   logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs
+                                tags:
+                                - windows
+                                filebeat.inputs:
+                                - type: log
+                                  enabled: true
+                                  paths:
+                                  - C:\\logs\\log.log
+                                """,
+                        BEATS_PREAMBEL));
     }
 
     private void ensureAuditbeatCollectorsAndConfig() {
@@ -388,7 +420,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         \tPort 12201
                         \tOutputType  GELF_TCP
                         \t<Exec>
-                        \t  # These fields are needed for Graylog
+                        \t  # These fields are needed for ingestion
                         \t  $gl2_source_collector = '${sidecar.nodeId}';
                         \t  $collector_node_id = '${sidecar.nodeName}';
                         \t</Exec>
@@ -472,7 +504,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         \tPort 12201
                         \tOutputType  GELF_TCP
                         \t<Exec>
-                        \t  # These fields are needed for Graylog
+                        \t  # These fields are needed for ingestion
                         \t  $gl2_source_collector = '${sidecar.nodeId}';
                         \t  $collector_node_id = '${sidecar.nodeName}';
                         \t</Exec>
@@ -487,19 +519,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         </Route>
 
                         """
-        );
-    }
-
-
-    private Optional<Collector> ensureFilebeatCollector(String operatingSystem, String executablePath, String config) {
-        return ensureCollector(
-                "filebeat",
-                "exec",
-                operatingSystem,
-                executablePath,
-                "-c  %s",
-                "test config -c %s",
-                config
         );
     }
 
@@ -661,6 +680,14 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 // !!! Extending this list does not work. It was persisted after the first migration run.
         );
 
+        private static final Set<CollectorChecksum> OLD_FILEBEAT_WINDOWS = java.util.Set.of(
+                new CollectorChecksum("filebeat", OS_WINDOWS, 1490581247L),
+                new CollectorChecksum("filebeat", OS_WINDOWS, 3884777971L),
+                new CollectorChecksum("filebeat", OS_WINDOWS, 341507103L),
+                new CollectorChecksum("filebeat", OS_WINDOWS, 1931248542L),
+                new CollectorChecksum("filebeat", OS_WINDOWS, 2559816928L)
+        );
+
         @JsonProperty("knownChecksums")
         public abstract Set<CollectorChecksum> knownChecksums();
 
@@ -678,6 +705,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         public static MigrationState create(@JsonProperty("knownChecksums") Set<CollectorChecksum> knownChecksums) {
             var merged = new HashSet<>(knownChecksums);
             merged.addAll(OLD_CHECKSUMS);
+            merged.addAll(OLD_FILEBEAT_WINDOWS);
+
 
             return new AutoValue_V20180212165000_AddDefaultCollectors_MigrationState(merged);
         }

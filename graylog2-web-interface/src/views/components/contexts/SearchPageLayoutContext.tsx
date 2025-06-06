@@ -34,16 +34,17 @@ export const BLANK = {
 };
 
 export type LayoutState = {
-  sidebar: { isShown: boolean },
+  sidebar: { isShown: boolean };
   viewActions: {
-    save: { isShown: boolean },
-    saveAs: { isShown: boolean },
-    share: { isShown: boolean },
-    actionsDropdown: { isShown: boolean },
-  },
-  searchAreaContainer?: { component: React.ComponentType }
-  infoBar?: { component: React.ComponentType }
-}
+    save: { isShown: boolean };
+    saveAs: { isShown: boolean };
+    share: { isShown: boolean };
+    actionsDropdown: { isShown: boolean };
+  };
+  searchAreaContainer?: { component: React.ComponentType };
+  infoBar?: { component: React.ComponentType };
+  synchronizeUrl?: boolean;
+};
 
 export const DEFAULT_STATE: LayoutState = {
   sidebar: { isShown: true },
@@ -53,6 +54,7 @@ export const DEFAULT_STATE: LayoutState = {
     share: { isShown: true },
     actionsDropdown: { isShown: true },
   },
+  synchronizeUrl: true,
 };
 
 const SearchPageLayoutContext = React.createContext<LayoutState>(DEFAULT_STATE);

@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
+import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -29,32 +28,33 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
-const getData = (list = [defaultField]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [defaultField]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypesPage = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <TestStoreProvider>
-      <IndexSetFieldTypesPage />
-    </TestStoreProvider>,
-  </QueryParamProvider>,
-);
+const renderIndexSetFieldTypesPage = () =>
+  render(
+    <DefaultQueryParamProvider>
+      <TestStoreProvider>
+        <IndexSetFieldTypesPage />
+      </TestStoreProvider>
+      ,
+    </DefaultQueryParamProvider>,
+  );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
-jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
@@ -63,27 +63,26 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
     list: jest.fn(() => Promise.resolve()),
     get: jest.fn(() => Promise.resolve()),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: '111', title: 'index set title', field_type_profile: null },
-    ],
-    indexSet: { id: '111', title: 'index set title', field_type_profile: null },
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [{ id: '111', title: 'index set title', field_type_profile: null }],
+      indexSet: { id: '111', title: 'index set title', field_type_profile: null },
+    }),
+  ]),
 }));
 
-describe('IndexSetFieldTypesList', () => {
+describe('IndexSetFieldTypesPage', () => {
   useViewsPlugin();
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['field_name',
-          'origin',
-          'is_reserved',
-          'type'],
+        displayedAttributes: ['field_name', 'origin', 'is_reserved', 'type'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypesForMappings).mockReturnValue({
@@ -97,15 +96,14 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
     });
 
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+    asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });
 
   it('Shows modal on edit click', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
-      isLoading: false,
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
       refetch: () => {},
       data: getData([overriddenIndexField]),
-
     });
 
     renderIndexSetFieldTypesPage();
@@ -113,25 +111,25 @@ describe('IndexSetFieldTypesList', () => {
     const editButton = await within(tableRow).findByText('Edit');
     fireEvent.click(editButton);
     await screen.findByText(/change field-1 field type/i);
-    const modal = await screen.findByTestId('modal-form');
+    const modal = await screen.findByRole('dialog', { name: /Change field-1 Field Type/i });
     await within(modal).findByText('Boolean');
 
     expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
   });
 
   it('Shows modal on Change field type click', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
-      isLoading: false,
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
       refetch: () => {},
       data: getData([overriddenIndexField]),
     });
 
     renderIndexSetFieldTypesPage();
-    const editButton = await screen.findByText(/change field type/i);
+    const editButton = await screen.findByRole('button', { name: /change field type/i });
     fireEvent.click(editButton);
 
-    const modal = await screen.findByTestId('modal-form');
-    await within(modal).findByText(/change field type/i);
+    const modal = await screen.findByRole('dialog', { name: /change field type/i });
+    await within(modal).findByRole('heading', { name: /change field type/i });
     await within(modal).findByText(/select or type the field/i);
 
     expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();

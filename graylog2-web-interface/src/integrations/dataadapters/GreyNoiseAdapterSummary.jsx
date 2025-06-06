@@ -14,37 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import React from 'react';
-import PropTypes from 'prop-types';
 
-import { Alert } from 'components/bootstrap';
-
-class GreyNoiseAdapterSummary extends React.Component {
-  static propTypes = {
-    dataAdapter: PropTypes.shape({
-      config: PropTypes.shape({
-      }).isRequired,
-      updateConfig: PropTypes.func.isRequired,
-      handleFormEvent: PropTypes.func.isRequired,
-      validationState: PropTypes.func.isRequired,
-      validationMessage: PropTypes.func.isRequired,
-    }),
-  };
-
-  render() {
-    return (
-      <div>
-        <dl>
-          <dt>API Token</dt>
-          <dd>******</dd>
-        </dl>
-        <Alert style={{ marginBottom: 10 }} bsStyle="danger" title="Deprecation Warning">
-          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-        </Alert>
-      </div>
-    );
-  }
-}
+const GreyNoiseAdapterSummary = () => (
+  <dl>
+    <dt>API Token</dt>
+    <dd>******</dd>
+  </dl>
+);
 
 export default GreyNoiseAdapterSummary;

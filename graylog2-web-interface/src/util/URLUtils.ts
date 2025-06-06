@@ -98,7 +98,7 @@ const URLUtils = {
     try {
       // eslint-disable-next-line
       new URL(str);
-    } catch (e) {
+    } catch (ignored) {
       isValid = false;
     }
 
@@ -112,6 +112,25 @@ const URLUtils = {
   },
   getPathnameWithoutId(pathname: string) {
     return pathname.replace(/\/[0-9a-fA-F]{24}/, '').slice(1);
+  },
+  currentPathname() {
+    return window.location.pathname;
+  },
+  currentPathnameWithoutPrefix() {
+    return URLUtils.stripPrefixFromPathname(URLUtils.currentPathname());
+  },
+  stripPrefixFromPathname(path: string) {
+    if (!path) {
+      return path;
+    }
+
+    const rawPathPrefix = AppConfig.gl2AppPathPrefix();
+    const pathPrefix =
+      rawPathPrefix?.length > 1 && rawPathPrefix.endsWith('/') ? rawPathPrefix.slice(0, -1) : rawPathPrefix;
+
+    const pathPrefixLength = !pathPrefix || pathPrefix === '' || pathPrefix === '/' ? 0 : pathPrefix.length;
+
+    return path.slice(pathPrefixLength);
   },
 };
 
@@ -127,4 +146,7 @@ export const {
   concatURLPath,
   isValidURL,
   hasAcceptedProtocol,
+  currentPathname,
+  currentPathnameWithoutPrefix,
+  stripPrefixFromPathname,
 } = URLUtils;

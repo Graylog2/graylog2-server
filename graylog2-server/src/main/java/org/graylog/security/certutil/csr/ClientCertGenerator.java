@@ -16,116 +16,111 @@
  */
 package org.graylog.security.certutil.csr;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import org.graylog.security.certutil.CaService;
-import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
+import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.OutputEncryptor;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.graylog.security.certutil.CaKeystore;
+import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateGenerator;
+import org.graylog.security.certutil.KeyPair;
+import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
+import org.graylog2.cluster.certificates.CertificateSigningRequest;
 import org.graylog2.indexer.security.SecurityAdapter;
-import org.graylog2.plugin.certificates.RenewalPolicy;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 
-import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Base64;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-
-import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
-import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
-import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class ClientCertGenerator {
-    private final CaService caService;
-    private final String passwordSecret;
-    private final CsrGenerator csrGenerator;
-    private final CsrSigner csrSigner;
-    private final ClusterConfigService clusterConfigService;
+    private final CaKeystore caKeystore;
     private final SecurityAdapter securityAdapter;
-    private final Path dataDir;
 
     @Inject
-    public ClientCertGenerator(final CaService caService,
-                               @Named("password_secret") final String passwordSecret,
-                               @Named("data_dir") Path dataDir,
-                               final CsrGenerator csrGenerator,
-                               final CsrSigner csrSigner,
-                               final ClusterConfigService clusterConfigService,
+    public ClientCertGenerator(CaKeystore caKeystore,
                                final SecurityAdapter securityAdapter) {
-        this.caService = caService;
-        this.passwordSecret = passwordSecret;
-        this.csrGenerator = csrGenerator;
-        this.csrSigner = csrSigner;
-        this.clusterConfigService = clusterConfigService;
+        this.caKeystore = caKeystore;
         this.securityAdapter = securityAdapter;
-        this.dataDir = dataDir;
     }
 
-    private Path certFilePath(final String role, final String principal) {
-        var certfile = Base64.getEncoder().encodeToString((role + ":" + principal).getBytes(StandardCharsets.UTF_8));
-        return dataDir.resolve(Path.of(certfile + ".cert"));
+    public ClientCert generateClientCert(final String principal,
+                                         final String role,
+                                         final char[] privateKeyPassword,
+                                         Duration certificateLifetime) throws ClientCertGenerationException {
+
+        try {
+            final String alias = createKeyAlias();
+            final String randomKeystorePassword = RandomStringUtils.secure().nextAlphanumeric(96);
+            final KeyPair keyPair = CertificateGenerator.generate(getCertRequest(principal, certificateLifetime));
+            final KeyStore keystore = keyPair.toKeystore(alias, randomKeystorePassword.toCharArray());
+            final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, randomKeystorePassword.toCharArray());
+            var csr = CsrGenerator.generateCSR(keystoreInformation, alias, principal, List.of(principal));
+            final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), certificateLifetime);
+            securityAdapter.addUserToRoleMapping(role, principal);
+            return toClientCert(principal, role, certChain, keyPair, privateKeyPassword);
+        } catch (Exception e) {
+            throw new ClientCertGenerationException("Failed to generate client certificate: " + e.getMessage(), e);
+        }
     }
 
-    private String c(final Object o) throws IOException {
+    /**
+     * This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+     * not dependent on a specific alias, we can generate a random alphabetic sequence.
+     */
+    private static String createKeyAlias() {
+        return RandomStringUtils.secure().nextAlphanumeric(10);
+    }
+
+    private static CertRequest getCertRequest(String principal, Duration certificateLifetime) {
+        return CertRequest.selfSigned(principal).isCA(false).validity(certificateLifetime);
+    }
+
+    @Nonnull
+    private ClientCert toClientCert(String principal, String role, CertificateChain certChain, KeyPair keyPair, char[] privateKeyPassword) throws IOException, OperatorCreationException {
+        final String caCertificate = serializeAsPEM(certChain.caCertificates().iterator().next());
+        final String privateKey = serializePrivateKey(keyPair.privateKey(), privateKeyPassword);
+        final String certificate = serializeAsPEM(certChain.signedCertificate());
+        return new ClientCert(principal, role, caCertificate, privateKey, certificate);
+    }
+
+    private String serializePrivateKey(PrivateKey privateKey, char[] privateKeyPassword) throws IOException, OperatorCreationException {
+        if (privateKeyPassword == null || privateKeyPassword.length == 0) {
+            return serializeAsPEM(privateKey);
+        } else {
+            return encryptPrivateKey(privateKey, privateKeyPassword);
+        }
+    }
+
+    private String encryptPrivateKey(PrivateKey privateKey, char[] privateKeyPassword) throws OperatorCreationException, IOException {
+        OutputEncryptor encryptor =
+                new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
+                        .setRandom(new SecureRandom())
+                        .setPassword(privateKeyPassword)
+                        .build();
+        PemObject pemObj = new JcaPKCS8Generator(privateKey, encryptor).generate();
+        return serializeAsPEM(pemObj);
+    }
+
+    public void removeCertFor(final String role, final String principal) throws IOException {
+        securityAdapter.removeUserFromRoleMapping(role, principal);
+    }
+
+    private String serializeAsPEM(final Object o) throws IOException {
         var writer = new StringWriter();
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
             jcaPEMWriter.writeObject(o);
         }
         return writer.toString();
-    }
-
-    public ClientCert generateClientCert(final String principal,
-                                         final String role,
-                                         final char[] privateKeyPassword) throws ClientCertGenerationException {
-        try {
-            var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
-            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(certFilePath(role, principal));
-
-            final Optional<KeyStore> optKey = caService.loadKeyStore();
-            final var caKeystore = optKey.get();
-
-            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
-            var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
-
-            var csr = csrGenerator.generateCSR(privateKeyPassword, principal, List.of(principal), privateKeyEncryptedStorage);
-            var pk = privateKeyEncryptedStorage.readEncryptedKey(privateKeyPassword);
-            var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
-
-            securityAdapter.addUserToRoleMapping(role, principal);
-
-            return new ClientCert(principal, role, c(caCertificate), c(pk), c(cert));
-        } catch (Exception e) {
-            throw new ClientCertGenerationException("Failed to generate client certificate", e);
-        }
-    }
-
-    public void removeCertFor(final String role, final String principal) throws IOException {
-        var certFile = certFilePath(role, principal);
-        if (Files.exists(certFile)) {
-            Files.delete(certFile);
-            securityAdapter.removeUserFromRoleMapping(role, principal);
-        }
     }
 }

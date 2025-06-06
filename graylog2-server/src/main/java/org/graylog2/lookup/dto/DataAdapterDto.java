@@ -68,6 +68,8 @@ public abstract class DataAdapterDto extends ScopedEntity {
         return new AutoValue_DataAdapterDto.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
         @JsonCreator

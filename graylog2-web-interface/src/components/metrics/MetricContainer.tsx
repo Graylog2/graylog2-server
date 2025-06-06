@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
 import TimeHelper from 'util/TimeHelper';
@@ -25,20 +24,14 @@ import type { Store } from 'stores/StoreTypes';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 type Props = {
-  metrics: ClusterMetric,
-  metricsUpdatedAt: number,
-  name: string,
-  zeroOnMissing: boolean,
-  children: React.ReactElement[] | React.ReactElement,
+  metrics: ClusterMetric;
+  metricsUpdatedAt: number;
+  name: string;
+  zeroOnMissing: boolean;
+  children: React.ReactElement[] | React.ReactElement;
 };
 
 class MetricContainer extends React.Component<Props> {
-  static propTypes = {
-    metricsUpdatedAt: PropTypes.number,
-    name: PropTypes.string.isRequired,
-    zeroOnMissing: PropTypes.bool,
-  };
-
   static defaultProps = {
     metricsUpdatedAt: TimeHelper.nowInSeconds(),
     zeroOnMissing: true,
@@ -74,12 +67,18 @@ class MetricContainer extends React.Component<Props> {
     const { children, metrics, name: fullName, zeroOnMissing } = this.props;
 
     if (!metrics) {
-      return (<span>Loading...</span>);
+      return <span>Loading...</span>;
     }
 
     let throughput = Object.keys(metrics)
       .map((nodeId) => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
-      .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: number | undefined | null }): { throughput?: number } => ({ throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) }), {});
+      .reduce(
+        (
+          accumulator: { throughput?: number },
+          currentMetric: { throughput: number | undefined | null },
+        ): { throughput?: number } => ({ throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) }),
+        {},
+      );
 
     if (zeroOnMissing && (!throughput || !throughput.throughput)) {
       throughput = { throughput: 0 };
@@ -87,23 +86,25 @@ class MetricContainer extends React.Component<Props> {
 
     return (
       <div>
-        {
-        React.Children.map(children, (child) => React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } }))
-      }
+        {React.Children.map(children, (child) =>
+          React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } }),
+        )}
       </div>
     );
   }
 }
 
 type MetricsStoreState = {
-  metrics: ClusterMetric,
-  metricsUpdatedAt: number,
+  metrics: ClusterMetric;
+  metricsUpdatedAt: number;
 };
 
-export default connect(MetricContainer,
+export default connect(
+  MetricContainer,
   { metricsStore: MetricsStore as Store<MetricsStoreState> },
   ({ metricsStore, ...otherProps }) => ({
     ...otherProps,
     metrics: metricsStore.metrics,
     metricsUpdatedAt: metricsStore.metricsUpdatedAt,
-  }));
+  }),
+);

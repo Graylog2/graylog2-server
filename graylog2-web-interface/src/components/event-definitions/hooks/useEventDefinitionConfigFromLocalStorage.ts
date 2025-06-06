@@ -22,36 +22,39 @@ import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
 export type EventDefinitionLocalStorageConfig = {
-  type,
-  query?: string,
-  streams?: Array<string>,
-  search_within_ms?: number,
-  group_by?: Array<string>,
-  agg_function?: string,
-  agg_field?: string,
-  agg_value?: string | number,
-  loc_query_parameters?: Array<ParameterJson>
-}
+  type;
+  query?: string;
+  streams?: Array<string>;
+  search_within_ms?: number;
+  group_by?: Array<string>;
+  agg_function?: string;
+  agg_field?: string;
+  agg_value?: string | number;
+  loc_query_parameters?: Array<ParameterJson>;
+};
 
 type EventDefinitionConfigFromUrl = {
-  type: string,
-  query: string,
-  query_parameters: ParameterJson[],
-  streams: string[],
-  group_by?: string[],
-  series?: Array<{ id: string, function: string, field: string }>,
-  search_within_ms: number,
+  type: string;
+  query: string;
+  query_parameters: ParameterJson[];
+  streams: string[];
+  group_by?: string[];
+  series?: Array<{ id: string; function: string; field: string }>;
+  search_within_ms: number;
   conditions?: {
-    expression: {left: any, right: any, expr: any},
-  },
-}
+    expression: { left: any; right: any; expr: any };
+  };
+};
 
-const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: boolean; configFromLocalStorage: EventDefinitionConfigFromUrl } => {
+const useEventDefinitionConfigFromLocalStorage = (): {
+  hasLocalStorageConfig: boolean;
+  configFromLocalStorage: EventDefinitionConfigFromUrl;
+} => {
   const { 'session-id': sessionId } = useQuery();
 
   return useMemo(() => {
     const parsedLocalStorageConfig = Store.get(sessionId);
-    if (!parsedLocalStorageConfig) return ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined });
+    if (!parsedLocalStorageConfig) return { hasLocalStorageConfig: false, configFromLocalStorage: undefined };
     Store.delete(sessionId);
 
     const {
@@ -66,19 +69,22 @@ const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: bo
       loc_query_parameters,
     } = parsedLocalStorageConfig;
 
-    const aggData = (agg_function && agg_value) ? {
-      conditions: {
-        expression: {
-          expr: undefined,
-          left: { expr: 'number-ref', ref: `${agg_function}-${agg_field}` },
-          right: { expr: 'number', value: agg_value },
-        },
-      },
-      series: [{ id: `${agg_function}-${agg_field}`, function: agg_function, field: agg_field }],
-      group_by: group_by || [],
-    } : {};
+    const aggData =
+      agg_function && agg_value
+        ? {
+            conditions: {
+              expression: {
+                expr: undefined,
+                left: { expr: 'number-ref', ref: `${agg_function}-${agg_field}` },
+                right: { expr: 'number', value: agg_value },
+              },
+            },
+            series: [{ id: `${agg_function}-${agg_field}`, function: agg_function, field: agg_field }],
+            group_by: group_by || [],
+          }
+        : {};
 
-    return ({
+    return {
       hasLocalStorageConfig: true,
       configFromLocalStorage: {
         type,
@@ -89,7 +95,7 @@ const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: bo
         query_parameters: loc_query_parameters ?? [],
         ...aggData,
       },
-    });
+    };
   }, [sessionId]);
 };
 

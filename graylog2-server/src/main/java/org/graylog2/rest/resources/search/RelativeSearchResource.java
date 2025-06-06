@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -86,11 +87,12 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
+            @QueryParam("range") @NotNull @PositiveOrZero Integer range,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.") @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset") @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter") @QueryParam("filter") String filter,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return") @QueryParam("fields") String fields,
+            @ApiParam(name = "streams", value = "Comma separated list of stream IDs to search in") @QueryParam("streams")  String streams,
             @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)") @QueryParam("sort") String sort,
             @ApiParam(name = "decorate", value = "Run decorators on search result") @QueryParam("decorate") @DefaultValue("true") boolean decorate,
             @Context SearchUser searchUser) {
@@ -100,8 +102,9 @@ public class RelativeSearchResource extends SearchResource {
         final Sort sorting = buildSortOrder(sort);
 
         final TimeRange timeRange = buildRelativeTimeRange(range);
+        final var parsedStreams = parseStreams(streams);
 
-        return search(query, limit, offset, filter, decorate, searchUser, fieldList, sorting, timeRange);
+        return search(query, limit, offset, filter, parsedStreams, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET
@@ -117,20 +120,22 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
+            @QueryParam("range") @NotNull @PositiveOrZero Integer range,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "streams", value = "Comma separated list of streams to search in") @QueryParam("streams")  String streams,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = true)
             @QueryParam("fields") @NotEmpty String fields) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> fieldList = parseFields(fields);
         final TimeRange timeRange = buildRelativeTimeRange(range);
+        final var parsedStreams = parseStreams(streams);
 
         final ChunkedResult scroll = searches
-                .scroll(query, timeRange, limit, offset, fieldList, filter, batchSize);
+                .scroll(query, timeRange, limit, offset, fieldList, filter, parsedStreams, batchSize);
         return buildChunkedOutput(scroll);
     }
 
@@ -153,11 +158,12 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "streams", value = "Comma separated list of streams to search in") @QueryParam("streams")  String streams,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = true)
             @QueryParam("fields") @NotEmpty String fields) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
         final String filename = "graylog-search-result-relative-" + range + ".csv";
-        return respondWithFile(filename, searchRelativeChunked(query, range, limit, offset, batchSize, filter, fields))
+        return respondWithFile(filename, searchRelativeChunked(query, range, limit, offset, batchSize, filter, streams, fields))
                 .build();
     }
 

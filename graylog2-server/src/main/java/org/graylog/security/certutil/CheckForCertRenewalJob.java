@@ -94,7 +94,6 @@ public class CheckForCertRenewalJob implements Job {
         return ctx.jobTriggerUpdates()
                 .scheduleNextExecution()
                 .toBuilder()
-                .status(JobTriggerStatus.RUNNABLE)
                 .build();
     }
 }

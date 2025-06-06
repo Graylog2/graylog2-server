@@ -29,7 +29,6 @@ public class GRNTypesModule extends PluginModule {
     protected void configure() {
         // TODO: Implement missing GRN descriptor providers
         addGRNType(GRNTypes.BUILTIN_TEAM, FallbackGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.COLLECTION, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.DASHBOARD, ViewGRNDescriptorProvider.class);
         addGRNType(GRNTypes.EVENT_DEFINITION, EventDefinitionGRNDescriptorProvider.class);
         addGRNType(GRNTypes.EVENT_NOTIFICATION, EventNotificationGRNDescriptorProvider.class);

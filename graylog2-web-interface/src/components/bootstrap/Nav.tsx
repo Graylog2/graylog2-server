@@ -20,7 +20,8 @@ import styled, { css } from 'styled-components';
 
 import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)(({ theme }) => css`
+const Nav = styled(BootstrapNav)(
+  ({ theme }) => css`
   &.nav {
     > li {
       > a {
@@ -87,7 +88,8 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
 
     &${navTabsStyles} /* This is a known non-issue that stylelint won't ignore but will hopefully be patched soon https://github.com/stylelint/stylelint/issues/4574 */
   }
-`);
+`,
+);
 
 /** @component */
 export default Nav;

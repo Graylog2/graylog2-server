@@ -22,26 +22,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EffectiveTimeRangeExtractor {
-    private static final Logger LOG = LoggerFactory.getLogger(EffectiveTimeRangeExtractor.class);
-    private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
-    private static TimeRange allMessagesTimeRange() {
-        try {
-            return RelativeRange.create(0);
-        } catch (InvalidRangeParametersException e) {
-            LOG.error("Unable to instantiate all messages timerange: ", e);
-        }
-        return null;
-    }
-
     AbsoluteRange extract(SearchResponse queryResult, Query query, Pivot pivot) {
         if (queryResult.getHits().getTotalHits().value != 0) {
             return getAbsoluteRangeFromAggregations(queryResult, query, pivot);
@@ -70,6 +56,6 @@ public class EffectiveTimeRangeExtractor {
         );
     }
     private boolean isAllMessagesTimeRange(TimeRange timeRange) {
-        return ALL_MESSAGES_TIMERANGE.equals(timeRange);
+        return timeRange instanceof RelativeRange relativeRange && relativeRange.isAllMessages();
     }
 }

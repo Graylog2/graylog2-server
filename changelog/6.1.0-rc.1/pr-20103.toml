@@ -1,0 +1,5 @@
+type = "a"
+message = "Add data node logs and migration logs to support bundle."
+
+pulls = ["20103"]
+issues = ["graylog-plugin-enterprise#7964"]

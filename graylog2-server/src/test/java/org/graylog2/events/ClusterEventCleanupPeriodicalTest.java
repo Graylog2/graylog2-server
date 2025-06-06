@@ -22,6 +22,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -56,8 +57,9 @@ public class ClusterEventCleanupPeriodicalTest {
 
         this.mongoConnection = mongodb.mongoConnection();
 
-        MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
-        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(provider, mongodb.mongoConnection());
+        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(new MongoCollections(
+                new MongoJackObjectMapperProvider(objectMapper),
+                mongodb.mongoConnection()));
     }
 
     @After

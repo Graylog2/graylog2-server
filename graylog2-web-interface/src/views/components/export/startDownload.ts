@@ -25,6 +25,8 @@ import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchType } from 'views/logic/queries/SearchType';
 import type { ExportSettings } from 'views/components/ExportSettingsContext';
+import { formatDefinition } from 'views/components/export/ExportStrategy';
+import type User from 'logic/users/User';
 
 const getFilename = (view, selectedWidget) => {
   let filename = 'search-result';
@@ -44,22 +46,47 @@ const getFilename = (view, selectedWidget) => {
 
 const startDownload = (
   format: string,
-  downloadFile: (format: string, payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => Promise<void>,
+  downloadFile: (
+    format: string,
+    payload: ExportPayload,
+    searchQueries: Set<Query>,
+    searchType: SearchType | undefined | null,
+    searchId: string,
+    filename: string,
+  ) => Promise<void>,
   view: View,
   executionState: SearchExecutionState,
   selectedWidget: Widget | undefined | null,
   selectedFields: { field: string }[],
   limit: number | undefined | null,
   customSettings: ExportSettings,
+  currentUser?: User | undefined,
+  currentQuery?: Query | undefined,
 ) => {
+  const { formatSpecificFileDownloader } = formatDefinition(format);
+
   const payload: ExportPayload = {
     execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
     limit,
     ...customSettings,
   };
-  const searchType: SearchType | undefined | null = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
+  const searchType: SearchType | undefined | null = selectedWidget
+    ? view.getSearchTypeByWidgetId(selectedWidget.id)
+    : undefined;
   const filename = getFilename(view, selectedWidget);
+
+  if (typeof formatSpecificFileDownloader === 'function') {
+    return formatSpecificFileDownloader(
+      format,
+      selectedWidget,
+      view,
+      executionState,
+      currentUser,
+      currentQuery,
+      payload,
+    );
+  }
 
   return downloadFile(format, payload, view.search.queries, searchType, view.search.id, filename);
 };

@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.ca;
 
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,11 +24,9 @@ import org.junit.jupiter.api.Test;
 
 import java.security.Security;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PemCaReaderTest {
-    private static final PemCaReader pemCaReader = new PemCaReader();
     private static final String PEM_CERT = """
             -----BEGIN CERTIFICATE-----
             MIIDSzCCAjOgAwIBAgIUCI/qZP6vie/Dmfd1Fo8cAnzRDMYwDQYJKoZIhvcNAQEL
@@ -114,7 +113,7 @@ public class PemCaReaderTest {
             -----END PRIVATE KEY-----
             """;
 
-    private static final String PEM_CERT_WITH_ENCRYPTED_KEY = PEM_CERT + "\n" + ENCRYPTED_KEY;
+    public static final String PEM_CERT_WITH_ENCRYPTED_KEY = PEM_CERT + "\n" + ENCRYPTED_KEY;
     private static final String PEM_CERT_WITH_UNENCRYPTED_KEY = PEM_CERT + "\n" + UNENCRYPTED_KEY;
 
     @BeforeAll
@@ -124,45 +123,45 @@ public class PemCaReaderTest {
 
     @Test
     void readsCombinedPemWithEncryptedPrivateKey() throws Exception {
-        final var ca = pemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, "foobar");
-        assertThat(ca.certificates()).hasSize(1);
-        assertThat(ca.privateKey()).isNotNull();
+        final var ca = PemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, "foobar");
+        Assertions.assertThat(ca.getCertificates()).hasSize(1);
+        Assertions.assertThat(ca.getPrivateKey()).isNotNull();
     }
 
     @Test
     void throwsExceptionIfKeyIsEncryptedAndPasswordIsWrong() throws Exception {
-        assertThatThrownBy(() -> pemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, "wrong!"))
+        assertThatThrownBy(() -> PemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, "wrong!"))
                 .isInstanceOf(CACreationException.class)
                 .hasMessage("Error while decrypting private key. Wrong password?");
     }
 
     @Test
     void throwsExceptionIfCertificatesAreMissing() throws Exception {
-        assertThatThrownBy(() -> pemCaReader.readCA(UNENCRYPTED_KEY, null))
+        assertThatThrownBy(() -> PemCaReader.readCA(UNENCRYPTED_KEY, null))
                 .isInstanceOf(CACreationException.class)
                 .hasMessage("No certificate supplied in CA bundle!");
     }
 
     @Test
     void throwsExceptionIfPrivateKeyIsMissing() throws Exception {
-        assertThatThrownBy(() -> pemCaReader.readCA(PEM_CERT, null))
+        assertThatThrownBy(() -> PemCaReader.readCA(PEM_CERT, null))
                 .isInstanceOf(CACreationException.class)
                 .hasMessage("No private key supplied in CA bundle!");
     }
 
     @Test
     void readsCombinedPemWithUnencryptedPrivateKey() throws Exception {
-        final var ca = pemCaReader.readCA(PEM_CERT_WITH_UNENCRYPTED_KEY, null);
-        assertThat(ca.certificates()).hasSize(1);
-        assertThat(ca.privateKey()).isNotNull();
+        final var ca = PemCaReader.readCA(PEM_CERT_WITH_UNENCRYPTED_KEY, null);
+        Assertions.assertThat(ca.getCertificates()).hasSize(1);
+        Assertions.assertThat(ca.getPrivateKey()).isNotNull();
     }
 
     @Test
     void throwsExceptionIfKeyIsEncryptedButPasswordIsMissing() {
-        assertThatThrownBy(() -> pemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, null))
+        assertThatThrownBy(() -> PemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, null))
                 .isInstanceOf(CACreationException.class)
                 .hasMessage("Private key is encrypted, but no password was supplied!");
-        assertThatThrownBy(() -> pemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, ""))
+        assertThatThrownBy(() -> PemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, ""))
                 .isInstanceOf(CACreationException.class)
                 .hasMessage("Private key is encrypted, but no password was supplied!");
     }

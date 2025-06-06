@@ -26,7 +26,7 @@ import type {
 
 export const urlPrefix = '/system/indices/index_sets/profiles';
 
-const putProfile = async ({ profile, id }: { profile: IndexSetFieldTypeProfileForm, id: string }) => {
+const putProfile = async ({ profile, id }: { profile: IndexSetFieldTypeProfileForm; id: string }) => {
   const url = qualifyUrl(urlPrefix);
   const body: IndexSetFieldTypeProfileRequestJson = {
     id,
@@ -60,8 +60,10 @@ const useProfileMutation = () => {
 
   const post = useMutation(postProfile, {
     onError: (errorThrown) => {
-      UserNotification.error(`Creating index set field type profile failed with status: ${errorThrown}`,
-        'Could not create index set field type profile');
+      UserNotification.error(
+        `Creating index set field type profile failed with status: ${errorThrown}`,
+        'Could not create index set field type profile',
+      );
     },
     onSuccess: () => {
       UserNotification.success('Index set field type profile has been successfully created.', 'Success!');
@@ -71,8 +73,10 @@ const useProfileMutation = () => {
   });
   const put = useMutation(putProfile, {
     onError: (errorThrown) => {
-      UserNotification.error(`Updating index set field type profile failed with status: ${errorThrown}`,
-        'Could not update index set field type profile');
+      UserNotification.error(
+        `Updating index set field type profile failed with status: ${errorThrown}`,
+        'Could not update index set field type profile',
+      );
     },
     onSuccess: () => {
       UserNotification.success('Index set field type profile has been successfully updated.', 'Success!');
@@ -82,8 +86,10 @@ const useProfileMutation = () => {
   });
   const remove = useMutation(deleteProfile, {
     onError: (errorThrown) => {
-      UserNotification.error(`Deleting index set field type profile failed with status: ${errorThrown}`,
-        'Could not delete index set field type profile');
+      UserNotification.error(
+        `Deleting index set field type profile failed with status: ${errorThrown}`,
+        'Could not delete index set field type profile',
+      );
     },
     onSuccess: () => {
       UserNotification.success('Index set field type profile has been successfully deleted.', 'Success!');
@@ -92,14 +98,14 @@ const useProfileMutation = () => {
     },
   });
 
-  return ({
+  return {
     editProfile: put.mutateAsync,
     isEditLoading: put.isLoading,
     createProfile: post.mutateAsync,
     isCreateLoading: post.isLoading,
     isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
     deleteProfile: remove.mutateAsync,
-  });
+  };
 };
 
 export default useProfileMutation;

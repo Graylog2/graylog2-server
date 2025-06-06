@@ -17,6 +17,9 @@
 package org.graylog2.notifications;
 
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorEngine;
@@ -26,10 +29,6 @@ import org.graylog.events.processor.systemnotification.SystemNotificationRenderS
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService.RenderResponse;
 import org.slf4j.Logger;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,6 +36,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -127,7 +127,7 @@ public class NotificationSystemEventPublisher extends AbstractExecutionThreadSer
         shutdownTask.set(scheduler.schedule(() -> {
             LOG.error("Notification queue was not drained within {}. Forcefully terminating.", shutdownTimeout);
             this.executionThread.interrupt();
-        }, shutdownTimeout.getSeconds(), TimeUnit.SECONDS));
+        }, shutdownTimeout.toSeconds(), TimeUnit.SECONDS));
     }
 
     @Override
@@ -139,10 +139,11 @@ public class NotificationSystemEventPublisher extends AbstractExecutionThreadSer
 
     private void publish(Notification notification) {
 
-        final EventDefinitionDto systemEventDefinition =
-                dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
-                        .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
-
+        final EventDefinitionDto systemEventDefinition;
+        try (Stream<EventDefinitionDto> eventDefinitionStream = dbEventDefinitionService.streamSystemEventDefinitions()) {
+            systemEventDefinition = eventDefinitionStream.findFirst()
+                    .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
+        }
         RenderResponse renderResponse;
         try {
             renderResponse = systemNotificationRenderService.render(notification);

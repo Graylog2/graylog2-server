@@ -25,6 +25,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -95,13 +96,13 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider =
                 new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        final DashboardsService dashboardsService = new DashboardsService(mongodb.mongoConnection(), mapperProvider);
+        final DashboardsService dashboardsService = new DashboardsService(new MongoCollections(mapperProvider, mongodb.mongoConnection()));
 
         final RandomObjectIdProvider randomObjectIdProvider = new StaticRandomObjectIdProvider(new Date(1575020937839L));
         final RandomUUIDProvider randomUUIDProvider = new RandomUUIDProvider(new Date(1575020937839L), 1575020937839L);
 
-        this.viewService = spy(new ViewService(mongodb.mongoConnection(), mapperProvider));
-        this.searchService = spy(new SearchService(mongodb.mongoConnection(), mapperProvider));
+        this.viewService = spy(new ViewService(new MongoCollections(mapperProvider, mongodb.mongoConnection())));
+        this.searchService = spy(new SearchService(new MongoCollections(mapperProvider, mongodb.mongoConnection())));
 
         migration = new V20191125144500_MigrateDashboardsToViews(
                 dashboardsService,

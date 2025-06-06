@@ -17,35 +17,36 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Markdown, Icon } from 'components/common';
+import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height?: number, $noBackground?: boolean, $noBorder?: boolean }>`
+const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBorder?: boolean }>`
   position: relative;
   padding: 8px 0;
-  background-color: ${({ theme, $noBackground }) => ($noBackground ? 'transparent' : theme.colors.global.contentBackground)};
-  ${({ $noBorder }) => (!$noBorder && css`border: 1px solid ${({ theme }) => theme.colors.input.border};`)}
+  background-color: ${({ theme, $noBackground }) =>
+    $noBackground ? 'transparent' : theme.colors.global.contentBackground};
+  ${({ $noBorder }) =>
+    !$noBorder &&
+    css`
+      border: 1px solid ${({ theme }) => theme.colors.input.border};
+    `}
   border-radius: 4px;
   flex-grow: 1;
   overflow: hidden;
 
   height: ${({ $height }) => ($height ? `${$height}px` : 'auto')};
   min-height: 100px;
+  width: 100%;
 `;
 
-const ExpandIcon = styled(Icon)`
+const ExpandIconButton = styled(IconButton)`
   position: absolute;
   bottom: 0;
   right: 0;
   padding: 8px 16px;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.input.placeholder};
   z-index: 10;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.global.textDefault};
-  }
 `;
 
 const MarkdownStyles = styled.div`
@@ -56,8 +57,14 @@ const MarkdownStyles = styled.div`
   container-type: inline-size;
 
   & > div {
-    & > h1, & > h2, & > h3, & > h4, & > h5, & > h6 {
+    & > h1,
+    & > h2,
+    & > h3,
+    & > h4,
+    & > h5,
+    & > h6 {
       margin-bottom: 8px;
+      font-family: ${({ theme }) => theme.fonts.family.body};
     }
 
     & > hr {
@@ -66,32 +73,8 @@ const MarkdownStyles = styled.div`
       border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
     }
 
-    & > h1 {
-      font-size: 5cqw;
-      font-weight: bold;
-    }
-
-    & > h2 {
-      font-size: 4cqw;
-      font-weight: normal;
-    }
-
-    & > h3 {
-      font-size: 3.5cqw;
-      font-weight: bold;
-    }
-
-    & > h4 {
-      font-size: 3.5cqw;
-      font-weight: normal;
-    }
-
-    & > h5, & > h6 {
-      font-size: 3cqw;
-      font-weight: normal;
-    }
-
-    & ul, & ol {
+    & ul,
+    & ol {
       padding-left: 1.5rem;
       margin: 8px 0;
 
@@ -114,7 +97,8 @@ const MarkdownStyles = styled.div`
       border-spacing: 0;
       margin: 8px 0;
 
-      & th, & td {
+      & th,
+      & td {
         border: 1px solid ${({ theme }) => theme.colors.input.border};
         padding: 4px 8px;
       }
@@ -131,25 +115,20 @@ type Props = {
   noBorder?: boolean;
 };
 
-function Preview({ value, height, show, withFullView, noBackground, noBorder }: Props) {
+function Preview({ value, height = 100, show, withFullView = false, noBackground = false, noBorder = false }: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
-  return show && (
-    <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
-      <MarkdownStyles>
-        <Markdown text={value} />
-      </MarkdownStyles>
-      {withFullView && <ExpandIcon name="expand" onClick={() => setFullView(true)} />}
-      <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
-    </Container>
+  return (
+    show && (
+      <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
+        <MarkdownStyles>
+          <Markdown text={value} />
+        </MarkdownStyles>
+        {withFullView && <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />}
+        <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
+      </Container>
+    )
   );
 }
-
-Preview.defaultProps = {
-  withFullView: false,
-  noBackground: false,
-  noBorder: false,
-  height: undefined,
-};
 
 export default Preview;

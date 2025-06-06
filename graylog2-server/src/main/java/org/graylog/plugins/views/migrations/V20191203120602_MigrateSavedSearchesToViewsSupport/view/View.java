@@ -19,14 +19,13 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +33,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class View {
+public abstract class View implements MongoEntity {
     private static final String FIELD_ID = "id";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_TITLE = "title";

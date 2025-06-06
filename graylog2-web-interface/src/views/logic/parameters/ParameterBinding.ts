@@ -17,15 +17,15 @@
 import * as Immutable from 'immutable';
 
 type InternalState = {
-  type: string,
-  value: string,
+  type: string;
+  value: string;
 };
 
 type InternalStateBuilder = Immutable.Map<string, any>;
 
 export type ParameterBindingJsonRepresentation = {
-  type: string,
-  value: any,
+  type: string;
+  value: any;
 };
 
 export default class ParameterBinding {

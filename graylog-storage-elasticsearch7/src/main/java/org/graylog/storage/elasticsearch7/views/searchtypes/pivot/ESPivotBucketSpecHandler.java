@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -26,9 +27,11 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,12 +49,24 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
         aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
     }
 
-    protected List<BucketOrder> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext, BucketOrder defaultOrder) {
+    public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> sortingAggregations) {}
+
+    protected SortOrders orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext, BucketOrder defaultOrder, Query query) {
+        final List<AggregationBuilder> sortingAggregations = new ArrayList<>();
         final List<BucketOrder> ordering = pivot.sort()
                 .stream()
                 .map(sortSpec -> {
-                    if (sortSpec instanceof PivotSort) {
-                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                    final var isAscending = sortSpec.direction().equals(SortSpec.Direction.Ascending);
+                    if (sortSpec instanceof PivotSort pivotSort) {
+                        if (isSortOnNumericPivotField(pivot, pivotSort, esGeneratedQueryContext, query)) {
+                            /* When we sort on a numeric pivot field, we create a metric sub-aggregation for that field, which returns
+                            the numeric value of it, so that we can sort on it numerically. Any metric aggregation (min/max/avg) will work. */
+                            final var aggregationName = "sort_helper" + pivotSort.field();
+                            sortingAggregations.add(AggregationBuilders.max(aggregationName).field(pivotSort.field()));
+                            return BucketOrder.aggregation(aggregationName, isAscending);
+                        } else {
+                            return BucketOrder.key(isAscending);
+                        }
                     }
                     if (sortSpec instanceof SeriesSort) {
                         final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
@@ -61,14 +76,14 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                         return matchingSeriesSpec
                                 .map(seriesSpec -> {
                                     if (seriesSpec.literal().equals("count()")) {
-                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                        return BucketOrder.count(isAscending);
                                     }
 
                                     String orderPath = seriesSpec.statsSubfieldName()
                                             .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "." + subField)
                                             .orElse(esGeneratedQueryContext.seriesName(seriesSpec, pivot));
 
-                                    return BucketOrder.aggregation(orderPath, sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    return BucketOrder.aggregation(orderPath, isAscending);
                                 })
                                 .orElse(null);
                     }
@@ -77,7 +92,19 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return ordering.isEmpty() ? List.of(defaultOrder) : ordering;
+        return ordering.isEmpty()
+                ? new SortOrders(List.of(defaultOrder), List.of())
+                : new SortOrders(ordering, List.copyOf(sortingAggregations));
+    }
+
+    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, ESGeneratedQueryContext queryContext, Query query) {
+        return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
+                .filter(this::isNumericFieldType)
+                .isPresent();
+    }
+
+    private boolean isNumericFieldType(String fieldType) {
+        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
     }
 
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket);

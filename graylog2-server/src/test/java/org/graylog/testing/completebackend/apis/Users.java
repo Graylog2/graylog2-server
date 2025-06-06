@@ -19,6 +19,7 @@ package org.graylog.testing.completebackend.apis;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -43,10 +44,12 @@ public class Users implements GraylogRestApi {
                        @JsonProperty("roles") List<String> roles,
                        @JsonProperty("permissions") List<String> permissions
     ) {
+
     }
 
     public static final User LOCAL_ADMIN = new User("admin", "admin", "Admin", "Admin", "admin@graylog", false, 30_0000, "UTC", List.of(), List.of());
-    public static final User JOHN_DOE = new User("john.doe", "asdfgh", "John", "Doe", "john@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
+
+    public static final User JOHN_DOE = new User("john.doe", "asdfgh", "John", "Doe", "john@graylog", false, 30_0000, "Europe/Vienna", List.of("Reader"), List.of());
 
     public JsonPath createUser(User user) {
         given()
@@ -57,6 +60,28 @@ public class Users implements GraylogRestApi {
                 .then()
                 .log().ifError()
                 .statusCode(201);
+
+        return getUserInfo(user.username);
+    }
+
+    public void deleteUser(String username) {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .delete("/users/" + username)
+                .then()
+                .log().ifError()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+    }
+
+    public JsonPath addUserToRole(User user, String role) {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .put("/roles/" + role + "/members/" + user.username)
+                .then()
+                .log().ifError()
+                .statusCode(204);
 
         return getUserInfo(user.username);
     }

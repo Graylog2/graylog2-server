@@ -20,28 +20,27 @@ import type { ActionComponentProps, ActionHandlerArguments } from 'views/compone
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type User from 'logic/users/User';
-import AppConfig from 'util/AppConfig';
 import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import { isPermitted } from 'util/PermissionsMixin';
 
-const ChangeFieldType = ({
-  field,
-  onClose,
-}: ActionComponentProps) => {
+const ChangeFieldType = ({ field, onClose }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
   const handleOnClose = useCallback(() => {
     setShow(false);
     onClose();
   }, [onClose]);
 
-  const initialSelection = useInitialSelection();
+  const { list, isLoading } = useInitialSelection();
 
   return show ? (
-    <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
-                          onClose={handleOnClose}
-                          initialData={{ fieldName: field }}
-                          show />
+    <ChangeFieldTypeModal
+      initialSelectedIndexSets={list}
+      onClose={handleOnClose}
+      initialData={{ fieldName: field }}
+      show
+      initialSelectionDataLoaded={!isLoading}
+    />
   ) : null;
 };
 
@@ -50,10 +49,8 @@ const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.per
 export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;
 
-  return (!isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(currentUser));
+  return !isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(currentUser);
 };
-
-export const isChangeFieldTypeHidden = () => !AppConfig.isFeatureEnabled('field_types_management');
 
 export const ChangeFieldTypeHelp = ({ contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;
@@ -61,7 +58,7 @@ export const ChangeFieldTypeHelp = ({ contexts }: ActionHandlerArguments) => {
 
   if (hasMappingPermission(currentUser)) return null;
 
-  return ({ title: 'No permission', description: 'You don\'t have permission to do that action' });
+  return { title: 'No permission', description: "You don't have permission to do that action" };
 };
 
 export default ChangeFieldType;

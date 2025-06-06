@@ -58,6 +58,10 @@ public class UserStreams {
         }
     }
 
+    public ImmutableSet<String> loadStreamsWithCategories(Set<String> categories) {
+        return permittedStreams.loadWithCategories(categories, streamPermissions);
+    }
+
     /**
      * If any stream IDs are provided, they will be filtered out by read permission. If none are given, we'll load
      * all available streams for the current SearchUser

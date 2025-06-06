@@ -48,6 +48,7 @@ public class StreamMock implements Stream {
     private boolean disabled;
     private String contentPack;
     private List<StreamRule> streamRules;
+    private List<String> categories;
     private MatchingType matchingType;
     private boolean defaultStream;
     private boolean removeMatchesFromDefaultStream;
@@ -69,6 +70,7 @@ public class StreamMock implements Stream {
         this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
         this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
         this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
+        this.categories = (List<String>) stream.getOrDefault(StreamImpl.FIELD_CATEGORIES, List.of());
         this.indexSet = new TestIndexSet(IndexSetConfig.create(
                 "index-set-id",
                 "title",
@@ -135,6 +137,11 @@ public class StreamMock implements Stream {
     }
 
     @Override
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    @Override
     public void setTitle(String title) {
         this.title = title;
     }
@@ -187,6 +194,11 @@ public class StreamMock implements Stream {
     @Override
     public void setMatchingType(MatchingType matchingType) {
         this.matchingType = matchingType;
+    }
+
+    @Override
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 
     @Override

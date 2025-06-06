@@ -71,16 +71,13 @@ class JobSchedulerServiceIT {
     @Mock
     private ServerStatus serverStatus;
 
-    private NodeId nodeId = new SimpleNodeId("dummy-node");
+    private final NodeId nodeId = new SimpleNodeId("dummy-node");
 
     @Mock
     SchedulerCapabilitiesService schedulerCapabilitiesService;
 
-    @Mock
-    private GracefulShutdownService gracefulShutdownService;
-
     private DBJobTriggerService jobTriggerService;
-    private DBCustomJobDefinitionService customJobDefinitionService;
+    private DBJobDefinitionService jobDefinitionService;
     private JobSchedulerService jobSchedulerService;
     private JobSchedulerClock clock;
 
@@ -103,14 +100,13 @@ class JobSchedulerServiceIT {
         final JobSchedulerConfig schedulerConfig = new TestSchedulerConfig();
         final Duration lockExpirationDuration = Duration.seconds(10);
 
-        customJobDefinitionService = new DBCustomJobDefinitionService(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
-                        mongoDBTestService.mongoConnection()));
+        final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        jobDefinitionService = new DBJobDefinitionService(
+                new MongoCollections(mapperProvider,
+                        mongoDBTestService.mongoConnection()), mapperProvider);
 
         jobTriggerService = new DBJobTriggerService(
-                mongoDBTestService.mongoConnection(),
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongoDBTestService.mongoConnection()),
-                new MongoJackObjectMapperProvider(objectMapper),
+                new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection()),
                 nodeId,
                 clock,
                 schedulerCapabilitiesService,
@@ -118,7 +114,9 @@ class JobSchedulerServiceIT {
         );
 
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(
-                mongoDBTestService.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
+                new MongoCollections(mapperProvider,
+                        mongoDBTestService.mongoConnection()),
+                mapperProvider);
         final JobScheduleStrategies scheduleStrategies = new JobScheduleStrategies(clock);
 
         final JobTriggerUpdates.Factory jobTriggerUpdatesFactory = trigger -> new JobTriggerUpdates(
@@ -149,12 +147,12 @@ class JobSchedulerServiceIT {
                 metricRegistry,
                 200);
 
-        final JobWorkerPool.Factory workerPoolFactory = (name, poolSize, shutdownCallback) ->
-                new JobWorkerPool(name, poolSize, shutdownCallback, gracefulShutdownService, metricRegistry);
+        final JobWorkerPool.Factory workerPoolFactory = (name, poolSize) ->
+                new JobWorkerPool(name, poolSize, metricRegistry);
 
         final Duration loopSleepDuration = Duration.milliseconds(200);
 
-        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, loopSleepDuration);
+        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, new GracefulShutdownService(), 30_000, loopSleepDuration);
     }
 
     @Test
@@ -182,8 +180,8 @@ class JobSchedulerServiceIT {
 
         jobSchedulerService.startAsync().awaitRunning();
         try {
-            createTriggers(nLimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
-            createTriggers(nUnlimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+            createTriggers(nLimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+            createTriggers(nUnlimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
             outstandingJobs.await();
         } finally {
             jobSchedulerService.stopAsync().awaitTerminated();
@@ -223,8 +221,8 @@ class JobSchedulerServiceIT {
 
         jobSchedulerService.startAsync().awaitRunning();
         try {
-            createTriggers(nLimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
-            createTriggers(nUnlimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+            createTriggers(nLimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+            createTriggers(nUnlimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
             outstandingJobsTotal.await();
         } finally {
             jobSchedulerService.stopAsync().awaitTerminated();
@@ -256,8 +254,8 @@ class JobSchedulerServiceIT {
         jobSchedulerService.startAsync().awaitRunning();
         try {
             for (int i = 0; i < (nJobs / 2); i++) {
-                createTriggers(1, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
-                createTriggers(1, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+                createTriggers(1, jobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+                createTriggers(1, jobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
             }
             outstandingJobs.await();
         } finally {

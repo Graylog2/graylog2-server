@@ -16,10 +16,13 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import com.github.oxo42.stateless4j.StateMachine;
+import jakarta.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.FailuresCounter;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.process.ManagableProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,16 +30,20 @@ import org.slf4j.LoggerFactory;
  * This process watchdog follows transitions of the state machine and will try to restart the process in case of termination.
  * If the process is actually stopped, it won't restart it and will automatically deactivate itself.
  */
-public class OpensearchWatchdog implements StateMachineTracer {
+public class OpensearchWatchdog implements StateMachineTracer<OpensearchState, OpensearchEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchWatchdog.class);
 
     private boolean active;
     private final FailuresCounter restartCounter;
-    private final ManagableProcess<?, ?, ?> process;
+    private OpensearchStateMachine stateMachine;
 
-    public OpensearchWatchdog(ManagableProcess<?, ?, ?> process, int restartAttemptsCount) {
-        this.process = process;
+    @Inject
+    public OpensearchWatchdog() {
+        this(3);
+    }
+
+    public OpensearchWatchdog(int restartAttemptsCount) {
         this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }
 
@@ -73,7 +80,7 @@ public class OpensearchWatchdog implements StateMachineTracer {
             if (!restartCounter.failedTooManyTimes()) {
                 try {
                     LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.failuresCount() + 1);
-                    process.start();
+                    this.stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
                 } catch (Exception e) {
                     LOG.warn("Failed to restart process", e);
                 } finally {
@@ -89,5 +96,10 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void setStateMachine(StateMachine<OpensearchState, OpensearchEvent> stateMachine) {
+        this.stateMachine = (OpensearchStateMachine) stateMachine;
     }
 }

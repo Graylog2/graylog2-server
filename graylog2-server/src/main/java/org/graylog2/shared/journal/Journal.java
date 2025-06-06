@@ -17,6 +17,7 @@
 package org.graylog2.shared.journal;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface Journal {
     Entry createEntry(byte[] idBytes, byte[] messageBytes);
@@ -30,6 +31,26 @@ public interface Journal {
     void markJournalOffsetCommitted(long offset);
 
     void flush();
+
+    /**
+     * Returns an {@code Optional} containing the current journal utilization as a percentage of the
+     * maximum retention size. This default implementation returns an empty {@code Optional},
+     * indicating that no utilization data is available.
+     *
+     * @return an {@code Optional<Double>} representing the journal utilization percentage,
+     * or an empty {@code Optional} if utilization data is unavailable.
+     */
+    default Optional<Double> getJournalUtilization() {
+        return Optional.empty();
+    }
+
+    /**
+     * Executes the retention policy on the journal, deleting outdated or excess data based on the
+     * configured retention rules.
+     *
+     * @return an integer representing the amount of data deleted during the retention process.
+     */
+    int runRetention();
 
     class Entry {
         private final byte[] idBytes;

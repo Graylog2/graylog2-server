@@ -1,0 +1,5 @@
+type="f"
+message="Make allowlist for datanode remote reindex migration optional, automatically remove protocols."
+
+issues=["19402"]
+pulls=["19682"]

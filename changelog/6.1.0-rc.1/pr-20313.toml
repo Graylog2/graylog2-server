@@ -1,0 +1,5 @@
+type="f"
+message="Automatically remove index write blocks during remote reindex migration"
+
+issues=["graylog-plugin-enterprise#8374"]
+pulls=["20313"]

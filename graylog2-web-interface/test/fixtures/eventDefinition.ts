@@ -30,6 +30,7 @@ export const simpleEventDefinition = {
     type: 'aggregation-v1',
     filters: [],
     _is_scheduled: true,
+    event_limit: 1000,
   },
   updated_at: '2024-02-26T15:32:24.666Z',
   description: '',
@@ -42,10 +43,12 @@ export const simpleEventDefinition = {
   },
   notifications: [],
   priority: 2,
-  storage: [{
-    streams: ['stream-id-2'],
-    type: 'persist-to-streams-v1',
-  }],
+  storage: [
+    {
+      streams: ['stream-id-2'],
+      type: 'persist-to-streams-v1',
+    },
+  ],
   title: 'Event Definition 1',
   _scope: 'DEFAULT',
 };

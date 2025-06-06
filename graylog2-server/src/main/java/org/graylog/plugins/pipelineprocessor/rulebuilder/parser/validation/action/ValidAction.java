@@ -32,7 +32,7 @@ public class ValidAction implements Validator {
 
     @Inject
     public ValidAction(RuleBuilderRegistry ruleBuilderRegistry) {
-        this.actions = ruleBuilderRegistry.actions();
+        this.actions = ruleBuilderRegistry.actionsWithInternal();
     }
 
     @Override

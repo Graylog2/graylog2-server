@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -42,9 +43,9 @@ public class IndexSetConfigTest {
                 .description("A test index-set.")
                 .indexPrefix("graylog1")
                 .indexWildcard("graylog1_*")
-                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
                 .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
                 .shards(4)
                 .replicas(0)
@@ -61,9 +62,9 @@ public class IndexSetConfigTest {
                 .description("A test index-set.")
                 .indexPrefix("graylog2")
                 .indexWildcard("graylog2_*")
-                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
                 .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
                 .shards(4)
                 .replicas(0)
@@ -299,14 +300,28 @@ public class IndexSetConfigTest {
 
     @Test
     public void testFailureIndexWithProfileSetIsIllegal() {
-        assertFalse(testIndexSetConfig("failures",
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
                 null,
                 "profile").canHaveProfile());
     }
 
     @Test
     public void testFailureIndexWithChangedFieldMappingsIsIllegal() {
-        assertFalse(testIndexSetConfig("failures",
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testIlluminateIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testIlluminateIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
                 new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
                 null).canHaveCustomFieldMappings());
     }
@@ -326,6 +341,7 @@ public class IndexSetConfigTest {
                                               final String fieldTypeProfile) {
         return IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
+                null,
                 "Test Index",
                 "Test Index",
                 true,

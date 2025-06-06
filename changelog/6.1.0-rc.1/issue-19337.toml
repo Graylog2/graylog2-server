@@ -1,0 +1,5 @@
+type="f"
+message="Fix issue with scroll position which could occur in news section on the startpage when scrolling by dragging cards."
+
+issues=["19337"]
+pulls=["19341"]

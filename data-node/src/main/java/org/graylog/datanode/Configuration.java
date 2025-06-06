@@ -32,8 +32,12 @@ import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.docs.DocumentationConstants;
+import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.configuration.Documentation;
+import org.graylog2.configuration.DocumentationSection;
+import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
@@ -57,7 +61,8 @@ import java.util.Set;
  * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration {
+@DocumentationSection(heading = "GRAYLOG DATANODE CONFIGURATION FILE", description = DocumentationConstants.DATANODE_DOCUMENTATION_DESCRIPTION)
+public class Configuration implements CommonNodeConfiguration, NativeLibPathConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
@@ -86,8 +91,10 @@ public class Configuration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Documentation("Data directory of the embedded opensearch. Contains indices of the opensearch. May be pointed to an existing" +
-            "opensearch directory during in-place migration to Datanode")
+    @Documentation("""
+            Data directory of the embedded opensearch. Contains indices of the opensearch.
+            May be pointed to an existing opensearch directory during in-place migration to Datanode
+            """)
     @Parameter(value = "opensearch_data_location", required = true)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
@@ -95,10 +102,26 @@ public class Configuration {
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchLogsLocation = Path.of("datanode/logs");
 
-    @Documentation("Configuration directory of the embedded opensearch. This is the directory where the opensearch" +
-            "process will store its configuration files. Caution, each start of the Datanode will regenerate the complete content of the directory!")
+    @Documentation("""
+            Configuration directory of the embedded opensearch. This is the directory where the opensearch
+            process will store its configuration files. Caution, each start of the Datanode will regenerate
+            the complete content of the directory!
+            """)
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchConfigLocation = Path.of("datanode/config");
+
+    @Documentation("""
+            Path to the file with configuration properties overriding default opensearch parameters.
+            Required format is java properties file.
+
+            If the path is relative, datanode will try to resolve the file relative to the configured "config_location"
+            path.
+
+            Caution! Overriding opensearch configuration parameters is not supported and may break in any future release.
+            Use at your own risk.
+            """)
+    @Parameter(value = "opensearch_configuration_overrides_file")
+    private Path opensearchConfigurationOverridesFile = null;
 
     @Documentation("Source directory of the additional configuration files for the Datanode. Additional certificates can be provided here.")
     @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
@@ -106,14 +129,17 @@ public class Configuration {
 
     @Documentation(visible = false)
     @Parameter(value = "native_lib_dir", required = true)
-    private Path nativeLibDir = Path.of("native_libs");
+    private String nativeLibDir = "native_libs";
 
     @Documentation("How many log entries of the opensearch process should Datanode hold in memory and make accessible via API calls.")
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
 
 
-    @Documentation("Unique name of this Datanode instance. use this, if your node name should be different from the hostname that's found by programmatically looking it up")
+    @Documentation("""
+            Unique name of this Datanode instance. use this, if your node name should be different from the hostname
+            that's found by programmatically looking it up.
+            """)
     @Parameter(value = "node_name")
     private String datanodeNodeName;
 
@@ -122,7 +148,10 @@ public class Configuration {
     @Parameter(value = "initial_cluster_manager_nodes")
     private String initialClusterManagerNodes;
 
-    @Documentation("Opensearch heap memory. Initial and maxmium heap must be identical for OpenSearch, otherwise the boot fails. So it's only one config option")
+    @Documentation("""
+            Opensearch heap memory. Initial and maximum heap must be identical for OpenSearch, otherwise the boot fails.
+            So it's only one config option.
+            """)
     @Parameter(value = "opensearch_heap")
     private String opensearchHeap = "1g";
 
@@ -138,7 +167,10 @@ public class Configuration {
     @Parameter(value = "opensearch_discovery_seed_hosts", converter = StringListConverter.class)
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
-    @Documentation("Binds an OpenSearch node to an address. Use 0.0.0.0 to include all available network interfaces, or specify an IP address assigned to a specific interface. ")
+    @Documentation("""
+            Binds an OpenSearch node to an address. Use 0.0.0.0 to include all available network interfaces,
+            or specify an IP address assigned to a specific interface.
+            """)
     @Parameter(value = "opensearch_network_host")
     private String opensearchNetworkHost = null;
 
@@ -150,6 +182,11 @@ public class Configuration {
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
+    @Documentation("Transport keystore alias name. Optional. Default is the first alias.")
+    @Parameter(value = "transport_certificate_alias")
+    private String datanodeTransportCertificateAlias;
+
+
     @Documentation("Relative path (to config_location) to a keystore used for opensearch REST layer TLS")
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = null;
@@ -158,37 +195,42 @@ public class Configuration {
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
 
-    @Documentation("You MUST specify a hash password for the root user (which you only need to initially set up the " +
-            "system and in case you lose connectivity to your authentication backend)." +
-            "This password cannot be changed using the API or via the web interface. If you need to change it, " +
-            "modify it in this file. " +
-            "Create one by using for example: echo -n yourpassword | shasum -a 256")
-    @Parameter(value = "root_password_sha2")
-    private String rootPasswordSha2;
+    @Documentation("Http keystore alias name. Optional. Default is the first alias.")
+    @Parameter(value = "http_certificate_alias")
+    private String datanodeHttpCertificateAlias;
 
-    @Documentation("You MUST set a secret to secure/pepper the stored user passwords here. Use at least 64 characters." +
-            "Generate one by using for example: pwgen -N 1 -s 96 \n" +
-            "ATTENTION: This value must be the same on all Graylog and Datanode nodes in the cluster. " +
-            "Changing this value after installation will render all user sessions and encrypted values in the database invalid. (e.g. encrypted access tokens)")
+    @Documentation("""
+            You MUST set a secret to secure/pepper the stored user passwords here. Use at least 16 characters.
+            Generate one by using for example: pwgen -N 1 -s 96
+            ATTENTION: This value must be the same on all Graylog and Datanode nodes in the cluster.
+            Changing this value after installation will render all user sessions and encrypted values
+            in the database invalid. (e.g. encrypted access tokens)
+            """)
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
 
-    @Documentation("communication between Graylog and OpenSearch is secured by JWT. This configuration defines interval between token regenerations.")
+    @DocumentationSection(heading = "OpenSearch JWT token usage",description = """
+            communication between Graylog and OpenSearch is secured by JWT. These are the defaults used for the token usage
+            adjust them, if you have special needs.
+            """)
+    @Documentation(value = "This configuration defines interval between token regenerations.")
     @Parameter(value = "indexer_jwt_auth_token_caching_duration")
     Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
-    @Documentation("communication between Graylog and OpenSearch is secured by JWT. This configuration defines validity interval of JWT tokens.")
+    @DocumentationSection(heading = "OpenSearch JWT token usage",description = """
+            communication between Graylog and OpenSearch is secured by JWT. These are the defaults used for the token usage
+            adjust them, if you have special needs.
+            """)
+    @Documentation("This configuration defines validity interval of JWT tokens")
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
-    @Documentation("The auto-generated node ID will be stored in this file and read after restarts. It is a good idea " +
-            "to use an absolute file path here if you are starting Graylog DataNode from init scripts or similar.")
+    @Documentation("""
+            The auto-generated node ID will be stored in this file and read after restarts. It is a good idea
+            to use an absolute file path here if you are starting Graylog DataNode from init scripts or similar.
+            """)
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "data/node-id";
-
-    @Documentation("The default root user is named 'admin'")
-    @Parameter(value = "root_username")
-    private String rootUsername = "admin";
 
     @Documentation("HTTP bind address. The network interface used by the Graylog DataNode to bind all services.")
     @Parameter(value = "bind_address", required = true)
@@ -207,15 +249,19 @@ public class Configuration {
     @Parameter(value = "clustername")
     private String clustername = "datanode-cluster";
 
-    @Documentation("This configuration should be used if you want to connect to this Graylog DataNode's REST API and it is available on " +
-            "another network interface than $http_bind_address, " +
-            "for example if the machine has multiple network interfaces or is behind a NAT gateway.")
-    @Parameter(value = "http_publish_uri", validators  = URIAbsoluteValidator.class)
+    @Documentation("""
+            This configuration should be used if you want to connect to this Graylog DataNode's REST API
+            and it is available on another network interface than $http_bind_address,
+            for example if the machine has multiple network interfaces or is behind a NAT gateway.
+            """)
+    @Parameter(value = "http_publish_uri", validators = URIAbsoluteValidator.class)
     private URI httpPublishUri;
 
 
-    @Documentation("Enable GZIP support for HTTP interface. This compresses API responses and therefore helps to reduce " +
-            " overall round trip times.")
+    @Documentation("""
+            Enable GZIP support for HTTP interface. This compresses API responses and therefore helps to reduce
+            overall round trip times.
+            """)
     @Parameter(value = "http_enable_gzip")
     private boolean httpEnableGzip = true;
 
@@ -266,7 +312,14 @@ public class Configuration {
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
-    @Documentation(value = "Cache size for searchable snaphots")
+    /**
+     * @see <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/searchable_snapshot/#configuring-a-node-to-use-searchable-snapshots}">Searchable snapshots</a>
+     */
+    @Documentation(value = """
+            Cache size for searchable snapshots. This space will be automatically reserved
+            if you have either S3 or shared filesystem repositories enabled and configured.
+            See s3_client_* configuration options and path_repo.
+            """)
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
 
@@ -281,24 +334,22 @@ public class Configuration {
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
     private Integer indicesQueryBoolMaxClauseCount = 32768;
 
-    @Documentation("The list of the opensearch node’s roles.")
+    @Documentation("""
+    List of the opensearch node’s roles. If nothing defined, datanode will use cluster_manager,data,ingest,remote_cluster_client.
+    If roles are not defined but configuration contains snapshots configuration (path_repo or s3 credentials), the search
+    role will be automatically added.
+    """)
     @Parameter(value = "node_roles", converter = StringListConverter.class)
-    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search");
-
-    @Documentation(visible = false)
-    @Parameter(value = "async_eventbus_processors")
-    private int asyncEventbusProcessors = 2;
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
-    }
-
+    private List<String> nodeRoles;
 
     public Integer getIndicesQueryBoolMaxClauseCount() {
         return indicesQueryBoolMaxClauseCount;
     }
 
-    @Documentation("Configures verbosity of embedded opensearch logs. Possible values OFF, FATAL, ERROR, WARN, INFO, DEBUG, and TRACE, default is INFO")
+    @Documentation("""
+            Configures verbosity of embedded opensearch logs.
+            Possible values OFF, FATAL, ERROR, WARN, INFO, DEBUG, and TRACE, default is INFO
+            """)
     @Parameter(value = "opensearch_logger_org_opensearch")
     private String opensearchDebug;
 
@@ -382,13 +433,9 @@ public class Configuration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
-        if (passwordSecret == null || passwordSecret.length() < 64) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
+        if (passwordSecret == null || passwordSecret.length() < 16) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
         }
-    }
-
-    public String getRootUsername() {
-        return rootUsername;
     }
 
     public String getDatanodeNodeName() {
@@ -465,7 +512,7 @@ public class Configuration {
     }
 
     public Path getNativeLibDir() {
-        return nativeLibDir;
+        return getOpensearchConfigLocation().resolve(Path.of(nativeLibDir));
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -653,11 +700,6 @@ public class Configuration {
         return bindAddress;
     }
 
-    public String getRootPasswordSha2() {
-        return rootPasswordSha2;
-    }
-
-
     public String getNodeSearchCacheSize() {
         return searchCacheSize;
     }
@@ -672,5 +714,39 @@ public class Configuration {
 
     public String getOpensearchHeap() {
         return opensearchHeap;
+    }
+
+    @Override
+    public String getEnvironmentVariablePrefix() {
+        return "GRAYLOG_DATANODE_";
+    }
+
+    @Override
+    public String getSystemPropertyPrefix() {
+        return "graylog.datanode.";
+    }
+
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
+    public Path getOpensearchConfigurationOverridesFile() {
+        return opensearchConfigurationOverridesFile;
+    }
+    public String getDatanodeTransportCertificateAlias() {
+        return datanodeTransportCertificateAlias;
+    }
+
+    public String getDatanodeHttpCertificateAlias() {
+        return datanodeHttpCertificateAlias;
+    }
+
+    public Duration getIndexerJwtAuthTokenCachingDuration() {
+        return indexerJwtAuthTokenCachingDuration;
+    }
+
+    public Duration getIndexerJwtAuthTokenExpirationDuration() {
+        return indexerJwtAuthTokenExpirationDuration;
     }
 }

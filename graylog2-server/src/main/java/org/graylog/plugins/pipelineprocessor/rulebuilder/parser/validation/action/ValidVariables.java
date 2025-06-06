@@ -41,7 +41,7 @@ public class ValidVariables implements Validator {
 
     @Inject
     public ValidVariables(RuleBuilderRegistry ruleBuilderRegistry) {
-        this.actions = ruleBuilderRegistry.actions();
+        this.actions = ruleBuilderRegistry.actionsWithInternal();
         this.variables = new HashMap<>();
     }
 

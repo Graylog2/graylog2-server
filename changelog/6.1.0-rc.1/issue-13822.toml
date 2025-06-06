@@ -1,0 +1,9 @@
+type = "fixed"
+message = "Fix link target for search query error documentation links."
+
+issues = ["13822"]
+pulls = ["20563"]
+
+details.user = """
+The documentation link now points to the error types section again, instead of just the search query page.
+"""

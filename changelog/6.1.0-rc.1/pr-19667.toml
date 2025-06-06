@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Preflight UI fixes"
+
+issues = ["19285", "19286"]
+pulls = ["19667"]

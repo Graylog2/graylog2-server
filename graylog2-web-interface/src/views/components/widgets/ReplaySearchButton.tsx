@@ -36,6 +36,10 @@ const NeutralLink = styled.a`
   color: inherit;
   text-decoration: none;
 
+  &:hover {
+    text-decoration: none;
+  }
+
   &:visited {
     color: inherit;
   }
@@ -50,12 +54,14 @@ const buildSearchLink = (
   timerange: TimeRange,
   queryString: string,
   streams: Array<string>,
+  streamCategories: Array<string>,
   parameters?: Immutable.Set<Parameter>,
 ) => {
   let searchLink = SearchLink.builder()
     .query(createElasticsearchQueryString(queryString))
     .timerange(timerange)
     .streams(streams)
+    .streamCategories(streamCategories)
     .build()
     .toURL();
 
@@ -66,26 +72,63 @@ const buildSearchLink = (
   return searchLink;
 };
 
-export const ReplaySearchButtonComponent = ({ searchLink, children, onClick }: { children?: React.ReactNode, searchLink: string, onClick?: () => void }) => (
-  <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search" onClick={onClick}>
-    {children
-      ? <>{children} <StyledIcon name="play_arrow" /></>
-      : <IconButton name="play_arrow" focusable={false} />}
-  </NeutralLink>
-);
+const iconName = 'play_arrow' as const;
 
-type Props = {
-  queryString?: string | undefined,
-  timerange?: TimeRange | undefined,
-  streams?: string[] | undefined,
-  parameters?: Immutable.Set<Parameter>,
-  children?: React.ReactNode,
-  parameterBindings?: ParameterBindings,
+type CustomComponentProps = React.PropsWithChildren<{
+  href?: string;
+  title?: string;
+  onClick?: React.MouseEventHandler<unknown>;
+  target?: string;
+  rel?: string;
+}>;
+
+export const ReplaySearchButtonComponent = ({
+  searchLink,
+  children = undefined,
+  onClick = undefined,
+  component: Component = NeutralLink,
+}: {
+  children?: React.ReactNode;
+  searchLink: string;
+  onClick?: () => void;
+  component?: React.ComponentType<CustomComponentProps>;
+}) => {
+  const title = 'Replay search';
+
+  return (
+    <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
+      {children ? (
+        <>
+          {children} <StyledIcon name={iconName} />
+        </>
+      ) : (
+        <IconButton name={iconName} focusable={false} title={title} />
+      )}
+    </Component>
+  );
 };
 
-const ReplaySearchButton = ({ queryString, timerange, streams, parameters, children, parameterBindings }: Props) => {
+type Props = {
+  queryString?: string | undefined;
+  timerange?: TimeRange | undefined;
+  streams?: string[] | undefined;
+  streamCategories?: string[] | undefined;
+  parameters?: Immutable.Set<Parameter>;
+  children?: React.ReactNode;
+  parameterBindings?: ParameterBindings;
+};
+
+const ReplaySearchButton = ({
+  queryString = undefined,
+  timerange = undefined,
+  streams = undefined,
+  streamCategories = undefined,
+  parameters = undefined,
+  children = undefined,
+  parameterBindings = undefined,
+}: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
-  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, parameters);
+  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters);
 
   const onReplaySearch = useCallback(() => {
     if (parameters?.size) {
@@ -93,21 +136,11 @@ const ReplaySearchButton = ({ queryString, timerange, streams, parameters, child
     }
   }, [sessionId, parameters, parameterBindings]);
 
-  return <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch}>{children}</ReplaySearchButtonComponent>;
-};
-
-ReplaySearchButton.defaultProps = {
-  queryString: undefined,
-  timerange: undefined,
-  streams: undefined,
-  parameters: undefined,
-  parameterBindings: undefined,
-  children: undefined,
-};
-
-ReplaySearchButtonComponent.defaultProps = {
-  children: undefined,
-  onClick: undefined,
+  return (
+    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch}>
+      {children}
+    </ReplaySearchButtonComponent>
+  );
 };
 
 export default ReplaySearchButton;

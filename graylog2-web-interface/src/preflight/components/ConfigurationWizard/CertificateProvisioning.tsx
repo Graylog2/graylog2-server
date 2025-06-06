@@ -22,19 +22,14 @@ import fetch from 'logic/rest/FetchProvider';
 import { Button, Title, Group, Space } from 'preflight/components/common';
 import Alert from 'components/bootstrap/Alert';
 import URLUtils from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
 
-const onProvisionCertificate = () => fetch(
-  'POST',
-  URLUtils.qualifyUrl('api/generate'),
-  undefined,
-  false,
-);
+const onProvisionCertificate = () => fetch('POST', URLUtils.qualifyUrl('api/generate'), undefined, false);
 
 type Props = {
-  onSkipProvisioning: () => void,
-}
+  onSkipProvisioning: () => void;
+};
 
 const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
   const queryClient = useQueryClient();
@@ -62,14 +57,17 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
     <div>
       <Title order={3}>Provision certificates</Title>
       <p>
-        Certificate authority has been configured successfully.<br />
+        Certificate authority has been configured successfully.
+        <br />
         You can now provision certificate for your data nodes.
       </p>
-      {(!dataNodes.length && !isInitialLoading) ? (
+      {!dataNodes.length && !isInitialLoading ? (
         <Alert bsStyle="warning">
           At least one Graylog data node needs to run before the certificate can be provisioned.
         </Alert>
-      ) : <Space h="sm" />}
+      ) : (
+        <Space h="sm" />
+      )}
       <Group>
         <Button onClick={() => onSubmit()} disabled={!dataNodes.length || isProvisioning}>
           {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}

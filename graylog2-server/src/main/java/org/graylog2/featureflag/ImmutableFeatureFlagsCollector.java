@@ -18,6 +18,7 @@ package org.graylog2.featureflag;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.graylog2.GraylogNodeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_ENVIRONMENT_VAR_PREFIX;
-import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_SYSTEM_PROP_PREFIX;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.startsWithIgnoreCase;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.stringFormat;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.toUpperCase;
@@ -42,18 +41,21 @@ class ImmutableFeatureFlagsCollector {
 
     private static final Logger LOG = LoggerFactory.getLogger(ImmutableFeatureFlagsCollector.class);
 
-    private static final String GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX = GRAYLOG_ENVIRONMENT_VAR_PREFIX + "FEATURE_";
-    private static final String GRAYLOG_FF_SYSTEM_PROP_PREFIX = GRAYLOG_SYSTEM_PROP_PREFIX + "feature.";
+    private final String featureFlagEnvPrefix;
+    private final String featureFlagSystemPropPrefix;
 
     private Map<String, FeatureFlagValue> existingFlags = new HashMap<>();
     private final FeatureFlagsResources resources;
     private final String defaultPropertiesFile;
     private final String customPropertiesFile;
 
-    public ImmutableFeatureFlagsCollector(FeatureFlagsResources resources, String defaultPropertiesFile, String customPropertiesFile) {
+    public ImmutableFeatureFlagsCollector(FeatureFlagsResources resources, String defaultPropertiesFile,
+                                          String customPropertiesFile, GraylogNodeConfiguration configuration) {
         this.resources = resources;
         this.defaultPropertiesFile = defaultPropertiesFile;
         this.customPropertiesFile = customPropertiesFile;
+        this.featureFlagEnvPrefix = configuration.getEnvironmentVariablePrefix() + "FEATURE_";
+        this.featureFlagSystemPropPrefix = configuration.getSystemPropertyPrefix() + "feature.";
     }
 
     public Map<String, String> toMap() {
@@ -100,11 +102,11 @@ class ImmutableFeatureFlagsCollector {
     }
 
     private void addSystemPropertiesFlags() {
-        addFlagsWithPrefix(GRAYLOG_FF_SYSTEM_PROP_PREFIX, resources.systemProperties(), "system properties");
+        addFlagsWithPrefix(featureFlagSystemPropPrefix, resources.systemProperties(), "system properties");
     }
 
     private void addEnvironmentVariableFlags() {
-        addFlagsWithPrefix(GRAYLOG_FF_ENVIRONMENT_VAR_PREFIX, resources.environmentVariables(), "environment variables");
+        addFlagsWithPrefix(featureFlagEnvPrefix, resources.environmentVariables(), "environment variables");
     }
 
     private void addFlagsWithPrefix(String prefix, Map<String, String> newFlags, String resourceType) {

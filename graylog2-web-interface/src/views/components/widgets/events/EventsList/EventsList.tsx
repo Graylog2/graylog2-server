@@ -15,29 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import type { WidgetComponentProps } from 'views/types';
 import { PaginatedList } from 'components/common';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
 import type { EventsListResult } from 'views/components/widgets/events/types';
 import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortConfig';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 import EventsTable from './EventsTable';
 
 import { PAGINATION } from '../Constants';
 
 type Pagination = {
-  pageErrors: Array<{ description: string }>,
-  currentPage: number
-}
+  pageErrors: Array<{ description: string }>;
+  currentPage: number;
+};
 
 const Container = styled.div`
   display: flex;
@@ -56,38 +57,50 @@ const useResetPaginationOnSearchExecution = (setPagination: (pagination: Paginat
   useOnSearchExecution(resetPagination);
 };
 
-const useHandlePageChange = (searchTypeId: string, setLoadingState: (loading: boolean) => void, setPagination: (pagination: Pagination) => void) => {
-  const dispatch = useAppDispatch();
+const useHandlePageChange = (
+  searchTypeId: string,
+  setLoadingState: (loading: boolean) => void,
+  setPagination: (pagination: Pagination) => void,
+) => {
+  const dispatch = useViewsDispatch();
   const { stopAutoRefresh } = useAutoRefresh();
 
-  return useCallback((pageNo: number) => {
-    // execute search with new offset
-    const searchTypePayload: SearchTypeOptions<{
-      page: number,
-      per_page: number,
-    }> = {
-      [searchTypeId]: {
-        page: pageNo,
-        per_page: PAGINATION.PER_PAGE,
-      },
-    };
+  return useCallback(
+    (pageNo: number) => {
+      // execute search with new offset
+      const searchTypePayload: SearchTypeOptions<{
+        page: number;
+        per_page: number;
+      }> = {
+        [searchTypeId]: {
+          page: pageNo,
+          per_page: PAGINATION.PER_PAGE,
+        },
+      };
 
-    stopAutoRefresh();
-    setLoadingState(true);
+      stopAutoRefresh();
+      setLoadingState(true);
 
-    return dispatch(reexecuteSearchTypes(searchTypePayload)).then((response) => {
-      const { result } = response.payload;
-      setLoadingState(false);
+      return dispatch(reexecuteSearchTypes(searchTypePayload)).then((response) => {
+        const { result } = response.payload;
+        setLoadingState(false);
 
-      setPagination({
-        pageErrors: result.errors,
-        currentPage: pageNo,
+        setPagination({
+          pageErrors: result.errors,
+          currentPage: pageNo,
+        });
       });
-    });
-  }, [dispatch, searchTypeId, setLoadingState, setPagination, stopAutoRefresh]);
+    },
+    [dispatch, searchTypeId, setLoadingState, setPagination, stopAutoRefresh],
+  );
 };
 
-const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
+const EventsList = ({
+  data,
+  config,
+  onConfigChange,
+  setLoadingState,
+}: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
     currentPage: PAGINATION.INITIAL_PAGE,
@@ -97,26 +110,39 @@ const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetCom
 
   const handlePageChange = useHandlePageChange(data.id, setLoadingState, setPagination);
 
-  const onSortChange = useCallback((newSort: EventsWidgetSortConfig) => {
-    const newConfig = config.toBuilder().sort(newSort).build();
+  const onSortChange = useCallback(
+    (newSort: EventsWidgetSortConfig) => {
+      const newConfig = config.toBuilder().sort(newSort).build();
 
-    return onConfigChange(newConfig);
-  }, [config, onConfigChange]);
+      return onConfigChange(newConfig);
+    },
+    [config, onConfigChange],
+  );
+  const onRenderComplete = useContext(RenderCompletionCallback);
+
+  useEffect(() => {
+    onRenderComplete();
+  }, [onRenderComplete]);
 
   return (
     <Container>
-      <PaginatedList onChange={handlePageChange}
-                     useQueryParameter={false}
-                     activePage={currentPage}
-                     pageSize={PAGINATION.PER_PAGE}
-                     showPageSizeSelect={false}
-                     totalItems={data.totalResults ?? 0}>
+      <PaginatedList
+        onChange={handlePageChange}
+        useQueryParameter={false}
+        activePage={currentPage}
+        pageSize={PAGINATION.PER_PAGE}
+        showPageSizeSelect={false}
+        totalItems={data.totalResults ?? 0}>
         {!pageErrors?.length ? (
-          <EventsTable config={config}
-                       setLoadingState={setLoadingState}
-                       onSortChange={onSortChange}
-                       events={data.events} />
-        ) : <ErrorWidget errors={pageErrors} />}
+          <EventsTable
+            config={config}
+            setLoadingState={setLoadingState}
+            onSortChange={onSortChange}
+            events={data.events}
+          />
+        ) : (
+          <ErrorWidget errors={pageErrors} />
+        )}
       </PaginatedList>
     </Container>
   );

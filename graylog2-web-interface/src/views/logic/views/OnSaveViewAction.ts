@@ -17,18 +17,19 @@
 import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type View from 'views/logic/views/View';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-const _extractErrorMessage = (error: FetchError) => ((error
-    && error.additional
-    && error.additional.body
-    && error.additional.body.message) ? error.additional.body.message : error);
+const _extractErrorMessage = (error: FetchError) =>
+  error && error.additional && error.additional.body && error.additional.body.message
+    ? error.additional.body.message
+    : error;
 
-export default (view: View) => async (dispatch: AppDispatch) => {
+export default (view: View, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
   try {
-    await ViewManagementActions.update(view);
+    await ViewManagementActions.update(view, entityShare);
     dispatch(setIsNew(false));
     dispatch(setIsDirty(false));
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');

@@ -21,11 +21,11 @@ import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/ho
 import type { Sort } from 'stores/PaginationTypes';
 
 type DefaultLayout = {
-  pageSize: number,
-  sort: Sort,
-  displayedColumns: Array<string>,
-  columnsOrder: Array<string>,
-}
+  pageSize: number;
+  sort: Sort;
+  displayedColumns: Array<string>;
+  columnsOrder: Array<string>;
+};
 
 const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: DefaultLayout) => {
   const [query, setQuery] = useState('');
@@ -37,12 +37,15 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     defaultSort: defaultLayout.sort,
   });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(entityTableId);
-  const searchParams = useMemo(() => ({
-    query,
-    page: activePage,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-  }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
+  const searchParams = useMemo(
+    () => ({
+      query,
+      page: activePage,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+    }),
+    [activePage, layoutConfig.pageSize, layoutConfig.sort, query],
+  );
 
   const onPageChange = useCallback(
     (newPage: number, newPageSize: number) => {
@@ -53,18 +56,25 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
       if (newPageSize) {
         updateTableLayout({ perPage: newPageSize });
       }
-    }, [updateTableLayout],
+    },
+    [updateTableLayout],
   );
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    setActivePage(1);
-    updateTableLayout({ perPage: newPageSize });
-  }, [updateTableLayout]);
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      setActivePage(1);
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [updateTableLayout],
+  );
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    setActivePage(1);
-    updateTableLayout({ sort: newSort });
-  }, [updateTableLayout]);
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      setActivePage(1);
+      updateTableLayout({ sort: newSort });
+    },
+    [updateTableLayout],
+  );
 
   const onSearch = useCallback((newQuery: string) => {
     setActivePage(1);
@@ -73,11 +83,14 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
 
   const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      updateTableLayout({ displayedAttributes });
+    },
+    [updateTableLayout],
+  );
 
-  return ({
+  return {
     activePage,
     isLoadingLayoutPreferences,
     onPageChange,
@@ -89,7 +102,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     onSortChange,
     onPageSizeChange,
     columnsOrder: defaultLayout.columnsOrder,
-  });
+  };
 };
 
 export default usePaginationAndTableLayout;

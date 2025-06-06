@@ -22,9 +22,10 @@ import type { ArrayElement } from 'views/types';
 import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 export type SearchBarFormValues = {
-  timerange: TimeRange,
-  streams: Array<string>,
-  queryString: string,
+  timerange: TimeRange;
+  streams: Array<string>;
+  streamCategories: Array<string>;
+  queryString: string;
 };
 
 export const FULL_MESSAGE_FIELD = 'full_message';
@@ -97,7 +98,8 @@ export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE
 export const NO_TIMERANGE_OVERRIDE = {};
 
 export const DEFAULT_HIGHLIGHT_COLOR = StaticColor.create('#ffec3d');
-export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
+export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma
+  .scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
   .mode('lch')
   .colors(40);
 
@@ -124,13 +126,16 @@ export const RELATIVE_RANGE_TYPES = [
   {
     type: 'seconds',
     label: 'Seconds',
-  }, {
+  },
+  {
     type: 'minutes',
     label: 'Minutes',
-  }, {
+  },
+  {
     type: 'hours',
     label: 'Hours',
-  }, {
+  },
+  {
     type: 'days',
     label: 'Days',
   },

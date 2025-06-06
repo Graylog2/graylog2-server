@@ -27,6 +27,7 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
@@ -65,15 +66,20 @@ public class DBEventProcessorServiceTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
+        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
 
-        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper),
+        this.dbService = new DBEventDefinitionService(mongoCollections,
                 stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
     }
 
     @Test
     @MongoDBFixtures("event-processors.json")
     public void loadPersisted() {
-        final List<EventDefinitionDto> dtos = dbService.streamAll().collect(Collectors.toList());
+        final List<EventDefinitionDto> dtos;
+        try (var stream = dbService.streamAll()) {
+            dtos = stream.collect(Collectors.toList());
+        }
 
         assertThat(dtos).hasSize(1);
 

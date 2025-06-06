@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventProcessorConfig;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -51,7 +52,7 @@ public abstract class SystemNotificationEventProcessorConfig implements EventPro
     }
 
     @Override
-    public ValidationResult validate() {
+    public ValidationResult validate(UserContext userContext) {
         // Nothing to validate
         return new ValidationResult();
     }
@@ -60,6 +61,11 @@ public abstract class SystemNotificationEventProcessorConfig implements EventPro
     public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         // Don't export this into content packs
         return null;
+    }
+
+    @Override
+    public boolean isContentPackExportable() {
+        return false;
     }
 
     @Override

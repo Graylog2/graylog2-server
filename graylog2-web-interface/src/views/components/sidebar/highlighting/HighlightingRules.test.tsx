@@ -27,7 +27,7 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 
 import OriginalHighlightingRules from './HighlightingRules';
 
-const HighlightingRules = ({ rules }: { rules?: Array<HighlightingRule> }) => {
+const HighlightingRules = ({ rules = [] }: { rules?: Array<HighlightingRule> }) => {
   const formatting = FormattingSettings.create(rules);
   const defaultView = createSearch();
   const view = defaultView
@@ -38,14 +38,16 @@ const HighlightingRules = ({ rules }: { rules?: Array<HighlightingRule> }) => {
   return (
     <TestStoreProvider view={view}>
       <HighlightingRulesProvider>
-        <OriginalHighlightingRules />
+        <OriginalHighlightingRules
+          description=""
+          onUpdateRules={() => Promise.resolve()}
+          onCreateRule={() => Promise.resolve()}
+          onUpdateRule={() => Promise.resolve()}
+          onDeleteRule={() => Promise.resolve()}
+        />
       </HighlightingRulesProvider>
     </TestStoreProvider>
   );
-};
-
-HighlightingRules.defaultProps = {
-  rules: [],
 };
 
 describe('HighlightingRules', () => {

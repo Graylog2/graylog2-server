@@ -1,0 +1,10 @@
+rule "remove_fields_by_regex_and_name)"
+when true
+then
+  set_field(field: "a.1", value: "a.1");
+  set_field(field: "a_1", value: "a_1");
+  set_field(field: "f1", value: "f1");
+  set_field(field: "f2", value: "f2");
+
+  remove_multiple_fields(pattern:"a.1", names:["f2"]);
+end

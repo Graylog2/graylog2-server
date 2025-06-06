@@ -29,6 +29,7 @@ const sizeMap = {
   '3x': '3.45em',
   '4x': '4.60em',
   '5x': '5.75em',
+  'huge': '10.35em',
 };
 
 const spinAnimation = keyframes`
@@ -41,48 +42,51 @@ const spinAnimation = keyframes`
 `;
 
 const StyledSpan = styled.span<{
-  $size: string,
-  $spin: boolean,
-  $rotation: RotateProp
-  $flip: FlipProp,
-  $fill: boolean
-}>(({
-  $size,
-  $spin,
-  $rotation,
-  $flip,
-  $fill,
-}) => css`
-  font-variation-settings: 'opsz' 48, 'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
-  font-size: ${sizeMap[$size] ?? '1.15em'};
-  transform: rotate(${$rotation}deg) scaleY(${$flip === 'horizontal' || $flip === 'both' ? -1 : 1}) scaleX(${$flip === 'vertical' || $flip === 'both' ? -1 : 1});
-  animation: ${$spin ? css`${spinAnimation} 2s infinite linear` : 'none'};
-  vertical-align: middle;
-`);
+  $size: string;
+  $spin: boolean;
+  $rotation: RotateProp;
+  $flip: FlipProp;
+  $fill: boolean;
+}>(
+  ({ $size, $spin, $rotation, $flip, $fill }) => css`
+    font-variation-settings:
+      'opsz' 48,
+      'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
+    font-size: ${sizeMap[$size] ?? '1.15em'};
+    transform: rotate(${$rotation}deg) scaleY(${$flip === 'horizontal' || $flip === 'both' ? -1 : 1})
+      scaleX(${$flip === 'vertical' || $flip === 'both' ? -1 : 1});
+    animation: ${$spin
+      ? css`
+          ${spinAnimation} 2s infinite linear
+        `
+      : 'none'};
+    vertical-align: middle;
+  `,
+);
 
 type Props = {
-  className?: string,
-  'data-testid'?: string,
+  className?: string;
+  'data-testid'?: string;
   /** Name of Material Symbol icon */
-  name: IconName,
-  rotation?: RotateProp,
-  size?: SizeProp,
-  spin?: boolean,
+  name: IconName;
+  rotation?: RotateProp;
+  size?: SizeProp;
+  spin?: boolean;
   /**
    * Name of icon type, the brand type is needed for all brand icons.
    * The type regular is needed to outlined icon.
    * Not all icons can be outlined.
    * */
-  type?: IconType,
-  style?: React.CSSProperties,
-  onClick?: (event: React.MouseEvent) => void,
-  onMouseEnter?: (event: React.MouseEvent) => void,
-  onMouseLeave?: (event: React.MouseEvent) => void,
-  onFocus?: (event: React.FocusEvent) => void,
-  tabIndex?: number,
-  title?: string,
-  flip?: FlipProp,
-}
+  type?: IconType;
+  style?: React.CSSProperties;
+  onClick?: (event: React.MouseEvent) => void;
+  onMouseEnter?: (event: React.MouseEvent) => void;
+  onMouseLeave?: (event: React.MouseEvent) => void;
+  onFocus?: (event: React.FocusEvent) => void;
+  tabIndex?: number;
+  title?: string;
+  flip?: FlipProp;
+};
 
 /**
  * Component that renders an icon or glyph.
@@ -91,54 +95,38 @@ type Props = {
  */
 const Icon = ({
   name,
-  type,
-  size,
-  className,
-  rotation,
-  spin,
-  flip,
-  style,
-  'data-testid': testId,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  onFocus,
-  tabIndex,
-  title,
+  type = 'solid',
+  size = undefined,
+  className = undefined,
+  rotation = 0,
+  spin = false,
+  flip = undefined,
+  style = undefined,
+  'data-testid': testId = undefined,
+  onClick = undefined,
+  onMouseEnter = undefined,
+  onMouseLeave = undefined,
+  onFocus = undefined,
+  tabIndex = undefined,
+  title = undefined,
 }: Props) => (
-  <StyledSpan className={`material-symbols-rounded ${className ?? ''}`}
-              data-testid={testId}
-              onClick={onClick}
-              style={style}
-              title={title}
-              onFocus={onFocus}
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
-              tabIndex={tabIndex}
-              $rotation={rotation}
-              $flip={flip}
-              $size={size}
-              $fill={type === 'solid'}
-              $spin={spin}>
+  <StyledSpan
+    className={`material-symbols-rounded ${className ?? ''}`}
+    data-testid={testId}
+    onClick={onClick}
+    style={style}
+    title={title}
+    onFocus={onFocus}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    tabIndex={tabIndex}
+    $rotation={rotation}
+    $flip={flip}
+    $size={size}
+    $fill={type === 'solid'}
+    $spin={spin}>
     {name}
   </StyledSpan>
 );
-
-Icon.defaultProps = {
-  className: undefined,
-  'data-testid': undefined,
-  flip: undefined,
-  rotation: 0,
-  size: undefined,
-  spin: false,
-  style: undefined,
-  type: 'solid',
-  onClick: undefined,
-  onMouseEnter: undefined,
-  onMouseLeave: undefined,
-  onFocus: undefined,
-  tabIndex: undefined,
-  title: undefined,
-};
 
 export default Icon;

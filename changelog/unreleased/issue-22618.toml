@@ -1,0 +1,5 @@
+type="f"
+message="Fixing Alerts & Events histogram on Elasticsearch 7."
+
+pulls = ["22622"]
+issues = ["22618"]

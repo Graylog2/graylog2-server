@@ -38,6 +38,7 @@ import java.util.Set;
 public abstract class ValidationRequestDTO {
 
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     private static final String FIELD_TIMERANGE = "timerange";
 
     @JsonProperty
@@ -57,6 +58,9 @@ public abstract class ValidationRequestDTO {
 
     @JsonProperty(FIELD_STREAMS)
     public abstract Optional<Set<String>> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract Optional<Set<String>> streamCategories();
 
     @JsonProperty
     public abstract ImmutableSet<Parameter> parameters();
@@ -78,6 +82,9 @@ public abstract class ValidationRequestDTO {
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(@Nullable Set<String> streams);
+
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
 
         @JsonProperty(FIELD_TIMERANGE)
         public abstract Builder timerange(@Nullable TimeRange timerange);

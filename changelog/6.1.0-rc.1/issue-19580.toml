@@ -1,0 +1,5 @@
+type = "Added"
+message = "Add export feature to events and investigations widget"
+
+issues = ["19580"]
+pulls = ["19597", "graylog-plugin-enterprise#7587"]

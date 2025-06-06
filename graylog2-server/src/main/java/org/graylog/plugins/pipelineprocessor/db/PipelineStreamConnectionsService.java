@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.db;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 public interface PipelineStreamConnectionsService {
@@ -31,4 +33,6 @@ public interface PipelineStreamConnectionsService {
     Set<PipelineConnections> loadByPipelineId(String pipelineId);
 
     void delete(String streamId);
+
+    Map<String, PipelineConnections> loadByStreamIds(Collection<String> streamIds);
 }

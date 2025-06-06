@@ -22,31 +22,9 @@ import io.krakens.grok.api.exception.GrokException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.grok.GrokPattern;
-import org.graylog2.grok.GrokPatternService;
-import org.graylog2.grok.GrokPatternService.ImportStrategy;
-import org.graylog2.grok.PaginatedGrokPatternService;
-import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
-import org.graylog2.rest.models.system.responses.GrokPatternList;
-import org.graylog2.search.SearchQuery;
-import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -60,6 +38,26 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.GrokPatternService.ImportStrategy;
+import org.graylog2.grok.PaginatedGrokPatternService;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
+import org.graylog2.rest.models.system.responses.GrokPatternList;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -122,10 +120,10 @@ public class GrokResource extends RestResource {
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "title,description,id")
+                                                            allowableValues = "name,pattern")
                                                   @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                  @DefaultValue("asc") @QueryParam("order") String order) {
+                                                      @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         checkPermission(RestPermissions.INPUTS_READ);
 
         SearchQuery searchQuery;

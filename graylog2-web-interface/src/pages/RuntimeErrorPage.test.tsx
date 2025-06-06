@@ -24,7 +24,9 @@ import RuntimeErrorPage from './RuntimeErrorPage';
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('RuntimeErrorPage', () => {
-  const SimpleRuntimeErrorPage = () => <RuntimeErrorPage error={new Error('The error message')} componentStack="The component stack" />;
+  const SimpleRuntimeErrorPage = () => (
+    <RuntimeErrorPage error={new Error('The error message')} componentStack="The component stack" />
+  );
 
   it('displays runtime error', async () => {
     render(<SimpleRuntimeErrorPage />);

@@ -33,27 +33,27 @@ describe('IfSearch', () => {
   it('should render children with search context', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
-    render((
+    render(
       <>
         <span>I must not fear.</span>
         <IfSearch>
           <span>Fear is the mind-killer.</span>
         </IfSearch>
-      </>
-    ));
+      </>,
+    );
 
     await screen.findByText(/Fear is the mind-killer/i);
   });
 
   it('should not render children without context', () => {
-    render((
+    render(
       <>
         <span>I must not fear.</span>
         <IfSearch>
           <span>Fear is the mind-killer.</span>
         </IfSearch>
-      </>
-    ));
+      </>,
+    );
 
     expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });
@@ -61,14 +61,14 @@ describe('IfSearch', () => {
   it('should not render children without search context', () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
-    render((
+    render(
       <>
         <span>I must not fear.</span>
         <IfSearch>
           <span>Fear is the mind-killer.</span>
         </IfSearch>
-      </>
-    ));
+      </>,
+    );
 
     expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });

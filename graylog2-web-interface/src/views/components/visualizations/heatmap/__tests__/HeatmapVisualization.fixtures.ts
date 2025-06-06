@@ -38,9 +38,7 @@ const validData: { [key: string]: Rows } = {
     },
     {
       key: [],
-      values: [
-        { key: ['count()'], value: 877, rollup: true, source: 'row-inner' },
-      ],
+      values: [{ key: ['count()'], value: 877, rollup: true, source: 'row-inner' }],
       source: 'non-leaf',
     },
   ],

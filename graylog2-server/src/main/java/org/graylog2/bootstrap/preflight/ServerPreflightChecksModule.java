@@ -18,10 +18,10 @@ package org.graylog2.bootstrap.preflight;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import okhttp3.OkHttpClient;
-import org.graylog.security.certutil.CaService;
-import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.NullAuditEventSender;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
@@ -37,8 +37,6 @@ public class ServerPreflightChecksModule extends Graylog2Module {
 
     @Override
     protected void configure() {
-        bind(CaService.class).to(CaServiceImpl.class);
-
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, CustomCAX509TrustManager.class)
                 .build(TrustManagerProvider.class));
@@ -50,8 +48,11 @@ public class ServerPreflightChecksModule extends Graylog2Module {
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(AuditEventSender.class).to(NullAuditEventSender.class);
 
+        bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+
         // The MongoDBPreflightCheck is not registered here, because it is called separately from ServerBootstrap
         addPreflightCheck(SearchDbPreflightCheck.class);
         addPreflightCheck(DiskJournalPreflightCheck.class);
+        addPreflightCheck(PasswordSecretPreflightCheck.class);
     }
 }

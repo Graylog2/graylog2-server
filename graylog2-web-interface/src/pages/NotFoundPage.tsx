@@ -15,31 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import ErrorPage from 'components/errors/ErrorPage';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 type Props = {
-  displayPageLayout?: boolean,
-}
+  displayPageLayout?: boolean;
+};
 
-const NotFoundPage = ({ displayPageLayout }: Props) => {
+const NotFoundPage = ({ displayPageLayout = true }: Props) => {
   const description = (
     <>
-      <p>The party gorilla was just here, but had another party to rock.</p>
-      <p>Oh, party gorilla! How we miss you! Will we ever see you again?</p>
+      <p>The page you are looking for does not exist (anymore).</p>
+      <p>
+        You can head back to the <Link to={Routes.WELCOME}>Main Page</Link> and navigate from there.
+      </p>
     </>
   );
 
-  return (<ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />);
-};
-
-NotFoundPage.propTypes = {
-  displayPageLayout: PropTypes.bool,
-};
-
-NotFoundPage.defaultProps = {
-  displayPageLayout: true,
+  return <ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />;
 };
 
 export default NotFoundPage;

@@ -16,24 +16,25 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 
-const Errors = styled.div(({ theme }) => css`
-  width: 100%;
-  margin-top: 3px;
-  color: ${theme.colors.variant.danger};
+const Errors = styled.div(
+  ({ theme }) => css`
+    width: 100%;
+    margin-top: 3px;
+    color: ${theme.colors.variant.danger};
 
-  > * {
-    margin-right: 5px;
+    > * {
+      margin-right: 5px;
 
-    &:last-child {
-      margin-right: 0;
+      &:last-child {
+        margin-right: 0;
+      }
     }
-  }
-`);
+  `,
+);
 
-const FormErrors = ({ errors }: { errors: { [name: string]: string }}) => {
+const FormErrors = ({ errors = {} }: { errors: { [name: string]: string } }) => {
   if (isEmpty(errors) || Object.values(errors).every((v) => !v)) return null;
 
   return (
@@ -43,14 +44,6 @@ const FormErrors = ({ errors }: { errors: { [name: string]: string }}) => {
       ))}
     </Errors>
   );
-};
-
-FormErrors.propTypes = {
-  errors: PropTypes.object,
-};
-
-FormErrors.defaultProps = {
-  errors: {},
 };
 
 export default FormErrors;

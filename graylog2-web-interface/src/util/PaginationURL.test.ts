@@ -36,14 +36,28 @@ describe('PaginationUR', () => {
   });
 
   it('should create a pagination url with query addition fields', () => {
-    const url = PaginationURL('https://foo', 1, 10, 'bar', { bool: false, number: 12, string: 'string', double: 1.2, object: { toString: () => 'object' } });
+    const url = PaginationURL('https://foo', 1, 10, 'bar', {
+      bool: false,
+      number: 12,
+      string: 'string',
+      double: 1.2,
+      object: { toString: () => 'object' },
+    });
 
-    expect(url).toEqual('https://foo/?page=1&per_page=10&bool=false&number=12&string=string&double=1.2&object=object&query=bar');
+    expect(url).toEqual(
+      'https://foo/?page=1&per_page=10&bool=false&number=12&string=string&double=1.2&object=object&query=bar',
+    );
   });
 
   it('should create a pagination url with query addition fields, when fields have multiple values', () => {
     const url = PaginationURL('https://foo', 1, 10, 'bar', { bool: false, scope: ['scope-1', 'scope-2'] });
 
     expect(url).toEqual('https://foo/?page=1&per_page=10&bool=false&scope=scope-1&scope=scope-2&query=bar');
+  });
+
+  it('should not URL-encode query parameter twice', () => {
+    const url = PaginationURL('https://foo', 1, 10, 'my search query');
+
+    expect(url).toEqual('https://foo/?page=1&per_page=10&query=my+search+query');
   });
 });

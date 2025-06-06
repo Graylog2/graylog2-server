@@ -62,11 +62,11 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
 
     @Nullable
     private IndexRotator.Result shouldRotate(final String index, IndexSet indexSet) {
-        if (!(indexSet.getConfig().rotationStrategy() instanceof SizeBasedRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
+        if (!(indexSet.getConfig().rotationStrategyConfig() instanceof SizeBasedRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategyConfig().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
         }
 
-        final SizeBasedRotationStrategyConfig config = (SizeBasedRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
+        final SizeBasedRotationStrategyConfig config = (SizeBasedRotationStrategyConfig) indexSet.getConfig().rotationStrategyConfig();
 
         final Optional<Long> storeSizeInBytes = indices.getStoreSizeInBytes(index);
         if (!storeSizeInBytes.isPresent()) {

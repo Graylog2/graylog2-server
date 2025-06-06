@@ -1,0 +1,5 @@
+type = "a"
+message = "Added support for scheduling Event Definitions using cron expressions."
+
+issues = ["graylog-plugin-enterprise#6598"]
+pulls = ["19563", "graylog-plugin-enterprise#7526"]

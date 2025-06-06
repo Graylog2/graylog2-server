@@ -19,8 +19,9 @@ import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
+import { events as eventsFixtures } from 'fixtures/events';
 import asMock from 'helpers/mocking/AsMock';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
 import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
@@ -43,7 +44,7 @@ const dummySearchJobResults = {
   results: {},
 };
 jest.mock('views/components/widgets/reexecuteSearchTypes');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 describe('EventsList', () => {
   const config = EventsWidgetConfig.createDefault();
@@ -51,70 +52,7 @@ describe('EventsList', () => {
   const data = {
     id: 'search-type-id',
     type: 'events' as const,
-    events: [
-      {
-        id: '01HV0YS4GHDMT30E3EMWQVQNK9',
-        streams: [
-          '000000000000000000000001',
-        ],
-        timestamp: '2024-04-09T08:14:49.445Z',
-        message: 'Test Event 1',
-        alert: false,
-        event_definition_id: 'event-definition-1',
-        priority: 2,
-        event_keys: [],
-        replay_info: {
-          timerange_start: '2024-04-09T08:14:46.644Z',
-          timerange_end: '2024-04-09T08:14:49.644Z',
-          query: '',
-          streams: [
-            '000000000000000000000001',
-          ],
-          filters: [],
-        },
-        status: 'NEW',
-        opened_at: '2024-04-09T08:14:49.445Z',
-        closed_at: null,
-        updated_at: null,
-        owner: null,
-        risk_score: 2,
-        archived: false,
-        assigned_to: undefined,
-        created_at: '2024-04-09T08:14:49.445Z',
-        name: undefined,
-      },
-      {
-        id: '01HV0YS4GH0VC7DV6A2VGN1VJ0',
-        streams: [
-          '000000000000000000000001',
-        ],
-        timestamp: '2024-04-09T08:14:49.416Z',
-        message: 'Test Event 2',
-        alert: false,
-        event_definition_id: 'event-definition-2',
-        priority: 2,
-        event_keys: [],
-        replay_info: {
-          timerange_start: '2024-04-09T08:14:46.644Z',
-          timerange_end: '2024-04-09T08:14:49.644Z',
-          query: '',
-          streams: [
-            '000000000000000000000001',
-          ],
-          filters: [],
-        },
-        status: 'NEW',
-        opened_at: '2024-04-09T08:14:49.416Z',
-        closed_at: null,
-        updated_at: null,
-        owner: null,
-        risk_score: 2,
-        archived: false,
-        assigned_to: undefined,
-        created_at: '2024-04-09T08:14:49.445Z',
-        name: undefined,
-      },
-    ],
+    events: eventsFixtures,
     totalResults: 1,
   };
 
@@ -125,6 +63,8 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
     });
   });
 
@@ -135,29 +75,32 @@ describe('EventsList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleEventsList = (props: Partial<React.ComponentProps<typeof EventsList>>) => (
+  const SimpleEventsList = ({
+    data: _data = data,
+    config: _config = config,
+    fields = Immutable.List([]),
+    ...props
+  }: Partial<React.ComponentProps<typeof EventsList>>) => (
     <TestStoreProvider>
-      <EventsList title="Events List"
-                  editing={false}
-                  filter=""
-                  onConfigChange={() => Promise.resolve()}
-                  type="events"
-                  id="events-list"
-                  queryId="deadbeef"
-                  toggleEdit={() => {}}
-                  setLoadingState={() => {}}
-                  data={props.data}
-                  config={props.config}
-                  fields={props.fields}
-                  {...props} />
+      <EventsList
+        title="Events List"
+        editing={false}
+        filter=""
+        onConfigChange={() => Promise.resolve()}
+        type="events"
+        id="events-list"
+        queryId="deadbeef"
+        toggleEdit={() => {}}
+        setLoadingState={() => {}}
+        data={_data}
+        config={_config}
+        fields={fields}
+        height={480}
+        width={640}
+        {...props}
+      />
     </TestStoreProvider>
   );
-
-  SimpleEventsList.defaultProps = {
-    config: config,
-    data: data,
-    fields: Immutable.List([]),
-  };
 
   it('lists events', async () => {
     render(<SimpleEventsList data={data} />);
@@ -166,11 +109,12 @@ describe('EventsList', () => {
   });
 
   it('reexecute query for search type, when using pagination', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+      }),
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { page: 2, per_page: 10 } };
     const secondPageSize = 10;
 
@@ -188,13 +132,16 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
     });
 
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+      }),
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
     render(<SimpleEventsList data={{ ...data, totalResults: 10 + secondPageSize }} />);
@@ -205,16 +152,19 @@ describe('EventsList', () => {
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult({
-        ...dummySearchJobResults,
-        errors: [{
-          description: 'Error description',
-        } as SearchErrorResponse],
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult({
+          ...dummySearchJobResults,
+          errors: [
+            {
+              description: 'Error description',
+            } as SearchErrorResponse,
+          ],
+        }),
       }),
-      widgetMapping: Immutable.Map(),
-    }));
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;
 

@@ -15,26 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 
 import PossiblyHighlight from './PossiblyHighlight';
 
 describe('PossiblyHighlight', () => {
   it('renders something for an `undefined` field value', () => {
-    const wrapper = mount(<PossiblyHighlight field="foo" value={undefined} />);
+    const { container } = render(<PossiblyHighlight field="foo" value={undefined} />);
 
-    expect(wrapper).not.toBeNull();
+    expect(container).not.toBeNull();
   });
 
   it('renders something for a `null` field value', () => {
-    const wrapper = mount(<PossiblyHighlight field="foo" value={null} />);
+    const { container } = render(<PossiblyHighlight field="foo" value={null} />);
 
-    expect(wrapper).not.toBeNull();
+    expect(container).not.toBeNull();
   });
 
   it('renders for invalid highlighting ranges', () => {
-    const wrapper = mount(<PossiblyHighlight field="foo" value="bar" highlightRanges={undefined} />);
+    const { container } = render(<PossiblyHighlight field="foo" value="bar" highlightRanges={undefined} />);
 
-    expect(wrapper).not.toBeNull();
+    expect(container).not.toBeNull();
   });
 });

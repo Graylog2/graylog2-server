@@ -21,38 +21,44 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Event } from 'components/events/events/types';
 import type FetchError from 'logic/errors/FetchError';
+import { onError } from 'util/conditional/onError';
 
 export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
 const fetchEvent = (eventId: string) => fetch('GET', eventsUrl(eventId)).then((data) => data.event);
 
-const useEventById = (eventId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
-  data: Event,
-  refetch: () => void,
-  isLoading: boolean,
-  isFetched: boolean,
+const useEventById = (
+  eventId: string,
+  { onErrorHandler }: { onErrorHandler?: (e: FetchError) => void } = {},
+): {
+  data: Event;
+  refetch: () => void;
+  isLoading: boolean;
+  isFetched: boolean;
 } => {
   const { data, refetch, isLoading, isFetched } = useQuery<Event>(
     ['event-by-id', eventId],
-    () => fetchEvent(eventId),
-    {
-      onError: (errorThrown: FetchError) => {
+    () =>
+      onError(fetchEvent(eventId), (errorThrown: FetchError) => {
         if (onErrorHandler) onErrorHandler(errorThrown);
 
-        UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
-          'Could not load event or alert');
-      },
+        UserNotification.error(
+          `Loading event or alert failed with status: ${errorThrown}`,
+          'Could not load event or alert',
+        );
+      }),
+    {
       keepPreviousData: true,
       enabled: !!eventId,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isLoading,
     isFetched,
-  });
+  };
 };
 
 export default useEventById;

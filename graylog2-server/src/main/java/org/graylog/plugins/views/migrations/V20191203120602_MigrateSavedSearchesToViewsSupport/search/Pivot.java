@@ -56,6 +56,11 @@ public abstract class Pivot implements SearchType {
         return Collections.emptySet();
     }
 
+    @Override
+    public Set<String> streamCategories() {
+        return Collections.emptySet();
+    }
+
     @JsonProperty("row_groups")
     abstract List<Time> rowGroups();
 

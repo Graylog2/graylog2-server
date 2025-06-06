@@ -1,0 +1,4 @@
+type = "a"
+message = "Add optional ignoreExtraFieldNames parameter to csv_to_map pipeline function"
+
+pulls = ["19865"]

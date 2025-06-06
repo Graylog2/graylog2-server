@@ -1,0 +1,5 @@
+type = "c"
+message = "Log usage of deprecated pipeline functions, specifically `remove_field`."
+
+issues = ["19287"]
+pulls = ["21386"]

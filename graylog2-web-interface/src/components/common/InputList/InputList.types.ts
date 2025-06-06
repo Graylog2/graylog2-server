@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type GenericTarget<T> = Omit<HTMLInputElement, 'value'> & {
-  name: string,
-  value: T,
-}
+  name: string;
+  value: T;
+};
 
 export class GenericChangeEvent<T> extends Event implements React.ChangeEvent<GenericTarget<T>> {
   _target: GenericTarget<T>;

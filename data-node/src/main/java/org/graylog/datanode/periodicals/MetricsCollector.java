@@ -21,9 +21,9 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
 import org.graylog.datanode.metrics.NodeMetricsCollector;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
@@ -59,7 +59,6 @@ public class MetricsCollector extends Periodical {
     private NodeMetricsCollector nodeStatMetricsCollector;
     private ClusterStatMetricsCollector clusterStatMetricsCollector;
     private final ObjectMapper objectMapper;
-    private boolean isLeader;
 
     @Inject
     public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
@@ -110,8 +109,6 @@ public class MetricsCollector extends Periodical {
             process.restClient().ifPresent(client -> {
                 this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
-                this.isLeader = process.isLeaderNode();
-
                 final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
@@ -122,13 +119,12 @@ public class MetricsCollector extends Periodical {
                 indexRequest.source(metrics);
                 indexDocument(client, indexRequest);
 
-                if (isLeader) {
+                if (process.isManagerNode()) {
                     metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics(getPreviousMetricsForCluster(client)));
                     metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                     indexRequest.source(metrics);
                     indexDocument(client, indexRequest);
                 }
-
             });
         }
     }

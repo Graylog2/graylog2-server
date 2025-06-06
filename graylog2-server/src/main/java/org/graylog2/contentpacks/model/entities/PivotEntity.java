@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -104,7 +105,8 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .columnGroups(of())
                 .filters(Collections.emptyList())
                 .sort(of())
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     @AutoValue.Builder
@@ -114,7 +116,8 @@ public abstract class PivotEntity implements SearchTypeEntity {
             return builder()
                     .filters(Collections.emptyList())
                     .sort(Collections.emptyList())
-                    .streams(Collections.emptySet());
+                    .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet());
         }
 
         @JsonProperty
@@ -167,6 +170,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder streams(Set<String> streams);
 
         @Override
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
+        @Override
         public abstract PivotEntity build();
     }
 
@@ -176,6 +183,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
         var columnGroups = columnLimit().map(columnLimit -> applyGroupLimit(columnGroups(), columnLimit)).orElse(columnGroups());
         return Pivot.builder()
                 .streams(mappedStreams(nativeEntities))
+                .streamCategories(streamCategories())
                 .name(name().orElse(null))
                 .sort(sort())
                 .timerange(timerange().orElse(null))
@@ -185,10 +193,18 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .rollup(rollup())
                 .query(query().orElse(null))
                 .filter(filter())
-                .filters(convertSearchFilters(filters()))
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .type(type())
                 .id(id())
                 .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 
     private List<BucketSpec> applyGroupLimit(List<BucketSpec> bucketSpecs, int limit) {

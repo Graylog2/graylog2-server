@@ -24,7 +24,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.datanode.DataNodeService;
+import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class DataNodeManagementResourceTest {
     private DataNodeManagementResource classUnderTest;
 
     @Mock
-    private DataNodeService dataNodeService;
+    private DataNodeCommandService dataNodeCommandService;
     @Mock
     private NodeService<DataNodeDto> nodeService;
     @Mock
@@ -58,19 +58,19 @@ public class DataNodeManagementResourceTest {
 
     @Before
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService, true, auditEventSender, objectMapper);
+        classUnderTest = new DataNodeManagementResource(dataNodeCommandService, nodeService, true, auditEventSender, objectMapper);
     }
 
     @Test
     public void removeUnavailableNode_throwsNotFoundException() throws NodeNotFoundException {
-        doThrow(NodeNotFoundException.class).when(dataNodeService).removeNode(NODEID);
+        doThrow(NodeNotFoundException.class).when(dataNodeCommandService).removeNode(NODEID);
         Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.removeNode(NODEID, userContext));
         assertEquals("Node " + NODEID + " not found", e.getMessage());
     }
 
     @Test
     public void resetUnavailableNode_throwsNotFoundException() throws NodeNotFoundException {
-        doThrow(NodeNotFoundException.class).when(dataNodeService).resetNode(NODEID);
+        doThrow(NodeNotFoundException.class).when(dataNodeCommandService).resetNode(NODEID);
         Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.resetNode(NODEID));
         assertEquals("Node " + NODEID + " not found", e.getMessage());
     }
@@ -78,13 +78,13 @@ public class DataNodeManagementResourceTest {
     @Test
     public void verifyRemoveServiceCalled() throws NodeNotFoundException {
         classUnderTest.removeNode(NODEID, userContext);
-        verify(dataNodeService).removeNode(NODEID);
+        verify(dataNodeCommandService).removeNode(NODEID);
     }
 
     @Test
     public void verifyResetServiceCalled() throws NodeNotFoundException {
         classUnderTest.resetNode(NODEID);
-        verify(dataNodeService).resetNode(NODEID);
+        verify(dataNodeCommandService).resetNode(NODEID);
     }
 
 

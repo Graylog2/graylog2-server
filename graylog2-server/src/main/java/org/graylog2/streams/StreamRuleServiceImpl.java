@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -34,9 +35,6 @@ import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleReques
 import org.graylog2.streams.events.StreamsChangedEvent;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -202,5 +200,13 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     private StreamRule toStreamRule(DBObject dbObject) {
         final Map<String, Object> fields = dbObject.toMap();
         return new StreamRuleImpl((ObjectId) dbObject.get("_id"), fields);
+    }
+
+    @Override
+    public List<StreamRule> loadForInput(String inputId) {
+        final List<DBObject> respStreamRules = query(StreamRuleImpl.class,
+                new BasicDBObject(StreamRuleImpl.FIELD_VALUE, inputId)
+        );
+        return respStreamRules.stream().map(this::toStreamRule).collect(Collectors.toList());
     }
 }

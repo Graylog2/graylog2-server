@@ -26,26 +26,24 @@ import QueryResult from './QueryResult';
 import type { SearchErrorResponse } from './SearchError';
 import SearchError from './SearchError';
 import type { ResultWindowLimitErrorResponse } from './ResultWindowLimitError';
-import ResultWindowLimitError, {
-  isResultWindowLimitErrorResponse,
-} from './ResultWindowLimitError';
+import ResultWindowLimitError, { isResultWindowLimitErrorResponse } from './ResultWindowLimitError';
 
 type SearchId = string;
 
 type SearchJobId = string;
 type SearchExecution = {
-  cancelled: boolean,
-  completed_exceptionally: boolean,
-  done: boolean,
+  cancelled: boolean;
+  completed_exceptionally: boolean;
+  done: boolean;
 };
 
 export type SearchJobResult = {
-  execution: SearchExecution,
-  id: SearchJobId,
-  owner: string,
-  results: { [id: string]: any },
-  search_id: SearchId,
-  errors: Array<SearchErrorResponse>,
+  execution: SearchExecution;
+  id: SearchJobId;
+  owner: string;
+  results: { [id: string]: any };
+  search_id: SearchId;
+  errors: Array<SearchErrorResponse>;
 };
 
 class SearchResult {
@@ -60,13 +58,15 @@ class SearchResult {
 
     this._results = fromJS(mapValues(result.results, (queryResult) => new QueryResult(queryResult)));
 
-    this._errors = fromJS((result?.errors ?? []).map((error: SearchErrorResponse | ResultWindowLimitErrorResponse) => {
-      if (isResultWindowLimitErrorResponse(error)) {
-        return new ResultWindowLimitError(error, this);
-      }
+    this._errors = fromJS(
+      (result?.errors ?? []).map((error: SearchErrorResponse | ResultWindowLimitErrorResponse) => {
+        if (isResultWindowLimitErrorResponse(error)) {
+          return new ResultWindowLimitError(error, this);
+        }
 
-      return new SearchError(error);
-    }));
+        return new SearchError(error);
+      }),
+    );
   }
 
   get result(): SearchJobResult {
@@ -85,10 +85,14 @@ class SearchResult {
     return this._results.get(queryId);
   }
 
-  updateSearchTypes(searchTypeResults) {
+  withErrors(errors: Array<SearchErrorResponse> | undefined) {
+    return new SearchResult({ ...this.result, errors });
+  }
+
+  updateSearchTypes(searchTypeResults: SearchJobResult['results']) {
     const updatedResult = this.result;
 
-    searchTypeResults.forEach((searchTypeResult: { id: string; }) => {
+    searchTypeResults.forEach((searchTypeResult: { id: string }) => {
       const searchQuery = this._getQueryBySearchTypeId(searchTypeResult.id);
 
       updatedResult.results[searchQuery.query.id].search_types[searchTypeResult.id] = searchTypeResult;
@@ -108,11 +112,13 @@ class SearchResult {
   }
 
   _getQueryBySearchTypeId(searchTypeId: SearchTypeId) {
-    return Object.values(this.result.results).find((query) => SearchResult._getSearchTypeFromQuery(query, searchTypeId));
+    return Object.values(this.result.results).find((query) =>
+      SearchResult._getSearchTypeFromQuery(query, searchTypeId),
+    );
   }
 
   private static _getSearchTypeFromQuery(query, searchTypeId: SearchTypeId) {
-    return (query && query.search_types) ? query.search_types[searchTypeId] : undefined;
+    return query && query.search_types ? query.search_types[searchTypeId] : undefined;
   }
 
   private static _filterFailedSearchTypes(searchTypes) {

@@ -29,12 +29,13 @@ import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore'
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const sendTelemetry = useSendTelemetry();
 
-  const onSave = (stream: Stream) => {
+  const onSave = (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });
@@ -56,21 +57,20 @@ const StreamsPage = () => {
 
   return (
     <DocumentTitle title="Streams">
-      <PageHeader title="Streams"
-                  documentationLink={{
-                    title: 'Streams documentation',
-                    path: DocsHelper.PAGES.STREAMS,
-                  }}
-                  actions={(
-                    <IfPermitted permissions="streams:create">
-                      <CreateStreamButton bsStyle="success"
-                                          onCreate={onSave}
-                                          indexSets={indexSets} />
-                    </IfPermitted>
-                  )}>
+      <PageHeader
+        title="Streams"
+        documentationLink={{
+          title: 'Streams documentation',
+          path: DocsHelper.PAGES.STREAMS,
+        }}
+        actions={
+          <IfPermitted permissions="streams:create">
+            <CreateStreamButton bsStyle="success" onCreate={onSave} indexSets={indexSets} />
+          </IfPermitted>
+        }>
         <span>
-          You can route incoming messages into streams by applying rules against them. Messages matching
-          the rules of a stream are routed into it. A message can also be routed into multiple streams.
+          You can route incoming messages into streams by applying rules against them. Messages matching the rules of a
+          stream are routed into it. A message can also be routed into multiple streams.
         </span>
       </PageHeader>
 

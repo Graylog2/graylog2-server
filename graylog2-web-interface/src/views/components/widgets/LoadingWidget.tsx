@@ -25,6 +25,4 @@ const LoadingWidget = () => (
   </Center>
 );
 
-LoadingWidget.propTypes = {};
-
 export default LoadingWidget;

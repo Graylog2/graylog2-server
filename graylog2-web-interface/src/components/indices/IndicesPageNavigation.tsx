@@ -16,19 +16,32 @@
  */
 import * as React from 'react';
 
+import AppConfig from 'util/AppConfig';
 import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
-const NAV_ITEMS = [
-  { title: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  { title: 'Field Type Profiles', path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, exactPathMatch: false },
+const PREM_ONLY_NAV_ITEMS = [
+  { description: 'Index Set Templates', path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW, exactPathMatch: false },
 ];
 
-const IndicesPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
+const NAV_ITEMS = [
+  { description: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
+  {
+    description: 'Field Type Profiles',
+    path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
+    exactPathMatch: false,
+  },
+];
+
+const IndicesPageNavigation = () => {
+  const navItems = AppConfig.isCloud() ? NAV_ITEMS : [...NAV_ITEMS, ...PREM_ONLY_NAV_ITEMS];
+
+  return (
+    <Row>
+      <PageNavigation items={navItems} />
+    </Row>
+  );
+};
 
 export default IndicesPageNavigation;

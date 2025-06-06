@@ -19,30 +19,23 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { Traffic } from 'components/cluster/types';
 
 type ClusterTrafficStoreState = {
-  traffic: {
-    from: string,
-    to: string,
-    output: Record<string, number>,
-    input: Record<string, number>,
-    decoded: Record<string, number>,
-  },
+  traffic: Traffic;
 };
 type ClusterTrafficActionsType = {
-  getTraffic: (days: number) => Promise<ClusterTrafficStoreState>,
+  getTraffic: (days: number) => Promise<ClusterTrafficStoreState>;
 };
 
-export const ClusterTrafficActions = singletonActions(
-  'core.ClusterTraffic',
-  () => Reflux.createActions<ClusterTrafficActionsType>({
+export const ClusterTrafficActions = singletonActions('core.ClusterTraffic', () =>
+  Reflux.createActions<ClusterTrafficActionsType>({
     getTraffic: { asyncResult: true },
   }),
 );
 
-export const ClusterTrafficStore = singletonStore(
-  'core.ClusterTraffic',
-  () => Reflux.createStore<ClusterTrafficStoreState>({
+export const ClusterTrafficStore = singletonStore('core.ClusterTraffic', () =>
+  Reflux.createStore<ClusterTrafficStoreState>({
     listenables: [ClusterTrafficActions],
     traffic: undefined,
 

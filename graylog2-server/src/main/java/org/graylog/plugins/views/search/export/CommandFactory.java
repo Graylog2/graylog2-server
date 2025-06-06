@@ -16,17 +16,17 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.database.filtering.HasAttributeFilter;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.List;
@@ -89,6 +89,7 @@ public class CommandFactory {
                 .queryString(queryStringFrom(search, query, searchType))
                 .streams(query.effectiveStreams(searchType))
                 .usedSearchFilters(query.filters())
+                .attributeFilters(searchType instanceof HasAttributeFilter hasAttributeFilter ? hasAttributeFilter.attributes() : List.of())
                 .decorators(decorators);
 
         return commandBuilder.build();

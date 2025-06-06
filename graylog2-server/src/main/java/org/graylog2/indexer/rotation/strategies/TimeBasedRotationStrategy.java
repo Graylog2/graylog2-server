@@ -201,11 +201,11 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
         final String indexSetId = indexSetConfig.id();
         checkState(!isNullOrEmpty(index), "Index name must not be null or empty");
         checkState(!isNullOrEmpty(indexSetId), "Index set ID must not be null or empty");
-        checkState(indexSetConfig.rotationStrategy() instanceof TimeBasedRotationStrategyConfig,
+        checkState(indexSetConfig.rotationStrategyConfig() instanceof TimeBasedRotationStrategyConfig,
                 "Invalid rotation strategy config <%s> for index set <%s>"
-                , indexSetConfig.rotationStrategy().getClass().getCanonicalName(), indexSet);
+                , indexSetConfig.rotationStrategyConfig().getClass().getCanonicalName(), indexSet);
 
-        final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
+        final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategyConfig();
 
         final Pair<Period, Boolean> normalizedRotationPeriod = getNormalizedRotationPeriod(config);
         final Period normalizedPeriod = normalizedRotationPeriod.getLeft();

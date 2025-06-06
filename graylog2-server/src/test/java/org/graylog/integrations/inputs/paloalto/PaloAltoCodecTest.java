@@ -75,16 +75,16 @@ public class PaloAltoCodecTest {
 
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
 
-        Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
 
-        message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
 
-        message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
 
-        message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
     }
 
@@ -93,11 +93,11 @@ public class PaloAltoCodecTest {
 
         // Verify that a messages with a line break at the end does not break parsing.
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        Message message = codec.decode(new RawMessage(PANORAMA_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(PANORAMA_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("SYSTEM", message.getField("type"));
 
         codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        message = codec.decode(new RawMessage(SYSLOG_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
     }
 
@@ -107,7 +107,7 @@ public class PaloAltoCodecTest {
         // Test an extra list of messages.
         for (String threatString : MORE_SYSLOG_THREAT_MESSAGES) {
             PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-            Message message = codec.decode(new RawMessage(threatString.getBytes(StandardCharsets.UTF_8)));
+            Message message = codec.decodeSafe(new RawMessage(threatString.getBytes(StandardCharsets.UTF_8))).get();
             assertEquals("THREAT", message.getField("type"));
         }
     }
@@ -117,7 +117,7 @@ public class PaloAltoCodecTest {
 
         // Test System message results
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
     }
 
@@ -126,7 +126,7 @@ public class PaloAltoCodecTest {
 
         // Test System message results
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        Message message = codec.decode(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("SYSTEM", message.getField("type"));
         assertEquals(message.getField("module"), "general");
 
@@ -144,7 +144,7 @@ public class PaloAltoCodecTest {
         assertEquals(0, ((DateTime) message.getField("timestamp")).compareTo(new DateTime("2018-09-19T11:50:35.000-05:00", DateTimeZone.UTC)));
 
         // Test Traffic message results
-        message = codec.decode(new RawMessage(PANORAMA_TRAFFIC_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(PANORAMA_TRAFFIC_MESSAGE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals(message.getField("bytes_received"), 140L);
         assertEquals(message.getField("source"), "Panorama--2");
         assertEquals(message.getField("repeat_count"), 1L);

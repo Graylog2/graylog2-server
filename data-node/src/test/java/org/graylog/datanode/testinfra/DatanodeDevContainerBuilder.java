@@ -18,6 +18,7 @@ package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,13 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +51,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private String rootUsername = "admin";
     private String passwordSecret;
-    private String rootPasswordSha2;
     private String mongoDbUri;
     private int restPort = 8999;
     private int openSearchHttpPort = 9200;
@@ -57,6 +59,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
     private Map<String, String> env;
+    private PluginJarsProvider pluginJarsProvider;
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -71,12 +74,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder passwordSecret(final String passwordSecret) {
         this.passwordSecret = passwordSecret;
-        return this;
-    }
-
-    @Override
-    public org.graylog.testing.datanode.DatanodeDevContainerBuilder rootPasswordSha2(final String rootPasswordSha2) {
-        this.rootPasswordSha2 = rootPasswordSha2;
         return this;
     }
 
@@ -128,6 +125,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return this;
     }
 
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder pluginJarsProvider(PluginJarsProvider pluginJarsProvider) {
+        this.pluginJarsProvider = pluginJarsProvider;
+        return this;
+    }
+
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
         if (!Files.exists(graylog)) {
@@ -169,14 +172,18 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
                 .withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", rootUsername)
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
-                .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + restPort)
 
                 // disable disk threshold in tests, it causes problems in github builds where we don't have
                 // enough free space
-                .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
+                .withCopyToContainer(Transferable.of(
+                        """
+                                cluster.routing.allocation.disk.threshold_enabled=false
+                                """
+                ), IMAGE_WORKING_DIR + "/config/opensearch.overrides")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIGURATION_OVERRIDES_FILE", IMAGE_WORKING_DIR + "/config/opensearch.overrides")
 
                 .withNetworkAliases(nodeName)
                 .waitingFor(new LogMessageWaitStrategy()
@@ -198,6 +205,15 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
                 .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
+
+        if (pluginJarsProvider != null) {
+            pluginJarsProvider.getJars().forEach(hostPath -> {
+                if (Files.exists(hostPath)) {
+                    final Path containerPath = Paths.get(IMAGE_WORKING_DIR, "plugin", hostPath.getFileName().toString());
+                    container.withFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+                }
+            });
+        }
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;

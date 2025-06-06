@@ -19,7 +19,9 @@ package org.graylog2.cluster;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -27,11 +29,9 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
-import jakarta.validation.constraints.NotEmpty;
-
 @AutoValue
 @WithBeanGetter
-public abstract class ClusterConfig {
+public abstract class ClusterConfig implements MongoEntity {
     @Id
     @ObjectId
     @Nullable

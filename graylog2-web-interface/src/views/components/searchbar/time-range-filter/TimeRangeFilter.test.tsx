@@ -34,6 +34,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 describe('TimeRangeFilter', () => {
   beforeEach(() => {
@@ -53,7 +54,6 @@ describe('TimeRangeFilter', () => {
 
     const button = await screen.findByRole('button', {
       name: /open time range selector/i,
-      hidden: true,
     });
 
     fireEvent.click(button);
@@ -92,12 +92,16 @@ describe('TimeRangeFilter', () => {
     });
     fireEvent.change(fromValue, { target: { value: 30 } });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
+    const submitButton = await screen.findByRole('button', { name: 'Update time range' });
+    await waitFor(() => expect(submitButton).toBeEnabled());
+    fireEvent.click(submitButton);
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith({
-      from: 1800,
-      type: 'relative',
-    }));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith({
+        from: 1800,
+        type: 'relative',
+      }),
+    );
   });
 
   it('shows "No Override" if no time range is provided', async () => {
@@ -138,7 +142,14 @@ describe('TimeRangeFilter', () => {
   });
 
   it('allows hiding the dropdown button for quick-selecting presets', async () => {
-    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
+    render(
+      <SUTTimeRangeFilter
+        onChange={() => {}}
+        value={defaultTimeRange}
+        validTypes={['relative']}
+        showPresetDropdown={false}
+      />,
+    );
 
     await screen.findByText(/5 minutes ago/);
 

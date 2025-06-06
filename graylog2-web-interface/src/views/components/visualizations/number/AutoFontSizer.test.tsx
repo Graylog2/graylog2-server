@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import AutoFontSizer from './AutoFontSizer';
 
@@ -29,64 +29,69 @@ class TargetMock {
     this._offsetWidth = offsetWidth;
   }
 
-  get offsetHeight(): number { return this._offsetHeight(); }
+  get offsetHeight(): number {
+    return this._offsetHeight();
+  }
 
-  get offsetWidth(): number { return this._offsetWidth(); }
+  get offsetWidth(): number {
+    return this._offsetWidth();
+  }
 }
 
 describe('AutoFontSizer', () => {
-  it('uses default size if element does not provide dimensions', () => {
+  it('uses default size if element does not provide dimensions', async () => {
     const target = { current: undefined };
-    const wrapper = mount((
-      <AutoFontSizer width={300}
-                     height={300}
-                     target={target}>
+    render(
+      <AutoFontSizer width={300} height={300} target={target}>
         <span>Foo</span>
-      </AutoFontSizer>
-    ));
+      </AutoFontSizer>,
+    );
 
-    expect(wrapper.children().props().fontSize).toBe(20);
+    const text = await screen.findByText('Foo');
+
+    expect(text).toHaveStyle('font-size: 20');
   });
 
-  it('changes font size if initial guess was too small', () => {
+  it('changes font size if initial guess was too small', async () => {
     const target = new TargetMock(
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
     );
-    const wrapper = mount((
-      <AutoFontSizer width={300}
-                     height={300}
-                     target={target}>
+    render(
+      <AutoFontSizer width={300} height={300} target={target}>
         <span>Foo</span>
-      </AutoFontSizer>
-    ));
+      </AutoFontSizer>,
+    );
 
-    expect(wrapper.children().props().fontSize).toBe(42);
+    const text = await screen.findByText('Foo');
+
+    expect(text).toHaveStyle('font-size: 42');
   });
 
-  it('changes font size upon resize', () => {
+  it('changes font size upon resize', async () => {
     const target = new TargetMock(
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
     );
-    const wrapper = mount((
-      <AutoFontSizer width={300}
-                     height={300}
-                     target={target}>
+    const { rerender } = render(
+      <AutoFontSizer width={300} height={300} target={target}>
         <span>Foo</span>
-      </AutoFontSizer>
-    ));
+      </AutoFontSizer>,
+    );
 
-    expect(wrapper.children().props().fontSize).toBe(42);
+    expect(await screen.findByText('Foo')).toHaveStyle('font-size: 42');
 
     const postTarget = new TargetMock(
       jest.fn().mockReturnValueOnce(300).mockReturnValueOnce(125),
       jest.fn().mockReturnValueOnce(300).mockReturnValueOnce(125),
     );
 
-    wrapper.setProps({ height: 125, width: 125, target: postTarget });
-    wrapper.update();
+    rerender(
+      <AutoFontSizer width={125} height={125} target={postTarget}>
+        <span>Foo</span>
+      </AutoFontSizer>,
+    );
 
-    expect(wrapper.children().props().fontSize).toBe(11);
+    expect(await screen.findByText('Foo')).toHaveStyle('font-size: 11');
   });
 });

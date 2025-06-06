@@ -17,13 +17,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Col, Panel, PanelGroup } from 'components/bootstrap';
-import {
-  MIGRATION_STATE,
-  REMOTE_REINDEXING_MIGRATION_STEPS,
-} from 'components/datanode/Constants';
-import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
-import MigrationError from 'components/datanode/migrations/common/MigrationError';
+import { Col } from 'components/bootstrap';
+import { MIGRATION_STATE, REMOTE_REINDEXING_MIGRATION_STEPS } from 'components/datanode/Constants';
+import type {
+  MigrationActions,
+  StepArgs,
+  MigrationStateItem,
+  MigrationStepComponentProps,
+} from 'components/datanode/Types';
 
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
@@ -31,6 +32,7 @@ import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
 import CertificatesProvisioning from './common/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
+import MigrationStepsPanel from './common/MigrationStepsPanel';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -40,51 +42,43 @@ const StyledTitle = styled.h3`
   }
 `;
 
-const StyledPanelGroup = styled(PanelGroup)`
-  &.panel-group > .panel {
-    margin-top: 0;
-    border-color: ${(props) => props.theme.colors.input.border};
-    background-color: ${(props) => props.theme.colors.global.contentBackground};
-
-    .panel-heading {
-      background-color: ${(props) => props.theme.colors.table.row.backgroundAlt};
-    }
-
-    &:not(:first-child) {
-      border-top: 0;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
-
-    &:not(:last-child) {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-  }
-`;
-
 const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const { state: activeStep } = currentStep;
-
   const onStepComplete = async (step: MigrationActions, args: StepArgs = {}) => onTriggerStep(step, args);
 
-  const getStepComponent = (step: MigrationStateItem) => {
+  const renderStepComponent = (step: MigrationStateItem, hideActions: boolean) => {
     switch (step) {
       case MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key:
-        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key:
+        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
-        return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
+        return (
+          <CertificatesProvisioning
+            currentStep={currentStep}
+            onTriggerStep={onStepComplete}
+            hideActions={hideActions}
+          />
+        );
       case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
-        return <ExistingDataMigrationQuestion currentStep={currentStep} onTriggerStep={onStepComplete} />;
+        return (
+          <ExistingDataMigrationQuestion
+            currentStep={currentStep}
+            onTriggerStep={onStepComplete}
+            hideActions={hideActions}
+          />
+        );
       case MIGRATION_STATE.MIGRATE_EXISTING_DATA.key:
-        return <MigrateExistingData currentStep={currentStep} onTriggerStep={onStepComplete} />;
+        return (
+          <MigrateExistingData currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key:
-        return <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} />;
+        return (
+          <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
-        return <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
+        return (
+          <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       default:
-        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
+        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
     }
   };
 
@@ -92,25 +86,11 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
     <Col>
       <StyledTitle>Remote reindexing migration</StyledTitle>
       <p>Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.</p>
-      <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
-        {REMOTE_REINDEXING_MIGRATION_STEPS.map((remoteReindexingStep, index) => {
-          const { description } = MIGRATION_STATE[remoteReindexingStep];
-
-          return (
-            <Panel key={remoteReindexingStep} eventKey={remoteReindexingStep} collapsible={false}>
-              <Panel.Heading>
-                <Panel.Title>
-                  <Panel.Toggle tabIndex={index}>{`${index + 1}. ${description}`}</Panel.Toggle>
-                </Panel.Title>
-              </Panel.Heading>
-              <Panel.Body collapsible>
-                <MigrationError errorMessage={currentStep.error_message} />
-                {getStepComponent(remoteReindexingStep)}
-              </Panel.Body>
-            </Panel>
-          );
-        })}
-      </StyledPanelGroup>
+      <MigrationStepsPanel
+        currentStep={currentStep}
+        sortedMigrationSteps={REMOTE_REINDEXING_MIGRATION_STEPS}
+        renderStepComponent={renderStepComponent}
+      />
     </Col>
   );
 };

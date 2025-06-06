@@ -28,6 +28,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const sendTelemetry = useSendTelemetry();
@@ -44,28 +45,22 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
   const streamList = streams.map((stream) => {
     if (stream.is_default) {
       return (
-        <MenuItem key={stream.id}
-                  onClick={() => sendEvent()}
-                  disabled
-                  title="Cannot test against the default stream">{stream.title}
+        <MenuItem key={stream.id} onClick={() => sendEvent()} disabled title="Cannot test against the default stream">
+          {stream.title}
         </MenuItem>
       );
     }
 
     return (
-      <LinkContainer key={stream.id}
-                     to={Routes.stream_edit_example(stream.id, index, id)}>
+      <LinkContainer key={stream.id} to={Routes.stream_edit_example(stream.id, index, id)}>
         <MenuItem onClick={() => sendEvent()}>{stream.title}</MenuItem>
       </LinkContainer>
     );
   });
 
   return (
-    <DropdownButton pullRight
-                    bsSize="small"
-                    title="Test against stream"
-                    id="select-stream-dropdown">
-      {(streamList && !streamList.isEmpty()) ? streamList.toArray() : <MenuItem header>No streams available</MenuItem>}
+    <DropdownButton pullRight bsSize="small" title="Test against stream" id="select-stream-dropdown">
+      {streamList && !streamList.isEmpty() ? streamList.toArray() : <MenuItem header>No streams available</MenuItem>}
     </DropdownButton>
   );
 };
@@ -73,27 +68,25 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
 const usePluggableMessageActions = (id: string, index: string) => {
   const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
 
-  return pluggableMenuActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  ).map(
-    ({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />,
-  );
+  return pluggableMenuActions
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
 };
 
 type Props = {
-  index: string,
-  id: string,
+  index: string;
+  id: string;
   fields: {
-    [key: string]: unknown,
-  },
-  decorationStats: any,
-  disabled: boolean,
-  disableSurroundingSearch: boolean,
-  disableTestAgainstStream: boolean,
-  showOriginal: boolean,
-  toggleShowOriginal: () => void,
-  streams: Immutable.List<any>,
-  searchConfig: SearchesConfig,
+    [key: string]: unknown;
+  };
+  decorationStats: any;
+  disabled: boolean;
+  disableSurroundingSearch: boolean;
+  disableTestAgainstStream: boolean;
+  showOriginal: boolean;
+  toggleShowOriginal: () => void;
+  streams: Immutable.List<any>;
+  searchConfig: SearchesConfig;
 };
 
 const MessageActions = ({
@@ -115,24 +108,27 @@ const MessageActions = ({
     return <ButtonGroup />;
   }
 
-  const messageUrl = index ? Routes.message_show(index, id) : '#';
-
   const { timestamp, ...remainingFields } = fields;
 
   const surroundingSearchButton = disableSurroundingSearch || (
-    <SurroundingSearchButton id={id}
-                             timestamp={timestamp as string}
-                             searchConfig={searchConfig}
-                             messageFields={remainingFields} />
+    <SurroundingSearchButton
+      id={id}
+      timestamp={timestamp as string}
+      searchConfig={searchConfig}
+      messageFields={remainingFields}
+    />
   );
 
-  const showChanges = decorationStats
-    && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
+  const showChanges = decorationStats && (
+    <Button onClick={toggleShowOriginal} active={showOriginal}>
+      Show changes
+    </Button>
+  );
 
   return (
     <ButtonGroup>
       {showChanges}
-      <Button bsSize="small" href={messageUrl}>Permalink</Button>
+      <MessagePermalinkButton messageIndex={index} messageId={id} />
       {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />

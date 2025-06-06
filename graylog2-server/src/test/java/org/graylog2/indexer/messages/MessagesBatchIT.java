@@ -66,7 +66,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testIfLargeBatchesGetSplitUpOnCircuitBreakerExceptions() throws Exception {
+    public void testIfLargeBatchesGetSplitUpOnCircuitBreakerExceptions() {
         // This test assumes that ES is running with only 256MB heap size.
         // This will trigger the circuit breaker when we are trying to index large batches
         final int MESSAGECOUNT = 50;
@@ -93,7 +93,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(messageFactory.createMessage(i + message, "source", now()), indexSet));
+            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
         }
         return messageList;
     }

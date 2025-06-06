@@ -21,14 +21,14 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-public class V20230915095200_AddSimpleRegexTest extends BaseFragmentTest {
+class V20230915095200_AddSimpleRegexTest extends BaseFragmentTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
         functions.put(RegexMatch.NAME, new RegexMatch());
@@ -36,7 +36,7 @@ public class V20230915095200_AddSimpleRegexTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testSimpleRegex() {
+    void testSimpleRegex() {
         RuleFragment fragment = V20230915095200_AddSimpleRegex.createSimpleRegex();
         Map<String, Object> params = Map.of("pattern", "^([a-zA-z]+)\\\\s(\\\\d+)$", "value", "Answer 42");
         createFragmentSource(fragment, params);

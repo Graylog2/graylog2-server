@@ -98,10 +98,13 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
     public static Comparator<IndexSetFieldType> getComparator(final String sort,
                                                               final Sorting.Direction order) {
         final Comparator<IndexSetFieldType> comparator = switch (sort) {
-            case TYPE -> Comparator.comparing(IndexSetFieldType::type);
-            case IS_RESERVED -> Comparator.comparing(IndexSetFieldType::isReserved);
-            case ORIGIN -> Comparator.comparing(IndexSetFieldType::origin);
-            default -> Comparator.comparing(IndexSetFieldType::fieldName);
+            case TYPE -> Comparator.comparing(IndexSetFieldType::type, Comparator.nullsLast(Comparator.naturalOrder()));
+            case IS_RESERVED ->
+                    Comparator.comparing(IndexSetFieldType::isReserved, Comparator.nullsLast(Comparator.naturalOrder()));
+            case ORIGIN ->
+                    Comparator.comparing(IndexSetFieldType::origin, Comparator.nullsLast(Comparator.naturalOrder()));
+            default ->
+                    Comparator.comparing(IndexSetFieldType::fieldName, Comparator.nullsLast(Comparator.naturalOrder()));
         };
 
         if (order == Sorting.Direction.DESC) {

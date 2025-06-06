@@ -23,48 +23,45 @@ describe('CollectorConfigurationModal', () => {
   const renderModal = (
     show: boolean = false,
     collectorName: string = '',
-    sidecarNames : string[] = [],
+    sidecarNames: string[] = [],
     assignedConfigs: string[] = [],
   ) => (
-    <CollectorConfigurationModal show={show}
-                                 selectedCollectorName={collectorName}
-                                 selectedSidecarNames={sidecarNames}
-                                 initialAssignedConfigs={assignedConfigs}
-                                 initialPartiallyAssignedConfigs={[]}
-                                 unassignedConfigs={[]}
-                                 onCancel={() => {}}
-                                 onSave={() => {}}
-                                 getRowData={() => ({
-                                   configuration: {
-                                     id: 'id',
-                                     name: 'name',
-                                     color: 'black',
-                                     template: '',
-                                     collector_id: '',
-                                     tags: [],
-                                   },
-                                   collector: {
-                                     id: 'id',
-                                     name: 'name',
-                                     node_operating_system: 'mac',
-                                     service_type: '',
-                                     validation_parameters: '',
-                                     executable_path: '',
-                                     execute_parameters: '',
-                                     default_template: '',
-                                   },
-                                   sidecars: [],
-                                   autoAssignedTags: [],
-                                 })} />
+    <CollectorConfigurationModal
+      show={show}
+      selectedCollectorName={collectorName}
+      selectedSidecarNames={sidecarNames}
+      initialAssignedConfigs={assignedConfigs}
+      initialPartiallyAssignedConfigs={[]}
+      unassignedConfigs={[]}
+      onCancel={() => {}}
+      onSave={() => {}}
+      getRowData={() => ({
+        configuration: {
+          id: 'id',
+          name: 'name',
+          color: 'black',
+          template: '',
+          collector_id: '',
+          tags: [],
+        },
+        collector: {
+          id: 'id',
+          name: 'name',
+          node_operating_system: 'mac',
+          service_type: '',
+          validation_parameters: '',
+          executable_path: '',
+          execute_parameters: '',
+          default_template: '',
+        },
+        sidecars: [],
+        autoAssignedTags: [],
+      })}
+    />
   );
 
   it('Should only open modal when show is true', () => {
-    render(
-      renderModal(
-        false,
-        'collector1',
-      ),
-    );
+    render(renderModal(false, 'collector1'));
 
     const modalTitle = screen.queryByText(/collector1/i);
 
@@ -72,13 +69,7 @@ describe('CollectorConfigurationModal', () => {
   });
 
   it('Should display in the title the collector name and the selected sidecar names', () => {
-    render(
-      renderModal(
-        true,
-        'collector1',
-        ['sidecar1', 'sidecar2'],
-      ),
-    );
+    render(renderModal(true, 'collector1', ['sidecar1', 'sidecar2']));
 
     const modalTitle = screen.queryByText(/collector1/i);
     const modalSubTitle = screen.queryByText(/sidecar1, sidecar2/i);
@@ -88,13 +79,7 @@ describe('CollectorConfigurationModal', () => {
   });
 
   it('Should display empty list message and a possibility to create a new config', () => {
-    render(
-      renderModal(
-        true,
-        'collector1',
-        ['sidecar1', 'sidecar2'],
-      ),
-    );
+    render(renderModal(true, 'collector1', ['sidecar1', 'sidecar2']));
 
     const emptyListMasg = screen.queryByText(/No configurations available for the selected log collector./i);
     const addNewConfig = screen.queryByText(/Add a new configuration/i);
@@ -104,14 +89,7 @@ describe('CollectorConfigurationModal', () => {
   });
 
   it('Should display assigned config names', () => {
-    render(
-      renderModal(
-        true,
-        'collector1',
-        ['sidecar1', 'sidecar2'],
-        ['config1', 'config2', 'config3'],
-      ),
-    );
+    render(renderModal(true, 'collector1', ['sidecar1', 'sidecar2'], ['config1', 'config2', 'config3']));
 
     const config1 = screen.queryByText(/config1/i);
     const config2 = screen.queryByText(/config2/i);

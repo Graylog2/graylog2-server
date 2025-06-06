@@ -21,34 +21,34 @@ import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import SurroundingSearchButton from './SurroundingSearchButton';
 
-const getOption = (optionText) => {
-  const button = screen.getByRole('button', { name: /show surrounding messages/i });
+const getOption = async (optionText: string) => {
+  const button = await screen.findByRole('button', { name: /show surrounding messages/i });
 
   fireEvent.click(button);
 
-  return screen.getByRole('menuitem', { name: new RegExp(optionText, 'i') });
+  return screen.findByRole('menuitem', { name: new RegExp(optionText, 'i') });
 };
 
 describe('SurroundingSearchButton', () => {
   const searchConfig = {
-    surrounding_filter_fields: [
-      'somefield',
-      'someotherfield',
-    ],
+    surrounding_filter_fields: ['somefield', 'someotherfield'],
     surrounding_timerange_options: {
       PT1S: '1 second',
       PT1M: 'Only a minute',
     },
   };
   const TestComponent = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>>) => (
-    <SurroundingSearchButton searchConfig={searchConfig}
-                             timestamp="2020-02-28T09:45:31.123Z"
-                             id="foo-bar"
-                             messageFields={{}}
-                             {...props} />
+    <SurroundingSearchButton
+      searchConfig={searchConfig}
+      timestamp="2020-02-28T09:45:31.123Z"
+      id="foo-bar"
+      messageFields={{}}
+      {...props}
+    />
   );
 
-  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) => render(<TestComponent {...props} />);
+  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) =>
+    render(<TestComponent {...props} />);
 
   it('renders a button with a "Show surrounding messages" caption', () => {
     renderButton();
@@ -56,88 +56,90 @@ describe('SurroundingSearchButton', () => {
     expect(screen.getByText('Show surrounding messages')).toBeTruthy();
   });
 
-  it('shows a dropdown after clicking the button', () => {
+  it('shows a dropdown after clicking the button', async () => {
     renderButton();
     const button = screen.getByText('Show surrounding messages');
 
     fireEvent.click(button);
 
-    expect(screen.getByText('Only a minute')).toBeTruthy();
-    expect(screen.getByText('1 second')).toBeTruthy();
+    await screen.findByText('Only a minute');
+    await screen.findByText('1 second');
   });
 
-  it('one second option has a valid url', () => {
+  it('one second option has a valid url', async () => {
     renderButton();
 
-    const oneSecond = getOption('1 second');
+    const oneSecond = await getOption('1 second');
 
     expect(asElement(oneSecond, HTMLAnchorElement).href).toEqual(
       'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A45%3A30.123Z&to=2020-02-28T09%3A45%3A32.123Z&highlightMessage=foo-bar',
     );
   });
 
-  it('"Only a minute" option has a valid url', () => {
+  it('"Only a minute" option has a valid url', async () => {
     renderButton();
 
-    const onlyAMinute = asElement(getOption('Only a minute'), HTMLAnchorElement);
+    const onlyAMinute = asElement(await getOption('Only a minute'), HTMLAnchorElement);
 
     expect(onlyAMinute.href).toEqual(
       'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A44%3A31.123Z&to=2020-02-28T09%3A46%3A31.123Z&highlightMessage=foo-bar',
     );
   });
 
-  it('the option opens the link in a new page', () => {
+  it('the option opens the link in a new page', async () => {
     renderButton();
 
-    const option = asElement(getOption('1 second'), HTMLAnchorElement);
+    const option = asElement(await getOption('1 second'), HTMLAnchorElement);
 
     expect(option.target).toEqual('_blank');
     expect(option.rel).toEqual('noopener noreferrer');
   });
 
-  it('the "1 second" option has a valid url', () => {
+  it('the "1 second" option has a valid url', async () => {
     renderButton({
       messageFields: {
         somefield: '42',
       },
     });
 
-    const option = asElement(getOption('1 second'), HTMLAnchorElement);
+    const option = asElement(await getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).toContain('q=somefield%3A%2242%22');
     expect(option.href).not.toContain('someotherfield');
   });
 
-  it('adds a query parameter for highlighting the id of the current message', () => {
+  it('adds a query parameter for highlighting the id of the current message', async () => {
     renderButton();
 
-    const option = asElement(getOption('1 second'), HTMLAnchorElement);
+    const option = asElement(await getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).toContain('highlightMessage=foo-bar');
   });
 
-  it('includes current set of streams in generated urls', () => {
+  it('includes current set of streams in generated urls', async () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
 
-    render((
+    render(
       <DrilldownContext.Consumer>
         {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
             <TestComponent />
           </DrilldownContext.Provider>
         )}
-      </DrilldownContext.Consumer>
-    ));
+      </DrilldownContext.Consumer>,
+    );
 
-    const option = asElement(getOption('1 second'), HTMLAnchorElement);
+    const option = asElement(await getOption('1 second'), HTMLAnchorElement);
 
-    expect(option.href).toContain('streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c');
+    expect(option.href).toContain(
+      'streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c',
+    );
   });
 
-  it('does not include a `streams` key in generated urls if none are selected', () => {
+  it('does not include a `streams` key in generated urls if none are selected', async () => {
     renderButton();
 
-    const option = asElement(getOption('1 second'), HTMLAnchorElement);
+    const option = asElement(await getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).not.toContain('streams=');
   });

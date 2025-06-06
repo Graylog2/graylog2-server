@@ -1,0 +1,4 @@
+type = "c"
+message = "Improving API error responses for JSON parsing failures."
+
+pulls = ["19367"]

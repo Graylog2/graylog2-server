@@ -109,6 +109,9 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -126,6 +129,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.MultiGrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
@@ -144,6 +148,7 @@ import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
+import org.graylog.plugins.pipelineprocessor.parser.InternalPipelineFunctions;
 import org.graylog2.plugin.PluginModule;
 
 public class ProcessorFunctionsModule extends PluginModule {
@@ -179,6 +184,9 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RenameField.NAME, RenameField.class);
         addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
+        addMessageProcessorFunction(RemoveSingleField.NAME, RemoveSingleField.class);
+        addMessageProcessorFunction(RemoveMultipleFields.NAME, RemoveMultipleFields.class);
+        addMessageProcessorFunction(RemoveStringFieldsByValue.NAME, RemoveStringFieldsByValue.class);
         addMessageProcessorFunction(NormalizeFields.NAME, NormalizeFields.class);
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
@@ -197,6 +205,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
         addMessageProcessorFunction(RegexReplace.NAME, RegexReplace.class);
         addMessageProcessorFunction(GrokMatch.NAME, GrokMatch.class);
+        addMessageProcessorFunction(MultiGrokMatch.NAME, MultiGrokMatch.class);
         addMessageProcessorFunction(GrokExists.NAME, GrokExists.class);
 
         // string functions
@@ -319,12 +328,23 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(binder(), name, functionClass);
     }
 
+    protected void addInternalMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
+        addInternalMessageProcessorFunction(binder(), name, functionClass);
+    }
+
     public static MapBinder<String, Function<?>> processorFunctionBinder(Binder binder) {
         return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<>() {});
     }
 
+    public static MapBinder<String, Function<?>> processorInternalFunctionBinder(Binder binder) {
+        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<>() {}, InternalPipelineFunctions.class);
+    }
+
     public static void addMessageProcessorFunction(Binder binder, String name, Class<? extends Function<?>> functionClass) {
         processorFunctionBinder(binder).addBinding(name).to(functionClass);
+    }
 
+    public static void addInternalMessageProcessorFunction(Binder binder, String name, Class<? extends Function<?>> functionClass) {
+        processorInternalFunctionBinder(binder).addBinding(name).to(functionClass);
     }
 }

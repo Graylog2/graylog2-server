@@ -15,10 +15,10 @@ Here is a summary of what to do if you just want to document a component:
 3. Each `propType` definition **must** be preceded by its documentation. Pay
    special attention to:
 
-    - Document data structures the component expect in array and object props
-    - Document when a callback function will be called. This is specially
-      helpful if the prop name is not as clear as it should be
-    - Document arguments any callback functions will receive
+   - Document data structures the component expect in array and object props
+   - Document when a callback function will be called. This is specially
+     helpful if the prop name is not as clear as it should be
+   - Document arguments any callback functions will receive
 
 4. In order to write a usage example of the component, you need to create a
    [Markdown](https://en.wikipedia.org/wiki/Markdown) file in the same directory

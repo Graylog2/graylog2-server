@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Sorting custom field mappings has been fixed, it does not fail on null values anymore."
+
+issues = ["19694"]
+pulls = ["19960"]
+

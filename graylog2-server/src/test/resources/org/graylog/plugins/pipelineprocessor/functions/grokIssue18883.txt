@@ -1,0 +1,13 @@
+rule "grokIssue18883"
+when true
+then
+  let e = grok (
+    pattern: "%{DATA:vendor_attack} against (?:server )?%{IP:destination_ip} (from %{IP:source_ip} )?detected(. %{NONNEGINT:packets:long})?",
+    // The message is deliberately missing a packets:long value at the end to test the behavior of our Grok library.
+    value: "DDOS against server 10.0.1.34 detected.",
+    only_named_captures: true
+  );
+  // Provide access to the raw Grok matches so we can verify the Grok library behavior.
+  set_field(field: "__grok_map", value: e);
+  set_fields(fields: e);
+end

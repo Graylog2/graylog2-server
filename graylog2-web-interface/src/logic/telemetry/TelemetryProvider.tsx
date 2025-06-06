@@ -25,6 +25,7 @@ import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStor
 import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
 import type { TelemetryDataType } from 'logic/telemetry/useTelemetryData';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
+import AppConfig from 'util/AppConfig';
 
 const getGlobalProps = (telemetryData: TelemetryDataType) => {
   const {
@@ -56,11 +57,11 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
   };
 };
 
-const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
+const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const theme = useTheme();
 
-  const isPosthogLoaded = useCallback(() => (posthog?.__loaded === true), [posthog]);
+  const isPosthogLoaded = useCallback(() => posthog?.__loaded === true, [posthog]);
 
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
@@ -68,11 +69,8 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
 
   useEffect(() => {
     const app_pathname = getPathnameWithoutId(window.location.pathname);
-
     const setGroup = () => {
-      if (isTelemetryDataLoaded
-        && telemetryData
-        && telemetryData.user_telemetry_settings?.telemetry_enabled) {
+      if (isTelemetryDataLoaded && telemetryData?.user_telemetry_settings?.telemetry_enabled) {
         const {
           cluster: { cluster_id: clusterId, ...clusterDetails },
           current_user: { user },
@@ -114,16 +112,26 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
             ...globalProps,
             app_theme: theme.mode,
           });
-        } catch {
+        } catch (e) {
           // eslint-disable-next-line no-console
-          console.warn('Could not capture telemetry event.');
+          console.warn('Could not capture telemetry event: ', e);
         }
       }
     };
 
-    return ({
+    const sendErrorReport = (error: unknown) => {
+      try {
+        posthog.captureException(error);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Unable to report exception: ', e);
+      }
+    };
+
+    return {
       sendTelemetry,
-    });
+      sendErrorReport,
+    };
   }, [globalProps, isPosthogLoaded, posthog, theme.mode]);
 
   const handleConfirmTelemetryDialog = () => {
@@ -137,10 +145,14 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   return (
     <TelemetryContext.Provider value={TelemetryContextValue}>
       {children}
-      {showTelemetryInfo
-        && <TelemetryInfoModal show={showTelemetryInfo} onConfirm={() => handleConfirmTelemetryDialog()} />}
+      {showTelemetryInfo && (
+        <TelemetryInfoModal show={showTelemetryInfo} onConfirm={() => handleConfirmTelemetryDialog()} />
+      )}
     </TelemetryContext.Provider>
   );
 };
 
+const isTelemetryEnabled = AppConfig?.telemetry()?.enabled;
+const TelemetryProvider = ({ children }) =>
+  isTelemetryEnabled ? <PostHogTelemetryProvider>{children}</PostHogTelemetryProvider> : children;
 export default TelemetryProvider;

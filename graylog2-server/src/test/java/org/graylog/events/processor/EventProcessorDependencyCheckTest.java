@@ -19,6 +19,7 @@ package org.graylog.events.processor;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -52,7 +53,7 @@ public class EventProcessorDependencyCheckTest {
 
     @Before
     public void setUp() throws Exception {
-        stateService = new DBEventProcessorStateService(mongodb.mongoConnection(), objectMapperProvider);
+        stateService = new DBEventProcessorStateService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
         dependencyCheck = new EventProcessorDependencyCheck(stateService, dbProcessingStatusService);
     }
 

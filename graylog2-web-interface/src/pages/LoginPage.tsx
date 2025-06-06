@@ -30,6 +30,7 @@ import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useProductName from 'brand-customization/useProductName';
 
 import LoadingPage from './LoadingPage';
 
@@ -64,19 +65,23 @@ type ErrorFallbackProps = {
 
 const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   const isCloud = AppConfig.isCloud();
+  const productName = useProductName();
 
   return (
     <Alert bsStyle="danger">
       {isCloud ? (
-        <p>Error loading login screen, please contact your Graylog account manager.</p>
+        <p>Error loading login screen, please contact your {productName} account manager.</p>
       ) : (
         <>
           <p>
-            Error using active authentication service login. Please check its configuration or contact your
-            Graylog account manager. Error details:
+            Error using active authentication service login. Please check its configuration or contact your{' '}
+            {productName}
+            account manager. Error details:
           </p>
           <StyledPre>{error.message}</StyledPre>
-          <Button bsStyle="danger" onClick={resetErrorBoundary}>Login with default method</Button>
+          <Button bsStyle="danger" onClick={resetErrorBoundary}>
+            Login with default method
+          </Button>
         </>
       )}
     </Alert>
@@ -111,7 +116,11 @@ const LoginPage = () => {
   const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
 
   const registeredLoginComponents = usePluginEntities('loginProviderType');
-  const loginComponent = useMemo(() => registeredLoginComponents.find((c) => c.type === activeBackend), [activeBackend, registeredLoginComponents]);
+  const loginComponent = useMemo(
+    () => registeredLoginComponents.find((c) => c.type === activeBackend),
+    [activeBackend, registeredLoginComponents],
+  );
+  const loginComponentTitle = loginComponent?.title ?? loginComponent?.type.replace(/^\w/, (c) => c.toUpperCase());
   const CustomLogin = loginComponent?.formComponent;
   const hasCustomLogin = CustomLogin !== undefined;
 
@@ -126,9 +135,10 @@ const LoginPage = () => {
   const PluggableLoginForm = useCallback(() => {
     if (!useFallback && CustomLogin) {
       return (
-        <ErrorBoundary FallbackComponent={ErrorFallback}
-                       onError={() => setEnableExternalBackend(false)}
-                       onReset={() => setUseFallback(true)}>
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onError={() => setEnableExternalBackend(false)}
+          onReset={() => setUseFallback(true)}>
           <CustomLogin onErrorChange={setLastError} setLoginFormState={setLoginFormState} />
         </ErrorBoundary>
       );
@@ -152,30 +162,24 @@ const LoginPage = () => {
   }, [lastError, resetLastError]);
 
   if (!didValidateSession || !isBackendDetermined) {
-    return (
-      <LoadingPage />
-    );
+    return <LoadingPage />;
   }
 
-  const shouldDisplayFallbackLink = hasCustomLogin
-  && enableExternalBackend
-  && !isCloud
-  && loginFormState === LOGIN_INITIALIZED_STATE;
+  const shouldDisplayFallbackLink =
+    hasCustomLogin && enableExternalBackend && !isCloud && loginFormState === LOGIN_INITIALIZED_STATE;
 
   return (
-    (
-      <DocumentTitle title="Sign in">
-        <LoginChrome>
-          <LastError />
-          <PluggableLoginForm />
-          {shouldDisplayFallbackLink && (
+    <DocumentTitle title="Sign in">
+      <LoginChrome>
+        <LastError />
+        <PluggableLoginForm />
+        {shouldDisplayFallbackLink && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+            {`Login with ${useFallback ? loginComponentTitle : 'default method'}`}
           </StyledButton>
-          )}
-        </LoginChrome>
-      </DocumentTitle>
-    )
+        )}
+      </LoginChrome>
+    </DocumentTitle>
   );
 };
 

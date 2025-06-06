@@ -18,7 +18,7 @@ package org.graylog2.migrations;
 
 public enum MigrationType {
     /**
-     * Will run _before_ the preflight interface starts
+     * Will run _before_ preflight checks and before the preflight interface starts
      */
     PREFLIGHT,
     /**

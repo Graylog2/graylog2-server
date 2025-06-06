@@ -30,12 +30,13 @@ public class SearchQueryField {
     public enum Type {
         STRING(value -> value),
         DATE(value -> dateParser.parseDate(value)),
+        DOUBLE(value -> Double.parseDouble(value)),
         INT(value -> Integer.parseInt(value)),
         LONG(value -> Long.parseLong(value)),
         OBJECT_ID(value -> new ObjectId(value)),
         BOOLEAN(value -> Boolean.parseBoolean(value));
 
-        public static final Collection<Type> NUMERIC_TYPES = List.of(DATE, LONG, INT);
+        public static final Collection<Type> NUMERIC_TYPES = List.of(DATE, LONG, INT, DOUBLE);
 
         private final Function<String, Object> mongoValueConverter;
 

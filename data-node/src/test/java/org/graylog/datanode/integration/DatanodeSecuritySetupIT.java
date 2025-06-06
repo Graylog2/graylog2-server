@@ -16,16 +16,14 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
-import org.graylog.datanode.restoperations.DatanodeRestApiWait;
-import org.graylog.datanode.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.testing.restoperations.DatanodeRestApiWait;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.plugin.Tools;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -43,7 +40,6 @@ import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
-import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT;
 
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
@@ -53,22 +49,18 @@ public class DatanodeSecuritySetupIT {
     private DatanodeContainerizedBackend backend;
     private KeyStore trustStore;
     private String containerHostname;
-    private String restAdminUsername;
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
-
-        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
-
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
-        KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
+        FilesystemKeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
         trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         // use the CA to generate transport certificate keystore
-        final KeystoreInformation transportCert = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, containerHostname);
+        final FilesystemKeystoreInformation transportCert = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, containerHostname);
         // use the CA to generate HTTP certificate keystore
-        final KeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
+        final FilesystemKeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(containerHostname, datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -77,12 +69,12 @@ public class DatanodeSecuritySetupIT {
 
             // configure transport security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", transportCert.passwordAsString());
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", new String(transportCert.password()));
             datanodeContainer.withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "false");
 
             // configure http security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", httpCert.passwordAsString());
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", new String(httpCert.password()));
 
             // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
             // to be able to reach opensearch from outside the container and docker network (true?)
@@ -94,8 +86,6 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
-
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
         }).start();
     }
 
@@ -106,12 +96,10 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
-        final String jwtAuthToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
-
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, restAdminUsername, ROOT_PASSWORD_PLAINTEXT);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
-            given().header( "Authorization", "Bearer " + jwtAuthToken)
+            given().header("Authorization", DatanodeContainerizedBackend.JWT_AUTH_TOKEN.headerValue().get())
                     .trustStore(trustStore)
                     .get("https://localhost:" + backend.getOpensearchRestPort())
                     .then().assertThat()
@@ -123,15 +111,14 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, String authUsername, String authPassword) throws ExecutionException, RetryException {
+    private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore) throws ExecutionException, RetryException {
 
         try {
             return new DatanodeRestApiWait(
                     RestOperationParameters.builder()
                             .port(datanodeRestPort)
                             .truststore(trustStore)
-                            .username(authUsername)
-                            .password(authPassword)
+                            .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                             .build())
                     .waitForAvailableStatus();
         } catch (Exception ex) {

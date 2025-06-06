@@ -64,7 +64,8 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField {
     }
 
     public static Builder builder() {
-        return new AutoValue_Percentage.Builder().type(Percentage.NAME);
+        return new AutoValue_Percentage.Builder()
+                .type(Percentage.NAME);
     }
 
     @AutoValue.Builder

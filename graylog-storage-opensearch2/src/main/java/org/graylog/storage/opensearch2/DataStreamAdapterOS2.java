@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
@@ -27,9 +28,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteDataSt
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
@@ -123,9 +126,27 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         try {
             client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
         } catch (Exception e) {
-            log.debug("Could not set replicas for .opendistro-job-scheduler-locl system index. It might not exist yet.");
+            log.debug("Could not set replicas for .opendistro-job-scheduler-lock system index. It might not exist yet.");
         }
         req.indices(dataStreamName);
+
+        PutIndexTemplateRequest templateRequest = new PutIndexTemplateRequest("data-stream-system-indices");
+        templateRequest.patterns(List.of(".opendistro-job-scheduler-lock"));
+        templateRequest.settings(Settings.builder().put("number_of_replicas", replicas).build());
+        try {
+            client.execute((c, requestOptions) -> c.indices().putTemplate(templateRequest, requestOptions));
+        } catch (Exception e) {
+            log.debug("Could not set replicas for data stream system indices");
+        }
+
+        ClusterUpdateSettingsRequest settingsRequest = new ClusterUpdateSettingsRequest();
+        settingsRequest.persistentSettings(Settings.builder().put("opendistro.index_state_management.history.number_of_replicas", replicas).build());
+        try {
+            client.execute((c, requestOptions) -> c.cluster().putSettings(settingsRequest, requestOptions));
+        } catch (Exception e) {
+            log.debug("Could not set default replicas for ism history");
+        }
+
         try {
             client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
         } catch (Exception e) {

@@ -17,7 +17,6 @@
 export { default as Badge } from './Badge';
 export { default as Button } from './Button';
 export { default as Col } from './Col';
-export { default as Dropzone } from './Dropzone';
 export { default as FormikInput } from './FormikTextInput';
 export { default as Grid } from './Grid';
 export { default as Input } from './Input';
@@ -29,14 +28,4 @@ export { default as Space } from './Space';
 export { default as Tabs } from './Tabs';
 export { default as TextInput } from './TextInput';
 export { default as Title } from './Title';
-export {
-  Anchor,
-  AppShell,
-  Box,
-  Divider,
-  Group,
-  NumberInput,
-  Text,
-  UnstyledButton,
-  Collapse,
-} from '@mantine/core';
+export { Anchor, AppShell, Box, Divider, Group, NumberInput, Text, UnstyledButton, Collapse } from '@mantine/core';

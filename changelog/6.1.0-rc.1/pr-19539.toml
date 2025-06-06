@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Datanode UI fixes"
+
+issues = ["19467", "19477"]
+pulls = ["19539"]

@@ -57,7 +57,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
         addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
         addMigration(V20220818112023_AddStreamMatcherToProcessingOrderMigration.class);
-        addMigration(V202211021200_CreateDefaultIndexDefaultsConfig.class);
+        addMigration(V202211021200_CreateDefaultIndexTemplate.class);
         addMigration(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
         addMigration(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
         addMigration(V20230220095500_MigrateStartPageObjectReferencesToGRNbyRemoval.class);
@@ -69,5 +69,11 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230601104500_AddSourcesPageV2.class);
         addMigration(V20230904073300_MigrateThemePreferences.class);
         addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
+        addMigration(V202404170856_UpdateIndexSetTemplates.class);
+        addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
+        addMigration(V20250304102900_ScopeMigration.class);
+        addMigration(V20250206105400_TokenManagementConfiguration.class);
+        addMigration(V20250219134200_DefaultTTLForNewTokens.class);
+        addMigration(V20250506090000_AddInputTypesPermissions.class);
     }
 }

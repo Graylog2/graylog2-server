@@ -16,19 +16,18 @@
  */
 import * as React from 'react';
 import { cloneElement, useCallback, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Popover from 'components/common/Popover';
 
 type Props = {
-  id: string,
-  placement?: 'top' | 'right' | 'bottom' | 'left',
-  title?: string,
-  triggerNode: React.ReactElement,
-  color: string,
-  colors?: Array<Array<string>>,
-  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void,
+  id: string;
+  placement?: 'top' | 'right' | 'bottom' | 'left';
+  title?: string;
+  triggerNode: React.ReactElement;
+  color: string;
+  colors?: Array<Array<string>>;
+  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void;
 };
 
 /**
@@ -40,17 +39,29 @@ type Props = {
  * is left for that component. Please look at `ColorPicker`'s documentation for more
  * information.
  */
-const ColorPickerPopover = ({ id, placement, title, triggerNode, onChange, ...rest }: Props) => {
+const ColorPickerPopover = ({
+  id,
+  placement = 'bottom',
+  title = 'Pick a color',
+  triggerNode,
+  onChange,
+  ...rest
+}: Props) => {
   const [show, setShow] = useState(false);
   const toggleTarget = useRef();
 
-  const handleToggle = useCallback(() => { setShow(!show); }, [show]);
+  const handleToggle = useCallback(() => {
+    setShow(!show);
+  }, [show]);
 
   const onClose = useCallback(() => setShow(false), []);
 
-  const handleChange = useCallback((newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(newColor, event, handleToggle);
-  }, [handleToggle, onChange]);
+  const handleChange = useCallback(
+    (newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(newColor, event, handleToggle);
+    },
+    [handleToggle, onChange],
+  );
 
   return (
     <Popover id={id} opened={show} position={placement} onClose={onClose}>
@@ -62,35 +73,10 @@ const ColorPickerPopover = ({ id, placement, title, triggerNode, onChange, ...re
       </Popover.Target>
 
       <Popover.Dropdown title={title}>
-        <ColorPicker onChange={handleChange}
-                     {...rest} />
+        <ColorPicker onChange={handleChange} {...rest} />
       </Popover.Dropdown>
     </Popover>
   );
-};
-
-ColorPickerPopover.propTypes = {
-  /** Provides an ID for this popover element. */
-  id: PropTypes.string.isRequired,
-  /** Indicates where the popover should appear. */
-  placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-  /** Title to use in the popover header. */
-  title: PropTypes.string,
-  /** React node that will be used as trigger to show/hide the popover. */
-  triggerNode: PropTypes.node.isRequired,
-  /**
-     * Function that will be called when the selected color changes.
-     * The function receives the color in hexadecimal format as first argument,
-     * the event as the second argument, and a callback function to hide the
-     * overlay as third argument.
-     */
-  onChange: PropTypes.func.isRequired,
-};
-
-ColorPickerPopover.defaultProps = {
-  placement: 'bottom',
-  title: 'Pick a color',
-  colors: undefined, // Use default color palette.
 };
 
 export default ColorPickerPopover;

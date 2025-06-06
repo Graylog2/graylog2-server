@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.db.DBDataAdapterService;
@@ -66,10 +67,10 @@ public class LookupDataAdapterFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         dataAdapterService = new DBDataAdapterService(
-                mongodb.mongoConnection(),
-                new MongoJackObjectMapperProvider(objectMapper),
+                mongoCollections,
                 EntityScopeTestUtil.getEntityScopeService(),
                 clusterEventBus);
         pluginMetaData = new HashSet<>();
@@ -133,7 +134,9 @@ public class LookupDataAdapterFacadeTest {
                         ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
                 ), JsonNode.class))
                 .build();
-        assertThat(dataAdapterService.findAll()).isEmpty();
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         final NativeEntity<DataAdapterDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
 
@@ -143,7 +146,9 @@ public class LookupDataAdapterFacadeTest {
         assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");
         assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV");
 
-        assertThat(dataAdapterService.findAll()).hasSize(1);
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
     }
 
     @Test
@@ -192,10 +197,14 @@ public class LookupDataAdapterFacadeTest {
     public void delete() {
         final Optional<DataAdapterDto> dataAdapterDto = dataAdapterService.get("5adf24a04b900a0fdb4e52c8");
 
-        assertThat(dataAdapterService.findAll()).hasSize(1);
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
         dataAdapterDto.ifPresent(facade::delete);
 
-        assertThat(dataAdapterService.findAll()).isEmpty();
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
         assertThat(dataAdapterService.get("5adf24a04b900a0fdb4e52c8")).isEmpty();
     }
 

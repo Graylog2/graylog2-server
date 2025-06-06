@@ -26,15 +26,17 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
 import javax.security.auth.x500.X500Principal;
-import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrGenerator {
@@ -42,27 +44,23 @@ public class CsrGenerator {
     /**
      * Generates new CSR.
      *
-     * @param privateKeyPassword         Password to protect private key.
-     * @param altNames                   List of alternative names to be stored in CSR
-     * @param privateKeyEncryptedStorage Mechanism for storing private keys.
+     * @param altNames List of alternative names to be stored in CSR
      * @return A new CSR, instance of {@link PKCS10CertificationRequest}
      */
-    public PKCS10CertificationRequest generateCSR(final char[] privateKeyPassword,
-                                                  final String principalName,
-                                                  final List<String> altNames,
-                                                  final PrivateKeyEncryptedStorage privateKeyEncryptedStorage) throws CSRGenerationException {
+    public static PKCS10CertificationRequest generateCSR(KeystoreInformation keystoreInformation, String alias,
+                                                         final String principalName,
+                                                         final List<String> altNames) throws CSRGenerationException {
         try {
-            final var keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
-            final var certKeyPair = keyGen.generateKeyPair();
 
-            privateKeyEncryptedStorage.writeEncryptedKey(privateKeyPassword, certKeyPair.getPrivate());
+            final KeyStore keystore = keystoreInformation.loadKeystore();
 
             final var p10Builder = new JcaPKCS10CertificationRequestBuilder(
                     new X500Principal("CN=" + principalName),
-                    certKeyPair.getPublic()
+                    keystore.getCertificate(alias).getPublicKey()
             );
 
-            final var names = new ArrayList<>(List.of(principalName));
+            final Set<String> names = new LinkedHashSet<>();
+            names.add(principalName);
             if (altNames != null) {
                 names.addAll(altNames);
             }
@@ -81,7 +79,7 @@ public class CsrGenerator {
                     new Extensions(subjectAltNames));
 
             JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
-            ContentSigner signer = csBuilder.build(certKeyPair.getPrivate());
+            ContentSigner signer = csBuilder.build((PrivateKey) keystore.getKey(alias, keystoreInformation.password()));
             return p10Builder.build(signer);
 
         } catch (Exception e) {

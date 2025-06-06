@@ -24,21 +24,22 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -54,6 +55,8 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     private final PreflightConfigService preflightConfigService;
     private final NodeService<DataNodeDto> nodeService;
 
+    private final Set<IndexerDiscoveryListener> indexerDiscoveryListeners;
+
     private final Supplier<List<URI>> resultsCachingSupplier;
 
     private final int connectionAttempts;
@@ -66,14 +69,17 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             @Named("datanode_startup_connection_attempts") int connectionAttempts,
             @Named("datanode_startup_connection_delay") Duration delayBetweenAttempts,
             PreflightConfigService preflightConfigService,
-            NodeService<DataNodeDto> nodeService) {
+            NodeService<DataNodeDto> nodeService,
+            Set<IndexerDiscoveryListener> indexerDiscoveryListeners) {
         this.hosts = hosts;
         this.connectionAttempts = connectionAttempts;
         this.delayBetweenAttempts = delayBetweenAttempts;
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
+        this.indexerDiscoveryListeners = indexerDiscoveryListeners;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);
     }
+
 
     @Override
     public List<URI> get() {
@@ -86,6 +92,8 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
         if (hosts != null && !hosts.isEmpty()) {
             return hosts;
         }
+
+        indexerDiscoveryListeners.forEach(IndexerDiscoveryListener::beforeIndexerDiscovery);
 
         final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
@@ -104,7 +112,9 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                                     } else {
                                         LOG.info("Datanode is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
                                     }
+
                                 }
+                                indexerDiscoveryListeners.forEach(IndexerDiscoveryListener::onDiscoveryRetry);
                             }
                         })
                         .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
@@ -124,11 +134,12 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     }
 
     private boolean isEmptyList(Object result) {
-        return result instanceof List<?> && ((List<?>)result).isEmpty();
+        return result instanceof List<?> && ((List<?>) result).isEmpty();
     }
 
     private List<URI> discover() {
         return nodeService.allActive().values().stream()
+                .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE) // avoid providing transport address of not fully initialized nodes
                 .map(Node::getTransportAddress)
                 .filter(address -> address != null && !address.isBlank())
                 .map(URI::create)

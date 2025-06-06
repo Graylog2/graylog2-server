@@ -15,30 +15,58 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { PluginNavigation } from 'graylog-web-plugin';
+
+import type { QualifiedUrl } from 'routing/Routes';
+
 export type EventReplayInfo = {
-  timerange_start: string,
-  timerange_end: string,
-  query: string,
-  streams: string[],
+  timerange_start: string;
+  timerange_end: string;
+  query: string;
+  streams: string[];
+  stream_categories?: string[];
 };
 
 export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
-  priority: number,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
-  fields: Object[],
-  group_by_fields: {[key: string]: string},
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
-  alert: boolean | undefined,
+  id: string;
+  event_definition_id: string;
+  event_definition_type: string;
+  priority: number;
+  timestamp: string;
+  timerange_start: string;
+  timerange_end: string;
+  key: string;
+  fields: Record<string, string>;
+  group_by_fields: { [key: string]: string };
+  source_streams: string[];
+  replay_info: EventReplayInfo | undefined;
+  alert: boolean | undefined;
+  message: string;
 };
 
 export type EventDefinitionContext = {
-  id: string,
-  title: string,
+  id: string;
+  title: string;
+  remediation_steps?: string;
+  event_procedure?: string;
+  description?: string;
 };
+
+export type EventDefinitionContexts = { [eventDefinitionId: string]: EventDefinitionContext };
+export type EventsAdditionalData = {
+  context: { event_definitions?: EventDefinitionContexts; streams?: EventDefinitionContexts };
+};
+
+type PageNavigation = {
+  description: string;
+  position?: PluginNavigation['position'];
+  permissions?: string | Array<string>;
+  useIsValidLicense?: () => boolean;
+  path: QualifiedUrl<string>;
+};
+
+declare module 'graylog-web-plugin/plugin' {
+  export interface PluginExports {
+    'alerts.pageNavigation'?: Array<PageNavigation>;
+  }
+}

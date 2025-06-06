@@ -20,24 +20,20 @@ import org.graylog.plugins.views.storage.migration.state.actions.MigrationAction
 
 public class MigrationActionsAdapter implements MigrationActions {
 
-    MigrationStateMachineContext context;
+    protected final MigrationStateMachineContext context;
 
-    public MigrationActionsAdapter() {
-        this.context = new MigrationStateMachineContext();
-    }
-
-    @Override
-    public boolean dataNodeStartupFinished() {
-        return false;
-    }
-
-    public void setStateMachineContext(MigrationStateMachineContext context) {
+    public MigrationActionsAdapter(MigrationStateMachineContext context) {
         this.context = context;
     }
 
     @Override
-    public MigrationStateMachineContext getStateMachineContext() {
-        return context;
+    public boolean allDatanodesAvailable() {
+        return false;
+    }
+
+    @Override
+    public void setPreflightFinished() {
+
     }
 
     @Override
@@ -58,6 +54,29 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public void verifyRemoteIndexerConnection() {
 
+    }
+
+    @Override
+    public boolean isCompatibleInPlaceMigrationVersion() {
+        return true;
+    }
+
+    @Override
+    public void getElasticsearchHosts() {
+
+    }
+
+    @Override
+    public void stopDatanodes() {
+    }
+
+    @Override
+    public void finishRemoteReindexMigration() {
+    }
+
+    @Override
+    public boolean isRemoteReindexMigrationEnabled() {
+        return true;
     }
 
     @Override
@@ -115,6 +134,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public boolean compatibleDatanodesRunning() {
+        return false;
+    }
+
+    @Override
     public void provisionDataNodes() {
     }
 
@@ -130,5 +154,10 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public void startDataNodes() {
 
+    }
+
+    @Override
+    public boolean allDatanodesPrepared() {
+        return false;
     }
 }

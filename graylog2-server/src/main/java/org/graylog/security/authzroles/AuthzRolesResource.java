@@ -45,6 +45,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -117,7 +118,7 @@ public class AuthzRolesResource extends RestResource {
                       allowableValues = "name,description")
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-            @DefaultValue("asc") @QueryParam("order") String order) {
+            @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -149,7 +150,7 @@ public class AuthzRolesResource extends RestResource {
                       allowableValues = "username,full_name,email")
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-            @DefaultValue("asc") @QueryParam("order") String order) {
+            @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -162,7 +163,7 @@ public class AuthzRolesResource extends RestResource {
                 searchQuery, page, perPage, sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
         final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(
-                        new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, "asc", roleIds)
+                        new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, SortOrder.ASCENDING, roleIds)
                 .stream().collect(Collectors.toMap(AuthzRoleDTO::id, AuthzRoleDTO::name));
         final List<UserOverviewDTO> users = result.stream().map(u -> {
             final Set<String> roleNames = u.roles().stream().map(rolesMap::get).collect(Collectors.toSet());
@@ -200,7 +201,7 @@ public class AuthzRolesResource extends RestResource {
                       allowableValues = "name,description")
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-            @DefaultValue("asc") @QueryParam("order") String order) {
+            @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -244,7 +245,7 @@ public class AuthzRolesResource extends RestResource {
         boolean update(Set<String> roles, String roleId);
     }
 
-    private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) throws ValidationException {
+    private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) {
         usernames.forEach(username -> {
             checkPermission(USERS_ROLESEDIT, username);
 
@@ -252,9 +253,12 @@ public class AuthzRolesResource extends RestResource {
             if (user == null) {
                 throw new NotFoundException("Cannot find user with name: " + username);
             }
-            if (authzRolesService.get(roleId).isEmpty()) {
-                throw new NotFoundException("Cannot find role with id: " + roleId);
-            }
+            authzRolesService.get(roleId)
+                    .ifPresentOrElse(role -> {
+                        checkPermission(RestPermissions.ROLES_EDIT, role.name());
+                    }, () -> {
+                        throw new NotFoundException("Cannot find role with id: " + roleId);
+                    });
             Set<String> roles = user.getRoleIds();
             rolesUpdater.update(roles, roleId);
             user.setRoleIds(roles);
@@ -284,7 +288,7 @@ public class AuthzRolesResource extends RestResource {
 
     private Map<String, Set<Map<String, String>>> userRoleContext(PaginatedList<AuthzRoleDTO> roles) {
         final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(new SearchQuery(""),
-                1, 0, UserOverviewDTO.FIELD_USERNAME, "asc",
+                1, 0, UserOverviewDTO.FIELD_USERNAME, SortOrder.ASCENDING,
                 roles.stream().map(AuthzRoleDTO::id).collect(Collectors.toSet()));
         final Map<String, Set<Map<String, String>>> userRoleMap = new HashMap<>(roles.size());
         roles.forEach(authzRoleDTO -> {

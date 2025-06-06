@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { scales } from 'plotly.js/src/components/colorscale';
-import * as chroma from 'chroma-js';
+import chroma from 'chroma-js';
 
 const plotlyScaleToChroma = (plotlyScale: Array<[domain: number, color: string]>) => {
   const domains = plotlyScale.map(([domain]) => domain);
@@ -35,8 +35,10 @@ const scaleForGradient = (gradient: string): chroma.Scale => {
     case 'Jet':
     case 'Picnic':
     case 'Portland':
-    case 'Rainbow': return plotlyScaleToChroma(scales[gradient]);
-    default: return chroma.scale(gradient);
+    case 'Rainbow':
+      return plotlyScaleToChroma(scales[gradient]);
+    default:
+      return chroma.scale(gradient);
   }
 };
 

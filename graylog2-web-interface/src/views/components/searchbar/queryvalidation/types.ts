@@ -16,26 +16,41 @@
  */
 
 export type IndexRange = {
-  index_name: string,
-  begin: number,
-  end: number,
-  is_warm_tiered: boolean
-}
+  index_name: string;
+  begin: number;
+  end: number;
+  is_warm_tiered: boolean;
+  stream_names: Array<string>;
+};
+
+export type StreamDataRouting = {
+  stream_name: string;
+  stream_id: string;
+  destination: string;
+  from: string;
+  to: string;
+};
 
 export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
+  status: 'OK' | 'ERROR' | 'WARNING' | 'INFO';
   explanations: Array<{
-    id: string,
-    errorType: string,
-    errorTitle: string,
-    errorMessage: string,
-    beginLine: number,
-    endLine: number,
-    beginColumn: number,
-    endColumn: number,
-    relatedProperty?: string,
-  }>,
+    id: string;
+    errorType: string;
+    errorTitle: string;
+    errorMessage: string;
+    beginLine: number;
+    endLine: number;
+    beginColumn: number;
+    endColumn: number;
+    relatedProperty?: string;
+  }>;
   context: {
-    searched_index_ranges: Array<IndexRange>
-  }
+    searched_index_ranges: Array<IndexRange>;
+    data_routed_streams?: Array<StreamDataRouting>;
+    searched_time_range?: {
+      from: string;
+      to: string;
+      type: 'absolute';
+    };
+  };
 };

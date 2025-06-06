@@ -36,8 +36,8 @@ import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -51,7 +51,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import java.util.Collections;
 import java.util.Map;
@@ -73,10 +72,11 @@ public class LookupTableFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         lookupTableService = new DBLookupTableService(
-                mongodb.mongoConnection(),
-                new MongoJackObjectMapperProvider(objectMapper),
+                mongoCollections,
                 EntityScopeTestUtil.getEntityScopeService(),
                 clusterEventBus);
 
@@ -190,7 +190,9 @@ public class LookupTableFacadeTest {
         final Map<EntityDescriptor, Object> nativeEntities = ImmutableMap.of(
                 cacheDescriptor, cacheDto,
                 dataAdapterDescriptor, dataAdapterDto);
-        assertThat(lookupTableService.findAll()).isEmpty();
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         final NativeEntity<LookupTableDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
 
@@ -205,7 +207,9 @@ public class LookupTableFacadeTest {
         assertThat(nativeEntity.entity().defaultMultiValue()).isEqualTo("Default multi value");
         assertThat(nativeEntity.entity().defaultMultiValueType()).isEqualTo(LookupDefaultValue.Type.OBJECT);
 
-        assertThat(lookupTableService.findAll()).hasSize(1);
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
     }
 
     @Test
@@ -333,10 +337,14 @@ public class LookupTableFacadeTest {
     public void delete() {
         final Optional<LookupTableDto> lookupTableDto = lookupTableService.get("5adf24dd4b900a0fdb4e530d");
 
-        assertThat(lookupTableService.findAll()).hasSize(1);
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
         lookupTableDto.ifPresent(facade::delete);
 
-        assertThat(lookupTableService.findAll()).isEmpty();
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
         assertThat(lookupTableService.get("5adf24dd4b900a0fdb4e530d")).isEmpty();
     }
 

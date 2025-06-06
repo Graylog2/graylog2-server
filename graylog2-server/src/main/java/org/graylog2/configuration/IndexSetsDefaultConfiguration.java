@@ -32,7 +32,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_DATA_TIERING;
 
 /**
  * In-database configuration (via ClusterConfigService) for index set
@@ -44,19 +44,19 @@ import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 @JsonDeserialize(builder = IndexSetsDefaultConfiguration.Builder.class)
 public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean {
 
-    public static final String INDEX_ANALYZER = "index_analyzer";
-    public static final String SHARDS = "shards";
-    public static final String REPLICAS = "replicas";
-    public static final String INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
-    public static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
-    public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
-    public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
-    public static final String ROTATION_STRATEGY = "rotation_strategy"; // alias for rotation_strategy_config
-    public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
-    public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
-    public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
+    private static final String INDEX_ANALYZER = "index_analyzer";
+    private static final String SHARDS = "shards";
+    private static final String REPLICAS = "replicas";
+    private static final String INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
+    private static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
+    private static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
+    private static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
+    private static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
+    private static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
+    private static final String ROTATION_STRATEGY = "rotation_strategy"; // alias for rotation_strategy_config
+    private static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
+    private static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
+    private static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
 
     public static final String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
 

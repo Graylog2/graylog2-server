@@ -34,9 +34,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     Optional<RestHighLevelClient> restClient();
 
     Optional<OpenSearchClient> openSearchClient();
-
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
     List<String> stdOutLogs();
     List<String> stdErrLogs();
 
@@ -44,8 +41,14 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     String getOpensearchClusterUrl();
     String getDatanodeRestApiUrl();
 
-    void onRemove();
+    List<String> getOpensearchRoles();
 
-    void onReset();
+    void remove();
 
+    void reset();
+
+    void available();
+    boolean isManagerNode();
+
+    List<String> configurationWarnings();
 }

@@ -16,9 +16,7 @@
  */
 
 export { default as DataTieringConfiguration } from './DataTieringConfiguration';
+export * from './DataTieringConfiguration';
 export { default as DataTieringSummary } from './DataTieringSummary';
-export { durationToRoundedDays } from './DataTieringConfiguration';
-export { prepareDataTieringConfig } from './DataTieringConfiguration';
-export { prepareDataTieringInitialValues } from './DataTieringConfiguration';
 export { default as DataTieringVisualisation } from './DataTieringVisualisation';
 export * from './types';

@@ -15,18 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { asMock } from 'helpers/mocking';
-import { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl, currentPathnameWithoutPrefix } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
 jest.mock('util/AppConfig');
 
-const oldLocation = window.location;
+const oldLocation = window.location.pathname;
 
-const mockLocation = (url: string): Location => new URL(url) as unknown as Location;
+// eslint-disable-next-line compat/compat
+const mockLocation = (url: string): string & Location => new URL(url) as unknown as string & Location;
 
 describe('qualifyUrl', () => {
   afterEach(() => {
-    window.location = oldLocation;
+    window.location.pathname = oldLocation;
   });
 
   it('qualifies url with hostname/scheme from current location if server url is relative', () => {
@@ -49,5 +50,53 @@ describe('qualifyUrl', () => {
     const qualifiedUrl = qualifyUrl('/foo');
 
     expect(qualifyUrl(qualifiedUrl)).toEqual('http://something.graylog.cloud/api/foo');
+  });
+
+  describe('currentPathnameWithoutPrefix', () => {
+    const setLocation = (pathname: string) => {
+      window.location.pathname = pathname;
+    };
+
+    const mockPathPrefix = (pathPrefix: string | undefined | null) =>
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
+
+    it('returns current path when prefix is undefined/null/empty/single slash', () => {
+      const pathname = '/welcome';
+      setLocation(pathname);
+
+      mockPathPrefix(null);
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+
+      mockPathPrefix(undefined);
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+
+      mockPathPrefix('');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+
+      mockPathPrefix('/');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
+
+    it('returns current path when prefix is defined', () => {
+      const pathname = '/welcome';
+      setLocation(`/foo${pathname}`);
+
+      mockPathPrefix('/foo');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
+
+    it('returns current path when prefix is defined and ends with `/`', () => {
+      const pathname = '/welcome';
+      setLocation(`/foo${pathname}`);
+
+      mockPathPrefix('/foo/');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
   });
 });

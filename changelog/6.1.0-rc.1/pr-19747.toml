@@ -1,0 +1,4 @@
+type = "c"
+message = "Migrate graylog CA to cluster config storage."
+
+pulls = ["19747"]

@@ -35,10 +35,12 @@ import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidat
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
+import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,9 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -86,6 +86,12 @@ public class SearchResourceExecutionTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchUser searchUser;
 
+    @Mock
+    private ClusterConfigService clusterConfigService;
+
+    @Mock
+    private StreamService streamService;
+
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     private SearchResource searchResource;
@@ -99,9 +105,9 @@ public class SearchResourceExecutionTest {
                 searchJobService,
                 queryEngine,
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
-                new PluggableSearchNormalization(Collections.emptySet()));
+                new PluggableSearchNormalization(Collections.emptySet(), streamService));
 
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService) {
             @Override
             protected User getCurrentUser() {
                 return currentUser;

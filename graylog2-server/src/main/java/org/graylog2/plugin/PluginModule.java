@@ -50,6 +50,7 @@ import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -62,6 +63,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -71,11 +73,15 @@ import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.streams.StreamDeletionGuard;
+import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.web.PluginUISettingsProvider;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public abstract class PluginModule extends Graylog2Module {
     public Set<? extends PluginConfigBean> getConfigBeans() {
@@ -122,6 +128,10 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addInitializer(Class<? extends Service> initializerClass) {
         Multibinder<Service> serviceBinder = serviceBinder();
         serviceBinder.addBinding().to(initializerClass);
+    }
+
+    protected void addFilteredMessageOutput(String name, Class<? extends FilteredMessageOutput> filteredMessageOutputClass) {
+        filteredOutputsMapBinder().addBinding(name).to(filteredMessageOutputClass);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.
@@ -438,5 +448,33 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
         Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
         scopeBinder.addBinding().to(entityScopeType);
+    }
+
+    protected MapBinder<String, TelemetryMetricSupplier> telemetryMetricSupplierBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, TelemetryMetricSupplier.class);
+    }
+
+    protected void addTelemetryMetricProvider(String eventId, Class<? extends TelemetryMetricSupplier> eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).to(eventSupplier);
+    }
+
+    protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
+    }
+
+    protected void addStreamDeletionGuard(Class<? extends StreamDeletionGuard> streamDeletionGuard) {
+        streamDeletionGuardBinder().addBinding().to(streamDeletionGuard);
+    }
+
+    protected void addDbEntities(Class<?>... entitiesClasses) {
+        for (final Class<?> entitiesClass : entitiesClasses) {
+            if (!entitiesClass.isAnnotationPresent(DbEntity.class)) {
+                throw new IllegalArgumentException(f(
+                        "Trying to bind entities class %s but found no @DbEntity annotation",
+                        entitiesClass.getCanonicalName()));
+            }
+
+            dbEntitiesBinder().addBinding().toInstance(entitiesClass);
+        }
     }
 }

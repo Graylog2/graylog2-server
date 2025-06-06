@@ -17,24 +17,20 @@
 
 import * as React from 'react';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 import { Spinner } from 'components/common';
-import DefaultDetails from 'components/events/events/EventDetails';
-import { isPermitted } from 'util/PermissionsMixin';
+import DefaultDetails from 'views/components/widgets/events/EventsList/DefaultDetails';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 export const usePluggableEventDetails = (eventId: string) => {
   const pluggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
 
-  return pluggableEventDetails.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  ).map(
-    ({ component: PluggableEventAction, key }) => (
-      <PluggableEventAction key={key} eventId={eventId} />
-    ),
-  );
+  return pluggableEventDetails
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .map(({ component: PluggableEventAction, key }) => <PluggableEventAction key={key} eventId={eventId} />);
 };
 
 export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
@@ -58,7 +54,6 @@ const EventDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const puggableEventDetails = usePluggableEventDetails(eventId);
 
   if (puggableEventDetails?.length) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{puggableEventDetails}</>;
   }
 

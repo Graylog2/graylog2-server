@@ -30,14 +30,7 @@ const defaultComponentIgnore = [
 
 module.exports = {
   skipComponentsWithoutExample: true,
-  require: [
-    'core-js/stable',
-    'regenerator-runtime/runtime',
-    'bootstrap/less/bootstrap.less',
-    'toastr/toastr.less',
-    'stylesheets/typeahead.less',
-    './fetch-mock',
-  ],
+  require: ['core-js/stable', 'regenerator-runtime/runtime', 'bootstrap/less/bootstrap.less', './fetch-mock'],
   sections: [
     {
       name: 'Introduction',
@@ -111,5 +104,10 @@ module.exports = {
     module: webpackConfig.module,
     resolve: merge.smart({ modules: ['node_modules'] }, webpackConfig.resolve),
     resolveLoader: webpackConfig.resolveLoader,
+    devServer: {
+      client: {
+        overlay: false,
+      },
+    },
   },
 };

@@ -18,6 +18,7 @@ package org.graylog2.indexer.datanode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.indexer.migration.LogEntry;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,16 +43,25 @@ public record MigrationConfiguration(
         @JsonProperty(FIELD_INDICES)
         List<IndexMigrationConfiguration> indices,
 
+        @JsonProperty(FIELD_CERTIFICATES)
+        List<String> certificates,
+
         @JsonProperty(FIELD_LOGS)
         List<LogEntry> logs
-) {
+) implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_INDICES = "indices";
     public static final String FIELD_CREATED = "created";
     public static final String FIELD_LOGS = "logs";
+    public static final String FIELD_CERTIFICATES = "certificates";
 
-    public static MigrationConfiguration forIndices(List<String> indices) {
-        return new MigrationConfiguration(null, new DateTime(DateTimeZone.UTC), indices.stream().map(indexName -> new IndexMigrationConfiguration(indexName, null)).collect(Collectors.toList()), Collections.emptyList());
+    /**
+     * @param indices
+     * @param trustedCertificates PEM encoded list of certificates that the migration should trust
+     * @return
+     */
+    public static MigrationConfiguration forIndices(List<String> indices, List<String> trustedCertificates) {
+        return new MigrationConfiguration(null, new DateTime(DateTimeZone.UTC), indices.stream().map(indexName -> new IndexMigrationConfiguration(indexName, null)).collect(Collectors.toList()), trustedCertificates, Collections.emptyList());
     }
 
     @JsonIgnore

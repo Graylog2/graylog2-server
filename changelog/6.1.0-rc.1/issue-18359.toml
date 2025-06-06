@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Clarify rule simulation processing"
+
+issues = ["18359"]
+pulls = ["19261"]

@@ -1,0 +1,4 @@
+type = "f"
+message = "Datanode preflight check for node.lock, preventing parallel run of opensearch and datanode"
+
+pulls = ["20366"]

@@ -42,6 +42,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMaxHandl
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.ArgumentCaptor;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedClientTestBase {
@@ -90,6 +92,7 @@ public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedC
                         .map(inlineSf -> ((InlineQueryStringSearchFilter) inlineSf).queryString())
                         .collect(Collectors.toSet()),
                 new NoOpStatsCollector<>(),
+                mock(StreamService.class),
                 false);
     }
 

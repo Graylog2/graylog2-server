@@ -21,16 +21,14 @@ import HighlightingRulesContext from 'views/components/contexts/HighlightingRule
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { StaticColor, GradientColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import CustomHighlighting from './CustomHighlighting';
 
-const renderDecorators = (decorators, field, value) => decorators.map((Decorator) => (
-  <Decorator key={Decorator.name}
-             type={FieldType.Unknown}
-             field={field}
-             value={value} />
-));
+const renderDecorators = (decorators, field, value) =>
+  decorators.map((Decorator) => (
+    <Decorator key={Decorator.name} type={FieldType.Unknown} field={field} value={value} />
+  ));
 
 describe('CustomHighlighting', () => {
   const field = 'foo';
@@ -43,7 +41,7 @@ describe('CustomHighlighting', () => {
     </CustomHighlighting>
   );
 
-  const CustomHighlightingWithContext = ({ highlightingRules }: {highlightingRules: Array<HighlightingRule>}) => (
+  const CustomHighlightingWithContext = ({ highlightingRules }: { highlightingRules: Array<HighlightingRule> }) => (
     <HighlightingRulesContext.Provider value={highlightingRules}>
       <SimpleCustomHighlighting />
     </HighlightingRulesContext.Provider>
@@ -92,11 +90,7 @@ describe('CustomHighlighting', () => {
   });
 
   it('does not render highlight if rule value only matches substring', async () => {
-    const rule = HighlightingRule.builder()
-      .field(field)
-      .value('2')
-      .color(StaticColor.create('#bc98fd'))
-      .build();
+    const rule = HighlightingRule.builder().field(field).value('2').color(StaticColor.create('#bc98fd')).build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
     const elem = await findByText('42');
@@ -105,15 +99,27 @@ describe('CustomHighlighting', () => {
   });
 
   it('does not render highlight if rule value does not match', async () => {
-    const rule = HighlightingRule.builder()
-      .field(field)
-      .value('23')
-      .color(StaticColor.create('#bc98fd'))
-      .build();
+    const rule = HighlightingRule.builder().field(field).value('23').color(StaticColor.create('#bc98fd')).build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
     const elem = await findByText('42');
 
     expect(elem).not.toHaveStyleRule('background-color');
+  });
+
+  describe('gradiant highlight', () => {
+    it('renders highlighted value if rule for value exists', async () => {
+      const rule = HighlightingRule.builder()
+        .field(field)
+        .value(String(value))
+        .color(GradientColor.create('Picnic', 0, 100))
+        .build();
+
+      const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+
+      const elem = await findByText('42');
+
+      expect(elem).toHaveStyle('background-color: rgb(214, 214, 255)');
+    });
   });
 });

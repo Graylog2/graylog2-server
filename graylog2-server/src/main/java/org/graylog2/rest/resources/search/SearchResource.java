@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
+import org.apache.commons.collections.CollectionUtils;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -31,7 +32,11 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.errors.SearchError;
+import org.graylog.plugins.views.search.filter.AndFilter;
+import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -61,9 +66,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -90,14 +97,21 @@ public abstract class SearchResource extends RestResource {
         this.searchExecutor = searchExecutor;
     }
 
-    protected SearchResponse search(String query, int limit, int offset, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
-        final Search search = createSearch(query, limit, offset, filter, fieldList, sorting, timeRange);
+    protected SearchResponse search(String query, int limit, int offset, String filter, Set<String> streams, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final Search search = createSearch(query, limit, offset, filter, streams, fieldList, sorting, timeRange);
 
         final Optional<String> streamId = Searches.extractStreamId(filter);
 
         final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
+    }
+
+    protected Set<String> parseStreams(String streams) {
+        if (isNullOrEmpty(streams)) {
+            return Set.of();
+        }
+        return Arrays.stream(streams.split(",")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toSet());
     }
 
     protected List<String> parseFields(String fields) {
@@ -127,23 +141,6 @@ public abstract class SearchResource extends RestResource {
         return fieldList;
     }
 
-    protected SearchResponse buildSearchResponse(SearchResult sr,
-                                                 org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange,
-                                                 boolean decorate,
-                                                 Optional<String> streamId) {
-        final SearchResponse result = SearchResponse.create(sr.getOriginalQuery(),
-                sr.getBuiltQuery(),
-                indexRangeListToValueList(sr.getUsedIndices()),
-                resultMessageListtoValueList(sr.getResults()),
-                sr.getFields(),
-                sr.tookMs(),
-                sr.getTotalResults(),
-                timeRange.getFrom(),
-                timeRange.getTo());
-
-        return decorate ? decoratorProcessor.decorate(result, streamId) : result;
-    }
-
     protected SearchResponse buildSearchResponse(String query, MessageList.Result results, List<String> fieldList, long tookMs, TimeRange timeRange, boolean decorate, Optional<String> streamId) {
         final SearchResponse result = SearchResponse.create(query,
                 query,
@@ -156,41 +153,6 @@ public abstract class SearchResource extends RestResource {
                 timeRange.getTo());
 
         return decorate ? decoratorProcessor.decorate(result, streamId) : result;
-    }
-
-    protected Set<IndexRangeSummary> indexRangeListToValueList(Set<IndexRange> indexRanges) {
-        final Set<IndexRangeSummary> result = Sets.newHashSetWithExpectedSize(indexRanges.size());
-
-        for (IndexRange indexRange : indexRanges) {
-            result.add(IndexRangeSummary.create(
-                    indexRange.indexName(),
-                    indexRange.begin(),
-                    indexRange.end(),
-                    indexRange.calculatedAt(),
-                    indexRange.calculationDuration()));
-        }
-
-        return result;
-    }
-
-    protected List<ResultMessageSummary> resultMessageListtoValueList(List<ResultMessage> resultMessages) {
-        return resultMessages.stream()
-                // TODO module merge: migrate to resultMessage.getMessage() instead of Map<String, Object> via getFields()
-                .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
-                .collect(Collectors.toList());
-    }
-
-    protected Sorting buildSorting(String sort) {
-        if (isNullOrEmpty(sort)) {
-            return Sorting.DEFAULT;
-        }
-
-        try {
-            return Sorting.fromApiParam(sort);
-        } catch (Exception e) {
-            LOG.error("Falling back to default sorting.", e);
-            return Sorting.DEFAULT;
-        }
     }
 
     protected Sort buildSortOrder(String sort) {
@@ -207,14 +169,17 @@ public abstract class SearchResource extends RestResource {
         return Sort.create(parts[0], Sort.Order.valueOf(parts[1].toUpperCase(Locale.ENGLISH)));
     }
 
-    protected Search createSearch(String queryString, int limit, int offset, String filter, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+    protected Search createSearch(String queryString, int limit, int offset, String filter, Set<String> streams, List<String> fieldList, Sort sorting, TimeRange timeRange) {
         final SearchType searchType = createMessageList(sorting, limit, offset, fieldList);
+
+        final var streamsFilter = OrFilter.builder().filters(streams.stream().map(stream -> StreamFilter.builder().streamId(stream).build()).collect(Collectors.toSet())).build();
+        final var queryStringFilter = QueryStringFilter.builder().query(Strings.isNullOrEmpty(filter) ? "*" : filter).build();
+
+        final var completeFilter = !streamsFilter.filters().isEmpty() ? AndFilter.and(streamsFilter, queryStringFilter) : queryStringFilter;
 
         final Query query = Query.builder()
                 .query(ElasticsearchQueryString.of(queryString))
-                .filter(QueryStringFilter.builder()
-                        .query(Strings.isNullOrEmpty(filter) ? "*" : filter)
-                        .build())
+                .filter(completeFilter)
                 .timerange(timeRange)
                 .searchTypes(Collections.singleton(searchType))
                 .build();
@@ -238,6 +203,12 @@ public abstract class SearchResource extends RestResource {
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Missing query result"));
+
+        if (!CollectionUtils.isEmpty(queryResult.errors())) {
+            final var errorText = String.join(", ", queryResult.errors().stream().map(SearchError::description).toList());
+            throw new RuntimeException("Failed to obtain results: " + errorText);
+        }
+
         final MessageList.Result result = queryResult.searchTypes()
                 .values()
                 .stream()

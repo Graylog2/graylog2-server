@@ -56,6 +56,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_RESET = PREFIX + "data_node:reset";
     public static final String DATANODE_STOP = PREFIX + "data_node:stop";
     public static final String DATANODE_START = PREFIX + "data_node:start";
+    public static final String DATANODE_START_REPLICATION = PREFIX + "data_node:start_replication";
+    public static final String DATANODE_STOP_REPLICATION = PREFIX + "data_node:stop_replication";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -76,6 +78,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
+    public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
 
     public static final String INDEX_FIELD_TYPE_PROFILE_CREATE = PREFIX + "index_field_type_profile:create";
     public static final String INDEX_FIELD_TYPE_PROFILE_UPDATE = PREFIX + "index_field_type_profile:update";
@@ -90,6 +93,11 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
     public static final String INDEX_SET_DELETE = PREFIX + "index_set:delete";
     public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
+    public static final String INDEX_SET_DELETE_FAILED_SNAPSHOT = PREFIX + "index_set:delete_failed_snapshot";
+    public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
+    public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
+    public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
+    public static final String INDEX_SET_DEFAULT_TEMPLATE_UPDATE = PREFIX + "index_set_default_template:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
     public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
@@ -108,6 +116,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MESSAGE_INPUT_DELETE = PREFIX + "message_input:delete";
     public static final String MESSAGE_INPUT_START = PREFIX + "message_input:start";
     public static final String MESSAGE_INPUT_STOP = PREFIX + "message_input:stop";
+    public static final String MESSAGE_INPUT_SETUP = PREFIX + "message_input:setup";
     public static final String MESSAGE_INPUT_UPDATE = PREFIX + "message_input:update";
     public static final String MESSAGE_OUTPUT_CREATE = PREFIX + "message_output:create";
     public static final String MESSAGE_OUTPUT_DELETE = PREFIX + "message_output:delete";
@@ -135,6 +144,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SESSION_DELETE = PREFIX + "session:delete";
     public static final String STATIC_FIELD_CREATE = PREFIX + "static_field:create";
     public static final String STATIC_FIELD_DELETE = PREFIX + "static_field:delete";
+    public static final String STREAM_DESTINATION_FILTER_CREATE = PREFIX + "stream_destination_filter:create";
+    public static final String STREAM_DESTINATION_FILTER_DELETE = PREFIX + "stream_destination_filter:delete";
+    public static final String STREAM_DESTINATION_FILTER_UPDATE = PREFIX + "stream_destination_filter:update";
     public static final String STREAM_CREATE = PREFIX + "stream:create";
     public static final String STREAM_DELETE = PREFIX + "stream:delete";
     public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = PREFIX + "stream_output_assignment:create";
@@ -199,6 +211,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DATANODE_RESET)
             .add(DATANODE_STOP)
             .add(DATANODE_START)
+            .add(DATANODE_START_REPLICATION)
+            .add(DATANODE_STOP_REPLICATION)
             .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
@@ -221,6 +235,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_UPDATE)
             .add(FIELD_TYPE_MAPPING_CREATE)
             .add(FIELD_TYPE_MAPPING_DELETE)
+            .add(FIELD_TYPE_POLLING_TRIGGERED)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GRANTS_UPDATE)
             .add(GROK_PATTERN_CREATE)
@@ -233,6 +248,11 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)
+            .add(INDEX_SET_DELETE_FAILED_SNAPSHOT)
+            .add(INDEX_SET_TEMPLATE_CREATE)
+            .add(INDEX_SET_TEMPLATE_DELETE)
+            .add(INDEX_SET_TEMPLATE_UPDATE)
+            .add(INDEX_SET_DEFAULT_TEMPLATE_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)
@@ -251,6 +271,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MESSAGE_INPUT_DELETE)
             .add(MESSAGE_INPUT_START)
             .add(MESSAGE_INPUT_STOP)
+            .add(MESSAGE_INPUT_SETUP)
             .add(MESSAGE_INPUT_UPDATE)
             .add(MESSAGE_OUTPUT_CREATE)
             .add(MESSAGE_OUTPUT_DELETE)
@@ -282,6 +303,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(STREAM_DELETE)
             .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)
             .add(STREAM_OUTPUT_ASSIGNMENT_DELETE)
+            .add(STREAM_DESTINATION_FILTER_CREATE)
+            .add(STREAM_DESTINATION_FILTER_DELETE)
+            .add(STREAM_DESTINATION_FILTER_UPDATE)
             .add(STREAM_RULE_CREATE)
             .add(STREAM_RULE_DELETE)
             .add(STREAM_RULE_UPDATE)

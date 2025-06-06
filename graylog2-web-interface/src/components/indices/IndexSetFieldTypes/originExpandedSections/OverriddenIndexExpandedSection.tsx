@@ -20,9 +20,8 @@ import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes
 
 const OverriddenProfileExpandedSection = ({ type }: ExpandedSectionProps) => (
   <span>
-    Field type <i>{type}</i> comes from the individual, custom field type mapping.
-    It overrides possible mappings from the search engine index mapping,
-    either immediately (if index was rotated) or during the next rotation.
+    Field type <i>{type}</i> comes from the individual, custom field type mapping. It overrides possible mappings from
+    the search engine index mapping, either immediately (if index was rotated) or during the next rotation.
   </span>
 );
 

@@ -26,6 +26,10 @@ import User from '../src/logic/users/User';
 import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
 /* eslint-enable import/no-relative-packages */
 
+import '@graylog/sawmill/fonts';
+import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
+
 export const adminUser = User.builder()
   .id('admin-id')
   .username('admin')
@@ -44,34 +48,36 @@ export const adminUser = User.builder()
   .accountStatus('enabled')
   .build();
 
-const StyleGuideStyles = createGlobalStyle(({ theme }) => css`
-  html {
-    font-size: ${theme.fonts.size.root};
-  }
-`);
+const StyleGuideStyles = createGlobalStyle(
+  ({ theme }) => css`
+    html {
+      font-size: ${theme.fonts.size.root};
+    }
+  `,
+);
 
 type Props = {
-  children: React.ReactNode,
-}
+  children: React.ReactNode;
+};
 
 const StyleGuideWrapper = ({ children }: Props) => {
-  const router = createBrowserRouter([{
-    path: '/:url?',
-    element: (
-      <CurrentUserContext.Provider value={adminUser}>
-        <UserDateTimeProvider>
-          <GraylogThemeProvider initialThemeModeOverride="light" userIsLoggedIn={false}>
-            <StyleGuideStyles />
-            {children}
-          </GraylogThemeProvider>
-        </UserDateTimeProvider>
-      </CurrentUserContext.Provider>
-    ),
-  }]);
+  const router = createBrowserRouter([
+    {
+      path: '/:url?',
+      element: (
+        <CurrentUserContext.Provider value={adminUser}>
+          <UserDateTimeProvider>
+            <GraylogThemeProvider initialThemeModeOverride="light" userIsLoggedIn={false}>
+              <StyleGuideStyles />
+              {children}
+            </GraylogThemeProvider>
+          </UserDateTimeProvider>
+        </CurrentUserContext.Provider>
+      ),
+    },
+  ]);
 
-  return (
-    <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default StyleGuideWrapper;

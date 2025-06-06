@@ -21,11 +21,15 @@ import useRemoteReindexMigrationStatus from './useRemoteReindexMigrationStatus';
 import { MIGRATION_STATE } from '../Constants';
 import type { MigrationActions, MigrationState } from '../Types';
 
-const mockOnTrigger = (migrationState: MigrationState = {} as unknown as MigrationState) => jest.fn(() => Promise.resolve(migrationState));
+const mockOnTrigger = (migrationState: MigrationState = {} as unknown as MigrationState) =>
+  jest.fn(() => Promise.resolve(migrationState));
 
 describe('useRemoteReindexMigrationStatus', () => {
   it('should not fetch migration status on other steps', async () => {
-    const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key, next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA'] as MigrationActions[] };
+    const currentStep = {
+      state: MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key,
+      next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA'] as MigrationActions[],
+    };
     const onTriggerStep = mockOnTrigger();
 
     const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
@@ -36,7 +40,10 @@ describe('useRemoteReindexMigrationStatus', () => {
   });
 
   it('should only fetch migration status on the RemoteReindexRunning step', async () => {
-    const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key, next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA'] as MigrationActions[] };
+    const currentStep = {
+      state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
+      next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA'] as MigrationActions[],
+    };
     const migrationState = { response: { progress: 0, status: 'STARTING' } } as unknown as MigrationState;
     const onTriggerStep = mockOnTrigger(migrationState);
 
@@ -48,7 +55,14 @@ describe('useRemoteReindexMigrationStatus', () => {
   });
 
   it('should update nextSteps when migration progress is 100% and status FINISHED', async () => {
-    const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key, next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER'] as MigrationActions[] };
+    const currentStep = {
+      state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
+      next_steps: [
+        'REQUEST_MIGRATION_STATUS',
+        'RETRY_MIGRATE_EXISTING_DATA',
+        'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER',
+      ] as MigrationActions[],
+    };
     const migrationState = { response: { progress: 100, status: 'FINISHED' } } as unknown as MigrationState;
     const onTriggerStep = mockOnTrigger(migrationState);
 
@@ -56,11 +70,16 @@ describe('useRemoteReindexMigrationStatus', () => {
 
     await waitFor(() => expect(onTriggerStep).toHaveBeenCalled());
     await waitFor(() => expect(result.current.migrationStatus).toEqual(migrationState.response));
-    await waitFor(() => expect(result.current.nextSteps).toEqual(['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER']));
+    await waitFor(() =>
+      expect(result.current.nextSteps).toEqual(['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER']),
+    );
   });
 
   it('should only show nextSteps that exist in the initial next_steps value', async () => {
-    const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key, next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA'] as MigrationActions[] };
+    const currentStep = {
+      state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
+      next_steps: ['REQUEST_MIGRATION_STATUS', 'RETRY_MIGRATE_EXISTING_DATA'] as MigrationActions[],
+    };
     const migrationState = { response: { progress: 100, status: 'FINISHED' } } as unknown as MigrationState;
     const onTriggerStep = mockOnTrigger(migrationState);
 

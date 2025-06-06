@@ -28,6 +28,7 @@ import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { Stream } from 'logic/streams/types';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -54,14 +55,16 @@ describe('ShowViewPage', () => {
     properties: List<any>(),
     state: {},
     created_at: '2022-01-01 00:00:00',
+    last_updated_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
     favorite: false,
-  }).toBuilder()
+  })
+    .toBuilder()
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
   const SimpleShowViewPage = () => (
-    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' }]}>
+    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' } as Stream]}>
       <ShowViewPage />
     </StreamsContext.Provider>
   );
@@ -71,7 +74,11 @@ describe('ShowViewPage', () => {
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(useFetchView).mockResolvedValue(view);
   });
 

@@ -1,0 +1,5 @@
+type = "f"
+message = "Pause index set rotation during remote reindex migration."
+
+pulls = ["20222"]
+issues = ["graylog-plugin-enterprise#8281"]

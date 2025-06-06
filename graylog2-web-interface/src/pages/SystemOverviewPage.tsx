@@ -39,7 +39,7 @@ const SystemOverviewPage = () => (
         </IfPermitted>
       </HideOnCloud>
 
-      <GraylogClusterOverview />
+      <GraylogClusterOverview showLicenseGraph />
 
       <HideOnCloud>
         <IndexerClusterHealth />

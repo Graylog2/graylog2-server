@@ -29,6 +29,7 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.utilities.ProxyHostsPattern;
@@ -42,7 +43,7 @@ import static org.graylog2.shared.messageq.MessageQueueModule.DISK_JOURNAL_MODE;
 import static org.graylog2.shared.messageq.MessageQueueModule.NOOP_JOURNAL_MODE;
 
 @SuppressWarnings("FieldMayBeFinal")
-public abstract class BaseConfiguration extends PathConfiguration {
+public abstract class BaseConfiguration extends PathConfiguration implements CommonNodeConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
@@ -83,6 +84,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     @Parameter("disable_native_system_stats_collector")
     private boolean disableNativeSystemStatsCollector = false;
+
+    @Parameter(value = "http_user_agent")
+    private String httpUserAgent = "Graylog";
 
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
@@ -169,12 +173,17 @@ public abstract class BaseConfiguration extends PathConfiguration {
         return udpRecvBufferSizes;
     }
 
+    @Override
     public boolean isMessageRecordingsEnabled() {
         return messageRecordingsEnable;
     }
 
     public boolean isDisableNativeSystemStatsCollector() {
         return disableNativeSystemStatsCollector;
+    }
+
+    public String getHttpUserAgent() {
+        return httpUserAgent;
     }
 
     public URI getHttpProxyUri() {

@@ -19,9 +19,9 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 type NodeSummary = {
-  id: string,
-  short_node_id: string,
-  hostname: string,
+  id: string;
+  short_node_id: string;
+  hostname: string;
 };
 type NodesMap = { [id: string]: NodeSummary };
 const NodesContext = React.createContext<NodesMap | undefined>(undefined);

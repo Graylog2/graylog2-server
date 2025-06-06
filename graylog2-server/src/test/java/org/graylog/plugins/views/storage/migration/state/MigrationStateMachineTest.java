@@ -38,10 +38,7 @@ class MigrationStateMachineTest {
     @Test
     void testPersistence() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-
-        final MigrationActionsAdapter migrationActions = new MigrationActionsAdapter() {};
-
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, migrationActions).get();
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, MigrationActionsAdapter::new).get();
         migrationStateMachine.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
 
 
@@ -55,7 +52,7 @@ class MigrationStateMachineTest {
     @Test
     void testReset() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, new MigrationActionsAdapter());
+        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, MigrationActionsAdapter::new);
         final MigrationStateMachine sm = provider.get();
         sm.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
 
@@ -69,7 +66,7 @@ class MigrationStateMachineTest {
 
     @Test
     void testSerialization() {
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), new MigrationActionsAdapter()).get();
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), MigrationActionsAdapter::new).get();
         final String serialized = migrationStateMachine.serialize();
         Assertions.assertThat(serialized).isNotEmpty().startsWith("digraph G {");
         final String fragment = URLEncoder.encode(serialized, StandardCharsets.UTF_8).replace("+", "%20");

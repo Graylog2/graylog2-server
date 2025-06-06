@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-const filterByPerspective = <T extends { perspective?: string }>(items: Array<T>, perspective: string | undefined): Array<T> => (
-  items.filter(
-    ({ perspective: itemPerspective }) => (
-      perspective === 'default' ? !itemPerspective || itemPerspective === 'default' : perspective === itemPerspective
-    ),
-  )
-);
+const filterByPerspective = <T extends { perspective?: string }>(
+  items: Array<T>,
+  perspective: string | undefined,
+): Array<T> =>
+  items.filter(({ perspective: itemPerspective }) =>
+    perspective === 'default' ? !itemPerspective || itemPerspective === 'default' : perspective === itemPerspective,
+  );
 
 export default filterByPerspective;

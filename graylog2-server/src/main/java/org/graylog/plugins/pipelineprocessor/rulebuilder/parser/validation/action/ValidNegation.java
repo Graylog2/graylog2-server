@@ -29,7 +29,7 @@ public class ValidNegation implements Validator {
     private final Map<String, RuleFragment> actions;
 
     public ValidNegation(RuleBuilderRegistry ruleBuilderRegistry) {
-        this.actions = ruleBuilderRegistry.actions();
+        this.actions = ruleBuilderRegistry.actionsWithInternal();
     }
 
     @Override

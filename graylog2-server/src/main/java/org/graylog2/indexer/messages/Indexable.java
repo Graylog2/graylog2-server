@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.util.Map;
 
 public interface Indexable {
@@ -38,10 +39,29 @@ public interface Indexable {
      * The message id is represented as a {@link de.huxhorn.sulky.ulid.ULID}
      */
     String getMessageId();
+
     long getSize();
+
     DateTime getReceiveTime();
-    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);
+
+    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter);
+
     DateTime getTimestamp();
+
+    /**
+     * Serializes the object to a form that can be sent to the indexer, e.g. JSON.
+     * <p>
+     * The default implementation will just call {@link #toElasticSearchObject(ObjectMapper, Meter)}
+     *
+     * @param context Context required to perform the serialization
+     * @return an array of bytes that can be sent to the indexer
+     * @throws IOException if serializing the object fails
+     */
+    default byte[] serialize(SerializationContext context) throws IOException {
+        return context.objectMapper().writeValueAsBytes(
+                toElasticSearchObject(context.objectMapper(), context.invalidTimestampMeter())
+        );
+    }
 
     /**
      * Guides the failure handling framework when deciding whether this particular

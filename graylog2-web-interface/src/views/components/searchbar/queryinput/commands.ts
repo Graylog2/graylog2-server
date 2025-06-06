@@ -18,4 +18,5 @@
 import type { Editor, CompletionResult } from 'views/components/searchbar/queryinput/ace-types';
 
 // eslint-disable-next-line import/prefer-default-export
-export const startAutocomplete = (editor: Editor, args?: { matches?: Array<CompletionResult> }) => editor.execCommand('startAutocomplete', args);
+export const startAutocomplete = (editor: Editor, args?: { matches?: Array<CompletionResult> }) =>
+  editor.execCommand('startAutocomplete', args);

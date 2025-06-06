@@ -17,18 +17,15 @@
 package org.graylog2.shared.security;
 
 import org.graylog.scheduler.schedule.CronJobSchedule;
-import org.graylog.security.certutil.CaService;
-import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog.security.certutil.CertRenewalServiceImpl;
 import org.graylog.security.certutil.CheckForCertRenewalJob;
-import org.graylog2.bootstrap.preflight.web.resources.CertificateRenewalResource;
+import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog2.plugin.PluginModule;
 
 public class CertificateRenewalBindings  extends PluginModule {
     @Override
     protected void configure() {
-        bind(CaService.class).to(CaServiceImpl.class);
         bind(CertRenewalService.class).to(CertRenewalServiceImpl.class).asEagerSingleton();
         addRestResource(CertificateRenewalResource.class);
 

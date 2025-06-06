@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation.validators;
 
+import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
@@ -25,8 +26,6 @@ import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog.plugins.views.search.validation.validators.util.UnknownFieldsListLimiter;
-
-import jakarta.inject.Singleton;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +65,7 @@ public class UnknownFieldsValidator implements QueryValidator {
     List<ParsedTerm> identifyUnknownFields(final Set<String> availableFields, final List<ParsedTerm> terms) {
         final Map<String, List<ParsedTerm>> groupedByField = terms.stream()
                 .filter(t -> !t.isDefaultField())
+                .filter(term -> !isParameter(term.getRealFieldName()))
                 .filter(term -> !SEARCHABLE_ES_FIELDS.contains(term.getRealFieldName()))
                 .filter(term -> !RESERVED_SETTABLE_FIELDS.contains(term.getRealFieldName()))
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
@@ -73,5 +73,9 @@ public class UnknownFieldsValidator implements QueryValidator {
                 .collect(Collectors.groupingBy(ParsedTerm::getRealFieldName));
 
         return unknownFieldsListLimiter.filterElementsContainingUsefulInformation(groupedByField);
+    }
+
+    private boolean isParameter(final String term) {
+        return term.startsWith("$") && term.endsWith("$");
     }
 }

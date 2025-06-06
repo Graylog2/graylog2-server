@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
@@ -125,7 +126,7 @@ public class TestSearchUser {
                 Optional.ofNullable(user).orElseGet(() -> Mockito.mock(User.class)),
                 permission -> verifyPermission(permissions, permission),
                 (permission, entityid) -> verifyPermission(permissions, permission, entityid),
-                new PermittedStreams(knownStreamIDs::stream),
+                new PermittedStreams(knownStreamIDs::stream, (categories) -> Stream.of()),
                 new HashMap<>());
     }
 

@@ -18,6 +18,7 @@ import React from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
+import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -25,7 +26,7 @@ import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitio
 import type { Scheduler, EventDefinition } from '../event-definitions-types';
 
 type Props = {
-  definition: EventDefinition,
+  definition: EventDefinition;
 };
 
 const DetailTitle = styled.dt`
@@ -33,16 +34,18 @@ const DetailTitle = styled.dt`
   clear: left;
 `;
 
-const DetailValue = styled.dd(({ theme }) => css`
-  margin-left: 180px;
-  word-wrap: break-word;
+const DetailValue = styled.dd(
+  ({ theme }) => css`
+    margin-left: 180px;
+    word-wrap: break-word;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.variant.lightest.default};
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-  }
-`);
+    &:not(:last-child) {
+      border-bottom: 1px solid ${theme.colors.variant.lightest.default};
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+    }
+  `,
+);
 
 const DetailsButton = styled(Button)`
   padding: 6px 8px;
@@ -55,9 +58,24 @@ const getTimeRange = (scheduler: Scheduler) => {
   return (
     <>
       <DetailTitle>Next time range:</DetailTitle>
-      <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} /></DetailValue>
+      <DetailValue>
+        <Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} />
+      </DetailValue>
     </>
   );
+};
+
+const describeSchedule = (isCron: boolean, value: number | string) => {
+  if (isCron) {
+    const cronDescription = describeExpression(value as string);
+
+    // Lower case the A in At or the E in Every
+    return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
+  }
+
+  return `every ${moment
+    .duration(value)
+    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
 };
 
 const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) => (
@@ -67,18 +85,23 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
     {scheduler.triggered_at && (
       <>
         <DetailTitle>Last execution:</DetailTitle>
-        <DetailValue><Timestamp dateTime={scheduler.triggered_at} /></DetailValue>
+        <DetailValue>
+          <Timestamp dateTime={scheduler.triggered_at} />
+        </DetailValue>
       </>
     )}
     {scheduler.next_time && (
       <>
         <DetailTitle>Next execution:</DetailTitle>
-        <DetailValue><Timestamp dateTime={scheduler.next_time} /></DetailValue>
+        <DetailValue>
+          <Timestamp dateTime={scheduler.next_time} />
+        </DetailValue>
       </>
     )}
     {getTimeRange(scheduler)}
     <DetailTitle>Queued notifications:</DetailTitle>
-    <DetailValue>{scheduler.queued_notifications}
+    <DetailValue>
+      {scheduler.queued_notifications}
       {scheduler.queued_notifications > 0 && (
         <Button bsStyle="link" bsSize="xsmall" onClick={() => clearNotifications()}>
           clear
@@ -91,36 +114,47 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
 const SchedulingInfo = ({
   executeEveryMs,
   searchWithinMs,
+  useCronScheduling,
+  cronExpression,
   scheduler,
   title,
   clearNotifications,
-}:{
-  executeEveryMs: number,
-  searchWithinMs: number,
-  scheduler: Scheduler, title: string,
-  clearNotifications: () => void
+}: {
+  executeEveryMs: number;
+  searchWithinMs: number;
+  useCronScheduling: boolean;
+  cronExpression: string;
+  scheduler: Scheduler;
+  title: string;
+  clearNotifications: () => void;
 }) => {
-  const executeEveryFormatted = moment.duration(executeEveryMs)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
-  const searchWithinFormatted = moment.duration(searchWithinMs)
+  const executeEveryFormatted = describeSchedule(
+    useCronScheduling,
+    useCronScheduling ? cronExpression : executeEveryMs,
+  );
+  const searchWithinFormatted = moment
+    .duration(searchWithinMs)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
   return (
     <>
-      {`Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
-      <OverlayTrigger trigger="click"
-                      rootClose
-                      placement="left"
-                      title={`${title} details.`}
-                      overlay={detailsPopover(scheduler, clearNotifications)}
-                      width={500}>
-        <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
+      {`Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
+      <OverlayTrigger
+        trigger="click"
+        rootClose
+        placement="left"
+        title={`${title} details.`}
+        overlay={detailsPopover(scheduler, clearNotifications)}
+        width={500}>
+        <DetailsButton bsStyle="link">
+          <Icon name="info" />
+        </DetailsButton>
       </OverlayTrigger>
     </>
   );
 };
 
-const SchedulingCell = ({ definition } : Props) => {
+const SchedulingCell = ({ definition }: Props) => {
   if (!definition?.config?.search_within_ms && !definition?.config?.execute_every_ms) {
     return <>Not Scheduled.</>;
   }
@@ -137,16 +171,22 @@ const SchedulingCell = ({ definition } : Props) => {
     config: {
       search_within_ms: searchWithinMs,
       execute_every_ms: executeEveryMs,
+      use_cron_scheduling: useCronScheduling,
+      cron_expression: cronExpression,
     },
     scheduler,
   } = definition;
 
   return (
-    <SchedulingInfo executeEveryMs={executeEveryMs}
-                    searchWithinMs={searchWithinMs}
-                    title={title}
-                    scheduler={scheduler}
-                    clearNotifications={clearNotifications(definition)} />
+    <SchedulingInfo
+      executeEveryMs={executeEveryMs}
+      searchWithinMs={searchWithinMs}
+      useCronScheduling={useCronScheduling}
+      cronExpression={cronExpression}
+      title={title}
+      scheduler={scheduler}
+      clearNotifications={clearNotifications(definition)}
+    />
   );
 };
 

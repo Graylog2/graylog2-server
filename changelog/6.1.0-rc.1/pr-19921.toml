@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Dropping legacy `dashboards` collection in migration."
+
+issues = ["19912"]
+pulls = ["19921"]

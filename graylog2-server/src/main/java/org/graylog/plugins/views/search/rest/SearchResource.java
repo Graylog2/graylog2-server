@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -48,6 +47,8 @@ import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -57,9 +58,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -80,15 +78,19 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchJobService searchJobService;
     private final EventBus serverEventBus;
 
+    private final ClusterConfigService clusterConfigService;
+
     @Inject
-    public SearchResource(SearchDomain searchDomain,
-                          SearchExecutor searchExecutor,
-                          SearchJobService searchJobService,
-                          EventBus serverEventBus) {
+    public SearchResource(final SearchDomain searchDomain,
+                          final SearchExecutor searchExecutor,
+                          final SearchJobService searchJobService,
+                          final EventBus serverEventBus,
+                          final ClusterConfigService clusterConfigService) {
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
         this.serverEventBus = serverEventBus;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @POST
@@ -157,7 +159,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
 
-        final SearchJob searchJob = searchExecutor.executeAsync(id, searchUser, executionState);
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        final ExecutionState enrichedExecutionState = executionState == null ?
+                ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig) : executionState.withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
+
+        final SearchJob searchJob = searchExecutor.executeAsync(id, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
 
@@ -186,16 +192,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
-                                   @QueryParam("timeout") @DefaultValue("60000") long timeout,
+                                   @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
                                    @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
-
-        postAuditEvent(searchJob);
-
-        final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
-
-        return Response.ok(searchJobDTO).build();
+        return executeSyncJobInner(search, searchUser);
     }
 
     @POST
@@ -206,10 +206,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({SEARCH_FORMAT_V2})
     public Response executeSyncJobv2(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTOv2 searchRequest,
                                      @ApiParam(name = "timeout", defaultValue = "60000")
-                                     @QueryParam("timeout") @DefaultValue("60000") long timeout,
+                                     @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
                                      @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
+        return executeSyncJobInner(search, searchUser);
+    }
+
+    private Response executeSyncJobInner(final Search search, final SearchUser searchUser) {
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        final ExecutionState enrichedExecutionState = ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
 
@@ -222,17 +228,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
-        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
-        if (searchJob.getResultFuture() != null) {
-            try {
-                // force a "conditional join", to catch fast responses without having to poll
-                Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
-            } catch (ExecutionException | TimeoutException ignore) {
-            }
-        }
+    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
+                              @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
+                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
+                              @Context SearchUser searchUser) {
         return Response
-                .ok(SearchJobDTO.fromSearchJob(searchJob))
+                .ok(
+                        searchJobService.load(jobId, searchUser)
+                                .map(searchJobDTO -> searchJobDTO.withResultsLimitedTo(page, perPage))
+                                .orElseThrow(NotFoundException::new)
+                )
                 .build();
     }
 
@@ -242,8 +247,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON})
     public Response cancelJob(@PathParam("jobId") String jobId,
                               @Context SearchUser searchUser) {
-        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
-        searchJob.cancel();
+
+        if (!searchJobService.cancel(jobId, searchUser)) {
+            throw new NotFoundException();
+        }
         return Response.ok().build();
     }
 
@@ -251,4 +258,5 @@ public class SearchResource extends RestResource implements PluginRestResource {
         final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(getCurrentUser(), searchJob, DateTime.now(DateTimeZone.UTC));
         this.serverEventBus.post(searchJobExecutionEvent);
     }
+
 }

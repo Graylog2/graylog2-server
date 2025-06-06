@@ -22,10 +22,11 @@ import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
-import { Icon } from 'components/common';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import NavIcon from 'components/navigation/NavIcon';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -36,11 +37,12 @@ import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
 type Props = {
-  pathname: string,
+  pathname: string;
 };
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
+  const { activePerspective } = useActivePerspective();
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -50,7 +52,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
         </Navbar.Brand>
         <Navbar.Toggle />
         <DevelopmentHeaderBadge smallScreen />
-        {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
+        {pluginItems.map(({ key, component: Item }) => (
+          <Item key={key} smallScreen />
+        ))}
       </Navbar.Header>
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
@@ -61,22 +65,24 @@ const Navigation = React.memo(({ pathname }: Props) => {
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (
-            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+            <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
               <GlobalThroughput />
             </LinkContainer>
           )}
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
-            {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
+            {pluginItems.map(({ key, component: Item }) => (
+              <Item key={key} />
+            ))}
           </InactiveNavItem>
           <ScratchpadToggle />
 
           <HelpMenu />
 
-          <LinkContainer relativeActive to={Routes.WELCOME}>
+          <LinkContainer relativeActive to={activePerspective.welcomeRoute}>
             <NavItem id="welcome-nav-link">
-              <Icon size="lg" title="Welcome" name="home" />
+              <NavIcon type="home" title="Welcome" />
             </NavItem>
           </LinkContainer>
 

@@ -17,9 +17,10 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
+import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
@@ -70,11 +71,7 @@ const retentionStrategies = [
         },
         index_action: {
           type: 'string',
-          enum: [
-            'NONE',
-            'CLOSE',
-            'DELETE',
-          ],
+          enum: ['NONE', 'CLOSE', 'DELETE'],
         },
         type: {
           type: 'string',
@@ -213,7 +210,7 @@ const rotationStrategies = [
   },
 ];
 
-const indexDefaultsConfig = {
+const indexSetTemplateDefaults = {
   index_prefix: 'default_index_prefix',
   index_analyzer: 'default_index_analyser',
   shards: 1,
@@ -222,6 +219,7 @@ const indexDefaultsConfig = {
   index_optimization_disabled: true,
   field_type_refresh_interval: 30,
   field_type_refresh_interval_unit: 'minutes' as 'minutes' | 'seconds',
+  use_legacy_rotation: false,
   rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
   rotation_strategy_config: {
     type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig',
@@ -241,26 +239,36 @@ const indexDefaultsConfig = {
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
-jest.mock('components/indices/hooks/useIndexDefaults', () => jest.fn());
+jest.mock('components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults', () => jest.fn());
+jest.mock('components/indices/IndexSetTemplates/hooks/useSelectedTemplate', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
-    asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
-    asMock(useIndexDefaults).mockReturnValue(({ loadingIndexDefaultsConfig: false, indexDefaultsConfig }));
+    asMock(useProfileOptions).mockReturnValue({ isLoading: false, options: [], refetch: () => {} });
+    asMock(useIndexSetTemplateDefaults).mockReturnValue({
+      loadingIndexSetTemplateDefaults: false,
+      indexSetTemplateDefaults,
+    });
+    asMock(useSelectedIndexSetTemplate).mockReturnValue({
+      selectedIndexSetTemplate: undefined,
+      setSelectedIndexSetTemplate: jest.fn(),
+    });
   });
 
   const onSave = jest.fn();
   const cancelLink = '/cancelLink';
 
   const SUT = (props: Partial<React.ComponentProps<typeof IndexSetConfigurationForm>>) => (
-    <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                               rotationStrategies={rotationStrategies}
-                               retentionStrategies={retentionStrategies}
-                               cancelLink={cancelLink}
-                               onUpdate={onSave}
-                               submitButtonText="Save"
-                               submitLoadingText="Saving..."
-                               {...props} />
+    <IndexSetConfigurationForm
+      retentionStrategiesContext={retentionStrategiesContext}
+      rotationStrategies={rotationStrategies}
+      retentionStrategies={retentionStrategies}
+      cancelLink={cancelLink}
+      onUpdate={onSave}
+      submitButtonText="Save"
+      submitLoadingText="Saving..."
+      {...props}
+    />
   );
 
   it('Should render IndexSetConfigurationForm', async () => {

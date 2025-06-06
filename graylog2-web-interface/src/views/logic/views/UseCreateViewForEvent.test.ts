@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import ObjectID from 'bson-objectid';
 
 import {
   mockedMappedAggregation,
@@ -33,6 +32,7 @@ import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import generateObjectId from 'logic/generateObjectId';
 
 const counter = () => {
   let index = 0;
@@ -53,7 +53,14 @@ const generateIdCounterOneAggregationNoField = counter();
 const objectIdCounterOneAggregationsNoField = counter();
 
 const mockedGenerateIdTwoAggregations = () => {
-  const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id', 'field2-widget-id', 'summary-widget-id'];
+  const idSet = [
+    'query-id',
+    'mc-widget-id',
+    'allm-widget-id',
+    'field1-widget-id',
+    'field2-widget-id',
+    'summary-widget-id',
+  ];
   const index = generateIdCounterTwoAggregations();
 
   return idSet[index];
@@ -98,9 +105,8 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: { exports: jest.fn(() => [{ type: 'aggregation', defaults: {} }]) },
 }));
 
+jest.mock('logic/generateObjectId', () => jest.fn());
 jest.mock('logic/generateId', () => jest.fn());
-
-jest.mock('bson-objectid', () => jest.fn());
 
 const mock_color = StaticColor.create('#ffffff');
 
@@ -113,10 +119,12 @@ jest.mock('views/logic/views/formatting/highlighting/HighlightingRule', () => ({
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -130,12 +138,15 @@ describe('UseCreateViewForEvent', () => {
 
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
+    asMock(generateObjectId).mockImplementation(mockedObjectIdTwoAggregations);
 
-    asMock(ObjectID).mockImplementation(() => ({
-      toString: () => mockedObjectIdTwoAggregations(),
-    }) as ObjectID);
-
-    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
+    const { result } = renderHook(() =>
+      UseCreateViewForEvent({
+        eventData: mockEventData.event,
+        eventDefinition: mockEventDefinitionTwoAggregations,
+        aggregations: mockedMappedAggregation,
+      }),
+    );
     const view = await result.current.then((r) => r);
 
     expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithTwoAggregations));
@@ -143,12 +154,15 @@ describe('UseCreateViewForEvent', () => {
 
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
+    asMock(generateObjectId).mockImplementation(mockedObjectIdOneAggregation);
 
-    asMock(ObjectID).mockImplementation(() => ({
-      toString: () => mockedObjectIdOneAggregation(),
-    }) as ObjectID);
-
-    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));
+    const { result } = renderHook(() =>
+      UseCreateViewForEvent({
+        eventData: mockEventData.event,
+        eventDefinition: mockEventDefinitionOneAggregation,
+        aggregations: [mockedMappedAggregation[0]],
+      }),
+    );
     const view = await result.current.then((r) => r);
 
     expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithOneAggregation));
@@ -156,12 +170,15 @@ describe('UseCreateViewForEvent', () => {
 
   it('should create view with 1 aggregation widgets when aggregation has no fields and grouping by', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregationNoFields);
+    asMock(generateObjectId).mockImplementation(mockedObjectIdOneAggregationNoFields);
 
-    asMock(ObjectID).mockImplementation(() => ({
-      toString: () => mockedObjectIdOneAggregationNoFields(),
-    }) as ObjectID);
-
-    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionOneAggregationNoFields, aggregations: mockedMappedAggregationNoField }));
+    const { result } = renderHook(() =>
+      UseCreateViewForEvent({
+        eventData: mockEventData.event,
+        eventDefinition: mockEventDefinitionOneAggregationNoFields,
+        aggregations: mockedMappedAggregationNoField,
+      }),
+    );
     const view = await result.current.then((r) => r);
 
     expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithOneAggregationNoField));

@@ -22,6 +22,10 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import com.google.errorprone.annotations.MustBeClosed;
+import jakarta.inject.Inject;
+import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -29,6 +33,8 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.security.GrantDTO;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -48,9 +54,8 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -69,18 +74,21 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     private final SearchDbService searchDbService;
     private final ViewSummaryService viewSummaryService;
     protected final UserService userService;
+    private final EntityOwnershipService entityOwnershipService;
 
     @Inject
     public ViewFacade(ObjectMapper objectMapper,
                       SearchDbService searchDbService,
                       ViewService viewService,
                       ViewSummaryService viewSummaryService,
-                      UserService userService) {
+                      UserService userService,
+                      EntityOwnershipService entityOwnershipService) {
         this.objectMapper = objectMapper;
         this.searchDbService = searchDbService;
         this.viewService = viewService;
         this.viewSummaryService = viewSummaryService;
         this.userService = userService;
+        this.entityOwnershipService = entityOwnershipService;
     }
 
     @Override
@@ -162,9 +170,12 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
+        try (final Stream<ViewSummaryDTO> nativeViews = getNativeViews()) {
+            return nativeViews.map(this::createExcerpt).collect(Collectors.toSet());
+        }
     }
 
+    @MustBeClosed
     protected Stream<ViewSummaryDTO> getNativeViews() {
         return viewSummaryService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
     }
@@ -187,12 +198,16 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
         mutableGraph.addNode(entityDescriptor);
 
         final ModelId modelId = entityDescriptor.id();
+        final ViewDTO view = viewService.get(modelId.id()).
+                orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
+        view.resolveNativeEntity(entityDescriptor, mutableGraph);
         final ViewSummaryDTO viewSummaryDTO = viewSummaryService.get(modelId.id()).
                 orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
         final Search search = searchDbService.get(viewSummaryDTO.searchId()).
                 orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewSummaryDTO.searchId()));
         search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_REF_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
+        search.resolveNativeEntity(entityDescriptor, mutableGraph);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
@@ -202,19 +217,27 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
         ensureV1(entity);
-        return resolveEntityV1((EntityV1) entity, entities);
+        return resolveEntityV1((EntityV1) entity, parameters, entities);
+    }
+
+    @Override
+    public List<GrantDTO> resolveGrants(ViewDTO nativeEntity) {
+        final GRNType type = nativeEntity.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+        return entityOwnershipService.getGrantsForTarget(type, nativeEntity.id());
     }
 
     @SuppressWarnings("UnstableApiUsage")
     private Graph<Entity> resolveEntityV1(EntityV1 entity,
+                                          Map<String, ValueReference> parameters,
                                           Map<EntityDescriptor, Entity> entities) {
         final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
-        return resolveViewEntity(entity, viewEntity, entities);
+        return resolveViewEntity(entity, viewEntity, parameters, entities);
     }
 
     @SuppressWarnings("UnstableApiUsage")
     protected Graph<Entity> resolveViewEntity(EntityV1 entity,
                                               ViewEntity viewEntity,
+                                              Map<String, ValueReference> parameters,
                                               Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
@@ -228,6 +251,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                 .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        viewEntity.resolveForInstallation(entity, parameters, entities, mutableGraph);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 }

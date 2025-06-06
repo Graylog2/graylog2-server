@@ -23,6 +23,9 @@ public class ScopedEntitiesModule extends PluginModule {
     protected void configure() {
 
         addEntityScope(DefaultEntityScope.class);
+        addEntityScope(NonDeletableSystemScope.class);
+        addEntityScope(DeletableSystemScope.class);
+        addEntityScope(ImmutableSystemScope.class);
 
         addSystemRestResource(EntityScopeResource.class);
     }

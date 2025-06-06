@@ -16,17 +16,16 @@
  */
 package org.graylog2.indexer.datanode;
 
-import com.mongodb.BasicDBObject;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.migration.LogEntry;
-import org.mongojack.WriteResult;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -36,23 +35,28 @@ import static org.graylog2.indexer.datanode.IndexMigrationConfiguration.FIELD_TA
 import static org.graylog2.indexer.datanode.MigrationConfiguration.FIELD_INDICES;
 import static org.graylog2.indexer.datanode.MigrationConfiguration.FIELD_LOGS;
 
-public class RemoteReindexMigrationServiceImpl extends PaginatedDbService<MigrationConfiguration> implements RemoteReindexMigrationService {
+public class RemoteReindexMigrationServiceImpl implements RemoteReindexMigrationService {
 
     public static final String COLLECTION_NAME = "remote_reindex_migrations";
 
+    private final MongoCollection<MigrationConfiguration> collection;
+    private final MongoUtils<MigrationConfiguration> mongoUtils;
+
     @Inject
-    public RemoteReindexMigrationServiceImpl(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, MigrationConfiguration.class, COLLECTION_NAME);
+    public RemoteReindexMigrationServiceImpl(MongoCollections mongoCollections) {
+        this.collection = mongoCollections.collection(COLLECTION_NAME, MigrationConfiguration.class);
+        this.mongoUtils = mongoCollections.utils(collection);
     }
 
     @Override
     public Optional<MigrationConfiguration> getMigration(String migrationId) {
-        return get(migrationId);
+        return mongoUtils.getById(migrationId);
     }
 
     @Override
     public MigrationConfiguration saveMigration(MigrationConfiguration migrationConfiguration) {
-        return save(migrationConfiguration);
+        var id = MongoUtils.insertedIdAsString(collection.insertOne(migrationConfiguration));
+        return mongoUtils.getById(id).orElseThrow();
     }
 
     @Override
@@ -62,7 +66,7 @@ public class RemoteReindexMigrationServiceImpl extends PaginatedDbService<Migrat
                 Filters.eq(FIELD_INDICES + "." + FIELD_INDEX_NAME, indexName)
         );
         final Bson update = Updates.set(FIELD_INDICES + ".$." + FIELD_TASK_ID, taskId);
-        if (!db.update(filter, update).isUpdateOfExisting()) {
+        if (collection.updateOne(filter, update).getModifiedCount() != 1) {
             throw new IllegalStateException(String.format(Locale.ROOT, "Failed to update migration %s. Index %s doesn't exist in the migration", migrationID, indexName));
         }
     }
@@ -71,8 +75,13 @@ public class RemoteReindexMigrationServiceImpl extends PaginatedDbService<Migrat
     public void appendLogEntry(String migrationId, LogEntry log) {
         final Bson filter = Filters.eq("_id", new ObjectId(migrationId));
         final Bson update = Updates.push(FIELD_LOGS, log);
-        if(db.update(filter, update).getN() != 1) {
+        if (collection.updateOne(filter, update).getModifiedCount() != 1) {
             throw new IllegalStateException("Failed to append log entry:" + log);
         }
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return Optional.ofNullable(collection.find().sort(new Document("_id", -1)).limit(1).first()).map(MigrationConfiguration::id);
     }
 }

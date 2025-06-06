@@ -16,20 +16,14 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import com.google.auto.value.AutoValue;
+public record SubstringMultilinePosition(int line,
+                                         int beginColumn,
+                                         int endColumn
+) {
 
-import java.util.ArrayList;
-import java.util.List;
-
-@AutoValue
-public abstract class SubstringMultilinePosition {
-    public abstract int line();
-
-    public abstract int beginColumn();
-
-    public abstract int endColumn();
-
-    public static SubstringMultilinePosition create(int line, int beginColumn, int endColumn) {
-        return new AutoValue_SubstringMultilinePosition(line, beginColumn, endColumn);
+    public static SubstringMultilinePosition create(final int line,
+                                                    final int beginColumn,
+                                                    final int endColumn) {
+        return new SubstringMultilinePosition(line, beginColumn, endColumn);
     }
 }

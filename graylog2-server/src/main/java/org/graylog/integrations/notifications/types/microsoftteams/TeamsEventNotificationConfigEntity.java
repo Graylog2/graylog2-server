@@ -32,6 +32,7 @@ import java.util.Map;
 @AutoValue
 @JsonTypeName(TeamsEventNotificationConfigEntity.TYPE_NAME)
 @JsonDeserialize(builder = TeamsEventNotificationConfigEntity.Builder.class)
+@Deprecated
 public abstract class TeamsEventNotificationConfigEntity implements EventNotificationConfigEntity {
 
     public static final String TYPE_NAME = "teams-notification-v1";
@@ -90,7 +91,6 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
         return TeamsEventNotificationConfig.builder()
                 .color(color().asString(parameters))
                 .webhookUrl(webhookUrl().asString(parameters))
-                .customMessage(customMessage().asString(parameters))
                 .customMessage(customMessage().asString(parameters))
                 .iconUrl(iconUrl().asString(parameters))
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))

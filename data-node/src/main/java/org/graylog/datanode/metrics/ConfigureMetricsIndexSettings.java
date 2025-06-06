@@ -20,12 +20,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.periodicals.MetricsCollector;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ConfigureMetricsIndexSettings implements StateMachineTracer {
+public class ConfigureMetricsIndexSettings implements StateMachineTracer<OpensearchState, OpensearchEvent> {
 
     private final Logger log = LoggerFactory.getLogger(ConfigureMetricsIndexSettings.class);
 
@@ -60,6 +61,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private DataStreamService dataStreamService;
     private final NodeService<DataNodeDto> nodeService;
 
+    @Inject
     public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper, NodeService<DataNodeDto> nodeService) {
         this.process = process;
         this.configuration = configuration;
@@ -74,7 +76,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
     @Override
     public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
-        if (destination == OpensearchState.AVAILABLE && source == OpensearchState.STARTING) {
+        if (destination == OpensearchState.AVAILABLE && source == OpensearchState.STARTING && process.isManagerNode()) {
             process.openSearchClient().ifPresent(client -> {
                 final IsmApi ismApi = new IsmApi(client, objectMapper);
                 int replicas = nodeService.allActive().size() == 1 ? 0 : 1;

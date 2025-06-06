@@ -1,0 +1,5 @@
+type="f"
+message="only hide DatanodeMigration if state 'FINISHED' and datanode is configured"
+
+issues=["19871"]
+pulls=["20042"]

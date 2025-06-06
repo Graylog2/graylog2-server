@@ -84,8 +84,8 @@ class TimeBasedSizeOptimizingStrategyTest {
         timeBasedSizeOptimizingStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder().build();
         when(indexSetConfig.shards()).thenReturn(1);
 
-        when(indexSetConfig.rotationStrategy()).thenReturn(timeBasedSizeOptimizingStrategyConfig);
-        lenient().when(indexSetConfig.retentionStrategy()).thenReturn(ClosingRetentionStrategyConfig.createDefault());
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(timeBasedSizeOptimizingStrategyConfig);
+        lenient().when(indexSetConfig.retentionStrategyConfig()).thenReturn(ClosingRetentionStrategyConfig.createDefault());
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
 
         when(indices.numberOfMessages(anyString())).thenReturn(10L);
@@ -189,7 +189,7 @@ class TimeBasedSizeOptimizingStrategyTest {
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(5L));
 
-        when(indexSetConfig.retentionStrategy()).thenReturn(NoopRetentionStrategyConfig.createDefault());
+        when(indexSetConfig.retentionStrategyConfig()).thenReturn(NoopRetentionStrategyConfig.createDefault());
 
         final Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 

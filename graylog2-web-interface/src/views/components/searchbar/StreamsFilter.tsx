@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
@@ -29,13 +28,15 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled: boolean,
-  value: Array<string>,
-  streams: Array<{ key: string, value: string }>,
-  onChange: (newStreamIds: Array<string>) => void,
+  disabled?: boolean;
+  value?: Array<string>;
+  streams: Array<{ key: string; value: string }>;
+  onChange: (newStreamIds: Array<string>) => void;
+  multi?: boolean;
+  clearable?: boolean;
 };
 
-const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
+const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi = true, clearable = true }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
@@ -56,34 +57,20 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
 
   return (
     <Container data-testid="streams-filter" title={placeholder}>
-      <Select placeholder={placeholder}
-              disabled={disabled}
-              inputProps={{ 'aria-label': placeholder }}
-              displayKey="key"
-              inputId="streams-filter"
-              onChange={handleChange}
-              options={options}
-              multi
-              value={selectedStreams} />
+      <Select
+        placeholder={placeholder}
+        disabled={disabled}
+        clearable={clearable}
+        aria-label={placeholder}
+        displayKey="key"
+        inputId="streams-filter"
+        onChange={handleChange}
+        options={options}
+        multi={multi}
+        value={selectedStreams}
+      />
     </Container>
   );
-};
-
-StreamsFilter.propTypes = {
-  disabled: PropTypes.bool,
-  value: PropTypes.arrayOf(PropTypes.string),
-  streams: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-StreamsFilter.defaultProps = {
-  disabled: false,
-  value: [],
 };
 
 export default StreamsFilter;

@@ -41,21 +41,27 @@ describe('ChartActionHandler', () => {
   it('uses average function if triggered on field', async () => {
     await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} }));
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({
-        series: [Series.forFunction('avg(somefield)')],
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          series: [Series.forFunction('avg(somefield)')],
+        }),
       }),
-    }));
+    );
   });
 
   it('uses the function itself if it was triggered on one', async () => {
-    await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'max(somefield)', type: emptyFieldType, contexts: {} }));
+    await dispatch(
+      ChartActionHandler({ queryId: 'queryId', field: 'max(somefield)', type: emptyFieldType, contexts: {} }),
+    );
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({
-        series: [Series.forFunction('max(somefield)')],
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          series: [Series.forFunction('max(somefield)')],
+        }),
       }),
-    }));
+    );
   });
 
   describe('Widget creation', () => {
@@ -64,11 +70,20 @@ describe('ChartActionHandler', () => {
       const origWidget = Widget.builder().filter(filter).build();
       const timestampFieldType = FieldTypes.DATE();
 
-      await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: { widget: origWidget } }));
+      await dispatch(
+        ChartActionHandler({
+          queryId: 'queryId',
+          field: 'somefield',
+          type: emptyFieldType,
+          contexts: { widget: origWidget },
+        }),
+      );
 
-      expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-        filter,
-      }));
+      expect(addWidget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter,
+        }),
+      );
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
@@ -81,19 +96,23 @@ describe('ChartActionHandler', () => {
         .timerange({ type: 'relative', range: 3600 })
         .build();
 
-      await dispatch(ChartActionHandler({
-        queryId: 'queryId',
-        field: 'foo',
-        type: new FieldType('keyword', [], []),
-        contexts: { widget: origWidget },
-      }));
+      await dispatch(
+        ChartActionHandler({
+          queryId: 'queryId',
+          field: 'foo',
+          type: new FieldType('keyword', [], []),
+          contexts: { widget: origWidget },
+        }),
+      );
 
-      expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-        filter: 'author: "Vanth"',
-        query: createElasticsearchQueryString('foo:42'),
-        streams: ['stream1', 'stream23'],
-        timerange: { type: 'relative', range: 3600 },
-      }));
+      expect(addWidget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter: 'author: "Vanth"',
+          query: createElasticsearchQueryString('foo:42'),
+          streams: ['stream1', 'stream23'],
+          timerange: { type: 'relative', range: 3600 },
+        }),
+      );
     });
   });
 });

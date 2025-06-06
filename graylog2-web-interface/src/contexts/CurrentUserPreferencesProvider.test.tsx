@@ -34,11 +34,13 @@ jest.mock('stores/users/CurrentUserStore', () => ({
 }));
 
 describe('CurrentUserPreferencesProvider', () => {
-  const SimpleCurrentUserPreferencesProvider = ({ children }: { children: (value: UserPreferences) => React.ReactNode }) => (
+  const SimpleCurrentUserPreferencesProvider = ({
+    children,
+  }: {
+    children: (value: UserPreferences) => React.ReactNode;
+  }) => (
     <CurrentUserPreferencesProvider>
-      <UserPreferencesContext.Consumer>
-        {children}
-      </UserPreferencesContext.Consumer>
+      <UserPreferencesContext.Consumer>{children}</UserPreferencesContext.Consumer>
     </CurrentUserPreferencesProvider>
   );
 
@@ -47,9 +49,7 @@ describe('CurrentUserPreferencesProvider', () => {
 
     render(
       <CurrentUserProvider>
-        <SimpleCurrentUserPreferencesProvider>
-          {consume}
-        </SimpleCurrentUserPreferencesProvider>
+        <SimpleCurrentUserPreferencesProvider>{consume}</SimpleCurrentUserPreferencesProvider>
       </CurrentUserProvider>,
     );
 
@@ -70,7 +70,11 @@ describe('CurrentUserPreferencesProvider', () => {
 
   it('provides default user preferences if the user has none', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: adminUser.toBuilder().preferences(undefined as PreferencesMap).build().toJSON(),
+      currentUser: adminUser
+        .toBuilder()
+        .preferences(undefined as PreferencesMap)
+        .build()
+        .toJSON(),
     });
 
     const consume = renderSUT();
@@ -80,7 +84,11 @@ describe('CurrentUserPreferencesProvider', () => {
 
   it('provides empty user preferences of current user', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: adminUser.toBuilder().preferences({} as PreferencesMap).build().toJSON(),
+      currentUser: adminUser
+        .toBuilder()
+        .preferences({} as PreferencesMap)
+        .build()
+        .toJSON(),
     });
 
     const consume = renderSUT();
@@ -90,9 +98,11 @@ describe('CurrentUserPreferencesProvider', () => {
 
   it('provides user preferences of current user', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: adminUser.toBuilder().preferences(
-        { enableSmartSearch: false, updateUnfocussed: true } as PreferencesMap,
-      ).build().toJSON(),
+      currentUser: adminUser
+        .toBuilder()
+        .preferences({ enableSmartSearch: false, updateUnfocussed: true } as PreferencesMap)
+        .build()
+        .toJSON(),
     });
 
     const consume = renderSUT();

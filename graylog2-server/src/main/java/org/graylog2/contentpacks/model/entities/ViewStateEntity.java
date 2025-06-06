@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
 import org.graylog.plugins.views.search.views.FormattingSettings;
@@ -135,5 +136,13 @@ public abstract class ViewStateEntity implements NativeEntityConverter<ViewState
             viewStateBuilder.staticMessageListId(this.staticMessageListId().get());
         }
         return viewStateBuilder.build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        widgets().forEach(widget -> widget.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

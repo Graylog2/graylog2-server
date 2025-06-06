@@ -26,13 +26,15 @@ describe('useColumnsWidths hook test', () => {
     };
     const columnsIds = ['title', 'description'];
 
-    const { result } = renderHook(() => useColumnsWidths({
-      columnRenderersByAttribute,
-      columnsIds,
-      actionsColWidth: 0,
-      bulkSelectColWidth: 0,
-      tableWidth: 600,
-    }));
+    const { result } = renderHook(() =>
+      useColumnsWidths({
+        columnRenderersByAttribute,
+        columnsIds,
+        actionsColWidth: 0,
+        bulkSelectColWidth: 0,
+        tableWidth: 600,
+      }),
+    );
 
     expect(result.current).toEqual({
       description: 400,
@@ -48,13 +50,15 @@ describe('useColumnsWidths hook test', () => {
     };
     const columnsIds = ['title', 'description'];
 
-    const { result } = renderHook(() => useColumnsWidths({
-      columnRenderersByAttribute,
-      columnsIds,
-      actionsColWidth: 0,
-      bulkSelectColWidth: 0,
-      tableWidth: 600,
-    }));
+    const { result } = renderHook(() =>
+      useColumnsWidths({
+        columnRenderersByAttribute,
+        columnsIds,
+        actionsColWidth: 0,
+        bulkSelectColWidth: 0,
+        tableWidth: 600,
+      }),
+    );
 
     expect(result.current).toEqual({
       description: 300,
@@ -69,13 +73,15 @@ describe('useColumnsWidths hook test', () => {
     };
     const columnsIds = ['title', 'description'];
 
-    const { result } = renderHook(() => useColumnsWidths({
-      columnRenderersByAttribute,
-      columnsIds,
-      actionsColWidth: 50,
-      bulkSelectColWidth: 20,
-      tableWidth: 600,
-    }));
+    const { result } = renderHook(() =>
+      useColumnsWidths({
+        columnRenderersByAttribute,
+        columnsIds,
+        actionsColWidth: 50,
+        bulkSelectColWidth: 20,
+        tableWidth: 600,
+      }),
+    );
 
     expect(result.current).toEqual({
       description: 353.3333333333333,

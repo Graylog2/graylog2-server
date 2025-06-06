@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { screen, renderPreflight, waitFor, within } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
+import { screen, renderPreflight } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
-import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
-import UserNotification from 'preflight/util/UserNotification';
-import suppressConsole from 'helpers/suppressConsole';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import App from './App';
 
@@ -32,45 +29,41 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'https://example.org/',
 }));
 
-jest.mock('preflight/hooks/useServerAvailability', () => jest.fn(() => ({
-  data: false,
-})));
+jest.mock('preflight/hooks/useServerAvailability', () =>
+  jest.fn(() => ({
+    data: false,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodes', () => jest.fn(() => ({
-  data: [],
-  isFetching: false,
-  isInitialLoading: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodes', () =>
+  jest.fn(() => ({
+    data: [],
+    isFetching: false,
+    isInitialLoading: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn(() => ({
-  data: undefined,
-  isInitialLoading: false,
-  isFetching: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodesCA', () =>
+  jest.fn(() => ({
+    data: undefined,
+    isInitialLoading: false,
+    isFetching: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
 
 describe('App', () => {
-  let windowConfirm;
   let windowLocation;
 
-  const startupButton = async () => {
-    const welcomeSection = await screen.findByTestId('welcome-section');
-
-    return within(welcomeSection).getByRole('button', {
-      name: /resume startup/i,
-    });
-  };
+  useWindowConfirmMock();
 
   beforeAll(() => {
-    windowConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { reload: jest.fn() },
@@ -82,53 +75,14 @@ describe('App', () => {
   });
 
   afterAll(() => {
-    window.confirm = windowConfirm;
     Object.defineProperty(window, 'location', { configurable: true, value: windowLocation });
   });
 
   it('should render', async () => {
     renderPreflight(<App />);
 
-    await screen.findByText(/It looks like you are starting Graylog for the first time and have not configured a data node./);
-  });
-
-  it('should resume startup and display loading page', async () => {
-    renderPreflight(<App />);
-
-    const resumeStartupButton = await startupButton();
-    userEvent.click(resumeStartupButton);
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
-    await screen.findByText(/The Graylog server is currently starting./);
-  });
-
-  it('should display confirm dialog on resume startup when there is no Graylog data node', async () => {
-    asMock(useDataNodes).mockReturnValue({
-      data: [],
-      isFetching: false,
-      isInitialLoading: false,
-      error: undefined,
-    });
-
-    renderPreflight(<App />);
-
-    const resumeStartupButton = await startupButton();
-    userEvent.click(resumeStartupButton);
-
-    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.'));
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
-  });
-
-  it('should display error when resuming startup failed', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Unexpected error!')));
-
-    renderPreflight(<App />);
-
-    suppressConsole(async () => {
-      const resumeStartupButton = await startupButton();
-      userEvent.click(resumeStartupButton);
-    });
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
-    await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Resuming startup failed with error: Error: Unexpected error!', 'Could not resume startup'));
+    await screen.findByText(
+      /It looks like you are starting Graylog for the first time and have not configured a data node./,
+    );
   });
 });

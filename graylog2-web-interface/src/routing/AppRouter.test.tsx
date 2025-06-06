@@ -30,7 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import { defaultPerspective } from 'fixtures/perspectives';
+import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
 
 import AppRouter from './AppRouter';
 
@@ -43,7 +43,6 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
 jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
-jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -58,6 +57,15 @@ jest.mock('react-router-dom', () => ({
   createBrowserRouter: jest.fn(),
 }));
 
+jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
+  __esModule: true,
+  default: () => ({
+    activePerspective: mockDefaultPerspective,
+  }),
+}));
+
+jest.mock('components/navigation/NotificationBadge', () => () => null);
+
 const AppRouterWithContext = () => (
   <HotkeysProvider>
     <DefaultProviders>
@@ -68,14 +76,12 @@ const AppRouterWithContext = () => (
   </HotkeysProvider>
 );
 
-AppRouterWithContext.defaultProps = {
-  path: '/',
-};
-
 const setInitialPath = (path: string) => {
-  asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes, {
-    initialEntries: [path],
-  }));
+  asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
+    createMemoryRouter(routes, {
+      initialEntries: [path],
+    }),
+  );
 };
 
 const mockRoutes = (routes: PluginExports['routes']) => {
@@ -87,11 +93,11 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   const defaultPlugins = {
-    perspectives: [defaultPerspective],
+    perspectives: [mockDefaultPerspective],
   };
 
   beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => (defaultPlugins[entityKey] ?? []));
+    asMock(usePluginEntities).mockImplementation((entityKey) => defaultPlugins[entityKey] ?? []);
     AppConfig.isFeatureEnabled = jest.fn(() => false);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
@@ -130,7 +136,9 @@ describe('AppRouter', () => {
     });
 
     it('does not render plugin route when required feature flag is not enabled', async () => {
-      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      mockRoutes([
+        { component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' },
+      ]);
       setInitialPath('/a-plugin-route');
       render(<AppRouterWithContext />);
 
@@ -141,7 +149,9 @@ describe('AppRouter', () => {
 
     it('render plugin route when required feature flag is enabled', async () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      mockRoutes([
+        { component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' },
+      ]);
       setInitialPath('/a-plugin-route');
       const { findByText } = render(<AppRouterWithContext />);
 
@@ -150,7 +160,9 @@ describe('AppRouter', () => {
 
     it('renders null-parent component plugin wrapped in global providers', async () => {
       const TestContext = React.createContext(undefined);
-      asMock(GlobalContextProviders).mockImplementation(({ children }: React.PropsWithChildren<{}>) => <TestContext.Provider value={42}>{children}</TestContext.Provider>);
+      asMock(GlobalContextProviders).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
+        <TestContext.Provider value={42}>{children}</TestContext.Provider>
+      ));
 
       const TestComponent = () => {
         const contextValue = useContext(TestContext);

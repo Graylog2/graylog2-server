@@ -19,20 +19,23 @@ package org.graylog2.system.traffic;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_TrafficDto.Builder.class)
-public abstract class TrafficDto {
-
+public abstract class TrafficDto implements MongoEntity {
     @Id
     @ObjectId
-    @JsonProperty
+    @Nullable
+    @Override
+    @JsonProperty("_id")
     public abstract String id();
 
     @JsonProperty
@@ -46,6 +49,8 @@ public abstract class TrafficDto {
 
     @JsonProperty
     public abstract Map<String, Long> decoded();
+
+    public abstract Builder toBuilder();
 
     public static Builder builder() {
         return new AutoValue_TrafficDto.Builder().decoded(Collections.emptyMap());

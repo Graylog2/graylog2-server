@@ -18,12 +18,11 @@ package org.graylog.datanode.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.bootstrap.preflight.DataNodeCertRenewalPeriodical;
 import org.graylog.datanode.bootstrap.preflight.DataNodeConfigurationPeriodical;
-import org.graylog.datanode.periodicals.ClusterManagerDiscovery;
 import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.periodicals.NodePingPeriodical;
 import org.graylog.datanode.periodicals.OpensearchNodeHeartbeat;
-import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.plugin.periodical.Periodical;
 
@@ -32,12 +31,10 @@ public class PeriodicalBindings extends AbstractModule {
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
-        periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(OpensearchNodeHeartbeat.class);
-        periodicalBinder.addBinding().to(ClusterManagerDiscovery.class);
-//        periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
         periodicalBinder.addBinding().to(NodePingPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeConfigurationPeriodical.class);
+        periodicalBinder.addBinding().to(DataNodeCertRenewalPeriodical.class);
         periodicalBinder.addBinding().to(MetricsCollector.class);
     }
 }

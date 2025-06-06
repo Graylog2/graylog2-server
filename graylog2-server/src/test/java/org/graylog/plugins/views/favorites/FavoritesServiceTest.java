@@ -34,6 +34,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,9 +92,8 @@ public class FavoritesServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.favoritesService = new FavoritesService(mongodb.mongoConnection(),
+        this.favoritesService = new FavoritesService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
                 new EventBus(),
-                mongoJackObjectMapperProvider,
                 null,
                 grnRegistry);
     }
@@ -130,19 +130,28 @@ public class FavoritesServiceTest {
         favoritesService.removeFavoriteOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, _2, "user4"));
         assertThat(favoritesService.streamAll().toList().size()).isEqualTo(4);
 
-        var fav1 = favoritesService.findForUser("user1").get();
-        assertThat(fav1.items().size()).isEqualTo(0);
+        assertThat(favoritesService.findForUser("user1"))
+                .isPresent()
+                .map(fav -> fav.items().size())
+                .hasValue(0);
 
-        var fav2 = favoritesService.findForUser("user2").get();
-        assertThat(fav2.items().size()).isEqualTo(1);
-        assertThat(fav2.items().get(0).entity()).isEqualTo("1");
+        assertThat(favoritesService.findForUser("user2"))
+                .isPresent()
+                .map(FavoritesForUserDTO::items)
+                .hasValueSatisfying(items -> assertThat(items).hasSize(1))
+                .map(items -> items.get(0).entity())
+                .hasValue("1");
 
-        var fav3 = favoritesService.findForUser("user3").get();
-        assertThat(fav3.items().size()).isEqualTo(2);
-        assertThat(fav3.items().get(0).entity()).isEqualTo("1");
-        assertThat(fav3.items().get(1).entity()).isEqualTo("3");
+        assertThat(favoritesService.findForUser("user3"))
+                .isPresent()
+                .map(FavoritesForUserDTO::items)
+                .hasValueSatisfying(items -> assertThat(items).hasSize(2))
+                .hasValueSatisfying(items -> assertThat(items.get(0).entity()).isEqualTo("1"))
+                .hasValueSatisfying(items -> assertThat(items.get(1).entity()).isEqualTo("3"));
 
-        var fav4 = favoritesService.findForUser("user4").get();
-        assertThat(fav4.items().size()).isEqualTo(3);
+        assertThat(favoritesService.findForUser("user4"))
+                .isPresent()
+                .map(fav -> fav.items().size())
+                .hasValue(3);
     }
 }

@@ -16,5 +16,3 @@
  */
 export { default as ContentArea } from './ContentArea';
 export { default as Container } from './Container';
-export { default as SideNav } from './SideNav';
-export { default as SideNavItem } from './SideNavItem';

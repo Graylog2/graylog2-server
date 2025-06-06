@@ -22,15 +22,18 @@ import org.graylog.events.configuration.EventsConfiguration;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobExecutionContext;
 import org.graylog.scheduler.JobExecutionException;
+import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobScheduleStrategies;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.JobTriggerUpdate;
 import org.graylog.scheduler.JobTriggerUpdates;
+import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.joda.time.DateTime;
@@ -659,5 +662,117 @@ public class EventProcessorExecutionJobTest {
                 .hasMessageContaining("from")
                 .hasMessageContaining("to")
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void executeCronScheduledEvent() throws Exception {
+        final DateTime noon01Dec2018 = DateTime.parse("2018-12-01T12:00:00.000Z");
+        // Every minute
+        final String cronExpression = "0 0/1 * ? * * *";
+        final long processingWindowSize = Duration.standardSeconds(60).getMillis();
+        final long processingHopSize = Duration.standardSeconds(60).getMillis();
+        final DateTime from = noon01Dec2018.minus(processingWindowSize);
+        final DateTime to = noon01Dec2018;
+        final DateTime now = clock.nowUTC();
+
+        final TestEventProcessorParameters eventProcessorParameters = TestEventProcessorParameters.create(from, to);
+        final JobDefinitionDto jobDefinition = jobDefinitionDto("processor-1", processingWindowSize, processingHopSize, eventProcessorParameters, true);
+
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, eventsConfigurationProvider, jobDefinition);
+        final CronJobSchedule schedule = CronJobSchedule.builder().cronExpression(cronExpression).build();
+        final JobTriggerDto trigger = jobTrigger(jobDefinition.id(), noon01Dec2018, now, schedule);
+        final JobExecutionContext jobExecutionContext = jobExecutionContext(jobDefinition, trigger);
+
+        final JobTriggerUpdate triggerUpdate = job.execute(jobExecutionContext);
+
+        verify(eventProcessorEngine, times(1))
+                .execute("processor-1", eventProcessorParameters);
+
+        assertThat(triggerUpdate.nextTime()).isPresent().get().isEqualTo(now);
+
+        assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
+                .timerangeFrom(to)
+                .timerangeTo(to.plus(processingWindowSize))
+                .build());
+
+        assertThat(triggerUpdate.status()).isNotPresent();
+    }
+
+    @Test
+    public void validateNextCronSchedule() throws Exception {
+        // Every hour
+        String cronExpression = "0 0 0/1 ? * * *";
+        final long processingWindowSize = Duration.standardMinutes(61).getMillis();
+        final long processingHopSize = Duration.standardSeconds(60).getMillis();
+        final DateTime now = clock.nowUTC();
+        final DateTime from = now.minus(processingWindowSize);
+        final DateTime to = now;
+
+        final TestEventProcessorParameters eventProcessorParameters = TestEventProcessorParameters.create(from, to);
+        final JobDefinitionDto jobDefinition = jobDefinitionDto("processor-1", processingWindowSize, processingHopSize, eventProcessorParameters, true);
+
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, eventsConfigurationProvider, jobDefinition);
+        CronJobSchedule schedule = CronJobSchedule.builder().cronExpression(cronExpression).build();
+        JobTriggerDto trigger = jobTrigger(jobDefinition.id(), now, now, schedule);
+        JobExecutionContext jobExecutionContext = jobExecutionContext(jobDefinition, trigger);
+
+        JobTriggerUpdate triggerUpdate = job.execute(jobExecutionContext);
+
+        assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
+                // Next time range should be one hour later searching 61 minutes back
+                .timerangeFrom(to.minus(Duration.standardMinutes(1).getMillis()))
+                .timerangeTo(to.plus(Duration.standardMinutes(60).getMillis()))
+                .build());
+
+        // Every Tuesday, Thursday, and Friday at midnight.
+        cronExpression = "0 0 0 ? * TUE,THU,FRI *";
+        schedule = CronJobSchedule.builder().cronExpression(cronExpression).build();
+        trigger = jobTrigger(jobDefinition.id(), now, now, schedule);
+        jobExecutionContext = jobExecutionContext(jobDefinition, trigger);
+        triggerUpdate = job.execute(jobExecutionContext);
+
+        // Date used for now is a Tuesday, so this should be scheduled for 2 days later
+        DateTime twoDaysLater = to.plus(Duration.standardDays(2).getMillis());
+        assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
+                .timerangeFrom(twoDaysLater.minus(Duration.standardMinutes(61).getMillis()))
+                .timerangeTo(twoDaysLater)
+                .build());
+    }
+
+    private JobDefinitionDto jobDefinitionDto(String eventDefinitionId, long windowSize, long hopSize, EventProcessorParametersWithTimerange params, boolean isCron) {
+        return JobDefinitionDto.builder()
+                .id("job-1")
+                .title("Test Job Definition")
+                .description("A test")
+                .config(EventProcessorExecutionJob.Config.builder()
+                        .eventDefinitionId(eventDefinitionId)
+                        .processingWindowSize(windowSize)
+                        .processingHopSize(hopSize)
+                        .parameters(params)
+                        .isCron(isCron)
+                        .build())
+                .build();
+    }
+
+    private JobTriggerDto jobTrigger(String id, DateTime startTime, DateTime nextTime, JobSchedule jobSchedule) {
+        return JobTriggerDto.builderWithClock(clock)
+                .id("trigger-1")
+                .jobDefinitionId(id)
+                .jobDefinitionType("event-processor-execution-v1")
+                .startTime(startTime)
+                .nextTime(nextTime)
+                .status(JobTriggerStatus.RUNNABLE)
+                .schedule(jobSchedule)
+                .build();
+    }
+
+    private JobExecutionContext jobExecutionContext(JobDefinitionDto jobDefinition, JobTriggerDto trigger) {
+        return JobExecutionContext.builder()
+                .definition(jobDefinition)
+                .trigger(trigger)
+                .schedulerIsRunning(new AtomicBoolean(true))
+                .jobTriggerUpdates(new JobTriggerUpdates(clock, jobScheduleStrategies, trigger))
+                .jobTriggerService(mock(DBJobTriggerService.class))
+                .build();
     }
 }

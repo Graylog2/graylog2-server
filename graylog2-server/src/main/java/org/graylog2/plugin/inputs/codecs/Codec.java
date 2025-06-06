@@ -24,10 +24,28 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public interface Codec {
+
+    /**
+     * @param rawMessage
+     * @return an empty Optional if RawMessage contains payload data that should not be decoded.
+     * Otherwise, an Optional with a Message that can be processed further.
+     * @throws org.graylog2.plugin.inputs.failure.InputProcessingException if an error occurs during decoding.
+     */
+    default Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
+        return Optional.ofNullable(decode(rawMessage));
+    }
+
+    /**
+     * @deprecated use {@link #decodeSafe(RawMessage)} instead.
+     */
+    @Deprecated
     @Nullable
-    Message decode(@Nonnull RawMessage rawMessage);
+    default Message decode(@Nonnull RawMessage rawMessage) {
+        throw new UnsupportedOperationException("implement decodeSafe method");
+    }
 
     @Nullable
     CodecAggregator getAggregator();
@@ -39,7 +57,9 @@ public interface Codec {
 
     interface Factory<C> {
         C create(Configuration configuration);
+
         Config getConfig();
+
         Descriptor getDescriptor();
     }
 
@@ -48,6 +68,7 @@ public interface Codec {
         String CK_CHARSET_NAME = "charset_name";
 
         ConfigurationRequest getRequestedConfiguration();
+
         void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
     }
 

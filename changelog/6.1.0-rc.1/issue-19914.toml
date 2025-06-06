@@ -1,0 +1,5 @@
+type = "removed"
+message = "Removed deprecated GreyNoise Community Data Adapter."
+
+issues = ["19914"]
+pulls = ["19927"]

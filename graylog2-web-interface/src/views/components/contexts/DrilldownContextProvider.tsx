@@ -19,7 +19,11 @@ import * as React from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import type Query from 'views/logic/queries/Query';
-import { createElasticsearchQueryString, filtersToStreamSet } from 'views/logic/queries/Query';
+import {
+  createElasticsearchQueryString,
+  filtersToStreamSet,
+  filtersToStreamCategorySet,
+} from 'views/logic/queries/Query';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -30,35 +34,41 @@ import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 import DrilldownContext from './DrilldownContext';
 import type { Drilldown } from './DrilldownContext';
 
-const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride | undefined, currentQuery: Query): Drilldown => {
+const useDrillDownContextValue = (
+  widget: Widget,
+  globalOverride: GlobalOverride | undefined,
+  currentQuery: Query,
+): Drilldown => {
   const viewType = useViewType();
 
   if (viewType === View.Type.Dashboard) {
-    const { streams, timerange, query } = widget;
+    const { streams, timerange, query, streamCategories } = widget;
     const dashboardAndWidgetQueryString = globalOverride?.query?.query_string
       ? concatQueryStrings([query?.query_string, globalOverride.query.query_string])
       : query?.query_string;
 
-    return ({
+    return {
       streams,
+      streamCategories,
       timerange: (globalOverride?.timerange ? globalOverride.timerange : timerange) || DEFAULT_TIMERANGE,
       query: createElasticsearchQueryString(dashboardAndWidgetQueryString || ''),
-    });
+    };
   }
 
   if (currentQuery) {
     const streams = filtersToStreamSet(currentQuery.filter).toJS();
+    const streamCategories = filtersToStreamCategorySet(currentQuery.filter).toJS();
     const { timerange, query } = currentQuery;
 
-    return ({ streams, timerange, query });
+    return { streams, streamCategories, timerange, query };
   }
 
   return undefined;
 };
 
 type Props = {
-  children: React.ReactElement,
-  widget: Widget,
+  children: React.ReactElement;
+  widget: Widget;
 };
 
 const DrilldownContextProvider = ({ children, widget }: Props) => {

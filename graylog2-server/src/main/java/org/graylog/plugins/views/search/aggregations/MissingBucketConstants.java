@@ -19,6 +19,5 @@ package org.graylog.plugins.views.search.aggregations;
 
 public interface MissingBucketConstants {
 
-    String MISSING_AGGREGATION_NAME = "__missing__";
     String MISSING_BUCKET_NAME = "(Empty Value)";
 }

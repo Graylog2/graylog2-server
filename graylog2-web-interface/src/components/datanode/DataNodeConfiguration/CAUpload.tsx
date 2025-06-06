@@ -22,18 +22,19 @@ import { Formik, Form, Field } from 'formik';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { FormikInput, Icon } from 'components/common';
-import { Input, Button, Label } from 'components/bootstrap';
-import { Dropzone } from 'preflight/components/common';
+import { FormikInput, Icon, Dropzone } from 'components/common';
+import { Button, Label, Alert } from 'components/bootstrap';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
-  files?: Array<File>,
-  password?: string,
-}
+  files?: Array<File>;
+  password?: string;
+};
 
 const CADropzone = styled(Dropzone)`
   height: 120px;
@@ -60,7 +61,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
+const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
 
@@ -96,6 +97,7 @@ const Explanation = styled.p`
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
   const onRejectUpload = useCallback(() => {
     UserNotification.error('CA upload failed');
   }, []);
@@ -111,7 +113,17 @@ const CAUpload = () => {
     },
   });
 
-  const onSubmit = useCallback((formValues: FormValues) => onProcessUpload(formValues).catch(() => {}), [onProcessUpload]);
+  const onSubmit = useCallback(
+    (formValues: FormValues) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_CA_CLICKED, {
+        app_pathname: 'datanode',
+        app_section: 'migration',
+      });
+
+      return onProcessUpload(formValues).catch(() => {});
+    },
+    [onProcessUpload, sendTelemetry],
+  );
 
   return (
     <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
@@ -119,17 +131,20 @@ const CAUpload = () => {
         <Form>
           <Explanation>
             Here you can upload your existing CA. You need to upload a single file containing both private key
-            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM
-            or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
+            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in
+            PEM or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
           </Explanation>
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <Label required htmlFor="ca-dropzone">Certificate Authority</Label>
-                <CADropzone onDrop={(files) => onChange({ target: { name, value: files } })}
-                            onReject={onRejectUpload}
-                            data-testid="upload-dropzone"
-                            loading={isLoading}>
+                <Label required htmlFor="ca-dropzone">
+                  Certificate Authority
+                </Label>
+                <CADropzone
+                  onDrop={(files) => onChange({ target: { name, value: files } })}
+                  onReject={onRejectUpload}
+                  data-testid="upload-dropzone"
+                  loading={isLoading}>
                   <DropzoneInner>
                     <Dropzone.Accept>
                       <Icon name="draft" type="solid" size="2x" />
@@ -140,34 +155,33 @@ const CAUpload = () => {
                     <Dropzone.Idle>
                       <Icon name="draft" type="regular" size="2x" />
                     </Dropzone.Idle>
-                    <div>
-                      Drag CA here or click to select file
-                    </div>
+                    <div>Drag CA here or click to select file</div>
                   </DropzoneInner>
                 </CADropzone>
                 <Files>
-                  {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
-                    <File key={fileName}>
-                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
-                                                                   onClick={() => {
-                                                                     const newValue = value.filter((_ignored, idx) => idx !== index);
-                                                                     onChange({ target: { name, value: newValue } });
-                                                                   }} />
-                    </File>
-                  ))}
+                  {value
+                    ?.filter((file) => !!file)
+                    .map(({ name: fileName }, index) => (
+                      <File key={fileName}>
+                        <Icon name="draft" /> {fileName}{' '}
+                        <DeleteIcon
+                          name="cancel"
+                          onClick={() => {
+                            const newValue = value.filter((_ignored, idx) => idx !== index);
+                            onChange({ target: { name, value: newValue } });
+                          }}
+                        />
+                      </File>
+                    ))}
                 </Files>
-                {error && <Input.Error>{error}</Input.Error>}
+                {error && <Alert bsStyle="warning">{error}</Alert>}
               </>
             )}
           </Field>
 
-          <FormikInput id="password"
-                       placeholder="Password"
-                       name="password"
-                       type="password"
-                       label="Password" />
+          <FormikInput id="password" placeholder="Password" name="password" type="password" label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<br />} />
-          <Button disabled={!isValid} type="submit">
+          <Button bsStyle="primary" bsSize="small" disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
         </Form>

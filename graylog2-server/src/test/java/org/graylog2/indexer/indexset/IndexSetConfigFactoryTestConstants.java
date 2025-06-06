@@ -36,9 +36,9 @@ public class IndexSetConfigFactoryTestConstants {
             // Use a special match pattern and wildcard to match restored indices like `restored-archive-graylog_33`
             .indexMatchPattern("test*")
             .indexWildcard("test*")
-            .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+            .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
             .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-            .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+            .retentionStrategyConfig(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
             .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
             .shards(1)
             .replicas(0)

@@ -68,7 +68,7 @@ class ValidVariablesTest {
         actions.put(INTEGER_FUNCTION, RuleFragment.builder().descriptor(integerFunction.descriptor()).build());
         actions.put(VOID_FUNCTION, RuleFragment.builder().descriptor(voidFunction.descriptor()).build());
 
-        when(ruleBuilderRegistry.actions()).thenReturn(actions);
+        when(ruleBuilderRegistry.actionsWithInternal()).thenReturn(actions);
 
         classUnderTest = new ValidVariables(ruleBuilderRegistry);
     }

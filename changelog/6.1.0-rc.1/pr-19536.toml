@@ -1,0 +1,4 @@
+type = "c"
+message = "Introduced DatanodeKeystore for unified handling of PKI inside data node"
+
+pulls = ["19536"]

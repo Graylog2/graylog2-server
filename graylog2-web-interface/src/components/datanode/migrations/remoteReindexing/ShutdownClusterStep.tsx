@@ -20,12 +20,20 @@ import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/co
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import { Space } from 'preflight/components/common';
 
-const ShutdownClusterStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
+const ShutdownClusterStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
   <>
-    <p>The migration from your current <code>OpenSearch</code> to the Data Node is almost done.</p>
-    <p>To finish please shut down your <code>OpenSearch</code> cluster before continuing.</p>
+    <p>
+      The migration from your current <code>OpenSearch</code> to the Data Node is almost done.
+    </p>
+    <p>
+      To finish please shut down your <code>OpenSearch</code> cluster before continuing.
+    </p>
     <Space h="md" />
-    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    <MigrationStepTriggerButtonToolbar
+      hidden={hideActions}
+      nextSteps={currentStep.next_steps}
+      onTriggerStep={onTriggerStep}
+    />
   </>
 );
 export default ShutdownClusterStep;

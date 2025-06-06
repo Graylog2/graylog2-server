@@ -1,0 +1,110 @@
+{
+  "stream_destination_filters": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "stream_id": "54e3deadbeefdeadbeef1000",
+      "destination_type": "indexer",
+      "title": "Test Filter 1",
+      "status": "enabled",
+      "rule": {
+        "operator": "OR",
+        "conditions": [
+          {
+            "id": {
+              "$oid": "54e3deadbeefdeadbeef0001"
+            },
+            "function": "has_field",
+            "params": {
+              "field": "is_debug",
+              "negate": false
+            }
+          },
+          {
+            "id": {
+              "$oid": "54e3deadbeefdeadbeef0002"
+            },
+            "function": "has_field",
+            "params": {
+              "field": "msg_is_debug",
+              "negate": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "stream_id": "54e3deadbeefdeadbeef1000",
+      "destination_type": "indexer",
+      "title": "Test Filter 2",
+      "status": "disabled",
+      "rule": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "id": {
+              "$oid": "54e3deadbeefdeadbeef0001"
+            },
+            "function": "has_field",
+            "params": {
+              "field": "is_debug",
+              "negate": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "stream_id": "54e3deadbeefdeadbeef1000",
+      "destination_type": "something-else",
+      "title": "Test Filter 3",
+      "status": "enabled",
+      "rule": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "id": {
+              "$oid": "54e3deadbeefdeadbeef0001"
+            },
+            "function": "has_field",
+            "params": {
+              "field": "is_debug",
+              "negate": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "stream_id": "54e3deadbeefdeadbeef2000",
+      "destination_type": "something-else",
+      "title": "Test Filter 4",
+      "status": "enabled",
+      "rule": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "id": {
+              "$oid": "54e3deadbeefdeadbeef0001"
+            },
+            "function": "has_field",
+            "params": {
+              "field": "is_debug",
+              "negate": false
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

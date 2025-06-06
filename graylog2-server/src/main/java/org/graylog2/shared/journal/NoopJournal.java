@@ -66,4 +66,10 @@ public class NoopJournal extends AbstractIdleService implements Journal {
     public void flush() {
         // nothing to do
     }
+
+    @Override
+    public int runRetention() {
+        // nothing to do here returning -1
+        return -1;
+    }
 }

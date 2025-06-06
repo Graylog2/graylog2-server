@@ -18,6 +18,9 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
@@ -34,16 +37,19 @@ import java.util.stream.Collectors;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Singleton
 public class Periodicals {
 
     private static final Logger LOG = LoggerFactory.getLogger(Periodicals.class);
 
     private final List<Periodical> periodicals;
-    private final Map<Periodical, ScheduledFuture> futures;
+    private final Map<Periodical, ScheduledFuture<?>> futures;
     private final ScheduledExecutorService scheduler;
     private final ScheduledExecutorService daemonScheduler;
 
-    public Periodicals(ScheduledExecutorService scheduler, ScheduledExecutorService daemonScheduler) {
+    @Inject
+    public Periodicals(@Named("scheduler") ScheduledExecutorService scheduler,
+                       @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
         this.scheduler = scheduler;
         this.daemonScheduler = daemonScheduler;
         this.periodicals = Lists.newArrayList();
@@ -132,7 +138,7 @@ public class Periodicals {
     /**
      * @return a copy of the map of all executor futures
      */
-    public Map<Periodical, ScheduledFuture> getFutures() {
+    public Map<Periodical, ScheduledFuture<?>> getFutures() {
         return Maps.newHashMap(futures);
     }
 

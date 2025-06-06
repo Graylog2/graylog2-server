@@ -14,10 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { SystemClusterConfig } from '@graylog/server-api';
 
-const useClusterConfig = <T, >(key: string) => useQuery<T>(['system', 'cluster_config', key], () => SystemClusterConfig.read(key) as Promise<T>);
+const QUERY_KEY = ['system', 'cluster_config'];
+const useClusterConfig = <T>(key: string) =>
+  useQuery<T>([...QUERY_KEY, key], () => SystemClusterConfig.read(key) as Promise<T>);
+
+export const useUpdateClusterConfig = <T>(key: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation((config: T) => SystemClusterConfig.update(key, config), {
+    onSuccess: () => {
+      queryClient.invalidateQueries([...QUERY_KEY, key]);
+    },
+  });
+};
 
 export default useClusterConfig;

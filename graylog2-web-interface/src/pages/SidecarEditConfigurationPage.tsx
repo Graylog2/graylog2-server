@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -27,7 +26,11 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import DocsHelper from 'util/DocsHelper';
 import useHistory from 'routing/useHistory';
 
-const SidecarEditConfigurationPage = ({ params }) => {
+type SidecarEditConfigurationPageProps = {
+  params: any;
+};
+
+const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPageProps) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [configurationSidecars, setConfigurationSidecars] = useState<ConfigurationSidecarsResponse>(null);
   const history = useHistory();
@@ -40,8 +43,9 @@ const SidecarEditConfigurationPage = ({ params }) => {
         (_configuration) => {
           setConfiguration(_configuration);
 
-          CollectorConfigurationsActions.getConfigurationSidecars(configurationId)
-            .then((_configurationSidecars) => setConfigurationSidecars(_configurationSidecars));
+          CollectorConfigurationsActions.getConfigurationSidecars(configurationId).then((_configurationSidecars) =>
+            setConfigurationSidecars(_configurationSidecars),
+          );
         },
         (error) => {
           if (error.status === 404) {
@@ -63,23 +67,17 @@ const SidecarEditConfigurationPage = ({ params }) => {
   return (
     <DocumentTitle title="Collector Configuration">
       <SidecarsPageNavigation />
-      <PageHeader title="Collector Configuration"
-                  documentationLink={{
-                    title: 'Sidecar documentation',
-                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                  }}>
-        <span>
-          Some words about collector configurations.
-        </span>
+      <PageHeader
+        title="Collector Configuration"
+        documentationLink={{
+          title: 'Sidecar documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>Some words about collector configurations.</span>
       </PageHeader>
-      <ConfigurationForm configuration={configuration}
-                         configurationSidecars={configurationSidecars} />
+      <ConfigurationForm configuration={configuration} configurationSidecars={configurationSidecars} />
     </DocumentTitle>
   );
-};
-
-SidecarEditConfigurationPage.propTypes = {
-  params: PropTypes.object.isRequired,
 };
 
 export default withParams(SidecarEditConfigurationPage);

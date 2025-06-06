@@ -101,8 +101,8 @@ class IndexFieldTypePollerPeriodicalTest {
                 .indexOptimizationMaxNumSegments(2048)
                 .indexOptimizationDisabled(false)
                 .fieldTypeRefreshInterval(org.joda.time.Duration.standardSeconds(1))
-                .retentionStrategy(NoopRetentionStrategyConfig.createDefault())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.createDefault())
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
                 .replicas(1)
                 .build();
         final List<IndexSetConfig> indexSets = List.of(indexSet);

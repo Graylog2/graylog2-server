@@ -29,11 +29,9 @@ public class DbEntitiesCatalog {
     private static final Logger LOG = LoggerFactory.getLogger(DbEntitiesCatalog.class);
 
     private final Map<String, DbEntityCatalogEntry> entitiesByCollectionName;
-    private final Map<Class<?>, DbEntityCatalogEntry> entitiesByClass;
 
     public DbEntitiesCatalog(final Collection<DbEntityCatalogEntry> entries) {
         entitiesByCollectionName = new HashMap<>(entries.size());
-        entitiesByClass = new HashMap<>(entries.size());
 
         entries.forEach(this::add);
     }
@@ -45,11 +43,6 @@ public class DbEntitiesCatalog {
             LOG.error(errorMsg);
             throw new IllegalStateException(errorMsg);
         }
-        entitiesByClass.put(entry.modelClass(), entry);
-    }
-
-    public Optional<DbEntityCatalogEntry> getByModelClass(final Class<?> modelClass) {
-        return Optional.ofNullable(entitiesByClass.get(modelClass));
     }
 
     public Optional<DbEntityCatalogEntry> getByCollectionName(final String collection) {

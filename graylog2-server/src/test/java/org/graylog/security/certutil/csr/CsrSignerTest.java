@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.csr;
 
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -25,6 +26,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,7 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -62,8 +66,30 @@ class CsrSignerTest {
         var cert = createCert(keyPair);
         var privateKey = keyPair.getPrivate();
         var csr = createCSR(keyPair);
+        final Duration certificateLifetime = getCertificateLifetime(lifetime);
+        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, certificateLifetime);
+    }
 
-        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime));
+
+    @Test
+    void testMismatchIntermediateCA() throws Exception {
+        final org.graylog.security.certutil.KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("rootCA").validity(Duration.ofDays(30)));
+        final org.graylog.security.certutil.KeyPair intermediateCa = CertificateGenerator.generate(CertRequest.signed("intermediateCa", rootCa).validity(Duration.ofDays(30)));
+
+        final KeyPair nodeKeyPair = createPrivateKey();
+        var csr = createCSR(nodeKeyPair);
+        final Duration certificateLifetime = getCertificateLifetime("P6M");
+
+        // notice the mismatch between private key and certificate!
+        final CsrSigner signer = new CsrSigner(fixedClock);
+        Assertions.assertThatThrownBy(()  -> signer.sign(intermediateCa.privateKey(), rootCa.certificate(), csr, certificateLifetime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Provided CA private key doesn't correspond to provided CA certificate!");
+    }
+
+    private static Duration getCertificateLifetime(String lifetime) {
+        final RenewalPolicy rp = new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime);
+        return rp.parsedCertificateLifetime();
     }
 
     @Test

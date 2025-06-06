@@ -17,11 +17,7 @@
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
-import {
-  createLookupTable,
-  createLookupTableCache,
-  createLookupTableAdapter,
-} from 'fixtures/lookupTables';
+import { createLookupTable, createLookupTableCache, createLookupTableAdapter } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
@@ -35,31 +31,31 @@ const renderedLUT = (scope: string) => {
   const cache = createLookupTableCache();
   const dataAdapter = createLookupTableAdapter();
 
-  return render(<table><LUTTableEntry table={table} cache={cache} dataAdapter={dataAdapter} /></table>);
+  return render(
+    <table>
+      <LUTTableEntry table={table} cache={cache} dataAdapter={dataAdapter} />
+    </table>,
+  );
 };
 
 describe('LUTTableEntry', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        if (!entity._scope) {
-          return {
-            loadingScopePermissions: true,
-            scopePermissions: null,
-          };
-        }
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+      return {
+        loadingScopePermissions: !entity._scope,
+        scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+        checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+          const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
-        };
-      },
-    );
+          return scopes[entityScope].is_mutable;
+        },
+      };
+    });
   });
 
   it('should show Loading spinner while loading scope permissions', async () => {

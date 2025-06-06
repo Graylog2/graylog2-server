@@ -77,6 +77,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
     @JsonProperty
     Set<String> streams();
 
+    @JsonProperty
+    Set<String> streamCategories();
+
     Builder toGenericBuilder();
 
     default Set<String> effectiveStreams() {
@@ -85,6 +88,8 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
     interface Builder {
         Builder streams(Set<String> streams);
+
+        Builder streamCategories(Set<String> streamCategories);
 
         SearchTypeEntity build();
     }
@@ -121,6 +126,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
         @JsonProperty
         private Set<String> streams;
+
+        @JsonProperty
+        private Set<String> streamCategories;
 
         @Override
         public String type() {
@@ -160,6 +168,11 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
         @Override
         public Set<String> streams() {
             return this.streams == null ? Collections.emptySet() : this.streams;
+        }
+
+        @Override
+        public Set<String> streamCategories() {
+            return this.streamCategories == null ? Collections.emptySet() : this.streamCategories;
         }
 
         @Override

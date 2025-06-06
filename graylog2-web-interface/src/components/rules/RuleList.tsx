@@ -15,36 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataTable } from 'components/common';
-import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
 
 import RuleListEntry from './RuleListEntry';
 
 type Props = {
-  rules: Array<RuleType>,
-  metricsConfig?: MetricsConfigType,
-  rulesContext?: RulesContext,
-  onDelete: (RuleType) => () => void,
-  searchFilter: React.ReactNode,
+  rules: Array<RuleType>;
+  rulesContext?: RulesContext;
+  onDelete: (ruleType: RuleType) => () => void;
+  searchFilter: React.ReactNode;
 };
 
 type State = {
-  openMetricsConfig: boolean,
+  openMetricsConfig: boolean;
 };
 
 class RuleList extends React.Component<Props, State> {
-  static propTypes = {
-    rules: PropTypes.array.isRequired,
-
-    rulesContext: PropTypes.exact({
-      used_in_pipelines: PropTypes.objectOf(PropTypes.any),
-    }),
-    onDelete: PropTypes.func.isRequired,
-    searchFilter: PropTypes.node.isRequired,
-  };
-
   static defaultProps = {
     rulesContext: undefined,
   };
@@ -59,18 +47,29 @@ class RuleList extends React.Component<Props, State> {
 
   render() {
     const { rules, searchFilter } = this.props;
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
+    const headers = [
+      'Title',
+      'Description',
+      'Created',
+      'Last modified',
+      'Throughput',
+      'Errors',
+      'Pipelines',
+      'Actions',
+    ];
 
     return (
-      <DataTable id="rule-list"
-                 className="table-hover"
-                 headers={headers}
-                 headerCellFormatter={this._headerCellFormatter}
-                 sortByKey="title"
-                 rows={rules}
-                 customFilter={searchFilter}
-                 dataRowFormatter={this._ruleInfoFormatter}
-                 filterKeys={[]} />
+      <DataTable
+        id="rule-list"
+        className="table-hover"
+        headers={headers}
+        headerCellFormatter={this._headerCellFormatter}
+        sortByKey="title"
+        rows={rules}
+        customFilter={searchFilter}
+        dataRowFormatter={this._ruleInfoFormatter}
+        filterKeys={[]}
+      />
     );
   }
 }

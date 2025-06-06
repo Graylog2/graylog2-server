@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix upload CA tab not clickable"
+
+issues = ["19485"]
+pulls = ["19478"]

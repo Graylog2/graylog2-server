@@ -17,6 +17,7 @@
 package org.graylog.security.certutil.csr;
 
 import com.google.common.collect.Sets;
+import jakarta.validation.constraints.NotNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -29,7 +30,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -39,8 +40,6 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.Period;
-import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -81,26 +80,16 @@ public class CsrSigner {
         return name == dNSName;
     }
 
-    private Duration periodToDuration(Period period) {
-        return Duration.ofDays(period.getYears() * 365L + period.getMonths() * 30L + period.getDays());
-    }
+    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, @NotNull Duration certificateLifetime) throws Exception {
 
-    private Duration safeParse(String duration) {
-        try {
-            return Duration.parse(duration);
-        } catch (DateTimeParseException ignored) {
-            return periodToDuration(Period.parse(duration));
+        final boolean keysMatching = KeystoreUtils.matchingKeys(caPrivateKey, caCertificate.getPublicKey());
+        if(!keysMatching) {
+            throw new IllegalArgumentException("Provided CA private key doesn't correspond to provided CA certificate!");
         }
-    }
 
-    private Instant plusIsoDuration(Instant validFrom, String duration) {
-        return validFrom.plus(safeParse(duration));
-    }
 
-    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
         Instant validFrom = Instant.now(clock);
-        var validUntil = plusIsoDuration(validFrom, renewalPolicy.certificateLifetime());
-
+        final Instant validUntil = validFrom.plus(certificateLifetime);
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }
 

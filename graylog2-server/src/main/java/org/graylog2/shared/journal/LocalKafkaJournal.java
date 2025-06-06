@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -29,6 +30,9 @@ import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.shaded.kafka09.common.KafkaException;
 import org.graylog.shaded.kafka09.common.OffsetOutOfRangeException;
@@ -63,10 +67,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -83,6 +83,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -166,6 +167,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     private final LogRetentionCleaner logRetentionCleaner;
     private final long maxSegmentSize;
     private final int maxMessageSize;
+    private final long maxRetentionSize;
     private final String metricPrefix;
 
     private long nextReadOffset = 0L;
@@ -225,6 +227,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         this.maxSegmentSize = segmentSize.toBytes();
         // Max message size should not be bigger than max segment size.
         this.maxMessageSize = Ints.saturatedCast(maxSegmentSize);
+        this.maxRetentionSize = retentionSize.toBytes();
         this.metricPrefix = metricPrefix;
         this.metricRegistry = metricRegistry;
 
@@ -619,7 +622,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
 
-        if (messages.isEmpty()) {
+        if (messages.isEmpty() && !shuttingDown) {
             // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
             // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
             // end of the log.
@@ -795,6 +798,31 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         return nextReadOffset;
     }
 
+    /**
+     * Returns the current utilization of the journal as a percentage of the maximum retention size.
+     * This method calculates how much of the maximum retention size is currently being utilized
+     * based on the size of the Kafka log.
+     *
+     * @return the journal utilization as a percentage, or 0.0 if the max retention size is zero.
+     */
+    @Override
+    public Optional<Double> getJournalUtilization() {
+        return Optional.of(calculateUtilization(maxRetentionSize, kafkaLog.size()));
+    }
+
+    /**
+     * Calculates the percentage utilization of the journal.
+     * This method computes the utilization as a percentage by dividing the Kafka log size by the
+     * maximum retention size and multiplying by 100.
+     *
+     * @param maxRetentionSize the maximum retention size of the journal
+     * @param kafkaLogSize     the current size of the Kafka log
+     * @return an {@code Optional<Double>} containing the journal utilization as a percentage.
+     */
+    private double calculateUtilization(long maxRetentionSize, long kafkaLogSize) {
+        return maxRetentionSize > 0 ? (double) (kafkaLogSize * 100) / maxRetentionSize : 0.0;
+    }
+
     @Override
     protected void startUp() throws Exception {
         // do NOT let Kafka's LogManager create its management threads, we will run them ourselves.
@@ -828,7 +856,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Shutting down journal!");
-        shuttingDown = true;
+        triggerShutDown();
 
         offsetFlusherFuture.cancel(false);
         logRetentionFuture.cancel(false);
@@ -844,7 +872,24 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         teardownLogMetrics();
     }
 
-    public int cleanupLogs() {
+    @VisibleForTesting
+    void triggerShutDown() {
+        shuttingDown = true;
+    }
+
+    /**
+     * Executes the retention policy on the journal by invoking the {@code logRetentionCleaner}.
+     * This method handles the following tasks:
+     * <ul>
+     *   <li>Cleans up expired log segments that have exceeded the configured retention time.</li>
+     *   <li>Ensures that segment sizes are maintained within the maximum allowable limits.</li>
+     *   <li>Removes committed log segments that are no longer needed,</li>
+     * </ul>
+     *
+     * @return an integer representing the total amount of data deleted by the {@code logRetentionCleaner}
+     */
+    @Override
+    public int runRetention() {
         try {
             return logRetentionCleaner.call();
         } catch (Exception e) {
@@ -975,7 +1020,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         }
 
         @Override
-        public Integer call() throws Exception {
+        public synchronized Integer call() throws Exception {
             loggerForCleaner.debug("Beginning log cleanup");
             int total = 0;
             final Timer.Context ctx = new Timer().time();
@@ -1045,7 +1090,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         private int cleanupSegmentsToMaintainSize(Log kafkaLog) {
             final long retentionSize = kafkaLog.config().retentionSize();
             final long currentSize = kafkaLog.size();
-            final double utilizationPercentage = retentionSize > 0 ? (currentSize * 100) / retentionSize : 0.0;
+            final double utilizationPercentage = calculateUtilization(retentionSize, currentSize);
             if (utilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
                 LOG.warn("Journal utilization ({}%) has gone over {}%.", utilizationPercentage,
                         LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);

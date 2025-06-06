@@ -57,6 +57,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     void throwsExceptionOnNullGroups() {
         assertThrows(IllegalArgumentException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
                 Set.of(),
+                Set.of(),
                 "42d",
                 null,
                 List.of("avg:joe")));
@@ -66,6 +67,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     void throwsExceptionOnEmptyGroups() {
         assertThrows(IllegalArgumentException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
                 Set.of(),
+                Set.of(),
                 "42d",
                 List.of(),
                 List.of("avg:joe")));
@@ -74,6 +76,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     @Test
     void throwsExceptionOnWrongMetricFormat() {
         assertThrows(IllegalArgumentException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
+                Set.of(),
                 Set.of(),
                 "42d",
                 List.of("http_method"),
@@ -85,12 +88,14 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         AggregationRequestSpec aggregationRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null,
                 null,
                 null,
+                null,
                 List.of("http_method"),
                 null);
 
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "*",
                         Set.of(),
+                Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
                         List.of(new Metric("count", null))
@@ -100,12 +105,14 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         aggregationRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null,
                 null,
                 null,
+                null,
                 List.of("http_method"),
                 List.of());
 
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "*",
                         Set.of(),
+                Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
                         List.of(new Metric("count", null))
@@ -113,10 +120,11 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 )
         );
 
-        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, 0, 10);
+        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10);
         assertThat(messagesRequestSpec).isEqualTo(new MessagesRequestSpec(
                         "*",
                         Set.of(),
+                Set.of(),
                         DEFAULT_TIMERANGE,
                         DEFAULT_SORT,
                         DEFAULT_SORT_ORDER,
@@ -134,6 +142,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         doReturn(KeywordRange.create("last 1 day", "UTC")).when(timerangeParser).parseTimeRange("1d");
         final AggregationRequestSpec aggregationRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification("http_method:GET",
                 Set.of("000000000000000000000001"),
+                Set.of("category1"),
                 "1d",
                 List.of("http_method", "controller"),
                 List.of("avg:took_ms"));
@@ -141,6 +150,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "http_method:GET",
                         Set.of("000000000000000000000001"),
+                Set.of("category1"),
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method"), new Grouping("controller")),
                         List.of(new Metric("avg", "took_ms"))

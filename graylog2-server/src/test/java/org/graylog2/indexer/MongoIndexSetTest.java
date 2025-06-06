@@ -28,6 +28,9 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -37,6 +40,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -50,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+import static org.graylog2.indexer.MongoIndexSet.hotIndexName;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -96,6 +101,8 @@ public class MongoIndexSetTest {
     @Mock
     private ActivityWriter activityWriter;
     private MongoIndexSet mongoIndexSet;
+    @Mock
+    private NotificationService notificationService;
 
     @Before
     public void setUp() {
@@ -232,7 +239,7 @@ public class MongoIndexSetTest {
     }
 
     @Test
-    public void testCleanupAliases() throws Exception {
+    public void testCleanupAliases() {
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
         verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
@@ -245,11 +252,21 @@ public class MongoIndexSetTest {
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         when(indices.create("graylog_0", mongoIndexSet)).thenReturn(false);
 
+        Notification notification = new NotificationImpl();
+        when(notificationService.build()).thenReturn(notification);
+
+        String errorMessage = "Could not create new target index <graylog_0>.";
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Could not create new target index <graylog_0>.");
+        expectedException.expectMessage(errorMessage);
 
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
+
+        ArgumentCaptor<Notification> argument = ArgumentCaptor.forClass(Notification.class);
+        verify(notificationService, times(1)).publishIfFirst(argument.capture());
+
+        Notification publishedNotification = argument.getValue();
+        assertThat(publishedNotification.getDetail("description")).isEqualTo(errorMessage);
     }
 
     @Test
@@ -349,7 +366,13 @@ public class MongoIndexSetTest {
         assertThat(mongoIndexSet.isManagedIndex(indexName)).isTrue();
     }
 
+    @Test
+    public void testHotIndexNameOfWarmIndex() {
+        assertThat(hotIndexName("gl_warm_1")).isEqualTo("gl_1");
+        assertThat(hotIndexName("gl_testwarm_1")).isEqualTo("gl_testwarm_1");
+    }
+
     private MongoIndexSet createIndexSet(IndexSetConfig indexSetConfig) {
-        return new MongoIndexSet(indexSetConfig, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        return new MongoIndexSet(indexSetConfig, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter, notificationService);
     }
 }

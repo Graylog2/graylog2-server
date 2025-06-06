@@ -19,22 +19,23 @@ import { stringify } from 'qs';
 import Routes from 'routing/Routes';
 import type View from 'views/logic/views/View';
 import type { HistoryFunction } from 'routing/useHistory';
+import type { NewDashboardPageState } from 'views/pages/NewDashboardPage';
 
 export const loadNewView = (history: HistoryFunction) => history.push(`${Routes.SEARCH}/new`);
 
 export const loadNewSearch = loadNewView;
 
-export const loadNewViewForStream = (history: HistoryFunction, streamId: string) => history.push(`${Routes.stream_search(streamId)}/new`);
+export const loadNewViewForStream = (history: HistoryFunction, streamId: string) =>
+  history.push(`${Routes.stream_search(streamId)}/new`);
 
 export const loadView = (history: HistoryFunction, viewId: string) => history.push(`${Routes.SEARCH}/${viewId}`);
 
-export const loadDashboard = (history: HistoryFunction, dashboardId: string, initialPage?: string) => history.push(
-  `${Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId)}${initialPage ? `?${stringify({ page: initialPage })}` : ''}`,
-);
+export const loadDashboard = (history: HistoryFunction, dashboardId: string, initialPage?: string) =>
+  history.push(
+    `${Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId)}${initialPage ? `?${stringify({ page: initialPage })}` : ''}`,
+  );
 
-export const loadAsDashboard = (history: HistoryFunction, view: View) => history.pushWithState(
-  Routes.pluginRoute('DASHBOARDS_NEW'),
-  {
+export const loadAsDashboard = (history: HistoryFunction, view: View) =>
+  history.pushWithState<NewDashboardPageState>(Routes.pluginRoute('DASHBOARDS_NEW'), {
     view,
-  },
-);
+  });

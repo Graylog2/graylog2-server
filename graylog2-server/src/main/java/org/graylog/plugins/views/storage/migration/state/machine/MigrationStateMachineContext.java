@@ -112,6 +112,10 @@ public class MigrationStateMachineContext {
         return Optional.of((T) value);
     }
 
+    public void removeExtendedState(String name) {
+        this.extendedState.remove(name);
+    }
+
     public void setResponse(Object response) {
         this.response = response;
     }

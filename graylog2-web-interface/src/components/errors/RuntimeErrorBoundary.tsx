@@ -15,26 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import type { ErrorInfo } from 'react';
 
 import { createReactError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 class RuntimeErrorBoundary extends React.Component<Props> {
-  static propTypes = {
-    children: PropTypes.node,
-  };
+  static contextType = TelemetryContext;
 
-  static defaultProps = {
-    children: null,
-  };
+  context: React.ContextType<typeof TelemetryContext>;
 
-  componentDidCatch(error: Error, info: { componentStack: string }) {
-    ErrorsActions.report(createReactError(error, info));
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    ErrorsActions.report(createReactError(error, { componentStack: info?.componentStack }));
+    this.context.sendErrorReport(error);
   }
 
   render() {

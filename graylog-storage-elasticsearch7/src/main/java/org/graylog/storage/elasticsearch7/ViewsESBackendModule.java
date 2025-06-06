@@ -24,8 +24,6 @@ import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
@@ -86,8 +84,7 @@ public class ViewsESBackendModule extends ViewsModule {
     protected void configure() {
         install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
-        bindForVersion(supportedSearchVersion, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
-                .to(ElasticsearchBackend.class);
+        registerVersionedQueryBackend(supportedSearchVersion, ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
         registerESSearchTypeHandler(EventList.NAME, ESEventList.class);

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
 
@@ -26,20 +25,28 @@ const StyledRow = styled(Row)`
   margin-bottom: 0 !important;
 `;
 
-const Container = styled.div<{ margin: number }>(({ margin }) => `
+const Container = styled.div<{ margin: number }>(
+  ({ margin }) => `
   margin-top: ${margin}px;
   margin-bottom: ${margin}px;
-`);
+`,
+);
 
 type Props = {
-  onClose: (msg?: string) => void,
-  children: React.ReactNode,
-  bsStyle: ColorVariant,
-  marginTopBottom: number,
-  runtimeError: boolean,
+  onClose?: (msg?: string) => void;
+  children?: React.ReactNode;
+  bsStyle?: ColorVariant;
+  marginTopBottom?: number;
+  runtimeError?: boolean;
 };
 
-const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 15, runtimeError }: Props) => {
+const ErrorAlert = ({
+  children = null,
+  onClose = () => undefined,
+  bsStyle = 'warning',
+  marginTopBottom = 15,
+  runtimeError = false,
+}: Props) => {
   const finalBsStyle = runtimeError ? 'danger' : bsStyle;
 
   if (!children) {
@@ -63,26 +70,6 @@ const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 
       </Alert>
     </Container>
   );
-};
-
-ErrorAlert.propTypes = {
-  bsStyle: PropTypes.string,
-  runtimeError: PropTypes.bool,
-  marginTopBottom: PropTypes.number,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-    PropTypes.string,
-  ]),
-  onClose: PropTypes.func,
-};
-
-ErrorAlert.defaultProps = {
-  bsStyle: 'warning',
-  runtimeError: false,
-  marginTopBottom: 15,
-  children: null,
-  onClose: () => undefined,
 };
 
 export default ErrorAlert;

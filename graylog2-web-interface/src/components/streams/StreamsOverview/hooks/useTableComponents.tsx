@@ -24,25 +24,24 @@ import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRul
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 
 const useTableElements = ({ indexSets }: { indexSets: Array<IndexSet> }) => {
-  const entityActions = useCallback((listItem: Stream) => (
-    <StreamActions stream={listItem}
-                   indexSets={indexSets} />
-  ), [indexSets]);
+  const entityActions = useCallback(
+    (listItem: Stream) => <StreamActions stream={listItem} indexSets={indexSets} />,
+    [indexSets],
+  );
 
-  const renderExpandedRules = useCallback((stream: Stream) => (
-    <ExpandedRulesSection stream={stream} />
-  ), []);
-  const renderExpandedRulesActions = useCallback((stream: Stream) => (
-    <ExpandedRulesActions stream={stream} />
-  ), []);
+  const renderExpandedRules = useCallback((stream: Stream) => <ExpandedRulesSection stream={stream} />, []);
+  const renderExpandedRulesActions = useCallback((stream: Stream) => <ExpandedRulesActions stream={stream} />, []);
 
-  const expandedSections = useMemo(() => ({
-    rules: {
-      title: 'Rules',
-      content: renderExpandedRules,
-      actions: renderExpandedRulesActions,
-    },
-  }), [renderExpandedRules, renderExpandedRulesActions]);
+  const expandedSections = useMemo(
+    () => ({
+      rules: {
+        title: 'Rules',
+        content: renderExpandedRules,
+        actions: renderExpandedRulesActions,
+      },
+    }),
+    [renderExpandedRules, renderExpandedRulesActions],
+  );
 
   return {
     entityActions,

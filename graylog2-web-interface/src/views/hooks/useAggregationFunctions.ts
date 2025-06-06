@@ -21,11 +21,11 @@ import fetch from 'logic/rest/FetchProvider';
 
 const functionsUrl = URLUtils.qualifyUrl('/views/functions');
 
-type AggregationFunction = { type: string, description: string };
+type AggregationFunction = { type: string; description: string };
 
 type AggregationFunctions = {
-  [functionName: string]: AggregationFunction | undefined,
-}
+  [functionName: string]: AggregationFunction | undefined;
+};
 
 const fetchAggregationFunctions = (): Promise<AggregationFunctions> => fetch('GET', functionsUrl);
 const useAggregationFunctions = () => useQuery(['aggregationFunctions'], fetchAggregationFunctions);

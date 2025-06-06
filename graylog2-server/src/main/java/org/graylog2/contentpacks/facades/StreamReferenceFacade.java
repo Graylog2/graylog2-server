@@ -23,9 +23,11 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -39,13 +41,12 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
@@ -144,7 +145,7 @@ public class StreamReferenceFacade extends StreamFacade {
 
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final StreamReferenceEntity streamEntity = objectMapper.convertValue(entity.data(), StreamReferenceEntity.class);
-        final List<Stream> streams = streamService.loadAllByTitle(streamEntity.title().asString());
+        final List<Stream> streams = streamService.loadAllByTitle(streamEntity.title().asString(parameters));
         if (streams.size() == 1) {
             final Stream stream = streams.get(0);
             return Optional.of(NativeEntity.create(entity.id(), stream.getId(), ModelTypes.STREAM_V1, stream.getTitle(), stream));
@@ -194,5 +195,10 @@ public class StreamReferenceFacade extends StreamFacade {
     public static String getStreamEntityIdOrThrow(String id, EntityDescriptorIds entityDescriptorIds) {
         return getStreamEntityId(id, entityDescriptorIds).orElseThrow(() ->
                 new ContentPackException("Couldn't find entity " + id + "/" + ModelTypes.STREAM_V1 + " or " + ModelTypes.STREAM_REF_V1));
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
     }
 }

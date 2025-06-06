@@ -71,7 +71,7 @@ describe('NestedForm', () => {
     const onReset = jest.fn();
 
     render(
-      <Formik onSubmit={(() => {})} onReset={onResetParentForm} initialValues={{}}>
+      <Formik onSubmit={() => {}} onReset={onResetParentForm} initialValues={{}}>
         <Form>
           <Formik onSubmit={() => {}} onReset={onReset} initialValues={{}}>
             <NestedForm>

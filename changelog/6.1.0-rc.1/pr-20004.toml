@@ -1,0 +1,4 @@
+type = "f"
+message = "Disable world map interactions in non-interactive mode."
+
+pulls = ["20004"]

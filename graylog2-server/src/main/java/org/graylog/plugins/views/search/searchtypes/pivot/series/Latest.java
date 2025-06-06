@@ -38,7 +38,6 @@ public abstract class Latest implements SeriesSpec, HasField {
 
     @Override
     public abstract String id();
-
     @JsonProperty
     public abstract String field();
 

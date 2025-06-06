@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import { LinkContainer } from 'components/common/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
@@ -27,9 +26,9 @@ import { Button } from 'components/bootstrap';
 import { IfPermitted, Spinner } from 'components/common';
 
 type Props = {
-  readOnly: $PropertyType<Role, 'readOnly'>,
-  roleId: $PropertyType<Role, 'id'>,
-  roleName: $PropertyType<Role, 'name'>,
+  readOnly: Role['readOnly'];
+  roleId: Role['id'];
+  roleName: Role['name'];
 };
 
 const ActionsWrapper = styled.div`
@@ -37,7 +36,7 @@ const ActionsWrapper = styled.div`
   justify-content: flex-end;
 `;
 
-const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: (boolean) => void) => {
+const _deleteRole = (roleId: Role['id'], roleName: Role['name'], setDeleting: (deleting: boolean) => void) => {
   let confirmMessage = `Do you really want to delete role "${roleName}"?`;
   const getOneUser = { page: 1, perPage: 1, query: '' };
   setDeleting(true);
@@ -75,7 +74,13 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
           <IfPermitted permissions={[`roles:delete:${roleName}`]}>
             <>
               &nbsp;
-              <Button id={`delete-role-${roleId}`} bsStyle="danger" bsSize="xs" title={`Delete role ${roleName}`} onClick={() => _deleteRole(roleId, roleName, setDeleting)} type="button">
+              <Button
+                id={`delete-role-${roleId}`}
+                bsStyle="danger"
+                bsSize="xs"
+                title={`Delete role ${roleName}`}
+                onClick={() => _deleteRole(roleId, roleName, setDeleting)}
+                type="button">
                 {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
               </Button>
             </>

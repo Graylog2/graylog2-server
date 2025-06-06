@@ -27,24 +27,19 @@ import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
 const renderHookWithWrapper = <TProps, TResult>(
   callback: (props: TProps) => TResult,
   options: RenderHookOptions<TProps> & { queryClientOptions?: QueryClientConfig } = {},
-): RenderHookResult<TProps, TResult> => renderHook(
-    callback,
-    {
-      ...options,
-      wrapper: ({ children }: React.PropsWithChildren<{}>) => {
-        const CustomWrapper = options.wrapper as React.ElementType ?? React.Fragment;
+): RenderHookResult<TProps, TResult> =>
+  renderHook(callback, {
+    ...options,
+    wrapper: ({ children }: React.PropsWithChildren<{}>) => {
+      const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
 
-        return (
-          <DefaultQueryClientProvider options={options.queryClientOptions}>
-            <CustomWrapper>
-              {children}
-            </CustomWrapper>
-          </DefaultQueryClientProvider>
-        );
-      },
-    });
+      return (
+        <DefaultQueryClientProvider options={options.queryClientOptions}>
+          <CustomWrapper>{children}</CustomWrapper>
+        </DefaultQueryClientProvider>
+      );
+    },
+  });
 
 export * from '@testing-library/react-hooks';
-export {
-  renderHookWithWrapper as renderHook,
-};
+export { renderHookWithWrapper as renderHook };

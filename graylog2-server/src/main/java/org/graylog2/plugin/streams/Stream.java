@@ -89,6 +89,8 @@ public interface Stream extends Persisted {
 
     String getContentPack();
 
+    List<String> getCategories();
+
     void setTitle(String title);
 
     void setDescription(String description);
@@ -98,6 +100,8 @@ public interface Stream extends Persisted {
     void setContentPack(String contentPack);
 
     void setMatchingType(MatchingType matchingType);
+
+    void setCategories(List<String> categories);
 
     Boolean isPaused();
 

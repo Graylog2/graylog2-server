@@ -27,7 +27,7 @@ const defaultProps = {
 
 describe('AbsoluteTimeInput', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it('renders', () => {

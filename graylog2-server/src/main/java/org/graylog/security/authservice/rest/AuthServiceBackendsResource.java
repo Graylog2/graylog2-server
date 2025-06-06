@@ -35,6 +35,7 @@ import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -195,7 +196,7 @@ public class AuthServiceBackendsResource extends RestResource {
             @ApiParam(name = "sort", value = "The field to sort the result on", required = true, allowableValues = "username,full_name,email")
             @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-            @DefaultValue("asc") @QueryParam("order") String order,
+            @DefaultValue("asc") @QueryParam("order") SortOrder order,
             @ApiParam(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId
     ) {
         final AuthServiceBackendDTO activeConfig = loadConfig(backendId);

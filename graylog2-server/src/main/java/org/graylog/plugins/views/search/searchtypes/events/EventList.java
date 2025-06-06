@@ -22,17 +22,21 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.SearchEngineSearchType;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.database.filtering.AttributeFilter;
+import org.graylog2.database.filtering.HasAttributeFilter;
 import org.graylog2.plugin.Message;
 
 import javax.annotation.Nullable;
@@ -49,10 +53,10 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 @AutoValue
 @JsonTypeName(EventList.NAME)
 @JsonDeserialize(builder = EventList.Builder.class)
-public abstract class EventList implements SearchType {
+public abstract class EventList implements SearchEngineSearchType, HasAttributeFilter {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
-    public static final Set<String> KNOWN_ATTRIBUTES = Set.of("priority", "event_definition_id", "alert");
+    public static final Set<String> KNOWN_ATTRIBUTES = Set.of("priority", "event_definition_id", "alert", "timestamp");
     public static final SortConfig DEFAULT_SORT = new SortConfig(Message.FIELD_TIMESTAMP, Direction.DESC);
 
     public enum Direction {
@@ -84,6 +88,7 @@ public abstract class EventList implements SearchType {
     @JsonProperty
     public abstract Optional<Integer> perPage();
 
+    @Override
     @JsonProperty
     public abstract List<AttributeFilter> attributes();
 
@@ -94,12 +99,18 @@ public abstract class EventList implements SearchType {
         return sort().orElse(DEFAULT_SORT);
     }
 
+    @Override
+    public boolean isExportable() {
+        return true;
+    }
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_EventList.Builder()
                 .type(NAME)
                 .filters(Collections.emptyList())
                 .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet())
                 .attributes(Collections.emptyList());
     }
 
@@ -111,6 +122,13 @@ public abstract class EventList implements SearchType {
             final var builder = toBuilder();
             state.page().ifPresent(builder::page);
             state.perPage().ifPresent(builder::perPage);
+            return builder.build();
+        } else if (state.limit().isPresent() &&
+                (state.offset().isEmpty() || state.offset().get().equals(0))
+        ) {
+            final var builder = toBuilder();
+            builder.page(1);
+            builder.perPage(state.limit().get());
             return builder.build();
         }
 
@@ -128,6 +146,7 @@ public abstract class EventList implements SearchType {
         public static Builder createDefault() {
             return builder()
                     .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet())
                     .streams(Collections.emptySet());
         }
 
@@ -156,6 +175,9 @@ public abstract class EventList implements SearchType {
 
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
 
         @JsonProperty
         public abstract Builder page(@Nullable Integer page);
@@ -250,13 +272,19 @@ public abstract class EventList implements SearchType {
     public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return EventListEntity.builder()
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .filter(filter())
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .id(id())
                 .name(name().orElse(null))
                 .query(query().orElse(null))
                 .type(type())
                 .timerange(timerange().orElse(null))
                 .build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

@@ -26,6 +26,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.joda.time.Period;
 
+import javax.annotation.Nullable;
+
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MAX;
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN;
 
@@ -36,10 +38,23 @@ import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_
 public abstract class FallbackDataTieringConfig implements DataTieringConfig {
 
     public static final String TYPE = "fallback";
+    public static final String FIELD_WARM_TIER_ENABLED = "warm_tier_enabled";
+    public static final String FIELD_INDEX_HOT_LIFETIME_MIN = "index_hot_lifetime_min";
 
     @JsonCreator
     public static FallbackDataTieringConfig create(@JsonProperty(FIELD_INDEX_LIFETIME_MIN) @NotNull Period indexLifetimeMin,
-                                                   @JsonProperty(FIELD_INDEX_LIFETIME_MAX) @NotNull Period indexLifetimeMax) {
-        return new AutoValue_FallbackDataTieringConfig(TYPE, indexLifetimeMin, indexLifetimeMax);
+                                                   @JsonProperty(FIELD_INDEX_LIFETIME_MAX) @NotNull Period indexLifetimeMax,
+                                                   @JsonProperty(FIELD_WARM_TIER_ENABLED) @Nullable Boolean warmTierEnabled,
+                                                   @JsonProperty(FIELD_INDEX_HOT_LIFETIME_MIN) @Nullable Period indexHotLifetimeMin
+    ) {
+        return new AutoValue_FallbackDataTieringConfig(TYPE, indexLifetimeMin, indexLifetimeMax, warmTierEnabled, indexHotLifetimeMin);
     }
+
+    @Nullable
+    @JsonProperty(FIELD_WARM_TIER_ENABLED)
+    public abstract Boolean warmTierEnabled();
+
+    @Nullable
+    @JsonProperty(FIELD_INDEX_HOT_LIFETIME_MIN)
+    public abstract Period indexHotLifetimeMin();
 }

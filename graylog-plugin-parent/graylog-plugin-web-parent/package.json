@@ -9,6 +9,7 @@
     "url": "git://github.com/Graylog2/graylog2-server.git"
   },
   "scripts": {
-    "build": "echo 'Dummy build script for graylog-plugin-web-parent'"
+    "build": "echo 'Dummy build script for graylog-plugin-web-parent'",
+    "generate:apidefs": "echo 'Dummy Backend API generation script for graylog-plugin-web-parent'"
   }
 }

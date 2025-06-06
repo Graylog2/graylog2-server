@@ -48,6 +48,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -377,6 +380,11 @@ public final class Tools {
 
     public static String getISO8601String(DateTime time) {
         return ISODateTimeFormat.dateTime().print(time);
+    }
+
+
+    public static ZonedDateTime jodaToJavaUTC(DateTime dateTime) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime.getMillis()), ZoneId.of("UTC"));
     }
 
     /**

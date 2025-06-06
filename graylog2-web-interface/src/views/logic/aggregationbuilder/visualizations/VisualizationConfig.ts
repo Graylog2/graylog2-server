@@ -16,7 +16,7 @@
  */
 
 export type VisualizationConfigJson = {
-  type: string,
+  type: string;
 };
 
 type DeserializesVisualizationConfig = {

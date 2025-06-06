@@ -20,9 +20,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.joda.time.DateTime;
+import org.joda.time.base.AbstractInstant;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @DbEntity(collection = "datanodes", titleField = "node_id")
 public class DataNodeEntity extends AbstractNode<DataNodeDto> {
@@ -44,6 +49,11 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
         return (String) fields.get("rest_api_address");
     }
 
+    public Date getCertValidTill() {
+        final DateTime dateTime = (DateTime) fields.get(DataNodeDto.FIELD_CERT_VALID_UNTIL);
+        return Optional.ofNullable(dateTime).map(AbstractInstant::toDate).orElse(null);
+    }
+
     public DataNodeLifecycleTrigger getActionQueue() {
         if (!fields.containsKey("action_queue") || Objects.isNull(fields.get("action_queue"))) {
             return null;
@@ -56,6 +66,24 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
             return null;
         }
         return DataNodeStatus.valueOf(fields.get("datanode_status").toString());
+    }
+
+
+    public String getDatanodeVersion() {
+        if (!fields.containsKey(DataNodeDto.FIELD_DATANODE_VERSION)) {
+            return null;
+        }
+        return (String) fields.get(DataNodeDto.FIELD_DATANODE_VERSION);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getOpensearchRoles() {
+        return (List<String>) fields.get(DataNodeDto.FIELD_OPENSEARCH_ROLES);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getConfigurationWarnings() {
+        return (List<String>) fields.get(DataNodeDto.FIELD_CONFIGURATION_WARNINGS);
     }
 
     @Override
@@ -71,6 +99,10 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setDataNodeStatus(this.getDataNodeStatus())
                 .setRestApiAddress(this.getRestApiAddress())
                 .setActionQueue(this.getActionQueue())
+                .setCertValidUntil(this.getCertValidTill())
+                .setDatanodeVersion(this.getDatanodeVersion())
+                .setOpensearchRoles(this.getOpensearchRoles())
+                .setConfigurationWarnings(this.getConfigurationWarnings())
                 .build();
     }
 

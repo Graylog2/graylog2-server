@@ -26,6 +26,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +44,8 @@ public interface IndicesAdapter {
 
     void create(String indexName, IndexSettings indexSettings);
 
+    void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping);
+
     /**
      * Add fields to an existing index or to change search only settings of existing fields
      * @param indexName existing index name
@@ -50,6 +53,11 @@ public interface IndicesAdapter {
      * @param mapping field mappings
      */
     void updateIndexMapping(@Nonnull String indexName, @Nonnull String mappingType, @Nonnull Map<String, Object> mapping);
+
+    Map<String, Object> getIndexMapping(@Nonnull String index);
+
+    Map<String, Object> getStructuredIndexSettings(@Nonnull String index);
+
 
     /**
      * Updates the metadata field (_meta) of an index mapping

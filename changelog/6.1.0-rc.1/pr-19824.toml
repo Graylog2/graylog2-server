@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix indexer cluster health box on indices page to use correct distribution name."
+
+issues = ["19805"]
+pulls = ["19824"]

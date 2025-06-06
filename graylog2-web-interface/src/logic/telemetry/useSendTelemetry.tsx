@@ -16,19 +16,40 @@
  */
 import { useCallback, useContext } from 'react';
 import type { Optional } from 'utility-types';
+import { UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
+import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import useRoutePattern from 'routing/useRoutePattern';
+import { currentPathname, stripPrefixFromPathname } from 'util/URLUtils';
+import { singleton } from 'logic/singleton';
+
+const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
+  if (!dataRouterContext?.router?.routes) {
+    return undefined;
+  }
+
+  const {
+    router: { routes },
+  } = dataRouterContext;
+  const pathname = currentPathname();
+  const matches = matchRoutes(routes, pathname);
+
+  return stripPrefixFromPathname(matches?.at(-1)?.route.path);
+};
 
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
-  const route = useRoutePattern();
+  const dataRouterContext = useContext(DataRouterContext);
 
-  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => sendTelemetry(
-    eventType,
-    { app_path_pattern: route, ...event },
-  ), [sendTelemetry, route]);
+  return useCallback(
+    (eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
+      const route = retrieveCurrentRoute(dataRouterContext);
+
+      return sendTelemetry(eventType, { app_path_pattern: route, ...event });
+    },
+    [dataRouterContext, sendTelemetry],
+  );
 };
 
-export default useSendTelemetry;
+export default singleton('core.useSendTelemetry', () => useSendTelemetry);

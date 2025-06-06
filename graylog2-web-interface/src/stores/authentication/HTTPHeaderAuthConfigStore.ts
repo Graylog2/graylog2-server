@@ -25,9 +25,8 @@ import { singletonStore } from 'logic/singleton';
 import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 
-const HTTPHeaderAuthConfigStore: Store<{}> = singletonStore(
-  'HTTPHeaderAuthConfig',
-  () => Reflux.createStore({
+const HTTPHeaderAuthConfigStore: Store<{}> = singletonStore('HTTPHeaderAuthConfig', () =>
+  Reflux.createStore({
     listenables: [HTTPHeaderAuthConfigActions],
 
     load(): Promise<HTTPHeaderAuthConfig> {

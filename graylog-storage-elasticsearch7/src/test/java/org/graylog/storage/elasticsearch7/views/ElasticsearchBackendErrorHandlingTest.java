@@ -31,6 +31,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,6 +74,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchMockedCl
                 ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
+                mock(StreamService.class),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 

@@ -16,47 +16,64 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useEventNotifications = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    elements: Array<EventNotification>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
-  refetch: () => void,
-  isInitialLoading: boolean,
+export const fetchEventNotifications = (searchParams: SearchParams) =>
+  EventNotificationsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams?.sort.attributeId,
+    order: searchParams?.sort.direction,
+  }).then(({ elements, pagination, attributes }) => ({
+    list: elements,
+    pagination,
+    attributes,
+  }));
+
+export const keyFn = (searchParams?: SearchParams | undefined) => [
+  'eventNotifications',
+  'overview',
+  ...(searchParams ? [searchParams] : []),
+];
+
+type EventNotificationsResult = {
+  list: Array<EventNotification>;
+  pagination: { total: number };
+  attributes: Array<{ id: string; title: string; sortable: boolean }>;
+};
+
+const useEventNotifications = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data: EventNotificationsResult | undefined;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    ['eventNotifications', 'overview', searchParams],
-    () => EventNotificationsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-    ),
+  const { data, refetch, isInitialLoading } = useQuery<EventNotificationsResult>(
+    keyFn(searchParams),
+    () =>
+      defaultOnError(
+        fetchEventNotifications(searchParams),
+        'Loading event notifications failed with status',
+        'Could not load event notifications',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading event notifications failed with status: ${errorThrown}`,
-          'Could not load event notifications');
-      },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useEventNotifications;

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Remove last data node from list if no more data nodes are running."
+
+issues = ["19980"]
+pulls = ["19981"]

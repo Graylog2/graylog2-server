@@ -17,12 +17,13 @@
 package org.graylog2.plugin;
 
 public enum DocsHelper {
-    PAGE_SENDING_JSONPATH("json"),
-    PAGE_SENDING_IPFIXPATH("ipfix-input"),
-    PAGE_ES_CONFIGURATION("elasticsearch"),
-    PAGE_ES_VERSIONS("elasticsearch#elasticsearch-versions");
+    PAGE_SENDING_JSONPATH("getting_in_log_data/json_path_from_http_api_input.html"),
+    PAGE_SENDING_IPFIXPATH("getting_in_log_data/ipfix_input.html"),
+    PAGE_ES_CONFIGURATION("setting_up_graylog/server_configuration_settings_reference.htm#SearchBackendConfigurationProperties"),
+    PAGE_ES_VERSIONS("downloading_and_installing_graylog/compatibility_matrix.htm"),
+    REPORTING_HELP("interacting_with_your_log_data/reporting.html");
 
-    private static final String DOCS_URL = "https://docs.graylog.org/docs/";
+    private static final String SERVER = "https://go2docs.graylog.org/current";
 
     private final String path;
 
@@ -32,10 +33,6 @@ public enum DocsHelper {
 
     @Override
     public String toString() {
-        return DOCS_URL + path;
-    }
-
-    public String toLink(String title) {
-        return "<a href=\"" + toString() + "\" target=\"_blank\">" + title + "</a>";
+        return SERVER + "/" + path;
     }
 }

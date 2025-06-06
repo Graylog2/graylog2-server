@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectWidget } from 'views/logic/slices/viewSelectors';
 
-const useWidget = (widgetId: string) => useAppSelector(selectWidget(widgetId));
+const useWidget = (widgetId: string) => useViewsSelector(selectWidget(widgetId));
 
 export default useWidget;

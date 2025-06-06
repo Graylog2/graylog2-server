@@ -21,8 +21,7 @@ import { useState } from 'react';
 
 import { Alert, Button } from 'components/bootstrap';
 import { Icon, ConfirmDialog } from 'components/common';
-import { SideNav, SideNavItem, ContentArea, Container } from 'components/security/page-layout';
-import Routes from 'routing/Routes';
+import { ContentArea, Container } from 'components/security/page-layout';
 
 const StyledAlert = styled(Alert)`
   padding: ${({ theme }) => theme.spacings.lg};
@@ -49,7 +48,7 @@ const BoldText = styled.h1`
   color: ${({ theme }) => theme.colors.variant.danger};
 `;
 
-const Col = styled.div<{ $width?: string, $align?: string, $justify?: string }>`
+const Col = styled.div<{ $width?: string; $align?: string; $justify?: string }>`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacings.md};
@@ -57,12 +56,17 @@ const Col = styled.div<{ $width?: string, $align?: string, $justify?: string }>`
   align-items: ${({ $align }) => $align || 'flex-start'};
 `;
 
-const Row = styled.div<{ $justify?: string, $fullWidth?: boolean }>`
+const Row = styled.div<{ $justify?: string; $fullWidth?: boolean }>`
   display: flex;
   flex-direction: row;
-  ${({ $justify }) => (
-    $justify ? css`justify-content: ${$justify};` : css`gap: ${({ theme }) => theme.spacings.md};`
-  )}
+  ${({ $justify }) =>
+    $justify
+      ? css`
+          justify-content: ${$justify};
+        `
+      : css`
+          gap: ${({ theme }) => theme.spacings.md};
+        `}
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
 `;
 
@@ -73,7 +77,7 @@ const StyledIcon = styled(Icon)`
 const LEFT_COLUMN_ITEM_LIST = [
   'Anomaly Detection AI',
   'Cloud Option',
-  'Achiving',
+  'Archiving',
   'Audit Logs for Graylog Cloud',
   'Dynamic Lookup Tables',
   'Advanced Alerting With Scripting',
@@ -89,62 +93,18 @@ const RIGHT_COLUMN_ITEM_LIST = [
   'Parameterized Dashboarding',
   'Input & Output Integrations',
   'Threat Management',
-  'Search Workflow, Temlplates & Filters',
+  'Search Workflow, Templates & Filters',
   'Integrated Search & Alerting',
   'SOAR Integrations',
 ];
 
-const navItems = [
-  {
-    path: Routes.SECURITY.OVERVIEW,
-    iconName: 'ballot',
-    end: true,
-    title: 'Overview',
-  },
-  {
-    path: Routes.SECURITY.USER_ACTIVITY,
-    iconName: 'person',
-    end: false,
-    title: 'User Activity',
-  },
-  {
-    path: Routes.SECURITY.HOST_ACTIVITY,
-    iconName: 'tv',
-    end: false,
-    title: 'Host Activity',
-  },
-  {
-    path: Routes.SECURITY.NETWORK_ACTIVITY,
-    iconName: 'wifi',
-    end: false,
-    title: 'Network Activity',
-  },
-  {
-    path: Routes.SECURITY.ANOMALIES,
-    iconName: 'zoom_in',
-    end: false,
-    title: 'Anomalies',
-  },
-] as const;
-
 const TeaserPageLayout = ({ children }: PropsWithChildren) => {
-  const [showSideBar, setShowSideBar] = useState(true);
   const [showModal, setShowModal] = useState(true);
 
   return (
     <>
       <Container>
-        <SideNav isOpen={showSideBar} toggleIsOpen={() => setShowSideBar((cur) => !cur)}>
-          {navItems.map((route) => (
-            <SideNavItem key={route.title}
-                         iconName={route.iconName}
-                         linkTarget={route.path}
-                         linkEnd={route.end}>
-              {route.title}
-            </SideNavItem>
-          ))}
-        </SideNav>
-        <ContentArea $sideNavIsOpen={showSideBar}>
+        <ContentArea>
           <StyledAlert bsStyle="info" noIcon>
             <Banner>
               <LeftItems>
@@ -160,16 +120,19 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
         </ContentArea>
       </Container>
       {showModal && (
-        <ConfirmDialog show
-                       title="Security Demo"
-                       onConfirm={() => setShowModal(false)}
-                       btnConfirmText="Close">
+        <ConfirmDialog
+          show
+          title="Security Demo"
+          onConfirm={() => setShowModal(false)}
+          onCancel={() => setShowModal(false)}
+          btnConfirmText="Close">
           <Col>
             <h2 className="text-danger">OVERVIEW</h2>
             <p>
-              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined capabilities of SIEM,
-              Security Analytics, Incident Investigation, and Anomaly Detection. By using our platform, you can work more efficiently,
-              tackling critical tasks quicker, and mitigating risk caused by malicious actors and credential-based attacks.
+              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined
+              capabilities of SIEM, Security Analytics, Incident Investigation, and Anomaly Detection. By using our
+              platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by
+              malicious actors and credential-based attacks.
             </p>
             <Row $justify="space-between" $fullWidth>
               <Col>

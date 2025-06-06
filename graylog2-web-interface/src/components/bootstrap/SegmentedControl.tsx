@@ -15,38 +15,44 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import { SegmentedControl as MantineSegmentedControl } from '@mantine/core';
 import { useTheme } from 'styled-components';
-import type { SegmentedControlItem } from '@mantine/core';
+import type { MantineRadius, SegmentedControlItem } from '@mantine/core';
 
-type Props = {
-  data: Array<string> | Array<SegmentedControlItem>,
-  defaultValue?: string,
-  disabled?: boolean,
-  handleChange?: (value: string) => void | Dispatch<SetStateAction<string>>,
-  value?: string,
-}
+type Props<OptionValue> = {
+  data: Array<SegmentedControlItem & { value: OptionValue }>;
+  defaultValue?: string;
+  disabled?: boolean;
+  onChange?: (value: OptionValue) => void;
+  value?: OptionValue;
+  className?: string;
+  radius?: MantineRadius;
+};
 
-const SegmentedControl = ({ data, defaultValue, disabled, handleChange, value }: Props) => {
+const SegmentedControl = <OptionValue extends string>({
+  className = undefined,
+  data,
+  defaultValue = undefined,
+  disabled = false,
+  onChange = undefined,
+  value = undefined,
+  radius = 'xs',
+}: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
-    <MantineSegmentedControl color={theme.colors.variant.info}
-                             data={data}
-                             defaultValue={defaultValue}
-                             disabled={disabled}
-                             value={value}
-                             onChange={handleChange}
-                             styles={{ label: { marginBottom: 0 } }} />
+    <MantineSegmentedControl
+      color={theme.colors.variant.info}
+      className={className}
+      data={data}
+      defaultValue={defaultValue}
+      radius={radius}
+      disabled={disabled}
+      value={value}
+      onChange={onChange}
+      styles={{ label: { marginBottom: 0 } }}
+    />
   );
-};
-
-SegmentedControl.defaultProps = {
-  defaultValue: undefined,
-  disabled: false,
-  handleChange: undefined,
-  value: undefined,
 };
 
 export default SegmentedControl;

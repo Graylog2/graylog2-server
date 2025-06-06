@@ -24,21 +24,20 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'logic/singleton';
 
 type StreamRule = {
-  field: string,
-  type: number,
-  value: string,
-  inverted: boolean,
-  description: string,
+  field: string;
+  type: number;
+  value: string;
+  inverted: boolean;
+  description: string;
 };
 
 type Callback = {
-  (): void,
+  (): void;
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const StreamRulesStore = singletonStore(
-  'core.StreamRules',
-  () => Reflux.createStore({
+export const StreamRulesStore = singletonStore('core.StreamRules', () =>
+  Reflux.createStore({
     callbacks: [],
 
     types() {
@@ -47,10 +46,9 @@ export const StreamRulesStore = singletonStore(
 
       return promise;
     },
-    update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
+    update(streamId: string, streamRuleId: string, data: StreamRule, callback: () => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Updating Stream Rule failed with status: ${error}`,
-          'Could not update Stream Rule');
+        UserNotification.error(`Updating Stream Rule failed with status: ${error}`, 'Could not update Stream Rule');
       };
 
       const url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.update(streamId, streamRuleId).url);
@@ -62,33 +60,25 @@ export const StreamRulesStore = singletonStore(
         description: data.description,
       };
 
-      return fetch('PUT', url, request)
-        .then(callback, failCallback)
-        .then(this._emitChange.bind(this));
+      return fetch('PUT', url, request).then(callback, failCallback).then(this._emitChange.bind(this));
     },
-    remove(streamId: string, streamRuleId: string, callback: (() => void)) {
+    remove(streamId: string, streamRuleId: string, callback: () => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Deleting Stream Rule failed with status: ${error}`,
-          'Could not delete Stream Rule');
+        UserNotification.error(`Deleting Stream Rule failed with status: ${error}`, 'Could not delete Stream Rule');
       };
 
       const url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.delete(streamId, streamRuleId).url);
 
-      fetch('DELETE', url)
-        .then(callback, failCallback)
-        .then(this._emitChange.bind(this));
+      fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
     },
-    create(streamId: string, data: StreamRule, callback: (() => void)) {
+    create(streamId: string, data: StreamRule, callback: () => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Creating Stream Rule failed with status: ${error}`,
-          'Could not create Stream Rule');
+        UserNotification.error(`Creating Stream Rule failed with status: ${error}`, 'Could not create Stream Rule');
       };
 
       const url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.create(streamId).url);
 
-      return fetch('POST', url, data)
-        .then(callback, failCallback)
-        .then(this._emitChange.bind(this));
+      return fetch('POST', url, data).then(callback, failCallback).then(this._emitChange.bind(this));
     },
     onChange(callback: Callback) {
       this.callbacks.push(callback);
