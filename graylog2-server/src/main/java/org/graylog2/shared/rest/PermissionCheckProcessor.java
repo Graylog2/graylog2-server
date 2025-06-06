@@ -17,13 +17,14 @@
 package org.graylog2.shared.rest;
 
 import com.google.common.collect.ComparisonChain;
+import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.Configuration;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.ResourceModel;
-import org.jetbrains.annotations.NotNull;
+import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,10 @@ public class PermissionCheckProcessor implements ModelProcessor {
             unprotectedEndpoints.addAll(checkResource(resource));
         }
 
+        unprotectedEndpoints.sort((o1, o2) -> ComparisonChain.start()
+                .compare(o1.resourcePath, o2.resourcePath)
+                .compare(o1.httpMethod, o2.httpMethod)
+                .result());
         if (!unprotectedEndpoints.isEmpty()) {
             StringBuilder sb = new StringBuilder("\n");
             sb.append("================================================================================\n");
@@ -115,28 +120,9 @@ public class PermissionCheckProcessor implements ModelProcessor {
 
         UnprotectedEndpoint(ResourceMethod method, Resource resource) {
             this.httpMethod = method.getHttpMethod();
-            this.resourcePath = getPathFromResource(resource);
+            this.resourcePath = RestTools.getPathFromResource(resource);
             final Method definitionMethod = method.getInvocable().getDefinitionMethod();
             this.methodRef = definitionMethod.getDeclaringClass().getCanonicalName() + "#" + definitionMethod.getName();
-        }
-
-        private String getPathFromResource(Resource resource) {
-            String path = resource.getPath();
-            Resource parent = resource.getParent();
-
-            while (parent != null) {
-                if (!path.startsWith("/")) {
-                    //noinspection StringConcatenationInLoop
-                    path = "/" + path;
-                }
-
-                //noinspection StringConcatenationInLoop
-                path = parent.getPath() + path;
-                parent = parent.getParent();
-            }
-
-            return path;
-
         }
 
         @Override
@@ -145,7 +131,7 @@ public class PermissionCheckProcessor implements ModelProcessor {
         }
 
         @Override
-        public int compareTo(@NotNull PermissionCheckProcessor.UnprotectedEndpoint o) {
+        public int compareTo(@Nonnull PermissionCheckProcessor.UnprotectedEndpoint o) {
             return ComparisonChain.start()
                     .compare(resourcePath, o.resourcePath)
                     .compare(httpMethod, o.httpMethod)
