@@ -20,11 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.users.ValidPassword;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotEmpty;
 
 @JsonAutoDetect
 @AutoValue
@@ -35,6 +35,7 @@ public abstract class ChangePasswordRequest {
     public abstract String oldPassword();
 
     @JsonProperty
+    @ValidPassword
     public abstract String password();
 
     @JsonCreator
