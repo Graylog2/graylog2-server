@@ -49,6 +49,7 @@ import type { JobIds } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import type { WidgetMapping } from 'views/logic/views/types';
+import UserNotification from 'util/UserNotification';
 
 const initialState = {
   searchTypesToSearch: undefined,
@@ -235,7 +236,13 @@ export const executeWithExecutionState =
       })
       .then((jobIds: JobIds) =>
         dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
-      );
+      )
+      .catch((error) => {
+        UserNotification.error(`Executing failed: ${error}`, 'Error!');
+        dispatch(cancelExecutedJob());
+
+        return dispatch(stopLoading());
+      });
 
 export const execute =
   ({
