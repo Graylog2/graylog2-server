@@ -14,17 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { singleton } from 'logic/singleton';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
+import { SystemNotifications } from '@graylog/server-api';
 
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
-export type ChartColorContextType = { colors: ChartColorMap; setColor: ChangeColorFunction };
+import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
-const ChartColorContext = React.createContext<ChartColorContextType>({
-  colors: ColorMapper.create(),
-  setColor: () => Promise.resolve([]),
-});
-export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
+const deleteNotification = ({ type, key }: { type: string; key: string }) =>
+  SystemNotifications.deleteKeyedNotification(type, key);
+
+const useNotificationDelete = () => {
+  const queryClient = useQueryClient();
+  const { mutateAsync } = useMutation(deleteNotification, {
+    onSuccess: () => queryClient.invalidateQueries(NOTIFICATIONS_QUERY_KEY),
+  });
+
+  return mutateAsync;
+};
+
+export default useNotificationDelete;

@@ -14,17 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { SystemNotifications } from '@graylog/server-api';
 
-import { singleton } from 'logic/singleton';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
-
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
-export type ChartColorContextType = { colors: ChartColorMap; setColor: ChangeColorFunction };
-
-const ChartColorContext = React.createContext<ChartColorContextType>({
-  colors: ColorMapper.create(),
-  setColor: () => Promise.resolve([]),
-});
-export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
+type Depromise<T> = T extends Promise<infer R> ? R : never;
+export type NotificationType = Depromise<
+  ReturnType<(typeof SystemNotifications)['listNotifications']>
+>['notifications'][number];

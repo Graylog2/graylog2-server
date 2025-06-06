@@ -14,17 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import { singleton } from 'logic/singleton';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
+import { SystemNotifications } from '@graylog/server-api';
 
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
-export type ChartColorContextType = { colors: ChartColorMap; setColor: ChangeColorFunction };
+import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
-const ChartColorContext = React.createContext<ChartColorContextType>({
-  colors: ColorMapper.create(),
-  setColor: () => Promise.resolve([]),
-});
-export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
+const POLL_INTERVAL = 3000;
+
+const useNotifications = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: NOTIFICATIONS_QUERY_KEY,
+    queryFn: SystemNotifications.listNotifications,
+    refetchInterval: POLL_INTERVAL,
+  });
+
+  return { data, isLoading };
+};
+export default useNotifications;
