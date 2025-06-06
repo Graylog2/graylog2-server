@@ -47,6 +47,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @GET
     @Timed
     @ApiOperation(value = "Get all input states of this node")
+    @InlinePermissionCheck
     public InputStatesList list() {
         final Set<InputStateSummary> result = this.inputRegistry.stream()
                 .filter(inputState -> isPermitted(RestPermissions.INPUTS_READ, inputState.getStoppable().getId()))
@@ -94,6 +96,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
+    @InlinePermissionCheck
     public InputStateSummary get(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final IOState<MessageInput> inputState = this.inputRegistry.getInputState(inputId);
@@ -111,6 +114,7 @@ public class InputStatesResource extends AbstractInputsResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
+    @InlinePermissionCheck
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
@@ -130,6 +134,7 @@ public class InputStatesResource extends AbstractInputsResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
+    @InlinePermissionCheck
     public InputSetup setup(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
@@ -149,6 +154,7 @@ public class InputStatesResource extends AbstractInputsResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
+    @InlinePermissionCheck
     public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);

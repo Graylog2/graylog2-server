@@ -26,6 +26,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
@@ -42,25 +56,10 @@ import org.graylog2.rest.models.system.loggers.responses.SingleLoggerSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleSubsystemSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import org.graylog2.shared.rest.HideOnCloud;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.LoggerFactory;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 
 import java.util.Collection;
 import java.util.List;
@@ -87,6 +86,7 @@ public class LoggersResource extends RestResource {
     @Timed
     @ApiOperation(value = "List all loggers and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public LoggersSummary loggers() {
         final Collection<LoggerConfig> loggerConfigs = getLoggerConfigs();
         final Map<String, SingleLoggerSummary> loggers = Maps.newHashMapWithExpectedSize(loggerConfigs.size());
@@ -114,6 +114,7 @@ public class LoggersResource extends RestResource {
     @Path("/subsystems")
     @ApiOperation(value = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public SubsystemSummary subsystems() {
         final Map<String, SingleSubsystemSummary> subsystems = Maps.newHashMap();
         for (Map.Entry<String, Subsystem> subsystem : SUBSYSTEMS.entrySet()) {
@@ -173,6 +174,7 @@ public class LoggersResource extends RestResource {
     })
     @Path("/subsystems/{subsystem}/level/{level}")
     @AuditEvent(type = AuditEventTypes.LOG_LEVEL_UPDATE)
+    @InlinePermissionCheck
     public void setSubsystemLoggerLevel(
             @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
             @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
@@ -198,6 +200,7 @@ public class LoggersResource extends RestResource {
                   notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
     @AuditEvent(type = AuditEventTypes.LOG_LEVEL_UPDATE)
+    @InlinePermissionCheck
     public void setSingleLoggerLevel(
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
             @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {

@@ -32,6 +32,7 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
@@ -81,6 +82,7 @@ public class WebInterfaceAssetsResource {
 
     @Path(ASSETS_PREFIX + "/" + FAVICON)
     @GET
+    @NoPermissionCheckRequired
     public Response getFavicon(@Context ContainerRequest request) {
         final var resourceFile = customizationConfig.favicon()
                 .map(favicon -> ResourceFileReader.ResourceFile.create(null, favicon))
@@ -110,6 +112,7 @@ public class WebInterfaceAssetsResource {
 
     @Path(ASSETS_PREFIX + "/plugin/{plugin}/{filename}")
     @GET
+    @NoPermissionCheckRequired
     public Response get(@Context Request request,
                         @Context HttpHeaders headers,
                         @PathParam("plugin") String pluginName,
@@ -132,6 +135,7 @@ public class WebInterfaceAssetsResource {
 
     @Path(ASSETS_PREFIX + "/{filename: .*}")
     @GET
+    @NoPermissionCheckRequired
     public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
@@ -160,6 +164,7 @@ public class WebInterfaceAssetsResource {
 
     @GET
     @Path("{filename:.*}")
+    @NoPermissionCheckRequired
     public Response getIndex(@Context ContainerRequest request,
                              @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();

@@ -17,22 +17,8 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.resources.system.RemoteSystemShutdownResource;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import retrofit2.Response;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -41,6 +27,19 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.resources.system.RemoteSystemShutdownResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -70,6 +69,7 @@ public class ClusterSystemShutdownResource extends ProxiedResource {
     @POST
     @Timed
     @AuditEvent(type = AuditEventTypes.NODE_SHUTDOWN_INITIATE)
+    @NoPermissionCheckRequired
     public void shutdown(@PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         LOG.warn(
                 "Deprecated API endpoint /cluster/{nodeId}/shutdown was called. Shutting down nodes via the API is " +
