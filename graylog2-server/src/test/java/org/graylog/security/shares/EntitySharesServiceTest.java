@@ -252,7 +252,7 @@ class EntitySharesServiceTest {
         final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(Grantee.createUser(janeGRN, "jane"));
         when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
-        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(user);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(user, ImmutableMap.of());
 
         assertThat(entityShareResponse.activeShares()).isEmpty();
         assertThat(entityShareResponse.availableGrantees()).hasSize(1);
