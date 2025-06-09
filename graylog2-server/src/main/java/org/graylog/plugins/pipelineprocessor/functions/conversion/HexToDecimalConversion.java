@@ -62,8 +62,7 @@ public class HexToDecimalConversion extends AbstractFunction<List<Long>> {
 
             try {
                 for (int i = 0; i < hexString.length(); i += 2) {
-                    final String byteHex = hexString.substring(i, i + 2);
-                    byteValues.add((long) Integer.parseInt(byteHex, 16));
+                    byteValues.add((long) Integer.parseInt(hexString, i, i + 2, 16));
                 }
                 return byteValues;
             } catch (NumberFormatException e) {
