@@ -21,61 +21,54 @@ import { Alert } from 'components/bootstrap';
 import CommonNotificationSummary from './CommonNotificationSummary';
 import commonStyles from './LegacyNotificationCommonStyles.css';
 
-type LegacyNotificationSummaryProps = {
+type Props = {
   type: string;
   notification: any;
   definitionNotification: any;
   legacyTypes: { [key: string]: { configuration: { [key: string]: { human_name: string } } } };
 };
 
-class LegacyNotificationSummary extends React.Component<
-  LegacyNotificationSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    const { notification, legacyTypes } = this.props;
-    const configurationValues = notification.config.configuration;
-    const callbackType = notification.config.callback_type;
-    const typeData = legacyTypes[callbackType];
+const LegacyNotificationSummary = (props: Props) => {
+  const { notification, legacyTypes } = props;
+  const configurationValues = notification.config.configuration;
+  const callbackType = notification.config.callback_type;
+  const typeData = legacyTypes[callbackType];
 
-    let content;
+  let content;
 
-    if (typeData) {
-      const typeConfiguration = typeData.configuration;
+  if (typeData) {
+    const typeConfiguration = typeData.configuration;
 
-      content = Object.entries(typeConfiguration).map(([key, value]) => (
-        <tr key={key}>
-          <td>{value.human_name}</td>
-          <td>{configurationValues[key]}</td>
-        </tr>
-      ));
-    } else {
-      content = (
-        <tr className="danger">
-          <td>Type</td>
-          <td>
-            Unknown legacy alarm callback type: <code>{callbackType}</code>. Please make sure the plugin is installed.
-          </td>
-        </tr>
-      );
-    }
-
-    return (
-      <>
-        {!typeData && (
-          <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
-            Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>, please
-            ensure the plugin is installed.
-          </Alert>
-        )}
-        <CommonNotificationSummary {...this.props}>
-          <>{content}</>
-        </CommonNotificationSummary>
-      </>
+    content = Object.entries(typeConfiguration).map(([key, value]) => (
+      <tr key={key}>
+        <td>{value.human_name}</td>
+        <td>{configurationValues[key]}</td>
+      </tr>
+    ));
+  } else {
+    content = (
+      <tr className="danger">
+        <td>Type</td>
+        <td>
+          Unknown legacy alarm callback type: <code>{callbackType}</code>. Please make sure the plugin is installed.
+        </td>
+      </tr>
     );
   }
-}
+
+  return (
+    <>
+      {!typeData && (
+        <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
+          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>, please
+          ensure the plugin is installed.
+        </Alert>
+      )}
+      <CommonNotificationSummary {...props}>
+        <>{content}</>
+      </CommonNotificationSummary>
+    </>
+  );
+};
 
 export default LegacyNotificationSummary;

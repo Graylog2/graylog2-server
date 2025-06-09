@@ -16,7 +16,7 @@
  */
 
 import Routes from 'routing/Routes';
-import type { NotificationType } from 'stores/notifications/NotificationsStore';
+import type { NotificationType } from 'components/notifications/types';
 
 class NotificationsFactory {
   static getValuesForNotification(notification: NotificationType) {
@@ -26,14 +26,13 @@ class NotificationsFactory {
 
         return {
           values: {
-            AUTHENTICATION_BACKEND: Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId),
+            AUTHENTICATION_BACKEND: Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId.toString()),
           },
         };
       }
 
       case 'no_input_running':
       case 'input_failure_shutdown':
-      case 'input_failed':
       case 'input_failed_to_start': {
         return {
           values: {

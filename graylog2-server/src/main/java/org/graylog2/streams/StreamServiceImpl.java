@@ -369,7 +369,7 @@ public class StreamServiceImpl implements StreamService {
         collection.deleteOne(idEq(stream.getId()));
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
-        clusterEventBus.post(StreamDeletedEvent.create(streamId));
+        clusterEventBus.post(new StreamDeletedEvent(streamId, stream.getTitle()));
         entityOwnershipService.unregisterStream(streamId);
     }
 

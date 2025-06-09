@@ -159,7 +159,7 @@ const LoginChrome = ({ children }: Props) => {
       </LoginBox>
       <Background>
         <NotificationsContainer>
-          <PublicNotifications readFromConfig />
+          <PublicNotifications login />
         </NotificationsContainer>
         <BackgroundText $backgroundImage={loginBackground}>
           <TextContainer>

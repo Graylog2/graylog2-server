@@ -20,7 +20,7 @@ import { Label } from 'components/bootstrap';
 import { RelativeTime, Icon } from 'components/common';
 import IndexSizeSummary from 'components/indices/IndexSizeSummary';
 
-type IndexSummaryProps = {
+type Props = {
   children: React.ReactNode;
   index: any;
   indexRange?: any;
@@ -28,17 +28,17 @@ type IndexSummaryProps = {
   name: string;
 };
 
-class IndexSummary extends React.Component<
-  IndexSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
+class IndexSummary extends React.Component<Props, { showDetails: boolean }> {
   static defaultProps = {
     indexRange: undefined,
   };
 
-  state = { showDetails: this.props.isDeflector };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      showDetails: props.isDeflector,
+    };
+  }
 
   _formatLabels = (index) => {
     const labels = [];
