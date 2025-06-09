@@ -36,6 +36,10 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
     setAdvancedOptionsVisibility(visible);
   };
 
+  const StyledAdditionalFields = styled(AdditionalFields)`
+  margin: 0 0 35px;
+`;
+
   return (
     <StyledAdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
       <Input
@@ -78,9 +82,5 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
     </StyledAdditionalFields>
   );
 };
-
-const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
-`;
 
 export default FormAdvancedOptions;
