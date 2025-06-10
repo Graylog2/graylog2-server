@@ -104,7 +104,7 @@
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.81</bouncycastle.version>
-        <caffeine.version>3.2.0</caffeine.version>
+        <caffeine.version>3.2.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
         <commons-codec.version>1.18.0</commons-codec.version>
@@ -152,7 +152,7 @@
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.1</lucene.version>
         <metrics.version>4.2.30</metrics.version>
-        <mongodb-driver.version>5.5.0</mongodb-driver.version>
+        <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.121.Final</netty.version>
