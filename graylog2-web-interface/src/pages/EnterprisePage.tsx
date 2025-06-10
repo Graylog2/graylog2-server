@@ -32,14 +32,14 @@ const EnterprisePage = () => {
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
 
-  const title = `${UpsellWrapper ? '' : 'Try '}${productName} Enterprise`;
+  const title = (<><UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise</>);
 
   if (!nodes) {
     return <Spinner />;
   }
 
   return (
-    <DocumentTitle title={title}>
+    <DocumentTitle title={`${productName} Enterprise`}>
       <div>
         <PageHeader title={title}>
           <span>
