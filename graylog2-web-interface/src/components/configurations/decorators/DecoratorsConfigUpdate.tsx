@@ -29,7 +29,7 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
+import StreamSelect, { DEFAULT_SEARCH_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
 
 type Props = {
@@ -63,7 +63,7 @@ const _updateOrder = (
 };
 
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
-  const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
+  const [currentStream, setCurrentStream] = useState<string>(streams?.[0]?.id);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

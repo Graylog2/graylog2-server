@@ -28,6 +28,8 @@ import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import type { Decorator, DecoratorType } from 'views/components/messagelist/decorators/Types';
 import { defaultCompare } from 'logic/DefaultCompare';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import { DEFAULT_SEARCH_ID } from './decorators/StreamSelect';
@@ -53,6 +55,7 @@ const DecoratorsConfig = () => {
 
   const openModal = useCallback(() => setShowConfigModal(true), []);
   const closeModal = useCallback(() => setShowConfigModal(false), []);
+  const currentUser = useCurrentUser();
 
   const onSave = useCallback(
     (newDecorators: Array<Decorator>) =>
@@ -101,6 +104,8 @@ const DecoratorsConfig = () => {
   if (streamsLoading || typesLoading || decoratorsLoading) {
     return <Spinner />;
   }
+  const editableStreams = streams?.filter((s) => isPermitted(currentUser.permissions, [ `streams:edit:${s.id}`]));
+  const editableDecorators = decorators?.filter((d) => isPermitted(currentUser.permissions, [ `streams:edit:${d.stream}`]));
 
   return (
     <div>
@@ -114,8 +119,8 @@ const DecoratorsConfig = () => {
       </IfPermitted>
       <DecoratorsConfigUpdate
         show={showConfigModal}
-        streams={streams}
-        decorators={decorators}
+        streams={editableStreams}
+        decorators={editableDecorators}
         onCancel={closeModal}
         onSave={onSave}
         types={types}
