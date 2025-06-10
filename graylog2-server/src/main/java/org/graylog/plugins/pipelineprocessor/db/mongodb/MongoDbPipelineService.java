@@ -46,13 +46,13 @@ import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
 
 public class MongoDbPipelineService implements PipelineService {
-    private static final RateLimitedLog log = getRateLimitedLog(MongoDbPipelineService.class);
+    private static final RateLimitedLog log = createRateLimitedLog(MongoDbPipelineService.class);
 
     public static final String COLLECTION = "pipeline_processor_pipelines";
 

@@ -24,6 +24,9 @@ import java.time.Duration;
 
 public class RateLimitedLogFactory {
 
+    private static final int DEFAULT_MAX_RATE = 5;
+    private static final Duration DEFAULT_DURATION = Duration.ofSeconds(10);
+
     public static RateLimitedLog createRateLimitedLog(final Logger logger,
                                                       final int maxRate,
                                                       final Duration duration) {
@@ -38,6 +41,10 @@ public class RateLimitedLogFactory {
                                                       final int maxRate,
                                                       final Duration duration) {
         return createRateLimitedLog(LoggerFactory.getLogger(clazz), maxRate, duration);
+    }
+
+    public static RateLimitedLog createRateLimitedLog(final Class<?> clazz) {
+        return createRateLimitedLog(LoggerFactory.getLogger(clazz), DEFAULT_MAX_RATE, DEFAULT_DURATION);
     }
 
 }

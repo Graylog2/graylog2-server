@@ -48,7 +48,6 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -62,7 +61,6 @@ import javax.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -73,10 +71,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineInterpreter.class);
+    private static final RateLimitedLog log = createRateLimitedLog(PipelineInterpreter.class);
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
@@ -471,10 +470,6 @@ public class PipelineInterpreter implements MessageProcessor {
         public String className() {
             return PipelineInterpreter.class.getCanonicalName();
         }
-    }
-
-    public static RateLimitedLog getRateLimitedLog(final Class<?> clazz) {
-        return RateLimitedLogFactory.createRateLimitedLog(clazz, 5, Duration.ofSeconds(10));
     }
 
     public static class State {

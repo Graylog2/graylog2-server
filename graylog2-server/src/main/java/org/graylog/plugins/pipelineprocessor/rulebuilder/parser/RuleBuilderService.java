@@ -35,12 +35,12 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
 
 @Singleton
 public class RuleBuilderService {
 
-    private static final RateLimitedLog log = getRateLimitedLog(RuleBuilderService.class);
+    private static final RateLimitedLog log = createRateLimitedLog(RuleBuilderService.class);
 
     private final String RULE_TEMPLATE =
             "rule \"%s\"" + System.lineSeparator() +

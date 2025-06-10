@@ -32,10 +32,10 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
 
 public class RemoveStringFieldsByValue extends AbstractFunction<Void> {
-    private static final RateLimitedLog LOG = getRateLimitedLog(RemoveStringFieldsByValue.class);
+    private static final RateLimitedLog LOG = createRateLimitedLog(RemoveStringFieldsByValue.class);
     public static final String NAME = "remove_string_fields_by_value";
     private static final String VALUES_ARG = "values";
     private static final String PATTERN_ARG = "pattern";

@@ -31,10 +31,10 @@ import jakarta.inject.Inject;
 import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
 
 public class JsonParse extends AbstractFunction<JsonNode> {
-    private static final RateLimitedLog log = getRateLimitedLog(JsonParse.class);
+    private static final RateLimitedLog log = createRateLimitedLog(JsonParse.class);
     public static final String NAME = "parse_json";
 
     private final ObjectMapper objectMapper;

@@ -30,10 +30,10 @@ import jakarta.inject.Inject;
 import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
 
 public class JsonFlatten extends AbstractFunction<JsonNode> {
-    private static final RateLimitedLog LOG = getRateLimitedLog(JsonFlatten.class);
+    private static final RateLimitedLog LOG = createRateLimitedLog(JsonFlatten.class);
     public static final String NAME = "flatten_json";
     private static final String OPTION_JSON = "json";
     private static final String OPTION_FLATTEN = "flatten";
