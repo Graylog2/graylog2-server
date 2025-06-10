@@ -23,11 +23,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Longs;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import org.apache.commons.codec.binary.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -38,6 +37,8 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 /**
  * A Graylog specific IPFIX parser.
@@ -53,7 +54,7 @@ import java.util.Set;
  * </p>
  */
 public class IpfixParser {
-    private static final Logger LOG = LoggerFactory.getLogger(IpfixParser.class);
+    private static final RateLimitedLog LOG = getRateLimitedLog(IpfixParser.class);
     private static final int SETID_RESERVED0 = 0;
     private static final int SETID_RESERVED1 = 1;
     private static final int SETID_TEMPLATE = 2;
@@ -208,9 +209,9 @@ public class IpfixParser {
         final long sequenceNumber = buffer.readUnsignedInt();
         final long observationDomainId = buffer.readUnsignedInt();
         return MessageHeader.create(packetLength,
-                                    ZonedDateTime.ofInstant(Instant.ofEpochSecond(exportTime), ZoneOffset.UTC),
-                                    sequenceNumber,
-                                    observationDomainId);
+                ZonedDateTime.ofInstant(Instant.ofEpochSecond(exportTime), ZoneOffset.UTC),
+                sequenceNumber,
+                observationDomainId);
     }
 
     /**
@@ -326,8 +327,8 @@ public class IpfixParser {
      * Unfortunately it is not possible to determine which templates lists refer to without actually parsing the data first.
      *
      * @param informationElements the field information from the template used by this data set
-     * @param templateMap map from template id to its information elements, used for subtemplateLists
-     * @param setContent the data set bytes to parse
+     * @param templateMap         map from template id to its information elements, used for subtemplateLists
+     * @param setContent          the data set bytes to parse
      * @return collection of parsed flows
      */
     public Set<Flow> parseDataSet(ImmutableList<InformationElement> informationElements, Map<Integer, TemplateRecord> templateMap, ByteBuf setContent) {
@@ -529,7 +530,7 @@ public class IpfixParser {
                             InformationElementDefinition def = infoElemDefs.getDefinition(element.id(), element.enterpriseNumber());
                             if (def == null) {
                                 LOG.error("Unable to find information element definition in basicList: id [{}] PEN [{}]. " +
-                                        HOW_TO_FIX_MISSING_FIELD_DEF_ERROR,
+                                                HOW_TO_FIX_MISSING_FIELD_DEF_ERROR,
                                         element.id(), element.enterpriseNumber());
                                 break;
                             } else {
