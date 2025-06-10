@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { forwardRef } from 'react';
 
 import Icon from 'components/common/Icon';
 import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
@@ -65,33 +66,31 @@ const handleClick = (
   }
 };
 
-const IconButton = React.forwardRef<HTMLButtonElement, Props>(
-  (
-    {
-      title,
-      onClick,
-      focusable = true,
-      className,
-      disabled = false,
-      iconType,
-      'data-testid': dataTestId,
-      ...rest
-    }: Props,
-    ref,
-  ) => (
-    <Wrapper
-      ref={ref}
-      tabIndex={focusable ? 0 : -1}
-      data-testid={dataTestId}
-      title={title}
-      aria-label={title}
-      onClick={(e) => handleClick(onClick, e)}
-      className={className}
-      type="button"
-      disabled={disabled}>
-      <Icon type={iconType} {...rest} />
-    </Wrapper>
-  ),
+const IconButton = (
+  {
+    title,
+    onClick = undefined,
+    focusable = true,
+    className = undefined,
+    disabled = false,
+    iconType = undefined,
+    'data-testid': dataTestId = undefined,
+    ...rest
+  }: Props,
+  ref: React.ForwardedRef<HTMLButtonElement>,
+) => (
+  <Wrapper
+    ref={ref}
+    tabIndex={focusable ? 0 : -1}
+    data-testid={dataTestId}
+    title={title}
+    aria-label={title}
+    onClick={(e) => handleClick(onClick, e)}
+    className={className}
+    type="button"
+    disabled={disabled}>
+    <Icon type={iconType} {...rest} />
+  </Wrapper>
 );
 
-export default IconButton;
+export default forwardRef(IconButton);

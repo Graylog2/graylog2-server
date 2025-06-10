@@ -48,7 +48,7 @@ const EntityShareModal = ({
   entityId,
   entityType,
   entityTitle,
-  entityTypeTitle,
+  entityTypeTitle = undefined,
   onClose,
   showShareableEntityURL = true,
 }: Props) => {

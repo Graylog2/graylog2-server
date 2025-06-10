@@ -66,12 +66,14 @@ class Input extends React.Component<
 > {
   static defaultProps = {
     type: undefined,
+    id: undefined,
     label: '',
     labelClassName: undefined,
     name: undefined,
     formGroupClassName: undefined,
     inputDescClassName: undefined,
     bsStyle: null,
+    bsSize: undefined,
     value: undefined,
     placeholder: '',
     error: undefined,
@@ -217,16 +219,16 @@ class Input extends React.Component<
       label,
       name,
       // The following props need to be extracted even if they are not used
-      // so they are not passed as controll props to the input
-      bsStyle,
-      formGroupClassName,
-      wrapperClassName,
-      labelClassName,
-      inputDescClassName,
-      error,
-      help,
-      addonAfter,
-      buttonAfter,
+      // so they are not passed as control props to the input
+      bsStyle: _bsStyle,
+      formGroupClassName: _formGroupClassName,
+      wrapperClassName: _wrapperClassName,
+      labelClassName: _labelClassName,
+      inputDescClassName: _inputDescClassName,
+      error: _error,
+      help: _help,
+      addonAfter: _addonAfter,
+      buttonAfter: _buttonAfter,
       ...controlProps
     } = this.props;
 

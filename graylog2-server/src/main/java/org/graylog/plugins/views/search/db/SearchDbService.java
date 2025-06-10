@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.db;
 
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
@@ -26,6 +25,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchSummary;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.Instant;

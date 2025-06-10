@@ -122,7 +122,7 @@ const InfoContainer = styled(Alert)`
 const getFilterQuery = (_query: string) => {
   try {
     return new RegExp(_query, 'i');
-  } catch (error) {
+  } catch (_e) {
     return ' ';
   }
 };

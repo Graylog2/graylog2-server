@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.integrations.aws.codecs.AWSCodec;
+import org.graylog.integrations.aws.codecs.KinesisRawLogCodec;
 import org.graylog.integrations.aws.service.AWSService;
 import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
@@ -54,6 +55,8 @@ public class AWSInput extends MessageInput {
     public static final String CK_DYNAMODB_ENDPOINT = "dynamodb_endpoint";
     public static final String CK_IAM_ENDPOINT = "iam_endpoint";
     public static final String CK_KINESIS_ENDPOINT = "kinesis_endpoint";
+
+    public static final String CK_OVERRIDE_SOURCE = "override_source";
 
     @Inject
     public AWSInput(@Assisted Configuration configuration,
@@ -182,6 +185,7 @@ public class AWSInput extends MessageInput {
                     "The name of the Kinesis stream that receives your messages. See README for instructions on how to connect messages to a Kinesis Stream.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 
+            request.addField(getKinesisStreamARNDefinition());
             request.addField(new NumberField(
                     KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE,
                     "Kinesis Record batch size.",
@@ -190,7 +194,27 @@ public class AWSInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
 
+            request.addField(getOverrideSourceFieldDefinition());
+
             return request;
         }
+    }
+
+    public static TextField getOverrideSourceFieldDefinition() {
+        return new TextField(
+                CK_OVERRIDE_SOURCE,
+                "Override Source",
+                "",
+                "The message source is set to '%s' by default. If desired, you may override it with a custom value.".formatted(KinesisRawLogCodec.SOURCE),
+                ConfigurationField.Optional.OPTIONAL);
+    }
+
+    public static TextField getKinesisStreamARNDefinition() {
+        return new TextField(
+                KinesisTransport.CK_KINESIS_STREAM_ARN,
+                "Kinesis Stream ARN",
+                "",
+                "The ARN of the Kinesis stream.",
+                ConfigurationField.Optional.OPTIONAL);
     }
 }

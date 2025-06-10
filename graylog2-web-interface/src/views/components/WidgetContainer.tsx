@@ -31,30 +31,31 @@ type Props = React.PropsWithChildren<{
   style?: React.CSSProperties;
 }>;
 
-const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(
-  ({ children, className, isFocused, style = {}, ...rest }: Props, ref) => {
-    let containerStyle = {
-      ...style,
-      transition: 'none',
+const WidgetContainer = (
+  { children = undefined, className = undefined, isFocused, style = {}, ...rest }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
+  let containerStyle = {
+    ...style,
+    transition: 'none',
+  };
+
+  if (isFocused) {
+    containerStyle = {
+      ...containerStyle,
+      height: '100%',
+      width: '100%',
+      zIndex: 3,
+      top: 0,
+      left: 0,
     };
+  }
 
-    if (isFocused) {
-      containerStyle = {
-        ...containerStyle,
-        height: '100%',
-        width: '100%',
-        zIndex: 3,
-        top: 0,
-        left: 0,
-      };
-    }
+  return (
+    <Container className={className} style={containerStyle} ref={ref} {...rest}>
+      {children}
+    </Container>
+  );
+};
 
-    return (
-      <Container className={className} style={containerStyle} ref={ref} {...rest}>
-        {children}
-      </Container>
-    );
-  },
-);
-
-export default WidgetContainer;
+export default React.forwardRef(WidgetContainer);

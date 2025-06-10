@@ -23,7 +23,7 @@ type Props = {
   description?: string;
 };
 
-const SharingDisabledPopover = ({ type, description }: Props) => {
+const SharingDisabledPopover = ({ type, description = undefined }: Props) => {
   const getReadableType = (_type: string) => _type.replaceAll('_', ' ');
 
   return (
