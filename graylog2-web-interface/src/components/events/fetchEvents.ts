@@ -73,7 +73,7 @@ const time = (
     return {
       type: 'relative',
       from: secondsFromWayBackTillNow,
-      to: secondsFromWayBackTillNow - Math.trunc(moment(to).toDate().getTime() / 1000),
+      to: secondsFromWayBackTillNow - Math.trunc(moment(to).utc().toDate().getTime() / 1000),
     };
   }
 
