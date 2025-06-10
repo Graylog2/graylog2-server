@@ -150,10 +150,8 @@ export const keyFn = (searchParams: SearchParams) => ['events', 'search', search
 const fetchEvents = (
   searchParams: SearchParams,
   streamId: string,
-): Promise<PaginatedResponse<Event, EventsAdditionalData>> => {
-  console.log(searchParams);
-
-  return fetch('POST', url, {
+): Promise<PaginatedResponse<Event, EventsAdditionalData>> =>
+  fetch('POST', url, {
     query: getConcatenatedQuery(searchParams.query, streamId),
     page: searchParams.page,
     per_page: searchParams.pageSize,
@@ -168,6 +166,5 @@ const fetchEvents = (
       context,
     },
   }));
-};
 
 export default fetchEvents;
