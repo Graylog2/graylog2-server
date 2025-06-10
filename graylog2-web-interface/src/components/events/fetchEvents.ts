@@ -38,7 +38,7 @@ type FiltersResult = {
     alerts: 'only' | 'exclude' | 'include';
     event_definitions?: Array<string>;
     priority?: Array<string>;
-    aggregation_timerange?: { from?: string; to?: string; type: string; range?: number };
+    aggregation_timerange?: { from?: string | number; to?: string | number; type: string; range?: number };
     key?: Array<string>;
     id?: Array<string>;
     part_of_detection_chain?: string;
@@ -58,6 +58,28 @@ export const parseTypeFilter = (alert: string) => {
 };
 
 const allTime = { type: 'relative', range: 0 } as const;
+
+const time = (
+  from?: string,
+  to?: string,
+): { from?: string | number; to?: string | number; type: string; range?: number } => {
+  if (from) {
+    return { type: 'absolute', from, to: to || adjustFormat(moment().utc(), 'internal') };
+  }
+
+  if (to) {
+    const secondsFromWayBackTillNow = Math.trunc(moment().utc().toDate().getTime() / 1000);
+
+    return {
+      type: 'relative',
+      from: secondsFromWayBackTillNow,
+      to: secondsFromWayBackTillNow - Math.trunc(moment(to).toDate().getTime() / 1000),
+    };
+  }
+
+  return allTime;
+};
+
 export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRange = allTime) => {
   const result: FiltersResult = {
     filter: {
@@ -70,9 +92,7 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
   if (filters.get('timerange_start')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
 
-    result.filter.aggregation_timerange = from
-      ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
-      : allTime;
+    result.filter.aggregation_timerange = time(from, to);
   }
 
   if (filters.get('key')?.length > 0) {
@@ -130,8 +150,10 @@ export const keyFn = (searchParams: SearchParams) => ['events', 'search', search
 const fetchEvents = (
   searchParams: SearchParams,
   streamId: string,
-): Promise<PaginatedResponse<Event, EventsAdditionalData>> =>
-  fetch('POST', url, {
+): Promise<PaginatedResponse<Event, EventsAdditionalData>> => {
+  console.log(searchParams);
+
+  return fetch('POST', url, {
     query: getConcatenatedQuery(searchParams.query, streamId),
     page: searchParams.page,
     per_page: searchParams.pageSize,
@@ -146,5 +168,6 @@ const fetchEvents = (
       context,
     },
   }));
+};
 
 export default fetchEvents;
