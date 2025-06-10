@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>6.3.0-beta.5</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -103,8 +103,8 @@
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
-        <bouncycastle.version>1.80</bouncycastle.version>
-        <caffeine.version>3.2.0</caffeine.version>
+        <bouncycastle.version>1.81</bouncycastle.version>
+        <caffeine.version>3.2.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
         <commons-codec.version>1.18.0</commons-codec.version>
@@ -118,11 +118,11 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.38.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.52.3</gcs.version>
+        <gcs.version>2.53.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.72.0</grpc.version>
+        <grpc.version>1.73.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -152,7 +152,7 @@
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.1</lucene.version>
         <metrics.version>4.2.30</metrics.version>
-        <mongodb-driver.version>5.5.0</mongodb-driver.version>
+        <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.121.Final</netty.version>
