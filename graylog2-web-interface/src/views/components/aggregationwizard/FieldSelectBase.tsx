@@ -49,6 +49,7 @@ type Props = {
   excludedFields?: Array<string>;
   id: string;
   isFieldQualified?: (field: FieldTypeMapping) => boolean;
+  isLoading?: boolean;
   name: string;
   onChange: (fieldName: string) => void;
   onMenuClose?: () => void;
@@ -104,6 +105,7 @@ const FieldSelect = ({
   excludedFields = [],
   id,
   isFieldQualified = () => true,
+  isLoading = undefined,
   name,
   onChange,
   onMenuClose = undefined,
@@ -162,6 +164,7 @@ const FieldSelect = ({
         size={size}
         autoFocus={autoFocus}
         onChange={onChange}
+        isLoading={isLoading}
       />
       {(_showSelectAllRest || _showDeSelectAll) && (
         <ButtonRow>
