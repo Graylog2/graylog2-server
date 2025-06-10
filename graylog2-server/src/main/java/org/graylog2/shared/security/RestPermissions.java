@@ -85,6 +85,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
     public static final String GRAYLOG_CA_READ = "graylog_ca:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
+    public static final String INDEXFIELDTYPES_REFRESH = "indexfieldtypes:refresh";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
     public static final String INDEXSETS_CREATE = "indexsets:create";
