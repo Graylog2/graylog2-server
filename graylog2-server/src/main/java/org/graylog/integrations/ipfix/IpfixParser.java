@@ -58,6 +58,7 @@ public class IpfixParser {
     private static final int SETID_RESERVED1 = 1;
     private static final int SETID_TEMPLATE = 2;
     private static final int SETID_OPTIONSTEMPLATE = 3;
+    private static final String HOW_TO_FIX_MISSING_FIELD_DEF_ERROR = "To fix this error, update the IPFIX field definitions template file to include a definition for this ID.";
 
     private final InformationElementDefinitions infoElemDefs;
 
@@ -350,6 +351,12 @@ public class IpfixParser {
                 for (InformationElement informationElement : informationElements) {
                     final int firstByte = setContent.readerIndex();
                     InformationElementDefinition desc = infoElemDefs.getDefinition(informationElement.id(), informationElement.enterpriseNumber());
+                    if (desc == null) {
+                        LOG.error("Unable to find info element definition due to incomplete field definitions: id [{}] PEN [{}]. " +
+                                        HOW_TO_FIX_MISSING_FIELD_DEF_ERROR,
+                                informationElement.id(), informationElement.enterpriseNumber());
+                        continue readFlows; // skip this element, since the template cannot be obtained for it.
+                    }
                     switch (desc.dataType()) {
                         // these are special because they can use reduced-size encoding (RFC 7011 Sec 6.2)
                         case UNSIGNED8:
@@ -521,7 +528,9 @@ public class IpfixParser {
                             final InformationElement element = parseInformationElement(listBuffer);
                             InformationElementDefinition def = infoElemDefs.getDefinition(element.id(), element.enterpriseNumber());
                             if (def == null) {
-                                LOG.error("Unable to find information element definition in basicList: id {} PEN {}, this is a bug, cannot parse packet.", element.id(), element.enterpriseNumber());
+                                LOG.error("Unable to find information element definition in basicList: id [{}] PEN [{}]. " +
+                                        HOW_TO_FIX_MISSING_FIELD_DEF_ERROR,
+                                        element.id(), element.enterpriseNumber());
                                 break;
                             } else {
                                 LOG.warn("Skipping basicList data ({} bytes)", informationElement.length());
