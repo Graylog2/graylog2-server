@@ -50,6 +50,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -98,6 +99,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @InlinePermissionCheck
     public Response createSearch(@ApiParam SearchDTO searchRequest, @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
 
@@ -115,6 +117,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({SEARCH_FORMAT_V2})
     @Produces({SEARCH_FORMAT_V2})
+    @InlinePermissionCheck
     public Response createSearchV2(@ApiParam SearchDTOv2 searchRequest, @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
 
@@ -140,6 +143,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @GET
     @ApiOperation(value = "Get all searches which the user may see")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @InlinePermissionCheck
     public List<SearchDTO> getAllSearches(@Context SearchUser searchUser) {
         // TODO should be paginated
         final List<Search> searches = searchDomain.getAllForUser(searchUser, searchUser::canReadView);
@@ -245,6 +249,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("cancel/{jobId}")
     @NoAuditEvent("To be decided if we want to have cancellation of jobs in audit log")
     @Produces({MediaType.APPLICATION_JSON})
+    @InlinePermissionCheck
     public Response cancelJob(@PathParam("jobId") String jobId,
                               @Context SearchUser searchUser) {
 
