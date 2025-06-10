@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-/* eslint-disable import/prefer-default-export */
-
 import { Map } from 'immutable';
 
 import Query from 'views/logic/queries/Query';
@@ -25,12 +23,17 @@ import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import type _Widget from 'views/logic/widgets/Widget';
 import type { WidgetPositions } from 'views/types';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 
-export const createSearch = ({ searchId, queryId }: { searchId?: string; queryId?: string } = {}) => {
+export const createSearch = ({
+  searchId,
+  queryId,
+  titles = Map(),
+}: { searchId?: string; queryId?: string; titles?: TitlesMap } = {}) => {
   const exampleSearchId = searchId ?? 'search-id-1';
   const exampleQueryId = queryId ?? 'query-id-1';
 
-  const viewState = ViewState.builder().titles(Map()).build();
+  const viewState = ViewState.builder().titles(titles).build();
   const query = Query.builder().id(exampleQueryId).build();
   const searchSearch = Search.builder().queries([query]).id(exampleSearchId).build();
 

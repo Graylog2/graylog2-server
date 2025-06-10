@@ -15,17 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import DataAdapterCreate from './DataAdapterCreate';
-
-jest.mock('components/common', () => ({
-  Select: mockComponent('SelectMock'),
-}));
-
-jest.mock('components/bootstrap/Input', () => mockComponent('InputMock'));
 
 jest.mock('components/lookup-tables', () => ({
   DataAdapterForm: mockComponent('DataAdapterFormMock'),
@@ -43,24 +37,22 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 }));
 
 describe('<DataAdapterCreate />', () => {
-  it('should render with empty parameters', () => {
+  it('should render with empty parameters', async () => {
     const callback = () => {};
     const types = {};
-    const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
-
-    expect(wrapper).toExist();
+    render(<DataAdapterCreate saved={callback} types={types} />);
+    await screen.findByText(/select data adapter type/i);
   });
 
-  it('should render for types with defined frontend components', () => {
+  it('should render for types with defined frontend components', async () => {
     const callback = () => {};
     const types = {
       someType: {
         type: 'someType',
       },
     };
-    const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
-
-    expect(wrapper).toExist();
+    render(<DataAdapterCreate saved={callback} types={types} />);
+    await screen.findByText(/select data adapter type/i);
   });
 
   describe('with mocked console.error', () => {
@@ -77,18 +69,18 @@ describe('<DataAdapterCreate />', () => {
       console.error = consoleError;
     });
 
-    it('should render for types without defined frontend components', () => {
+    it('should render for types without defined frontend components', async () => {
       const callback = () => {};
       const types = {
         unknownType: {
           type: 'unknownType',
         },
       };
-      const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+      render(<DataAdapterCreate saved={callback} types={types} />);
+      await screen.findByText(/select data adapter type/i);
 
-      expect(wrapper).toExist();
       // eslint-disable-next-line no-console
-      expect(console.error.mock.calls.length).toBe(1);
+      expect(console.error).toHaveBeenCalledTimes(1);
     });
   });
 });
