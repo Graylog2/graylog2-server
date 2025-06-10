@@ -74,7 +74,7 @@ const InteractiveValue = ({
     [render],
   );
   const Component = useCallback(
-    ({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />,
+    ({ value: componentValue }: { value: any }) => <RenderComponent field={field} value={componentValue} />,
     [RenderComponent, field],
   );
   const element = (
@@ -90,18 +90,22 @@ const InteractiveValue = ({
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit = undefined }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) =>
-      interactive ? (
-        <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
-      ) : (
-        <span>
-          <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={type} unit={unit} />
-        </span>
-      )
-    }
-  </InteractiveContext.Consumer>
-);
+const Value = ({ field, value, render = defaultRenderer, type, unit = undefined }: Props) => {
+  const _type = type ?? FieldType.Unknown;
+
+  return (
+    <InteractiveContext.Consumer>
+      {(interactive) =>
+        interactive ? (
+          <InteractiveValue field={field} value={value} render={render} type={_type} unit={unit} />
+        ) : (
+          <span>
+            <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={_type} unit={unit} />
+          </span>
+        )
+      }
+    </InteractiveContext.Consumer>
+  );
+};
 
 export default Value;

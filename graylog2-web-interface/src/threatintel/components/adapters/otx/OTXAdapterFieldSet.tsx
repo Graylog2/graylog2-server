@@ -51,7 +51,7 @@ type Props = {
 };
 
 const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationState, validationMessage }: Props) => {
-  const handleSelect = (fieldName) => (selectedIndicator) => {
+  const handleSelect = (fieldName: string) => (selectedIndicator: string) => {
     const newConfig = cloneDeep(config);
     newConfig[fieldName] = selectedIndicator;
     updateConfig(newConfig);

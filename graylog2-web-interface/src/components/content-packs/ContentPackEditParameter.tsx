@@ -50,7 +50,7 @@ class ContentPackEditParameter extends React.Component<
 
   private titleInput: Input;
 
-  constructor(props) {
+  constructor(props: ContentPackEditParameterProps) {
     super(props);
 
     this.state = {
@@ -62,7 +62,7 @@ class ContentPackEditParameter extends React.Component<
     };
   }
 
-  addNewParameter = (e) => {
+  addNewParameter = (e: React.FormEvent<HTMLFormElement>) => {
     if (e) {
       e.preventDefault();
     }
@@ -84,15 +84,35 @@ class ContentPackEditParameter extends React.Component<
     this.setState({ newParameter: ObjectUtils.clone(ContentPackEditParameter.emptyParameter) });
   };
 
-  _updateField = (name, value) => {
-    const updatedParameter = ObjectUtils.clone(this.state.newParameter);
-
-    updatedParameter[name] = value;
-    this.setState({ newParameter: updatedParameter });
+  _updateField = (name: string, value: any) => {
+    this.setState((parameter) => ({ newParameter: { ...parameter.newParameter, [name]: value } }));
   };
 
-  _bindValue = (event) => {
+  _bindValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
+  };
+
+  _validateName = () => {
+    const value = this.state.newParameter.name;
+
+    if (value.match(/\W/)) {
+      this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
+
+      return false;
+    }
+
+    if (
+      (this.props.parameterToEdit || {}).name !== value &&
+      this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0
+    ) {
+      this.setState({ nameError: 'The parameter name must be unique.' });
+
+      return false;
+    }
+
+    this.setState({ nameError: undefined });
+
+    return true;
   };
 
   _validateDefaultValue = () => {
@@ -111,7 +131,7 @@ class ContentPackEditParameter extends React.Component<
         }
 
         case 'double': {
-          if (isNaN(value)) {
+          if (Number.isNaN(Number.parseFloat(value))) {
             this.setState({ defaultValueError: 'This is not a double value.' });
 
             return false;
@@ -136,29 +156,6 @@ class ContentPackEditParameter extends React.Component<
     }
 
     this.setState({ defaultValueError: undefined });
-
-    return true;
-  };
-
-  _validateName = () => {
-    const value = this.state.newParameter.name;
-
-    if (value.match(/\W/)) {
-      this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
-
-      return false;
-    }
-
-    if (
-      (this.props.parameterToEdit || {}).name !== value &&
-      this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0
-    ) {
-      this.setState({ nameError: 'The parameter name must be unique.' });
-
-      return false;
-    }
-
-    this.setState({ nameError: undefined });
 
     return true;
   };
@@ -201,7 +198,11 @@ class ContentPackEditParameter extends React.Component<
       <div>
         <h2>{header}</h2>
         <br />
-        <form className="parameter-form" id="parameter-form" onSubmit={this.addNewParameter}>
+        <form
+          className="parameter-form"
+          id="parameter-form"
+          data-testid="parameter-form"
+          onSubmit={this.addNewParameter}>
           <fieldset>
             <Input
               ref={(node) => {

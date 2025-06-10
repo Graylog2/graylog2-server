@@ -43,7 +43,7 @@ const useClusterNodes = (): ClusterNodes => {
   const { clusterOverview: systemInfo } = useStore(ClusterOverviewStore);
   const graylogNodes = Object.values(_graylogNodes || {}).map((graylogNode) => ({
     nodeName: `${graylogNode?.short_node_id} / ${graylogNode?.hostname}`,
-    type: 'Graylog',
+    type: 'Server',
     role: graylogNode?.is_leader ? 'Leader' : 'Non-Leader',
     nodeInfo: {
       ...graylogNode,
