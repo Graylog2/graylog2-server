@@ -156,8 +156,9 @@ public class EntitySharesService {
      * This method is used for generic sharing operations where the entity is not known yet - active shares and
      * dependencies are always null.
      */
-    public EntityShareResponse prepareShare(User sharingUser) {
+    public EntityShareResponse prepareShare(User sharingUser, ImmutableMap<GRN, Capability> selectedGranteeCapabilities) {
         requireNonNull(sharingUser, "sharingUser cannot be null");
+        requireNonNull(selectedGranteeCapabilities, "selectedGranteeCapabilities cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser);
@@ -168,7 +169,7 @@ public class EntitySharesService {
                 .availableGrantees(modifiableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(ImmutableSet.of())
-                .selectedGranteeCapabilities(ImmutableMap.of())
+                .selectedGranteeCapabilities(selectedGranteeCapabilities)
                 .validationResult(new ValidationResult())
                 .build();
     }
@@ -183,7 +184,7 @@ public class EntitySharesService {
     public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
         requireNonNull(entityGRNs, "entityGRNs cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        final EntityShareResponse response = prepareShare(sharingUser);
+        final EntityShareResponse response = prepareShare(sharingUser, ImmutableMap.of());
 
         return response.toBuilder()
                 .missingPermissionsOnDependencies(missingPermissions(
