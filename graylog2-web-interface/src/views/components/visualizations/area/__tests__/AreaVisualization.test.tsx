@@ -83,7 +83,7 @@ describe('AreaVisualization', () => {
     expect(genericPlot).toHaveProp(
       'layout',
       expect.objectContaining({
-        xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
+        xaxis: { range: ['2019-11-28T16:21:24.000+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
         legend: { y: -0.14 },
       }),
     );
