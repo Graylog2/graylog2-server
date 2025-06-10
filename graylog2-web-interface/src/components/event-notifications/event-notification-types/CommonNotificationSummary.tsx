@@ -18,6 +18,8 @@ import React from 'react';
 
 import { Table, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 import styles from './CommonNotificationSummary.css';
 
@@ -41,7 +43,11 @@ const CommonNotificationSummary = ({
 
   return (
     <>
-      <h4>{notification.title || definitionNotification.notification_id}</h4>
+      <h4>
+        <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(definitionNotification.notification_id)}>
+          {notification.title || definitionNotification.notification_id}
+        </Link>
+      </h4>
       <dl>
         <dd>{type}</dd>
         <dd>
