@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToDecimalConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -161,6 +162,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(StringConversion.NAME, StringConversion.class);
         addMessageProcessorFunction(MapConversion.NAME, MapConversion.class);
         addMessageProcessorFunction(CsvMapConversion.NAME, CsvMapConversion.class);
+        addMessageProcessorFunction(HexToDecimalConversion.NAME, HexToDecimalConversion.class);
 
         // Comparison functions
         addMessageProcessorFunction(IsBoolean.NAME, IsBoolean.class);
