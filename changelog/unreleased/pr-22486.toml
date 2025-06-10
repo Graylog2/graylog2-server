@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix an issue when barchrts were cutted at the ends of x-axis"
+
+issues = ["graylog-plugin-enterprise#8899"]
+pulls = ["22486"]
