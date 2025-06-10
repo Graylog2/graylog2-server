@@ -83,6 +83,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -145,6 +146,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @GET
     @ApiOperation("Get a list of all views")
+    @InlinePermissionCheck
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @ApiParam(name = "sort",
@@ -229,6 +231,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    @InlinePermissionCheck
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) {
@@ -407,6 +410,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Timed
     @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @InlinePermissionCheck
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final SearchUser searchUser) {
 
