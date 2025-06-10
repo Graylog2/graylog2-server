@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { Row, Col } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 
 import PipelineForm from './PipelineForm';
 
@@ -49,9 +49,16 @@ type Props = {
   create?: boolean;
   onChange: (event) => void;
   onCancel?: () => void;
+  disableEdit?: boolean;
 };
 
-const PipelineDetails = ({ pipeline, create = false, onChange, onCancel = () => {} }: Props) => {
+const PipelineDetails = ({
+  pipeline = undefined,
+  create = false,
+  onChange,
+  onCancel = () => {},
+  disableEdit = false,
+}: Props) => {
   if (create) {
     return <PipelineForm create save={onChange} onCancel={onCancel} modal={false} />;
   }
@@ -61,7 +68,7 @@ const PipelineDetails = ({ pipeline, create = false, onChange, onCancel = () => 
       <Row>
         <Col md={12}>
           <div className="pull-right">
-            <PipelineForm pipeline={pipeline} save={onChange} />
+            <PipelineForm pipeline={pipeline} save={onChange} disableEdit={disableEdit} />
           </div>
           <h2>Details</h2>
           <PipelineDl className="dl-horizontal">

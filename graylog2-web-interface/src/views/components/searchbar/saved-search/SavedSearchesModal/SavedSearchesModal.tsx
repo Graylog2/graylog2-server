@@ -28,8 +28,8 @@ type Props = {
 };
 
 const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => (
-  <Modal show title="Saved searches" bsSize="large" onHide={toggleModal}>
-    <Modal.Header closeButton>
+  <Modal show bsSize="large" onHide={toggleModal}>
+    <Modal.Header>
       <Modal.Title>Saved Searches</Modal.Title>
     </Modal.Header>
     <Modal.Body>

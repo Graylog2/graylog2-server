@@ -28,7 +28,7 @@ import type { FocusContextState } from 'views/components/contexts/WidgetFocusCon
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates, selectIsDirty } from 'views/logic/slices/viewSelectors';
 import type Widget from 'views/logic/widgets/Widget';
 import findGaps from 'views/components/GridGaps';
@@ -36,8 +36,8 @@ import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 import isDeepEqual from 'stores/isDeepEqual';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
 import { setIsDirty } from 'views/logic/slices/viewSlice';
 
@@ -110,7 +110,7 @@ const selectWidgetPositions = createSelector(selectViewStates, (viewStates) =>
 );
 
 const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositions] => {
-  const initialPositions = useAppSelector(selectWidgetPositions);
+  const initialPositions = useViewsSelector(selectWidgetPositions);
   const widgets = useWidgets();
 
   const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
@@ -127,7 +127,7 @@ type GridProps = {
   width: number;
 };
 
-const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, width }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, onSyncLayout = undefined, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return (
@@ -152,7 +152,7 @@ const MAXIMUM_GRID_SIZE = 12;
 const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) =>
   new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
 
-const onPositionChange = (dispatch: AppDispatch, newPosition: BackendWidgetPosition) => {
+const onPositionChange = (dispatch: ViewsDispatch, newPosition: BackendWidgetPosition) => {
   const { id } = newPosition;
   const widgetPosition = convertPosition(newPosition);
 
@@ -160,7 +160,7 @@ const onPositionChange = (dispatch: AppDispatch, newPosition: BackendWidgetPosit
 };
 
 const _onPositionsChange = (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   newPositions: Array<BackendWidgetPosition>,
   setLastUpdate: (newValue: string) => void,
 ) => {
@@ -174,7 +174,7 @@ const _onPositionsChange = (
 
 const _onSyncLayout =
   (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) =>
-  (dispatch: AppDispatch, getState: GetState) => {
+  (dispatch: ViewsDispatch, getState: GetState) => {
     const isDirty = selectIsDirty(getState());
     const widgetPositions = Object.fromEntries(
       newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]),
@@ -208,7 +208,7 @@ const WidgetGrid = () => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   const [widgets, positions] = useWidgetsAndPositions();
 

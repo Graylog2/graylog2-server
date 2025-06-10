@@ -15,17 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { configureStore } from '@reduxjs/toolkit';
-import type { PluggableReducer } from 'graylog-web-plugin';
+import type { Reducer, UnknownAction, ReducersMapObject } from 'redux';
 
-import type { RootState } from 'views/types';
-import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+export type PluggableReducer<T> = {
+  key: keyof T;
+  reducer: Reducer<T[keyof T], UnknownAction>;
+};
 
-const createStore = (
-  reducers: PluggableReducer[],
-  initialState: Partial<RootState>,
-  searchExecutors: SearchExecutors,
-) => {
-  const reducer = Object.fromEntries(reducers.map((r) => [r.key, r.reducer]));
+const createStore = <T>(reducers: Array<PluggableReducer<T>>, initialState: Partial<T>, extraArgument?: unknown) => {
+  const reducer = Object.fromEntries(reducers.map((r) => [r.key, r.reducer])) as ReducersMapObject<T, UnknownAction>;
 
   return configureStore({
     reducer,
@@ -35,7 +33,7 @@ const createStore = (
         serializableCheck: false,
         immutableCheck: false,
         thunk: {
-          extraArgument: { searchExecutors },
+          extraArgument,
         },
       }),
   });

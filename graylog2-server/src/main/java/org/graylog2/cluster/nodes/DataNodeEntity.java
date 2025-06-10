@@ -24,6 +24,7 @@ import org.joda.time.DateTime;
 import org.joda.time.base.AbstractInstant;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,6 +76,16 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
         return (String) fields.get(DataNodeDto.FIELD_DATANODE_VERSION);
     }
 
+    @SuppressWarnings("unchecked")
+    private List<String> getOpensearchRoles() {
+        return (List<String>) fields.get(DataNodeDto.FIELD_OPENSEARCH_ROLES);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getConfigurationWarnings() {
+        return (List<String>) fields.get(DataNodeDto.FIELD_CONFIGURATION_WARNINGS);
+    }
+
     @Override
     public DataNodeDto toDto() {
         return DataNodeDto.Builder.builder()
@@ -90,6 +101,8 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setActionQueue(this.getActionQueue())
                 .setCertValidUntil(this.getCertValidTill())
                 .setDatanodeVersion(this.getDatanodeVersion())
+                .setOpensearchRoles(this.getOpensearchRoles())
+                .setConfigurationWarnings(this.getConfigurationWarnings())
                 .build();
     }
 

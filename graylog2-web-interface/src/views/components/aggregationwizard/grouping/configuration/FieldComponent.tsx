@@ -89,7 +89,6 @@ const FieldComponent = ({ groupingIndex }: Props) => {
       <FieldsConfiguration
         onChange={onChangeSelectedFields}
         selectedFields={grouping.fields}
-        menuPortalTarget={document.body}
         createSelectPlaceholder={createSelectPlaceholder}
         isFieldQualified={isFieldQualified}
         testPrefix={`grouping-${groupingIndex}`}

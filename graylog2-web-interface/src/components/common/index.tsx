@@ -103,6 +103,7 @@ export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as RelativeTime } from './RelativeTime';
 export { default as RingProgress } from './RingProgress';
 export { default as ScrollButton } from './ScrollButton';
+export { default as Skeleton } from './Skeleton';
 export { default as SearchForm } from './SearchForm';
 export { default as Section } from './Section';
 export { default as Select } from './Select';

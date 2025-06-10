@@ -17,7 +17,7 @@
 import type { UnknownAction } from '@reduxjs/toolkit';
 
 import type { RootState, ExtraArguments, SearchExecutionResult } from 'views/types';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { asMock } from 'helpers/mocking';
 import { createSearch } from 'fixtures/searches';
 import type View from 'views/logic/views/View';
@@ -33,12 +33,12 @@ const mockSearchExecutors: SearchExecutors = {
   cancelJob: async () => null,
 };
 
-type ActionFn = (d: AppDispatch, getState: () => RootState, extraArgs?: ExtraArguments) => UnknownAction;
+type ActionFn = (d: ViewsDispatch, getState: () => RootState, extraArgs?: ExtraArguments) => UnknownAction;
 
 const isActionFn = (fn: UnknownAction | ActionFn): fn is ActionFn => typeof fn === 'function';
 
 const mockDispatch = (state: RootState = defaultState) => {
-  const dispatch: AppDispatch = jest.fn();
+  const dispatch: ViewsDispatch = jest.fn();
 
   asMock(dispatch).mockImplementation((fn) =>
     isActionFn(fn) ? fn(dispatch, () => state, { searchExecutors: mockSearchExecutors }) : fn,
@@ -49,7 +49,7 @@ const mockDispatch = (state: RootState = defaultState) => {
 
 export const mockDispatchForView = (view: View, initialQuery: string = 'query-id-1') => {
   const state = { ...defaultState, view: { view, activeQuery: initialQuery } } as RootState;
-  const dispatch: AppDispatch = jest.fn();
+  const dispatch: ViewsDispatch = jest.fn();
 
   asMock(dispatch).mockImplementation((fn) => (isActionFn(fn) ? fn(dispatch, () => state) : fn));
 

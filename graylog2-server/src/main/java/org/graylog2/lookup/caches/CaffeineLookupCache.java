@@ -31,10 +31,10 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.Min;
-import org.checkerframework.checker.index.qual.NonNegative;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
@@ -43,7 +43,6 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -99,7 +98,7 @@ public class CaffeineLookupCache extends LookupCache {
     private Expiry<LookupCacheKey, LookupResult> buildExpiry(Config config) {
         return new Expiry<>() {
             @Override
-            public long expireAfterCreate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime) {
+            public long expireAfterCreate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull LookupResult lookupResult, long currentTime) {
                 if (lookupResult.hasTTL()) {
                     return TimeUnit.MILLISECONDS.toNanos(lookupResult.cacheTTL());
                 } else {
@@ -112,12 +111,12 @@ public class CaffeineLookupCache extends LookupCache {
             }
 
             @Override
-            public long expireAfterUpdate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
+            public long expireAfterUpdate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull LookupResult lookupResult, long currentTime, long currentDuration) {
                 return currentDuration;
             }
 
             @Override
-            public long expireAfterRead(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
+            public long expireAfterRead(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull LookupResult lookupResult, long currentTime, long currentDuration) {
                 if (config.ttlEmpty() != null
                         && !Boolean.TRUE.equals(config.ignoreNull())
                         && lookupResult.isEmpty()) {
@@ -362,12 +361,12 @@ public class CaffeineLookupCache extends LookupCache {
         }
 
         @Override
-        public void recordEviction(@NonNegative int i, RemovalCause removalCause) {
+        public void recordEviction(int i, RemovalCause removalCause) {
             // not tracking this metric
         }
 
         @Override
-        public @NonNull CacheStats snapshot() {
+        public @Nonnull CacheStats snapshot() {
             throw new UnsupportedOperationException("snapshots not implemented");
         }
     }

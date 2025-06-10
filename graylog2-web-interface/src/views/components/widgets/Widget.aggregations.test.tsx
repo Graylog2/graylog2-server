@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import MockStore from 'helpers/mocking/StoreMock';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -36,13 +35,13 @@ import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
-import FieldTypesContext from '../contexts/FieldTypesContext';
 
 const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
@@ -76,8 +75,6 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidget: jest.fn(() => async () => {}),
 }));
-
-const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
   useViewsPlugin();
@@ -116,7 +113,7 @@ describe('Aggregation Widget', () => {
 
   const AggregationWidget = ({ widget: propsWidget = dataTableWidget, ...props }: AggregationWidgetProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <TestFieldTypesContextProvider>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
             <Widget
@@ -129,7 +126,7 @@ describe('Aggregation Widget', () => {
             />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
@@ -176,7 +173,7 @@ describe('Aggregation Widget', () => {
         });
 
         await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+          await selectEvent.select(metricFieldSelect, 'Count');
         });
 
         await findWidgetConfigSubmitButton();
@@ -191,7 +188,7 @@ describe('Aggregation Widget', () => {
         });
 
         await act(async () => {
-          await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
+          await selectEvent.select(streamsSelect, 'Stream 1');
         });
 
         await screen.findByRole('button', {
@@ -271,7 +268,7 @@ describe('Aggregation Widget', () => {
         });
 
         await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+          await selectEvent.select(metricFieldSelect, 'Count');
         });
 
         await findWidgetConfigSubmitButton();

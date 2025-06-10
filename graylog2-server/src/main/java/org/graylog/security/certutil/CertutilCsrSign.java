@@ -101,9 +101,6 @@ public class CertutilCsrSign implements CliCommand {
                 console.printLine("Certificate written to file " + certPath.toAbsolutePath());
 
                 // TODO: provide good user-friendly error message for each exception type!
-            } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
-                     UnrecoverableKeyException e) {
-                throw new RuntimeException(e);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

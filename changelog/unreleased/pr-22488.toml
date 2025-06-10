@@ -1,0 +1,4 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Alerts & Events page now filters only on the event streams that the user is allowed to see."
+
+pulls = ["22488"]

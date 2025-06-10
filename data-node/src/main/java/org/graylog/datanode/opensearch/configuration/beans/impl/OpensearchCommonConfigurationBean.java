@@ -25,12 +25,15 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 
+import java.util.List;
 import java.util.Map;
 
 public class OpensearchCommonConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
+
+    private static final List<String> DEFAULT_NODE_ROLES = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
 
     @Inject
     public OpensearchCommonConfigurationBean(Configuration localConfiguration, DatanodeConfiguration datanodeConfiguration) {
@@ -42,11 +45,20 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams buildParams) {
         return DatanodeConfigurationPart.builder()
                 .properties(commonOpensearchConfig(buildParams))
-                .nodeRoles(localConfiguration.getNodeRoles())
+                .nodeRoles(getNodeRoles())
                 .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
                 .build();
+    }
+
+    private List<String> getNodeRoles() {
+        final List<String> configuredRoles = localConfiguration.getNodeRoles();
+        if(configuredRoles != null && !configuredRoles.isEmpty()) {
+            return configuredRoles;
+        } else {
+            return DEFAULT_NODE_ROLES;
+        }
     }
 
     private Map<String, String> commonOpensearchConfig(OpensearchConfigurationParams buildParams) {

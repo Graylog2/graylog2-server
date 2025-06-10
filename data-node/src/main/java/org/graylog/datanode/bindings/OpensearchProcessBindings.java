@@ -36,15 +36,18 @@ import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpaceProvid
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchClusterConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchDefaultConfigFilesBean;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchConfigurationOverridesBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchSecurityConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.SearchableSnapshotsConfigurationBean;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.opensearch.statemachine.tracer.ClusterNodeStateTracer;
+import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchStateMachineTransitionLogger;
 import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchWatchdog;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTransitionLogger;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 
 public class OpensearchProcessBindings extends AbstractModule {
 
@@ -74,6 +77,7 @@ public class OpensearchProcessBindings extends AbstractModule {
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchClusterConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(SearchableSnapshotsConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchSecurityConfigurationBean.class).asEagerSingleton();
+        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchConfigurationOverridesBean.class).asEagerSingleton();
 
         // this service both starts and provides the opensearch process
         serviceBinder.addBinding().to(OpensearchConfigurationService.class).asEagerSingleton();
@@ -82,10 +86,12 @@ public class OpensearchProcessBindings extends AbstractModule {
         bind(DatanodeTrustManagerProvider.class);
 
         // tracer
-        Multibinder<StateMachineTracer> tracerBinder = Multibinder.newSetBinder(binder(), StateMachineTracer.class);
+        TypeLiteral<StateMachineTracer<OpensearchState, OpensearchEvent>> tracerType = new TypeLiteral<>() {};
+        Multibinder<StateMachineTracer<OpensearchState, OpensearchEvent>> tracerBinder =
+                Multibinder.newSetBinder(binder(), tracerType);
         tracerBinder.addBinding().to(ClusterNodeStateTracer.class).asEagerSingleton();
         tracerBinder.addBinding().to(OpensearchWatchdog.class).asEagerSingleton();
-        tracerBinder.addBinding().to(StateMachineTransitionLogger.class).asEagerSingleton();
+        tracerBinder.addBinding().to(OpensearchStateMachineTransitionLogger.class).asEagerSingleton();
         tracerBinder.addBinding().to(ConfigureMetricsIndexSettings.class).asEagerSingleton();
 
     }

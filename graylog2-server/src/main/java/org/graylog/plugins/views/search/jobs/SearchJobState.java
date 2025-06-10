@@ -22,15 +22,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
-import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = SearchJobState.Builder.class)
@@ -41,8 +44,11 @@ public abstract class SearchJobState implements MongoEntity {
     public static final String STATUS_FIELD = "status";
     public static final String TYPE_FIELD = "type";
     public static final String RESULT_FIELD = "result";
+    public static final String ERRORS_FIELD = "error_message";
+    public static final String PROGRESS_FIELD = "progress";
 
     @JsonUnwrapped
+    @Id
     public abstract SearchJobIdentifier identifier();
 
     @JsonProperty(STATUS_FIELD)
@@ -51,15 +57,15 @@ public abstract class SearchJobState implements MongoEntity {
     @JsonProperty(TYPE_FIELD)
     public abstract SearchJobType type();
 
-    @JsonProperty("error_message")
-    public abstract String errorMessage();
+    @JsonProperty(ERRORS_FIELD)
+    public abstract Set<SearchError> errors();
 
-    @JsonProperty("progress")
+    @JsonProperty(PROGRESS_FIELD)
     public abstract int progress();
 
     @JsonProperty(RESULT_FIELD)
     @Nullable
-    public abstract SearchType.Result result();
+    public abstract QueryResult result();
 
     @JsonProperty(CREATED_AT_FIELD)
     public abstract DateTime createdAt();
@@ -85,14 +91,14 @@ public abstract class SearchJobState implements MongoEntity {
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(final SearchJobType type);
 
-        @JsonProperty("error_message")
-        public abstract Builder errorMessage(final String errorMessage);
+        @JsonProperty(ERRORS_FIELD)
+        public abstract Builder errors(final Set<SearchError> errors);
 
-        @JsonProperty("progress")
+        @JsonProperty(PROGRESS_FIELD)
         public abstract Builder progress(final int progress);
 
         @JsonProperty(RESULT_FIELD)
-        public abstract Builder result(final SearchType.Result result);
+        public abstract Builder result(final QueryResult result);
 
         @JsonProperty(CREATED_AT_FIELD)
         public abstract Builder createdAt(final DateTime createdAt);
@@ -107,14 +113,20 @@ public abstract class SearchJobState implements MongoEntity {
             return new AutoValue_SearchJobState.Builder()
                     .progress(0)
                     .type(SearchJobType.DATA_LAKE)
-                    .errorMessage("");
+                    .errors(Set.of());
         }
     }
 
-    public static SearchJobState createNewJob(final SearchJobIdentifier searchJobIdentifier) {
+    public static SearchJobState createNewJob(final SearchJobIdentifier searchJobIdentifier,
+                                              final Query query) {
         return SearchJobState.builder()
                 .identifier(searchJobIdentifier)
-                .result(null)
+                .result(QueryResult.builder()
+                        .state(QueryResult.State.INCOMPLETE)
+                        .searchTypes(Map.of())
+                        .query(query)
+                        .errors(Set.of())
+                        .build())
                 .status(SearchJobStatus.RUNNING)
                 .progress(0)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -123,7 +135,7 @@ public abstract class SearchJobState implements MongoEntity {
     }
 
     public static SearchJobState createDoneJobFrom(final SearchJobState existingSearchJob,
-                                                   final SearchType.Result result) {
+                                                   final QueryResult result) {
         return existingSearchJob.toBuilder()
                 .result(result)
                 .status(SearchJobStatus.DONE)
@@ -133,8 +145,6 @@ public abstract class SearchJobState implements MongoEntity {
     }
 
     @Override
-    @ObjectId
-    @Id
     @JsonIgnore
     public String id() {
         return identifier().id();

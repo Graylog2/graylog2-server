@@ -17,12 +17,12 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
@@ -45,13 +45,11 @@ const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
 const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
-const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
+const fieldTypes = { all: fields, currentQuery: fields };
 
 jest.mock('views/hooks/useAggregationFunctions');
 
 jest.mock('views/hooks/useActiveQueryId');
-
-const selectEventConfig = { container: document.body };
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
@@ -74,7 +72,7 @@ const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
   });
 
   await act(async () => {
-    await selectEvent.select(newFunctionSelect, functionName, selectEventConfig);
+    await selectEvent.select(newFunctionSelect, functionName);
   });
 
   await act(async () => {
@@ -82,7 +80,7 @@ const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
   });
 
   await act(async () => {
-    await selectEvent.select(newFieldSelect, fieldName, selectEventConfig);
+    await selectEvent.select(newFieldSelect, fieldName);
   });
 };
 
@@ -136,7 +134,7 @@ describe('AggregationWizard', () => {
 
       const functionSelect = await screen.findByLabelText('Select a function');
       await selectEvent.openMenu(functionSelect);
-      await selectEvent.select(functionSelect, 'Minimum', selectEventConfig);
+      await selectEvent.select(functionSelect, 'Minimum');
 
       await screen.findByText('Field is required for function min.');
     },
@@ -229,7 +227,7 @@ describe('AggregationWizard', () => {
       });
 
       await act(async () => {
-        await selectEvent.select(percentileInput, '50', selectEventConfig);
+        await selectEvent.select(percentileInput, '50');
       });
 
       await submitWidgetConfigForm();

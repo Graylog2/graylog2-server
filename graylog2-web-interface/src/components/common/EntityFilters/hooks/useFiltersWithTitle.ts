@@ -131,6 +131,11 @@ const _allFiltersWithTitle = (
 ): Filters =>
   urlQueryFilters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedAttribute = attributesMetaData?.find(({ id }) => id === attributeId);
+    if (!relatedAttribute) {
+      throw new Error(
+        `Found value for attribute "${attributeId}", which is not in list of registered attributes: ${attributesMetaData?.map(({ id }) => id).join(', ')} - typo in attribute name?`,
+      );
+    }
     const filtersWithTitle: Array<Filter> = filterValues.map((value) => {
       const title = filterTitle(
         relatedAttribute,

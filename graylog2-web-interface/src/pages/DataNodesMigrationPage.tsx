@@ -20,12 +20,13 @@ import styled from 'styled-components';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import MigrationWizard from 'components/datanode/migrations/MigrationWizard';
 import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
 import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import useProductName from 'brand-customization/useProductName';
 
 const WizardContainer = styled(Col)`
   .nav-pills > li > a {
@@ -36,6 +37,7 @@ const WizardContainer = styled(Col)`
 const DataNodesMigrationPage = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
+  const productName = useProductName();
 
   useEffect(() => {
     if (!isLoading && currentStep.state === MIGRATION_STATE.NEW.key) {
@@ -44,18 +46,18 @@ const DataNodesMigrationPage = () => {
   }, [currentStep.next_steps, currentStep.state, isLoading, onTriggerNextState]);
 
   return (
-    <DocumentTitle title="Data Nodes Migration">
-      <DataNodesPageNavigation />
+    <DocumentTitle title="Data Node Migration">
+      <ClusterConfigurationPageNavigation />
       <PageHeader
-        title="Data Nodes Migration"
+        title="Data Node Migration"
         actions={<ResetMigrationButton />}
         documentationLink={{
           title: 'Data Nodes documentation',
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
         <span>
-          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to
-          index and search through all the messages in your Graylog message database.
+          {productName} Data Nodes offer a better integration with {productName} and simplify future updates. They allow
+          you to index and search through all the messages in your {productName} message database.
         </span>
       </PageHeader>
       <Row className="content">

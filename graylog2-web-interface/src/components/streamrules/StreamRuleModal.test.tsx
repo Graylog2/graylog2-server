@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { MockStore, asMock } from 'helpers/mocking';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
@@ -26,6 +26,11 @@ import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 import StreamRuleModal from './StreamRuleModal';
 
 jest.mock('components/streams/hooks/useStreamRuleTypes');
+jest.mock('@graylog/server-api', () => ({
+  SystemFields: {
+    fields: async () => ({ fields: [] }),
+  },
+}));
 
 jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
   StreamRulesInputsActions: {
@@ -67,26 +72,21 @@ describe('StreamRuleModal', () => {
   it('should render without provided stream rule', async () => {
     render(<SUT />);
 
-    await screen.findByRole('textbox', {
+    await screen.findByRole('combobox', {
       name: /field/i,
-      hidden: true,
     });
   });
 
   it('should render with provided stream rule', async () => {
     render(<SUT initialValues={getStreamRule()} />);
 
-    const fieldInput = await screen.findByRole('textbox', {
-      name: /field/i,
-      hidden: true,
-    });
+    await screen.findByRole('combobox', { name: /field/i });
 
     const valueInput = await screen.findByRole('textbox', {
       name: /value/i,
-      hidden: true,
     });
 
-    expect(fieldInput).toHaveValue('field_1');
+    expect(await screen.findAllByText('field_1')).toHaveLength(2);
     expect(valueInput).toHaveValue('value_1');
   });
 
@@ -97,7 +97,6 @@ describe('StreamRuleModal', () => {
 
     const submitBtn = await screen.findByRole('button', {
       name: /update rule/i,
-      hidden: true,
     });
 
     const ruleTypeSelect = await screen.findByLabelText('Type');

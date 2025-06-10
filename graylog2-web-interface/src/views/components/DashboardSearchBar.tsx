@@ -51,8 +51,8 @@ import {
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
-import useAppDispatch from 'stores/useAppDispatch';
-import { setGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import { setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHandlerContext from 'views/components/useHandlerContext';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -62,6 +62,7 @@ import useView from 'views/hooks/useView';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -125,7 +126,7 @@ const DashboardSearchBar = () => {
   const { config } = useSearchConfiguration();
   const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const handlerContext = useHandlerContext();
   const { restartAutoRefresh } = useAutoRefresh();
   const submitForm = useCallback(
@@ -135,7 +136,7 @@ const DashboardSearchBar = () => {
       await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
 
       dispatch(setGlobalOverride(newQueryString, newTimerange));
-      dispatch(execute());
+      dispatch(executeActiveQuery());
     },
     [dispatch, pluggableSearchBarControls, restartAutoRefresh],
   );

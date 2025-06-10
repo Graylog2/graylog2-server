@@ -17,12 +17,24 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { ClipboardButton, ControlledTableList, Icon, RelativeTime, SearchForm, Spinner } from 'components/common';
-import { Button, Col, Panel, Row } from 'components/bootstrap';
+import {
+  ClipboardButton,
+  Icon,
+  SearchForm,
+  IfPermitted,
+  Timestamp,
+  NoEntitiesExist,
+  RelativeTime,
+} from 'components/common';
+import { Button, Panel, Table } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
+import { Headline } from 'components/common/Section/SectionComponent';
+import useCurrentUser from 'hooks/useCurrentUser';
+import type User from 'logic/users/User';
 
 import CreateTokenForm from './CreateTokenForm';
+import TokenActions from './UsersTokenManagement/TokenManagementActions';
 
 const StyledTokenPanel = styled(Panel)`
   &.panel {
@@ -44,21 +56,16 @@ const StyledSearchForm = styled(SearchForm)`
   margin-bottom: 10px;
 `;
 
-const StyledLastAccess = styled.div`
-  color: ${(props) => props.theme.colors.gray[60]};
-  font-size: ${(props) => props.theme.fonts.size.small};
-  margin-bottom: 5px;
-`;
-
 type Props = {
   creatingToken?: boolean;
-  deletingToken?: string;
-  onCreate: (tokenName: string) => Promise<Token>;
-  onDelete: (tokenId: string, tokenName: string) => void;
+  onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => Promise<Token>;
   tokens?: TokenSummary[];
+  user: User;
+  onDelete?: () => void;
 };
 
-const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, tokens = [] }: Props) => {
+const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {}, tokens = [] }: Props) => {
+  const currentUser = useCurrentUser();
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
@@ -70,8 +77,8 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = (tokenName: string) => {
-    const promise = onCreate(tokenName);
+  const handleTokenCreation = ({ tokenName, tokenTtl }) => {
+    const promise = onCreate({ tokenName, tokenTtl });
 
     promise.then((token) => {
       setCreatedToken(token);
@@ -79,16 +86,18 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
       return token;
     });
   };
-
-  const deleteToken = (token: TokenSummary) => () => {
-    onDelete(token.id, token.name);
-  };
-
   const updateQuery = (nextQuery?: string) => setQuery(nextQuery || '');
 
   return (
-    <span>
-      <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+    <>
+      <IfPermitted permissions={['users:tokencreate', `users:tokencreate:${currentUser.username}`]} anyPermissions>
+        <Headline>Create And Edit Tokens</Headline>
+        <CreateTokenForm
+          onCreate={handleTokenCreation}
+          creatingToken={creatingToken}
+          forceDefaultTtl={user.serviceAccount ? 'P100Y' : undefined}
+        />
+      </IfPermitted>
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
           <Panel.Heading>
@@ -109,48 +118,50 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
         </StyledTokenPanel>
       )}
       <hr />
+
+      <Headline>Tokens</Headline>
       <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label="Filter" useLoadingState={false} />
+      {effectiveTokens.length === 0 ? (
+        <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
+      ) : (
+        <Table striped bordered condensed>
+          <thead>
+            <tr>
+              <th>Token Name</th>
+              <th>Created</th>
+              <th>Last Access</th>
+              <th>Expires At</th>
+              <th className="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {effectiveTokens.map((token) => {
+              const tokenNeverUsed = !token.last_access || Date.parse(token.last_access) === 0;
 
-      <ControlledTableList>
-        <ControlledTableList.Header />
-        {effectiveTokens.length === 0 && (
-          <ControlledTableList.Item>
-            <p>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</p>
-          </ControlledTableList.Item>
-        )}
-        {effectiveTokens.map((token) => {
-          const tokenNeverUsed = Date.parse(token.last_access) === 0;
-
-          return (
-            <ControlledTableList.Item key={token.id}>
-              <Row className="row-sm">
-                <Col md={9}>
-                  {token.name}
-                  <StyledLastAccess>
-                    {tokenNeverUsed ? (
-                      'Never used'
-                    ) : (
-                      <>
-                        Last used <RelativeTime dateTime={token.last_access} />
-                      </>
-                    )}
-                  </StyledLastAccess>
-                </Col>
-                <Col md={3} className="text-right">
-                  <Button
-                    bsSize="xsmall"
-                    disabled={deletingToken === token.id}
-                    bsStyle="danger"
-                    onClick={deleteToken(token)}>
-                    {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
-                  </Button>
-                </Col>
-              </Row>
-            </ControlledTableList.Item>
-          );
-        })}
-      </ControlledTableList>
-    </span>
+              return (
+                <tr key={token.id}>
+                  <td>{token.name}</td>
+                  <td>
+                    <Timestamp dateTime={token.created_at} />
+                  </td>
+                  <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
+                  <td>
+                    <Timestamp dateTime={token.expires_at} />
+                  </td>
+                  <td>
+                    <TokenActions
+                      userId={currentUser.id}
+                      tokenId={token.id}
+                      tokenName={token.name}
+                      onDeleteCallback={onDelete} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      )}
+    </>
   );
 };
 

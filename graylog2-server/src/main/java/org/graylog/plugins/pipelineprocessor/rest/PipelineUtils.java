@@ -24,10 +24,10 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -90,7 +90,7 @@ public class PipelineUtils {
     private static boolean isSystemRule(RuleService ruleService, String ruleRef) {
         try {
             final RuleDao ruleDao = ruleService.loadByName(ruleRef);
-            return ruleDao.scope().equalsIgnoreCase(SystemPipelineRuleScope.NAME);
+            return ruleDao.scope().equalsIgnoreCase(DeletableSystemScope.NAME);
         } catch (NotFoundException e) {
             return false;
         }

@@ -24,7 +24,7 @@ import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { Th } from 'components/common/EntityDataTable/TableHead';
 
-type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
+export type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
 const useCheckboxStatus = <Entity extends EntityBase>(
   data: Readonly<Array<Entity>>,
@@ -63,14 +63,21 @@ const useCheckboxStatus = <Entity extends EntityBase>(
   };
 };
 
+const getDefaultTitle = (checkboxStatus: CheckboxStatus) =>
+  `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
+
 type Props<Entity extends EntityBase> = {
   data: Readonly<Array<Entity>>;
+  getTitle?: (checkboxStatus: CheckboxStatus) => string;
 };
 
-const BulkSelectHead = <Entity extends EntityBase>({ data }: Props<Entity>) => {
+export const BulkSelectHeadContent = <Entity extends EntityBase>({
+  data,
+  getTitle = getDefaultTitle,
+}: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
-  const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
+  const title = getTitle(checkboxStatus);
 
   const onBulkSelect = () => {
     setSelectedEntities((cur) => {
@@ -85,19 +92,22 @@ const BulkSelectHead = <Entity extends EntityBase>({ data }: Props<Entity>) => {
   };
 
   return (
-    <Th $width={BULK_SELECT_COLUMN_WIDTH}>
-      <RowCheckbox
-        inputRef={(ref) => {
-          checkboxRef.current = ref;
-        }}
-        onChange={onBulkSelect}
-        checked={checkboxStatus === 'CHECKED'}
-        title={title}
-        disabled={!data?.length}
-        aria-label={title}
-      />
-    </Th>
+    <RowCheckbox
+      inputRef={(ref) => {
+        checkboxRef.current = ref;
+      }}
+      onChange={onBulkSelect}
+      checked={checkboxStatus === 'CHECKED'}
+      title={title}
+      disabled={!data?.length}
+      aria-label={title}
+    />
   );
 };
 
+const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => (
+  <Th $width={BULK_SELECT_COLUMN_WIDTH}>
+    <BulkSelectHeadContent<Entity> data={data} getTitle={getTitle} />
+  </Th>
+);
 export default BulkSelectHead;

@@ -20,10 +20,13 @@ import { useCallback, useMemo, useState } from 'react';
 
 import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
 import type { InputSetupWizardStep, WizardData } from 'components/inputs/InputSetupWizard/types';
+import { INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
 import { getNextStep, checkHasPreviousStep } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DEFAULT_ACTIVE_STEP = undefined;
-const DEFAULT_WIZARD_DATA = {};
+const DEFAULT_WIZARD_DATA = {
+  flow: INPUT_WIZARD_FLOWS.NON_ILLUMINATE,
+};
 
 const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);
@@ -33,7 +36,7 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
   const goToNextStep = useCallback(() => {
     const nextStep = getNextStep(orderedSteps, activeStep);
 
-      if (!nextStep) return;
+    if (!nextStep) return;
 
     const nextStepIndex = orderedSteps.indexOf(nextStep);
 
@@ -48,29 +51,21 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setActiveStep(orderedSteps[previousStepIndex]);
   }, [activeStep, orderedSteps]);
 
-  const value = useMemo(() => ({
-    setActiveStep,
-    activeStep,
-    wizardData,
-    setWizardData,
-    orderedSteps,
-    setOrderedSteps,
-    goToPreviousStep,
-    goToNextStep,
-  }), [
-    activeStep,
-    wizardData,
-    orderedSteps,
-    goToPreviousStep,
-    goToNextStep,
-  ]);
-
-  return (
-    <InputSetupWizardContext.Provider value={value}>
-      {children}
-    </InputSetupWizardContext.Provider>
+  const value = useMemo(
+    () => ({
+      setActiveStep,
+      activeStep,
+      wizardData,
+      setWizardData,
+      orderedSteps,
+      setOrderedSteps,
+      goToPreviousStep,
+      goToNextStep,
+    }),
+    [activeStep, wizardData, orderedSteps, goToPreviousStep, goToNextStep],
   );
 
+  return <InputSetupWizardContext.Provider value={value}>{children}</InputSetupWizardContext.Provider>;
 };
 
 export default InputSetupWizardProvider;

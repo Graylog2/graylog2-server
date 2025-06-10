@@ -20,10 +20,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.bouncycastle.openssl.PEMEncryptor;
-import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
@@ -35,8 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.FileWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -85,6 +79,9 @@ class DatanodeKeystoreTest {
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
 
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
+        Assertions.assertThat(datanodeKeystore.getSubjectAlternativeNames())
+                .hasSizeGreaterThanOrEqualTo(2)
+                .contains("my-hostname", "second-hostname");
 
         Assertions.assertThat(this.receivedEvents).hasSize(1);
 

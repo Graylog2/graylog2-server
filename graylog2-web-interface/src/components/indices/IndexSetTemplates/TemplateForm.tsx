@@ -40,6 +40,7 @@ import {
   prepareDataTieringInitialValues,
   DataTieringConfiguration,
 } from 'components/indices/data-tiering';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   initialValues?: IndexSetTemplate;
@@ -99,8 +100,8 @@ const getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig
 
 const RotationConfig = ({
   rotationStrategies,
-  indexSetRotationStrategy,
-  indexSetRotationStrategyClass,
+  indexSetRotationStrategy = undefined,
+  indexSetRotationStrategyClass = undefined,
 }: RotationStrategiesProps) => {
   if (!rotationStrategies) return <Spinner />;
 
@@ -109,7 +110,7 @@ const RotationConfig = ({
       title="Index Rotation Configuration"
       name="rotation"
       label="Rotation strategy"
-      description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
+      description="Multiple indices are used to store documents. You can configure the strategy it uses to determine when to rotate the currently active write index."
       selectPlaceholder="Select rotation strategy"
       pluginExports={PluginStore.exports('indexRotationConfig')}
       strategies={rotationStrategies}
@@ -125,8 +126,8 @@ const RotationConfig = ({
 const RetentionConfig = ({
   retentionStrategies,
   retentionStrategiesContext,
-  indexSetRetentionStrategy,
-  indexSetRetentionStrategyClass,
+  indexSetRetentionStrategy = undefined,
+  indexSetRetentionStrategyClass = undefined,
 }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
 
@@ -135,7 +136,7 @@ const RetentionConfig = ({
       title="Index Retention Configuration"
       name="retention"
       label="Retention strategy"
-      description="Graylog uses a retention strategy to clean up old indices."
+      description="A retention strategy is used to clean up old indices"
       selectPlaceholder="Select retention strategy"
       pluginExports={PluginStore.exports('indexRetentionConfig')}
       strategies={retentionStrategies}
@@ -200,7 +201,14 @@ const validate = (formValues: IndexSetTemplateFormValues, usesLegacyRetention: b
   return errors;
 };
 
-const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCancel, onSubmit }: Props) => {
+const TemplateForm = ({
+  initialValues = undefined,
+  submitButtonText,
+  submitLoadingText,
+  onCancel,
+  onSubmit,
+}: Props) => {
+  const productName = useProductName();
   const retentionConfigSegments: Array<{ value: RetentionConfigSegment; label: string }> = [
     { value: 'data_tiering', label: 'Data Tiering' },
     { value: 'legacy', label: 'Legacy (Deprecated)' },
@@ -389,7 +397,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
                               <em>Advanced Option.</em> How often the Field Type Information for the active write Index
                               will be updated. Setting this value higher can marginally reduce search cluster overhead
                               and improve performance, but will result in new data messages longer to be searchable in
-                              Graylog.
+                              {productName}.
                             </>
                           }
                           value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}

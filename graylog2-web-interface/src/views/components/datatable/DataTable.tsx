@@ -31,7 +31,7 @@ import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 
@@ -148,7 +148,7 @@ const DataTable = ({
   const widget = useContext(WidgetContext);
   useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   const onSetColumnsWidth = useCallback(
     ({ field, offsetWidth }: { field: string; offsetWidth: number }) => {

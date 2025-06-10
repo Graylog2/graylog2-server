@@ -24,7 +24,7 @@
             "query_string": "NOT(_exists_:node)"
           },
           "streams": ["datastream:gl-datanode-metrics"],
-          "stream_categories":[],
+          "stream_categories": [],
           "id": "cda87d95-f63a-4b34-a9a4-74aec9f8272c",
           "name": "chart",
           "series": [

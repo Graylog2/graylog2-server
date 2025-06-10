@@ -17,7 +17,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 

@@ -31,7 +31,7 @@ const useForwarderInput = (inputId: string, enabled: boolean) => {
     isError,
     isLoading,
   } = useQuery(['forwarder', 'input', inputId], () => fetchForwarderInput(inputId), {
-    enabled: fetchForwarderInput && enabled,
+    enabled: !!fetchForwarderInput && enabled,
   });
 
   return isLoading || isError ? undefined : forwarderInput;

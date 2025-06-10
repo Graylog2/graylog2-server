@@ -56,7 +56,7 @@ type State = {
   searchTypes: SearchTypeResults;
 };
 
-type QueryResultResponse = {
+export type QueryResultResponse = {
   execution_stats: {
     duration: number;
     timestamp: string;

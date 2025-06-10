@@ -16,15 +16,15 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -51,9 +51,9 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
-jest.mock('views/logic/slices/searchExecutionSlice', () => ({
-  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
-  execute: jest.fn(() => async () => {}),
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 jest.mock('views/logic/slices/widgetActions', () => ({
@@ -90,7 +90,7 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
     });
 
     it("changes the widget's streams when using stream filter", async () => {

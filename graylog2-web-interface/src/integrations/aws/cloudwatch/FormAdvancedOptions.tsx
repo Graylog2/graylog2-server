@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
-import styled from 'styled-components';
 
+import ThrottlingCheckbox from 'integrations/components/ThrottlingCheckbox';
 import { Input } from 'components/bootstrap';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
@@ -30,22 +30,18 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { awsCloudWatchBatchSize, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } = formData;
+  const { awsCloudWatchBatchSize, overrideSource, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } = formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
   };
 
   return (
-    <StyledAdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
-      <Input
+    <AdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
+      <ThrottlingCheckbox
         id="awsCloudWatchThrottleEnabled"
-        type="checkbox"
-        value="enable-throttling"
-        defaultChecked={awsCloudWatchThrottleEnabled && awsCloudWatchThrottleEnabled.value}
+        defaultChecked={awsCloudWatchThrottleEnabled?.value}
         onChange={onChange}
-        label="Enable Throttling"
-        help="If enabled, no new messages will be read from this input until Graylog catches up with its message load. This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
       />
 
       <Input
@@ -59,6 +55,15 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
       />
 
       <Input
+        id="overrideSource"
+        type="text"
+        value={overrideSource?.value}
+        onChange={onChange}
+        label="Override Source (optional)"
+        help="The message source is set to aws-kinesis-raw-logs by default. If desired, you may override it with a custom value."
+      />
+
+      <Input
         id="awsCloudWatchBatchSize"
         type="number"
         value={awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue}
@@ -66,12 +71,8 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         label="Kinesis Record batch size"
         help="The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time."
       />
-    </StyledAdditionalFields>
+    </AdditionalFields>
   );
 };
-
-const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
-`;
 
 export default FormAdvancedOptions;

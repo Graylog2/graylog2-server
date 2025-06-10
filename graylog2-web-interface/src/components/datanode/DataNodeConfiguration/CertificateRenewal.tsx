@@ -22,7 +22,7 @@ import moment from 'moment';
 
 import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import UserNotification from 'util/UserNotification';
 import { Spinner } from 'components/common';
 import { Alert, ListGroup, ListGroupItem, Button } from 'components/bootstrap';

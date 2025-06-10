@@ -16,7 +16,8 @@
  */
 
 import * as Immutable from 'immutable';
-import ObjectID from 'bson-objectid';
+
+import generateObjectId from 'logic/generateObjectId';
 
 import Query from '../queries/Query';
 import Parameter from '../parameters/Parameter';
@@ -113,7 +114,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(new ObjectID().toString());
+    return this.id(generateObjectId());
   }
 
   queries(value: Array<Query> | QuerySet): Builder {

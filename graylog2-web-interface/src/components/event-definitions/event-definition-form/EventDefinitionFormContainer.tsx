@@ -25,6 +25,7 @@ import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/Ava
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
   EventDefinition,
   EventDefinitionFormControlsProps,
@@ -36,6 +37,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
 
@@ -45,7 +47,9 @@ const fetchNotifications = () => {
 
 type Props = {
   action?: 'edit' | 'create';
-  eventDefinition?: EventDefinition;
+  eventDefinition?: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
   onCancel?: () => void;
@@ -144,6 +148,7 @@ const EventDefinitionFormContainer = ({
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
+    CurrentUserStore.update(currentUser.username);
 
     onSubmit();
   };

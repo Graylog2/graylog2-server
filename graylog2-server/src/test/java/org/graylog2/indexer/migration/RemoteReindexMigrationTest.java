@@ -23,13 +23,27 @@ import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 class RemoteReindexMigrationTest {
+
+    @Test
+    void testLogErrorExtraction() {
+        final RemoteReindexMigration migration = new RemoteReindexMigration(
+                UUID.randomUUID().toString(),
+                List.of(index("one", RemoteReindexingMigrationAdapter.Status.FINISHED)),
+                List.of(new LogEntry(new DateTime(DateTimeZone.UTC), LogLevel.ERROR, "This is a failure"))
+        );
+
+        Assertions.assertThat(migration.status()).isEqualTo(RemoteReindexingMigrationAdapter.Status.ERROR);
+    }
 
     @Test
     void testProgress() {

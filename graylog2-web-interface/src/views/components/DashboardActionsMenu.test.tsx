@@ -39,12 +39,7 @@ import DashboardActionsMenu from './DashboardActionsMenu';
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
-
-jest.mock('bson-objectid', () =>
-  jest.fn(() => ({
-    toString: jest.fn(() => 'new-dashboard-id'),
-  })),
-);
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -73,7 +68,13 @@ describe('DashboardActionsMenu', () => {
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, view = mockView }: { providerOverrides?: Partial<LayoutState>; view?: View }) => (
+  const SUT = ({
+    providerOverrides = undefined,
+    view = mockView,
+  }: {
+    providerOverrides?: Partial<LayoutState>;
+    view?: View;
+  }) => (
     <TestStoreProvider view={view}>
       <HotkeysProvider>
         <SearchPageLayoutProvider value={providerOverrides}>
@@ -86,11 +87,10 @@ describe('DashboardActionsMenu', () => {
   useViewsPlugin();
 
   const submitDashboardSaveForm = async () => {
-    const saveDashboardModal = await screen.findByTestId('modal-form');
+    const saveDashboardModal = await screen.findByRole('dialog', { name: /Save new dashboard/i });
 
     const saveButton = within(saveDashboardModal).getByRole('button', {
       name: /create dashboard/i,
-      hidden: true,
     });
 
     userEvent.click(saveButton);
@@ -122,7 +122,7 @@ describe('DashboardActionsMenu', () => {
 
     const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null));
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
@@ -146,7 +146,7 @@ describe('DashboardActionsMenu', () => {
       .summary('This dashboard has been extended by a plugin')
       .build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null));
   });
 
   it('should open edit dashboard meta information modal', async () => {
@@ -159,13 +159,12 @@ describe('DashboardActionsMenu', () => {
     await findByText(/Editing dashboard/);
   });
 
-  it('should open dashboard share modal', () => {
-    const { getByRole, getByText } = render(<SUT />);
-    const openShareButton = getByText(/Share/i);
-
+  it('should open dashboard share modal', async () => {
+    render(<SUT />);
+    const openShareButton = await screen.findByRole('button', { name: /Share/i });
     userEvent.click(openShareButton);
 
-    expect(getByRole('button', { name: /update sharing/i, hidden: true })).not.toBeNull();
+    await screen.findByRole('button', { name: /update sharing/i });
   });
 
   it('should use FULL_MENU layout option by default and render all buttons', async () => {

@@ -31,6 +31,7 @@ import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
+import org.graylog2.bindings.providers.DefaultJmteEngineProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
@@ -107,6 +108,8 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
+
+import java.time.Clock;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
@@ -189,10 +192,11 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
-        bind(Engine.class).toInstance(Engine.createEngine());
+        bind(Engine.class).toProvider(DefaultJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("JsonSafe")).toProvider(JsonSafeEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
+        bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
     }
 
     private void bindInterfaces() {

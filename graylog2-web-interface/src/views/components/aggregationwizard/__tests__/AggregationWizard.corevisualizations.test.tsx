@@ -17,32 +17,24 @@
 import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { createSearch } from 'fixtures/searches';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
 const widgetConfig = AggregationWidgetConfig.builder().visualization('table').build();
-
-const fieldTypes: FieldTypes = {
-  all: Immutable.List([]),
-  queryFields: Immutable.Map(),
-};
-
-const selectEventConfig = { container: document.body };
 
 jest.mock('views/hooks/useAggregationFunctions');
 
@@ -50,7 +42,7 @@ const view = createSearch();
 
 const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof AggregationWizard>>) => (
   <TestStoreProvider view={view} isNew initialQuery="query-id-1">
-    <FieldTypesContext.Provider value={fieldTypes}>
+    <TestFieldTypesContextProvider>
       <AggregationWizard
         config={widgetConfig}
         editing
@@ -62,7 +54,7 @@ const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof Aggr
         {...props}>
         <span>The visualization</span>
       </AggregationWizard>
-    </FieldTypesContext.Provider>
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 
@@ -86,7 +78,7 @@ const selectOption = async (ariaLabel: string, option: string) => {
   await selectEvent.openMenu(select);
 
   await act(async () => {
-    await selectEvent.select(select, option, selectEventConfig);
+    await selectEvent.select(select, option);
   });
 };
 

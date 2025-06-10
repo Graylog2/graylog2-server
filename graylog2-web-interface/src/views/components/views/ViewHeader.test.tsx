@@ -26,6 +26,8 @@ import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import { updateView } from 'views/logic/slices/viewSlice';
 import asMock from 'helpers/mocking/AsMock';
+import { createEntityShareState } from 'fixtures/entityShareState';
+import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 jest.mock('views/logic/views/OnSaveViewAction');
 
@@ -37,7 +39,17 @@ jest.mock('views/logic/slices/viewSlice', () => {
     updateView: jest.fn(actualModule.updateView),
   };
 });
-
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  __esModule: true,
+  EntityShareActions: {
+    prepare: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
+  },
+  EntityShareStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(),
+  },
+}));
 const view = createSearch().toBuilder().id('viewId').title('Some view').type(View.Type.Dashboard).build();
 
 const ViewHeader = () => (
@@ -49,6 +61,15 @@ const ViewHeader = () => (
 describe('ViewHeader', () => {
   beforeEach(() => {
     asMock(onSaveView).mockReturnValue(async () => {});
+    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+  });
+
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   useViewsPlugin();
@@ -68,10 +89,10 @@ describe('ViewHeader', () => {
     fireEvent.click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
 
-    const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
+    const titleInput = await screen.findByRole('textbox', { name: /title/i });
     await userEvent.type(titleInput, ' updated');
 
-    const saveButton = await screen.findByRole('button', { name: /save dashboard/i, hidden: true });
+    const saveButton = await screen.findByRole('button', { name: /save dashboard/i });
     await userEvent.click(saveButton);
 
     expect(onSaveView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));

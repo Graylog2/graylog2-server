@@ -21,7 +21,7 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
 
-const typePreservingFunctions = ['avg', 'min', 'max', 'percentile'];
+const typePreservingFunctions = ['avg', 'min', 'max', 'percentile', 'latest'];
 const constantTypeFunctions = {
   card: FieldTypes.LONG,
   count: FieldTypes.LONG,

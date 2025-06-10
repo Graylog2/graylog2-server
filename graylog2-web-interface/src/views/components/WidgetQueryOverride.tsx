@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
+import type { QueryString } from 'views/logic/queries/types';
 
 import BasicQueryInput from './searchbar/queryinput/AsyncBasicQueryInput';
 
@@ -64,7 +64,7 @@ const ResetButton = styled(Button)`
 `;
 
 type Props = {
-  value: ElasticsearchQueryString;
+  value: QueryString;
   onReset: () => void;
 };
 

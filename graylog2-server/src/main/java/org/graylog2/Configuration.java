@@ -153,6 +153,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;
 
+    @Parameter(value = "static_leader_timeout", converter = JavaDurationConverter.class)
+    private java.time.Duration staticLeaderTimeout = java.time.Duration.of(60, java.time.temporal.ChronoUnit.SECONDS);
+
     @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
@@ -253,6 +256,18 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
     private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
+
+    @Parameter(value = "search_query_engine_indexer_jobs_pool_size", validators = PositiveIntegerValidator.class)
+    private int searchQueryEngineIndexerJobsPoolSize = 4;
+
+    @Parameter("search_query_engine_indexer_jobs_queue_size")
+    private int searchQueryEngineIndexerJobsQueueSize = 0;
+
+    @Parameter(value = "search_query_engine_data_lake_jobs_pool_size", validators = PositiveIntegerValidator.class)
+    private int searchQueryEngineDataLakeJobsPoolSize = 4;
+
+    @Parameter("search_query_engine_data_lake_jobs_queue_size")
+    private int searchQueryEngineDataLakeJobsQueueSize = 0;
 
     @Documentation("""
             Enabling this parameter will activate automatic security configuration. Graylog server will
@@ -437,6 +452,10 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return staleLeaderTimeout != null ? staleLeaderTimeout : staleMasterTimeout;
     }
 
+    public java.time.Duration getStaticLeaderTimeout() {
+        return staticLeaderTimeout;
+    }
+
     public int getLdapConnectionTimeout() {
         return ldapConnectionTimeout;
     }
@@ -574,6 +593,22 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     public boolean selfsignedStartupEnabled() {
         return selfsignedStartup;
+    }
+
+    public int searchQueryEngineIndexerJobsPoolSize() {
+        return searchQueryEngineIndexerJobsPoolSize;
+    }
+
+    public int searchQueryEngineIndexerJobsQueueSize() {
+        return searchQueryEngineIndexerJobsQueueSize;
+    }
+
+    public int searchQueryEngineDataLakeJobsPoolSize() {
+        return searchQueryEngineDataLakeJobsPoolSize;
+    }
+
+    public int searchQueryEngineDataLakeJobsQueueSize() {
+        return searchQueryEngineDataLakeJobsQueueSize;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

@@ -18,8 +18,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import { act } from 'react';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import mockEntityShareState, {
   failedEntityShareState,
@@ -33,6 +33,7 @@ import mockEntityShareState, {
 } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import EntityShareModal from './EntityShareModal';
 
@@ -76,7 +77,7 @@ describe('EntityShareModal', () => {
     />
   );
 
-  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i, hidden: true });
+  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i });
 
   it('fetches entity share state initially', async () => {
     render(<SimpleEntityShareModal />);
@@ -89,7 +90,7 @@ describe('EntityShareModal', () => {
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
+    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -104,7 +105,6 @@ describe('EntityShareModal', () => {
 
     const cancelButton = await screen.findByRole('button', {
       name: /cancel/i,
-      hidden: true,
     });
 
     fireEvent.click(cancelButton);
@@ -155,16 +155,7 @@ describe('EntityShareModal', () => {
   });
 
   describe('grantee selector', () => {
-    let oldConfirm;
-
-    beforeEach(() => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => true);
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-    });
+    useWindowConfirmMock();
 
     describe('adds new selected grantee', () => {
       const addGrantee = async ({ newGrantee, capability }) => {
@@ -195,7 +186,6 @@ describe('EntityShareModal', () => {
         // Submit form
         const submitButton = await screen.findByRole('button', {
           name: /add collaborator/i,
-          hidden: true,
         });
 
         fireEvent.click(submitButton);
@@ -233,7 +223,7 @@ describe('EntityShareModal', () => {
 
       await selectEvent.select(granteesSelect, john.title);
 
-      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
+      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith(

@@ -25,57 +25,49 @@ import SystemOverviewSummary from './SystemOverviewSummary';
 import JvmHeapUsage from './JvmHeapUsage';
 import JournalState from './JournalState';
 
-type NodeListItemProps = {
+type Props = {
   node: any;
   systemOverview?: any;
 };
 
-class NodeListItem extends React.Component<
-  NodeListItemProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    const { node } = this.props;
-    const title = <LinkToNode nodeId={node.node_id} />;
+const NodeListItem = ({ systemOverview = undefined, node }: Props) => {
+  const title = <LinkToNode nodeId={node.node_id} />;
 
-    if (!this.props.systemOverview) {
-      return (
-        <EntityListItem
-          key={`entry-list-${node.node_id}`}
-          title={title}
-          description="System information is currently unavailable."
-        />
-      );
-    }
-
-    const nodeThroughput = <NodeThroughput nodeId={node.node_id} />;
-    const journalState = <JournalState nodeId={node.node_id} />;
-    const actions = <NodesActions node={node} systemOverview={this.props.systemOverview} />;
-
-    const additionalContent = (
-      <div>
-        <Col md={3}>
-          <SystemOverviewSummary information={this.props.systemOverview} />
-        </Col>
-        <Col md={9}>
-          <JvmHeapUsage nodeId={this.props.node.node_id} />
-        </Col>
-      </div>
-    );
-
+  if (!systemOverview) {
     return (
       <EntityListItem
         key={`entry-list-${node.node_id}`}
         title={title}
-        titleSuffix={nodeThroughput}
-        description={journalState}
-        actions={actions}
-        contentRow={additionalContent}
+        description="System information is currently unavailable."
       />
     );
   }
-}
+
+  const nodeThroughput = <NodeThroughput nodeId={node.node_id} />;
+  const journalState = <JournalState nodeId={node.node_id} />;
+  const actions = <NodesActions node={node} systemOverview={systemOverview} />;
+
+  const additionalContent = (
+    <div>
+      <Col md={3}>
+        <SystemOverviewSummary information={systemOverview} />
+      </Col>
+      <Col md={9}>
+        <JvmHeapUsage nodeId={node.node_id} />
+      </Col>
+    </div>
+  );
+
+  return (
+    <EntityListItem
+      key={`entry-list-${node.node_id}`}
+      title={title}
+      titleSuffix={nodeThroughput}
+      description={journalState}
+      actions={actions}
+      contentRow={additionalContent}
+    />
+  );
+};
 
 export default NodeListItem;

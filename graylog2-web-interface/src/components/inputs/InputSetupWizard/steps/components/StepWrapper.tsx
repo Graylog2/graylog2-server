@@ -18,32 +18,53 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
+import { Tooltip } from 'components/common';
 
-export const DescriptionCol = styled(Col)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
+export const DescriptionCol = styled(Col)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
 
-export const ButtonCol = styled(Col)(({ theme }) => css`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${theme.spacings.xs};
-  margin-top: ${theme.spacings.lg};
-`);
+export const ButtonCol = styled(Col)(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: flex-end;
+    gap: ${theme.spacings.xs};
+    margin-top: ${theme.spacings.lg};
+  `,
+);
 
-export const StyledHeading = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+export const StyledHeading = styled.h3(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
-const StepCol = styled(Col)(({ theme }) => css`
-  padding-left: ${theme.spacings.lg};
-  padding-right: ${theme.spacings.lg};
-  padding-top: ${theme.spacings.sm};
-`);
+export const StyledList = styled.ul`
+  list-style-type: disc;
+  padding-left: 20px;
+`;
 
-export const StepWrapper = ({children}: {children: React.ReactNode}) => (
+const StepCol = styled(Col)(
+  ({ theme }) => css`
+    padding-left: ${theme.spacings.lg};
+    padding-right: ${theme.spacings.lg};
+    padding-top: ${theme.spacings.sm};
+  `,
+);
+
+export const RecommendedTooltip = styled(Tooltip)(
+  ({ theme }) => css`
+    &.mantine-Tooltip-tooltip {
+      background-color: ${theme.colors.global.background}!important;
+      font-size: ${theme.fonts.size.small}!important;
+    }
+  `,
+);
+
+export const StepWrapper = ({ children }: { children: React.ReactNode }) => (
   <Row>
-    <StepCol md={12}>
-      {children}
-    </StepCol>
+    <StepCol md={12}>{children}</StepCol>
   </Row>
-)
+);

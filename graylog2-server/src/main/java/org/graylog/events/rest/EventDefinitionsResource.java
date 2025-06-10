@@ -66,6 +66,8 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -138,6 +140,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -148,7 +151,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     AuditEventSender auditEventSender,
                                     ObjectMapper objectMapper,
                                     EventResolver eventResolver,
-                                    EventDefinitionConfiguration eventDefinitionConfiguration
+                                    EventDefinitionConfiguration eventDefinitionConfiguration,
+                                    EntitySharesService entitySharesService
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -161,8 +165,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
         this.eventResolver = eventResolver;
+        this.entitySharesService = entitySharesService;
     }
-
 
     @GET
     @Timed
@@ -277,10 +281,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") EventDefinitionDto dto, @Context UserContext userContext) {
+                           @ApiParam(name = "JSON Body") UnwrappedCreateEntityRequest<EventDefinitionDto> unwrappedCreateEntityRequest, @Context UserContext userContext) {
+        final EventDefinitionDto dto = unwrappedCreateEntityRequest.getEntity();
         checkEventDefinitionPermissions(dto, "create");
 
-        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -288,6 +293,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
                 eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
+        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest -> {
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, entity.id(), shareRequest, userContext.getUser());
+        });
+
         return Response.ok().entity(entity).build();
     }
 
@@ -305,7 +314,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
-        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -455,7 +464,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
 
-        return eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
+        return eventDefinitionHandler.duplicate(eventDefinitionDto, userContext.getUser());
     }
 
     @POST
@@ -464,9 +473,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull EventDefinitionDto toValidate) {
-        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(eventDefinitionDto -> eventDefinitionDto.config()).orElse(null);
-        ValidationResult validationResult = toValidate.config().validate();
+                                         @Valid @NotNull EventDefinitionDto toValidate,
+                                     @Context UserContext userContext) {
+        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
+        ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }

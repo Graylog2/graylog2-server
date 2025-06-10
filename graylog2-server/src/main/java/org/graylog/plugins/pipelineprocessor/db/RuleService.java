@@ -41,9 +41,25 @@ public interface RuleService {
         }
     }
 
+    /**
+     * Returns all rules with given source pattern.
+     * This method is only implemented in the MongoDB implementation.
+     */
+    default Collection<RuleDao> loadBySourcePattern(String sourcePattern) {
+        throw new UnsupportedOperationException("loadBySourcePattern is not implemented");
+    }
+
     Collection<RuleDao> loadAll();
 
+    Collection<RuleDao> loadAllByTitle(String regex);
+
+    Collection<RuleDao> loadAllByScope(String scope);
+
     void delete(String id);
+
+    default void delete(RuleDao rule) {
+        delete(rule.id());
+    }
 
     Collection<RuleDao> loadNamed(Collection<String> ruleNames);
 }

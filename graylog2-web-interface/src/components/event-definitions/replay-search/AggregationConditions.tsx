@@ -22,11 +22,11 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 import { ColorPickerPopover, Icon } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import { conditionToExprMapper, exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import { updateHighlightingRule, createHighlightingRules } from 'views/logic/slices/highlightActions';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 
@@ -50,10 +50,10 @@ const ColorComponent = styled.div`
   cursor: pointer;
 `;
 
-const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
+const useHighlightingRules = () => useViewsSelector(selectHighlightingRules);
 
 const AggregationConditions = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const { alertId, definitionId } = useReplaySearchContext();
   const { aggregations } = useAlertAndEventDefinitionData(alertId, definitionId);
   const highlightingRules = useHighlightingRules();

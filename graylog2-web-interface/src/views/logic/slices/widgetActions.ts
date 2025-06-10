@@ -17,7 +17,7 @@
 import * as Immutable from 'immutable';
 
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { GetState, WidgetPositions } from 'views/types';
 import { selectWidgetPositions } from 'views/logic/slices/widgetSelectors';
 import {
@@ -36,7 +36,7 @@ import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import normalizeViewState from 'views/logic/views/normalizeViewState';
 
 export const updateWidgetPositions =
-  (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
+  (newWidgetPositions: WidgetPositions) => (dispatch: ViewsDispatch, getState: GetState) => {
     const activeQuery = selectActiveQuery(getState());
     const activeViewState = selectActiveViewState(getState());
     const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).build();
@@ -45,14 +45,14 @@ export const updateWidgetPositions =
   };
 
 export const updateWidgetPosition =
-  (id: string, newWidgetPosition: WidgetPosition) => (dispatch: AppDispatch, getState: GetState) => {
+  (id: string, newWidgetPosition: WidgetPosition) => (dispatch: ViewsDispatch, getState: GetState) => {
     const widgetPositions = selectWidgetPositions(getState());
     const newWidgetPositions = { ...widgetPositions, [id]: newWidgetPosition };
 
     return dispatch(updateWidgetPositions(newWidgetPositions));
   };
 
-export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: AppDispatch, getState: GetState) => {
+export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: ViewsDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
   const activeViewState = selectActiveViewState(getState());
   const newViewState = activeViewState.toBuilder().widgets(newWidgets).build();
@@ -62,26 +62,27 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
   return dispatch(updateViewState(activeQuery, newViewStateNormalized));
 };
 
-export const addWidget = (widget: Widget, position?: WidgetPosition) => (dispatch: AppDispatch, getState: GetState) => {
-  if (widget.id === undefined) {
-    throw new Error('Unable to add widget without id to query.');
-  }
+export const addWidget =
+  (widget: Widget, position?: WidgetPosition) => (dispatch: ViewsDispatch, getState: GetState) => {
+    if (widget.id === undefined) {
+      throw new Error('Unable to add widget without id to query.');
+    }
 
-  const widgets = selectWidgets(getState());
-  const widgetPositions = Immutable.Map(selectWidgetPositions(getState()));
-  const newWidgets = widgets.push(widget);
-  const newWidgetPositions = position
-    ? widgetPositions.set(widget.id, position)
-    : GenerateNextPosition(widgetPositions, newWidgets.toArray());
+    const widgets = selectWidgets(getState());
+    const widgetPositions = Immutable.Map(selectWidgetPositions(getState()));
+    const newWidgets = widgets.push(widget);
+    const newWidgetPositions = position
+      ? widgetPositions.set(widget.id, position)
+      : GenerateNextPosition(widgetPositions, newWidgets.toArray());
 
-  const activeQuery = selectActiveQuery(getState());
-  const activeViewState = selectActiveViewState(getState());
-  const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).widgets(newWidgets).build();
+    const activeQuery = selectActiveQuery(getState());
+    const activeViewState = selectActiveViewState(getState());
+    const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).widgets(newWidgets).build();
 
-  return dispatch(updateViewState(activeQuery, newViewState));
-};
+    return dispatch(updateViewState(activeQuery, newViewState));
+  };
 
-export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
+export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: ViewsDispatch, getState: GetState) => {
   const widgets = selectWidgets(getState());
   const newWidgets = widgets.map((widget) => (widget.id === id ? updatedWidget : widget)).toList();
 
@@ -89,7 +90,7 @@ export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: Ap
 };
 
 export const updateWidgetConfig =
-  (id: string, newWidgetConfig: WidgetConfig) => (dispatch: AppDispatch, getState: GetState) => {
+  (id: string, newWidgetConfig: WidgetConfig) => (dispatch: ViewsDispatch, getState: GetState) => {
     const widget = selectWidget(id)(getState());
     const newWidget = widget.toBuilder().config(newWidgetConfig).build();
 
@@ -97,7 +98,7 @@ export const updateWidgetConfig =
   };
 
 export const duplicateWidget =
-  (widgetId: string, widgetTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  (widgetId: string, widgetTitle: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
     const widget = selectWidget(widgetId)(getState());
 
     if (!widget) {
@@ -113,7 +114,7 @@ export const duplicateWidget =
     );
   };
 
-export const removeWidget = (widgetId: string) => async (dispatch: AppDispatch, getState: GetState) => {
+export const removeWidget = (widgetId: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
   const widgets = selectWidgets(getState());
   const newWidgets = widgets.filter((widget) => widget.id !== widgetId).toList();
 
@@ -121,7 +122,7 @@ export const removeWidget = (widgetId: string) => async (dispatch: AppDispatch, 
 };
 
 export const setChartColor =
-  (widgetId: string, name: string, color: string) => (dispatch: AppDispatch, getState: GetState) => {
+  (widgetId: string, name: string, color: string) => (dispatch: ViewsDispatch, getState: GetState) => {
     const widget = selectWidget(widgetId)(getState());
     const formattingSettings: WidgetFormattingSettings =
       widget?.config?.formattingSettings ?? WidgetFormattingSettings.empty();

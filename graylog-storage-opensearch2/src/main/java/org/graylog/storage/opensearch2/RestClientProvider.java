@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.base.Suppliers;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -25,19 +26,20 @@ import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
+import org.graylog.storage.opensearch2.sniffer.SnifferAggregator;
+import org.graylog.storage.opensearch2.sniffer.SnifferBuilder;
+import org.graylog.storage.opensearch2.sniffer.SnifferFilter;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import jakarta.annotation.Nonnull;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @Singleton
@@ -47,8 +49,9 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
     private final ElasticsearchClientConfiguration configuration;
     private final CredentialsProvider credentialsProvider;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
-    private final Boolean runsWithDataNode;
-    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
+    private final Set<SnifferBuilder> snifferBuilders;
+    private final Set<SnifferFilter> snifferFilters;
 
     @Inject
     public RestClientProvider(
@@ -57,47 +60,44 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
             ElasticsearchClientConfiguration configuration,
             CredentialsProvider credentialsProvider,
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
-            @RunsWithDataNode Boolean runsWithDataNode,
-            IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
+            IndexerJwtAuthToken indexerJwtAuthToken,
+            Set<SnifferBuilder> snifferBuilders,
+            Set<SnifferFilter> snifferFilters) {
         this.shutdownService = shutdownService;
         this.configuration = configuration;
         this.credentialsProvider = credentialsProvider;
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
-        this.runsWithDataNode = runsWithDataNode;
-        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.clientSupplier = Suppliers.memoize(() -> createClient(hosts));
+        this.snifferBuilders = snifferBuilders;
+        this.snifferFilters = snifferFilters;
     }
 
 
     @Nonnull
     private RestHighLevelClient createClient(List<URI> hosts) {
         final RestHighLevelClient client = buildBasicRestClient(hosts);
-
-        var sniffer = SnifferWrapper.create(
-                client,
-                TimeUnit.SECONDS.toMillis(5),
-                configuration.discoveryFrequency(),
-                mapDefaultScheme(configuration.defaultSchemeForDiscoveredNodes())
-        );
-
-        if (configuration.discoveryEnabled()) {
-            sniffer.add(FilteredOpenSearchNodesSniffer.create(configuration.discoveryFilter()));
-        }
-        if (configuration.isNodeActivityLogger()) {
-            sniffer.add(NodeListSniffer.create());
-        }
-
-        sniffer.build().ifPresent(s -> shutdownService.register(s::close));
+        registerSniffers(client);
         return client;
     }
 
-    private OpenSearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
-        return switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
-            case "HTTP" -> OpenSearchNodesSniffer.Scheme.HTTP;
-            case "HTTPS" -> OpenSearchNodesSniffer.Scheme.HTTPS;
-            default ->
-                    throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
-        };
+    private void registerSniffers(RestHighLevelClient client) {
+        final List<NodesSniffer> sniffers = snifferBuilders.stream()
+                .filter(SnifferBuilder::enabled)
+                .map(b -> b.create(client.getLowLevelClient()))
+                .toList();
+
+        if (!sniffers.isEmpty()) {
+            final List<SnifferFilter> filters = snifferFilters.stream().filter(SnifferFilter::enabled).toList();
+            final SnifferAggregator snifferAggregator = new SnifferAggregator(sniffers, filters);
+
+            final Sniffer sniffer = Sniffer.builder(client.getLowLevelClient())
+                    .setSniffIntervalMillis(Math.toIntExact(configuration.discoveryFrequency().toMilliseconds()))
+                    .setNodesSniffer(snifferAggregator)
+                    .build();
+
+            shutdownService.register(sniffer::close);
+        }
     }
 
     @Override
@@ -106,7 +106,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
     }
 
     public RestHighLevelClient buildBasicRestClient(List<URI> hosts) {
-        boolean isJwtAuthentication = runsWithDataNode || configuration.indexerUseJwtAuthentication();
+
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
         final var restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> {
@@ -115,7 +115,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                                     .setSocketTimeout(Math.toIntExact(configuration.elasticsearchSocketTimeout().toMilliseconds()))
                                     .setExpectContinueEnabled(configuration.useExpectContinue());
                             // manually handle Auth if we use JWT
-                            if (!isJwtAuthentication) {
+                            if (!indexerJwtAuthToken.isJwtAuthEnabled()) {
                                 requestConfig.setAuthenticationEnabled(true);
                             }
                             return requestConfig;
@@ -126,8 +126,8 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                             .setMaxConnTotal(configuration.elasticsearchMaxTotalConnections())
                             .setMaxConnPerRoute(configuration.elasticsearchMaxTotalConnectionsPerRoute());
 
-                    if (isJwtAuthentication) {
-                        httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
+                    if (indexerJwtAuthToken.isJwtAuthEnabled()) {
+                        httpClientConfig.addInterceptorLast(jwtAuthInterceptor());
                     } else {
                         httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
                     }
@@ -144,5 +144,11 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                 .setChunkedEnabled(configuration.compressionEnabled());
 
         return new RestHighLevelClient(restClientBuilder);
+    }
+
+    @Nonnull
+    private HttpRequestInterceptor jwtAuthInterceptor() {
+        return (request, context) ->
+                indexerJwtAuthToken.headerValue().ifPresent(value -> request.addHeader("Authorization", value));
     }
 }

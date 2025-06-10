@@ -74,7 +74,8 @@ public class V20250206105400_TokenManagementConfiguration extends Migration {
                         configToUpdate.enableGlobalSessionTimeout(),
                         configToUpdate.globalSessionTimeoutInterval(),
                         newDefaults.allowAccessTokenForExternalUsers(),
-                        newDefaults.restrictAccessTokenToAdmins());
+                        newDefaults.restrictAccessTokenToAdmins(),
+                        newDefaults.defaultTTLForNewTokens());
             }
 
             configService.write(configToUpdate);

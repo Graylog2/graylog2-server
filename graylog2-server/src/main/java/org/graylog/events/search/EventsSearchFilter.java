@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ public abstract class EventsSearchFilter {
     private static final String FIELD_AGGREGATION_TIMERANGE = "aggregation_timerange";
     private static final String FIELD_KEY = "key";
     private static final String FIELD_ID = "id";
+    private static final String FIELD_EXTRA_FILTERS = "extra_filters";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -63,6 +65,9 @@ public abstract class EventsSearchFilter {
     @JsonProperty(FIELD_ID)
     public abstract Set<String> id();
 
+    @JsonProperty(FIELD_EXTRA_FILTERS)
+    public abstract Map<String, Set<String>> extraFilters();
+
     public static EventsSearchFilter empty() {
         return builder().build();
     }
@@ -82,6 +87,7 @@ public abstract class EventsSearchFilter {
                     .eventDefinitions(Collections.emptySet())
                     .priority(Collections.emptySet())
                     .key(Collections.emptySet())
+                    .extraFilters(Map.of())
                     .id(Collections.emptySet());
         }
 
@@ -96,6 +102,9 @@ public abstract class EventsSearchFilter {
 
         @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
         public abstract Builder aggregationTimerange(TimeRange aggregationTimerange);
+
+        @JsonProperty(FIELD_EXTRA_FILTERS)
+        public abstract Builder extraFilters(Map<String, Set<String>> extraFilters);
 
         @JsonProperty(FIELD_KEY)
         public abstract Builder key(Set<String> key);

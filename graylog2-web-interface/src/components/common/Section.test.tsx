@@ -40,6 +40,16 @@ describe('Section', () => {
     await screen.findByText(/the actions/i);
   });
 
+  it('should render preHeaderSection', async () => {
+    render(
+      <Section title="The Title" preHeaderSection="Preheader section">
+        The children
+      </Section>,
+    );
+
+    await screen.findByText(/preheader section/i);
+  });
+
   it('should render headerLeftSection', async () => {
     render(
       <Section title="The Title" headerLeftSection="The left section">

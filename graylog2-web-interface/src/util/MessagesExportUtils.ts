@@ -18,9 +18,10 @@ import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { createLinkAndDownload } from 'util/FileDownloadUtils';
+import type { QueryString } from 'views/logic/queries/types';
 
 export type ExportPayload = {
   timerange?: TimeRange | undefined | null;

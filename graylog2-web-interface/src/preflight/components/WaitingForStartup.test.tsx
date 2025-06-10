@@ -28,8 +28,6 @@ describe('WaitingForStartup', () => {
   let windowLocation;
 
   beforeAll(() => {
-    window.confirm = jest.fn(() => true);
-
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { reload: jest.fn() },

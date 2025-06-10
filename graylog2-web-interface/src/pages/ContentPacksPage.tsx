@@ -28,6 +28,7 @@ import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useContentPacks from 'components/content-packs/hooks/useContentPacks';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const ConfigurationBundles = styled.div(
   ({ theme }) => css`
@@ -105,11 +106,7 @@ const ContentPacksPage = () => {
             Content Packs accelerate the set up process for a specific data source. A Content Pack can include
             inputs/extractors, streams, and dashboards.
             <br />
-            Find more Content Packs in{' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">
-              the Graylog Marketplace
-            </a>
-            .
+            <MarketplaceLink prefix="Find more Content Packs in" />
           </span>
         </PageHeader>
 

@@ -16,12 +16,12 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
 
 const selectWidgetIdsByQuery = createSelector(selectViewStates, (viewState) =>
   viewState.map((state) => state.widgets.map((widget) => widget.id).toList()).toMap(),
 );
-const useWidgetIds = () => useAppSelector(selectWidgetIdsByQuery);
+const useWidgetIds = () => useViewsSelector(selectWidgetIdsByQuery);
 
 export default useWidgetIds;

@@ -25,6 +25,7 @@ jest.mock('util/AppConfig');
 
 const contextValue = {
   sendTelemetry: jest.fn(),
+  sendErrorReport: jest.fn(),
 };
 const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <TelemetryContext.Provider value={contextValue}>{children}</TelemetryContext.Provider>
@@ -39,10 +40,10 @@ describe('useSendTelemetry', () => {
       writable: true,
     });
 
-  const oldLocation = window.location;
+  const oldLocation = window.location.pathname;
 
   afterEach(() => {
-    window.location = oldLocation;
+    window.location.pathname = oldLocation;
   });
 
   it('should return `sendTelemetry` that retrieves current route', () => {

@@ -2,7 +2,7 @@ name: Request a dispatched main branch build
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, "[0-9]+.[0-9]+" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -18,9 +18,10 @@ import * as Immutable from 'immutable';
 import URI from 'urijs';
 
 import Routes from 'routing/Routes';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
 import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
+import type { QueryString } from 'views/logic/queries/types';
 
 type InternalState = {
   id: string;

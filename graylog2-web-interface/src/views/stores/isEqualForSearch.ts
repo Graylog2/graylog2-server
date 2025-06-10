@@ -17,12 +17,12 @@
 import isEqualWith from 'lodash/isEqualWith';
 import isFunction from 'lodash/isFunction';
 
-const hasFn = (obj, fn) => obj && obj[fn] && isFunction(obj[fn]);
-const hasEquals = (obj) => hasFn(obj, 'equals');
-const hasEqualsForSearch = (obj) => hasFn(obj, 'equalsForSearch');
-const isImmutable = (obj) => hasFn(obj, 'toJS');
+const hasFn = (obj: any, fn: string) => obj && obj[fn] && isFunction(obj[fn]);
+const hasEquals = (obj: any) => hasFn(obj, 'equals');
+const hasEqualsForSearch = (obj: any) => hasFn(obj, 'equalsForSearch');
+const isImmutable = (obj: any) => hasFn(obj, 'toJS');
 
-const _isEqual = (first, second) => {
+const _isEqual = (first: any, second: any) => {
   if (hasEqualsForSearch(first)) {
     return first.equalsForSearch(second);
   }

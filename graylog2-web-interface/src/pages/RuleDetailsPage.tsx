@@ -23,14 +23,14 @@ import Rule from 'components/rules/Rule';
 import Routes from 'routing/Routes';
 import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
-import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
+import type { RulesStoreState } from 'stores/rules/RulesStore';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import usePipelines from 'hooks/usePipelines';
 
 import useHistory from '../routing/useHistory';
 
-function filterRules(rule, ruleId) {
-  return rule?.rules?.filter((r) => r.id === ruleId)[0];
-}
+const getCurrentRule = (ruleStoreState: RulesStoreState, ruleId: string) =>
+  ruleStoreState?.rules?.filter((r) => r.id === ruleId)[0];
 
 function filterPipelines(pipelines = [], title = '') {
   return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
@@ -38,30 +38,28 @@ function filterPipelines(pipelines = [], title = '') {
 
 const RuleDetailsPage = () => {
   const { ruleId } = useParams<{ ruleId: string }>();
-  const rule = useStore(RulesStore);
-  const pipelines = useStore(PipelinesStore, ({ pipelines: state }) => state);
+  const ruleStoreState = useStore(RulesStore);
+  const isNewRule = ruleId === 'new';
+  const { data: pipelines, isInitialLoading: isInitialLoadingPipelines } = usePipelines({ enabled: !isNewRule });
   const [isLoading, setIsLoading] = useState(true);
-  const [filteredRule, setFilteredRule] = useState(undefined);
+  const [currentRule, setCurrentRule] = useState(undefined);
   const history = useHistory();
   const { rule_builder } = useQuery();
 
   const isRuleBuilder = rule_builder === 'true';
-  const isNewRule = ruleId === 'new';
-  const title = filteredRule?.title || '';
+  const title = currentRule?.title || '';
   const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
 
   const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
   useEffect(() => {
-    setFilteredRule(filterRules(rule, ruleId));
-  }, [ruleId, rule]);
+    setCurrentRule(getCurrentRule(ruleStoreState, ruleId));
+  }, [ruleId, ruleStoreState]);
 
   useEffect(() => {
     if (isNewRule) {
       setIsLoading(false);
     } else {
-      PipelinesActions.list();
-
       RulesActions.get(ruleId).then(
         () => {},
         (error) => {
@@ -71,9 +69,9 @@ const RuleDetailsPage = () => {
         },
       );
 
-      setIsLoading(!(filteredRule && pipelines));
+      setIsLoading(!currentRule || isInitialLoadingPipelines);
     }
-  }, [filteredRule, history, isNewRule, ruleId, pipelines]);
+  }, [currentRule, history, isNewRule, ruleId, isInitialLoadingPipelines]);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;
@@ -81,7 +79,7 @@ const RuleDetailsPage = () => {
 
   return (
     <DocumentTitle title={pageTitle}>
-      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={filteredRule}>
+      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={currentRule}>
         <Rule create={isNewRule} isRuleBuilder={isRuleBuilder} title={title} />
       </PipelineRulesProvider>
     </DocumentTitle>

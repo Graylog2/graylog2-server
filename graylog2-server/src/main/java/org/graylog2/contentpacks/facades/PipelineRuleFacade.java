@@ -19,10 +19,13 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -40,8 +43,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -118,7 +120,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
 
     @Override
     public void delete(RuleDao nativeEntity) {
-        ruleService.delete(nativeEntity.id());
+        ruleService.delete(nativeEntity);
     }
 
     @Override
@@ -179,5 +181,10 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
             LOG.debug("Couldn't find pipeline rule {}", entityDescriptor, e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(PipelineRestPermissions.PIPELINE_RULE_CREATE);
     }
 }

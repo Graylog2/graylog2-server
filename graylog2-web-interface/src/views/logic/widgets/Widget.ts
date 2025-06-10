@@ -17,11 +17,12 @@
 import { Map, List } from 'immutable';
 import * as Immutable from 'immutable';
 
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { singleton } from 'logic/singleton';
 import generateId from 'logic/generateId';
 import isDeepEqual from 'stores/isDeepEqual';
 import type { FiltersType, SearchFilter } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
 export type WidgetState = {
   id: string;
@@ -35,9 +36,9 @@ export type WidgetState = {
   stream_categories: Array<string>;
 };
 
-type DeserializesWidgets = {
-  fromJSON: (value) => Widget;
-};
+interface DeserializesWidgets {
+  fromJSON: (value: any) => Widget;
+}
 
 const isNullish = (o: any) => o === null || o === undefined;
 
@@ -264,6 +265,17 @@ class Builder {
     return new Widget(id, type, config, filter, timerange, query, streams, streamCategories, filters);
   }
 }
+
+export const widgetAttributesForComparison: Array<keyof Widget> = [
+  'id',
+  'config',
+  'filter',
+  'timerange',
+  'query',
+  'streams',
+  'streamCategories',
+  'filters',
+];
 
 Widget.Builder = Builder;
 

@@ -42,7 +42,7 @@ const _pageTitle = (authBackend) => {
   return 'Create Active Directory Authentication Service';
 };
 
-const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
+const WizardPageHeader = ({ authenticationBackend: authBackend = undefined }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
   const pageTitle = _pageTitle(authBackend);
 
@@ -56,7 +56,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
           title: 'Authentication documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+        <span>Configure authentication services of this cluster.</span>
       </PageHeader>
     </>
   );

@@ -19,11 +19,8 @@ import { renderHook } from '@testing-library/react-hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { layoutPreferences, layoutPreferencesJSON } from 'fixtures/entityListLayoutPreferences';
-import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-
-import useUserLayoutPreferences from './useUserLayoutPreferences';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,10 +37,6 @@ jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 jest.mock('./useUserLayoutPreferences');
 
 describe('useUserSearchFilterQuery hook', () => {
-  beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -63,7 +56,6 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should allow partial update of user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
     result.current.mutate({ perPage: 100 });

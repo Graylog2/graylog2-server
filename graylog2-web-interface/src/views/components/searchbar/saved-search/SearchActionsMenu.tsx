@@ -42,16 +42,21 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useIsDirty from 'views/hooks/useIsDirty';
 import useIsNew from 'views/hooks/useIsNew';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
+import { createGRN } from 'logic/permissions/GRN';
+import useSelectedStreamsGRN from "views/hooks/useSelectedStreamsGRN";
 import type { SearchType } from 'views/logic/queries/SearchType';
 import type { SearchTypeList } from 'views/logic/queries/Query';
+
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -146,8 +151,9 @@ const SearchActionsMenu = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
   const currentTitle = view?.title ?? '';
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
+  const { selectedStreamsGRN } = useSelectedStreamsGRN();
 
   const loaded = isNew === false;
   const disableReset = !(dirty || loaded);
@@ -166,26 +172,29 @@ const SearchActionsMenu = () => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(
-    async (newTitle: string) => {
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
       if (!view.id) {
         return;
       }
-
       const newView = view.toBuilder().title(newTitle).type(View.Type.Search).build();
 
-      await dispatch(onSaveView(newView));
+      await dispatch(onSaveView(newView, entityShare));
+
+      if (entityShare) {
+        await EntityShareDomain.update('search', title, createGRN('search', view.id), entityShare);
+      }
+
       closeFormModal();
       await dispatch(loadView(newView));
     },
-    [closeFormModal, dispatch, view],
+    [closeFormModal, dispatch, view, title],
   );
 
   const saveAsSearch = useCallback(
-    async (newTitle: string) => {
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
       if (!newTitle || newTitle === '') {
         return;
       }
-
       const viewWithPluginData = await executePluggableDuplicationHandler(
         view,
         currentUser.permissions,
@@ -194,7 +203,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView)
+      ViewManagementActions.create(newView, entityShare)
         .then((createdView) => {
           toggleFormModal();
 
@@ -255,7 +264,9 @@ const SearchActionsMenu = () => {
         saveAsSearch={saveAsSearch}
         isCreateNew={isNew || !isAllowedToEdit}
         toggleModal={toggleFormModal}
-        value={currentTitle}>
+        value={currentTitle}
+        selectedStreamGRN={selectedStreamsGRN}
+        viewId={!isNew && view.id}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>
       <Button title="Load a previously saved search" onClick={toggleListModal}>

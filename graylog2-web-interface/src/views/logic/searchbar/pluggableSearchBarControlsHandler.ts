@@ -21,7 +21,7 @@ import type { SearchBarControl, CombinedSearchBarFormValues, HandlerContext } fr
 import usePluginEntities from 'hooks/usePluginEntities';
 import type Widget from 'views/logic/widgets/Widget';
 import type Query from 'views/logic/queries/Query';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
 const executeSafely = <T extends () => ReturnType<T>>(
   fn: T,
@@ -70,9 +70,9 @@ export const useInitialDashboardWidgetValues = (currentWidget: Widget) => {
 };
 
 const executeSubmitHandler = async <T>(
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   values: CombinedSearchBarFormValues,
-  submitHandlers: Array<(values: CombinedSearchBarFormValues, dispatch: AppDispatch, entity?: T) => Promise<T>>,
+  submitHandlers: Array<(values: CombinedSearchBarFormValues, dispatch: ViewsDispatch, entity?: T) => Promise<T>>,
   currentEntity?: T,
 ): Promise<T> => {
   let updatedEntity = currentEntity;
@@ -98,7 +98,7 @@ const executeSubmitHandler = async <T>(
 };
 
 export const executeSearchSubmitHandler = (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   values: CombinedSearchBarFormValues,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   currentQuery?: Query,
@@ -111,7 +111,7 @@ export const executeSearchSubmitHandler = (
 };
 
 export const executeDashboardWidgetSubmitHandler = (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   values: CombinedSearchBarFormValues,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   currentWidget: Widget,

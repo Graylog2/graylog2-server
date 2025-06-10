@@ -22,9 +22,9 @@ import URI from 'urijs';
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 
 const _clearURI = (query: string) => new URI(query).removeSearch('page');
@@ -40,8 +40,8 @@ const _updateQueryParams = (newPage: string | undefined, query: string) => {
 };
 
 const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage }) => {
-  const states = useAppSelector(selectViewStates);
-  const dispatch = useAppDispatch();
+  const states = useViewsSelector(selectViewStates);
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     const nextPage = uriParams.page;

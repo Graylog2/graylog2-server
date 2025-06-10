@@ -55,7 +55,7 @@ const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onHide} bsSize="large" backdrop>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{hostname} logs</Modal.Title>
       </Modal.Header>
       <Modal.Body>
