@@ -101,7 +101,7 @@ const Toolbar = styled.div(
   `,
 );
 
-const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] as const;
+type AvailableModes = 'json' | 'lua' | 'markdown' | 'text' | 'yaml' | 'pipeline';
 
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector
@@ -118,7 +118,7 @@ type Props = {
   width?: number;
   id: string;
   innerRef?: React.MutableRefObject<AceEditor>;
-  mode?: (typeof availableModes)[number];
+  mode?: AvailableModes;
   onLoad?: () => void;
   onChange?: () => void;
   onBlur?: () => void;

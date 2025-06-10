@@ -90,7 +90,7 @@ const InteractiveValue = ({
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type, unit = undefined }: Props) => {
+const Value = ({ field, value, render = defaultRenderer, type = undefined, unit = undefined }: Props) => {
   const _type = type ?? FieldType.Unknown;
 
   return (

@@ -22,7 +22,7 @@ type Props = {
   indexRange: { calculated_at: string; took_ms: number } | undefined;
 };
 
-const IndexRangeSummary = ({ indexRange = undefined }: Props) => {
+const IndexRangeSummary = ({ indexRange }: Props) => {
   if (!indexRange) {
     return (
       <span>
