@@ -21,10 +21,10 @@ import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.joda.time.DateTime;
 
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class EqualityExpression extends BinaryExpression implements LogicalExpression {
-    private static final RateLimitedLog log = createRateLimitedLog(EqualityExpression.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(EqualityExpression.class);
 
     private final boolean checkEquality;
 

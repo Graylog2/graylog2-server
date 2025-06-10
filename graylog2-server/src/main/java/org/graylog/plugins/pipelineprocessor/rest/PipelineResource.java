@@ -78,7 +78,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -88,7 +88,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineResource extends RestResource implements PluginRestResource {
-    private static final RateLimitedLog log = createRateLimitedLog(PipelineResource.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(PipelineDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))

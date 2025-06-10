@@ -28,10 +28,10 @@ import org.graylog2.grok.GrokPatternRegistry;
 import jakarta.inject.Inject;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class GrokExists extends AbstractFunction<Boolean> {
-    private static final RateLimitedLog log = createRateLimitedLog(GrokExists.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(GrokExists.class);
 
     public static final String NAME = "grok_exists";
 

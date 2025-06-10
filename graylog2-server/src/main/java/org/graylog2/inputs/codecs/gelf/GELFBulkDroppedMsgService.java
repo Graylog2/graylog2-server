@@ -24,10 +24,10 @@ import org.graylog2.plugin.journal.RawMessage;
 import java.time.Duration;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class GELFBulkDroppedMsgService {
-    private static final RateLimitedLog LOG = createRateLimitedLog(GELFBulkDroppedMsgService.class, 1, Duration.ofSeconds(5));
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(GELFBulkDroppedMsgService.class, 1, Duration.ofSeconds(5));
     public static final String METRIC_SUFFIX = "dropped.message.occurrence";
     protected static final String METRIC_PREFIX = "org.graylog2.inputs";
 

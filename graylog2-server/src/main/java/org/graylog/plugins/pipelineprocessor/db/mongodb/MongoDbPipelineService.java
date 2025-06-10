@@ -49,10 +49,10 @@ import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class MongoDbPipelineService implements PipelineService {
-    private static final RateLimitedLog log = createRateLimitedLog(MongoDbPipelineService.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbPipelineService.class);
 
     public static final String COLLECTION = "pipeline_processor_pipelines";
 

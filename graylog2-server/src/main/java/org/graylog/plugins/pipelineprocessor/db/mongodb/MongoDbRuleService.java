@@ -45,13 +45,13 @@ import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_TITLE;
 import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 /**
  * A RuleService backed by a MongoDB collection.
  */
 public class MongoDbRuleService implements RuleService {
-    private static final RateLimitedLog log = createRateLimitedLog(MongoDbRuleService.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbRuleService.class);
 
     private static final String COLLECTION = "pipeline_processor_rules";
 

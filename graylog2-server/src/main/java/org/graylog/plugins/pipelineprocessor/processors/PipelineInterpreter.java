@@ -71,11 +71,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
-    private static final RateLimitedLog log = createRateLimitedLog(PipelineInterpreter.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineInterpreter.class);
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;

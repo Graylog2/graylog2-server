@@ -49,7 +49,7 @@ import org.graylog2.streams.StreamService;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines", tags = {CLOUD_VISIBLE})
@@ -58,7 +58,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineConnectionsResource extends RestResource implements PluginRestResource {
-    private static final RateLimitedLog LOG = createRateLimitedLog(PipelineConnectionsResource.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(PipelineConnectionsResource.class);
 
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;

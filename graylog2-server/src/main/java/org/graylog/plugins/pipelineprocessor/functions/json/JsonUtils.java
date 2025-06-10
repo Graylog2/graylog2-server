@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class JsonUtils {
-    private static final RateLimitedLog LOG = createRateLimitedLog(JsonUtils.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(JsonUtils.class);
     private static final String KEY_SEPARATOR = "_";
     private static final String KEY_VALUE_SEPARATOR = ":";
     private static final String LIST_SEPARATOR = ",";

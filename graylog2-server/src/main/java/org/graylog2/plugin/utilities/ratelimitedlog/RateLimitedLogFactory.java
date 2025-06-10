@@ -43,7 +43,7 @@ public class RateLimitedLogFactory {
         return createRateLimitedLog(LoggerFactory.getLogger(clazz), maxRate, duration);
     }
 
-    public static RateLimitedLog createRateLimitedLog(final Class<?> clazz) {
+    public static RateLimitedLog createDefaultRateLimitedLog(final Class<?> clazz) {
         return createRateLimitedLog(LoggerFactory.getLogger(clazz), DEFAULT_MAX_RATE, DEFAULT_DURATION);
     }
 

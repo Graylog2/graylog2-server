@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 
 import jakarta.inject.Inject;
 
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class LegacyDefaultStreamMigration extends Periodical {
-    private static final RateLimitedLog LOG = createRateLimitedLog(LegacyDefaultStreamMigration.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(LegacyDefaultStreamMigration.class);
 
     private final ClusterConfigService clusterConfigService;
     private final PipelineStreamConnectionsService connectionsService;
