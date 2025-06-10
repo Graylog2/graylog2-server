@@ -22,9 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks resource methods that should be accessible without authentication and thus have no {@link org.apache.shiro.authz.annotation.RequiresPermissions @RequiresPermissions} annotation.
+ * Marks resource methods that should be accessible without explicit permission checks and thus have no {@link org.apache.shiro.authz.annotation.RequiresPermissions @RequiresPermissions} annotation.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface NoPermissionCheckRequired {
+    String value() default "";
 }
