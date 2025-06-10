@@ -87,6 +87,7 @@ import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
 import org.graylog2.security.UserSessionTerminationService;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -188,6 +189,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
+    @InlinePermissionCheck
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                            @PathParam("username") String username,
                            @Context UserContext userContext) {
@@ -211,6 +213,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
+    @InlinePermissionCheck
     public UserSummary getbyId(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
                                @PathParam("userId") String userId,
                                @Context UserContext userContext) {
@@ -239,6 +242,7 @@ public class UsersResource extends RestResource {
     @GET
     @Deprecated
     @ApiOperation(value = "List all users", notes = "Permissions and session data included by default")
+    @InlinePermissionCheck
     public UserList listUsers(
             @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
             @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions,
@@ -414,6 +418,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+    @InlinePermissionCheck
     public void changeUser(@ApiParam(name = "userId", value = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
                            @ApiParam(name = "JSON body", value = "Updated user information.", required = true)
@@ -568,6 +573,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid permission data.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PREFERENCES_UPDATE)
+    @InlinePermissionCheck
     public void savePreferences(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
@@ -611,6 +617,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 404, message = "User does not exist.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PASSWORD_UPDATE)
+    @InlinePermissionCheck
     public void changePassword(
             @ApiParam(name = "userId", value = "The id of the user whose password to change.", required = true)
             @PathParam("userId") String userId,
@@ -667,6 +674,7 @@ public class UsersResource extends RestResource {
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Update the account status for a user")
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+    @InlinePermissionCheck
     public Response updateAccountStatus(
             @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true)
             @PathParam("userId") @NotBlank String userId,
@@ -695,6 +703,7 @@ public class UsersResource extends RestResource {
     @GET
     @Path("{userId}/tokens")
     @ApiOperation("Retrieves the list of access tokens for a user")
+    @InlinePermissionCheck
     public TokenList listTokens(@ApiParam(name = "userId", required = true)
                                 @PathParam("userId") String userId) {
         final User user = loadUserById(userId);
@@ -722,6 +731,7 @@ public class UsersResource extends RestResource {
     @Path("{userId}/tokens/{name}")
     @ApiOperation("Generates a new access token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE)
+    @InlinePermissionCheck
     public Token generateNewToken(
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
@@ -748,6 +758,7 @@ public class UsersResource extends RestResource {
     @Path("{userId}/tokens/{idOrToken}")
     @ApiOperation("Removes a token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
+    @InlinePermissionCheck
     public void revokeToken(
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
