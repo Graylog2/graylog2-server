@@ -78,8 +78,8 @@ public class PermissionCheckProcessor implements ModelProcessor {
             sb.append("\n");
             unprotectedEndpoints.stream().sorted().forEach(endpoint -> sb.append("  endpoint: ").append(endpoint).append("\n"));
             sb.append("\n");
-            sb.append("Use @PublicResource or @ManualPermissionCheck on the method if this is intended.\n");
-            sb.append("================================================================================\n");
+            sb.append("Use @InlinePermissionCheck or @NoPermissionCheckRequired on the method if this is intended.\n");
+            sb.append("===========================================================================================\n");
             LOG.error(sb.toString());
         }
     }
