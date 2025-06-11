@@ -181,6 +181,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
+    @InlinePermissionCheck
     public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
@@ -356,6 +357,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
+    @InlinePermissionCheck
     public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
                           @Context SearchUser searchUser) {
@@ -381,6 +383,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
     @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
+    @InlinePermissionCheck
     public void setDefault(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
@@ -391,6 +394,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
+    @InlinePermissionCheck
     public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @Context SearchUser searchUser) {
         final ViewDTO view = loadView(id);
