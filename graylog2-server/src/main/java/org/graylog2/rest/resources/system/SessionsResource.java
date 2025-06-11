@@ -34,6 +34,7 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
@@ -114,6 +115,7 @@ public class SessionsResource extends RestResource {
                   notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.",
                   response = SessionResponse.class)
     @NoAuditEvent("dispatches audit events in the method body")
+    @NoPermissionCheckRequired("session creation limitations are independent of permissions")
     public Response newSession(@Context ContainerRequestContext requestContext,
                                @ApiParam(name = "Login request", value = "Credentials. The default " +
                                        "implementation requires presence of two properties: 'username' and " +
@@ -166,6 +168,7 @@ public class SessionsResource extends RestResource {
                   code = 204,
                   response = SessionValidationResponse.class
     )
+    @NoPermissionCheckRequired("current session is validated")
     public Response validateSession(@Context ContainerRequestContext requestContext) {
         try {
             this.authenticationFilter.filter(requestContext);
@@ -226,6 +229,7 @@ public class SessionsResource extends RestResource {
     @RequiresAuthentication
     @Deprecated
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
+    @NoPermissionCheckRequired("session id is ignored, cookie session is destroyed")
     public Response terminateSessionWithId(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId,
                                            @Context ContainerRequestContext requestContext) {
         final Subject subject = getSubject();
@@ -240,6 +244,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @RequiresAuthentication
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
+    @NoPermissionCheckRequired("the current session is destroyed")
     public Response terminateSession(@Context ContainerRequestContext requestContext) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
