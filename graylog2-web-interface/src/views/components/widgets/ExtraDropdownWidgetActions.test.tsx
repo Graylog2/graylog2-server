@@ -29,7 +29,7 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraWidgetActionsWithoutMenu = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
+const ExtraWidgetActionsWithoutMenu = ({ ...props }: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
   <TestStoreProvider>
     <OriginalExtraWidgetActions {...props} />
   </TestStoreProvider>

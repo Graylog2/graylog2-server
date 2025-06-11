@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToDecimalConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -115,6 +116,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -234,6 +236,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());
@@ -243,6 +246,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
+        functions.put(RemoveStringFieldsByValue.NAME, new RemoveStringFieldsByValue());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -1691,6 +1695,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void removeStringFieldsByValue() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull(); // match regex
+        assertThat(message.getField("f2")).isNull(); // match regex
+        assertThat(message.getField("f3")).isEqualTo("stay in message");
+        assertThat(message.getField("f4")).isNull(); // match values
+        assertThat(message.getField("f5")).isEqualTo("stay in message");
+        assertThat(message.getField("f6")).isNull(); // match values
+        assertThat(message.getField("f7")).isEqualTo("f-7");
+        assertThat(message.getField("number_field")).isEqualTo(3L);
+        assertThat(message.getField("boolean_field")).isEqualTo(true);
+        assertThat(message.getField("array_field")).satisfies(value -> {
+            assertThat(value instanceof List<?>).isTrue();
+            assertThat(((List<String>) value)).containsAll(List.of("a", "b", "c"));
+        });
+    }
+
+    @Test
     void setField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
@@ -1799,5 +1824,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    void hexToDecimalConversion() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("0x17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("0x117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("not_hex")).isEqualTo(null);
     }
 }

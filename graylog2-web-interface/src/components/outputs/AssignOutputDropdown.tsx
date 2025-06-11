@@ -18,22 +18,25 @@ import React from 'react';
 
 import { Button } from 'components/bootstrap';
 
-type AssignOutputDropdownProps = {
+type Props = {
   outputs: any[];
   onSubmit: (...args: any[]) => void;
 };
 
 class AssignOutputDropdown extends React.Component<
-  AssignOutputDropdownProps,
+  Props,
   {
-    [key: string]: any;
+    selectedOutput: string;
   }
 > {
   PLACEHOLDER = 'placeholder';
 
-  state = {
-    selectedOutput: this.PLACEHOLDER,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      selectedOutput: this.PLACEHOLDER,
+    };
+  }
 
   _formatOutput = (output) => (
     <option key={output.id} value={output.id}>

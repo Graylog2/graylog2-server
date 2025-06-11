@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 import { Collapse } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
 import { Row, Col, Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
+import useDisclosure from 'util/hooks/useDisclosure';
 
 type Props = {
   children: React.ReactNode;

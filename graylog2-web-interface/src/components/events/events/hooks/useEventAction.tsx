@@ -21,16 +21,19 @@ import { MenuItem } from 'components/bootstrap';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
 import type { Event } from 'components/events/events/types';
+import usePermissions from 'hooks/usePermissions';
 
 const useEventAction = (event: Event) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions([event]);
   const sendEventActionTelemetry = useSendEventActionTelemetry();
   const hasReplayInfo = !!event.replay_info;
+  const permissions = usePermissions();
+  const isPermitted = permissions.isPermitted(`eventdefinitions:edit:${event.event_definition_id}`);
 
   const moreActions = useMemo(
     () =>
       [
-        hasReplayInfo ? (
+        hasReplayInfo && isPermitted ? (
           <LinkToReplaySearch
             key="replay-search"
             isMenuitem
@@ -42,7 +45,7 @@ const useEventAction = (event: Event) => {
         pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
         pluggableActions.length ? pluggableActions : null,
       ].filter(Boolean),
-    [sendEventActionTelemetry, event.id, hasReplayInfo, pluggableActions],
+    [sendEventActionTelemetry, event.id, hasReplayInfo, pluggableActions, isPermitted],
   );
 
   return { moreActions, pluggableActionModals };
