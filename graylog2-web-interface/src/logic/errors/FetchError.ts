@@ -16,6 +16,8 @@
  */
 import isString from 'lodash/isString';
 
+import { singleton } from 'logic/singleton';
+
 type Res = {
   text?: string;
 };
@@ -26,7 +28,7 @@ type Additional = {
   res?: Res;
 };
 
-export default class FetchError extends Error {
+class FetchError extends Error {
   name: 'FetchError';
 
   responseMessage: string;
@@ -51,3 +53,5 @@ export default class FetchError extends Error {
     this.status = status; // Shortcut, as this is often used
   }
 }
+
+export default singleton('logic.errors.FetchError', () => FetchError);

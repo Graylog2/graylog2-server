@@ -17,9 +17,10 @@
 import * as React from 'react';
 import type { ErrorInfo } from 'react';
 
-import { createReactError } from 'logic/errors/ReportedErrors';
+import { createReactError, createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import FetchError from 'logic/errors/FetchError';
 
 type Props = {
   children: React.ReactNode;
@@ -31,7 +32,11 @@ class RuntimeErrorBoundary extends React.Component<Props> {
   context: React.ContextType<typeof TelemetryContext>;
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    ErrorsActions.report(createReactError(error, { componentStack: info?.componentStack }));
+    ErrorsActions.report(
+      error instanceof FetchError
+        ? createFromFetchError(error)
+        : createReactError(error, { componentStack: info?.componentStack }),
+    );
     this.context.sendErrorReport(error);
   }
 

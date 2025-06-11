@@ -14,17 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database;
+package org.graylog2.rest;
 
-import com.google.common.base.Function;
-import org.bson.types.ObjectId;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
+import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.rest.helpers.DatabaseIdParser;
 
-import javax.annotation.Nullable;
-
-public class StringObjectIdFunction implements Function<String, ObjectId> {
-    @Nullable
+@Provider
+public class InvalidObjectIdExceptionMapper implements ExceptionMapper<DatabaseIdParser.InvalidObjectIdException> {
     @Override
-    public ObjectId apply(String input) {
-        return new ObjectId(input);
+    public Response toResponse(DatabaseIdParser.InvalidObjectIdException exception) {
+        final ApiError apiError = ApiError.create(exception.getMessage());
+        return Response.status(Response.Status.NOT_FOUND).entity(apiError).build();
     }
 }
