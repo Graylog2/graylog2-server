@@ -31,6 +31,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import UserNotification from 'util/UserNotification';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
@@ -69,7 +70,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
       const response = pluggableLicenseCheck[0]('/license/security');
       validSecurityLicense = response?.data?.valid ?? false;
     } catch (error) {
-      console.error('License check failed:', error);
+      UserNotification.error(`License check failed: ${error}`);
     }
   }
 

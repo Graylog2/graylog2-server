@@ -31,6 +31,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import UserNotification from 'util/UserNotification';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
@@ -72,7 +73,7 @@ const EventDefinitionSummary = ({
       const response = pluggableLicenseCheck[0]('/license/security');
       validSecurityLicense = response?.data?.valid ?? false;
     } catch (error) {
-      console.error('License check failed:', error);
+      UserNotification.error(`License check failed: ${error}`);
     }
   }
 

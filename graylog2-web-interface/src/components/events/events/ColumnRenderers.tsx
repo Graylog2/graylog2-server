@@ -31,6 +31,7 @@ import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpa
 import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
+import UserNotification from 'util/UserNotification';
 
 const EventDefinitionRenderer = ({
   eventDefinitionId,
@@ -131,7 +132,7 @@ const ValidSecurityLicense = () => {
       const response = pluggableLicenseCheck[0]('/license/security');
       validSecurityLicense = response?.data?.valid ?? false;
     } catch (error) {
-      console.error('License check failed:', error);
+      UserNotification.error(`License check failed: ${error}`);
     }
   }
 
