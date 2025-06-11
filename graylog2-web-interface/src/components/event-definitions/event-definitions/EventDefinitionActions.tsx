@@ -260,20 +260,24 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               Edit
             </MenuItem>
           </IfPermitted>
-          {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
-            <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-          )}
-          <MenuItem divider />
-          <MenuItem
-            disabled={isSystemEventDefinition(eventDefinition)}
-            title={isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined}
-            onClick={
-              isSystemEventDefinition(eventDefinition)
-                ? undefined
-                : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
-            }>
-            {isEnabled ? 'Disable' : 'Enable'}
-          </MenuItem>
+          <IfPermitted permissions="eventdefinitions:create">
+            {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
+              <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
+            )}
+            <MenuItem divider />
+          </IfPermitted>
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <MenuItem
+              disabled={isSystemEventDefinition(eventDefinition)}
+              title={isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined}
+              onClick={
+                isSystemEventDefinition(eventDefinition)
+                  ? undefined
+                  : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
+              }>
+              {isEnabled ? 'Disable' : 'Enable'}
+            </MenuItem>
+          </IfPermitted>
 
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
