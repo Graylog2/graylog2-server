@@ -37,7 +37,7 @@ type CloudWatchProps = {
   onSubmit?: (...args: any[]) => void;
 };
 
-const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) => {
+const CloudWatch = ({ externalInputSubmit = false, onSubmit = () => {} }: CloudWatchProps) => {
   const { availableSteps, currentStep, isDisabledStep, setAvailableStep, setCurrentStep, setEnabledStep } =
     useContext(StepsContext);
   const { setFormData } = useContext(FormDataContext);
@@ -76,14 +76,12 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) 
 
         setCurrentStep(key);
         setEnabledStep(key);
-      } else {
-        if (externalInputSubmit) {
+      } else if (externalInputSubmit) {
           onSubmit(maybeFormData);
         } else {
           // history.push(Routes.SYSTEM.INPUTS);
           navigate(Routes.SYSTEM.INPUTS);
         }
-      }
     };
 
     return [
