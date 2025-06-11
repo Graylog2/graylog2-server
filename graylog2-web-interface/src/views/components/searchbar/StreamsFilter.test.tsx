@@ -31,12 +31,11 @@ describe('StreamsFilter', () => {
     ];
     render(<StreamsFilter streams={streams} onChange={() => {}} />);
 
-    const select = await selectEvent.findSelectInput('select streams');
-    selectEvent.openMenu(select);
-
-    await selectEvent.findOption('101 Stream');
-    await selectEvent.findOption('Second Stream');
-    await selectEvent.findOption('First Stream');
-    await selectEvent.findOption('Yet another Stream');
+    await selectEvent.findOption('select streams', [
+      '101 Stream',
+      'Second Stream',
+      'First Stream',
+      'Yet another Stream',
+    ]);
   });
 });

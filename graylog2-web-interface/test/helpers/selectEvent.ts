@@ -40,7 +40,17 @@ const findSelectInput = (name: string, config?: { container: HTMLElement }) => {
 
   return queryRoot.findByRole('combobox', { name: new RegExp(name, 'i') });
 };
-const findOption = async (name: string | RegExp) => screen.findByRole('option', { name: new RegExp(name, 'i') });
+const findOption = async (
+  selectName: string,
+  optionName: (string | RegExp) | Array<string | RegExp>,
+  config?: { container: HTMLElement },
+) => {
+  const input = await findSelectInput(selectName, config);
+  selectEvent.openMenu(input);
+  const optionNames = Array.isArray(optionName) ? optionName : [optionName];
+
+  return Promise.all(optionNames.map((name) => screen.findByRole('option', { name: new RegExp(name, 'i') })));
+};
 
 const selectOption = async (
   selectName: string,

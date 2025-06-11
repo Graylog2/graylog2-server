@@ -190,10 +190,7 @@ describe('ChangeFieldTypeModal', () => {
   it('Shows type options', async () => {
     renderChangeFieldTypeModal({});
 
-    const typeSelect = await selectEvent.findSelectInput('select field type for field');
-    selectEvent.openMenu(typeSelect);
-
-    await selectEvent.findOption('Boolean');
+    await selectEvent.findOption('select field type for field', 'Boolean');
   });
 
   it('Shows index sets data', async () => {

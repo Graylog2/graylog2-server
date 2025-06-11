@@ -68,8 +68,6 @@ const expectSubmitButtonToBeDisabled = async () => {
 
 const expectSubmitButtonNotToBeDisabled = () => waitFor(async () => expect(await submitButton()).not.toBeDisabled());
 
-const visualizationSelect = async () => screen.findByLabelText('Select visualization type');
-
 describe('AggregationWizard/Core Visualizations', () => {
   useViewsPlugin();
 
@@ -78,17 +76,17 @@ describe('AggregationWizard/Core Visualizations', () => {
     async () => {
       render(<SimpleAggregationWizard />);
 
-      await selectEvent.openMenu(await visualizationSelect());
-
-      selectEvent.findOption('Area Chart');
-      selectEvent.findOption('Bar Chart');
-      selectEvent.findOption('Data Table');
-      selectEvent.findOption('Heatmap');
-      selectEvent.findOption('Line Chart');
-      selectEvent.findOption('Pie Chart');
-      selectEvent.findOption('Scatter Plot');
-      selectEvent.findOption('Single Number');
-      selectEvent.findOption('World Map');
+      await selectEvent.findOption('Select visualization type', [
+        'Area Chart',
+        'Bar Chart',
+        'Data Table',
+        'Heatmap',
+        'Line Chart',
+        'Pie Chart',
+        'Scatter Plot',
+        'Single Number',
+        'World Map',
+      ]);
     },
     testTimeout,
   );

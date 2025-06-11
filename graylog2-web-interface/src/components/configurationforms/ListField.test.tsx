@@ -54,10 +54,7 @@ describe('<ListField>', () => {
     expect(screen.queryByText('uno')).not.toBeInTheDocument();
     expect(screen.queryByText('dos')).not.toBeInTheDocument();
 
-    const select = await selectEvent.findSelectInput(listField.human_name);
-    await selectEvent.openMenu(select);
-
-    await selectEvent.findOption('uno');
+    await selectEvent.findOption(listField.human_name, 'uno');
 
     expect(screen.getByText('dos')).toBeInTheDocument();
   });

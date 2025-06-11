@@ -62,11 +62,10 @@ describe('RuleBlockForm', () => {
   it('renders a select with all functions as options', async () => {
     render(comp());
 
-    const select = await selectEvent.findSelectInput('Add action');
-
-    await selectEvent.openMenu(select);
-
-    await Promise.all(options.map((option) => selectEvent.findOption(option.label)));
+    await selectEvent.findOption(
+      'Add action',
+      options.map(({ label }) => label),
+    );
   });
 
   it('calls onSelect handler when selecting an option', async () => {

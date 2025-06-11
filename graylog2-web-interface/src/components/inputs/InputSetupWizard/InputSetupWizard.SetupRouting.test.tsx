@@ -245,10 +245,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await selectEvent.findSelectInput('Default Stream');
-        await selectEvent.openMenu(streamSelect);
-
-        await selectEvent.findOption('Aloho');
+        await selectEvent.findOption('Default Stream', 'Aloho');
 
         const moraOption = screen.queryByText(/Mora/i);
 
@@ -271,10 +268,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await selectEvent.findSelectInput('Default Stream');
-        await selectEvent.openMenu(streamSelect);
-
-        await selectEvent.findOption('Mora');
+        await selectEvent.findOption('Default Stream', 'Mora');
 
         const alohoOption = screen.queryByText(/Aloho/i);
 

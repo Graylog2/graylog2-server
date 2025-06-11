@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import { act } from 'react';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
