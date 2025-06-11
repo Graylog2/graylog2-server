@@ -35,6 +35,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -70,6 +71,7 @@ public class NotificationsResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get all active notifications")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public NotificationsResponse listNotifications() {
         final var notifications = notificationService.all().stream()
                 .filter(notification -> isPermitted(RestPermissions.NOTIFICATIONS_READ, notification.getType().toString()))
@@ -87,6 +89,7 @@ public class NotificationsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such notification type.")
     })
     @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
+    @InlinePermissionCheck
     public void deleteNotification(@ApiParam(name = "notificationType")
                                    @PathParam("notificationType") String notificationType) {
         deleteKeyedNotification(notificationType, null);
@@ -101,6 +104,7 @@ public class NotificationsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such notification type.")
     })
     @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
+    @InlinePermissionCheck
     public void deleteKeyedNotification(@ApiParam(name = "notificationType") @PathParam("notificationType") String notificationType,
                                         @ApiParam(name = "notificationKey") @PathParam("notificationKey") @Nullable String notificationKey) {
         Notification.Type type;
