@@ -27,6 +27,7 @@ import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.rest.models.tools.requests.RegexReplaceTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexReplaceTesterResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.validation.Valid;
@@ -52,6 +53,7 @@ public class RegexReplaceTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public RegexReplaceTesterResponse regexTester(@QueryParam("regex") @NotEmpty String regex,
                                                   @QueryParam("replacement") @NotNull String replacement,
                                                   @QueryParam("replace_all") @DefaultValue("false") boolean replaceAll,
@@ -64,6 +66,7 @@ public class RegexReplaceTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test regex replace extractor")
+    @NoPermissionCheckRequired("Utility resource")
     public RegexReplaceTesterResponse testRegex(@Valid @NotNull RegexReplaceTestRequest r) {
         return testRegexReplaceExtractor(r.string(), r.regex(), r.replacement(), r.replaceAll());
     }

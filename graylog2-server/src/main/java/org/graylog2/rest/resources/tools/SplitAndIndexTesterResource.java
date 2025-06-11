@@ -22,6 +22,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.inputs.extractors.SplitAndIndexExtractor;
 import org.graylog2.rest.models.tools.requests.SplitAndIndexTestRequest;
 import org.graylog2.rest.models.tools.responses.SplitAndIndexTesterResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.validation.Valid;
@@ -42,6 +43,7 @@ public class SplitAndIndexTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public SplitAndIndexTesterResponse splitAndIndexTester(@QueryParam("split_by") @NotNull String splitBy,
                                                            @QueryParam("index") @Min(0) int index,
                                                            @QueryParam("string") @NotNull String string) {
@@ -53,6 +55,7 @@ public class SplitAndIndexTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test split and index extractor")
+    @NoPermissionCheckRequired("Utility resource")
     public SplitAndIndexTesterResponse splitAndIndexTest(@Valid @NotNull SplitAndIndexTestRequest splitAndIndexTestRequest) {
         return doSplitAndIndexTest(splitAndIndexTestRequest.string(),
                 splitAndIndexTestRequest.splitBy(), splitAndIndexTestRequest.index());
