@@ -24,20 +24,19 @@ import StreamsFilter from './StreamsFilter';
 describe('StreamsFilter', () => {
   it('sorts stream names', async () => {
     const streams = [
-      { key: 'One Stream', value: 'streamId1' },
-      { key: 'another Stream', value: 'streamId2' },
+      { key: 'First Stream', value: 'streamId1' },
+      { key: 'Second Stream', value: 'streamId2' },
       { key: 'Yet another Stream', value: 'streamId3' },
       { key: '101 Stream', value: 'streamId4' },
     ];
     render(<StreamsFilter streams={streams} onChange={() => {}} />);
 
     const select = await selectEvent.findSelectInput('select streams');
-
     selectEvent.openMenu(select);
 
     await selectEvent.findOption('101 Stream');
-    await selectEvent.findOption('another Stream');
-    await selectEvent.findOption('One Stream');
+    await selectEvent.findOption('Second Stream');
+    await selectEvent.findOption('First Stream');
     await selectEvent.findOption('Yet another Stream');
   });
 });
