@@ -467,7 +467,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   createCustomFilter = () => {
     const { ignoreAccents } = this.props;
 
-    return createFilter({ ignoreAccents, stringify: (option: { label: string }) => option.label });
+    return createFilter({ ignoreAccents, stringify: (option: { label: unknown }) => String(option.label) });
   };
 
   render() {
