@@ -280,6 +280,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/{id}")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_UPDATE)
+    @InlinePermissionCheck
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
