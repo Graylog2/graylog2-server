@@ -134,6 +134,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @InlinePermissionCheck
     public SearchDTO getSearch(@ApiParam(name = "id") @PathParam("id") String searchId, @Context SearchUser searchUser) {
         final Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
@@ -159,6 +160,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("{id}/execute")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @InlinePermissionCheck
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
@@ -182,6 +184,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Explains how the referenced search would be executed", response = ExplainResults.class)
     @Path("{id}/explain")
     @NoAuditEvent("Does not return any actual data")
+    @InlinePermissionCheck
     public ExplainResults explainQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                        @ApiParam ExecutionState executionState,
                                        @Context SearchUser searchUser) {
@@ -194,6 +197,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Creating audit event manually in method body.")
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @InlinePermissionCheck
     public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
@@ -208,6 +212,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Creating audit event manually in method body.")
     @Consumes({SEARCH_FORMAT_V2})
     @Produces({SEARCH_FORMAT_V2})
+    @InlinePermissionCheck
     public Response executeSyncJobv2(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTOv2 searchRequest,
                                      @ApiParam(name = "timeout", defaultValue = "60000")
                                      @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
@@ -232,6 +237,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @InlinePermissionCheck
     public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
                               @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
                               @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
