@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fix node link in message details of message table widget on search page"
+
+issues = ["22431"]
+pulls = [""]
+
+
