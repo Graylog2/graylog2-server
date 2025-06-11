@@ -278,6 +278,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/routing")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
+    @InlinePermissionCheck
     public RoutingResponse routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
