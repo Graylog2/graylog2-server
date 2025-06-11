@@ -68,12 +68,14 @@ const time = (
   }
 
   if (to) {
+    // calculating the from/to that the backend needs: the BE is subtracting seconds from now() for the "relative" with from/to both set case
     const secondsFromWayBackTillNow = Math.trunc(moment().utc().toDate().getTime() / 1000);
+    const secondsUpToTheSelectedToDate = Math.trunc(moment(to).utc().toDate().getTime() / 1000);
 
     return {
       type: 'relative',
       from: secondsFromWayBackTillNow,
-      to: secondsFromWayBackTillNow - Math.trunc(moment(to).utc().toDate().getTime() / 1000),
+      to: secondsFromWayBackTillNow - secondsUpToTheSelectedToDate,
     };
   }
 
