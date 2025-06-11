@@ -21,6 +21,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.models.tools.requests.ContainsStringTestRequest;
 import org.graylog2.rest.models.tools.responses.ContainsStringTesterResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.validation.Valid;
@@ -44,6 +45,7 @@ public class ContainsStringTesterResource extends RestResource {
 
     @GET
     @Timed
+    @NoPermissionCheckRequired("Utility endpoint")
     public ContainsStringTesterResponse containsStringTest(@QueryParam("string") @NotEmpty String string,
                                                            @QueryParam("search_string") @NotEmpty String searchString) {
         return doTestContainsString(string, searchString);
@@ -53,6 +55,7 @@ public class ContainsStringTesterResource extends RestResource {
     @POST
     @Timed
     @NoAuditEvent("only used to test if field contains a string")
+    @NoPermissionCheckRequired("Utility endpoint")
     public ContainsStringTesterResponse testContainsString(@Valid @NotNull ContainsStringTestRequest request) {
         return doTestContainsString(request.string(), request.searchString());
     }
