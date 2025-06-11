@@ -1,0 +1,4 @@
+type = "f"
+message = "Catch invalid queries for histogram on Alerts & Events page."
+
+pulls = ["22850"]
