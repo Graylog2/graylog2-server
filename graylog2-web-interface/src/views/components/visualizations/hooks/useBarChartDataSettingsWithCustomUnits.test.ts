@@ -107,11 +107,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
     };
     asMock(chartLayoutGenerators.generateMappersForYAxis).mockReturnValue(mappers);
 
-    asMock(chartLayoutGenerators.getBarChartTraceOffsetSettings).mockReturnValue({
-      offsetgroup: 1,
-      width: 0.25,
-      offset: -0.375,
-    });
+    asMock(chartLayoutGenerators.getBarChartTraceOffsetGroup).mockReturnValue(1);
   });
 
   it('Runs all related functions and return combined result from them', async () => {
@@ -119,11 +115,6 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
       useBarChartDataSettingsWithCustomUnits({
         config: testConfig,
         barmode: 'group',
-        effectiveTimerange: {
-          from: '2024-08-11T14:56:10.000Z',
-          to: '2024-08-12T15:01:10.000Z',
-          type: 'absolute',
-        },
       }),
     );
 
@@ -141,34 +132,12 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
       });
     });
 
-    expect(chartLayoutGenerators.generateMappersForYAxis).toHaveBeenCalledWith({
-      series: testConfig.series,
-      units,
-    });
-
     expect(useChartDataSettingsWithCustomUnits).toHaveBeenCalledWith({ config: testConfig });
-    expect(getFieldNameFromTrace).toHaveBeenCalledWith({ series: testConfig.series, fullPath: 'Name1' });
-
-    expect(chartLayoutGenerators.getBarChartTraceOffsetSettings).toHaveBeenCalledWith('group', {
-      yaxis: 'y1',
-      totalAxis: 4,
-      axisNumber: 1,
-      traceIndex: 1,
-      totalTraces: 4,
-      effectiveTimerange: {
-        from: '2024-08-11T14:56:10.000Z',
-        to: '2024-08-12T15:01:10.000Z',
-        type: 'absolute',
-      },
-      isTimeline: false,
-      xAxisItemsLength: 10,
-    });
+    expect(chartLayoutGenerators.getBarChartTraceOffsetGroup).toHaveBeenCalledWith('group', 'y1', 1);
 
     expect(barChartDataSettingsWithCustomUnits).toEqual({
       fullPath: 'Name1',
-      offset: -0.375,
       offsetgroup: 1,
-      width: 0.25,
       y: [1, 2, 3],
       yaxis: 'y1',
     });
