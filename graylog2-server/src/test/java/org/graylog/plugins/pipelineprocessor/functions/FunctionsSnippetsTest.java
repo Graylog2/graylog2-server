@@ -1092,7 +1092,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("string_5")).isEqualTo("false");
         assertThat(message.getField("string_6")).isEqualTo("42");
         assertThat(message.getField("string_7")).isEqualTo("23.42");
-        assertThat(message.getField("string_default_null_set_single_field")).isNull();
+        assertThat(message.getField("string_default_null")).isNull();
         assertThat(message.getField("string_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("long_1")).isEqualTo(1L);
@@ -1123,14 +1123,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("double_inf2")).isEqualTo(Double.NEGATIVE_INFINITY);
         assertThat(message.getField("double_inf3")).isEqualTo(Double.POSITIVE_INFINITY);
         assertThat(message.getField("double_inf4")).isEqualTo(Double.NEGATIVE_INFINITY);
-        assertThat(message.getField("double_default_null_set_single_field")).isNull();
+        assertThat(message.getField("double_default_null")).isNull();
         assertThat(message.getField("double_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("bool_1")).isEqualTo(true);
         assertThat(message.getField("bool_2")).isEqualTo(false);
         assertThat(message.getField("bool_3")).isEqualTo(false);
         assertThat(message.getField("bool_4")).isEqualTo(true);
-        assertThat(message.getField("bool_default_null_set_single_field")).isNull();
+        assertThat(message.getField("bool_default_null")).isNull();
         assertThat(message.getField("bool_default_null_set_single_field")).isNull();
 
         // the is wrapped in our own class for safety in rules
@@ -1138,7 +1138,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("ip_2")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
         assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
-        assertThat(message.getField("ip_default_null_set_single_field")).isNull();
+        assertThat(message.getField("ip_default_null")).isNull();
         assertThat(message.getField("ip_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("map_1")).isEqualTo(Collections.singletonMap("foo", "bar"));
@@ -1147,7 +1147,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_4")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_5")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
-        assertThat(message.getField("map_default_null_set_single_field")).isNull();
+        assertThat(message.getField("map_default_null")).isNull();
         assertThat(message.getField("map_default_null_set_single_field")).isNull();
     }
 
