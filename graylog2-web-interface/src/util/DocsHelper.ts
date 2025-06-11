@@ -60,6 +60,7 @@ const docsHelper = {
     SEARCH_FILTERS: 'making_sense_of_your_log_data/search_filters.htm',
     SEARCH_QUERY_ERRORS: 'making_sense_of_your_log_data/writing_search_queries.html#ErrorTypes',
     SEARCH_QUERY_LANGUAGE: 'making_sense_of_your_log_data/writing_search_queries.html',
+    SECURITY_EVENTS: 'what_more_can_graylog_do_for_me/security_events.htm',
     STREAMS: 'making_sense_of_your_log_data/streams.html',
     STREAM_PROCESSING_RUNTIME_LIMITS:
       'making_sense_of_your_log_data/stream_processing.htm#StreamProcessingRuntimeLimits',
