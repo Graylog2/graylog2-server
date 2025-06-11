@@ -85,27 +85,12 @@ describe('EntityCreateShareFormGroup', () => {
     const mockOnSetEntityShare = jest.fn();
 
     render(<SUT onSetEntityShare={mockOnSetEntityShare} />);
+
     // Select a grantee
-    const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-    await act(async () => {
-      await selectEvent.openMenu(granteesSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(granteesSelect, everyone.title);
-    });
+    await selectEvent.selectOption('Search for users and teams', everyone.title);
 
     // Select a capability
-    const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-    await act(async () => {
-      await selectEvent.openMenu(capabilitySelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(capabilitySelect, viewer.title);
-    });
+    await selectEvent.selectOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,
