@@ -16,7 +16,6 @@
  */
 
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
 import type { SyntheticEvent } from 'react';
 
 import Button from 'components/bootstrap/Button';
@@ -84,14 +83,6 @@ const ModalSubmit = ({ ...props }: Props) => {
 
   const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
   const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
-  const confirmRef = useRef<HTMLButtonElement>();
-  useEffect(() => {
-    if (autoFocus && !disabledSubmit && confirmRef.current) {
-      confirmRef.current.focus();
-    }
-    // Should only run once during mount to avoid refocussing
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <ModalButtonToolbar className={className}>
@@ -108,7 +99,7 @@ const ModalSubmit = ({ ...props }: Props) => {
         </Button>
       )}
       <Button
-        ref={confirmRef}
+        autoFocus={autoFocus}
         bsStyle="success"
         bsSize={bsSize}
         disabled={disabledSubmit || submittingAsync}
