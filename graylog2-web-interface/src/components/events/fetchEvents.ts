@@ -59,7 +59,7 @@ export const parseTypeFilter = (alert: string) => {
 
 const allTime = { type: 'relative', range: 0 } as const;
 
-const time = (
+const calculateTimerange = (
   from?: string,
   to?: string,
 ): { from?: string | number; to?: string | number; type: string; range?: number } => {
@@ -94,7 +94,7 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
   if (filters.get('timerange_start')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
 
-    result.filter.aggregation_timerange = time(from, to);
+    result.filter.aggregation_timerange = calculateTimerange(from, to);
   }
 
   if (filters.get('key')?.length > 0) {
