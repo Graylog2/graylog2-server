@@ -16,18 +16,16 @@
  */
 package org.graylog2.notifications;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
 public interface Notification extends Persisted {
-    // Some pre-defined detail keys
-    final String KEY_TITLE = "title";
-    final String KEY_DESCRIPTION = "description";
-
     Notification addType(Type type);
 
     Notification addKey(String key);
@@ -100,10 +98,20 @@ public interface Notification extends Persisted {
         REMOTE_REINDEX_FINISHED,
         DATA_NODE_VERSION_MISMATCH,
         DATA_TIERING_ROLLOVER_ERROR,
-        DATA_NODE_HEAP_WARNING
+        DATA_NODE_HEAP_WARNING;
+
+        @JsonValue
+        public String json() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 
     enum Severity {
-        NORMAL, URGENT
+        NORMAL, URGENT;
+
+        @JsonValue
+        public String json() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 }

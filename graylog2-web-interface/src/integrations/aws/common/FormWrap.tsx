@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
 
 import { Button, Panel } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -23,6 +23,21 @@ import Icon from 'components/common/Icon';
 type ErrorMessageProps = {
   fullMessage: string;
   niceMessage?: string | React.ReactNode;
+};
+
+type FormWrapProps = {
+  buttonContent?: string | React.ReactNode;
+  children: any;
+  disabled?: boolean;
+  error?: {
+    full_message: string;
+    nice_message?: string | React.ReactNode;
+  };
+  description?: string | React.ReactNode;
+  loading?: boolean;
+  onSubmit?: (...args: any[]) => void;
+  title?: string | React.ReactNode;
+  className?: string;
 };
 
 const ErrorOutputStyle = createGlobalStyle`
@@ -46,10 +61,10 @@ const ErrorOutput = styled.span`
   display: block;
 `;
 
-const ErrorToggleInfo = styled.button`
+const ErrorToggleInfo = styled.button<{ isDarkMode: boolean }>`
   border: 0;
   background: none;
-  color: #1f1f1f;
+  color:${({ isDarkMode }) => (isDarkMode ? 'white' : 'black')};
   font-size: 11px;
   text-transform: uppercase;
   margin: 12px 0 0;
@@ -65,13 +80,15 @@ const MoreIcon = styled(Icon)<{ expanded: boolean }>(
 
 export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessageProps) => {
   const [expanded, toggleExpanded] = useState(false);
+  const theme = useTheme();
+  const isDarkMode = theme.mode === 'dark';
 
   const Header = (
     <>
       <ErrorOutputStyle />
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
       {niceMessage && (
-        <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
+        <ErrorToggleInfo isDarkMode={isDarkMode} onClick={() => toggleExpanded(!expanded)}>
           More Info <MoreIcon name="chevron_right" expanded={expanded} />
         </ErrorToggleInfo>
       )}
@@ -88,21 +105,6 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       {fullMessage}
     </Panel>
   );
-};
-
-type FormWrapProps = {
-  buttonContent?: string | React.ReactNode;
-  children: any;
-  disabled?: boolean;
-  error?: {
-    full_message: string;
-    nice_message?: string | React.ReactNode;
-  };
-  description?: string | React.ReactNode;
-  loading?: boolean;
-  onSubmit?: (...args: any[]) => void;
-  title?: string | React.ReactNode;
-  className?: string;
 };
 
 const FormWrap = ({

@@ -28,16 +28,6 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 
-type DefaultProps = {
-  value: string;
-};
-
-const Default = ({ value }: DefaultProps) => (
-  <>
-    {value} <small>(default)</small>
-  </>
-);
-
 const Container = styled.div`
   border: 1px solid #a6afbd;
   margin: 25px 0;
@@ -83,6 +73,24 @@ const EditAnchor = styled.a`
   }
 `;
 
+const ArnErrorMessage = styled.span`
+  color: #856404;
+  background-color: #fff3cd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+`;
+
+type DefaultProps = {
+  value: string;
+};
+
+const Default = ({ value }: DefaultProps) => (
+  <>
+    {value} <small>(default)</small>
+  </>
+);
+
 type StepReviewProps = {
   onSubmit: (...args: any[]) => void;
   onEditClick: (...args: any[]) => (...args: any[]) => void;
@@ -108,10 +116,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     awsEndpointDynamoDB = { value: undefined },
     awsEndpointIAM = { value: undefined },
     awsEndpointKinesis = { value: undefined },
+    overrideSource = {value: undefined},
   } = formData;
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
@@ -127,6 +137,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
+      override_source: overrideSource?.value ?? '',
     },
   );
 
@@ -231,9 +243,22 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
         </Subheader>
         <ReviewItems>
           <li>
-            <strong>Stream</strong>
+            <strong>Kinesis Stream</strong>
             <span>{awsCloudWatchKinesisStream.value}</span>
           </li>
+          <li>
+            <strong>Kinesis Stream ARN</strong>
+            <span>
+              {!awsCloudwatchKinesisStreamArn ? (
+                <ArnErrorMessage>
+                  Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream permission.
+                </ArnErrorMessage>
+              ) : (
+                awsCloudwatchKinesisStreamArn
+              )}
+            </span>
+          </li>
+
           <li>
             <strong>Global Input</strong>
             <span>
@@ -262,6 +287,10 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
               <Icon name={addPrefix ? 'check_circle' : 'cancel'} />
             </span>
           </li>
+          {overrideSource.value && (<li>
+            <strong>Override Source</strong>
+            <span>{overrideSource.value}</span>
+          </li>)}
         </ReviewItems>
 
         <Subheader>Formatting</Subheader>
