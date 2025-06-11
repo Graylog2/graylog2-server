@@ -59,10 +59,19 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
   const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+  let validSecurityLicense = false;
 
-  const {
-    data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  if (
+    Array.isArray(pluggableLicenseCheck) &&
+    typeof pluggableLicenseCheck[0] === 'function'
+  ) {
+    try {
+      const response = pluggableLicenseCheck[0]('/license/security');
+      validSecurityLicense = response?.data?.valid ?? false;
+    } catch (error) {
+      console.error('License check failed:', error);
+    }
+  }
 
   const handleChange = (event) => {
     const { name } = event.target;

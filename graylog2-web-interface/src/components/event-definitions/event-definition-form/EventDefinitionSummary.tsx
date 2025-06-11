@@ -62,10 +62,19 @@ const EventDefinitionSummary = ({
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
   const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+  let validSecurityLicense = false;
 
-  const {
-    data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  if (
+    Array.isArray(pluggableLicenseCheck) &&
+    typeof pluggableLicenseCheck[0] === 'function'
+  ) {
+    try {
+      const response = pluggableLicenseCheck[0]('/license/security');
+      validSecurityLicense = response?.data?.valid ?? false;
+    } catch (error) {
+      console.error('License check failed:', error);
+    }
+  }
 
   useEffect(() => {
     const flipShowValidation = () => {
