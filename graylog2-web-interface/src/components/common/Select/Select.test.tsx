@@ -128,18 +128,6 @@ describe('Select', () => {
       await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
     });
 
-    it('should use matchProp to configure how options are filtered', async () => {
-      render(<SimpleSelect matchProp="value" />);
-
-      const select = await screen.findByLabelText('Select value');
-      selectEvent.openMenu(select);
-      userEvent.type(select, 'value1');
-
-      await screen.findByRole('option', { name: /label1/ });
-
-      expect(screen.queryByRole('option', { name: /label2/ })).not.toBeInTheDocument();
-    });
-
     it("should use optionRenderer to customize options' appearance", async () => {
       const optionRenderer = (option: { label: string }) => <span>Custom {option.label}</span>;
       render(<SimpleSelect optionRenderer={optionRenderer} menuIsOpen />);

@@ -129,7 +129,6 @@ class LegacyNotificationForm extends React.Component<
             <ControlLabel>Choose Legacy Notification</ControlLabel>
             <Select
               id="notification-legacy-select"
-              matchProp="label"
               placeholder="Select Legacy Notification"
               onChange={this.handleSelectNotificationChange}
               options={formatLegacyTypes(legacyTypes)}
