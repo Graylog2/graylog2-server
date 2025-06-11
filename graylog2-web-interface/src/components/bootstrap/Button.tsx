@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import { Button as MantineButton, FocusTrap } from '@mantine/core';
+import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
 import { Link } from 'react-router-dom';
@@ -210,7 +210,6 @@ const StyledButton = styled(MantineButton)<{
 type Props = React.PropsWithChildren<{
   active?: boolean;
   'aria-label'?: string;
-  autoFocus?: boolean;
   bsStyle?: StyleProps;
   bsSize?: BsSize;
   className?: string;
@@ -233,7 +232,6 @@ type Props = React.PropsWithChildren<{
 const Button = (
   {
     'aria-label': ariaLabel,
-    autoFocus = false,
     bsStyle = 'default',
     bsSize = undefined,
     className = undefined,
@@ -278,17 +276,21 @@ const Button = (
     type,
   } as const;
 
-  const button = href ? (
-    <StyledButton
-      component={Link}
-      to={href}
-      target={target}
-      rel={rel}
-      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-      {...sharedProps}>
-      {children}
-    </StyledButton>
-  ) : (
+  if (href) {
+    return (
+      <StyledButton
+        component={Link}
+        to={href}
+        target={target}
+        rel={rel}
+        onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+        {...sharedProps}>
+        {children}
+      </StyledButton>
+    );
+  }
+
+  return (
     <StyledButton
       ref={ref}
       form={form}
@@ -298,8 +300,6 @@ const Button = (
       {children}
     </StyledButton>
   );
-
-  return autoFocus ? <FocusTrap active>{button}</FocusTrap> : button;
 };
 
 export default React.forwardRef(Button);
