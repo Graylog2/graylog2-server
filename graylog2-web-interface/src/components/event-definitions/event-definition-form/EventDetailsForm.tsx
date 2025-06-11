@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import map from 'lodash/map';
 import upperFirst from 'lodash/upperFirst';
