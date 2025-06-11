@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
@@ -81,19 +81,19 @@ const useFieldTypeUsages = (
   isInitialLoading: boolean;
   isLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isLoading } = useQuery(
-    ['fieldTypeUsages', field, searchParams],
-    () =>
+  const { data, refetch, isInitialLoading, isLoading } = useQuery({
+    queryKey: ['fieldTypeUsages', field, searchParams],
+
+    queryFn: () =>
       defaultOnError(
         fetchFieldTypeUsages({ streams, field }, searchParams),
         `Loading ${field} types failed with status`,
         'Could not load field types',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

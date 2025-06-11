@@ -35,7 +35,10 @@ export type BulkEventReplayState = {
 };
 
 const useEventsById = (eventIds: Array<string>) =>
-  useQuery(['events', eventIds], () => Events.getByIds({ event_ids: eventIds }));
+  useQuery({
+    queryKey: ['events', eventIds],
+    queryFn: () => Events.getByIds({ event_ids: eventIds }),
+  });
 
 type Props = {
   BulkActions?: React.ComponentType<RemainingBulkActionsProps>;

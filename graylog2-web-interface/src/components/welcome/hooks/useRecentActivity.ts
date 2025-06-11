@@ -49,21 +49,22 @@ const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedR
 };
 
 const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity; isFetching: boolean } =>
-  useQuery(
-    [RECENT_ACTIONS_QUERY_KEY, pagination],
-    () =>
+  useQuery({
+    queryKey: [RECENT_ACTIONS_QUERY_KEY, pagination],
+
+    queryFn: () =>
       defaultOnError(
         fetchRecentActivities(pagination),
         'Loading recent activity failed with status',
         'Could not load recent activity',
       ),
-    {
-      retry: 0,
-      initialData: {
-        recentActivity: [],
-        ...DEFAULT_PAGINATION,
-      },
+
+    retry: 0,
+
+    initialData: {
+      recentActivity: [],
+      ...DEFAULT_PAGINATION,
     },
-  );
+  });
 
 export default useRecentActivity;

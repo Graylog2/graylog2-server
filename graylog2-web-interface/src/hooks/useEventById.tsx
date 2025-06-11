@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
@@ -36,9 +36,10 @@ const useEventById = (
   isLoading: boolean;
   isFetched: boolean;
 } => {
-  const { data, refetch, isLoading, isFetched } = useQuery<Event>(
-    ['event-by-id', eventId],
-    () =>
+  const { data, refetch, isLoading, isFetched } = useQuery({
+    queryKey: ['event-by-id', eventId],
+
+    queryFn: () =>
       onError(fetchEvent(eventId), (errorThrown: FetchError) => {
         if (onErrorHandler) onErrorHandler(errorThrown);
 
@@ -47,11 +48,10 @@ const useEventById = (
           'Could not load event or alert',
         );
       }),
-    {
-      keepPreviousData: true,
-      enabled: !!eventId,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    enabled: !!eventId,
+  });
 
   return {
     data,

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -67,19 +67,19 @@ const useSavedSearches = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    ['saved-searches', 'overview', searchParams],
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: ['saved-searches', 'overview', searchParams],
+
+    queryFn: () =>
       defaultOnError(
         fetchSavedSearches(searchParams),
         'Loading saved searches failed with status',
         'Could not load saved searches',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

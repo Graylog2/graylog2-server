@@ -34,14 +34,6 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
-
 describe('CACreateForm', () => {
   beforeEach(() => {
     asMock(fetch).mockReturnValue(Promise.resolve());
@@ -72,7 +64,7 @@ describe('CACreateForm', () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
     render(
-      <DefaultQueryClientProvider options={{ logger }}>
+      <DefaultQueryClientProvider>
         <CACreateForm />
       </DefaultQueryClientProvider>,
     );
