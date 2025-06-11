@@ -92,6 +92,7 @@ public class MetricsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such metric")
     })
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public Metric singleMetric(@ApiParam(name = "metricName", required = true)
                                @PathParam("metricName") String metricName) {
         checkPermission(RestPermissions.METRICS_READ, metricName);
