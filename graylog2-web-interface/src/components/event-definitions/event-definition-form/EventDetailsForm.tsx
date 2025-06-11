@@ -26,6 +26,7 @@ import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEdito
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import * as FormsUtils from 'util/FormsUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -58,11 +59,9 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
   const {
     data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  } = usePluggableLicenseCheck('/license/security');
 
   const handleChange = (event) => {
     const { name } = event.target;
