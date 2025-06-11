@@ -74,8 +74,7 @@ describe('<ListField>', () => {
 
     render(<SUT onChange={updateFunction} />);
 
-    const select = await selectEvent.findSelectInput(listField.human_name);
-    await selectEvent.select(select, ['uno', 'dos']);
+    await selectEvent.selectOption(listField.human_name, ['uno', 'dos']);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['one', 'two']));
   });
 

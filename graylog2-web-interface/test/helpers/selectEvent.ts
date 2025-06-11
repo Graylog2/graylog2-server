@@ -17,7 +17,7 @@
 
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
-import { screen } from 'wrappedTestingLibrary';
+import { screen, within } from 'wrappedTestingLibrary';
 
 /*
  * This file contains helper methods, which replace the `react-select-event` methods.
@@ -35,12 +35,24 @@ const customCreate = (element: HTMLElement, option: string) =>
 const customSelect = (element: HTMLElement, optionOrOptions: string | Array<string> | RegExp) =>
   selectEvent.select(element, optionOrOptions, { container: document.body });
 
-const findSelectInput = (name: string) => screen.findByRole('combobox', { name: new RegExp(name, 'i') });
+const findSelectInput = (name: string, config?: { container: HTMLElement }) => {
+  const queryRoot = config?.container ? within(config.container) : screen;
+
+  return queryRoot.findByRole('combobox', { name: new RegExp(name, 'i') });
+};
 const findOption = async (name: string | RegExp) => screen.findByRole('option', { name: new RegExp(name, 'i') });
 
-const selectOption = async (selectName: string, optionName: string | RegExp) => {
-  const input = await findSelectInput(selectName);
-  userEvent.type(input, `${optionName}{enter}`);
+const selectOption = async (
+  selectName: string,
+  optionName: (string | RegExp) | Array<string | RegExp>,
+  config?: { container: HTMLElement },
+) => {
+  const input = await findSelectInput(selectName, config);
+  const optionNames = Array.isArray(optionName) ? optionName : [optionName];
+
+  optionNames.forEach((name) => {
+    userEvent.type(input, `${name}{enter}`);
+  });
 };
 
 export default {
