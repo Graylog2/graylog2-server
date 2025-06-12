@@ -63,6 +63,7 @@ import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
+import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -326,6 +327,7 @@ type EventProcedureFormProps = {
 type EventProcedureSummaryProps = {
   eventDefinitionEventProcedure: string | undefined;
   eventId?: string;
+  event?: Event;
 };
 
 type SearchAction = {
@@ -616,5 +618,6 @@ declare module 'graylog-web-plugin/plugin' {
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: LicenseCheck;
+    entityPermissionsMapper?: EntityPermissionsMapper;
   }
 }

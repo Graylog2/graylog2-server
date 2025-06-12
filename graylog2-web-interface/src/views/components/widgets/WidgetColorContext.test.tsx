@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import type { ColorRule } from 'views/components/widgets/useColorRules';
@@ -25,7 +25,7 @@ import { setChartColor } from 'views/logic/slices/widgetActions';
 import WidgetColorContext from './WidgetColorContext';
 
 import ChartColorContext from '../visualizations/ChartColorContext';
-import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
+import type { ChartColorContextType } from '../visualizations/ChartColorContext';
 
 jest.mock('views/components/widgets/useColorRules');
 jest.mock('views/stores/useViewsDispatch', () => () => jest.fn());
@@ -34,12 +34,11 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   setChartColor: jest.fn(),
 }));
 
-type ContainerProps = {
-  colors: ChartColorMap;
-  setColor: ChangeColorFunction;
-};
-
-const Container = ({ colors: _colors, setColor: _setColor }: ContainerProps) => <div>Hello!</div>;
+const SUT = ({ fn }: { fn: (context: ChartColorContextType) => React.ReactNode }) => (
+  <WidgetColorContext id="deadbeef">
+    <ChartColorContext.Consumer>{fn}</ChartColorContext.Consumer>
+  </WidgetColorContext>
+);
 
 describe('WidgetColorContext', () => {
   const colorRules: Array<ColorRule> = [
@@ -54,29 +53,29 @@ describe('WidgetColorContext', () => {
     asMock(useColorRules).mockReturnValue(colorRules);
   });
 
-  const container = () => {
-    const wrapper = mount(
-      <WidgetColorContext id="deadbeef">
-        <ChartColorContext.Consumer>
-          {({ colors, setColor }) => <Container colors={colors} setColor={setColor} />}
-        </ChartColorContext.Consumer>
-      </WidgetColorContext>,
-    );
+  it('extracts coloring rules for current widget', async () => {
+    const fn = ({ colors }: ChartColorContextType) => {
+      expect(colors.get('localhost')).toEqual('#171EFE');
+      expect(colors.get('sum(bytes)')).toEqual('#affe42');
 
-    return wrapper.find(Container);
-  };
+      return <span>Done!</span>;
+    };
 
-  it('extracts coloring rules for current widget', () => {
-    const { colors } = container().props();
+    render(<SUT fn={fn} />);
 
-    expect(colors.get('localhost')).toEqual('#171EFE');
-    expect(colors.get('sum(bytes)')).toEqual('#affe42');
+    await screen.findByText('Done!');
   });
 
-  it('supplies setter for color of current widget', () => {
-    const { setColor } = container().props();
+  it('supplies setter for color of current widget', async () => {
+    const fn = ({ setColor }: ChartColorContextType) => {
+      setColor('avg(took_ms)', '#FEFC67');
 
-    setColor('avg(took_ms)', '#FEFC67');
+      return <span>Done!</span>;
+    };
+
+    render(<SUT fn={fn} />);
+
+    await screen.findByText('Done!');
 
     expect(setChartColor).toHaveBeenCalledWith('deadbeef', 'avg(took_ms)', '#FEFC67');
   });

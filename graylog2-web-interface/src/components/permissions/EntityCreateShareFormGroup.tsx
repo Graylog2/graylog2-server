@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -26,7 +27,7 @@ import type { GranteesList as GranteesListType, SelectedGranteeCapabilities } fr
 import type Grantee from 'logic/permissions/Grantee';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { createGRN } from 'logic/permissions/GRN';
-import { Spinner } from 'components/common';
+import { Section, Spinner } from 'components/common';
 
 import type { SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -50,6 +51,7 @@ type Props = {
   entityTypeTitle?: string | null | undefined;
   defaultSharePayload?: EntitySharePayload;
   onSetEntityShare: (payload: EntitySharePayload) => void;
+  dependenciesGRN?: Array<GRN>;
 };
 
 const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; granteeType: Grantee['type'] }) => (
@@ -70,6 +72,7 @@ const EntityCreateShareFormGroup = ({
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',
+  dependenciesGRN = null,
   defaultSharePayload = undefined,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
@@ -94,10 +97,12 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
+      prepare_request: dependenciesGRN
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
-      onSetEntityShare(payload);
+      onSetEntityShare({ selected_grantee_capabilities: newSelectedCapabilities });
+
       resetSelection();
       setDisableSubmit(false);
 
@@ -110,12 +115,15 @@ const EntityCreateShareFormGroup = ({
 
     setDisableSubmit(true);
 
+    const prepare_request = isEmpty(newSelectedGranteeCapabilities) ? null: dependenciesGRN;
+
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
+      prepare_request,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
-      onSetEntityShare(payload);
+      onSetEntityShare({ selected_grantee_capabilities: newSelectedGranteeCapabilities });
       setDisableSubmit(false);
 
       return response;
@@ -127,7 +135,7 @@ const EntityCreateShareFormGroup = ({
   };
 
   return (
-    <>
+    <Section title="">
       {entityShareState ? (
         <>
           <ShareFormSection>
@@ -179,7 +187,7 @@ const EntityCreateShareFormGroup = ({
       ) : (
         <Spinner />
       )}
-    </>
+    </Section>
   );
 };
 

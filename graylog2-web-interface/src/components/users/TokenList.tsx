@@ -21,13 +21,12 @@ import {
   ClipboardButton,
   Icon,
   SearchForm,
-  Spinner,
   IfPermitted,
   Timestamp,
   NoEntitiesExist,
   RelativeTime,
 } from 'components/common';
-import { Button, ButtonToolbar, Panel, Table } from 'components/bootstrap';
+import { Button, Panel, Table } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
 import { Headline } from 'components/common/Section/SectionComponent';
@@ -35,6 +34,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import type User from 'logic/users/User';
 
 import CreateTokenForm from './CreateTokenForm';
+import TokenActions from './UsersTokenManagement/TokenManagementActions';
 
 const StyledTokenPanel = styled(Panel)`
   &.panel {
@@ -58,14 +58,13 @@ const StyledSearchForm = styled(SearchForm)`
 
 type Props = {
   creatingToken?: boolean;
-  deletingToken?: string;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => Promise<Token>;
-  onDelete: (tokenId: string, tokenName: string) => void;
   tokens?: TokenSummary[];
   user: User;
+  onDelete?: () => void;
 };
 
-const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDelete, user, tokens = [] }: Props) => {
+const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {}, tokens = [] }: Props) => {
   const currentUser = useCurrentUser();
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
@@ -78,20 +77,10 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = ({ tokenName, tokenTtl }) => {
-    const promise = onCreate({ tokenName, tokenTtl });
-
-    promise.then((token) => {
-      setCreatedToken(token);
-
-      return token;
-    });
+  const handleTokenCreation = async ({ tokenName, tokenTtl }) => {
+    const token = await onCreate({ tokenName, tokenTtl });
+    setCreatedToken(token);
   };
-
-  const deleteToken = (token: TokenSummary) => () => {
-    onDelete(token.id, token.name);
-  };
-
   const updateQuery = (nextQuery?: string) => setQuery(nextQuery || '');
 
   return (
@@ -155,15 +144,12 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
                     <Timestamp dateTime={token.expires_at} />
                   </td>
                   <td>
-                    <ButtonToolbar className="pull-right">
-                      <Button
-                        bsSize="xsmall"
-                        disabled={deletingToken === token.id}
-                        bsStyle="danger"
-                        onClick={deleteToken(token)}>
-                        {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
-                      </Button>
-                    </ButtonToolbar>
+                    <TokenActions
+                      userId={currentUser.id}
+                      tokenId={token.id}
+                      tokenName={token.name}
+                      onDeleteCallback={onDelete}
+                    />
                   </td>
                 </tr>
               );

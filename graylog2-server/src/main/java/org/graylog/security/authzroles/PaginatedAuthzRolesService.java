@@ -18,7 +18,7 @@ package org.graylog.security.authzroles;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
@@ -45,7 +45,7 @@ public class PaginatedAuthzRolesService {
     private static final String COLLECTION_NAME = "roles";
 
     private final MongoCollection<AuthzRoleDTO> collection;
-    private final MongoCollection<Document> documentCollection;
+    private final com.mongodb.client.MongoCollection<Document> documentCollection;
     private final UserService userService;
 
     private final MongoUtils<AuthzRoleDTO> mongoUtils;
