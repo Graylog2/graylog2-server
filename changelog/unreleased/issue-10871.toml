@@ -2,4 +2,4 @@ type = "f"
 message = "Fixed permission issues on Configurations -> Decorators edit / create modal"
 
 issues = ["10871"]
-pulls = []
+pulls = ["Graylog2/graylog2-server#22877"]
