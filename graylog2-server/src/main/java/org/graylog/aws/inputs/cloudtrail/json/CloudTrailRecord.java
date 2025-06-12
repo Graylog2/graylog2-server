@@ -111,7 +111,14 @@ public class CloudTrailRecord implements Serializable {
 
     public String getConstructedMessage() {
         return eventSource + ":" + eventName + " in " + awsRegion + " by " + sourceIPAddress + " / " +
-                Optional.ofNullable(userIdentity).map(i -> i.userName).orElse("<unknown user_name>");
+                Optional.ofNullable(userIdentity)
+                        .map(ui -> ui.userName != null ? ui.userName :
+                                Optional.ofNullable(ui.sessionContext)
+                                        .map(sc -> sc.sessionIssuer)
+                                        .map(issuer -> issuer.userName)
+                                        .orElse(null)
+                        )
+                        .orElse("<unknown user_name>");
     }
 
 }
