@@ -22,6 +22,11 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 public class CloudTrailUserIdentity {
+    private static final String USER_TYPE = "user_type";
+    private static final String USER_NAME = "user_name";
+    private static final String USER_PRINCIPAL_ID = "user_principal_id";
+    private static final String USER_PRINCIPAL_ARN = "user_principal_arn";
+    private static final String USER_ACCOUNT_ID = "user_account_id";
     @JsonProperty("type")
     public String type;
     @JsonProperty("principalId")
@@ -40,11 +45,11 @@ public class CloudTrailUserIdentity {
     public Map<String, Object> additionalFieldsAsMap() {
         Map<String, Object> m = Maps.newHashMap();
 
-        m.put("user_type", type);
-        m.put("user_name", userName);
-        m.put("user_principal_id", principalId);
-        m.put("user_principal_arn", arn);
-        m.put("user_account_id", accountId);
+        m.put(USER_TYPE, type);
+        m.put(USER_NAME, userName);
+        m.put(USER_PRINCIPAL_ID, principalId);
+        m.put(USER_PRINCIPAL_ARN, arn);
+        m.put(USER_ACCOUNT_ID, accountId);
         m.put("user_access_key_id", accessKeyId);
 
         if (sessionContext != null && sessionContext.attributes != null) {
@@ -53,11 +58,11 @@ public class CloudTrailUserIdentity {
         }
 
         if (sessionContext != null && sessionContext.sessionIssuer != null) {
-            m.put("user_type", sessionContext.sessionIssuer.type);
-            m.put("user_name", sessionContext.sessionIssuer.userName);
-            m.put("user_principal_id", sessionContext.sessionIssuer.principalId);
-            m.put("user_principal_arn", sessionContext.sessionIssuer.arn);
-            m.put("user_account_id", sessionContext.sessionIssuer.accountId);
+            m.put(USER_TYPE, sessionContext.sessionIssuer.type);
+            m.put(USER_NAME, sessionContext.sessionIssuer.userName);
+            m.put(USER_PRINCIPAL_ID, sessionContext.sessionIssuer.principalId);
+            m.put(USER_PRINCIPAL_ARN, sessionContext.sessionIssuer.arn);
+            m.put(USER_ACCOUNT_ID, sessionContext.sessionIssuer.accountId);
         }
 
         return m;
