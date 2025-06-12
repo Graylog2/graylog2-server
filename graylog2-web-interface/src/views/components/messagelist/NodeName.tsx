@@ -60,7 +60,7 @@ const NodeName = ({ nodeId }: Props) => {
   }
 
   return (
-    <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>
+    <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)} title={`Cluster node ${node.short_node_id} / ${node.hostname}`}>
       <NodeTitle shortNodeId={node.short_node_id} hostname={node.hostname} />
     </Link>
   );
