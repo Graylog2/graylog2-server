@@ -98,6 +98,11 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     });
   };
 
+  const handleTabClick = (category: TemplateCategorySegment) => {
+    setTempSelectedTemplate(undefined);
+    setSelectedTemplateCategory(category);
+  };
+
   const handleSubmit = () => {
     trackSelectedTemplate();
     setSelectedIndexSetTemplate(tempSelectedTemplate);
@@ -147,7 +152,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
               <SegmentedControl<TemplateCategorySegment>
                 data={templateCategorySegments}
                 value={selectedTemplateCategory}
-                onChange={setSelectedTemplateCategory}
+                onChange={handleTabClick}
               />
             </Col>
           </Row>

@@ -51,6 +51,26 @@ const ConfirmDialog = ({
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
+  const submit = hideCancelButton ? (
+    <ModalSubmit
+      autoFocus
+      onSubmit={onConfirm}
+      submitButtonType="button"
+      disabledSubmit={btnConfirmDisabled}
+      submitButtonText={btnConfirmText}
+    />
+  ) : (
+    <ModalSubmit
+      autoFocus
+      onCancel={onCancel}
+      onSubmit={onConfirm}
+      submitButtonType="button"
+      disabledSubmit={btnConfirmDisabled}
+      submitButtonText={btnConfirmText}
+      displayCancel
+    />
+  );
+
   return (
     <StyledModal show={show} onHide={onHide}>
       <Modal.Header>
@@ -59,16 +79,7 @@ const ConfirmDialog = ({
 
       <Modal.Body>{children}</Modal.Body>
 
-      <Modal.Footer>
-        <ModalSubmit
-          onCancel={onCancel}
-          onSubmit={onConfirm}
-          submitButtonType="button"
-          disabledSubmit={btnConfirmDisabled}
-          submitButtonText={btnConfirmText}
-          displayCancel={!hideCancelButton as any}
-        />
-      </Modal.Footer>
+      <Modal.Footer>{submit}</Modal.Footer>
     </StyledModal>
   );
 };
