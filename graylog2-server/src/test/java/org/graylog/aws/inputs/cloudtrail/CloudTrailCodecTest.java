@@ -24,13 +24,21 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class CloudTrailCodecTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
+
+    private static final String STATIC_CREDENTIALS_FILE = "static_credentials.json";
+    private static final String TEMPORARY_CREDENTIALS_FILE = "temporary_credentials.json";
 
     @Test
     public void testAdditionalEventDataField() {
@@ -107,4 +115,33 @@ public class CloudTrailCodecTest {
         Message message = codec.decodeSafe(rawMessage).get();
         assertNull(message.getField("additional_event_data"));
     }
+
+    @Test
+    public void testIssue22086WithStaticCreds() throws IOException, URISyntaxException {
+        final CloudTrailCodec codec = new CloudTrailCodec(Configuration.EMPTY_CONFIGURATION,
+                new ObjectMapperProvider().get(), messageFactory);
+
+        Message message = codec.decodeSafe(getRawMessageFromFile(STATIC_CREDENTIALS_FILE)).get();
+        String userName = message.getField("user_name").toString();
+        assertEquals("Alice", userName);
+    }
+
+    @Test
+    public void testIssue22086WithTempCreds() throws IOException, URISyntaxException {
+        final CloudTrailCodec codec = new CloudTrailCodec(Configuration.EMPTY_CONFIGURATION,
+                new ObjectMapperProvider().get(), messageFactory);
+
+        Message message = codec.decodeSafe(getRawMessageFromFile(TEMPORARY_CREDENTIALS_FILE)).get();
+        String userName = message.getField("user_name").toString();
+
+        assertEquals("someTestUser", userName);
+        assertEquals("AROAIDPPEZS35WEXAMPLE", message.getField("user_principal_id"));
+        assertEquals("arn:aws:iam::123456789012:role/someTestUser", message.getField("user_principal_arn"));
+    }
+
+    private RawMessage getRawMessageFromFile(String fileName) throws IOException, URISyntaxException {
+        File events = new File(this.getClass().getResource(fileName).toURI());
+        return new RawMessage(Files.readString(events.toPath(), StandardCharsets.UTF_8).getBytes(StandardCharsets.UTF_8));
+    }
+
 }
