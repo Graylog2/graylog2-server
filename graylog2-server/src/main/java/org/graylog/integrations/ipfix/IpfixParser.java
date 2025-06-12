@@ -38,7 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 /**
  * A Graylog specific IPFIX parser.
@@ -54,7 +54,7 @@ import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpret
  * </p>
  */
 public class IpfixParser {
-    private static final RateLimitedLog LOG = getRateLimitedLog(IpfixParser.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(IpfixParser.class);
     private static final int SETID_RESERVED0 = 0;
     private static final int SETID_RESERVED1 = 1;
     private static final int SETID_TEMPLATE = 2;
