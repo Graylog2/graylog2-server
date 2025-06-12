@@ -26,8 +26,10 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import jakarta.annotation.Nullable;
+import jakarta.inject.Named;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
+import org.graylog2.inputs.transports.netty.HttpForwardedForHandler;
 import org.graylog2.inputs.transports.netty.HttpHandler;
 import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
 import org.graylog2.plugin.InputFailureRecorder;
@@ -43,8 +45,10 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.utilities.IpSubnet;
 
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -66,6 +70,10 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     static final String CK_AUTHORIZATION_HEADER_VALUE = "authorization_header_value";
     private static final String AUTHORIZATION_HEADER_NAME_LABEL = "Authorization Header Name";
     private static final String AUTHORIZATION_HEADER_VALUE_LABEL = "Authorization Header Value";
+    static final String CK_REAL_IP_HEADER_NAME = "real_ip_header_name";
+    static final String CK_ENABLE_FORWARDED_FOR = "enable_forwarded_for";
+    static final String CK_REQUIRE_TRUSTED_PROXIES = "require_trusted_proxies";
+    static final String CK_ENABLE_REAL_IP_HEADER = "enable_real_ip_header";
 
     protected final boolean enableBulkReceiving;
     protected final boolean enableCors;
@@ -73,7 +81,12 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     private final int idleWriterTimeout;
     private final String authorizationHeader;
     private final String authorizationHeaderValue;
+    private final Set<IpSubnet> trustedProxies;
     private final String path;
+    private final boolean enableForwardedFor;
+    private final boolean requireTrustedProxies;
+    private final boolean enableRealIpHeader;
+    private final String realIpHeaders;
 
     public AbstractHttpTransport(Configuration configuration,
                                  EventLoopGroup eventLoopGroup,
@@ -81,7 +94,9 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                                  NettyTransportConfiguration nettyTransportConfiguration,
                                  ThroughputCounter throughputCounter,
                                  LocalMetricRegistry localRegistry,
-                                 TLSProtocolsConfiguration tlsConfiguration, String path) {
+                                 TLSProtocolsConfiguration tlsConfiguration,
+                                 @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
+                                 String path) {
         super(configuration,
                 throughputCounter,
                 localRegistry,
@@ -95,6 +110,11 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
         this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
         this.authorizationHeaderValue = configuration.getString(CK_AUTHORIZATION_HEADER_VALUE);
+        this.enableForwardedFor = configuration.getBoolean(CK_ENABLE_FORWARDED_FOR);
+        this.requireTrustedProxies = configuration.getBoolean(CK_REQUIRE_TRUSTED_PROXIES);
+        this.enableRealIpHeader = configuration.getBoolean(CK_ENABLE_REAL_IP_HEADER);
+        this.realIpHeaders = configuration.getString(CK_REAL_IP_HEADER_NAME);
+        this.trustedProxies = trustedProxies;
         this.path = path;
     }
 
@@ -120,6 +140,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         handlers.put("decompressor", HttpContentDecompressor::new);
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
+        handlers.put("http-forwarded-for-handler", () -> new HttpForwardedForHandler(enableForwardedFor, enableRealIpHeader, realIpHeaders, requireTrustedProxies, trustedProxies));
         handlers.put("http-handler", () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValue, path));
         if (enableBulkReceiving) {
             handlers.put("http-bulk-newline-decoder",
@@ -180,6 +201,31 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>N",
                     ConfigurationField.Optional.OPTIONAL,
                     TextField.Attribute.IS_PASSWORD));
+            r.addField(new BooleanField(
+                    CK_ENABLE_FORWARDED_FOR,
+                    "Take original client IP from X-Forwarded-For or Forwarded headers",
+                    false,
+                    "Parse X-Forwarded-For and Forwarded (RFC 7239) headers to find the original client IP address, when relayed through proxies or load balancers."
+            ));
+            r.addField(new BooleanField(
+                    CK_REQUIRE_TRUSTED_PROXIES,
+                    "Require all proxies to be in the trusted proxies list",
+                    false,
+                    "Check all relaying proxies for forwarded-for headers to match the server configuration's trusted_proxies setting."
+            ));
+            r.addField(new BooleanField(
+                    CK_ENABLE_REAL_IP_HEADER,
+                    "Enable trusting the original client IP header(s)",
+                    false,
+                    "If enabled try to find the original client IP in one of the specified 'real ip' headers."
+            ));
+            r.addField(new TextField(
+                    CK_REAL_IP_HEADER_NAME,
+                    "Header(s) containing the original client IP",
+                    "X-Real-IP, X-Client-IP, CF-Connecting-IP, True-Client-IP, Fastly-Client-IP",
+                    "Some services and proxies set the first non-proxy IP address in a special header, these headers are checked in order if specified. Separate multiple headers by comma.",
+                    ConfigurationField.Optional.OPTIONAL
+            ));
             return r;
         }
     }
