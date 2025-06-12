@@ -21,6 +21,8 @@ import type { SelectInstance } from 'react-select';
 
 import Select from 'components/common/Select';
 
+type TimezoneLabel = { label: string, disabled?: boolean, value: string }
+
 type TimezoneSelectProps = Omit<
   React.ComponentProps<typeof Select>,
   'inputId' | 'onChange' | 'placeholder' | 'options' | 'optionRenderer'
@@ -75,7 +77,7 @@ class TimezoneSelect extends React.Component<
       timezones[area].push(location);
     });
 
-    const labels = [];
+    const labels: TimezoneLabel[] = [{ label: "Browser's time zone", value: '' }];
 
     Object.keys(timezones)
       .sort()
