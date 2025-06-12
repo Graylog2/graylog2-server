@@ -26,6 +26,7 @@ import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
 import type { TelemetryDataType } from 'logic/telemetry/useTelemetryData';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
 import AppConfig from 'util/AppConfig';
+import useSystemDetails from 'hooks/useSystemDetails';
 
 const getGlobalProps = (telemetryData: TelemetryDataType) => {
   const {
@@ -60,6 +61,7 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
 const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const theme = useTheme();
+  const system = useSystemDetails();
 
   const isPosthogLoaded = useCallback(() => posthog?.__loaded === true, [posthog]);
 
@@ -121,7 +123,7 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
 
     const sendErrorReport = (error: unknown) => {
       try {
-        posthog.captureException(error);
+        posthog.captureException(error, { version: system?.version });
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn('Unable to report exception: ', e);
