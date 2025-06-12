@@ -20,8 +20,6 @@ import styled from 'styled-components';
 import Select from 'components/common/Select';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { defaultCompare } from 'logic/DefaultCompare';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
 
 export const DEFAULT_STREAM_ID = '000000000000000000000001';
 export const DEFAULT_SEARCH_ID = 'DEFAULT_SEARCH';
@@ -37,13 +35,12 @@ type Props = {
 };
 
 const StreamSelect = ({ onChange, value, streams }: Props) => {
-  const { permissions } = useCurrentUser();
   const options = [
     { label: 'Default Search', value: DEFAULT_SEARCH_ID },
     ...streams
       .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
       .map(({ title, id }) => ({ label: title, value: id })),
-  ].filter(({ value: id }: { value: string }) => isPermitted(permissions, `streams:edit:${id}`));
+  ];
 
   return (
     <SelectContainer>
