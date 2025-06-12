@@ -302,8 +302,6 @@ const Routes = {
 
   show_saved_search: (searchId: string) => `/search/${searchId}`,
 
-  node: (nodeId: string) => `/system/nodes/${nodeId}`,
-
   node_inputs: (nodeId: string) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
   global_input_extractors: (inputId: string) => `/system/inputs/${inputId}/extractors`,
   local_input_extractors: (nodeId: string, inputId: string) => `/system/inputs/${nodeId}/${inputId}/extractors`,
