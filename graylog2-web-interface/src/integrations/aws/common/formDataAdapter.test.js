@@ -45,7 +45,7 @@ describe('formDataAdapter', () => {
       kinesis_record_batch_size: 'awsCloudWatchBatchSize',
       kinesis_stream_name: 'awsCloudWatchKinesisStream',
       throttling_allowed: 'awsCloudWatchThrottleEnabled',
-      override_source: 'overrideSource'
+      override_source: 'overrideSource',
     };
 
     const request = toGenericInputCreateRequest(formData);
@@ -165,13 +165,13 @@ describe('formDataAdapter', () => {
 
   it('adapts formData into an InputCreateRequest with key & secret', () => {
     const request = testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
-    
+
     expect(request).toBeDefined();
   });
 
   it('adapts formData into an InputCreateRequest with automatic auth', () => {
     const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
-    
+
     expect(request).toBeDefined();
   });
 });

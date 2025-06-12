@@ -76,11 +76,11 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
         setCurrentStep(key);
         setEnabledStep(key);
       } else if (externalInputSubmit) {
-          onSubmit(maybeFormData);
-        } else {
-          // history.push(Routes.SYSTEM.INPUTS);
-          navigate(Routes.SYSTEM.INPUTS);
-        }
+        onSubmit(maybeFormData);
+      } else {
+        // history.push(Routes.SYSTEM.INPUTS);
+        navigate(Routes.SYSTEM.INPUTS);
+      }
     };
 
     return [
@@ -141,14 +141,14 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
 
   return (
     <Wizard
-        steps={wizardSteps}
-        activeStep={currentStep}
-        onStepChange={handleStepChange}
-        horizontal
-        justified
-        hidePreviousNextButtons>
-        {sidebar}
-      </Wizard>
+      steps={wizardSteps}
+      activeStep={currentStep}
+      onStepChange={handleStepChange}
+      horizontal
+      justified
+      hidePreviousNextButtons>
+      {sidebar}
+    </Wizard>
   );
 };
 

@@ -80,7 +80,7 @@ const RemediationStepRenderer = ({
   );
 };
 
-const EventProcedureRenderer = ({ eventProcedureId, event }: { eventProcedureId: string, event: Event }) => {
+const EventProcedureRenderer = ({ eventProcedureId, event }: { eventProcedureId: string; event: Event }) => {
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
 
   return (
