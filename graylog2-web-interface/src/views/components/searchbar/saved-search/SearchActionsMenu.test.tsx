@@ -87,6 +87,7 @@ describe('SearchActionsMenu', () => {
   const createView = (id: string = undefined) =>
     View.builder()
       .id(id)
+      .search(Search.create().toBuilder().id('foosearch').build())
       .title('title')
       .type(View.Type.Search)
       .description('description')
