@@ -296,7 +296,10 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           )}
           {isAggregationEventDefinition(eventDefinition) && (
             <>
-              <MenuItem divider />
+              <IfPermitted permissions={[`eventdefinitions:edit:${eventDefinition.id}`,
+                `eventdefinitions:delete:${eventDefinition.id}`]} anyPermissions>
+                <MenuItem divider />
+              </IfPermitted>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
                 <MenuItem>Replay search</MenuItem>
               </LinkContainer>
