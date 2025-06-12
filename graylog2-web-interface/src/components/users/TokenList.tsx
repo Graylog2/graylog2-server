@@ -77,14 +77,9 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = ({ tokenName, tokenTtl }) => {
-    const promise = onCreate({ tokenName, tokenTtl });
-
-    promise.then((token) => {
-      setCreatedToken(token);
-
-      return token;
-    });
+  const handleTokenCreation = async ({ tokenName, tokenTtl }) => {
+    const token = await onCreate({ tokenName, tokenTtl });
+    setCreatedToken(token);
   };
   const updateQuery = (nextQuery?: string) => setQuery(nextQuery || '');
 
@@ -153,7 +148,8 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
                       userId={currentUser.id}
                       tokenId={token.id}
                       tokenName={token.name}
-                      onDeleteCallback={onDelete} />
+                      onDeleteCallback={onDelete}
+                    />
                   </td>
                 </tr>
               );
