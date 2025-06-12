@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 
 type IpAnonymizerConverterConfigurationProps = {
   type: string;
@@ -40,7 +40,7 @@ class IpAnonymizerConverterConfiguration extends React.Component<
   _toggleConverter = (event) => {
     let converter;
 
-    if (FormUtils.getValueFromInput(event.target) === true) {
+    if (getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 

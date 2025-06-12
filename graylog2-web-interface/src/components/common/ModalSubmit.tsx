@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import type { SyntheticEvent } from 'react';
 
 import Button from 'components/bootstrap/Button';
@@ -45,6 +46,7 @@ type WithSyncSubmit = {
 };
 
 type Props = {
+  autoFocus?: boolean;
   bsSize?: 'large' | 'small' | 'xsmall';
   className?: string;
   disabledSubmit?: boolean;
@@ -66,8 +68,9 @@ const isWithCancelProps = (props: Props): props is WithCancelProps =>
 // @ts-expect-error
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
-const ModalSubmit = (props: Props) => {
+const ModalSubmit = ({ ...props }: Props) => {
   const {
+    autoFocus = false,
     bsSize,
     className,
     disabledSubmit = false,
@@ -81,6 +84,14 @@ const ModalSubmit = (props: Props) => {
 
   const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
   const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
+  const confirmRef = useRef<HTMLButtonElement>();
+  useEffect(() => {
+    if (autoFocus && !disabledSubmit && confirmRef.current) {
+      confirmRef.current.focus();
+    }
+    // Should only run once during mount to avoid refocussing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ModalButtonToolbar className={className}>
@@ -97,6 +108,7 @@ const ModalSubmit = (props: Props) => {
         </Button>
       )}
       <Button
+        ref={confirmRef}
         bsStyle="success"
         bsSize={bsSize}
         disabled={disabledSubmit || submittingAsync}

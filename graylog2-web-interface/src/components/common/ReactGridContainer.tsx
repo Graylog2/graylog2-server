@@ -156,17 +156,17 @@ const removeGaps = (_layout: Layout) => {
  */
 const ReactGridContainer = ({
   children,
-  className,
+  className = undefined,
   columns = COLUMNS,
-  draggableHandle,
+  draggableHandle = undefined,
   isResizable = true,
   locked = false,
   measureBeforeMount = false,
   onPositionsChange,
-  onSyncLayout: _onSyncLayout,
+  onSyncLayout: _onSyncLayout = undefined,
   positions,
   rowHeight = ROW_HEIGHT,
-  width,
+  width = undefined,
 }: Props) => {
   const theme = useTheme();
   const cellMargin = theme.spacings.px.xs;

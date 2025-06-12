@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.views;
 
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
@@ -26,9 +25,9 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.indices.MongoDbIndexTools;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -75,7 +74,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
 
-        new MongoDbIndexTools<>(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
+        mongoCollections.indexUtils(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
 
     private PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,

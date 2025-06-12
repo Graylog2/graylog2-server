@@ -47,54 +47,52 @@ const DragHandle = styled.div`
   margin-right: 5px;
 `;
 
-const ListItem = forwardRef(
-  <ItemType extends ListItemType>(
-    {
-      alignItemContent = 'flex-start',
-      item,
-      index,
-      className,
-      customListItemRender,
-      customContentRender,
-      disableDragging = false,
-      draggableProps,
-      dragHandleProps,
-    }: Props<ItemType>,
-    ref,
-  ) => {
-    const itemContent = customContentRender ? customContentRender({ item, index }) : item.title;
+const ListItem = <ItemType extends ListItemType>(
+  {
+    alignItemContent = 'flex-start',
+    item,
+    index,
+    className = undefined,
+    customListItemRender = undefined,
+    customContentRender = undefined,
+    disableDragging = false,
+    draggableProps,
+    dragHandleProps,
+  }: Props<ItemType>,
+  ref: React.ForwardedRef<HTMLLIElement>,
+) => {
+  const itemContent = customContentRender ? customContentRender({ item, index }) : item.title;
 
-    if (customListItemRender) {
-      return (
-        <>
-          {customListItemRender({
-            className,
-            disableDragging,
-            draggableProps: draggableProps,
-            dragHandleProps: dragHandleProps,
-            index,
-            item,
-            ref,
-          })}
-        </>
-      );
-    }
-
+  if (customListItemRender) {
     return (
-      <StyledListGroupItem
-        $alignItemContent={alignItemContent}
-        ref={ref}
-        className={className}
-        containerProps={{ ...draggableProps }}>
-        {!disableDragging && (
-          <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
-            <Icon name="drag_indicator" />
-          </DragHandle>
-        )}
-        {itemContent}
-      </StyledListGroupItem>
+      <>
+        {customListItemRender({
+          className,
+          disableDragging,
+          draggableProps: draggableProps,
+          dragHandleProps: dragHandleProps,
+          index,
+          item,
+          ref,
+        })}
+      </>
     );
-  },
-);
+  }
 
-export default ListItem;
+  return (
+    <StyledListGroupItem
+      $alignItemContent={alignItemContent}
+      ref={ref}
+      className={className}
+      containerProps={{ ...draggableProps }}>
+      {!disableDragging && (
+        <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
+          <Icon name="drag_indicator" />
+        </DragHandle>
+      )}
+      {itemContent}
+    </StyledListGroupItem>
+  );
+};
+
+export default forwardRef(ListItem);

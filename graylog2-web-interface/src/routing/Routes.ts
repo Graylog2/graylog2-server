@@ -61,9 +61,6 @@ const Routes = {
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
     },
-    EVENT_PROCEDURES: {
-      LIST: (viewType: string) => `/alerts/event-procedures/${viewType}`,
-    },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
@@ -304,8 +301,6 @@ const Routes = {
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
   show_saved_search: (searchId: string) => `/search/${searchId}`,
-
-  node: (nodeId: string) => `/system/nodes/${nodeId}`,
 
   node_inputs: (nodeId: string) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
   global_input_extractors: (inputId: string) => `/system/inputs/${inputId}/extractors`,

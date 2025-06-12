@@ -117,10 +117,10 @@ const Tooltip = ({
   className = '',
   id,
   placement = 'right',
-  positionTop,
-  positionLeft,
-  arrowOffsetTop,
-  arrowOffsetLeft,
+  positionTop = undefined,
+  positionLeft = undefined,
+  arrowOffsetTop = undefined,
+  arrowOffsetLeft = undefined,
   show = true,
 }: TooltipProps) => (
   <StyledTooltip

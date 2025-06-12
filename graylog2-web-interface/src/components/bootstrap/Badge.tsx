@@ -38,19 +38,27 @@ type Props = React.PropsWithChildren<{
   title?: string;
 }>;
 
-const Badge = React.forwardRef<HTMLDivElement, Props>(
-  ({ bsStyle = 'default', className, children, 'data-testid': dataTestid, onClick, title }, ref) => (
-    <StyledBadge
-      color={bsStyle}
-      className={className}
-      title={title}
-      data-testid={dataTestid}
-      ref={ref}
-      variant="filled"
-      onClick={onClick}>
-      {children}
-    </StyledBadge>
-  ),
+const Badge = (
+  {
+    bsStyle = 'default',
+    className = undefined,
+    children = undefined,
+    'data-testid': dataTestid,
+    onClick = undefined,
+    title = undefined,
+  }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <StyledBadge
+    color={bsStyle}
+    className={className}
+    title={title}
+    data-testid={dataTestid}
+    ref={ref}
+    variant="filled"
+    onClick={onClick}>
+    {children}
+  </StyledBadge>
 );
 
-export default Badge;
+export default React.forwardRef(Badge);

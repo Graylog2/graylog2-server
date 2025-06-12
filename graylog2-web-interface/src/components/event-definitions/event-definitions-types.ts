@@ -55,7 +55,7 @@ export type Scheduler = {
 
 export type SearchFilter = {
   id: string;
-  type: string;
+  type: 'referenced' | 'inlineQueryString';
   title: string;
   queryString: string;
   disabled: boolean;
@@ -117,7 +117,7 @@ export type EventDefinitionFormControlsProps = {
   onOpenNextPage: () => void;
   onOpenPrevPage: () => void;
   onSubmit: (event: SyntheticEvent) => void;
-  steps: StepsType;
+  steps: StepsType<string>;
 };
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>

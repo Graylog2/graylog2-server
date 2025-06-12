@@ -135,7 +135,6 @@ const StreamRuleModal = ({
                           <TypeAheadFieldInput
                             id={name}
                             onBlur={onBlur}
-                            type="text"
                             label="Field"
                             name={name}
                             error={error && touched ? error : undefined}

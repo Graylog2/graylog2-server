@@ -19,16 +19,10 @@ package org.graylog.events.procedures;
 import com.google.inject.assistedinject.Assisted;
 
 public abstract class Action {
-    private final String title;
     private final String type;
 
     protected Action(ActionDto dto) {
-        this.title = dto.title();
         this.type = dto.config().type();
-    }
-
-    public String title() {
-        return title;
     }
 
     public String type() {
