@@ -18,8 +18,8 @@ import * as React from 'react';
 import '@testing-library/jest-dom/jest-globals';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
-import type { RenderHookResult, RenderHookOptions } from '@testing-library/react-hooks';
-import { renderHook } from '@testing-library/react-hooks';
+import type { RenderHookOptions } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { QueryClientConfig } from '@tanstack/react-query';
 
 import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
@@ -27,9 +27,10 @@ import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
 const renderHookWithWrapper = <TProps, TResult>(
   callback: (props: TProps) => TResult,
   options: RenderHookOptions<TProps> & { queryClientOptions?: QueryClientConfig } = {},
-): RenderHookResult<TProps, TResult> =>
+) =>
   renderHook(callback, {
     ...options,
+
     wrapper: ({ children }: React.PropsWithChildren<{}>) => {
       const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
 
@@ -41,5 +42,4 @@ const renderHookWithWrapper = <TProps, TResult>(
     },
   });
 
-export * from '@testing-library/react-hooks';
-export { renderHookWithWrapper as renderHook };
+export { renderHookWithWrapper as renderHook, act, waitFor };

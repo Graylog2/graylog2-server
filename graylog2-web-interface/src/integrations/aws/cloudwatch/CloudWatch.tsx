@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
@@ -43,8 +42,6 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
   const { setFormData } = useContext(FormDataContext);
   const { availableStreams } = useContext(ApiContext);
   const { sidebar, clearSidebar } = useContext(SidebarContext);
-  const [dirty, setDirty] = useState(false);
-  const [lastStep, setLastStep] = useState(false);
   // const history = useHistory();
   const navigate = useNavigate();
 
@@ -66,10 +63,6 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
         value = value.trim();
       }
 
-      if (!dirty) {
-        setDirty(true);
-      }
-
       setFormData(id, { ...fieldData, value });
     };
 
@@ -82,16 +75,12 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
 
         setCurrentStep(key);
         setEnabledStep(key);
-      } else {
-        setLastStep(true);
-
-        if (externalInputSubmit) {
+      } else if (externalInputSubmit) {
           onSubmit(maybeFormData);
         } else {
           // history.push(Routes.SYSTEM.INPUTS);
           navigate(Routes.SYSTEM.INPUTS);
         }
-      }
     };
 
     return [
@@ -135,7 +124,6 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
     availableStreams.length,
     externalInputSubmit,
     setCurrentStep,
-    dirty,
     setFormData,
     clearSidebar,
     availableSteps,
@@ -152,9 +140,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
   }, [availableSteps, setAvailableStep, wizardSteps]);
 
   return (
-    <>
-      {dirty && !lastStep && <ConfirmLeaveDialog question="Are you sure? Your new Input will not be created." />}
-      <Wizard
+    <Wizard
         steps={wizardSteps}
         activeStep={currentStep}
         onStepChange={handleStepChange}
@@ -163,7 +149,6 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
         hidePreviousNextButtons>
         {sidebar}
       </Wizard>
-    </>
   );
 };
 
