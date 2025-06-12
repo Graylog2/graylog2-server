@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -56,7 +56,7 @@ describe('useFieldTypeMutation', () => {
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
-      const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
         result.current.putFieldTypeMutation(requestBody);
@@ -72,7 +72,7 @@ describe('useFieldTypeMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
         result.current.putFieldTypeMutation(requestBody).catch(() => {});
