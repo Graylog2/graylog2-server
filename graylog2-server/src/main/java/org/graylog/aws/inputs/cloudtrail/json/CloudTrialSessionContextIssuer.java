@@ -14,27 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+package org.graylog.aws.inputs.cloudtrail.json;
 
-import { OverlayTrigger, Icon } from 'components/common';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-type Props = {
-  errorText: string;
-  title?: string;
-  placement?: 'bottom' | 'top' | 'right' | 'left';
-};
+public class CloudTrialSessionContextIssuer {
+    @JsonProperty("type")
+    public String type;
+    @JsonProperty("principalId")
+    public String principalId;
+    @JsonProperty("arn")
+    public String arn;
+    @JsonProperty("accountId")
+    public String accountId;
+    @JsonProperty("userName")
+    public String userName;
 
-const StyledSpan = styled.span`
-  margin-right: 5px;
-`;
-
-const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => (
-  <OverlayTrigger trigger={['hover', 'focus']} placement={placement} overlay={errorText} title={title} width={400}>
-    <StyledSpan>
-      <Icon name="warning" className="text-danger" />
-    </StyledSpan>
-  </OverlayTrigger>
-);
-
-export default ErrorPopover;
+}
