@@ -32,7 +32,7 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class StringConversion extends AbstractFunction<String> {
+public class StringConversion extends AbstractConversion<String> {
 
     public static final String NAME = "to_string";
 
@@ -61,7 +61,7 @@ public class StringConversion extends AbstractFunction<String> {
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final Object evaluated = valueParam.required(args, context);
         if (evaluated == null) {
-            return defaultParam.optional(args, context).orElse("");
+            return defaultToNull(args, context) ? null : defaultParam.optional(args, context).orElse("");
         }
         // fast path for the most common targets
         if (evaluated instanceof String
@@ -101,7 +101,8 @@ public class StringConversion extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(of(
                         valueParam,
-                        defaultParam
+                        defaultParam,
+                        defaultToNullParam
                 ))
                 .description("Converts a value to its string representation")
                 .ruleBuilderEnabled()
