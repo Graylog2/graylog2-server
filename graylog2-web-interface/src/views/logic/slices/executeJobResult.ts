@@ -50,12 +50,14 @@ export const buildSearchExecutionState = (
   return executionStateBuilder.build();
 };
 
-export const startJob = async (
+export type StartJobType = (
   search: Search,
   searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
-  keepQueries: string[] = [],
-): Promise<JobIds> => {
+  keepQueries: string[],
+) => Promise<JobIds>;
+
+export const startJob: StartJobType = async (search, searchTypesToSearch, executionStateParam, keepQueries = []) => {
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
   return runStartJob(search, executionState)
@@ -103,19 +105,21 @@ export const pollJob = ({
     }
   });
 
-export const executeJobResult = async ({
-  jobIds: { asyncSearchId, nodeId },
-  widgetMapping,
-  page,
-  perPage,
-  stopPolling,
-}: {
+export type ExecuteJobResultType = (param: {
   jobIds: JobIds;
   widgetMapping?: WidgetMapping;
   page?: number;
   perPage?: number;
   stopPolling?: (progress: number) => boolean;
-}): Promise<SearchExecutionResult> =>
+}) => Promise<SearchExecutionResult>;
+
+export const executeJobResult: ExecuteJobResultType = async ({
+  jobIds: { asyncSearchId, nodeId },
+  widgetMapping,
+  page,
+  perPage,
+  stopPolling,
+}) =>
   pollJob({
     jobIds: { asyncSearchId, nodeId },
     result: null,
