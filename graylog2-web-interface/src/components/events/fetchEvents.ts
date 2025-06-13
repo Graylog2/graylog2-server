@@ -68,14 +68,10 @@ const calculateTimerange = (
   }
 
   if (to) {
-    // calculating the from/to that the backend needs: the BE is subtracting seconds from now() for the "relative" with from/to both set case
-    const secondsFromWayBackTillNow = Math.trunc(moment().utc().toDate().getTime() / 1000);
-    const secondsUpToTheSelectedToDate = Math.trunc(moment(to).utc().toDate().getTime() / 1000);
-
     return {
-      type: 'relative',
-      from: secondsFromWayBackTillNow,
-      to: secondsFromWayBackTillNow - secondsUpToTheSelectedToDate,
+      type: 'absolute',
+      from: adjustFormat(0, 'internal'),
+      to: adjustFormat(moment(to).utc(), 'internal'),
     };
   }
 
