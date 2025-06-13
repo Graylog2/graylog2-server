@@ -37,7 +37,8 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class CsvMapConversion extends AbstractFunction<Map> {
+public class CsvMapConversion extends AbstractConversion<Map> {
+    private static final Map<Object, Object> DEFAULT_VALUE = Collections.emptyMap();
     private final Logger log = LoggerFactory.getLogger(CsvMapConversion.class);
 
     public static final String NAME = "csv_to_map";
@@ -93,7 +94,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
             String[] fieldNames = parser.parseLine(fields);
             if (fieldNames.length == 0) {
                 log.error("No field names found");
-                return Collections.emptyMap();
+                return computeDefault(args, context);
             }
 
             final Map<String, String> map = Maps.newHashMap();
@@ -104,18 +105,18 @@ public class CsvMapConversion extends AbstractFunction<Map> {
                     if (values.length > fieldNames.length) {
                         log.error("More columns of CSV data ({}) were specified than field names ({}). Discarding input.",
                                 values.length, fieldNames.length);
-                        return Collections.emptyMap();
+                        return computeDefault(args, context);
                     }
                 } else if (!ignoreExtraFieldNames && ignoreExtraCsvValues) {
                     if (values.length < fieldNames.length) {
                         log.error("More field names ({}) were specified than columns of CSV data ({}). Discarding input.",
                                 values.length, fieldNames.length);
-                        return Collections.emptyMap();
+                        return computeDefault(args, context);
                     }
                 } else if (values.length != fieldNames.length) {
                     log.error("Different number of columns in CSV data ({}) and configured field names ({}). Discarding input.",
                             values.length, fieldNames.length);
-                    return Collections.emptyMap();
+                    return computeDefault(args, context);
                 }
 
                 for (int i = 0; i < values.length; i++) {
@@ -127,14 +128,18 @@ public class CsvMapConversion extends AbstractFunction<Map> {
                 }
             } catch (IOException e) {
                 log.error("Invalid CSV input, discarding input", e);
-                return Collections.emptyMap();
+                return computeDefault(args, context);
             }
             return map;
 
         } catch (IOException e) {
             log.error("Error parsing csv: {}", e.getMessage());
-            return Collections.emptyMap();
+            return computeDefault(args, context);
         }
+    }
+
+    private Map computeDefault(FunctionArgs args, EvaluationContext context) {
+        return defaultToNull(args, context) ? null : DEFAULT_VALUE;
     }
 
     @Override
@@ -150,7 +155,8 @@ public class CsvMapConversion extends AbstractFunction<Map> {
                         strictQuotesParam,
                         trimParam,
                         ignoreExtraFieldNamesParam,
-                        ignoreExtraCsvValuesParam
+                        ignoreExtraCsvValuesParam,
+                        defaultToNullParam
                 ))
                 .description("Converts a single line of a CSV string into a map usable by set_fields()")
                 .ruleBuilderEnabled()
