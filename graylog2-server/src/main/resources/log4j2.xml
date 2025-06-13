@@ -52,6 +52,8 @@
             <RegexFilter regex=".*An error occurred while aborting the stream.*" onMatch="DENY" onMismatch="ACCEPT"/>
         </Logger>
         <Logger name="org.apache.iceberg.metrics.LoggingMetricsReporter" level="warn"/>
+        <!-- Silence AWS Kinesis log chatter -->
+        <Logger name="software.amazon.kinesis" level="warn"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>

@@ -45,6 +45,7 @@ describe('formDataAdapter', () => {
       kinesis_record_batch_size: 'awsCloudWatchBatchSize',
       kinesis_stream_name: 'awsCloudWatchKinesisStream',
       throttling_allowed: 'awsCloudWatchThrottleEnabled',
+      override_source: 'overrideSource'
     };
 
     const request = toGenericInputCreateRequest(formData);
@@ -82,7 +83,7 @@ describe('formDataAdapter', () => {
       cloudwatch_endpoint: 'awsEndpointCloudWatch',
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',
-      kinesis_endpoint: 'awsEndpointKinesis',
+      kinesis_endpoint: 'awsEndpointKinesis'
     };
 
     const request = toAWSRequest(formData, options);
@@ -106,7 +107,7 @@ describe('formDataAdapter', () => {
   };
 
   it('adapts formData into an AWS request with key & secret', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
       awsCloudWatchAssumeARN: { value: '' },
       awsCloudWatchAwsKey: { value: 'mykey' },
@@ -116,10 +117,12 @@ describe('formDataAdapter', () => {
       awsEndpointKinesis: { value: undefined },
       awsCloudWatchAwsSecret: { value: 'mysecret' },
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with automatic auth', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
       awsCloudWatchAssumeARN: { value: '' },
       key: 'mykey',
@@ -129,6 +132,8 @@ describe('formDataAdapter', () => {
       awsEndpointKinesis: { value: undefined },
       secret: 'mysecret',
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with additional options', () => {
@@ -155,10 +160,14 @@ describe('formDataAdapter', () => {
   });
 
   it('adapts formData into an InputCreateRequest with key & secret', () => {
-    testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+    
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an InputCreateRequest with automatic auth', () => {
-    testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+    
+    expect(request).toBeDefined();
   });
 });

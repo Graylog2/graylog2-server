@@ -24,8 +24,8 @@ import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = KinesisHealthCheckRequest.Builder.class)
-public abstract class KinesisHealthCheckRequest implements AWSRequest {
+@JsonDeserialize(builder = KinesisRequest.Builder.class)
+public abstract class KinesisRequest implements AWSRequest {
 
     private static final String STREAM_NAME = "stream_name";
 
@@ -40,12 +40,12 @@ public abstract class KinesisHealthCheckRequest implements AWSRequest {
     public static abstract class Builder implements AWSRequest.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_KinesisHealthCheckRequest.Builder();
+            return new AutoValue_KinesisRequest.Builder();
         }
 
         @JsonProperty(STREAM_NAME)
         public abstract Builder streamName(String streamName);
 
-        public abstract KinesisHealthCheckRequest build();
+        public abstract KinesisRequest build();
     }
 }

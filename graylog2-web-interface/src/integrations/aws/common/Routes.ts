@@ -36,6 +36,7 @@ const ApiRoutes = {
       KINESIS: {
         HEALTH_CHECK: '/plugins/org.graylog.integrations/aws/kinesis/health_check',
         STREAMS: '/plugins/org.graylog.integrations/aws/kinesis/streams',
+        STREAM_ARN: '/plugins/org.graylog.integrations/aws/kinesis/stream_arn',
         SAVE: '/plugins/org.graylog.integrations/aws/inputs?setup_wizard=true',
       },
       KINESIS_AUTO_SETUP: {
