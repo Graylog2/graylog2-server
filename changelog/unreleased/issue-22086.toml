@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix AWS CloudTrail input to support IAM temporary security credentials."
+
+issues = ["22086"]
