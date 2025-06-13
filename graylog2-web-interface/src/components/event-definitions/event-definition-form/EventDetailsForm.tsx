@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import get from 'lodash/get';
-import map from 'lodash/map';
+import * as React from 'react';
 import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
@@ -26,6 +24,7 @@ import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEdito
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import * as FormsUtils from 'util/FormsUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -36,10 +35,12 @@ import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
-const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({
-  value: key,
-  label: upperFirst(value.name),
-})).sort((a, b) => Number(b.value) - Number(a.value));
+const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
+  .map(([key, value]) => ({
+    value: key,
+    label: upperFirst(value.name),
+  }))
+  .sort((a, b) => Number(b.value) - Number(a.value));
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -58,19 +59,17 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
   const {
     data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  } = usePluggableLicenseCheck('/license/security');
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
 
     onChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
-  const handlePriorityChange = (nextPriority) => {
+  const handlePriorityChange = (nextPriority: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.PRIORITY_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-details',
@@ -131,7 +130,11 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             readOnly={readOnly}
             height={150}
             value={eventDefinition.remediation_steps}
-            onChange={(newValue: string) => handleChange({ target: { name: 'remediation_steps', value: newValue } })}
+            onChange={(newValue: string) =>
+              handleChange({
+                target: { name: 'remediation_steps', value: newValue },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
           />
         )}
       </div>
@@ -150,11 +153,9 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               label="Title"
               type="text"
               bsStyle={validation.errors.title ? 'error' : null}
-              help={get(
-                validation,
-                'errors.title[0]',
-                'Title for this Event Definition, Events and Alerts created from it.',
-              )}
+              help={
+                validation?.errors?.title?.[0] ?? 'Title for this Event Definition, Events and Alerts created from it.'
+              }
               value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
