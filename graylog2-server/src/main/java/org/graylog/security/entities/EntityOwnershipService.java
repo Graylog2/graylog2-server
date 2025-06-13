@@ -47,37 +47,29 @@ public class EntityOwnershipService {
     }
 
     public void registerNewEventDefinition(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, id);
-        registerNewEntity(grn, user);
+        registerNewEntity(id, user, GRNTypes.EVENT_DEFINITION);
     }
 
     public void registerNewEventNotification(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_NOTIFICATION, id);
-        registerNewEntity(grn, user);
+        registerNewEntity(id, user, GRNTypes.EVENT_NOTIFICATION);
     }
 
     public void registerNewDashboard(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
-        registerNewEntity(grn, user);
+        registerNewEntity(id, user, GRNTypes.DASHBOARD);
     }
 
     public void registerNewSearch(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(GRNTypes.SEARCH, id);
-        registerNewEntity(grn, user);
+        registerNewEntity(id, user, GRNTypes.SEARCH);
     }
 
     public void registerNewStream(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(GRNTypes.STREAM, id);
-        registerNewEntity(grn, user);
+        registerNewEntity(id, user, GRNTypes.STREAM);
     }
 
-    //TODO: this method could replace all methods from registerNew... family, so that we don't have to add two methods and tests for each new GRN Type in the future
     public void registerNewEntity(final String id, final User user, final GRNType grnType) {
-        final GRN grn = grnRegistry.newGRN(grnType, id);
-        registerNewEntity(grn, user);
+        registerNewEntity(grnRegistry.newGRN(grnType, id), user);
     }
 
-    //TODO: this method could replace all methods from unregister... family, so that we don't have to add two methods and tests for each new GRN Type in the future
     public void unregisterEntity(final String id, final GRNType grnType) {
         removeGrantsForTarget(grnRegistry.newGRN(grnType, id));
     }
@@ -85,6 +77,31 @@ public class EntityOwnershipService {
     public List<GrantDTO> getGrantsForTarget(final GRNType type, final String id) {
         final GRN grn = grnRegistry.newGRN(type, id);
         return dbGrantService.getForTarget(grn);
+    }
+
+    public void unregisterStream(String id) {
+        unregisterEntity(id, GRNTypes.STREAM);
+    }
+
+    public void unregisterDashboard(String id) {
+        unregisterEntity(id, GRNTypes.DASHBOARD);
+    }
+
+    public void unregisterSearch(String id) {
+        unregisterEntity(id, GRNTypes.SEARCH);
+    }
+
+    public void unregisterEventDefinition(String id) {
+        unregisterEntity(id, GRNTypes.EVENT_DEFINITION);
+    }
+
+    public void unregisterEventNotification(String id) {
+        unregisterEntity(id, GRNTypes.EVENT_NOTIFICATION);
+    }
+
+    private void removeGrantsForTarget(GRN target) {
+        LOG.debug("Removing grants for <{}>", target);
+        dbGrantService.deleteForTarget(target);
     }
 
     private void registerNewEntity(GRN entity, User user) {
@@ -101,28 +118,4 @@ public class EntityOwnershipService {
                 .build(), user);
     }
 
-    public void unregisterStream(String id) {
-        removeGrantsForTarget(grnRegistry.newGRN(GRNTypes.STREAM, id));
-    }
-
-    public void unregisterDashboard(String id) {
-        removeGrantsForTarget(grnRegistry.newGRN(GRNTypes.DASHBOARD, id));
-    }
-
-    public void unregisterSearch(String id) {
-        removeGrantsForTarget(grnRegistry.newGRN(GRNTypes.SEARCH, id));
-    }
-
-    public void unregisterEventDefinition(String id) {
-        removeGrantsForTarget(grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, id));
-    }
-
-    public void unregisterEventNotification(String id) {
-        removeGrantsForTarget(grnRegistry.newGRN(GRNTypes.EVENT_NOTIFICATION, id));
-    }
-
-    private void removeGrantsForTarget(GRN target) {
-        LOG.debug("Removing grants for <{}>", target);
-        dbGrantService.deleteForTarget(target);
-    }
 }
