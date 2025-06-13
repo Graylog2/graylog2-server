@@ -25,7 +25,7 @@ const Item = styled.div`
 const TextWidgetEdit = ({ config, onChange }: EditWidgetComponentProps<TextWidgetConfig>) => {
   const [text, setText] = useState(config?.text ?? '');
   const _onChange = useMemo(
-    () => debounce((newText: string) => onChange(new TextWidgetConfig(newText)), 50),
+    () => debounce((newText: string) => onChange(new TextWidgetConfig(newText)), 200),
     [onChange],
   );
 
