@@ -1,0 +1,5 @@
+type = "f"
+message = "fix Enterprise overview document title show [object object]."
+
+issues = ["Graylog2/graylog-plugin-enterprise#11020"]
+pulls = ["22838"]
