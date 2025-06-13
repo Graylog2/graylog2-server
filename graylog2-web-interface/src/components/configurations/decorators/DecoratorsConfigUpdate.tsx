@@ -20,7 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { Modal } from 'components/bootstrap';
+import { Modal, Alert } from 'components/bootstrap';
 import { IfPermitted, ModalSubmit } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
@@ -72,7 +72,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const { permissions } = useCurrentUser();
 
   const canEditStream = useMemo(
-    () => isPermitted(permissions, `streams:edit:${currentStream}`),
+    () => isPermitted(permissions, `streams:edit:${currentStream}`) || currentStream === DEFAULT_SEARCH_ID,
     [currentStream, permissions],
   );
 
@@ -130,7 +130,12 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
       </Modal.Header>
       <Modal.Body>
         <p>Select the stream for which you want to change the set of default decorators.</p>
+
         <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
+
+        {!canEditStream && currentStream && (
+          <Alert bsStyle="warning">Read only access - you need permission to edit the selected stream</Alert>
+        )}
 
         <IfPermitted permissions="decorators:create">
           <p>Select the type to create a new decorator for this stream:</p>
