@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -53,7 +53,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
 
   it('should run fetch and display UserNotification', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve({}));
-    const { result, waitFor } = renderHook(() => useRemoveProfileFromIndexMutation(), {
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation(), {
       queryClientOptions: { logger },
     });
 
@@ -71,7 +71,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
   it('should display notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderHook(() => useRemoveProfileFromIndexMutation(), {
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation(), {
       queryClientOptions: { logger },
     });
 

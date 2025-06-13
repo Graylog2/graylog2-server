@@ -14,4 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/// <reference types="jest-enzyme" />
+import React from 'react';
+
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
+import usePermissions from 'hooks/usePermissions';
+
+const EventNotificationLink = ({ id, title }) => {
+  const { isPermitted } = usePermissions();
+
+  if (!isPermitted(`eventnotifications:read:${id}`)) return title ?? <em>{id}</em>;
+
+  return <Link to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title ?? id}</Link>;
+};
+
+export default EventNotificationLink;
