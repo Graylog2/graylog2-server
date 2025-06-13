@@ -269,7 +269,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
             <MenuItem
               disabled={isSystemEventDefinition(eventDefinition)}
-              title={isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined}
+              title={
+                isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined
+              }
               onClick={
                 isSystemEventDefinition(eventDefinition)
                   ? undefined
@@ -296,8 +298,12 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           )}
           {isAggregationEventDefinition(eventDefinition) && (
             <>
-              <IfPermitted permissions={[`eventdefinitions:edit:${eventDefinition.id}`,
-                `eventdefinitions:delete:${eventDefinition.id}`]} anyPermissions>
+              <IfPermitted
+                permissions={[
+                  `eventdefinitions:edit:${eventDefinition.id}`,
+                  `eventdefinitions:delete:${eventDefinition.id}`,
+                ]}
+                anyPermissions>
                 <MenuItem divider />
               </IfPermitted>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>

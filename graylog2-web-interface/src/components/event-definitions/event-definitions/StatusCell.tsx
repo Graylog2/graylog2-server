@@ -59,8 +59,9 @@ const StatusCell = ({ eventDefinition }: Props) => {
   const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const isEnabled = eventDefinition?.state === 'ENABLED';
   const currentUser = useCurrentUser();
-  const disableChange = isSystemEventDefinition(eventDefinition)
-    || !isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinition.id}`);
+  const disableChange =
+    isSystemEventDefinition(eventDefinition) ||
+    !isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinition.id}`);
   const description = isEnabled ? 'enabled' : 'disabled';
   const title = _title(!isEnabled, disableChange, description);
 
