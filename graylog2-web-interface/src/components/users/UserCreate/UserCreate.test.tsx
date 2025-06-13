@@ -73,8 +73,6 @@ describe('<UserCreate />', () => {
       const lastNameInput = await screen.findByLabelText('Last Name');
       const emailInput = await screen.findByLabelText('E-Mail Address');
       const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
-      const timezoneSelect = await screen.findByLabelText('Time Zone');
-      const roleSelect = await screen.findByText(/search for roles/i);
       const passwordInput = await screen.findByPlaceholderText('Password');
       const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
       const submitButton = await findSubmitButton();
@@ -90,21 +88,9 @@ describe('<UserCreate />', () => {
       await userEvent.clear(timeoutAmountInput);
       await userEvent.type(timeoutAmountInput, '40');
 
-      await act(async () => {
-        await selectEvent.openMenu(timezoneSelect);
-      });
+      await selectEvent.selectOption('Time Zone', 'Berlin');
 
-      await act(async () => {
-        await selectEvent.select(timezoneSelect, 'Berlin');
-      });
-
-      await act(async () => {
-        await selectEvent.openMenu(roleSelect);
-      });
-
-      await act(async () => {
-        await selectEvent.select(roleSelect, 'Manager');
-      });
+      await selectEvent.selectOption('search for roles', 'Manager');
 
       await userEvent.type(passwordInput, 'thepassword');
       await userEvent.type(passwordRepeatInput, 'thepassword');

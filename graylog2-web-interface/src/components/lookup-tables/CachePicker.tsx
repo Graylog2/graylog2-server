@@ -49,7 +49,6 @@ const CachePicker = ({ caches = [] }: Props) => {
           placeholder="Select a cache"
           clearable={false}
           options={sortedCaches}
-          matchProp="label"
           onBlur={() => setTouched(true)}
           onChange={setValue}
           value={value}

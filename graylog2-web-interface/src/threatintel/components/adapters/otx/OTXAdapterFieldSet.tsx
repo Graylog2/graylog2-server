@@ -72,7 +72,6 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
           placeholder="Select indicator"
           clearable={false}
           options={OTX_INDICATORS}
-          matchProp="label"
           onChange={handleSelect('indicator')}
           value={config.indicator}
         />

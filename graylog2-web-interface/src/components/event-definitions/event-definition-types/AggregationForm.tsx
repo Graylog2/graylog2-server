@@ -107,7 +107,6 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
             </ControlLabel>
             <MultiSelect
               id="group-by"
-              matchProp="label"
               onChange={handleGroupByChange}
               options={formattedFields}
               ignoreAccents={false}
