@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Removed actions from the event definition UI that users do not have permissions for."
+
+issues = ["Graylog2/graylog-plugin-enterprise#11032"]
+pulls = ["22855", "Graylog2/graylog-plugin-enterprise#11036"]
