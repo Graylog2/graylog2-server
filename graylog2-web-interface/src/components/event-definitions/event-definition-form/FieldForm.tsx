@@ -299,7 +299,6 @@ class FieldForm extends React.Component<
               onChange={this.handleProviderTypeChange}
               options={formatFieldValueProviders()}
               value={getConfigProviderType(config, '')}
-              matchProp="label"
               required
             />
             <HelpBlock>
