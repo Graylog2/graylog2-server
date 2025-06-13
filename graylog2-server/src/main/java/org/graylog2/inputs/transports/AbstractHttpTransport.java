@@ -209,9 +209,9 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
             ));
             r.addField(new BooleanField(
                     CK_REQUIRE_TRUSTED_PROXIES,
-                    "Require all proxies to be in the trusted proxies list",
+                    "Only allow trusted proxies",
                     false,
-                    "Check all relaying proxies for forwarded-for headers to match the server configuration's trusted_proxies setting."
+                    "Check all relaying proxies in forwarded-for headers to match the server configuration's trusted_proxies setting."
             ));
             r.addField(new BooleanField(
                     CK_ENABLE_REAL_IP_HEADER,
