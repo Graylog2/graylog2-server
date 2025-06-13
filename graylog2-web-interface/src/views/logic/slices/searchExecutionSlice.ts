@@ -240,7 +240,7 @@ export const executeWithExecutionState =
         dispatch(cancelExecutedJob());
         dispatch(stopLoading());
 
-        throw new Error(error);
+        throw error;
       });
 
 export const execute =
