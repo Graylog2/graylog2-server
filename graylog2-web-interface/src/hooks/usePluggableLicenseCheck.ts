@@ -14,4 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as GraylogClusterOverview } from './GraylogClusterOverview';
+import type { LicenseSubject, LicenseCheck } from 'views/types';
+
+import usePluginEntities from './usePluginEntities';
+
+const defaultResponse = {
+  data: {
+    valid: false,
+    expired: false,
+    violated: false,
+  },
+  isInitialLoading: false,
+  refetch: () => {},
+} as const;
+const usePluggableLicenseCheck: LicenseCheck = (licenseType: LicenseSubject) => {
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  return pluggableLicenseCheck?.[0]?.(licenseType) ?? defaultResponse;
+};
+
+export default usePluggableLicenseCheck;
