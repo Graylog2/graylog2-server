@@ -119,7 +119,6 @@ class LookupTableExtractorConfiguration extends React.Component<
                 placeholder="Select a lookup table"
                 clearable={false}
                 options={lookupTables}
-                matchProp="label"
                 onChange={this._onSelect('lookup_table_name')}
                 value={this.props.configuration.lookup_table_name}
               />

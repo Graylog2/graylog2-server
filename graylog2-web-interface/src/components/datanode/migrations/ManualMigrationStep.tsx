@@ -74,7 +74,6 @@ const ManualMigrationStep = () => {
                 clearable={false}
                 inputId="datanode-migration-type-select"
                 options={migrationTypeOptions}
-                matchProp="label"
                 onChange={handleSelectMigrationType}
                 value={null}
               />

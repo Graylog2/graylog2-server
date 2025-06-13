@@ -113,7 +113,6 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
                   placeholder="Select a lookup table"
                   clearable={false}
                   options={lookupTables}
-                  matchProp="label"
                   onChange={this._onSelect('lookup_table_name')}
                   value={this.props.configuration.lookup_table_name}
                 />

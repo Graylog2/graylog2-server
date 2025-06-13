@@ -107,7 +107,6 @@ const LookupTableFields = ({
             onChange={onTableNameChange}
             options={formatLookupTables(lookupTables.tables)}
             value={selectedTableName}
-            matchProp="label"
             required
           />
           <HelpBlock>{nameValidation || 'Select the Lookup Table which should be used to get the value.'}</HelpBlock>
@@ -125,7 +124,6 @@ const LookupTableFields = ({
               onChange={onKeyChange}
               options={formatMessageFields(allFieldTypes)}
               value={selectedKeyName}
-              matchProp="label"
               allowCreate
               required
             />

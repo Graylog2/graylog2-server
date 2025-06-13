@@ -368,7 +368,6 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                 name="method"
                 clearable={false}
                 options={httpMethods}
-                matchProp="label"
                 onChange={this.handleMethodChange}
                 value={config.method}
               />
@@ -383,7 +382,6 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                 id="content-type"
                 name="content-type"
                 options={contentTypes}
-                matchProp="label"
                 disabled={config.method === 'GET'}
                 onChange={this.handleContentTypeChange}
                 clearable={false}

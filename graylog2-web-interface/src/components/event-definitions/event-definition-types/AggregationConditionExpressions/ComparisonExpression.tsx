@@ -69,7 +69,6 @@ const ComparisonExpression = ({
             {renderLabel && <ControlLabel>Is</ControlLabel>}
             <Select
               id="aggregation-condition"
-              matchProp="label"
               placeholder="Select Condition"
               onChange={handleExpressionOperatorChange}
               options={[
