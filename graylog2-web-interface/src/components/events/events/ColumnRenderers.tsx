@@ -31,7 +31,6 @@ import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpa
 import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
-import usePermissions from 'hooks/usePermissions';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const EventDefinitionRenderer = ({
@@ -41,12 +40,7 @@ const EventDefinitionRenderer = ({
   eventDefinitionId: string;
   meta: EventsAdditionalData;
 }) => {
-  const permissions = usePermissions();
-  const canReadEventDefinition = permissions.isPermitted(`eventdefinitions:read:${eventDefinitionId}`);
-
-  const title = canReadEventDefinition
-    ? meta?.context?.event_definitions?.[eventDefinitionId]?.title
-    : eventDefinitionId;
+  const title = meta?.context?.event_definitions?.[eventDefinitionId]?.title || eventDefinitionId;
 
   return <EventDefinitionLink id={eventDefinitionId} title={title} />;
 };
