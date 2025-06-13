@@ -51,6 +51,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collection;
@@ -120,6 +121,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @ApiOperation("Get action descriptors for rule builder")
     @Path("/actions")
     @GET
+    @NoPermissionCheckRequired("Utility resource")
     public Collection<Object> actions() {
         return ruleBuilderRegistry.actions()
                 .values().stream()
@@ -131,6 +133,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @ApiOperation("Get condition descriptors for ruleBuilder")
     @Path("/conditions")
     @GET
+    @NoPermissionCheckRequired("Utility resource")
     public Collection<Object> conditions() {
         return ruleBuilderRegistry.conditions()
                 .values().stream()
@@ -143,6 +146,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @Path("/validate")
     @POST
     @NoAuditEvent("Used to validate rule builder")
+    @NoPermissionCheckRequired("Utility resource")
     public RuleBuilderDto validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
         final RuleBuilderDto validated = validatorService.validate(ruleBuilderDto);
         return validated.toBuilder()
@@ -154,6 +158,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @Path("/simulate")
     @POST
     @NoAuditEvent("Only used to simulate a rule builder")
+    @NoPermissionCheckRequired("Utility resource")
     public RuleBuilderSimulatorResponse simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
         Message message = ruleSimulator.createMessage(simulateRuleBuilderRequest.message());
 

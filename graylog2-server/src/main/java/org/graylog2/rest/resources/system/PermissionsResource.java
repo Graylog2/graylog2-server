@@ -32,6 +32,7 @@ import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.responses.ReaderPermissionResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -63,6 +64,7 @@ public class PermissionsResource extends RestResource {
     @Timed
     @RequiresGuest // turns off authentication for this action
     @ApiOperation(value = "Get all available user permissions.")
+    @NoPermissionCheckRequired("Utility resource")
     public Map<String, Map<String, Collection<String>>> permissions() {
         return ImmutableMap.of("permissions", permissions.allPermissionsMap());
     }

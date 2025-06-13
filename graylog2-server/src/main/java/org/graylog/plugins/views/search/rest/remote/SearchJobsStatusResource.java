@@ -43,6 +43,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import java.io.IOException;
@@ -70,6 +71,7 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("{nodeId}/{jobId}/status")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
+    @NoPermissionCheckRequired("remote call checks permissions")
     public void asyncSearchJobStatus(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
                                      @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
                                      @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
@@ -93,6 +95,7 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     @Path("{nodeId}/{jobId}/cancel")
     @Produces({MediaType.APPLICATION_JSON})
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
+    @NoPermissionCheckRequired("remote call checks permissions")
     public void cancelAsyncSearchJob(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
                                      @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
                                      @Context SearchUser searchUser,

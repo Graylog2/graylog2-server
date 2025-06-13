@@ -27,6 +27,7 @@ import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.rest.models.tools.requests.JsonTestRequest;
 import org.graylog2.rest.models.tools.responses.JsonTesterResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.validation.Valid;
@@ -53,6 +54,7 @@ import java.util.Map;
 public class JsonTesterResource extends RestResource {
     @GET
     @Timed
+    @NoPermissionCheckRequired("Utility endpoint")
     public JsonTesterResponse get(@QueryParam("string") @NotEmpty String string,
                                   @QueryParam("flatten") @DefaultValue("false") boolean flatten,
                                   @QueryParam("list_separator") @NotEmpty String listSeparator,
@@ -68,6 +70,7 @@ public class JsonTesterResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used for testing JSON extractor")
+    @NoPermissionCheckRequired("Utility endpoint")
     public JsonTesterResponse post(@Valid @NotNull JsonTestRequest r) {
         return testJsonExtractor(r.string(), r.flatten(), r.listSeparator(), r.keySeparator(), r.kvSeparator(), r.replaceKeyWhitespace(), r.keyWhitespaceReplacement(), r.keyPrefix());
     }

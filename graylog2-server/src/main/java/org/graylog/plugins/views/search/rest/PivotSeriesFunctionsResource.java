@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.inject.Inject;
@@ -45,6 +46,7 @@ public class PivotSeriesFunctionsResource extends RestResource implements Plugin
     }
 
     @GET
+    @NoPermissionCheckRequired
     public Map<String, SeriesDescription> functions() {
         return this.availableFunctions;
     }

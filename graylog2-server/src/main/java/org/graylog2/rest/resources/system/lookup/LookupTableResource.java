@@ -80,6 +80,7 @@ import org.graylog2.rest.models.system.lookup.LookupTableApi;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -300,6 +301,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("tables/{idOrName}")
     @ApiOperation(value = "Retrieve the named lookup table")
+    @InlinePermissionCheck
     public LookupTablePage get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
@@ -353,6 +355,7 @@ public class LookupTableResource extends RestResource {
     @Path("tables/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
     @ApiOperation(value = "Update the given lookup table")
+    @InlinePermissionCheck
     public LookupTableApi updateTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                       @Valid @ApiParam LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
@@ -366,6 +369,7 @@ public class LookupTableResource extends RestResource {
     @Path("tables/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_DELETE)
     @ApiOperation(value = "Delete the lookup table")
+    @InlinePermissionCheck
     public LookupTableApi removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use, how?
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
@@ -528,6 +532,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("adapters/{idOrName}")
     @ApiOperation(value = "List the given data adapter")
+    @InlinePermissionCheck
     public DataAdapterApi getAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isPresent()) {
@@ -581,6 +586,7 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_DELETE)
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
+    @InlinePermissionCheck
     public DataAdapterApi deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isEmpty()) {
@@ -604,6 +610,7 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
     @ApiOperation(value = "Update the given data adapter settings")
+    @InlinePermissionCheck
     public DataAdapterApi updateAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                         @Valid @ApiParam DataAdapterApi toUpdate) {
         checkLookupAdapterId(idOrName, toUpdate);
@@ -707,6 +714,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("caches/{idOrName}")
     @ApiOperation(value = "List the given cache")
+    @InlinePermissionCheck
     public CacheApi getCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isPresent()) {
@@ -737,6 +745,7 @@ public class LookupTableResource extends RestResource {
     @Path("caches/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_DELETE)
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
+    @InlinePermissionCheck
     public CacheApi deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isEmpty()) {
@@ -760,6 +769,7 @@ public class LookupTableResource extends RestResource {
     @Path("caches/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
     @ApiOperation(value = "Update the given cache settings")
+    @InlinePermissionCheck
     public CacheApi updateCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                 @ApiParam CacheApi toUpdate) {
         checkLookupCacheId(idOrName, toUpdate);
