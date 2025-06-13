@@ -22,6 +22,8 @@ import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitio
 import { Label, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
@@ -56,7 +58,9 @@ const StatusCell = ({ eventDefinition }: Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
   const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const isEnabled = eventDefinition?.state === 'ENABLED';
-  const disableChange = isSystemEventDefinition(eventDefinition);
+  const currentUser = useCurrentUser();
+  const disableChange = isSystemEventDefinition(eventDefinition)
+    || !isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinition.id}`);
   const description = isEnabled ? 'enabled' : 'disabled';
   const title = _title(!isEnabled, disableChange, description);
 
