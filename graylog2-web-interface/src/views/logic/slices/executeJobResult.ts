@@ -22,7 +22,6 @@ import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 import type Search from 'views/logic/search/Search';
 import type { WidgetMapping } from 'views/logic/views/types';
-import UserNotification from 'util/UserNotification';
 
 const delay = (ms: number) =>
   new Promise((resolve) => {
@@ -60,13 +59,7 @@ export type StartJobType = (
 export const startJob: StartJobType = async (search, searchTypesToSearch, executionStateParam, keepQueries = []) => {
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
-  return runStartJob(search, executionState)
-    .then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }))
-    .catch((error) => {
-      UserNotification.error(`Starting of search job failed: ${error}`, 'Error!');
-
-      throw new Error(error);
-    });
+  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
 
 const getDelayTime = (depth: number = 1): number => {
@@ -127,17 +120,11 @@ export const executeJobResult: ExecuteJobResultType = async ({
     page,
     perPage,
     stopPolling,
-  })
-    .then((result) => ({
-      result: new SearchResult(result),
-      widgetMapping,
-      jobIds: { asyncSearchId, nodeId },
-    }))
-    .catch((error) => {
-      UserNotification.error(`Executing of search failed: ${error}`, 'Error!');
-
-      throw new Error(error);
-    });
+  }).then((result) => ({
+    result: new SearchResult(result),
+    widgetMapping,
+    jobIds: { asyncSearchId, nodeId },
+  }));
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
 
