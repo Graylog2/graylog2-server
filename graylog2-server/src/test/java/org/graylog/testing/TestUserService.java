@@ -74,8 +74,7 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public List<User> loadByIds(Collection<String> ids) {
-        final DBObject query = new BasicDBObject("_id", new BasicDBObject("$in", ids));
-        final List<DBObject> result = query(UserImpl.class, query);
+        final DBObject query = new BasicDBObject("_id", new BasicDBObject("$in", ids.stream().map(ObjectId::new).toList()));
         return buildUserList(query);
     }
 
