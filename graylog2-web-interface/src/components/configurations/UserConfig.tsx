@@ -39,7 +39,7 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
     &&.deflist {
       dd {
         padding-left: ${theme.spacings.md};
-        margin-left: 200px;
+        margin-left: 400px;
       }
     }
   `,
