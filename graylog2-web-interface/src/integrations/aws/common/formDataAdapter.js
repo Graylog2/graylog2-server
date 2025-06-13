@@ -29,7 +29,6 @@ export const toAWSRequest = (formData, options) => {
     awsEndpointKinesis,
     key,
     secret,
-    overrideSource,
   } = formData;
 
   return {
@@ -47,7 +46,6 @@ export const toAWSRequest = (formData, options) => {
     dynamodb_endpoint: awsEndpointDynamoDB?.value,
     iam_endpoint: awsEndpointIAM?.value,
     kinesis_endpoint: awsEndpointKinesis?.value,
-    override_source: overrideSource?.value,
     ...options,
   };
 };
