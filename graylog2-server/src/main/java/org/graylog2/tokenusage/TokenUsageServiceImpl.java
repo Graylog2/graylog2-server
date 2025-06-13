@@ -85,8 +85,11 @@ public class TokenUsageServiceImpl implements TokenUsageService {
         LOG.debug("Found {} distinct authentication services used by users of current page of access tokens.", allAuthServiceIds.size());
 
         //Load corresponding auth-services and extract the title:
-        final Map<String, String> authServiceIdToTitle = dbAuthServiceBackendService.streamByIds(allAuthServiceIds)
-                .collect(Collectors.toMap(AuthServiceBackendDTO::id, AuthServiceBackendDTO::title));
+        final Map<String, String> authServiceIdToTitle;
+        try (var stream = dbAuthServiceBackendService.streamByIds(allAuthServiceIds)) {
+            authServiceIdToTitle = stream
+                    .collect(Collectors.toMap(AuthServiceBackendDTO::id, AuthServiceBackendDTO::title));
+        }
 
         //Build up the resulting objects:
         final List<TokenUsageDTO> tokenUsage = currentPage.stream()

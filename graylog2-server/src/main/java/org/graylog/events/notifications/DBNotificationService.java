@@ -16,10 +16,11 @@
  */
 package org.graylog.events.notifications;
 
-import org.graylog2.database.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -86,6 +87,7 @@ public class DBNotificationService {
         return mongoUtils.getById(id);
     }
 
+    @MustBeClosed
     public Stream<NotificationDto> streamAll() {
         return stream(collection.find());
     }

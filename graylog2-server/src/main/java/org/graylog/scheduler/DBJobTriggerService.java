@@ -21,7 +21,6 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.AggregateIterable;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
@@ -37,6 +36,7 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
@@ -214,8 +214,11 @@ public class DBJobTriggerService {
                 .collect(Collectors.toSet());
 
         final var filter = in(FIELD_JOB_DEFINITION_ID, queryValues);
-        final Map<String, List<JobTriggerDto>> groupedTriggers = StreamEx.of(stream(collection.find(filter)))
-                .groupingBy(JobTriggerDto::jobDefinitionId);
+        final Map<String, List<JobTriggerDto>> groupedTriggers;
+        try (final var stream = stream(collection.find(filter));
+             final var streamEx = StreamEx.of(stream)) {
+            groupedTriggers = streamEx.groupingBy(JobTriggerDto::jobDefinitionId);
+        }
 
         // We are currently expecting only one trigger per job definition. This will most probably change in the
         // future once we extend our scheduler usage.
@@ -580,6 +583,8 @@ public class DBJobTriggerService {
                 )
         ), OverdueTrigger.class);
 
-        return stream(result).collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
+        try (var stream = stream(result)) {
+            return stream.collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
+        }
     }
 }
