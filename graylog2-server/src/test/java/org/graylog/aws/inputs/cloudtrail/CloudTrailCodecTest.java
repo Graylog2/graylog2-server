@@ -121,7 +121,7 @@ public class CloudTrailCodecTest {
         final CloudTrailCodec codec = new CloudTrailCodec(Configuration.EMPTY_CONFIGURATION,
                 new ObjectMapperProvider().get(), messageFactory);
 
-        Message message = codec.decodeSafe(getRawMessageFromFile(STATIC_CREDENTIALS_FILE)).get();
+        Message message = codec.decode(getRawMessageFromFile(STATIC_CREDENTIALS_FILE));
         String userName = message.getField("user_name").toString();
         assertEquals("Alice", userName);
     }
@@ -131,7 +131,7 @@ public class CloudTrailCodecTest {
         final CloudTrailCodec codec = new CloudTrailCodec(Configuration.EMPTY_CONFIGURATION,
                 new ObjectMapperProvider().get(), messageFactory);
 
-        Message message = codec.decodeSafe(getRawMessageFromFile(TEMPORARY_CREDENTIALS_FILE)).get();
+        Message message = codec.decode(getRawMessageFromFile(TEMPORARY_CREDENTIALS_FILE));
         String userName = message.getField("user_name").toString();
 
         assertEquals("someTestUser", userName);
