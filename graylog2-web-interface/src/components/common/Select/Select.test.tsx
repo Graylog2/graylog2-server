@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
