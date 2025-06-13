@@ -52,7 +52,7 @@ type Props = {
   units: UnitsConfig;
 };
 
-const _c = (field, value, path, source) => ({ field, value, path, source });
+const _c = (field: string, value: any, path: ValuePath, source: string) => ({ field, value, path, source });
 
 type ColumnProps = {
   field: string;
@@ -85,13 +85,13 @@ const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) =>
   );
 };
 
-const fullValuePathForField = (fieldName, valuePath) => {
+const fullValuePathForField = (fieldName: string, valuePath: ValuePath) => {
   const currentSeries = parseSeries(fieldName);
 
   return currentSeries && currentSeries.field ? [...valuePath, { _exists_: currentSeries.field }] : valuePath;
 };
 
-const columnNameToField = (column, series = []) => {
+const columnNameToField = (column: string, series: Series[] = []) => {
   const currentSeries = series.find((s) => s.effectiveName === column);
 
   return currentSeries ? currentSeries.function : column;

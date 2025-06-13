@@ -90,7 +90,7 @@ const EventDefinitionFormContainer = ({
   initialStep = STEP_KEYS[0],
   onCancel = undefined,
   onChangeStep = undefined,
-  onEventDefinitionChange = () => { },
+  onEventDefinitionChange = () => {},
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);

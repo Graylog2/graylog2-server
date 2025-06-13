@@ -45,6 +45,7 @@ describe('formDataAdapter', () => {
       kinesis_record_batch_size: 'awsCloudWatchBatchSize',
       kinesis_stream_name: 'awsCloudWatchKinesisStream',
       throttling_allowed: 'awsCloudWatchThrottleEnabled',
+      override_source: 'overrideSource',
     };
 
     const request = toGenericInputCreateRequest(formData);
@@ -83,6 +84,7 @@ describe('formDataAdapter', () => {
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',
       kinesis_endpoint: 'awsEndpointKinesis',
+      override_source: 'overrideSource',
     };
 
     const request = toAWSRequest(formData, options);
@@ -106,7 +108,7 @@ describe('formDataAdapter', () => {
   };
 
   it('adapts formData into an AWS request with key & secret', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
       awsCloudWatchAssumeARN: { value: '' },
       awsCloudWatchAwsKey: { value: 'mykey' },
@@ -115,11 +117,14 @@ describe('formDataAdapter', () => {
       awsEndpointIAM: { value: undefined },
       awsEndpointKinesis: { value: undefined },
       awsCloudWatchAwsSecret: { value: 'mysecret' },
+      overrideSource: { value: '' },
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with automatic auth', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
       awsCloudWatchAssumeARN: { value: '' },
       key: 'mykey',
@@ -127,8 +132,11 @@ describe('formDataAdapter', () => {
       awsEndpointDynamoDB: { value: undefined },
       awsEndpointIAM: { value: undefined },
       awsEndpointKinesis: { value: undefined },
+      overrideSource: { value: '' },
       secret: 'mysecret',
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with additional options', () => {
@@ -147,6 +155,7 @@ describe('formDataAdapter', () => {
         awsEndpointIAM: { value: undefined },
         awsEndpointKinesis: { value: undefined },
         awsCloudWatchAwsSecret: { value: 'mysecret' },
+        overrideSource: { value: '' },
       },
       options,
     );
@@ -155,10 +164,14 @@ describe('formDataAdapter', () => {
   });
 
   it('adapts formData into an InputCreateRequest with key & secret', () => {
-    testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an InputCreateRequest with automatic auth', () => {
-    testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+
+    expect(request).toBeDefined();
   });
 });
