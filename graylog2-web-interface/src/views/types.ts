@@ -539,7 +539,7 @@ type LICENSE_SUBJECTS = {
   anomaly: '/license/anomaly';
 };
 
-type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
+export type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
 
 export type LicenseCheck = (subject: LicenseSubject) => {
   data: {
@@ -617,7 +617,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
-    'licenseCheck'?: LicenseCheck;
+    'licenseCheck'?: Array<LicenseCheck>;
     entityPermissionsMapper?: EntityPermissionsMapper;
   }
 }
