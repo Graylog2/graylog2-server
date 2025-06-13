@@ -14,17 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const EventDefinitionPriorityEnum = {
-  LOW: 1,
-  MEDIUM: 2,
-  HIGH: 3,
-  CRITICAL: 4,
-  properties: {
-    1: { name: 'low' },
-    2: { name: 'medium' },
-    3: { name: 'high' },
-    4: { name: 'critical' },
-  },
-} as const;
+import type { LicenseSubject, LicenseCheck } from 'views/types';
 
-export default EventDefinitionPriorityEnum;
+import usePluginEntities from './usePluginEntities';
+
+const defaultResponse = {
+  data: {
+    valid: false,
+    expired: false,
+    violated: false,
+  },
+  isInitialLoading: false,
+  refetch: () => {},
+} as const;
+const usePluggableLicenseCheck: LicenseCheck = (licenseType: LicenseSubject) => {
+  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
+
+  return pluggableLicenseCheck?.[0]?.(licenseType) ?? defaultResponse;
+};
+
+export default usePluggableLicenseCheck;
