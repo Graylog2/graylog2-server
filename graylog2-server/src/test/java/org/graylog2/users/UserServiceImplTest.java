@@ -100,6 +100,8 @@ public class UserServiceImplTest {
                 userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
 
         lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
+        lenient().when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
+                .thenReturn(UserConfiguration.DEFAULT_VALUES);
     }
 
     @Test
@@ -198,6 +200,26 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testLoadByAuthServiceUid() throws Exception {
+        final var user1 = createDummyUser("user1", "uid1");
+        final var user2 = createDummyUser("user2", "uid2");
+
+        userService.save(user1);
+        userService.save(user2);
+
+        assertThat(userService.loadByAuthServiceUid("uid1"))
+                .hasValueSatisfying(user -> assertThat(user.getName()).isEqualTo("user1"));
+        assertThat(userService.loadByAuthServiceUid("uid2"))
+                .hasValueSatisfying(user -> assertThat(user.getName()).isEqualTo("user2"));
+        assertThat(userService.loadByAuthServiceUid("uid3")).isEmpty();
+
+        userService.save(createDummyUser("user3", "uid1"));
+        assertThatThrownBy(() -> userService.loadByAuthServiceUid("uid1"))
+                .isInstanceOf(UserServiceImpl.DuplicateUserException.class)
+                .hasMessageContaining("more than one matching user");
+    }
+
+    @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testDeleteByName() {
         assertThat(userService.delete("user1")).isEqualTo(1);
@@ -222,7 +244,6 @@ public class UserServiceImplTest {
     @Test
     public void testSave() throws Exception {
         final UserImpl user = (UserImpl) userService.create();
-        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         user.setName("TEST");
         user.setFullName("TEST");
@@ -245,7 +266,6 @@ public class UserServiceImplTest {
     @Test
     public void testSaveNoFullNameSuccess() throws Exception {
         final UserImpl user = (UserImpl) userService.create();
-        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         user.setName("TEST");
         user.setEmail("test@example.com");
@@ -341,8 +361,6 @@ public class UserServiceImplTest {
         user.setName("user");
         final Role role = createRole("Foo");
 
-        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-
         user.setRoleIds(Collections.singleton(role.getId()));
         user.setPermissions(Collections.singletonList("hello:world"));
 
@@ -362,4 +380,15 @@ public class UserServiceImplTest {
                 .containsExactlyInAnyOrder("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
                         "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
     }
+
+    private UserImpl createDummyUser(String username, String authServiceUid) {
+        final var user = (UserImpl) userService.create();
+        user.setEmail(username + "@graylog.local");
+        user.setName(username);
+        user.setPassword("password");
+        user.setPermissions(List.of());
+        user.setAuthServiceUid(authServiceUid);
+        return user;
+    }
+
 }
