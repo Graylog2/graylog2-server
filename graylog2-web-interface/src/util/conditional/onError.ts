@@ -44,3 +44,8 @@ export async function onSettled<T, R, E = Error>(
 export function defaultOnError<T>(promise: Promise<T>, message: string, title?: string) {
   return onError(promise, (error: Error) => UserNotification.error(`${message}: ${error}`, title));
 }
+
+export const wrapWithOnError =
+  <Fn extends (...args: Array<any>) => Promise<any>>(fn: Fn, message: string, title?: string) =>
+  (...args: Parameters<Fn>) =>
+    defaultOnError(fn(...args), message, title) as ReturnType<Fn>;

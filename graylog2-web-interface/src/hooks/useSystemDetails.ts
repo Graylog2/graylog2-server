@@ -14,17 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useStore } from 'stores/connect';
+import { SystemStore } from 'stores/system/SystemStore';
 
-import { ClusterPlugins } from '@graylog/server-api';
-
-const usePluginList = (nodeId: string) => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['plugins', 'list', nodeId],
-    queryFn: () => ClusterPlugins.list(nodeId),
-  });
-
-  return { pluginList: data, isLoading: isInitialLoading };
-};
-
-export default usePluginList;
+const useSystemDetails = () => useStore(SystemStore, (_system) => _system?.system);
+export default useSystemDetails;
