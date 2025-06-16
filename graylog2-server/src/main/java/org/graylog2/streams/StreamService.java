@@ -51,6 +51,13 @@ public interface StreamService {
 
     Set<Stream> loadByIds(Collection<String> streamIds);
 
+    /**
+     * Returns the IDs of the streams that have the given categories.
+     *
+     * @param streamCategories the categories the returned stream IDs should have
+     * @return a stream of String IDs of the streams containing the given categories. This must be closed by the caller.
+     */
+    @MustBeClosed
     java.util.stream.Stream<String> mapCategoriesToIds(Collection<String> streamCategories);
 
     Set<String> indexSetIdsByIds(Collection<String> streamIds);
@@ -87,6 +94,11 @@ public interface StreamService {
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
 
+    /**
+     * Returns a stream of all Stream IDs.
+     *
+     * @return a stream of Stream IDs. This must be closed by the caller.
+     */
     @MustBeClosed
     java.util.stream.Stream<String> streamAllIds();
 
@@ -99,6 +111,12 @@ public interface StreamService {
     @MustBeClosed
     java.util.stream.Stream<StreamDTO> streamAllDTOs();
 
+    /**
+     * Returns only StreamDTOs with the given IDs. The DTO methods skip the full loading of StreamRules, Outputs, and
+     * Index Set and should be used when information stored solely in the 'streams' collection.
+     *
+     * @return a stream of StreamDTO objects. This must be closed by the caller.
+     */
     @MustBeClosed
     java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds);
 

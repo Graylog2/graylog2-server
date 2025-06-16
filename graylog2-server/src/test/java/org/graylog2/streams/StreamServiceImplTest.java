@@ -119,8 +119,8 @@ public class StreamServiceImplTest {
 
         when(output1.getId()).thenReturn(output1Id.toHexString());
         when(output2.getId()).thenReturn(output2Id.toHexString());
-        when(outputService.load(output1Id.toHexString())).thenReturn(output1);
-        when(outputService.load(output2Id.toHexString())).thenReturn(output2);
+        when(outputService.loadByIds(Set.of(output1Id.toHexString(), output2Id.toHexString())))
+                .thenReturn(Set.of(output1, output2));
 
         streamService.addOutputs(streamId, ImmutableSet.of(output1Id, output2Id));
 

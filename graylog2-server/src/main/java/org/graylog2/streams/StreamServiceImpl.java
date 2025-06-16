@@ -21,13 +21,13 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -61,7 +61,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -303,6 +302,7 @@ public class StreamServiceImpl implements StreamService {
     }
 
     @Override
+    @MustBeClosed
     public java.util.stream.Stream<String> mapCategoriesToIds(Collection<String> categories) {
         return stream(collection.find(in(FIELD_CATEGORIES, categories))).map(StreamDTO::id);
     }
@@ -499,23 +499,17 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public List<String> streamTitlesForIndexSet(final String indexSetId) {
-        List<String> result = new LinkedList<>();
         try (var stream = stream(collection.find(eq(FIELD_INDEX_SET_ID, indexSetId)))) {
-            stream.map(StreamDTO::title).forEach(result::add);
+            return stream.map(StreamDTO::title).toList();
         }
-        return result;
     }
 
     @Override
     public Map<String, Long> streamRuleCountByStream() {
-        final ImmutableMap.Builder<String, Long> streamRules = ImmutableMap.builder();
         try (var streamIds = streamAllIds()) {
-            streamIds.forEach(streamId -> {
-                streamRules.put(streamId, streamRuleService.streamRuleCount(streamId));
-            });
+            return streamIds.collect(Collectors.toUnmodifiableMap(Function.identity(), streamRuleService::streamRuleCount));
         }
 
-        return streamRules.build();
     }
 
     // Output objects, StreamRules, and the IndexSet object are not saved on this object. These are loaded by
@@ -533,10 +527,10 @@ public class StreamServiceImpl implements StreamService {
                 .isDefault(stream.isDefaultStream())
                 .removeMatchesFromDefaultStream(stream.getRemoveMatchesFromDefaultStream())
                 .indexSetId(stream.getIndexSetId());
-        if (stream.getOutputIds() != null) {
+        if (!CollectionUtils.isEmpty(stream.getOutputIds())) {
             dtoBuilder.outputIds(stream.getOutputIds());
         }
-        if (stream.getCategories() != null) {
+        if (!CollectionUtils.isEmpty(stream.getCategories())) {
             dtoBuilder.categories(stream.getCategories());
         }
         return dtoBuilder.build();
