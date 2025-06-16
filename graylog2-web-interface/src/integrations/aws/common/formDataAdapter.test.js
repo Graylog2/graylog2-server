@@ -83,7 +83,7 @@ describe('formDataAdapter', () => {
       cloudwatch_endpoint: 'awsEndpointCloudWatch',
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',
-      kinesis_endpoint: 'awsEndpointKinesis'
+      kinesis_endpoint: 'awsEndpointKinesis',
     };
 
     const request = toAWSRequest(formData, options);
