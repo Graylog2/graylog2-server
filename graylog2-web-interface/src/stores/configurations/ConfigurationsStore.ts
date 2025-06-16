@@ -272,14 +272,14 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
         () => {
           this.configuration = { ...this.configuration, [configType]: config };
           this.propagateChanges();
-          UserNotification.success('Url Whitelist Configuration updated successfully');
+          UserNotification.success('URL Allowlist Configuration updated successfully');
 
           return config;
         },
         (error) => {
           UserNotification.error(
-            `Url Whitelist config update failed: ${error}`,
-            `Could not update Url Whitelist: ${configType}`,
+            `URL Allowlist config update failed: ${error}`,
+            `Could not update URL Allowlist: ${configType}`,
           );
         },
       );
