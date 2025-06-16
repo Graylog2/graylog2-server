@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -205,7 +206,7 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<HttpReq
                         .map(KEYVALUE_SPLITTER::splitToList)
                         .filter(kv -> kv.size() == 2)
                         .collect(Collectors.toMap(
-                                kv -> kv.get(0).toLowerCase(), // one of "for", "by", "proto"
+                                kv -> kv.get(0).toLowerCase(Locale.ROOT), // one of "for", "by", "proto"
                                 kv -> stripQuotes(kv.get(1))   // ipv6 values are quoted, so we need to unquote those
                         ));
                 result.add(attrs);
