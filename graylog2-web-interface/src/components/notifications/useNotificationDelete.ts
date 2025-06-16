@@ -21,7 +21,7 @@ import { SystemNotifications } from '@graylog/server-api';
 import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
 const deleteNotification = ({ type, key }: { type: string; key: string }) =>
-  SystemNotifications.deleteKeyedNotification(type, key);
+  key ? SystemNotifications.deleteKeyedNotification(type, key) : SystemNotifications.deleteNotification(type);
 
 const useNotificationDelete = () => {
   const queryClient = useQueryClient();
