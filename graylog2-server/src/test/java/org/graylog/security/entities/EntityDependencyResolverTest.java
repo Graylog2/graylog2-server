@@ -21,6 +21,7 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
 import org.graylog.security.DBGrantService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -165,7 +166,8 @@ class EntityDependencyResolverTest {
         when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(definitionDescriptor, procedureDescriptor));
 
         final GRN definitionGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
+        grnRegistry.registerType(GRNType.create("event_procedure", "event_procedures:"));
         final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(definitionGrn);
-        assertThat(missingDependencies).hasSize(0);
+        assertThat(missingDependencies).hasSize(1);
     }
 }

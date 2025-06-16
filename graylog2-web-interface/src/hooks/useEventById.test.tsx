@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { mockEventData } from 'helpers/mocking/EventAndEventDefinitions_mock';
@@ -62,7 +62,7 @@ describe('useEventById', () => {
 
   it('should run fetch and store mapped response', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockEventData));
-    const { result, waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
+    const { result } = renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
@@ -74,7 +74,7 @@ describe('useEventById', () => {
   it('should display notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
+    renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await suppressConsole(async () => {
       await waitFor(() =>

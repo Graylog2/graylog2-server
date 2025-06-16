@@ -157,7 +157,7 @@ public class KinesisService {
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
 
         if (records.isEmpty()) {
-            LOG.warn("The Kinesis stream [{}] is empty. Proceeding with setup at the user's own risk.", request.streamName());
+            LOG.debug("The Kinesis stream [{}] is empty.", request.streamName());
             return KinesisHealthCheckResponse.create(
                     AWSMessageType.KINESIS_RAW,
                     String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()),
