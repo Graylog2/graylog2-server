@@ -76,6 +76,8 @@ describe('RuleBlockForm', () => {
     await selectEvent.openMenu(select);
     await selectEvent.select(select, 'set_field');
 
+    await selectEvent.selectOption('Add action', 'set_field');
+
     expect(mockSelect).toHaveBeenCalledWith('set_field');
   });
 

@@ -112,10 +112,8 @@ describe('UrlWhitelistForm', () => {
     render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
     const row = await screen.findByRole('row', { name: /3/i });
-    const select = await within(row).findByText(/exact match/i);
 
-    await selectEvent.openMenu(select);
-    await selectEvent.select(select, 'Regex');
+    await selectEvent.selectOption('Select url type', 'Regex', { container: row });
 
     const numberCalls = 2; // First render + debounce
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));

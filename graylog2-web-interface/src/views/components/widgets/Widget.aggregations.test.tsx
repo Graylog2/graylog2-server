@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
@@ -166,30 +166,15 @@ describe('Aggregation Widget', () => {
         const nameInput = await screen.findByLabelText(/Name/);
         await userEvent.type(nameInput, 'Metric name');
 
-        const metricFieldSelect = await screen.findByLabelText('Select a function');
-
-        await act(async () => {
-          await selectEvent.openMenu(metricFieldSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count');
-        });
+        await selectEvent.selectOption('Select a function', 'Count');
 
         await findWidgetConfigSubmitButton();
 
         // Change widget search controls
-        const streamsSelect = await screen.findByLabelText(
+        await selectEvent.selectOption(
           'Select streams the search should include. Searches in all streams if empty.',
+          'Stream 1',
         );
-
-        await act(async () => {
-          await selectEvent.openMenu(streamsSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(streamsSelect, 'Stream 1');
-        });
 
         await screen.findByRole('button', {
           name: /perform search \(changes were made after last search execution\)/i,

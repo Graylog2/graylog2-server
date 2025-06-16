@@ -52,6 +52,7 @@ const findOption = async (
   return Promise.all(optionNames.map((name) => screen.findByRole('option', { name: new RegExp(name, 'i') })));
 };
 
+// The select name should ideally be the HTML label. If there is no label, you can use the placeholder text.
 const selectOption = async (
   selectName: string,
   optionName: (string | RegExp) | Array<string | RegExp>,
