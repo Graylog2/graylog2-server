@@ -18,16 +18,20 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.bson.types.ObjectId;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -36,7 +40,9 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -71,71 +77,69 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
     @Test
     public void upgrade() throws Exception {
-        final Stream stream1 = mock(Stream.class);
-        final Stream stream2 = mock(Stream.class);
+        final Stream stream1 = testStream("stream1", "");
+        final Stream stream2 = testStream("stream2", "");
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
-        when(stream1.getId()).thenReturn("stream1");
-        when(stream2.getId()).thenReturn("stream2");
         when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream1, stream2));
 
         migration.upgrade();
 
-        verify(streamService, times(1)).save(stream1);
-        verify(streamService, times(1)).save(stream2);
+        verify(streamService, times(2)).save(any());
         verify(clusterConfigService, times(1)).write(
                 V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create(
-                        indexSetConfig.id(), Sets.newHashSet("stream1", "stream2"), Collections.emptySet()));
+                        indexSetConfig.id(), Sets.newHashSet(stream1.getId(), stream2.getId()), Collections.emptySet()));
     }
 
     @Test
     public void upgradeWithAlreadyAssignedIndexSet() throws Exception {
-        final Stream stream1 = mock(Stream.class);
-        final Stream stream2 = mock(Stream.class);
+        final Stream stream1 = testStream("stream1", "");
+        final Stream stream2 = testStream("stream2", "abc123");
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
-        when(stream1.getId()).thenReturn("stream1");
-        when(stream2.getId()).thenReturn("stream2");
         when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream1, stream2));
-        when(stream2.getIndexSetId()).thenReturn("abc123");
 
         migration.upgrade();
 
-        verify(streamService, times(1)).save(stream1);
+        ArgumentCaptor<StreamDTO> captor = ArgumentCaptor.forClass(StreamDTO.class);
+        verify(streamService, times(1)).save(captor.capture());
+        assertEquals("stream1", captor.getValue().getTitle());
         verify(streamService, never()).save(stream2);
         verify(clusterConfigService, times(1)).write(
                 V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create(
-                        indexSetConfig.id(), Sets.newHashSet("stream1"), Collections.emptySet()));
+                        indexSetConfig.id(), Sets.newHashSet(stream1.getId()), Collections.emptySet()));
     }
 
     @Test
     public void upgradeWithFailedStreamUpdate() throws Exception {
-        final Stream stream1 = mock(Stream.class);
-        final Stream stream2 = mock(Stream.class);
+        final Stream stream1 = testStream("stream1", "");
+        final Stream stream2 = testStream("stream2", "");
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
-        when(stream1.getId()).thenReturn("stream1");
-        when(stream2.getId()).thenReturn("stream2");
         when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream1, stream2));
 
+        ArgumentCaptor<StreamDTO> captor = ArgumentCaptor.forClass(StreamDTO.class);
         // Updating stream1 should fail!
-        when(streamService.save(stream1)).thenThrow(ValidationException.class);
+        doAnswer(inv -> {
+            StreamDTO captured = inv.getArgument(0);
+            if (captured.getId().equals(stream1.getId())) {
+                throw new ValidationException("Fail on Stream1");
+            }
+            return captured.getId();
+        }).when(streamService).save(captor.capture());
 
         migration.upgrade();
-
-        verify(streamService, times(1)).save(stream1);
-        verify(streamService, times(1)).save(stream2);
 
         // Check that the failed stream1 will be recorded as failed!
         verify(clusterConfigService, times(1)).write(
                 V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create(
-                        indexSetConfig.id(), Sets.newHashSet("stream2"), Sets.newHashSet("stream1")));
+                        indexSetConfig.id(), Sets.newHashSet(stream2.getId()), Sets.newHashSet(stream1.getId())));
     }
 
     @Test
@@ -169,5 +173,16 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
         verify(streamService, never()).save(any(Stream.class));
         verify(clusterConfigService, never()).write(any(V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.class));
+    }
+
+    private StreamDTO testStream(String title, String indexSetId) {
+        return StreamDTO.builder()
+                .id(new ObjectId().toHexString())
+                .title(title)
+                .indexSetId(indexSetId)
+                .creatorUserId("test-user")
+                .createdAt(DateTime.now())
+                .disabled(false)
+                .build();
     }
 }
