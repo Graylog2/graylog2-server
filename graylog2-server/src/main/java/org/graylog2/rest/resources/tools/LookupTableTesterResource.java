@@ -20,10 +20,12 @@ import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.rest.models.tools.requests.LookupTableTestRequest;
 import org.graylog2.rest.resources.tools.responses.LookupTableTesterResponse;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -55,6 +57,7 @@ public class LookupTableTesterResource extends RestResource {
 
     @GET
     @Timed
+    @InlinePermissionCheck
     public LookupTableTesterResponse grokTest(@QueryParam("lookup_table_name") @NotEmpty String lookupTableName,
                                               @QueryParam("string") @NotEmpty String string) {
         return doTestLookupTable(string, lookupTableName);
@@ -65,15 +68,17 @@ public class LookupTableTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test lookup tables")
-    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
+    @InlinePermissionCheck
     public LookupTableTesterResponse testLookupTable(@Valid @NotNull LookupTableTestRequest lookupTableTestRequest) {
         return doTestLookupTable(lookupTableTestRequest.string(), lookupTableTestRequest.lookupTableName());
     }
 
     private LookupTableTesterResponse doTestLookupTable(String string, String lookupTableName) {
-        if (!lookupTableService.hasTable(lookupTableName)) {
+        final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+        if (lookupTable == null) {
             return LookupTableTesterResponse.error("Lookup table <" + lookupTableName + "> doesn't exist");
         }
+        checkPermission(RestPermissions.LOOKUP_TABLES_READ, lookupTable.id());
 
         final LookupTableService.Function table = lookupTableService.newBuilder().lookupTable(lookupTableName).build();
         final LookupResult result = table.lookup(string.trim());

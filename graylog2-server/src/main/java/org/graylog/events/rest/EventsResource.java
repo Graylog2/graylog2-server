@@ -35,6 +35,7 @@ import org.graylog.events.search.EventsSearchService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTimeZone;
 
@@ -65,6 +66,7 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @Path("/search")
     @ApiOperation("Search events")
     @NoAuditEvent("Doesn't change any data, only searches for events")
+    @InlinePermissionCheck
     public EventsSearchResult search(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
         return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
     }
@@ -85,6 +87,7 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{event_id}")
     @ApiOperation("Get event by ID")
+    @InlinePermissionCheck
     public Optional<EventsSearchResult.Event> getById(@ApiParam(name = "event_id") @PathParam("event_id") final String eventId) {
         return searchService.searchByIds(List.of(eventId), getSubject()).events().stream().findFirst();
     }

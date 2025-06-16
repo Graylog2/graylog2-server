@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -53,6 +54,7 @@ public class AggregationWidgetExportResource extends RestResource {
             MediaType.APPLICATION_XML,
             MoreMediaTypes.APPLICATION_XLS})
     @Path("/{filename}")
+    @NoPermissionCheckRequired("converting pre-existing data only")
     public Response exportData(@ApiParam @Valid PivotResult pivotResult,
                                @HeaderParam("Accept") String mediaType,
                                @ApiParam("filename") @PathParam("filename") String filename) {

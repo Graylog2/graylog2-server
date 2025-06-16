@@ -29,6 +29,7 @@ import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckRequest;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckResponse;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistRegexGenerationRequest;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistRegexGenerationResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.urlwhitelist.RegexHelper;
@@ -92,7 +93,7 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Check if a url is whitelisted.")
     @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
-    // Checking can be done without any special permission.
+    @NoPermissionCheckRequired("Utility resource")
     public WhitelistCheckResponse check(@ApiParam(name = "JSON body", required = true)
                                         @Valid @NotNull final WhitelistCheckRequest checkRequest) {
         final boolean isWhitelisted = urlWhitelistService.isWhitelisted(checkRequest.url());
@@ -105,6 +106,7 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Generates a regex that can be used as a value for a whitelist entry.")
     @NoAuditEvent("Utility function only.")
     @Consumes(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public WhitelistRegexGenerationResponse generateRegex(@ApiParam(name = "JSON body", required = true)
                                                           @Valid @NotNull final WhitelistRegexGenerationRequest generationRequest) {
         final String regex;

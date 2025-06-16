@@ -28,6 +28,7 @@ import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.inject.Inject;
@@ -67,6 +68,7 @@ public class AvailableEntityTypesResource extends RestResource implements Plugin
 
     @GET
     @ApiOperation("List all available entity types")
+    @NoPermissionCheckRequired
     public AvailableEntityTypesSummary all() {
         return AvailableEntityTypesSummary.create(eventProcessorTypes, fieldValueProviderTypes, storageHandlerFactories, aggregationFunctions);
     }

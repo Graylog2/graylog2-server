@@ -36,6 +36,8 @@ import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse
 import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -74,6 +76,7 @@ public class SystemResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get system overview")
+    @InlinePermissionCheck
     public SystemOverviewResponse system() {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
@@ -97,6 +100,7 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Get JVM information")
     @Path("/jvm")
     @Timed
+    @InlinePermissionCheck
     public SystemJVMResponse jvm() {
         checkPermission(RestPermissions.JVMSTATS_READ, serverStatus.getNodeId().toString());
 
@@ -115,6 +119,7 @@ public class SystemResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a thread dump")
     @Path("/threaddump")
+    @InlinePermissionCheck
     public SystemThreadDumpResponse threaddump() {
         checkPermission(RestPermissions.THREADS_DUMP, serverStatus.getNodeId().toString());
 
@@ -130,6 +135,7 @@ public class SystemResource extends RestResource {
     @Path("/processbufferdump")
     @Timed
     @ApiOperation(value = "Get a process buffer dump")
+    @InlinePermissionCheck
     public SystemProcessBufferDumpResponse processBufferDump() {
         checkPermission(RestPermissions.PROCESSBUFFER_DUMP, serverStatus.getNodeId().toString());
         return SystemProcessBufferDumpResponse.create(processBuffer.getDump());
@@ -140,6 +146,7 @@ public class SystemResource extends RestResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Timed
     @ApiOperation(value = "Get a thread dump as plain text")
+    @InlinePermissionCheck
     public StreamingOutput threadDumpAsText() {
         checkPermission(RestPermissions.THREADS_DUMP, serverStatus.getNodeId().toString());
         return output -> new ThreadDump(ManagementFactory.getThreadMXBean()).dump(output);
@@ -149,6 +156,7 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Get supported locales")
     @Path("/locales")
     @Timed
+    @NoPermissionCheckRequired
     public LocalesResponse locales() {
         return LocalesResponse.create(Locale.getAvailableLocales());
     }

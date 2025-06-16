@@ -36,6 +36,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
@@ -69,6 +70,7 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
     @GET
     @Path("/satisfiesVersion/{distribution}")
     @ApiOperation(value = "Confirms whether the current search version satisfies a given distribution and an optional Semantic Versioning version")
+    @NoPermissionCheckRequired("Utility resource")
     public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "distribution", required = true) @PathParam("distribution") String distribution,
                                                      @ApiParam(name = "version") @QueryParam("version") String version) {
         // if no version provided give default to only check distribution

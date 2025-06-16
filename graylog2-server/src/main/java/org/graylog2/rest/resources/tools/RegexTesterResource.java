@@ -22,6 +22,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
 import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.validation.Valid;
@@ -47,6 +48,7 @@ public class RegexTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public RegexTesterResponse regexTester(@QueryParam("regex") @NotEmpty String regex,
                                            @QueryParam("string") @NotNull String string) {
         return doTestRegex(string, regex);
@@ -57,6 +59,7 @@ public class RegexTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test regex values")
+    @NoPermissionCheckRequired("Utility resource")
     public RegexTesterResponse testRegex(@Valid @NotNull RegexTestRequest regexTestRequest) {
         return doTestRegex(regexTestRequest.string(), regexTestRequest.regex());
     }
@@ -65,6 +68,7 @@ public class RegexTesterResource extends RestResource {
     @Path("/validate")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public RegexValidationResponse validateRegex(@QueryParam("regex") @NotEmpty String regex) {
         final RegexValidationResponse.Builder response = RegexValidationResponse.builder()
                 .regex(regex);

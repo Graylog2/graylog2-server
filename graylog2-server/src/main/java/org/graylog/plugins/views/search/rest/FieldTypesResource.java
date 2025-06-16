@@ -39,12 +39,14 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Set;
 
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_POLLING_TRIGGERED;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.security.RestPermissions.INDEXFIELDTYPES_REFRESH;
 
 @Api(value = "FieldTypes", tags = {CLOUD_VISIBLE})
 @Path("/views/fields")
@@ -62,6 +64,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
+    @InlinePermissionCheck
     public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
         final ImmutableSet<String> streams = searchUser.streams().loadAllMessageStreams();
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, RelativeRange.allTime());
@@ -70,6 +73,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @POST
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
+    @InlinePermissionCheck
     public Set<MappedFieldTypeDTO> byStreams(@ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull FieldTypesForStreamsRequest request,
                                              @Context SearchUser searchUser) {
@@ -80,7 +84,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @POST
     @ApiOperation(value = "Trigger a full refresh of field types")
     @Path("/poll")
-    @RequiresPermissions("*")
+    @RequiresPermissions(INDEXFIELDTYPES_REFRESH)
     @AuditEvent(type = FIELD_TYPE_POLLING_TRIGGERED)
     public Response triggerFieldTypePolling() {
         fieldTypePoller.triggerFullRefresh();

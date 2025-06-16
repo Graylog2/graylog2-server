@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.inject.Inject;
@@ -55,6 +56,7 @@ public class ExportJobsResource extends RestResource {
     @ApiOperation(value = "Create job to export a defined set of messages")
     @POST
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
+    @NoPermissionCheckRequired("Checked when executing export job")
     public String create(@ApiParam @Valid MessagesRequest rawrequest) {
         return exportJobService.save(exportJobFactory.fromMessagesRequest(rawrequest));
     }
@@ -63,6 +65,7 @@ public class ExportJobsResource extends RestResource {
     @POST
     @Path("{searchId}")
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
+    @NoPermissionCheckRequired("Checked when executing export job")
     public String createForSearch(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
@@ -73,6 +76,7 @@ public class ExportJobsResource extends RestResource {
     @POST
     @Path("{searchId}/{searchTypeId}")
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
+    @NoPermissionCheckRequired("Checked when executing export job")
     public String createForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
