@@ -59,7 +59,11 @@ export type StartJobType = (
 export const startJob: StartJobType = async (search, searchTypesToSearch, executionStateParam, keepQueries = []) => {
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
-  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
+  if (Math.random() > 0.5) {
+    return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
+  }
+
+  return Promise.reject(new Error('Boom!'));
 };
 
 const getDelayTime = (depth: number = 1): number => {
