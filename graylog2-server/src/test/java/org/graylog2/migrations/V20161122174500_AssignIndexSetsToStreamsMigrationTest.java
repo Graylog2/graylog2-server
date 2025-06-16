@@ -27,6 +27,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -181,7 +182,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
                 .title(title)
                 .indexSetId(indexSetId)
                 .creatorUserId("test-user")
-                .createdAt(DateTime.now())
+                .createdAt(DateTime.now(DateTimeZone.UTC))
                 .disabled(false)
                 .build();
     }
