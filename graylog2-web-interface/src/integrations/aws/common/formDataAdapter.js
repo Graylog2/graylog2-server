@@ -68,6 +68,7 @@ export const toGenericInputCreateRequest = ({
   awsCloudWatchAwsSecret,
   key,
   secret,
+  overrideSource,
 }) => ({
   type: 'org.graylog.integrations.aws.inputs.AWSInput',
   title: awsCloudWatchName.value,
@@ -92,5 +93,6 @@ export const toGenericInputCreateRequest = ({
     kinesis_endpoint: awsEndpointKinesis?.value,
     kinesis_stream_name: awsCloudWatchKinesisStream.value,
     kinesis_record_batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
+    override_source: overrideSource?.value,
   },
 });

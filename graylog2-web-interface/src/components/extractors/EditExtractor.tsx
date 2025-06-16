@@ -26,6 +26,17 @@ import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
 
+const StaticField = ({ label, text }: { label: string; text: string }) => (
+  <FormGroup>
+    <Col componentClass={ControlLabel} md={2}>
+      {label}
+    </Col>
+    <Col md={10}>
+      <FormControl.Static>{text}</FormControl.Static>
+    </Col>
+  </FormGroup>
+);
+
 type EditExtractorProps = {
   action: 'create' | 'edit';
   extractor: any;
@@ -204,17 +215,6 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     ExtractorsActions.save.triggerPromise(inputId, updatedExtractor).then(() => onSave());
   };
 
-  _staticField = (label, text) => (
-    <FormGroup>
-      <Col componentClass={ControlLabel} md={2}>
-        {label}
-      </Col>
-      <Col md={10}>
-        <FormControl.Static>{text}</FormControl.Static>
-      </Col>
-    </FormGroup>
-  );
-
   render() {
     const { updatedExtractor, exampleMessage } = this.state;
     const { action } = this.props;
@@ -279,11 +279,11 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             <Row>
               <Col md={8}>
                 <form className="extractor-form form-horizontal" method="POST" onSubmit={this._saveExtractor}>
-                  {this._staticField(
-                    'Extractor type',
-                    ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type),
-                  )}
-                  {this._staticField('Source field', updatedExtractor.source_field)}
+                  <StaticField
+                    label="Extractor type"
+                    text={ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type)}
+                  />
+                  <StaticField label="Source field" text={updatedExtractor.source_field} />
 
                   <EditExtractorConfiguration
                     extractorType={updatedExtractor.type}

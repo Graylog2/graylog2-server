@@ -64,7 +64,7 @@ describe('FormatReceivedBy', () => {
 
     const nodeLink = (await screen.findByRole('link', { name: /existing.node/ })) as HTMLAnchorElement;
 
-    expect(nodeLink.href).toEqual('http://localhost/system/nodes/existingNode');
+    expect(nodeLink.href).toEqual('http://localhost/system/cluster/node/existingNode');
     expect(within(nodeLink).getByText('foobar')).not.toBeNull();
   });
 

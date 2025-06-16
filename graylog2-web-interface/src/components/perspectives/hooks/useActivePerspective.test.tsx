@@ -44,10 +44,8 @@ describe('useActivePerspective', () => {
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {
-    const { result } = renderHook(() => useActivePerspective());
-
-    expect(result.error).toEqual(
-      Error('useActivePerspective hook needs to be used inside PerspectivesContext.Provider'),
+    expect(() => renderHook(() => useActivePerspective())).toThrow(
+      'useActivePerspective hook needs to be used inside PerspectivesContext.Provider',
     );
   });
 });
