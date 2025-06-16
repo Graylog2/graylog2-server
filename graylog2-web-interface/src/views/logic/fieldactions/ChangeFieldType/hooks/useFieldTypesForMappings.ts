@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemFieldTypes } from '@graylog/server-api';
 
@@ -35,18 +35,18 @@ const useFieldTypesForMappings = (): {
   data: { fieldTypes: FieldTypes };
   isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery(
-    ['fieldTypeOptions'],
-    () =>
+  const { data, isLoading } = useQuery({
+    queryKey: ['fieldTypeOptions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchFieldTypes(),
         'Loading field type options failed with status',
         'Could not load field type options',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+  });
 
   return {
     data: data ?? INITIAL_DATA,
