@@ -18,10 +18,11 @@ package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableSet;
+import org.bson.types.ObjectId;
 import org.graylog2.indexer.IndexSet;
+import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Strings.emptyToNull;
@@ -86,7 +87,9 @@ public interface Stream {
 
     String getDescription();
 
-    Map<String, Object> getFields();
+    String getCreatorUserId();
+
+    DateTime getCreatedAt();
 
     Boolean getDisabled();
 
@@ -94,23 +97,11 @@ public interface Stream {
 
     List<String> getCategories();
 
-    void setTitle(String title);
-
-    void setDescription(String description);
-
-    void setDisabled(Boolean disabled);
-
-    void setContentPack(String contentPack);
-
-    void setMatchingType(MatchingType matchingType);
-
-    void setCategories(List<String> categories);
-
     Boolean isPaused();
 
-    Map<String, Object> asMap(List<StreamRule> streamRules);
-
     List<StreamRule> getStreamRules();
+
+    Set<ObjectId> getOutputIds();
 
     Set<Output> getOutputs();
 
@@ -118,17 +109,11 @@ public interface Stream {
 
     boolean isDefaultStream();
 
-    void setDefaultStream(boolean defaultStream);
-
     boolean getRemoveMatchesFromDefaultStream();
-
-    void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream);
 
     IndexSet getIndexSet();
 
     String getIndexSetId();
-
-    void setIndexSetId(String indexSetId);
 
     static boolean isSystemStreamId(String id) {
         return ALL_SYSTEM_STREAM_IDS.contains(id);

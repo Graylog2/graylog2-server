@@ -20,7 +20,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,7 +59,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsFalseWhenCatalogHasNullPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, null))
+                new DbEntityCatalogEntry("streams", "title", StreamDTO.class, null))
         ).when(catalog)
                 .getByCollectionName("streams");
 
@@ -70,7 +70,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsTrueWhenCatalogHasAllAllowedPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, DbEntity.ALL_ALLOWED))
+                new DbEntityCatalogEntry("streams", "title", StreamDTO.class, DbEntity.ALL_ALLOWED))
         ).when(catalog)
                 .getByCollectionName("streams");
 
@@ -81,7 +81,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsFalseWhenSubjectMissesPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"))
+                new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read"))
         ).when(catalog)
                 .getByCollectionName("streams");
 
@@ -93,7 +93,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsTrueWhenSubjectHasPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"))
+                new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read"))
         ).when(catalog)
                 .getByCollectionName("streams");
 

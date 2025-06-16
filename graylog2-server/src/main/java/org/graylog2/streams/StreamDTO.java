@@ -18,6 +18,7 @@ package org.graylog2.streams;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -25,20 +26,21 @@ import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
-import org.graylog2.plugin.Tools;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
@@ -47,12 +49,13 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)
-public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
+public abstract class StreamDTO implements Stream, BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
     public static final String FIELD_OUTPUTS = "outputs";
+    public static final String FIELD_OUTPUT_OBJECTS = "output_objects";
     public static final String FIELD_CONTENT_PACK = "content_pack";
     public static final String FIELD_ALERT_RECEIVERS = "alert_receivers";
     public static final String FIELD_DISABLED = "disabled";
@@ -62,6 +65,7 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
     public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
+    public static final String FIELD_INDEX_SET = "index_set";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
     public static final String FIELD_CATEGORIES = "categories";
@@ -72,21 +76,17 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
 
     @JsonProperty(FIELD_OUTPUTS)
     @Nullable
-    public abstract Collection<ObjectId> outputs();
+    public abstract Set<ObjectId> outputIds();
 
     @JsonProperty(FIELD_MATCHING_TYPE)
-    public abstract String matchingType();
+    public abstract MatchingType matchingType();
 
     @JsonProperty(FIELD_DESCRIPTION)
     @Nullable
     public abstract String description();
 
     @JsonProperty(FIELD_CREATED_AT)
-    public abstract Date createdAt();
-
-    @JsonProperty(FIELD_RULES)
-    @Nullable
-    public abstract Collection<StreamRule> rules();
+    public abstract DateTime createdAt();
 
     @JsonProperty(FIELD_DISABLED)
     public abstract boolean disabled();
@@ -128,55 +128,54 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
 
     public abstract Builder toBuilder();
 
-    static Builder builder() {
+    public static Builder builder() {
         return Builder.create();
     }
 
-    public static Map<String, Object> toMap(StreamDTO dto) {
-        final Map<String, Object> map = new HashMap<>();
-        if (dto.id() != null) {
-            map.put("id", dto.id());
-        }
-        map.put(FIELD_TITLE, dto.title().strip());
-        map.put(FIELD_CREATED_AT, Tools.getISO8601String(new DateTime(dto.createdAt(), DateTimeZone.UTC)));
-        map.put(FIELD_DESCRIPTION, dto.description());
-        map.put(FIELD_CREATOR_USER_ID, dto.creatorUserId());
-        map.put(FIELD_CONTENT_PACK, dto.contentPack());
-        map.put(FIELD_MATCHING_TYPE, dto.matchingType());
-        map.put(FIELD_DISABLED, dto.disabled());
-        map.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, dto.removeMatchesFromDefaultStream());
-        map.put(FIELD_INDEX_SET_ID, dto.indexSetId());
-        map.put(FIELD_CATEGORIES, dto.categories());
-        map.put(FIELD_DEFAULT_STREAM, dto.isDefault());
-        return map;
-    }
+    // The following fields are not saved to the DB and are loaded afterward from their own collections.
+    @JsonProperty(FIELD_OUTPUT_OBJECTS)
+    @Nullable
+    public abstract Set<Output> outputObjects();
+
+    @JsonProperty(FIELD_RULES)
+    @Nullable
+    public abstract Collection<StreamRule> rules();
+
+    @JsonProperty(FIELD_INDEX_SET)
+    @Nullable
+    public abstract IndexSet indexSet();
 
     @AutoValue.Builder
     public abstract static class Builder implements BuildableMongoEntity.Builder<StreamDTO, Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
-                    .matchingType(DEFAULT_MATCHING_TYPE.toString())
+                    .matchingType(DEFAULT_MATCHING_TYPE)
                     .isDefault(false)
                     .isEditable(false)
                     .removeMatchesFromDefaultStream(false)
-                    .categories(List.of());
+                    .categories(List.of())
+                    .outputIds(Set.of())
+                    .outputObjects(Set.of());
         }
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
 
         @JsonProperty(FIELD_OUTPUTS)
-        public abstract Builder outputs(Collection<ObjectId> outputs);
+        public abstract Builder outputIds(Set<ObjectId> outputIds);
+
+        @JsonProperty(FIELD_OUTPUT_OBJECTS)
+        public abstract Builder outputObjects(Set<Output> outputObjects);
 
         @JsonProperty(FIELD_MATCHING_TYPE)
-        public abstract Builder matchingType(String matchingType);
+        public abstract Builder matchingType(MatchingType matchingType);
 
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
         @JsonProperty(FIELD_CREATED_AT)
-        public abstract Builder createdAt(Date createdAt);
+        public abstract Builder createdAt(DateTime createdAt);
 
         @JsonProperty(FIELD_CONTENT_PACK)
         public abstract Builder contentPack(String contentPack);
@@ -207,6 +206,9 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
         @JsonProperty(FIELD_INDEX_SET_ID)
         public abstract Builder indexSetId(String indexSetId);
 
+        @JsonProperty(FIELD_INDEX_SET)
+        public abstract Builder indexSet(IndexSet indexSet);
+
         @JsonProperty(FIELD_IS_EDITABLE)
         public abstract Builder isEditable(boolean isEditable);
 
@@ -223,5 +225,126 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
         }
     }
 
+    @Override
+    @JsonIgnore
+    public String getId() {
+        return id();
+    }
 
+    @Override
+    @JsonIgnore
+    public String getTitle() {
+        return title();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getDescription() {
+        return description();
+    }
+
+    @Override
+    @JsonIgnore
+    public Boolean getDisabled() {
+        return disabled();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getContentPack() {
+        return contentPack();
+    }
+
+    @Override
+    @JsonIgnore
+    public List<String> getCategories() {
+        return categories();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getCreatorUserId() {
+        return creatorUserId();
+    }
+
+    @Override
+    @JsonIgnore
+    public DateTime getCreatedAt() {
+        return createdAt();
+    }
+
+    @Override
+    @JsonIgnore
+    public Set<ObjectId> getOutputIds() {
+        final Set<ObjectId> outputs = new HashSet<>();
+        if (outputIds() != null) {
+            outputs.addAll(outputIds());
+        }
+        return outputs;
+    }
+
+    @Override
+    @JsonIgnore
+    public Set<Output> getOutputs() {
+        final Set<Output> outputs = new HashSet<>();
+        if (outputObjects() != null) {
+            outputs.addAll(outputObjects());
+        }
+        return outputs;
+    }
+
+    @Override
+    @JsonIgnore
+    public IndexSet getIndexSet() {
+        return indexSet();
+    }
+
+    @Override
+    @JsonIgnore
+    public Boolean isPaused() {
+        return disabled();
+    }
+
+    @Override
+    @JsonIgnore
+    public List<StreamRule> getStreamRules() {
+        final List<StreamRule> rules = new ArrayList<>();
+        if (rules() != null) {
+            rules.addAll(rules());
+        }
+        return rules;
+    }
+
+    @Override
+    @JsonIgnore
+    public MatchingType getMatchingType() {
+        if (matchingType() == null) {
+            return MatchingType.AND;
+        } else {
+            return matchingType();
+        }
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isDefaultStream() {
+        return Boolean.TRUE.equals(isDefault());
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean getRemoveMatchesFromDefaultStream() {
+        return Boolean.TRUE.equals(removeMatchesFromDefaultStream());
+    }
+
+    @Override
+    @JsonIgnore
+    public String getIndexSetId() {
+        return indexSetId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id(), title(), creatorUserId());
+    }
 }

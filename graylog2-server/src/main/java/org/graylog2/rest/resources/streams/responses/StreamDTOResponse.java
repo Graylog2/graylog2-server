@@ -18,11 +18,12 @@ package org.graylog2.rest.resources.streams.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import static org.graylog2.streams.StreamDTO.FIELD_CATEGORIES;
@@ -42,9 +43,9 @@ import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
 public record StreamDTOResponse(@JsonProperty("id") String id,
                                 @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
                                 @JsonProperty(FIELD_OUTPUTS) @Nullable Collection<ObjectId> outputs,
-                                @JsonProperty(FIELD_MATCHING_TYPE) String matchingType,
+                                @JsonProperty(FIELD_MATCHING_TYPE) Stream.MatchingType matchingType,
                                 @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
-                                @JsonProperty(FIELD_CREATED_AT) Date createdAt,
+                                @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
                                 @JsonProperty(FIELD_RULES) @Nullable Collection<StreamRule> rules,
                                 @JsonProperty(FIELD_DISABLED) boolean disabled,
                                 @JsonProperty(FIELD_TITLE) String title,

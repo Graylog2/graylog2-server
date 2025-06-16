@@ -17,8 +17,7 @@
 package org.graylog2.streams;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import org.bson.types.ObjectId;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -29,7 +28,9 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
@@ -52,24 +54,27 @@ public class StreamMock implements Stream {
     private boolean defaultStream;
     private boolean removeMatchesFromDefaultStream;
     private IndexSet indexSet;
+    private Set<Output> outputs;
 
     public StreamMock(Map<String, Object> stream) {
         this(stream, Collections.emptyList());
     }
 
     public StreamMock(Map<String, Object> stream, List<StreamRule> streamRules) {
-        this.id = stream.get("_id").toString();
-        this.title = (String) stream.get(StreamImpl.FIELD_TITLE);
-        this.description = (String) stream.get(StreamImpl.FIELD_DESCRIPTION);
-        if (stream.containsKey(StreamImpl.FIELD_DISABLED)) {
-            this.disabled = (boolean) stream.get(StreamImpl.FIELD_DISABLED);
+        this.id = stream.getOrDefault("_id", ObjectId.get()).toString();
+        this.title = (String) stream.get(StreamDTO.FIELD_TITLE);
+        this.description = (String) stream.get(StreamDTO.FIELD_DESCRIPTION);
+        if (stream.containsKey(StreamDTO.FIELD_DISABLED)) {
+            this.disabled = (boolean) stream.get(StreamDTO.FIELD_DISABLED);
         }
-        this.contentPack = (String) stream.get(StreamImpl.FIELD_CONTENT_PACK);
+        this.contentPack = (String) stream.get(StreamDTO.FIELD_CONTENT_PACK);
         this.streamRules = streamRules;
-        this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
-        this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
-        this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
-        this.categories = (List<String>) stream.getOrDefault(StreamImpl.FIELD_CATEGORIES, List.of());
+        this.matchingType = (MatchingType) stream.getOrDefault(StreamDTO.FIELD_MATCHING_TYPE, MatchingType.AND);
+        this.defaultStream = (boolean) stream.getOrDefault(StreamDTO.FIELD_DEFAULT_STREAM, false);
+        this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamDTO.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
+        //noinspection unchecked
+        this.categories = (List<String>) stream.getOrDefault(StreamDTO.FIELD_CATEGORIES, List.of());
+        this.outputs = Set.of();
         this.indexSet = new TestIndexSet(IndexSetConfig.create(
                 "index-set-id",
                 "title",
@@ -90,14 +95,26 @@ public class StreamMock implements Stream {
                 false));
     }
 
+    public StreamMock(ObjectId id, Map<String, Object> fields, List<StreamRule> streamRules, Set<Output> outputs, @Nullable IndexSet indexSet) {
+        this(fields, streamRules);
+        this.id = id.toString();
+        this.outputs = outputs;
+        this.indexSet = indexSet;
+    }
+
     @Override
     public String getId() {
         return id;
     }
 
     @Override
-    public Map<String, Object> getFields() {
-        return Collections.emptyMap();
+    public String getCreatorUserId() {
+        return "mock-user";
+    }
+
+    @Override
+    public DateTime getCreatedAt() {
+        return null;
     }
 
     @Override
@@ -126,33 +143,8 @@ public class StreamMock implements Stream {
     }
 
     @Override
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    @Override
-    public void setContentPack(String contentPack) {
-        this.contentPack = contentPack;
-    }
-
-    @Override
     public Boolean isPaused() {
         return getDisabled() != null ? getDisabled() : false;
-    }
-
-    @Override
-    public Map<String, Object> asMap(List<StreamRule> streamRules) {
-        return Maps.newHashMap();
     }
 
     @Override
@@ -166,23 +158,17 @@ public class StreamMock implements Stream {
 
     @Override
     public Set<Output> getOutputs() {
-        return Sets.newHashSet();
+        return outputs;
     }
 
+    @Override
+    public Set<ObjectId> getOutputIds() {
+        return outputs.stream().map(o -> new ObjectId(o.getId())).collect(Collectors.toSet());
+    }
 
     @Override
     public MatchingType getMatchingType() {
         return this.matchingType;
-    }
-
-    @Override
-    public void setMatchingType(MatchingType matchingType) {
-        this.matchingType = matchingType;
-    }
-
-    @Override
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
     }
 
     @Override
@@ -191,16 +177,10 @@ public class StreamMock implements Stream {
     }
 
     @Override
-    public void setDefaultStream(boolean defaultStream) {
-        this.defaultStream = defaultStream;
-    }
-
-    @Override
     public boolean getRemoveMatchesFromDefaultStream() {
         return removeMatchesFromDefaultStream;
     }
 
-    @Override
     public void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream) {
         this.removeMatchesFromDefaultStream = removeMatchesFromDefaultStream;
     }
@@ -231,23 +211,18 @@ public class StreamMock implements Stream {
                 Objects.equals(title, that.title) &&
                 Objects.equals(description, that.description) &&
                 Objects.equals(streamRules, that.streamRules) &&
-                Objects.equals(defaultStream, that.defaultStream) &&
                 Objects.equals(removeMatchesFromDefaultStream, that.removeMatchesFromDefaultStream) &&
                 matchingType == that.matchingType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, streamRules, matchingType, defaultStream, removeMatchesFromDefaultStream);
+        return Objects.hash(id);
     }
 
     @Override
     public String getIndexSetId() {
         return "index-set-id";
-    }
-
-    @Override
-    public void setIndexSetId(String indexSetId) {
     }
 
     @Override

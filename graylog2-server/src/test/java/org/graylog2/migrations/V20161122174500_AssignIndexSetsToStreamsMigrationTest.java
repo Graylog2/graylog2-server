@@ -83,8 +83,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
         migration.upgrade();
 
-        verify(stream1).setIndexSetId(indexSetConfig.id());
-        verify(stream2).setIndexSetId(indexSetConfig.id());
         verify(streamService, times(1)).save(stream1);
         verify(streamService, times(1)).save(stream2);
         verify(clusterConfigService, times(1)).write(
@@ -107,8 +105,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
         migration.upgrade();
 
-        verify(stream1).setIndexSetId(indexSetConfig.id());
-        verify(stream2, never()).setIndexSetId(indexSetConfig.id());
         verify(streamService, times(1)).save(stream1);
         verify(streamService, never()).save(stream2);
         verify(clusterConfigService, times(1)).write(
@@ -133,8 +129,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
         migration.upgrade();
 
-        verify(stream1).setIndexSetId(indexSetConfig.id());
-        verify(stream2).setIndexSetId(indexSetConfig.id());
         verify(streamService, times(1)).save(stream1);
         verify(streamService, times(1)).save(stream2);
 

@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
@@ -23,6 +24,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 
 import javax.annotation.Nullable;
@@ -32,11 +34,12 @@ import java.util.Map;
 import java.util.Set;
 
 public interface StreamService {
-    Stream create(Map<String, Object> fields);
 
     Stream create(CreateStreamRequest request, String userId);
 
     String save(Stream stream) throws ValidationException;
+
+    Stream update(String streamId, UpdateStreamRequest request) throws NotFoundException, ValidationException;
 
     String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException;
 
@@ -72,8 +75,6 @@ public interface StreamService {
 
     void resume(Stream stream) throws ValidationException;
 
-    void addOutput(Stream stream, Output output);
-
     void addOutputs(ObjectId streamId, Collection<ObjectId> outputIds);
 
     void removeOutput(Stream stream, Output output);
@@ -86,16 +87,19 @@ public interface StreamService {
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
 
+    @MustBeClosed
     java.util.stream.Stream<String> streamAllIds();
 
     /**
-     * Returns only StreamDTOs. The DTO methods skip the full loading of StreamRules and Outputs and should be used when
-     * information stored solely on the StreamDTO itself is necessary.
+     * Returns only StreamDTOs. The DTO methods skip the full loading of StreamRules, Outputs, and Index Set and should
+     * be used when information stored solely in the 'streams' collection.
      *
      * @return a stream of StreamDTO objects. This must be closed by the caller.
      */
+    @MustBeClosed
     java.util.stream.Stream<StreamDTO> streamAllDTOs();
 
+    @MustBeClosed
     java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds);
 
     /**

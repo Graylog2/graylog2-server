@@ -26,7 +26,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitl
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -107,7 +107,7 @@ class EntityTitleServiceTest {
                         new DbEntityCatalogEntry(
                                 "streams",
                                 DbEntity.NO_TITLE,
-                                StreamImpl.class,
+                                StreamDTO.class,
                                 DbEntity.ALL_ALLOWED)
                 )
         ).when(entitiesCatalog).getByCollectionName("streams");

@@ -43,7 +43,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -65,6 +64,10 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.FAILURES_STREAM_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -91,10 +94,10 @@ public class AggregationSearchUtilsTest {
                 "stream-1",
                 "stream-2",
                 "stream-3",
-                StreamImpl.DEFAULT_STREAM_ID,
-                StreamImpl.DEFAULT_EVENTS_STREAM_ID,
-                StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
-                StreamImpl.FAILURES_STREAM_ID
+                DEFAULT_STREAM_ID,
+                DEFAULT_EVENTS_STREAM_ID,
+                DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                FAILURES_STREAM_ID
         );
         final Function<Collection<String>, Stream<String>> categoryMappingFunction = (categories) -> Stream.of();
 
@@ -565,10 +568,10 @@ public class AggregationSearchUtilsTest {
                 "stream-1",
                 "stream-2",
                 "stream-3",
-                StreamImpl.DEFAULT_STREAM_ID,
-                StreamImpl.DEFAULT_EVENTS_STREAM_ID,
-                StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
-                StreamImpl.FAILURES_STREAM_ID
+                DEFAULT_STREAM_ID,
+                DEFAULT_EVENTS_STREAM_ID,
+                DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                FAILURES_STREAM_ID
         ));
         eventStreamService = new EventStreamService(streamService);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
@@ -613,7 +616,7 @@ public class AggregationSearchUtilsTest {
                     "stream-1",
                     "stream-2",
                     "stream-3",
-                    StreamImpl.DEFAULT_STREAM_ID
+                    DEFAULT_STREAM_ID
             );
 
             final Message message = eventWithContext.messageContext().orElse(null);

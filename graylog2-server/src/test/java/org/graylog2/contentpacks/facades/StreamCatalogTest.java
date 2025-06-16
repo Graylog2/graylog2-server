@@ -50,7 +50,7 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamDTO;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
@@ -140,7 +140,7 @@ public class StreamCatalogTest {
         );
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId();
-        final StreamImpl stream = new StreamImpl(streamId, streamFields, streamRules, outputs, null);
+        final Stream stream = new StreamMock(streamId, streamFields, streamRules, outputs, null);
         final EntityDescriptor descriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(stream, entityDescriptorIds);
@@ -162,7 +162,7 @@ public class StreamCatalogTest {
         final ImmutableMap<String, Object> fields = ImmutableMap.of(
                 "title", "Stream Title"
         );
-        final StreamImpl stream = new StreamImpl(fields);
+        final StreamMock stream = new StreamMock(fields);
         final EntityExcerpt excerpt = facade.createExcerpt(stream);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(stream.getId()));

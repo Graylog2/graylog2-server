@@ -41,7 +41,7 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -104,10 +104,10 @@ public class AggregationEventProcessorTest {
                 "stream-1",
                 "stream-2",
                 "stream-3",
-                StreamImpl.DEFAULT_STREAM_ID,
-                StreamImpl.DEFAULT_EVENTS_STREAM_ID,
-                StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
-                StreamImpl.FAILURES_STREAM_ID
+                Stream.DEFAULT_STREAM_ID,
+                Stream.DEFAULT_EVENTS_STREAM_ID,
+                Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                Stream.FAILURES_STREAM_ID
         ));
 
         eventStreamService = new EventStreamService(streamService);

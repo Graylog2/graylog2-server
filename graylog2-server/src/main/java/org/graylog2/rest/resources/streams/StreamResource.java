@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -106,18 +105,15 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
 import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamGuardException;
-import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.events.StreamRenamedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -198,7 +194,7 @@ public class StreamResource extends RestResource {
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineService = pipelineService;
         this.entitySharesService = entitySharesService;
-        this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
+        this.dbQueryCreator = new DbQueryCreator(StreamDTO.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         this.clusterEventBus = clusterEventBus;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
@@ -224,7 +220,6 @@ public class StreamResource extends RestResource {
         final CreateStreamRequest cr = unwrappedCreateEntityRequest.getEntity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
-        stream.setDisabled(true);
 
         final IndexSet indexSet = stream.getIndexSet();
         checkIndexSet(indexSet);
@@ -380,56 +375,12 @@ public class StreamResource extends RestResource {
     public StreamResponse update(@ApiParam(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "JSON body", required = true)
-                                 @Valid @NotNull UpdateStreamRequest cr,
+                                 @Valid @NotNull UpdateStreamRequest request,
                                  @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be edited.");
 
-        final Stream stream = streamService.load(streamId);
-
-        StreamRenamedEvent streamRenamedEvent = null;
-        if (!Strings.isNullOrEmpty(cr.title())) {
-            String newTitle = cr.title().strip();
-            streamRenamedEvent = new StreamRenamedEvent(streamId, stream.getTitle(), newTitle);
-            stream.setTitle(newTitle);
-        }
-
-        stream.setDescription(cr.description());
-
-        if (cr.matchingType() != null) {
-            try {
-                stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
-            } catch (IllegalArgumentException e) {
-                throw new BadRequestException("Invalid matching type '" + cr.matchingType()
-                        + "' specified. Should be one of: " + Arrays.toString(Stream.MatchingType.values()));
-            }
-        }
-
-        final Boolean removeMatchesFromDefaultStream = cr.removeMatchesFromDefaultStream();
-        if (removeMatchesFromDefaultStream != null) {
-            stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
-        }
-
-        // Apparently we are sending partial resources sometimes so do not overwrite the index set
-        // id if it's null/empty in the update request.
-        if (!Strings.isNullOrEmpty(cr.indexSetId())) {
-            stream.setIndexSetId(cr.indexSetId());
-        }
-
-        final IndexSet indexSet = indexSetRegistry.get(stream.getIndexSetId())
-                .orElseThrow(() -> new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!"));
-
-        if (!indexSet.getConfig().isWritable()) {
-            throw new BadRequestException("Assigned index set must be writable!");
-        }
-        if (!indexSet.getConfig().isRegularIndex()) {
-            throw new BadRequestException("Assigned index set is not usable");
-        }
-
-        streamService.save(stream);
-        if (streamRenamedEvent != null) {
-            clusterEventBus.post(streamRenamedEvent);
-        }
+        final Stream stream = streamService.update(streamId, request);
 
         recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
@@ -637,26 +588,21 @@ public class StreamResource extends RestResource {
                 .map(streamRule -> streamRuleService.copy(null, streamRule))
                 .collect(Collectors.toSet());
 
-        final Map<String, Object> streamData = Map.of(
-                StreamImpl.FIELD_TITLE, cr.title().strip(),
-                StreamImpl.FIELD_DESCRIPTION, cr.description(),
-                StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
-                StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
-                StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
-                StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
-                StreamImpl.FIELD_DISABLED, true,
-                StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
-        );
+        final Stream stream = StreamDTO.builder()
+                .title(cr.title().strip())
+                .description(cr.description())
+                .creatorUserId(creatorUser)
+                .createdAt(Tools.nowUTC())
+                .matchingType(sourceStream.getMatchingType())
+                .removeMatchesFromDefaultStream(cr.removeMatchesFromDefaultStream())
+                .disabled(true)
+                .indexSetId(cr.indexSetId())
+                .build();
 
-        final Stream stream = streamService.create(streamData);
         final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
-        final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
-                .map(Output::getId)
-                .map(ObjectId::new)
-                .collect(Collectors.toSet());
-        streamService.addOutputs(savedStreamObjectId, outputIds);
+        streamService.addOutputs(savedStreamObjectId, sourceStream.getOutputIds());
 
         entitySharesService.cloneEntityGrants(GRNTypes.STREAM, streamId, savedStreamId, userContext.getUser());
 
@@ -772,11 +718,11 @@ public class StreamResource extends RestResource {
     private StreamResponse streamToResponse(Stream stream) {
         return StreamResponse.create(
                 stream.getId(),
-                (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+                stream.getCreatorUserId(),
                 outputsToSummaries(stream.getOutputs()),
                 stream.getMatchingType().name(),
                 stream.getDescription(),
-                stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
+                stream.getCreatedAt().toString(),
                 stream.getDisabled(),
                 stream.getStreamRules(),
                 stream.getTitle(),
@@ -791,7 +737,7 @@ public class StreamResource extends RestResource {
     private StreamDTOResponse dtoToResponse(StreamDTO dto) {
         return new StreamDTOResponse(dto.id(),
                 dto.creatorUserId(),
-                dto.outputs(),
+                dto.outputIds(),
                 dto.matchingType(),
                 dto.description(),
                 dto.createdAt(),
