@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.pagination;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Filters;
@@ -59,7 +58,7 @@ class DefaultMongoPaginationHelperWithPipelineTest {
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        final MongoCollection<DTO> collection = mongoCollections.collection("test", DTO.class);
+        final var collection = mongoCollections.collection("test", DTO.class);
         paginationHelper = new DefaultMongoPaginationHelper<>(collection);
     }
 
