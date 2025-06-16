@@ -25,8 +25,9 @@ const deleteNotification = ({ type, key }: { type: string; key: string }) =>
 
 const useNotificationDelete = () => {
   const queryClient = useQueryClient();
-  const { mutateAsync } = useMutation(deleteNotification, {
-    onSuccess: () => queryClient.invalidateQueries(NOTIFICATIONS_QUERY_KEY),
+  const { mutateAsync } = useMutation({
+    mutationFn: deleteNotification,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
   });
 
   return mutateAsync;
