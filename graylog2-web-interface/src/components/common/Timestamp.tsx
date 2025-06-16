@@ -44,7 +44,7 @@ type Props = {
  */
 const Timestamp = ({
   dateTime = undefined,
-  field = undefined,
+  field,
   format = 'default',
   render: Component = ({ value }: RenderProps) => <>{value}</>,
   tz = undefined,

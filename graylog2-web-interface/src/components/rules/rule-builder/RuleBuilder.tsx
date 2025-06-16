@@ -291,8 +291,7 @@ const RuleBuilder = () => {
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _scope , ...updatedRule } = rule;
+      const { _scope, ...updatedRule } = rule;
       await updateRule(updatedRule);
       if (closeAfter) handleCancel();
     } else {

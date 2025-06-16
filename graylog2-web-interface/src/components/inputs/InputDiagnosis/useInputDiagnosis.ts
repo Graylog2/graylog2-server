@@ -102,16 +102,18 @@ const useInputDiagnosis = (
     InputsActions.get(inputId);
   }, [inputId]);
 
-  const { data: messageCountByStream } = useQuery<InputDiagnostics, Error>(
-    ['input-diagnostics', inputId],
-    () =>
+  const { data: messageCountByStream } = useQuery({
+    queryKey: ['input-diagnostics', inputId],
+
+    queryFn: () =>
       defaultOnError(
         fetchInputDiagnostics(inputId),
         'Fetching Input Diagnostics failed with status',
         'Could not fetch Input Diagnostics',
       ),
-    { refetchInterval: 5000 },
-  );
+
+    refetchInterval: 5000,
+  });
 
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : ({} as InputStateByNode);

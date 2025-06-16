@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
-import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.ObjectUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -35,11 +34,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class CloneMessage extends AbstractFunction<Message> {
-    private static final RateLimitedLog LOG = getRateLimitedLog(CloneMessage.class);
-
     public static final String NAME = "clone_message";
 
     private static final String CLONE_SOURCE = "gl2_clone_source_rule";

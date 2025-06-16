@@ -23,7 +23,9 @@ import ApiRoutes from 'routing/ApiRoutes';
 const fetchClusterName = async () => fetch('GET', qualifyUrl(ApiRoutes.IndexerClusterApiController.info().url));
 
 const useIsElasticsearch = (): boolean => {
-  const { data } = useQuery(['cluster-name'], fetchClusterName, {
+  const { data } = useQuery({
+    queryKey: ['cluster-name'],
+    queryFn: fetchClusterName,
     refetchInterval: 5000,
   });
 

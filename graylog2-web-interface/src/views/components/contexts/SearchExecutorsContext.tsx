@@ -19,12 +19,17 @@ import * as React from 'react';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import { cancelJob, executeJobResult, startJob } from 'views/logic/slices/executeJobResult';
 import parseSearch from 'views/logic/slices/parseSearch';
+import { wrapWithOnError } from 'util/conditional/onError';
+
+const defaultStartJob = wrapWithOnError(startJob, 'Starting search job failed', 'Error!');
+
+const defaultExecuteJobResult = wrapWithOnError(executeJobResult, 'Executing search failed', 'Error!');
 
 const defaultSearchExecutors: SearchExecutors = {
   resultMapper: (r) => r,
   parse: parseSearch,
-  startJob,
-  executeJobResult,
+  startJob: defaultStartJob,
+  executeJobResult: defaultExecuteJobResult,
   cancelJob,
 };
 const SearchExecutorsContext = React.createContext<SearchExecutors>(defaultSearchExecutors);

@@ -14,4 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/// <reference types="jest-enzyme" />
+import { useStore } from 'stores/connect';
+import { SystemStore } from 'stores/system/SystemStore';
+
+const useSystemDetails = () => useStore(SystemStore, (_system) => _system?.system);
+export default useSystemDetails;

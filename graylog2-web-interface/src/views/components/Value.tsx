@@ -32,7 +32,7 @@ type Props = {
   field: string;
   value: any;
   render?: ValueRenderer;
-  type: FieldType;
+  type?: FieldType;
   unit?: FieldUnit;
 };
 
@@ -61,7 +61,13 @@ const TypeSpecificValueWithHighlight = ({
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit = undefined }: Props) => {
+const InteractiveValue = ({
+  field,
+  value,
+  render = defaultRenderer,
+  type = FieldType.Unknown,
+  unit = undefined,
+}: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(
     () => render ?? ((props: ValueRendererProps) => props.value),
@@ -84,7 +90,7 @@ const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit =
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type, unit = undefined }: Props) => {
+const Value = ({ field, value, render = defaultRenderer, type = undefined, unit = undefined }: Props) => {
   const _type = type ?? FieldType.Unknown;
 
   return (

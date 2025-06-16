@@ -30,7 +30,9 @@ const useForwarderNode = (nodeId: string, enabled: boolean) => {
     data: forwarderNode,
     isError,
     isLoading,
-  } = useQuery(['forwarder', 'node', nodeId], () => fetchForwarderNode(nodeId), {
+  } = useQuery({
+    queryKey: ['forwarder', 'node', nodeId],
+    queryFn: () => fetchForwarderNode(nodeId),
     enabled: fetchForwarderNode && enabled,
   });
 

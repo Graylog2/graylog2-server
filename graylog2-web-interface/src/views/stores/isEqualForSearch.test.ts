@@ -33,17 +33,20 @@ import {
 
 import isEqualForSearch from './isEqualForSearch';
 
-export class AlwaysEqualForSearch {
+class AlwaysEqualForSearch {
+  // eslint-disable-next-line class-methods-use-this
   equalsForSearch = () => true;
 }
 
-export class NeverEqualForSearch {
+class NeverEqualForSearch {
+  // eslint-disable-next-line class-methods-use-this
   equalsForSearch = () => false;
 }
 
 describe('isEqualForSearch', () => {
   const verifyIsEqualForSearch = ({ initial, next, result }) => expect(isEqualForSearch(initial, next)).toBe(result);
 
+  // eslint-disable-next-line jest/expect-expect
   it.each`
     initial                            | next                                  | result   | description
     ${undefined}                       | ${undefined}                          | ${true}  | ${'equal undefined values'}

@@ -53,7 +53,10 @@ const useActiveBackend = (isCloud: boolean) => {
     return AuthenticationDomain.loadActiveBackendType();
   };
 
-  const { data, isSuccess } = useQuery(['activeBackendType'], cloudBackendLoader);
+  const { data, isSuccess } = useQuery({
+    queryKey: ['activeBackendType'],
+    queryFn: cloudBackendLoader,
+  });
 
   return [data, isSuccess];
 };

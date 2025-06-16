@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import GrokPatternFilter from './GrokPatternFilter';
@@ -46,7 +46,7 @@ describe('<GrokPatternFilter />', () => {
     render(<GrokPatternFilter patterns={grokPatterns} addToPattern={changeFn} />);
 
     const addButton = await screen.findAllByRole('button', { name: 'Add' });
-    addButton[0].click();
+    await userEvent.click(addButton[0]);
 
     expect(changeFn.mock.calls.length).toBe(1);
   });
@@ -62,10 +62,8 @@ describe('<GrokPatternFilter />', () => {
 
     userEvent.type(patternFilter, 'COMMON');
 
-    await waitFor(async () => {
-      const buttons = await screen.findAllByRole('button', { name: 'Add' });
+    const buttons = await screen.findAllByRole('button', { name: 'Add' });
 
-      expect(buttons).toHaveLength(1);
-    });
+    expect(buttons).toHaveLength(1);
   });
 });

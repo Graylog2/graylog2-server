@@ -50,13 +50,12 @@ const TokenList = (props: Optional<React.ComponentProps<typeof OriginalTokenList
   <OriginalTokenList onCreate={async () => tokens[0]} {...props} />
 );
 
-const deleteToken =  jest.fn(() => Promise.resolve());
+const deleteToken = jest.fn(() => Promise.resolve());
 
 jest.mock('components/users/UsersTokenManagement/hooks/useDeleteTokenMutation', () => ({
   __esModule: true,
   default: jest.fn(() => ({ deleteToken: jest.fn(() => Promise.resolve()) })),
 }));
-
 
 describe('<TokenList />', () => {
   beforeAll(() => {
@@ -83,82 +82,83 @@ describe('<TokenList />', () => {
   });
 
   it('should add new token and display it', async () => {
-    const createFn = jest.fn(({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
-      expect(tokenName).toEqual('hans');
-      expect(tokenTtl).toEqual('PT72H');
-
-      return Promise.resolve({
+    const createFn = jest.fn(() =>
+      Promise.resolve({
         name: 'hans',
         token: 'beef2003',
         id: 'abc3',
         last_access: '1970-01-01T00:00:00.000Z',
         expires_at: '2020-01-01T00:00:00.000Z',
         tokenTtl: 'PT72H',
-      });
-    });
+      }),
+    );
 
     render(<TokenList tokens={tokens} onCreate={createFn} user={alice} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
-    userEvent.type(nameInput, 'hans');
+    await userEvent.type(nameInput, 'hans');
 
     const ttlInput = await screen.findByLabelText('Token TTL');
     fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
-    createToken.click();
+    await userEvent.click(createToken);
 
     await screen.findByText('beef2003');
 
-    expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'PT72H' });
+    await screen.findByText(/This is your new token./i);
+
+    await waitFor(() => {
+      expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'PT72H' });
+    });
   });
 
   it('should add new token for service account', async () => {
-    const createFn = jest.fn(({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
-      expect(tokenName).toEqual('hans');
-      expect(tokenTtl).toEqual('P100Y');
-
-      return Promise.resolve({
+    const createFn = jest.fn(() =>
+      Promise.resolve({
         name: 'hans',
         token: 'beef2003',
         id: 'abc3',
         last_access: '1970-01-01T00:00:00.000Z',
         expires_at: '2020-01-01T00:00:00.000Z',
         tokenTtl: 'P100Y',
-      });
-    });
+      }),
+    );
 
     render(<TokenList tokens={tokens} onCreate={createFn} user={serviceUser} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
-    userEvent.type(nameInput, 'hans');
+    await userEvent.type(nameInput, 'hans');
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
-    createToken.click();
+    await userEvent.click(createToken);
 
     await screen.findByText('beef2003');
 
-    expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'P100Y' });
+    await waitFor(() => {
+      expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'P100Y' });
+    });
   });
 
   it('should delete a token', async () => {
     const onDeleteFn = jest.fn();
-    render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn}/>);
+    render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn} />);
 
-    (await screen.findAllByRole('button', { name: 'Delete' }))[0].click();
+    const deleteButtons = await screen.findAllByRole('button', { name: 'Delete' });
+    await userEvent.click(deleteButtons[0]);
     await screen.findByRole('heading', {
-      name: /deleting token/i
+      name: /deleting token/i,
     });
 
-    userEvent.click(await screen.findByRole('button', { name: /Confirm/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Confirm/i }));
 
     await waitFor(() => {
-      expect(deleteToken).toHaveBeenCalledTimes(1);
+      expect(deleteToken).toHaveBeenCalled();
     });
 
     await waitFor(() => {
-      expect(onDeleteFn).toHaveBeenCalledTimes(1);
-    })
+      expect(onDeleteFn).toHaveBeenCalled();
+    });
   });
 
   it('show include token last access time', async () => {

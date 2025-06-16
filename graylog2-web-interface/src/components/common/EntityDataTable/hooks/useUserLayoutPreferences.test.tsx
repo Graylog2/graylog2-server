@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -47,7 +47,7 @@ describe('useUserSearchFilterQuery hook', () => {
 
   it('should return layout preferences', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(layoutPreferencesJSON));
-    const { result, waitFor } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
+    const { result } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
 
     await waitFor(() => result.current.isInitialLoading);
     await waitFor(() => !result.current.isInitialLoading);
@@ -59,7 +59,7 @@ describe('useUserSearchFilterQuery hook', () => {
   it('should trigger notification on error', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error!')));
 
-    const { result, waitFor } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
+    const { result } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isInitialLoading);

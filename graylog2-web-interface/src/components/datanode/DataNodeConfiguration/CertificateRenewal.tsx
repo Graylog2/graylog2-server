@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useState } from 'react';
 import moment from 'moment';
@@ -62,7 +62,7 @@ const useDataNodes = () => {
     queryKey: ['data-nodes', 'overview'],
     queryFn: () =>
       defaultOnError(fetchDataNodes(), 'Loading Data Nodes failed with status', 'Could not load data nodes'),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchInterval: 3000,
   });
 

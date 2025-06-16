@@ -30,18 +30,14 @@ const StyledButton = styled(Button)`
   margin-bottom: 15px;
 `;
 
-type HttpNotificationFormProps = React.ComponentProps<EventNotificationTypes['formComponent']>;
+type Props = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
 class HttpNotificationForm extends React.Component<
-  HttpNotificationFormProps,
+  Props,
   {
     [key: string]: any;
   }
 > {
-  static defaultProps = {
-    setIsSubmitEnabled: () => {},
-  };
-
   static defaultConfig = {
     url: '',
     api_key_as_header: false,

@@ -19,7 +19,10 @@ import { useQuery } from '@tanstack/react-query';
 import { SystemOutputs } from '@graylog/server-api';
 
 const useOutputTypes = () => {
-  const { data, isInitialLoading } = useQuery(['outputs', 'types'], () => SystemOutputs.available());
+  const { data, isInitialLoading } = useQuery({
+    queryKey: ['outputs', 'types'],
+    queryFn: () => SystemOutputs.available(),
+  });
 
   return { types: data?.types, isLoading: isInitialLoading };
 };

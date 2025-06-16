@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import {
   getLutParameters,
@@ -60,7 +60,7 @@ describe('useMappedData', () => {
     asMock(transformSearchFiltersToQuery).mockReturnValue('(http_method:GET)');
     asMock(replaceParametersInQueryString).mockReturnValue('http_method:GET');
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useMappedData({
           contexts: mockedContexts,

@@ -59,6 +59,10 @@ const useShowRouteForEntity = (id: string, type: string) => {
       return Routes.dashboard_show(id);
     case 'event_definition':
       return Routes.ALERTS.DEFINITIONS.show(id);
+    case 'event_procedure':
+      return Routes.getPluginRoute('ALERTS_EVENT-PROCEDURES_PROCEDURES');
+    case 'event_procedure_step':
+      return Routes.getPluginRoute('ALERTS_EVENT-PROCEDURES_STEPS');
     case 'notification':
       return Routes.ALERTS.NOTIFICATIONS.show(id);
     case 'search':

@@ -48,6 +48,8 @@ public interface UserService extends PersistedService {
      */
     Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username);
 
+    Optional<User> loadByAuthServiceUid(String authServiceUid);
+
     int delete(String username);
 
     int deleteById(String userId);

@@ -97,7 +97,7 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
-      prepare_request: dependenciesGRN
+      prepare_request: dependenciesGRN,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
@@ -115,7 +115,7 @@ const EntityCreateShareFormGroup = ({
 
     setDisableSubmit(true);
 
-    const prepare_request = isEmpty(newSelectedGranteeCapabilities) ? null: dependenciesGRN;
+    const prepare_request = isEmpty(newSelectedGranteeCapabilities) ? null : dependenciesGRN;
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedGranteeCapabilities,

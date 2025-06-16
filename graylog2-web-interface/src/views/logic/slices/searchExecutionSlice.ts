@@ -235,7 +235,13 @@ export const executeWithExecutionState =
       })
       .then((jobIds: JobIds) =>
         dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
-      );
+      )
+      .catch((error) => {
+        dispatch(cancelExecutedJob());
+        dispatch(stopLoading());
+
+        throw error;
+      });
 
 export const execute =
   ({

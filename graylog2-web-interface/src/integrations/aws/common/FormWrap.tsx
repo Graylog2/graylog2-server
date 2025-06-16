@@ -64,7 +64,7 @@ const ErrorOutput = styled.span`
 const ErrorToggleInfo = styled.button<{ isDarkMode: boolean }>`
   border: 0;
   background: none;
-  color:${({ isDarkMode }) => (isDarkMode ? 'white' : 'black')};
+  color: ${({ isDarkMode }) => (isDarkMode ? 'white' : 'black')};
   font-size: 11px;
   text-transform: uppercase;
   margin: 12px 0 0;

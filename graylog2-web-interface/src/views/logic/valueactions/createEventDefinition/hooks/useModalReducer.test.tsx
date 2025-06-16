@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
-import { act } from '@testing-library/react-hooks';
+import { act, renderHook } from 'wrappedTestingLibrary/hooks';
 
 import { modalDataResult } from 'fixtures/createEventDefinitionFromValue';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';

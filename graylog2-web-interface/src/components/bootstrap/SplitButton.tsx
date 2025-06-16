@@ -28,6 +28,7 @@ type Props = {
   open?: boolean;
   onMenuChange?: (newState: boolean) => void;
   width?: number;
+  dataTestId?: string;
 } & Pick<React.ComponentProps<typeof Button>, 'bsStyle' | 'bsSize' | 'children' | 'id' | 'onClick'>;
 const SplitButton = (
   {
@@ -38,12 +39,13 @@ const SplitButton = (
     onMenuChange = undefined,
     width = undefined,
     onClick,
+    dataTestId = undefined,
     ...props
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => (
   <Menu opened={open} onChange={onMenuChange} width={width}>
-    <ButtonGroup>
+    <ButtonGroup data-testid={dataTestId}>
       <Button {...props} disabled={disabled} onClick={onClick}>
         {title}
       </Button>

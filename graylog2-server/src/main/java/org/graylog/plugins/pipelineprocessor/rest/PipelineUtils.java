@@ -31,13 +31,13 @@ import org.graylog2.database.entities.DeletableSystemScope;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 /**
  * Factor out utility methods that are used in multiple services to avoid circular dependencies.
  */
 public class PipelineUtils {
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineUtils.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineUtils.class);
 
     private PipelineUtils() {
     }
