@@ -134,7 +134,7 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
       sendTelemetry,
       sendErrorReport,
     };
-  }, [globalProps, isPosthogLoaded, posthog, theme.mode]);
+  }, [globalProps, isPosthogLoaded, posthog, theme.mode, system?.version]);
 
   const handleConfirmTelemetryDialog = () => {
     TelemetrySettingsActions.update({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {
