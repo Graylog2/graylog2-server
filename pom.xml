@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -104,7 +104,7 @@
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.81</bouncycastle.version>
-        <caffeine.version>3.2.0</caffeine.version>
+        <caffeine.version>3.2.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
         <commons-codec.version>1.18.0</commons-codec.version>
@@ -122,7 +122,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.72.0</grpc.version>
+        <grpc.version>1.73.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -152,7 +152,7 @@
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.1</lucene.version>
         <metrics.version>4.2.30</metrics.version>
-        <mongodb-driver.version>5.5.0</mongodb-driver.version>
+        <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.121.Final</netty.version>
@@ -180,7 +180,7 @@
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
         <zstd.version>1.5.7-3</zstd.version>
@@ -195,7 +195,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0</equalsverifier.version>
+        <equalsverifier.version>4.0.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>

@@ -23,12 +23,13 @@ import { IfPermitted, CountBadge } from 'components/common';
 import type { UserContext } from 'actions/roles/AuthzRolesActions';
 
 type Props = {
-  users: Immutable.Set<UserContext>;
+  users: Immutable.Set<UserContext> | undefined;
 };
 
 const MAX_USERS = 10;
 
-const UsersCell = ({ users = Immutable.Set() }: Props) => {
+const UsersCell = ({ users: usersProp }: Props) => {
+  const users = usersProp ?? Immutable.Set();
   const usersLength = users.size;
   const usersComponents = users
     .take(MAX_USERS)
