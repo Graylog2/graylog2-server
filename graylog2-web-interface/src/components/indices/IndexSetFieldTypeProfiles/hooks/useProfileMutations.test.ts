@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 import omit from 'lodash/omit';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -43,7 +43,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations());
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.editProfile(requestBody);
@@ -62,7 +62,7 @@ describe('useProfileMutations', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations());
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.editProfile(requestBody).catch(() => {});
@@ -86,7 +86,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations());
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.createProfile(requestBody);
@@ -105,7 +105,7 @@ describe('useProfileMutations', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations());
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.createProfile(requestBody).catch(() => {});
@@ -126,7 +126,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations());
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.deleteProfile('111');
@@ -145,7 +145,7 @@ describe('useProfileMutations', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations());
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.deleteProfile('111').catch(() => {});

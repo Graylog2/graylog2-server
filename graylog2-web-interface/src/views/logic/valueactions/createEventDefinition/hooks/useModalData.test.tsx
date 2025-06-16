@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import { ltParamJSON, modalDataResult } from 'fixtures/createEventDefinitionFromValue';
@@ -37,7 +37,7 @@ const wrapper = ({ children }) => <div>{children}</div>;
 
 describe('useModalData', () => {
   it('return correct data', async () => {
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useModalData({
           searchWithinMs: 300000,

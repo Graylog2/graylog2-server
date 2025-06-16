@@ -45,7 +45,7 @@ describe('formDataAdapter', () => {
       kinesis_record_batch_size: 'awsCloudWatchBatchSize',
       kinesis_stream_name: 'awsCloudWatchKinesisStream',
       throttling_allowed: 'awsCloudWatchThrottleEnabled',
-      override_source: 'overrideSource'
+      override_source: 'overrideSource',
     };
 
     const request = toGenericInputCreateRequest(formData);
@@ -84,7 +84,6 @@ describe('formDataAdapter', () => {
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',
       kinesis_endpoint: 'awsEndpointKinesis',
-      override_source: 'overrideSource',
     };
 
     const request = toAWSRequest(formData, options);
@@ -117,7 +116,6 @@ describe('formDataAdapter', () => {
       awsEndpointIAM: { value: undefined },
       awsEndpointKinesis: { value: undefined },
       awsCloudWatchAwsSecret: { value: 'mysecret' },
-      overrideSource: { value: '' },
     });
 
     expect(request).toBeDefined();
@@ -132,7 +130,6 @@ describe('formDataAdapter', () => {
       awsEndpointDynamoDB: { value: undefined },
       awsEndpointIAM: { value: undefined },
       awsEndpointKinesis: { value: undefined },
-      overrideSource: { value: '' },
       secret: 'mysecret',
     });
 
@@ -155,7 +152,6 @@ describe('formDataAdapter', () => {
         awsEndpointIAM: { value: undefined },
         awsEndpointKinesis: { value: undefined },
         awsCloudWatchAwsSecret: { value: 'mysecret' },
-        overrideSource: { value: '' },
       },
       options,
     );
@@ -165,13 +161,13 @@ describe('formDataAdapter', () => {
 
   it('adapts formData into an InputCreateRequest with key & secret', () => {
     const request = testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
-    
+
     expect(request).toBeDefined();
   });
 
   it('adapts formData into an InputCreateRequest with automatic auth', () => {
     const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
-    
+
     expect(request).toBeDefined();
   });
 });

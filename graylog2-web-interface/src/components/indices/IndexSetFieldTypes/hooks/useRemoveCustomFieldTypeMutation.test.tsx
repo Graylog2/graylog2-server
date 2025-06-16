@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -62,7 +62,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         }),
       );
 
-      const { result, waitFor } = renderHook(() =>
+      const { result } = renderHook(() =>
         useRemoveCustomFieldTypeMutation({
           onSuccessHandler: mockOnSuccessHandler,
           onErrorHandler: mockOnErrorHandler,
@@ -95,7 +95,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() =>
+      const { result } = renderHook(() =>
         useRemoveCustomFieldTypeMutation({
           onSuccessHandler: mockOnSuccessHandler,
           onErrorHandler: mockOnErrorHandler,
@@ -126,7 +126,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         }),
       );
 
-      const { result, waitFor } = renderHook(() =>
+      const { result } = renderHook(() =>
         useRemoveCustomFieldTypeMutation({
           onSuccessHandler: mockOnSuccessHandler,
           onErrorHandler: mockOnErrorHandler,
