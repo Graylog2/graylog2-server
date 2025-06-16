@@ -33,14 +33,6 @@ jest.mock('./RuleForm', () => mockComponent('RuleForm'));
 jest.mock('./rule-builder/RuleBuilder', () => mockComponent('RuleBuilder'));
 jest.mock('hooks/useScopePermissions');
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
-
 const ruleMock = {
   source: `rule "function howto"
       when
@@ -62,7 +54,7 @@ const entityScope = {
 } as unknown as ScopeParams;
 
 const SUT = ({ rule }: { rule: RuleType }) => (
-  <DefaultQueryClientProvider options={{ logger }}>
+  <DefaultQueryClientProvider>
     <PipelineRulesContext.Provider
       value={{
         rule,
