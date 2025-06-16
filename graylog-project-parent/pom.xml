@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -548,7 +548,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <forkCount>2</forkCount>
+                    <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>-Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</argLine>
                     <excludes>
@@ -622,7 +622,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.9</version>
+                                    <version>7.6.10</version>
                                 </plugin>
                             </plugins>
                         </configuration>

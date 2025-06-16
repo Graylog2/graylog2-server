@@ -30,7 +30,8 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { awsCloudWatchBatchSize, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } = formData;
+  const { awsCloudWatchBatchSize, overrideSource, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } =
+    formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
@@ -52,6 +53,15 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         onChange={onChange}
         label="Add Flow Log field name prefix"
         help='Add field with the Flow Log prefix e. g. "src_addr" -> "flow_log_src_addr".'
+      />
+
+      <Input
+        id="overrideSource"
+        type="text"
+        value={overrideSource?.value}
+        onChange={onChange}
+        label="Override Source (optional)"
+        help="The message source is set to aws-kinesis-raw-logs by default. If desired, you may override it with a custom value."
       />
 
       <Input

@@ -20,16 +20,18 @@ import com.google.common.base.Joiner;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.LocationAwareEvalException;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import java.time.Duration;
 
 public class FunctionExpression extends BaseExpression {
-    private static final RateLimitedLog LOG = getRateLimitedLog(FunctionExpression.class);
+    private static final RateLimitedLog RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(FunctionExpression.class, 1, Duration.ofSeconds(60));
 
     private final FunctionArgs args;
     private final Function<?> function;
@@ -62,7 +64,8 @@ public class FunctionExpression extends BaseExpression {
     public Object evaluateUnsafe(EvaluationContext context) {
         try {
             if (Boolean.TRUE.equals(function.descriptor().deprecated())) {
-                LOG.warn("Using deprecated function {}", function.descriptor().name());
+                final Rule rule = context.getRule();
+                RATE_LIMITED_LOG.warn("Using deprecated function {} in rule {}", function.descriptor().name(), rule == null ? "[unknown]" : rule.name());
             }
             return descriptor.returnType().cast(function.evaluate(args, context));
         } catch (LocationAwareEvalException laee) {

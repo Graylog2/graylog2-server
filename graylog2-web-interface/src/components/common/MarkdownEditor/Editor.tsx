@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import { IconButton } from 'components/common';
 
 import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
@@ -52,18 +52,13 @@ const Tab = styled.div<{ $active?: boolean }>`
     `}
 `;
 
-const ExpandIcon = styled(Icon)`
+const ExpandIconButton = styled(IconButton)`
   position: absolute;
   bottom: 0;
   right: 0;
   padding: 8px;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.input.placeholder};
   z-index: 10;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.global.textDefault};
-  }
 `;
 
 type Props = {
@@ -117,7 +112,14 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
           />
         )}
         <Preview value={localValue} height={height} show={showPreview} />
-        <ExpandIcon data-testid="expand-icon" name="expand_content" size="sm" onClick={() => handleOnFullMode(true)} />
+        <ExpandIconButton
+          data-testid="expand-icon"
+          name="expand_content"
+          title="Expand Preview"
+          onClick={() => handleOnFullMode(true)}
+          size="sm"
+          aria-label="Expand preview"
+        />
       </div>
       {fullView && (
         <EditorModal

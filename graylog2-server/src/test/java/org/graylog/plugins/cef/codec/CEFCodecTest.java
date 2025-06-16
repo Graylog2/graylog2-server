@@ -17,18 +17,23 @@
 package org.graylog.plugins.cef.codec;
 
 import org.graylog.plugins.cef.parser.MappedMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -94,7 +99,39 @@ public class CEFCodecTest {
     }
 
     @Test
+    public void testIssue8844() {
+        // https://github.com/Graylog2/graylog-plugin-enterprise/issues/8844
+        final RawMessage rawMessage = buildRawMessage("<134>1 2024-09-13T12:23:43.288000+02:00 netscaler-waf appname 1234 msgid - CEF:0|Vendor|Product|Version|EventID|Name|Severity|...\n");
+        final MappedMessage cefMessage = mock(MappedMessage.class);
+        when(cefMessage.mappedExtensions()).thenReturn(Collections.singletonMap("dvc", "128.66.23.42"));
+        final Message message = codec.decodeSafe(rawMessage).get();
+        verifyFields(message);
+    }
+
+    @Test
+    public void testIssue8844WithoutPriority() {
+        // https://github.com/Graylog2/graylog-plugin-enterprise/issues/8844
+        final RawMessage rawMessage = buildRawMessage("<134>2024-09-13T12:23:43.288000+02:00 netscaler-waf appname 1234 msgid - CEF:0|Vendor|Product|Version|EventID|Name|Severity|...\n");
+        final MappedMessage cefMessage = mock(MappedMessage.class);
+        when(cefMessage.mappedExtensions()).thenReturn(Collections.singletonMap("dvc", "128.66.23.42"));
+        final Message message = codec.decodeSafe(rawMessage).get();
+        verifyFields(message);
+    }
+
+    private static void verifyFields(Message message) {
+        assertTrue(message.getMessage().contains("Product: [EventID, Severity] Name"));
+        assertEquals(6, message.getField("level"));
+        assertEquals("Vendor", message.getField("device_vendor"));
+        assertEquals("local0", message.getField("facility"));
+        assertEquals(new DateTime(2024, 9, 13, 10, 28, 31, DateTimeZone.UTC), message.getTimestamp());
+    }
+
+    @Test
     public void getAggregator() throws Exception {
         assertNull(codec.getAggregator());
+    }
+
+    private RawMessage buildRawMessage(String message) {
+        return new RawMessage(message.getBytes(StandardCharsets.UTF_8), new InetSocketAddress("127.0.0.1", 5140));
     }
 }

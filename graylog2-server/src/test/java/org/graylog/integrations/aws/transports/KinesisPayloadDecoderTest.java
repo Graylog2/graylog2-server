@@ -36,6 +36,7 @@ public class KinesisPayloadDecoderTest {
 
     private KinesisPayloadDecoder flowLogDecoder;
     private KinesisPayloadDecoder rawDecoder;
+    public static final String TEST_REGION = "ap-northeast-1";
 
     @Before
     public void setUp() {
@@ -54,7 +55,7 @@ public class KinesisPayloadDecoderTest {
 
         final List<KinesisLogEntry> logEntries =
                 flowLogDecoder.processMessages(AWSTestingUtils.cloudWatchFlowLogPayload(),
-                                               Instant.ofEpochMilli(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP.getMillis()));
+                        Instant.ofEpochMilli(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP.getMillis()));
 
         Assert.assertEquals(2, logEntries.size());
 
@@ -66,8 +67,8 @@ public class KinesisPayloadDecoderTest {
 
         // Verify that both messages have to correct timestamp.
         Assert.assertEquals(2, logEntries.stream()
-                                         .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
-                                         .count());
+                .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
+                .count());
     }
 
     @Test
@@ -85,8 +86,8 @@ public class KinesisPayloadDecoderTest {
 
         // Verify that both messages have to correct timestamp.
         Assert.assertEquals(2, logEntries.stream()
-                                         .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
-                                         .count());
+                .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
+                .count());
     }
 
     @Test

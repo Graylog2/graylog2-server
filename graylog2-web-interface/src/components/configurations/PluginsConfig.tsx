@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
 
@@ -55,7 +55,14 @@ const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) 
 const PluginsConfig = () => {
   const [activeSectionKey, setActiveSectionKey] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
-  const pluginSystemConfigs = usePluginEntities('systemConfigurations');
+  const originalPluginSystemConfigs = usePluginEntities('systemConfigurations');
+  const pluginSystemConfigs = useMemo(
+    () =>
+      originalPluginSystemConfigs.filter(
+        (config) => typeof config?.useCondition !== 'function' || config.useCondition(),
+      ),
+    [originalPluginSystemConfigs],
+  );
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
   useEffect(() => {

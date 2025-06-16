@@ -57,7 +57,7 @@ const SidecarsPage = () => {
                 <br />
                 Do you need an API token for a sidecar?&ensp;
                 <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                  Create or reuse a token for the <em>graylog-sidecar</em> user
+                  Create or reuse a token for the <em>{sidecarUser.username}</em> user
                 </Link>
               </span>
             ) : (

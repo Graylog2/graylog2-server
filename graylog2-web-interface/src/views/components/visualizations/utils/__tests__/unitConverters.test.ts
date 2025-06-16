@@ -18,6 +18,7 @@ import {
   convertValueToBaseUnit,
   convertValueToUnit,
   getPrettifiedValue,
+  roundValue,
 } from 'views/components/visualizations/utils/unitConverters';
 
 describe('Unit converter functions', () => {
@@ -320,6 +321,18 @@ describe('Unit converter functions', () => {
 
       expect(result1).toEqual(expectedResult);
       expect(result2).toEqual(expectedResult);
+    });
+  });
+
+  describe('Round value', () => {
+    it('for value less then 10 do round ceil', () => {
+      expect(roundValue(3.3)).toEqual(4);
+      expect(roundValue(9.7)).toEqual(10);
+    });
+
+    it('for value more then 10 round ceil with 5 or 0 as last number', () => {
+      expect(roundValue(43.3)).toEqual(45);
+      expect(roundValue(899.7)).toEqual(900);
     });
   });
 });

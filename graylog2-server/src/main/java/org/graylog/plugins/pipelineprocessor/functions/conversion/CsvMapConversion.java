@@ -37,9 +37,9 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class CsvMapConversion extends AbstractFunction<Map> {
+public class CsvMapConversion extends AbstractConversion<Map> {
+    private static final Map<Object, Object> DEFAULT_VALUE = Collections.emptyMap();
     private final Logger log = LoggerFactory.getLogger(CsvMapConversion.class);
-
 
     public static final String NAME = "csv_to_map";
     private static final String VALUE = "value";
@@ -52,7 +52,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
     private final ParameterDescriptor<Boolean, Boolean> strictQuotesParam;
     private final ParameterDescriptor<Boolean, Boolean> trimParam;
     private final ParameterDescriptor<Boolean, Boolean> ignoreExtraFieldNamesParam;
-
+    private final ParameterDescriptor<Boolean, Boolean> ignoreExtraCsvValuesParam;
 
     public CsvMapConversion() {
         this.valueParam = string(VALUE).ruleBuilderVariable().description("Map-like value to convert").build();
@@ -63,6 +63,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
         this.strictQuotesParam = bool("strictQuotes").optional().description("Ignore content outside of quotes").defaultValue(Optional.of(false)).build();
         this.trimParam = bool("trimLeadingWhitespace").optional().description("Trim leading whitespace").defaultValue(Optional.of(false)).build();
         this.ignoreExtraFieldNamesParam = bool("ignoreExtraFieldNames").optional().description("Ignore extra fieldName values, which do not have a corresponding value.").defaultValue(Optional.of(false)).build();
+        this.ignoreExtraCsvValuesParam = bool("ignoreExtraCsvValues").optional().description("Ignore extra values, which do not have a corresponding field name.").defaultValue(Optional.of(false)).build();
     }
 
     private Character getFirstChar(String s) {
@@ -81,6 +82,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
         final boolean strictQuotes = strictQuotesParam.optional(args, context).orElse(false);
         final boolean trimLeadingWhiteSpace = trimParam.optional(args, context).orElse(true);
         final boolean ignoreExtraFieldNames = ignoreExtraFieldNamesParam.optional(args, context).orElse(false);
+        final boolean ignoreExtraCsvValues = ignoreExtraCsvValuesParam.optional(args, context).orElse(false);
 
         final CSVParser parser = new CSVParser(separator,
                 quoteChar,
@@ -92,39 +94,52 @@ public class CsvMapConversion extends AbstractFunction<Map> {
             String[] fieldNames = parser.parseLine(fields);
             if (fieldNames.length == 0) {
                 log.error("No field names found");
-                return Collections.emptyMap();
+                return computeDefault(args, context);
             }
 
             final Map<String, String> map = Maps.newHashMap();
             try {
-                final String[] strings = parser.parseLine(value);
+                final String[] values = parser.parseLine(value);
 
-                if (ignoreExtraFieldNames) {
-                    if (strings.length > fieldNames.length) {
+                if (ignoreExtraFieldNames && !ignoreExtraCsvValues) {
+                    if (values.length > fieldNames.length) {
                         log.error("More columns of CSV data ({}) were specified than field names ({}). Discarding input.",
-                                strings.length, fieldNames.length);
-                        return Collections.emptyMap();
+                                values.length, fieldNames.length);
+                        return computeDefault(args, context);
                     }
-                } else if (strings.length != fieldNames.length) {
+                } else if (!ignoreExtraFieldNames && ignoreExtraCsvValues) {
+                    if (values.length < fieldNames.length) {
+                        log.error("More field names ({}) were specified than columns of CSV data ({}). Discarding input.",
+                                values.length, fieldNames.length);
+                        return computeDefault(args, context);
+                    }
+                } else if (values.length != fieldNames.length) {
                     log.error("Different number of columns in CSV data ({}) and configured field names ({}). Discarding input.",
-                            strings.length, fieldNames.length);
-                    return Collections.emptyMap();
+                            values.length, fieldNames.length);
+                    return computeDefault(args, context);
                 }
-                for (int i = 0; i < strings.length; i++) {
-                    map.put(fieldNames[i], strings[i]);
+
+                for (int i = 0; i < values.length; i++) {
+                    // When ignoring extra CSV values, skip iterations where a matching column header is not present.
+                    if (ignoreExtraCsvValues && i >= fieldNames.length) {
+                        continue;
+                    }
+                    map.put(fieldNames[i], values[i]);
                 }
             } catch (IOException e) {
                 log.error("Invalid CSV input, discarding input", e);
-                return Collections.emptyMap();
+                return computeDefault(args, context);
             }
             return map;
 
         } catch (IOException e) {
             log.error("Error parsing csv: {}", e.getMessage());
-            return Collections.emptyMap();
+            return computeDefault(args, context);
         }
+    }
 
-
+    private Map computeDefault(FunctionArgs args, EvaluationContext context) {
+        return defaultToNull(args, context) ? null : DEFAULT_VALUE;
     }
 
     @Override
@@ -139,7 +154,9 @@ public class CsvMapConversion extends AbstractFunction<Map> {
                         escapeCharParam,
                         strictQuotesParam,
                         trimParam,
-                        ignoreExtraFieldNamesParam
+                        ignoreExtraFieldNamesParam,
+                        ignoreExtraCsvValuesParam,
+                        defaultToNullParam
                 ))
                 .description("Converts a single line of a CSV string into a map usable by set_fields()")
                 .ruleBuilderEnabled()

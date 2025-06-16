@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
@@ -143,7 +144,9 @@ const svgDataUrl = (content: string) => `data:image/svg+xml;utf-8,${encodeURICom
 const useLoginBackground = () =>
   useMemo(
     () =>
-      AppConfig.branding()?.login?.background ? svgDataUrl(AppConfig.branding()?.login?.background) : backgroundImage,
+      AppConfig.branding()?.login?.background
+        ? svgDataUrl(DOMPurify.sanitize(AppConfig.branding()?.login?.background))
+        : backgroundImage,
     [],
   );
 
@@ -159,7 +162,7 @@ const LoginChrome = ({ children }: Props) => {
       </LoginBox>
       <Background>
         <NotificationsContainer>
-          <PublicNotifications readFromConfig />
+          <PublicNotifications login />
         </NotificationsContainer>
         <BackgroundText $backgroundImage={loginBackground}>
           <TextContainer>

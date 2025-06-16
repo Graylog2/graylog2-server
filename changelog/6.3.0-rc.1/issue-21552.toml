@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Legacy Retention Strategies should not allow Max number of indices to be lower then 1."
+
+issues = ["21552"]
+pulls = ["22774"]

@@ -26,6 +26,7 @@ import { asMock } from 'helpers/mocking';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePluginEntities from 'hooks/usePluginEntities';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
@@ -205,6 +206,7 @@ jest.mock('routing/useLocation');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('hooks/useScopePermissions');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/usePluginEntities');
 
 jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({
   id: 'security',
@@ -228,6 +230,13 @@ describe('EventDefinitionFormContainer', () => {
       configFromLocalStorage: undefined,
     }));
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeMutable);
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.eventProcedureSummary': [],
+          'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
+        })[entityKey] ?? [],
+    );
   });
 
   it('should render Event Details form enabled', async () => {

@@ -44,6 +44,8 @@ const Container = styled.div`
   }
 `;
 
-const SelectGroup = ({ children, className }: Props) => <Container className={className}>{children}</Container>;
+const SelectGroup = ({ children, className = undefined }: Props) => (
+  <Container className={className}>{children}</Container>
+);
 
 export default SelectGroup;

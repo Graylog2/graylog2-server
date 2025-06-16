@@ -69,6 +69,7 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
@@ -109,6 +110,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamRenamedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
@@ -170,6 +172,7 @@ public class StreamResource extends RestResource {
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
     private final EntitySharesService entitySharesService;
+    private final ClusterEventBus clusterEventBus;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -184,7 +187,8 @@ public class StreamResource extends RestResource {
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService,
-                          EntitySharesService entitySharesService) {
+                          EntitySharesService entitySharesService,
+                          ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
@@ -196,6 +200,7 @@ public class StreamResource extends RestResource {
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
+        this.clusterEventBus = clusterEventBus;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
@@ -382,8 +387,11 @@ public class StreamResource extends RestResource {
 
         final Stream stream = streamService.load(streamId);
 
+        StreamRenamedEvent streamRenamedEvent = null;
         if (!Strings.isNullOrEmpty(cr.title())) {
-            stream.setTitle(cr.title().strip());
+            String newTitle = cr.title().strip();
+            streamRenamedEvent = new StreamRenamedEvent(streamId, stream.getTitle(), newTitle);
+            stream.setTitle(newTitle);
         }
 
         stream.setDescription(cr.description());
@@ -419,6 +427,9 @@ public class StreamResource extends RestResource {
         }
 
         streamService.save(stream);
+        if (streamRenamedEvent != null) {
+            clusterEventBus.post(streamRenamedEvent);
+        }
 
         recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
@@ -646,6 +657,8 @@ public class StreamResource extends RestResource {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(savedStreamObjectId, outputIds);
+
+        entitySharesService.cloneEntityGrants(GRNTypes.STREAM, streamId, savedStreamId, userContext.getUser());
 
         var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)

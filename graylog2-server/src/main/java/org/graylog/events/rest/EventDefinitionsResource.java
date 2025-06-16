@@ -285,7 +285,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final EventDefinitionDto dto = unwrappedCreateEntityRequest.getEntity();
         checkEventDefinitionPermissions(dto, "create");
 
-        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -314,7 +314,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
-        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -464,7 +464,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
 
-        return eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
+        return eventDefinitionHandler.duplicate(eventDefinitionDto, userContext.getUser());
     }
 
     @POST
@@ -473,9 +473,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull EventDefinitionDto toValidate) {
+                                         @Valid @NotNull EventDefinitionDto toValidate,
+                                     @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
-        ValidationResult validationResult = toValidate.config().validate();
+        ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }

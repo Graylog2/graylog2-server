@@ -235,7 +235,7 @@ const RelativeRangeSelect = ({
   disabled = false,
   fieldName,
   limitDuration,
-  onUnsetRange,
+  onUnsetRange = undefined,
   title,
   unsetRangeLabel,
 }: Props) => (

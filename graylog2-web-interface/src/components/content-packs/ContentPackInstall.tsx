@@ -19,6 +19,7 @@ import React from 'react';
 import ContentPack from 'logic/content-packs/ContentPack';
 import { Row, Col, Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
+import type Parameter from 'views/logic/parameters/Parameter';
 
 import ContentPackUtils from './ContentPackUtils';
 import ContentPackEntitiesList from './ContentPackEntitiesList';
@@ -38,7 +39,7 @@ class ContentPackInstall extends React.Component<
     onInstall: () => {},
   };
 
-  constructor(props) {
+  constructor(props: ContentPackInstallProps) {
     super(props);
 
     const parameterInput = props.contentPack.parameters.reduce((result, parameter) => {
@@ -60,6 +61,7 @@ class ContentPackInstall extends React.Component<
     };
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   onInstall = () => {
     if (this._validateInput()) {
       const contentPackId = this.props.contentPack.id;
@@ -81,21 +83,18 @@ class ContentPackInstall extends React.Component<
       return newResult;
     }, {});
 
-  _getValue = (name, value) => {
-    const newParameterInput = this.state.parameterInput;
-
-    newParameterInput[name] = value;
-    this.setState({ parameterInput: newParameterInput });
+  _getValue = (name: string, value: string) => {
+    this.setState(({ parameterInput }) => ({ parameterInput: { ...parameterInput, [name]: value } }));
   };
 
-  _getComment = (e) => {
+  _getComment = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ comment: e.target.value });
   };
 
   _validateInput = () => {
     const { parameterInput } = this.state;
     const errors = this.props.contentPack.parameters.reduce((result, parameter) => {
-      if (parameterInput[parameter.name] && parameterInput[parameter.name].length > 0) {
+      if (parameterInput[parameter.name]?.length) {
         return result;
       }
 
@@ -111,7 +110,7 @@ class ContentPackInstall extends React.Component<
     return Object.keys(errors).length <= 0;
   };
 
-  renderParameter(parameter) {
+  renderParameter(parameter: Parameter) {
     const error = this.state.errorMessages[parameter.name];
 
     return (

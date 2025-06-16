@@ -20,6 +20,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
@@ -40,6 +41,7 @@ import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
+import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.plugin.PluginModule;
 
 public class SecurityModule extends PluginModule {
@@ -53,16 +55,21 @@ public class SecurityModule extends PluginModule {
         );
         authServiceBackendBinder();
 
+        final Multibinder<CapabilityPermissions> capabilityPermissionsMultibinder = Multibinder.newSetBinder(binder(), CapabilityPermissions.class);
+        capabilityPermissionsMultibinder.addBinding().to(DefaultBuiltinCapabilities.class);
+
         bind(BuiltinCapabilities.class).asEagerSingleton();
+
         bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);
 
         install(new FactoryModuleBuilder().implement(GranteeAuthorizer.class, GranteeAuthorizer.class).build(GranteeAuthorizer.Factory.class));
 
         OptionalBinder.newOptionalBinder(binder(), PermissionAndRoleResolver.class)
                 .setDefault().to(DefaultPermissionAndRoleResolver.class);
-
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
+
+        Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
 
         bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 

@@ -18,7 +18,6 @@ package org.graylog.events.processor;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -37,6 +36,7 @@ import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -163,9 +163,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
     public abstract Builder toBuilder();
 
-    @JsonIgnore
     public ValidationResult validate(@Nullable EventDefinitionDto oldEventDefinitionDto,
-                                     EventDefinitionConfiguration eventDefinitionConfiguration) {
+                                     EventDefinitionConfiguration eventDefinitionConfiguration,
+                                     UserContext userContext) {
         final ValidationResult validation = new ValidationResult();
 
         if (title().isEmpty()) {
@@ -173,7 +173,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         }
 
         try {
-            validation.addAll(config().validate());
+            validation.addAll(config().validate(userContext));
             validation.addAll(config().validate(
                     Optional.ofNullable(oldEventDefinitionDto).map(EventDefinitionDto::config).orElse(null),
                     eventDefinitionConfiguration));

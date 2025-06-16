@@ -17,22 +17,33 @@
 package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog2.contentpacks.model.EntityPermissions;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
-import jakarta.inject.Inject;
+import java.util.List;
+import java.util.Optional;
 
 public class DashboardFacade extends ViewFacade implements DashboardEntityCreator {
     public static final ModelType TYPE_V2 = ModelTypes.DASHBOARD_V2;
 
     @Inject
-    public DashboardFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService, ViewSummaryService viewSummaryService, UserService userService) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
+    public DashboardFacade(ObjectMapper objectMapper,
+                           SearchDbService searchDbService,
+                           ViewService viewService,
+                           ViewSummaryService viewSummaryService,
+                           UserService userService,
+                           EntityOwnershipService entityOwnershipService) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityOwnershipService);
     }
 
     @Override
@@ -43,5 +54,10 @@ public class DashboardFacade extends ViewFacade implements DashboardEntityCreato
     @Override
     public ViewDTO.Type getDTOType() {
         return ViewDTO.Type.DASHBOARD;
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.DASHBOARDS_CREATE);
     }
 }
