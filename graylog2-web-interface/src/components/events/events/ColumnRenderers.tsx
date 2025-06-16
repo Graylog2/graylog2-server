@@ -31,6 +31,7 @@ import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpa
 import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const EventDefinitionRenderer = ({
   eventDefinitionId,
@@ -80,13 +81,13 @@ const RemediationStepRenderer = ({
   );
 };
 
-const EventProcedureRenderer = ({ eventId, eventProcedureId }: { eventId: string; eventProcedureId: string }) => {
+const EventProcedureRenderer = ({ eventProcedureId, event }: { eventProcedureId: string; event: Event }) => {
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
 
   return (
     <>
       {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
-        <PluggableEventProcedureSummary eventId={eventId} eventDefinitionEventProcedure={eventProcedureId} />
+        <PluggableEventProcedureSummary eventDefinitionEventProcedure={eventProcedureId} event={event} />
       ))}
     </>
   );
@@ -120,11 +121,9 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
   );
 
 const ValidSecurityLicense = () => {
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
   const {
     data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  } = usePluggableLicenseCheck('/license/security');
 
   return validSecurityLicense;
 };
@@ -179,8 +178,8 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
     remediation_steps: {
       renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
         <>
-          {ValidSecurityLicense ? (
-            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+          {ValidSecurityLicense() ? (
+            <EventProcedureRenderer eventProcedureId={eventProcedureId} event={event} />
           ) : (
             <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
           )}

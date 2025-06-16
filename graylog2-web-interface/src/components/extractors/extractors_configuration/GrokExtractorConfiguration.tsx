@@ -41,6 +41,8 @@ class GrokExtractorConfiguration extends React.Component<
     patterns: Array<any>;
   }
 > {
+  private loadPromise: CancellablePromise<void>;
+
   static defaultProps = {
     exampleMessage: undefined,
   };
@@ -56,8 +58,6 @@ class GrokExtractorConfiguration extends React.Component<
   componentDidMount() {
     this.loadData();
   }
-
-  private loadPromise: CancellablePromise<void>;
 
   componentWillUnmount() {
     if (this.loadPromise) {
