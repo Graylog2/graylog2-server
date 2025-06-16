@@ -167,11 +167,17 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<HttpReq
                 // if we hit one that we don't trust, bail out and don't use the candidate IP
                 while (iterator.hasNext()) {
                     final String proxyIp = iterator.next();
+                    boolean trusted = false;
                     for (final IpSubnet subnet : trustedProxies) {
-                        if (!subnet.contains(proxyIp)) {
-                            LOG.debug("Untrusted proxy found in X-Forwarded-For header: {}, ignoring the supplied original IP address", proxyIp);
-                            return Optional.empty();
+                        if (subnet.contains(proxyIp)) {
+                            trusted = true;
+                            // we can skip the remainder of the subnet checks for this proxy ip
+                            break;
                         }
+                    }
+                    if (!trusted) {
+                        LOG.debug("No trusted proxy entry found in {}, ignoring the supplied original IP address {}", trustedProxies, candidate);
+                        return Optional.empty();
                     }
                 }
             }
