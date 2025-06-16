@@ -56,7 +56,7 @@ const StyledThumb = styled.div(
   `,
 );
 
-const Thumb = (props: React.ComponentProps<typeof StyledThumb>, state: { valueNow: number }) => (
+const Thumb = ({ ...props }: React.ComponentProps<typeof StyledThumb>, state: { valueNow: number }) => (
   <StyledThumb {...props} className={`${state.valueNow}-tooltip`}>
     <Tooltip label={state.valueNow}>
       <span className="value">{state.valueNow}</span>
@@ -75,7 +75,16 @@ const StyledTrack = styled.div<{ $index: number }>(
 
 const Track = (props, state) => <StyledTrack {...props} $index={state.index} />;
 
-const RangeInput = ({ id, label, help, error, bsStyle, labelClassName, wrapperClassName, ...otherProps }: Props) => (
+const RangeInput = ({
+  id,
+  label = undefined,
+  help = undefined,
+  error = undefined,
+  bsStyle = undefined,
+  labelClassName = undefined,
+  wrapperClassName = undefined,
+  ...otherProps
+}: Props) => (
   <Input
     labelClassName={labelClassName}
     id={id}

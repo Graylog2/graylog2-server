@@ -20,9 +20,9 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -126,7 +126,6 @@ const visualizationPlugin: PluginRegistration = {
   },
 };
 
-const selectEventConfig = { container: document.body };
 const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
@@ -138,7 +137,7 @@ const expectSubmitButtonToBeDisabled = async () => {
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option, selectEventConfig);
+  await selectEvent.select(select, option);
 };
 
 describe('AggregationWizard/Visualizations', () => {
@@ -160,7 +159,7 @@ describe('AggregationWizard/Visualizations', () => {
     const visualizationSelect = await screen.findByLabelText('Select visualization type');
 
     await selectEvent.openMenu(visualizationSelect);
-    await selectEvent.select(visualizationSelect, 'Without Config', selectEventConfig);
+    await selectEvent.select(visualizationSelect, 'Without Config');
 
     userEvent.click(await findWidgetConfigSubmitButton());
 

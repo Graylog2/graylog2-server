@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.views;
 
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.Field;
@@ -26,12 +25,14 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.database.MongoCollection;
+import org.graylog2.database.MongoEntity;
 
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface ViewUtils<T> {
+public interface ViewUtils<T extends MongoEntity> {
     MongoCollection<T> collection();
 
     default Stream<T> findViews(SearchUser searchUser,

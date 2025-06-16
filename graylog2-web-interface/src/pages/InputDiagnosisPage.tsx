@@ -36,8 +36,9 @@ import type { InputState } from 'stores/inputs/InputStatesStore';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
-import DiagnosisHelp from 'components/inputs/InputDiagnosis/DiagnosisHelp';
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
+import useProductName from 'brand-customization/useProductName';
+import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -224,6 +225,7 @@ const InputDiagnosisPage = () => {
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
   const navigate = useNavigate();
+  const productName = useProductName();
 
   const isInputStateDown =
     inputNodeStates.total === 0 ||
@@ -250,9 +252,9 @@ const InputDiagnosisPage = () => {
               title="Information"
               preHeaderSection={<StatusColorIndicator radius="50%" />}
               headerLeftSection={
-                <DiagnosisHelp
+                <HelpPopoverButton
                   helpText={`This Input Is Listening On:
-                        ${DIAGNOSIS_HELP.INPUT_LISTENING_ON}
+                        ${DIAGNOSIS_HELP.INPUT_LISTENING_ON(productName)}
             
                         This Input is Listening For:
                         ${DIAGNOSIS_HELP.INPUT_LISTENING_FOR}
@@ -271,7 +273,7 @@ const InputDiagnosisPage = () => {
                 </StyledListGroupItem>
                 <StyledListGroupItem>
                   <StyledTitle>This Input is running on:</StyledTitle>
-                  {input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}
+                  {input.global ? `all ${productName} nodes` : <LinkToNode nodeId={input.node} />}
                 </StyledListGroupItem>
                 {input.attributes?.bind_address && input.attributes?.port && (
                   <>
@@ -296,10 +298,10 @@ const InputDiagnosisPage = () => {
                   bsStyle={isInputStateDown ? 'danger' : 'success'}
                 />
               }
-              headerLeftSection={<DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
+              headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
               <StyledP>
-                Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not
-                running, click to see any associated error messages.
+                Number of {productName} nodes the Input is configured to run, and on how many it is running. If any are
+                not running, click to see any associated error messages.
               </StyledP>
               <StyledListGroup>
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
@@ -319,12 +321,13 @@ const InputDiagnosisPage = () => {
                 </p>
                 <StyledList>
                   <li>
-                    When an Input fails on one or more Graylog nodes, the Message field of the State panel will show a
-                    short error message; a full length error message may be found in Graylog’s server.log file.
+                    When an Input fails on one or more {productName} nodes, the Message field of the State panel will
+                    show a short error message; a full length error message may be found in the {productName} server.log
+                    file.
                   </li>
                   <li>
-                    An input configured to use a specified port will fail if that port is privileged (and Graylog is not
-                    running as Root), or already in use by another Input or application.
+                    An input configured to use a specified port will fail if that port is privileged (and {productName}{' '}
+                    is not running as root), or already in use by another Input or application.
                   </li>
                   <li>An input will fail if it is unable to route to the specified IP.</li>
                   <li>
@@ -334,10 +337,10 @@ const InputDiagnosisPage = () => {
                   <li>A TCP input will fail if it has an invalid or expired certificate.</li>
                   <li>
                     Inputs that connect to an external API (for example, the Microsoft Azure Input) require
-                    configuration changes at the source to enable Graylog to collect logs. The steps required will be
-                    detailed on the appropriate documentation sub-page for that Input. An input that connects to an
-                    external API will fail if incorrectly configured at either the Graylog side, or (as applicable) the
-                    side hosting the API.
+                    configuration changes at the source to enable {productName} to collect logs. The steps required will
+                    be detailed on the appropriate documentation sub-page for that Input. An input that connects to an
+                    external API will fail if incorrectly configured at either the {productName} side, or (as
+                    applicable) the side hosting the API.
                   </li>
                 </StyledList>
                 <br />
@@ -350,13 +353,13 @@ const InputDiagnosisPage = () => {
                     suggests a connectivity problem.
                     <StyledList>
                       <li>
-                        If no traffic is showing, first troubleshoot network connectivity between the Graylog server(s)
-                        and the log source. This may be achieved by running ping, telnet or tracert commands.
+                        If no traffic is showing, first troubleshoot network connectivity between the {productName}{' '}
+                        server(s) and the log source. This may be achieved by running ping, telnet or tracert commands.
                       </li>
                       <li>
-                        For Inputs that connect to an external API, check Graylog’s server.log file - authentication
-                        failures (invalid logins or permissions to perform the action on the API) will be printed in
-                        full here.
+                        For Inputs that connect to an external API, check the {productName} server.log file -
+                        authentication failures (invalid logins or permissions to perform the action on the API) will be
+                        printed in full here.
                       </li>
                     </StyledList>
                   </li>
@@ -402,7 +405,7 @@ const InputDiagnosisPage = () => {
                 <StatusColorIndicator radius="50%" bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />
               }
               headerLeftSection={
-                <DiagnosisHelp
+                <HelpPopoverButton
                   helpText={`Empty Messages discarded:
                 ${DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}
 
@@ -451,11 +454,11 @@ const InputDiagnosisPage = () => {
           <Section
             preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasReceivedMessage ? 'success' : 'gray'} />}
             title="Received Message count by Stream"
-            headerLeftSection={<DiagnosisHelp helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
+            headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
             actions={<ShowReceivedMessagesButton input={input} />}>
             <StyledP>
-              Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream to
-              inspect the messages.
+              Messages successfully ingested from this Input in the last 15 minutes. Click on the Stream to inspect the
+              messages.
             </StyledP>
             {inputMetrics.stream_message_count?.length ? (
               <StyledListGroup>

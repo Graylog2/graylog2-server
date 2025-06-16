@@ -49,7 +49,7 @@ const SearchBarForm = ({
   onSubmit,
   children,
   validateOnMount = true,
-  formRef,
+  formRef = undefined,
   validateQueryString,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();

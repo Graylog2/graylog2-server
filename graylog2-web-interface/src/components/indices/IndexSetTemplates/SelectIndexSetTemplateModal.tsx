@@ -98,6 +98,11 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     });
   };
 
+  const handleTabClick = (category: TemplateCategorySegment) => {
+    setTempSelectedTemplate(undefined);
+    setSelectedTemplateCategory(category);
+  };
+
   const handleSubmit = () => {
     trackSelectedTemplate();
     setSelectedIndexSetTemplate(tempSelectedTemplate);
@@ -128,8 +133,8 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const selectedCustomTemplate = customList.find((template) => template.id === tempSelectedTemplate?.id);
 
   return (
-    <Modal show={show} title="Index Set Templates" bsSize="large" onHide={handleClose}>
-      <Modal.Header closeButton>
+    <Modal show={show} bsSize="large" onHide={handleClose}>
+      <Modal.Header>
         <Modal.Title>Index Set Templates</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -147,7 +152,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
               <SegmentedControl<TemplateCategorySegment>
                 data={templateCategorySegments}
                 value={selectedTemplateCategory}
-                onChange={setSelectedTemplateCategory}
+                onChange={handleTabClick}
               />
             </Col>
           </Row>

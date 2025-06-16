@@ -17,8 +17,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Spinner, ISODurationInput } from 'components/common';
+
+import useTokenTTL from './useTokenTTL';
 
 const StyledForm = styled.form`
   margin-top: 10px;
@@ -40,25 +42,25 @@ type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
-  defaultTtl?: string;
+  forceDefaultTtl?: string;
   disableTtl?: boolean;
 };
 
 const CreateTokenForm = ({
   creatingToken = false,
   disableForm = false,
-  defaultTtl = 'P30D',
+  forceDefaultTtl = undefined,
   disableTtl = false,
   onCreate,
 }: Props) => {
   const [tokenName, setTokenName] = useState('');
-  const [tokenTtl, setTokenTtl] = useState(defaultTtl);
+  const { tokenTtl, setTokenTtl, resetTokenTtl } = useTokenTTL(forceDefaultTtl);
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
     onCreate({ tokenName, tokenTtl });
     setTokenName('');
-    setTokenTtl(defaultTtl);
+    resetTokenTtl();
   };
 
   const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
@@ -95,6 +97,9 @@ const CreateTokenForm = ({
         bsStyle="primary">
         {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
+      <HelpBlock>
+        TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D
+      </HelpBlock>
     </StyledForm>
   );
 };

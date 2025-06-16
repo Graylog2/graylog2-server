@@ -31,14 +31,19 @@ export type PaginatedEntityShares = PaginatedList<SharedEntity> & {
 };
 
 export type EntitySharePayload = {
-  selected_grantee_capabilities: SelectedGranteeCapabilities;
+  selected_grantee_capabilities?: SelectedGranteeCapabilities;
+  prepare_request?: Array<GRN>;
+};
+
+export type EntityShare = {
+  share_request?: EntitySharePayload;
 };
 
 export type ActionsType = {
   prepare: (
     entityType: string,
     entityTitle: string,
-    GRN: GRN,
+    GRN?: GRN,
     payload?: EntitySharePayload,
   ) => Promise<EntityShareState>;
   update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>;

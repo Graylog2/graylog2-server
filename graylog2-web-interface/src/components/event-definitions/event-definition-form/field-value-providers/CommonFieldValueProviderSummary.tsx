@@ -21,61 +21,47 @@ import { Icon } from 'components/common';
 
 import styles from './CommonFieldValueProviderSummary.css';
 
-type CommonFieldValueProviderSummaryProps = {
+type Props = {
   fieldName: string;
   config: any;
   keys: any[];
   children: React.ReactElement;
 };
 
-class CommonFieldValueProviderSummary extends React.Component<
-  CommonFieldValueProviderSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  state = {
-    displayDetails: false,
+const CommonFieldValueProviderSummary = ({ fieldName, config, keys, children }: Props) => {
+  const [displayDetails, setDisplayDetails] = React.useState(false);
+
+  const toggleDisplayDetails = () => {
+    setDisplayDetails((prev) => !prev);
   };
 
-  toggleDisplayDetails = () => {
-    const { displayDetails } = this.state;
-
-    this.setState({ displayDetails: !displayDetails });
-  };
-
-  render() {
-    const { fieldName, config, keys, children } = this.props;
-    const { displayDetails } = this.state;
-
-    return (
-      <dl className={styles.field}>
-        <dt>{fieldName}</dt>
-        <dd>
-          <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-            <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
-            &nbsp;
-            {displayDetails ? 'Less details' : 'More details'}
-          </Button>
-          {displayDetails && (
-            <Table condensed hover className={styles.fixedTable}>
-              <tbody>
-                <tr>
-                  <td>Is Key?</td>
-                  <td>{keys.includes(fieldName) ? 'Yes' : 'No'}</td>
-                </tr>
-                <tr>
-                  <td>Data Type</td>
-                  <td>{config.data_type}</td>
-                </tr>
-                {children}
-              </tbody>
-            </Table>
-          )}
-        </dd>
-      </dl>
-    );
-  }
-}
+  return (
+    <dl className={styles.field}>
+      <dt>{fieldName}</dt>
+      <dd>
+        <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDisplayDetails}>
+          <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
+          &nbsp;
+          {displayDetails ? 'Less details' : 'More details'}
+        </Button>
+        {displayDetails && (
+          <Table condensed hover className={styles.fixedTable}>
+            <tbody>
+              <tr>
+                <td>Is Key?</td>
+                <td>{keys.includes(fieldName) ? 'Yes' : 'No'}</td>
+              </tr>
+              <tr>
+                <td>Data Type</td>
+                <td>{config.data_type}</td>
+              </tr>
+              {children}
+            </tbody>
+          </Table>
+        )}
+      </dd>
+    </dl>
+  );
+};
 
 export default CommonFieldValueProviderSummary;

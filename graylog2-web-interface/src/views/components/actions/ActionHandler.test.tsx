@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
@@ -49,23 +49,21 @@ describe('ActionHandler', () => {
 
     expect(handler).toBeDefined();
 
-    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(() => {
-      expect(setActionComponents).toHaveBeenCalled();
-      expect(setState).toHaveBeenCalled();
+    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(
+      async () => {
+        expect(setActionComponents).toHaveBeenCalled();
+        expect(setState).toHaveBeenCalled();
 
-      const state = setState.mock.calls[0][0];
+        const state = setState.mock.calls[0][0];
 
-      expect(Object.entries(state)).toHaveLength(1);
+        expect(Object.entries(state)).toHaveLength(1);
 
-      const Component = state[Object.keys(state)[0]];
-      const component = mount(Component);
+        const Component = state[Object.keys(state)[0]];
+        render(Component);
 
-      expect(component).toHaveProp('field', 'bar');
-      expect(component).toHaveProp('queryId', 'foo');
-      expect(component).toHaveProp('value', 42);
-      expect(component).toHaveProp('onClose');
-      expect(component).toMatchSnapshot();
-    });
+        await screen.findByText(/hello world/i);
+      },
+    );
   });
 
   it('supplied onClose removes component from state', () => {

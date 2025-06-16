@@ -17,7 +17,7 @@
 package org.graylog2.database.pagination;
 
 import com.google.common.collect.Lists;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationCaseFirst;
 import com.mongodb.client.model.Filters;

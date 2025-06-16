@@ -84,8 +84,8 @@ const Routes = {
     CLUSTER: {
       NODES: '/system/cluster',
       NODE_SHOW: (nodeId: string) => `/system/cluster/node/${nodeId}`,
+      CERTIFICATE_MANAGEMENT: '/system/cluster/certificate-management',
       DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
-      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
       DATANODE_MIGRATION: '/system/cluster/datanode-migration',
       DATANODE_UPGRADE: '/system/cluster/datanode-upgrade',
       DATANODE_SHOW: (dataNodeId: string) => `/system/cluster/datanode/${dataNodeId}`,
@@ -301,8 +301,6 @@ const Routes = {
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
   show_saved_search: (searchId: string) => `/search/${searchId}`,
-
-  node: (nodeId: string) => `/system/nodes/${nodeId}`,
 
   node_inputs: (nodeId: string) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
   global_input_extractors: (inputId: string) => `/system/inputs/${inputId}/extractors`,

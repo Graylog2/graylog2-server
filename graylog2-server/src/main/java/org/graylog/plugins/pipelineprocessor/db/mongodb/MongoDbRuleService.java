@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -28,6 +27,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.EntityScopeService;
@@ -43,15 +43,15 @@ import java.util.regex.Pattern;
 import static com.mongodb.client.model.Filters.regex;
 import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_TITLE;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 /**
  * A RuleService backed by a MongoDB collection.
  */
 public class MongoDbRuleService implements RuleService {
-    private static final RateLimitedLog log = getRateLimitedLog(MongoDbRuleService.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbRuleService.class);
 
     private static final String COLLECTION = "pipeline_processor_rules";
 

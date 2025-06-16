@@ -21,8 +21,9 @@ import { Section } from 'components/common';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useProductName from 'brand-customization/useProductName';
+import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
-import DiagnosisHelp from './DiagnosisHelp';
 import { DIAGNOSIS_HELP } from './Constants';
 
 type Props = {
@@ -69,8 +70,8 @@ const StyledP = styled.p(
 );
 
 const Component = ({ children }) => children;
-
 const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
+  const productName = useProductName();
   const hasError = Object.keys(messageErrors).some((error) => messageErrors[error] > 0);
   const inputSetupWizards = usePluginEntities('inputSetupWizard');
   const InputFailureLink = useMemo(
@@ -83,9 +84,9 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
     <Section
       preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasError ? 'danger' : 'gray'} />}
       headerLeftSection={
-        <DiagnosisHelp
+        <HelpPopoverButton
           helpText={`Message Error at Input:
-            ${DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}
+            ${DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT(productName)}
 
             Message Failed to Process:
             ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}

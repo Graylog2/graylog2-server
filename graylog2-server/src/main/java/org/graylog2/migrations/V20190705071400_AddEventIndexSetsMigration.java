@@ -95,22 +95,22 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     @Override
     public void upgrade() {
         ensureEventsStreamAndIndexSet(
-                "Graylog Events",
-                "Stores Graylog events.",
+                "Events",
+                "Stores events created by event definitions.",
                 elasticsearchConfiguration.getDefaultEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_EVENTS_INDEX_PREFIX,
                 Stream.DEFAULT_EVENTS_STREAM_ID,
                 "All events",
-                "Stream containing all events created by Graylog"
+                "Stream containing all events created"
         );
         ensureEventsStreamAndIndexSet(
-                "Graylog System Events",
-                "Stores Graylog system events.",
+                "System Events",
+                "Stores events created by and related to the system itself.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
                 Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
-                "Stream containing all system events created by Graylog"
+                "Stream containing all system events created"
         );
         ensureSystemNotificationEventsDefinition();
     }

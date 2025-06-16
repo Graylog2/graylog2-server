@@ -19,7 +19,7 @@ package org.graylog2.database.pagination;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Collation;

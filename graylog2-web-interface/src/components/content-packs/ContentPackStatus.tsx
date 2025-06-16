@@ -42,7 +42,7 @@ type ContentPackStatusProps = {
   contentPackId?: string;
 };
 
-const ContentPackStatus = ({ contentPackId, states = [] }: ContentPackStatusProps) => {
+const ContentPackStatus = ({ contentPackId = undefined, states = [] }: ContentPackStatusProps) => {
   const badges = states.map((state) => (
     <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(contentPackId)}>
       <StatusBadge status={state}>{state}</StatusBadge>

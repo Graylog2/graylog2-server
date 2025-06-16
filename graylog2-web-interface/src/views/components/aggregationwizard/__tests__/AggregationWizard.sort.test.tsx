@@ -18,10 +18,10 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import type { Matcher } from 'wrappedTestingLibrary';
 import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -55,8 +55,6 @@ const widgetConfig = AggregationWidgetConfig.builder()
   .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
-const selectEventConfig = { container: document.body };
-
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: /add a sort/i }));
 };
@@ -77,13 +75,13 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
     await selectEvent.openMenu(sortFieldSelect);
   });
 
-  await selectEvent.select(sortFieldSelect, option, selectEventConfig);
+  await selectEvent.select(sortFieldSelect, option);
 
   await act(async () => {
     await selectEvent.openMenu(sortDirectionSelect);
   });
 
-  await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
+  await selectEvent.select(sortDirectionSelect, 'Descending');
 
   await within(httpMethodSortContainer).findByText('Descending');
 };

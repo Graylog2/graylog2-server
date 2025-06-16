@@ -18,7 +18,8 @@ package org.graylog2.rest.resources.system.inputs;
 
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.BadRequestException;
-import org.apache.shiro.subject.Subject;
+import jakarta.ws.rs.ForbiddenException;
+import org.assertj.core.api.Assertions;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -30,6 +31,8 @@ import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
+import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -49,12 +52,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(WithAuthorizationExtension.class)
+@WithAuthorization(permissions = {"*"})
 class InputsResourceTest {
 
     @Mock
@@ -81,7 +86,7 @@ class InputsResourceTest {
     @Mock
     MessageInput messageInput;
 
-    InputsResource inputsResource;
+    InputsTestResource inputsResource;
 
     @BeforeEach
     public void setUp() {
@@ -93,7 +98,7 @@ class InputsResourceTest {
     void testCreateNotGlobalInputInCloud() {
         when(configuration.isCloud()).thenReturn(true);
 
-        assertThatThrownBy(() -> inputsResource.create(getCR(false))).isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> inputsResource.create(false, getCR(false))).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Only global inputs");
     }
 
@@ -101,9 +106,9 @@ class InputsResourceTest {
     void testCreateNotCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(false);
-        when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
+        when(messageInputFactory.create(any(), any(), any(), anyBoolean())).thenReturn(messageInput);
 
-        assertThatThrownBy(() -> inputsResource.create(getCR(true))).isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> inputsResource.create(false, getCR(true))).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("not allowed in the cloud environment");
     }
 
@@ -111,22 +116,23 @@ class InputsResourceTest {
     void testCreateCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(true);
-        when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
+        when(messageInputFactory.create(any(), any(), any(), anyBoolean())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
-        assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
+        assertThat(inputsResource.create(false, getCR(true)).getStatus()).isEqualTo(201);
     }
 
     @Test
     void testCreateInput() throws Exception {
         when(configuration.isCloud()).thenReturn(false);
-        when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
+        when(messageInputFactory.create(any(), any(), any(), anyBoolean())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
-        assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
+        assertThat(inputsResource.create(false, getCR(true)).getStatus()).isEqualTo(201);
     }
 
     @Test
+    @WithAuthorization(permissions = {"inputs:read", "pipeline:read", "streams:read:streamId1", "streams:read:streamId2"})
     void testStreamReferences() {
         when(streamRuleService.loadForInput("inputId")).thenReturn(List.of(
                 new StreamRuleMock(Map.of("_id", "ruleId1", "stream_id", "streamId1")),
@@ -143,6 +149,18 @@ class InputsResourceTest {
 
         assertThat(refs.streamRefs()).hasSize(2);
         assertThat(refs.streamRefs()).containsAll(expected);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:read", "pipeline:read", "streams:read:streamId1"})
+    void testStreamReferencesPermissionFailsIfNotPermitted() {
+        when(streamRuleService.loadForInput("inputId")).thenReturn(List.of(
+                new StreamRuleMock(Map.of("_id", "ruleId1", "stream_id", "streamId1")),
+                new StreamRuleMock(Map.of("_id", "ruleId2", "stream_id", "streamId2"))
+        ));
+        when(streamService.streamTitleFromCache("streamId1")).thenReturn("streamTitle1");
+
+        Assertions.assertThatThrownBy(() -> inputsResource.getReferences("inputId")).isInstanceOf(ForbiddenException.class);
     }
 
     @Test
@@ -170,7 +188,6 @@ class InputsResourceTest {
     static class InputsTestResource extends InputsResource {
 
         private final User user;
-        private final Subject subject;
 
         public InputsTestResource(InputService inputService,
                                   StreamService streamService,
@@ -187,13 +204,6 @@ class InputsResourceTest {
             lenient().when(user.getName()).thenReturn("foo");
             lenient().when(configuration.getHttpPublishUri()).thenReturn(URI.create("http://localhost"));
 
-            this.subject = mock(Subject.class);
-            lenient().when(subject.isPermitted(anyString())).thenReturn(true);
-        }
-
-        @Override
-        protected Subject getSubject() {
-            return subject;
         }
 
         @Nullable

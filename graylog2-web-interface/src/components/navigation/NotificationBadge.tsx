@@ -15,15 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
 import { Badge, Nav } from 'components/bootstrap';
-import { useStore } from 'stores/connect';
 import Routes from 'routing/Routes';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import useNotifications from 'components/notifications/useNotifications';
 
 import InactiveNavItem from './InactiveNavItem';
 
@@ -44,30 +42,20 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
   }
 `;
 
-const POLL_INTERVAL = 3000;
-
 const NotificationBadge = () => {
-  const total = useStore(NotificationsStore, (notifications) => notifications?.total);
+  const { data, isLoading } = useNotifications();
 
-  useEffect(() => {
-    const interval = setInterval(NotificationsActions.list, POLL_INTERVAL);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  return total ? (
+  return isLoading || data.total === 0 ? null : (
     <StyledNav navbar>
       <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
         <StyledInactiveNavItem>
           <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">
-            {total}
+            {data.total}
           </Badge>
         </StyledInactiveNavItem>
       </LinkContainer>
     </StyledNav>
-  ) : null;
+  );
 };
 
 export default NotificationBadge;

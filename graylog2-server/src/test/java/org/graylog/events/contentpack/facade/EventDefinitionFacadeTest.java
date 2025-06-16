@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.inject.Provider;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
@@ -154,10 +155,9 @@ public class EventDefinitionFacadeTest {
         jobSchedulerClock = mock(JobSchedulerClock.class);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(
-                eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService);
+        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityOwnershipService);
     }
 
     @Test
@@ -332,7 +332,7 @@ public class EventDefinitionFacadeTest {
     @Test
     public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
         EventDefinitionFacade testFacade = new EventDefinitionFacade(
-                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService, entityOwnershipService);
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
         when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);

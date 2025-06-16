@@ -16,13 +16,14 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
 import org.graylog.security.certutil.csr.KeystoreInformation;
@@ -30,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,16 +66,17 @@ public class OpensearchConfiguration {
     }
 
     public Environment getEnv() {
-        final Environment env = new Environment(System.getenv());
+        return new Environment(System.getenv())
+                .withOpensearchJavaHome(opensearchDistribution.getOpensearchJavaHome())
+                .withOpensearchJavaOpts(getJavaOpts())
+                .withOpensearchPathConf(opensearchConfigurationDir.configurationRoot());
+    }
 
-        List<String> javaOpts = new LinkedList<>();
-
-        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
-                .forEach(javaOpts::addAll);
-
-        env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
-        return env;
+    @Nonnull
+    private List<String> getJavaOpts() {
+        return configurationParts.stream()
+                .flatMap(part -> part.javaOpts().stream())
+                .collect(Collectors.toList());
     }
 
     public HttpHost getRestBaseUrl() {
@@ -92,12 +95,11 @@ public class OpensearchConfiguration {
     }
 
 
-    public Map<String, String> getKeystoreItems() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    public Collection<OpensearchKeystoreItem> getKeystoreItems() {
+        final ImmutableList.Builder<OpensearchKeystoreItem> builder = ImmutableList.builder();
         configurationParts.stream()
                 .map(DatanodeConfigurationPart::keystoreItems)
-                .forEach(builder::putAll);
-
+                .forEach(builder::addAll);
         return builder.build();
     }
 
