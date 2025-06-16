@@ -54,7 +54,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const currentUser = useCurrentUser();
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
-  useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries(KEY_PREFIX));
+  useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));
 
   const columnRenderers = useMemo(
     () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions),

@@ -37,39 +37,51 @@ const removeStreamOutputRule = async ({ streamId, filterId }: { streamId: string
 
 const useStreamOutputRuleMutation = () => {
   const queryClient = useQueryClient();
-  const invalidateStreamQueries = () => queryClient.invalidateQueries(['streams']);
+  const invalidateStreamQueries = () =>
+    queryClient.invalidateQueries({
+      queryKey: ['streams'],
+    });
 
-  const createMutation = useMutation(createStreamOutputRule, {
+  const createMutation = useMutation({
+    mutationFn: createStreamOutputRule,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Creating stream output filter rule failed with status: ${errorThrown}`,
         'Could not create stream output filter rule',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Stream Output filter rule has been successfully created.', 'Success!');
       invalidateStreamQueries();
     },
   });
-  const updateMutation = useMutation(updateStreamOutputRule, {
+  const updateMutation = useMutation({
+    mutationFn: updateStreamOutputRule,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Updating stream output filter rule failed with status: ${errorThrown}`,
         'Could not update stream output filter rule',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Stream Output filter rule has been successfully updated.', 'Success!');
       invalidateStreamQueries();
     },
   });
-  const removeMutation = useMutation(removeStreamOutputRule, {
+  const removeMutation = useMutation({
+    mutationFn: removeStreamOutputRule,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting stream output filter rule failed with status: ${errorThrown}`,
         'Could not delete stream output filter rule',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Stream Output filter rule has been successfully removed.', 'Success!');
       invalidateStreamQueries();

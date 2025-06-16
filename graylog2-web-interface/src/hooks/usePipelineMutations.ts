@@ -47,35 +47,44 @@ const deletePipeline = async ({ pipelineId }: { pipelineId: string }) => Pipelin
 const usePipelineMutations = () => {
   const queryClient = useQueryClient();
 
-  const createMutation = useMutation(createPipeline, {
+  const createMutation = useMutation({
+    mutationFn: createPipeline,
+
     onError: (errorThrown) => {
       UserNotification.error(`Creating pipeline failed with status: ${errorThrown}`, 'Could not create pipeline');
     },
+
     onSuccess: () => {
       UserNotification.success('Pipeline has been successfully created.', 'Success!');
-      queryClient.invalidateQueries(PIPELINES_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
     },
   });
 
-  const updateMutation = useMutation(updatePipeline, {
+  const updateMutation = useMutation({
+    mutationFn: updatePipeline,
+
     onError: (errorThrown) => {
       UserNotification.error(`Updating pipeline failed with status: ${errorThrown}`, 'Could not update pipeline');
     },
+
     onSuccess: () => {
       UserNotification.success('Pipeline has been successfully updated.', 'Success!');
-      queryClient.invalidateQueries(PIPELINES_QUERY_KEY);
-      queryClient.invalidateQueries(PIPELINE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PIPELINE_QUERY_KEY });
     },
   });
 
-  const deleteMutation = useMutation(deletePipeline, {
+  const deleteMutation = useMutation({
+    mutationFn: deletePipeline,
+
     onError: (errorThrown) => {
       UserNotification.error(`Deleting pipeline failed with status: ${errorThrown}`, 'Could not delete pipeline');
     },
+
     onSuccess: () => {
       UserNotification.success('Pipeline has been successfully deleted.', 'Success!');
-      queryClient.invalidateQueries(PIPELINES_QUERY_KEY);
-      queryClient.invalidateQueries(PIPELINE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PIPELINE_QUERY_KEY });
     },
   });
 

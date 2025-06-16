@@ -75,7 +75,9 @@ const BulkActions = () => {
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
           if (notDeletedNotificationIds.length !== selectedEntities.length) {
-            queryClient.invalidateQueries(['eventNotifications', 'overview']);
+            queryClient.invalidateQueries({
+              queryKey: ['eventNotifications', 'overview'],
+            });
           }
 
           UserNotification.error(
@@ -85,7 +87,9 @@ const BulkActions = () => {
           return;
         }
 
-        queryClient.invalidateQueries(['eventNotifications', 'overview']);
+        queryClient.invalidateQueries({
+          queryKey: ['eventNotifications', 'overview'],
+        });
         setSelectedEntities(notDeletedNotificationIds);
         refetchEventNotifications();
         UserNotification.success(
