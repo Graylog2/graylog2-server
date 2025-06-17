@@ -1,0 +1,5 @@
+type = "a"
+message = "Added node_name to data node certificate SAN."
+
+issues = ["22598"]
+pulls = ["22656"]
