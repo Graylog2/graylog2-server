@@ -22,7 +22,6 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog2.plugin.database.users.User;
@@ -30,20 +29,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 @Singleton
-public class EntityOwnershipService {
-    private static final Logger LOG = LoggerFactory.getLogger(EntityOwnershipService.class);
+public class EntityRegistrar {
+    private static final Logger LOG = LoggerFactory.getLogger(EntityRegistrar.class);
 
+    // TODO: get rid of this dependency
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
+    private final Set<EntityRegistrationHandler> registrationHandlers;
 
 
     @Inject
-    public EntityOwnershipService(DBGrantService dbGrantService,
-                                  GRNRegistry grnRegistry) {
+    public EntityRegistrar(DBGrantService dbGrantService, GRNRegistry grnRegistry,
+                           Set<EntityRegistrationHandler> registrationHandlers) {
         this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
+        this.registrationHandlers = registrationHandlers;
     }
 
     public void registerNewEventDefinition(String id, User user) {
@@ -70,10 +73,16 @@ public class EntityOwnershipService {
         registerNewEntity(grnRegistry.newGRN(grnType, id), user);
     }
 
-    public void unregisterEntity(final String id, final GRNType grnType) {
-        removeGrantsForTarget(grnRegistry.newGRN(grnType, id));
+    public void registerNewEntity(GRN entityGRN, User user) {
+        registrationHandlers.forEach(handler -> handler.handleRegistration(entityGRN, user));
     }
 
+    public void unregisterEntity(final String id, final GRNType grnType) {
+        GRN target = grnRegistry.newGRN(grnType, id);
+        registrationHandlers.forEach(handler -> handler.handleUnregistration(target));
+    }
+
+    // TODO: move this method to a more appropriate place
     public List<GrantDTO> getGrantsForTarget(final GRNType type, final String id) {
         final GRN grn = grnRegistry.newGRN(type, id);
         return dbGrantService.getForTarget(grn);
@@ -98,24 +107,4 @@ public class EntityOwnershipService {
     public void unregisterEventNotification(String id) {
         unregisterEntity(id, GRNTypes.EVENT_NOTIFICATION);
     }
-
-    private void removeGrantsForTarget(GRN target) {
-        LOG.debug("Removing grants for <{}>", target);
-        dbGrantService.deleteForTarget(target);
-    }
-
-    private void registerNewEntity(GRN entity, User user) {
-        // Don't create ownership grants for the admin user.
-        // They can access anything anyhow
-        if (user.isLocalAdmin()) {
-            return;
-        }
-
-        dbGrantService.create(GrantDTO.builder()
-                .capability(Capability.OWN)
-                .target(entity)
-                .grantee(grnRegistry.ofUser(user))
-                .build(), user);
-    }
-
 }
