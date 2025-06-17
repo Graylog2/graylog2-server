@@ -16,22 +16,17 @@
  */
 package org.graylog.datanode.docs;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Set;
 
 public class ConfigurationBeansSPI {
     public static List<Object> loadConfigurationBeans() {
-        final ServiceLoader<DocumentedBeansService> configurationBeansLoader = ServiceLoader.load(DocumentedBeansService.class);
-        final Iterator<DocumentedBeansService> iterator = configurationBeansLoader.iterator();
-        Set<Object> configurationBeans = new LinkedHashSet<>();
-        while (iterator.hasNext()) {
-            final DocumentedBeansService service = iterator.next();
-            configurationBeans.addAll(service.getDocumentedConfigurationBeans());
-        }
-        return new ArrayList<>(configurationBeans);
+        return ServiceLoader.load(DocumentedBeansService.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .map(DocumentedBeansService::getDocumentedConfigurationBeans)
+                .flatMap(Collection::stream)
+                .distinct()
+                .toList();
     }
 }
