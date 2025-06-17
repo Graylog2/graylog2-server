@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Modal as MantineModal, FocusTrap } from '@mantine/core';
+import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
@@ -65,7 +65,7 @@ const Modal = ({
   show = false,
   children,
   bsSize = undefined,
-  enforceFocus = false,
+  enforceFocus = true,
   backdrop = true,
   closable = true,
 }: Props) => (
@@ -76,9 +76,7 @@ const Modal = ({
     trapFocus={enforceFocus}
     closeOnEscape={closable}>
     {backdrop && <ModalOverlay />}
-    <FocusTrap active>
-      <ModalContent>{children}</ModalContent>
-    </FocusTrap>
+    <ModalContent>{children}</ModalContent>
   </ModalRoot>
 );
 
