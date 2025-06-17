@@ -30,14 +30,19 @@ const deleteToken = async (userId: string, tokenId: string) => {
 const useDeleteTokenMutation = (userId: string, tokenId: string) => {
   const queryClient = useQueryClient();
 
-  const remove = useMutation(() => deleteToken(userId, tokenId), {
+  const remove = useMutation({
+    mutationFn: () => deleteToken(userId, tokenId),
+
     onError: (errorThrown) => {
       UserNotification.error(`Token deletion failed: ${errorThrown}`, 'Could not delete token');
     },
+
     onSuccess: () => {
       UserNotification.success('Token has been successfully deleted.', 'Success!');
 
-      queryClient.invalidateQueries(['token-management', 'overview']);
+      queryClient.invalidateQueries({
+        queryKey: ['token-management', 'overview'],
+      });
     },
   });
 
