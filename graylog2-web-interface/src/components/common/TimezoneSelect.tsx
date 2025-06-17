@@ -77,6 +77,7 @@ class TimezoneSelect extends React.Component<
 
   private timezone: SelectInstance<unknown, boolean>;
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => this.timezone.getValue();
 
   _formatTimezones = () => {
