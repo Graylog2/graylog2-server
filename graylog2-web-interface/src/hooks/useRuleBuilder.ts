@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
+import type { RuleBuilderRule } from 'components/rules/rule-builder/types';
 import useParams from 'routing/useParams';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -87,50 +87,50 @@ const useRuleBuilder = () => {
     data: rule,
     refetch: refetchRule,
     isFetching: isLoadingRule,
-  } = useQuery<RuleBuilderRule | null>(
-    ['rule'],
-    () =>
+  } = useQuery({
+    queryKey: ['rule'],
+
+    queryFn: () =>
       defaultOnError(
         fetchRule(ruleId),
         'Loading Rule Builder Rule failed with status',
         'Could not load Rule Builder Rule.',
       ),
-    {
-      enabled,
-    },
-  );
+
+    enabled,
+  });
   const {
     data: conditionsDict,
     refetch: refetchConditionsDict,
     isFetching: isLoadingConditionsDict,
-  } = useQuery<Array<BlockDict>>(
-    ['conditions'],
-    () =>
+  } = useQuery({
+    queryKey: ['conditions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchConditionsDict(),
         'Loading Rule Builder Conditions list failed with status',
         'Could not load Rule Builder Conditions list.',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+  });
   const {
     data: actionsDict,
     refetch: refetchActionsDict,
     isFetching: isLoadingActionsDict,
-  } = useQuery<Array<BlockDict>>(
-    ['actions'],
-    () =>
+  } = useQuery({
+    queryKey: ['actions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchActionsDict(),
         'Loading Rule Builder Actions list failed with status',
         'Could not load Rule Builder Actions list.',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+  });
 
   return {
     isLoadingRule,
