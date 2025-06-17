@@ -16,7 +16,6 @@
  */
 import type { SyntheticEvent } from 'react';
 import * as React from 'react';
-import defaultTo from 'lodash/defaultTo';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
@@ -144,7 +143,7 @@ const EventDefinitionForm = ({
     },
     {
       key: currentStepKeys[1],
-      title: defaultTo(eventDefinitionType.displayName, 'Condition'),
+      title: eventDefinitionType?.displayName ?? 'Condition',
       component: <EventConditionForm {...defaultStepProps} canEdit={canEditCondition} />,
     },
     {
