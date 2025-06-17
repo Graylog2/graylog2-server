@@ -26,6 +26,7 @@ import org.graylog.grn.GRN;
 import org.graylog.security.Capability;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -56,16 +57,15 @@ public abstract class EntityShareRequest {
 
     @JsonCreator
     public static EntityShareRequest create(
-            @JsonProperty(SELECTED_GRANTEE_CAPABILITIES) @Nullable Map<GRN, Capability> selectedGranteeCapabilities) {
-        return create(selectedGranteeCapabilities, null);
-    }
-
-    @JsonCreator
-    public static EntityShareRequest create(
             @JsonProperty(SELECTED_GRANTEE_CAPABILITIES) @Nullable Map<GRN, Capability> selectedGranteeCapabilities,
-            @JsonProperty(SELECTED_COLLECTIONS) @Nullable Set<GRN> selectedCollections) {
+            @JsonProperty(SELECTED_COLLECTIONS) @Nullable List<GRN> selectedCollections) {
         final ImmutableMap<GRN, Capability> capabilities = selectedGranteeCapabilities == null ? null : ImmutableMap.copyOf(selectedGranteeCapabilities);
         final ImmutableSet<GRN> collections = selectedCollections == null ? null : ImmutableSet.copyOf(selectedCollections);
         return new AutoValue_EntityShareRequest(Optional.ofNullable(capabilities), Optional.ofNullable(collections));
+    }
+
+    public static EntityShareRequest create(
+            Map<GRN, Capability> selectedGranteeCapabilities) {
+        return create(selectedGranteeCapabilities, null);
     }
 }
