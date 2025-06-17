@@ -16,7 +16,7 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;

@@ -30,7 +30,7 @@ type Provider = {
 
 type FieldSpec = {
   [key: string]: {
-    data_type: string;
+    data_type: 'string' | 'error';
     providers: Array<Provider>;
   };
 };
@@ -50,12 +50,12 @@ export type Scheduler = {
   triggered_at: string;
   queued_notifications: number;
   is_scheduled: boolean;
-  status: string;
+  status: 'runnable' | 'running' | 'complete' | 'paused' | 'error' | 'cancelled';
 };
 
 export type SearchFilter = {
   id: string;
-  type: string;
+  type: 'referenced' | 'inlineQueryString';
   title: string;
   queryString: string;
   disabled: boolean;
@@ -100,6 +100,7 @@ export type EventDefinition = {
   };
   notifications: Array<Notification>;
   remediation_steps?: string;
+  event_procedure?: string;
   storage: Array<{
     type: string;
     streams: number[] | string[];
@@ -116,7 +117,7 @@ export type EventDefinitionFormControlsProps = {
   onOpenNextPage: () => void;
   onOpenPrevPage: () => void;
   onSubmit: (event: SyntheticEvent) => void;
-  steps: StepsType;
+  steps: StepsType<string>;
 };
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>

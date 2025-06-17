@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 import useHistory from 'routing/useHistory';
 
 import PipelineDetails from './PipelineDetails';

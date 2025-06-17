@@ -21,6 +21,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
 import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 import {
   IndicesConfigurationDropdown,
   IndicesMaintenanceDropdown,
@@ -39,7 +40,6 @@ import type { Indices } from 'stores/indices/IndicesStore';
 import { IndexerOverviewActions, IndexerOverviewStore } from 'stores/indexers/IndexerOverviewStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
-import useProductName from 'brand-customization/useProductName';
 
 const REFRESH_INTERVAL = 2000;
 

@@ -25,7 +25,7 @@ import OriginalNavigationLink from './NavigationLink';
 
 jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualifyUrl: jest.fn((path) => path) }));
 
-const NavigationLink = (props: React.ComponentProps<typeof OriginalNavigationLink>) =>
+const NavigationLink = ({ ...props }: React.ComponentProps<typeof OriginalNavigationLink>) =>
   props.topLevel ? (
     <OriginalNavigationLink {...props} />
   ) : (

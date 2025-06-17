@@ -57,6 +57,8 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -67,6 +69,7 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
@@ -107,6 +110,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamRenamedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
@@ -167,6 +171,8 @@ public class StreamResource extends RestResource {
     private final BulkExecutor<Stream, UserContext> bulkStreamStopExecutor;
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
+    private final EntitySharesService entitySharesService;
+    private final ClusterEventBus clusterEventBus;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -180,7 +186,9 @@ public class StreamResource extends RestResource {
                           AuditEventSender auditEventSender,
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
-                          PipelineService pipelineService) {
+                          PipelineService pipelineService,
+                          EntitySharesService entitySharesService,
+                          ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
@@ -189,8 +197,10 @@ public class StreamResource extends RestResource {
         this.messageFactory = messageFactory;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineService = pipelineService;
+        this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
+        this.clusterEventBus = clusterEventBus;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
@@ -209,8 +219,9 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr,
+    public Response create(@ApiParam(name = "JSON body", required = true) final UnwrappedCreateEntityRequest<CreateStreamRequest> unwrappedCreateEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
+        final CreateStreamRequest cr = unwrappedCreateEntityRequest.getEntity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
@@ -223,12 +234,15 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
-        var result = new StreamCreatedResponse(id);
+        final StreamCreatedResponse result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
+        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest ->
+                entitySharesService.updateEntityShares(GRNTypes.STREAM, result.streamId(), shareRequest, userContext.getUser()));
+
         return Response.created(streamUri).entity(result).build();
     }
 
@@ -373,8 +387,11 @@ public class StreamResource extends RestResource {
 
         final Stream stream = streamService.load(streamId);
 
+        StreamRenamedEvent streamRenamedEvent = null;
         if (!Strings.isNullOrEmpty(cr.title())) {
-            stream.setTitle(cr.title().strip());
+            String newTitle = cr.title().strip();
+            streamRenamedEvent = new StreamRenamedEvent(streamId, stream.getTitle(), newTitle);
+            stream.setTitle(newTitle);
         }
 
         stream.setDescription(cr.description());
@@ -410,6 +427,9 @@ public class StreamResource extends RestResource {
         }
 
         streamService.save(stream);
+        if (streamRenamedEvent != null) {
+            clusterEventBus.post(streamRenamedEvent);
+        }
 
         recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
@@ -637,6 +657,8 @@ public class StreamResource extends RestResource {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(savedStreamObjectId, outputIds);
+
+        entitySharesService.cloneEntityGrants(GRNTypes.STREAM, streamId, savedStreamId, userContext.getUser());
 
         var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)

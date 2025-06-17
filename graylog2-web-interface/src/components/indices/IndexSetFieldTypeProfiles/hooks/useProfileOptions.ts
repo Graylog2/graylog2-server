@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -36,18 +36,18 @@ const useProfileOptions = (): {
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypeProfileOptions'],
-    () =>
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypeProfileOptions'],
+
+    queryFn: () =>
       defaultOnError(
         fetchProfileOptions(),
         'Loading index field type profile options failed with status',
         'Could not load index field type profile options',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+  });
 
   return {
     options: data ?? INITIAL_DATA,

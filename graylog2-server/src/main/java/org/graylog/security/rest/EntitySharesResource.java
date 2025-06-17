@@ -16,32 +16,15 @@
  */
 package org.graylog.security.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
-import org.graylog.security.DBGrantService;
-import org.graylog.security.entities.EntityDescriptor;
-import org.graylog.security.shares.EntityShareRequest;
-import org.graylog.security.shares.EntityShareResponse;
-import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.GranteeSharesService;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.PaginationParameters;
-import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.shared.users.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
@@ -55,10 +38,29 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.security.Capability;
+import org.graylog.security.entities.EntityDescriptor;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntityShareResponse;
+import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.GranteeSharesService;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.PaginationParameters;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.users.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog.security.shares.EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
@@ -71,19 +73,15 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     private static final Logger LOG = LoggerFactory.getLogger(EntitySharesResource.class);
 
     private final GRNRegistry grnRegistry;
-    private final DBGrantService grantService;
-    private final UserService userService;
     private final GranteeSharesService granteeSharesService;
     private final EntitySharesService entitySharesService;
 
     @Inject
     public EntitySharesResource(GRNRegistry grnRegistry,
-                                DBGrantService grantService,
                                 UserService userService,
                                 GranteeSharesService granteeSharesService,
                                 EntitySharesService entitySharesService) {
         this.grnRegistry = grnRegistry;
-        this.grantService = grantService;
         this.userService = userService;
         this.granteeSharesService = granteeSharesService;
         this.entitySharesService = entitySharesService;
@@ -124,7 +122,33 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         // we can do a second request including the "grantees". Then we can do the dependency check to
         // fill out "missing_dependencies".
         // This should probably be a POST request with a JSON payload.
-        return entitySharesService.prepareShare(grn, request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(grn, request, getCurrentUser());
+    }
+
+    public record PrepareShareRequest(
+            @JsonProperty("prepare_request") @Nullable List<String> dependentEntityGRNs,
+            @JsonProperty(SELECTED_GRANTEE_CAPABILITIES) @Nullable ImmutableMap<GRN, Capability> selectedGranteeCapabilities) {
+    }
+
+    /**
+     * Prepare shares independent of a specific entity.
+     * Optionally check for missing permissions on dependent entities.
+     */
+    @POST
+    @ApiOperation(value = "Prepare shares with optional dependency checks")
+    @Path("entities/prepare")
+    @NoAuditEvent("This does not change any data")
+    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body") PrepareShareRequest request) {
+        if (request.dependentEntityGRNs() != null && !request.dependentEntityGRNs().isEmpty()) {
+            if (request.selectedGranteeCapabilities() != null) {
+                return entitySharesService.prepareShare(request.selectedGranteeCapabilities(), request.dependentEntityGRNs(), getCurrentUser());
+            } else {
+                return entitySharesService.prepareShare(request.dependentEntityGRNs(), getCurrentUser());
+            }
+        } else {
+            return entitySharesService.prepareShare(getCurrentUser(),
+                    request.selectedGranteeCapabilities() == null ? ImmutableMap.of() : request.selectedGranteeCapabilities());
+        }
     }
 
     @POST

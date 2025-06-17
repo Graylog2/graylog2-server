@@ -21,10 +21,10 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Overview', path: Routes.SYSTEM.SIDECARS.OVERVIEW, exactPathMatch: true },
-  { title: 'Administration', path: Routes.SYSTEM.SIDECARS.ADMINISTRATION },
-  { title: 'Configuration', path: Routes.SYSTEM.SIDECARS.CONFIGURATION },
-  { title: 'Failure Tracking', path: Routes.SYSTEM.SIDECARS.FAILURE_TRACKING },
+  { description: 'Overview', path: Routes.SYSTEM.SIDECARS.OVERVIEW, exactPathMatch: true },
+  { description: 'Administration', path: Routes.SYSTEM.SIDECARS.ADMINISTRATION },
+  { description: 'Configuration', path: Routes.SYSTEM.SIDECARS.CONFIGURATION },
+  { description: 'Failure Tracking', path: Routes.SYSTEM.SIDECARS.FAILURE_TRACKING },
 ];
 
 const SidecarsPageNavigation = () => (

@@ -22,7 +22,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, FormikInput, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
 type FormValues = {};
@@ -32,11 +32,14 @@ const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('/api/ca/creat
 const CACreateForm = () => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: onCreateCA } = useMutation(createCA, {
+  const { mutateAsync: onCreateCA } = useMutation({
+    mutationFn: createCA,
+
     onSuccess: () => {
       UserNotification.success('CA created successfully');
-      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
     },
+
     onError: (error) => {
       UserNotification.error(`CA creation failed with error: ${error}`);
     },

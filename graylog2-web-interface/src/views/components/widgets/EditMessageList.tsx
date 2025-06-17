@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type { EditWidgetComponentProps } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -61,7 +60,7 @@ const _onFieldSelectionChanged = (
   return onChange(newConfig);
 };
 
-const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, config, onChange) => {
+const _onSortChange = (sort: AggregationWidgetConfig['sort'], config, onChange) => {
   const newConfig = config.toBuilder().sort(sort).build();
 
   return onChange(newConfig);
@@ -96,7 +95,6 @@ const EditMessageList = ({
           <DescriptionBox description="Fields">
             <FieldsConfiguration
               onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
-              menuPortalTarget={document.body}
               selectedFields={config.fields}
             />
           </DescriptionBox>

@@ -120,17 +120,25 @@ type Props = {
 
 const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const { data: currentConfig, isLoading } = useQuery(queryKey, fetchCurrentConfig);
+  const { data: currentConfig, isLoading } = useQuery({
+    queryKey: queryKey,
+    queryFn: fetchCurrentConfig,
+  });
 
   const sendTelemetry = useSendTelemetry();
   const queryClient = useQueryClient();
 
-  const { mutateAsync: updateConfig } = useMutation(handleSaveConfig, {
+  const { mutateAsync: updateConfig } = useMutation({
+    mutationFn: handleSaveConfig,
+
     onSuccess: () => {
-      queryClient.invalidateQueries(queryKey);
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({
+        queryKey: queryKey,
+      });
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
       setShowModal(false);
     },
+
     onError: (err: Error) => {
       UserNotification.error(
         `Error Updating Detector Definition: ${err.toString()}`,
@@ -226,12 +234,12 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
         </>
       )}
 
-      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+      <Modal show={showModal} onHide={resetConfig}>
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
           {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>
               <Modal.Header>
-                <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                <Modal.Title>{modalTitle}</Modal.Title>
               </Modal.Header>
 
               <Modal.Body>

@@ -21,6 +21,7 @@ import * as Immutable from 'immutable';
 
 import { Button, Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
+import useInputTypes from 'components/inputs/useInputTypes';
 
 const LoaderContainer = styled.div`
   display: flex;
@@ -43,17 +44,20 @@ type InputType = {
   type: string;
 };
 
-const _formatInput = ({ id, title, type }: InputType) => (
-  <option key={id} value={id}>
-    {title} ({type})
-  </option>
-);
+const InputOption = ({ input }: { input: InputType }) => {
+  const inputTypes = useInputTypes();
+  const inputType = inputTypes[input.type] ?? 'Unknown Input Type';
+
+  return <option value={input.id}>{`${input.title} (${inputType})`}</option>;
+};
+
+const _formatInput = (input: InputType) => <InputOption key={input.id} input={input} />;
 
 const _sortByTitle = (input1: InputType, input2: InputType) => input1.title.localeCompare(input2.title);
 
-const StaticInput = ({ input: { type, title } }: { input: InputType }) => (
-  <StyledInputDropdown id={`${type}-select`} type="select" disabled>
-    <option>{`${title} (${type})`}</option>
+const StaticInput = ({ input }: { input: InputType }) => (
+  <StyledInputDropdown id={`${input.type}-select`} type="select" disabled>
+    <InputOption input={input} />
   </StyledInputDropdown>
 );
 
@@ -69,7 +73,7 @@ const InputDropdown = ({
   disabled = false,
   inputs = Immutable.Map(),
   onLoadMessage = () => {},
-  preselectedInputId,
+  preselectedInputId = undefined,
   title,
 }: Props) => {
   const [selectedInput, setSelectedInput] = useState(preselectedInputId || PLACEHOLDER);

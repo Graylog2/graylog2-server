@@ -17,6 +17,10 @@
 package org.graylog2.rest.resources.system.contentpacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
@@ -29,18 +33,16 @@ import org.graylog2.rest.models.system.contentpacks.responses.ContentPackList;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackRevisions;
+import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.shared.security.RestPermissions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.Map;
@@ -48,11 +50,15 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(WithAuthorizationExtension.class)
 public class ContentPackResourceTest {
+
     private static final String CONTENT_PACK = "" +
             "{\n" +
             "    \"v\": \"1\",\n" +
@@ -67,9 +73,6 @@ public class ContentPackResourceTest {
             "    \"entities\": [ ]\n" +
             "}";
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     @Mock
     private ContentPackService contentPackService;
     @Mock
@@ -80,14 +83,14 @@ public class ContentPackResourceTest {
     @Mock
     private Set<ContentPackInstallation> contentPackInstallations;
 
-    private ContentPackResource contentPackResource;
+    private PermittedTestResource contentPackResource;
     private ObjectMapper objectMapper;
 
     public ContentPackResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.setSubtypeResolver(new AutoValueSubtypeResolver());
@@ -98,6 +101,14 @@ public class ContentPackResourceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = {})
+    public void testListContentPacksRequiresPermissionFail() {
+        assertThatThrownBy(() -> contentPackResource.listContentPacks())
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    @WithAuthorization(permissions = RestPermissions.CONTENT_PACK_CREATE)
     public void uploadContentPack() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
         when(contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack)).thenReturn(Optional.ofNullable(contentPack));
@@ -109,6 +120,7 @@ public class ContentPackResourceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = RestPermissions.CONTENT_PACK_READ)
     public void listAndLatest() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
         final Set<ContentPack> contentPacks = Collections.singleton(contentPack);
@@ -127,6 +139,7 @@ public class ContentPackResourceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = RestPermissions.CONTENT_PACK_READ)
     public void getContentPack() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
         final Set<ContentPack> contentPackSet = Collections.singleton(contentPack);
@@ -149,6 +162,7 @@ public class ContentPackResourceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = RestPermissions.CONTENT_PACK_DELETE)
     public void deleteContentPack() throws Exception {
         final ModelId id = ModelId.of("1");
         when(contentPackPersistenceService.deleteById(id)).thenReturn(1);
@@ -161,9 +175,9 @@ public class ContentPackResourceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = RestPermissions.CONTENT_PACK_DELETE)
     public void notDeleteContentPack() throws Exception {
         final ModelId id = ModelId.of("1");
-        when(contentPackInstallations.size()).thenReturn(1);
         when(contentPackInstallationPersistenceService.findByContentPackId(id)).thenReturn(contentPackInstallations);
         boolean exceptionCalled = false;
         try {
@@ -175,7 +189,6 @@ public class ContentPackResourceTest {
         verify(contentPackInstallationPersistenceService, times(1)).findByContentPackId(id);
         verify(contentPackPersistenceService, times(0)).deleteById(id);
 
-        when(contentPackInstallations.size()).thenReturn(1);
         when(contentPackInstallationPersistenceService.findByContentPackIdAndRevision(id, 1)).thenReturn(contentPackInstallations);
         exceptionCalled = false;
         try {
@@ -193,16 +206,6 @@ public class ContentPackResourceTest {
                               ContentPackPersistenceService contentPackPersistenceService,
                               ContentPackInstallationPersistenceService contentPackInstallationPersistenceService) {
             super(contentPackService, contentPackPersistenceService, contentPackInstallationPersistenceService);
-        }
-
-        @Override
-        protected boolean isPermitted(String permission) {
-            return true;
-        }
-
-        @Override
-        protected boolean isPermitted(String permission, String id) {
-            return true;
         }
 
         @Override

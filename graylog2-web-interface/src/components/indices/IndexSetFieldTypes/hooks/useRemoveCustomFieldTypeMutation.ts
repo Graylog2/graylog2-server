@@ -63,13 +63,16 @@ const useRemoveCustomFieldTypeMutation = (params: {
 }) => {
   const queryClient = useQueryClient();
 
-  const put = useMutation(putFieldType, {
+  const put = useMutation({
+    mutationFn: putFieldType,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Removing custom field type failed with status: ${errorThrown}`,
         'Could not remove custom field type',
       );
     },
+
     onSuccess: (response: RemovalResponseJSON) => {
       let errorsQuantity: number = 0;
       const mappedResponse: RemovalResponse = mapValues(
@@ -109,7 +112,7 @@ const useRemoveCustomFieldTypeMutation = (params: {
     },
   });
 
-  return { removeCustomFieldTypeMutation: put.mutateAsync, isLoading: put.isLoading };
+  return { removeCustomFieldTypeMutation: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default useRemoveCustomFieldTypeMutation;

@@ -29,7 +29,7 @@ type Props = {
   color: string;
 };
 
-const Highlight = ({ children, color }: React.PropsWithChildren<Props>) => (
+const Highlight = ({ children = undefined, color }: React.PropsWithChildren<Props>) => (
   <BackgroundColor $color={color}>{children}</BackgroundColor>
 );
 

@@ -16,13 +16,20 @@
  */
 import * as Immutable from 'immutable';
 
+import type { Notifications } from 'theme/types';
+
 declare global {
   const DEVELOPMENT: boolean | undefined;
   const FEATURES: string | undefined;
   const IS_CLOUD: boolean | undefined;
 }
 
-type Branding = {
+export type BrandingResource = { enabled?: boolean; url?: string | undefined };
+export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
+
+export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
+
+export type Branding = {
   product_name?: string;
   favicon?: string;
   logo?: {
@@ -44,6 +51,10 @@ type Branding = {
   };
   help_url?: string;
   footer?: { enabled: boolean };
+  resources?: BrandingResources;
+  features?: {
+    ai_investigation_report?: { enabled?: boolean };
+  };
 };
 
 export type AppConfigs = {
@@ -118,7 +129,7 @@ const AppConfig = {
     return appConfig()?.telemetry;
   },
 
-  publicNotifications() {
+  publicNotifications(): Notifications {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 

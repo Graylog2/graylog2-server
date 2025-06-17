@@ -26,6 +26,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import usePluginEntities from 'hooks/usePluginEntities';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import EditEventDefinitionPage from 'pages/EditEventDefinitionPage';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -62,10 +63,18 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionFormContainer', () =>
   mockComponent('EventDefinitionFormContainer'),
 );
+jest.mock('hooks/usePluginEntities');
 
 describe('<EditEventDefinitionPage />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
+          'alerts.pageNavigation': [],
+        })[entityKey],
+    );
   });
 
   it('should display the event definition to edit', async () => {

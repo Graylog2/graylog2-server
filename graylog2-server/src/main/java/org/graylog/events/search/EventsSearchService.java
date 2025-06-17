@@ -24,11 +24,14 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -59,10 +62,25 @@ public class EventsSearchService {
         return new EventsFilterBuilder(parameters).build();
     }
 
+    private Set<String> allowedEventStreams(Subject subject) {
+        final var eventStreams = Set.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
+            return eventStreams;
+        }
+
+        return eventStreams.stream()
+                .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)) || streamId.equals(DEFAULT_EVENTS_STREAM_ID))
+                .collect(Collectors.toSet());
+    }
+
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
+        final var eventStreams = allowedEventStreams(subject);
+        if (eventStreams.isEmpty()) {
+            return EventsSearchResult.empty();
+        }
+
         final var filter = buildFilter(parameters);
 
-        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
@@ -94,12 +112,32 @@ public class EventsSearchService {
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
-        final var filter = buildFilter(parameters);
+        final var eventStreams = allowedEventStreams(subject);
+        if (eventStreams.isEmpty()) {
+            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
+        }
 
-        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        final var filter = buildFilter(parameters);
         final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
+    }
+
+    public EventsSearchResult searchByIds(Collection<String> eventIds, Subject subject) {
+        final var query = eventIds.stream()
+                .map(eventId -> EventDto.FIELD_ID + ":" + eventId)
+                .collect(Collectors.joining(" OR "));
+        final EventsSearchParameters parameters = EventsSearchParameters.builder()
+                .page(1)
+                .perPage(eventIds.size())
+                .timerange(RelativeRange.allTime())
+                .query(query)
+                .filter(EventsSearchFilter.empty())
+                .sortBy(Message.FIELD_TIMESTAMP)
+                .sortDirection(EventsSearchParameters.SortDirection.DESC)
+                .build();
+
+        return search(parameters, subject);
     }
 
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is

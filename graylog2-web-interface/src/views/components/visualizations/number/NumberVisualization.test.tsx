@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -24,7 +24,6 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import type { CurrentViewType } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 
@@ -33,7 +32,7 @@ import NumberVisualization from './NumberVisualization';
 jest.mock(
   './AutoFontSizer',
   () =>
-    ({ children }: React.PropsWithChildren<{}>) =>
+    ({ children = undefined }: React.PropsWithChildren<{}>) =>
       children,
 );
 
@@ -67,7 +66,6 @@ describe('NumberVisualization', () => {
       },
     ],
   };
-  const currentView: CurrentViewType = { activeQuery: 'dead-beef' };
   const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
   const SimplifiedNumberVisualization = (props: SUTProps = {}) => (
@@ -77,8 +75,7 @@ describe('NumberVisualization', () => {
         width={200}
         height={200}
         fields={fields}
-        // @ts-ignore
-        currentView={currentView}
+        setLoadingState={() => {}}
         onChange={() => {}}
         toggleEdit={() => {}}
         effectiveTimerange={{
@@ -96,16 +93,16 @@ describe('NumberVisualization', () => {
 
   useViewsPlugin();
 
-  it('should render a number visualization', () => {
-    const wrapper = mount(<SimplifiedNumberVisualization />);
+  it('should render a number visualization', async () => {
+    render(<SimplifiedNumberVisualization />);
 
-    expect(wrapper.find(NumberVisualization)).toExist();
+    await screen.findByText('2134342');
   });
 
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    mount(
+    render(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedNumberVisualization />
       </RenderCompletionCallback.Provider>,
@@ -114,7 +111,7 @@ describe('NumberVisualization', () => {
     expect(onRenderComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('renders 0 if value is 0', () => {
+  it('renders 0 if value is 0', async () => {
     const dataWithZeroValue: { chart: Rows } = {
       chart: [
         {
@@ -131,12 +128,12 @@ describe('NumberVisualization', () => {
         },
       ],
     };
-    const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
+    render(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 
-    expect(wrapper).toHaveText('0');
+    await screen.findByText('0');
   });
 
-  it('renders N/A if value is null', () => {
+  it('renders N/A if value is null', async () => {
     const dataWithZeroValue: Data = {
       chart: [
         {
@@ -153,8 +150,8 @@ describe('NumberVisualization', () => {
         },
       ],
     };
-    const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
+    render(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 
-    expect(wrapper).toHaveText('N/A');
+    await screen.findByText('N/A');
   });
 });

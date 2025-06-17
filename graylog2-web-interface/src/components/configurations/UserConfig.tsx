@@ -39,7 +39,7 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
     &&.deflist {
       dd {
         padding-left: ${theme.spacings.md};
-        margin-left: 200px;
+        margin-left: 400px;
       }
     }
   `,
@@ -129,12 +129,12 @@ const UserConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal && !!formConfig} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal && !!formConfig} onHide={resetConfig}>
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                    <Modal.Title>{modalTitle}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>

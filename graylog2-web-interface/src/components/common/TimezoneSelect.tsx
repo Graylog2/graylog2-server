@@ -21,6 +21,22 @@ import type { SelectInstance } from 'react-select';
 
 import Select from 'components/common/Select';
 
+const renderOption = (option: { disabled: boolean; value: string; label: string }) => {
+  if (!option.disabled) {
+    return (
+      <span key={option.value} title={option.value}>
+        &nbsp; {option.label}
+      </span>
+    );
+  }
+
+  return (
+    <span key={option.value} title={option.value}>
+      {option.label}
+    </span>
+  );
+};
+
 type TimezoneSelectProps = Omit<
   React.ComponentProps<typeof Select>,
   'inputId' | 'onChange' | 'placeholder' | 'options' | 'optionRenderer'
@@ -56,6 +72,8 @@ class TimezoneSelect extends React.Component<
   // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   _UNCLASSIFIED_AREA = 'Unclassified';
+
+  private timezone: SelectInstance<unknown, boolean>;
 
   getValue = () => this.timezone.getValue();
 
@@ -97,24 +115,6 @@ class TimezoneSelect extends React.Component<
     return labels;
   };
 
-  _renderOption = (option) => {
-    if (!option.disabled) {
-      return (
-        <span key={option.value} title={option.value}>
-          &nbsp; {option.label}
-        </span>
-      );
-    }
-
-    return (
-      <span key={option.value} title={option.value}>
-        {option.label}
-      </span>
-    );
-  };
-
-  private timezone: SelectInstance<unknown, boolean>;
-
   render() {
     const timezones = this._formatTimezones();
     const { onChange, ...otherProps } = this.props;
@@ -129,7 +129,7 @@ class TimezoneSelect extends React.Component<
         onChange={onChange}
         placeholder="Pick a time zone"
         options={timezones}
-        optionRenderer={this._renderOption}
+        optionRenderer={renderOption}
       />
     );
   }

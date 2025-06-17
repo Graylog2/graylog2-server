@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Display error in message list widget when page exceeds search cluster result limit."
+
+issues = ["18947", "20644"]
+pulls = ["22311"]

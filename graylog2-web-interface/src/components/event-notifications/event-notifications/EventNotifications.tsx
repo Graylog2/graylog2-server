@@ -18,7 +18,7 @@ import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer } from 'components/common/router';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import {
   EmptyEntity,
@@ -34,6 +34,7 @@ import {
 } from 'components/common';
 import { Col, DropdownButton, MenuItem, Row, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 
 import styles from './EventNotifications.css';
 
@@ -45,7 +46,7 @@ const renderEmptyContent = () => (
       <EmptyEntity>
         <p>
           Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications to
-          integrate Graylog Alerts with an external alerting system you use.
+          integrate Alerts with an external alerting system you use.
         </p>
         <IfPermitted permissions="eventnotifications:create">
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
@@ -116,12 +117,10 @@ class EventNotifications extends React.Component<
           </Col>
         ) : null;
 
-      const title = <Link to={Routes.ALERTS.NOTIFICATIONS.show(notification.id)}>{notification.title}</Link>;
-
       return (
         <EntityListItem
           key={`event-definition-${notification.id}`}
-          title={title}
+          title={<EventNotificationLink id={notification.id} title={notification.title} />}
           titleSuffix={plugin?.displayName || notification.config.type}
           description={notification.description || <em>No description given</em>}
           actions={actions}

@@ -78,7 +78,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
       '${end}' +
       '${end}\n',
     /* eslint-enable no-template-curly-in-string */
-    user_name: 'Graylog',
+    user_name: 'Username',
     notify_channel: false,
     link_names: false,
     icon_url: '',

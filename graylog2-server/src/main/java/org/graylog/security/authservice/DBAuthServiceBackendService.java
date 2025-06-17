@@ -20,7 +20,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
