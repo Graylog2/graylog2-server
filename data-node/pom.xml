@@ -41,8 +41,6 @@
     <properties>
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
 
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opensearch.version>2.15.0</opensearch.version>
 
