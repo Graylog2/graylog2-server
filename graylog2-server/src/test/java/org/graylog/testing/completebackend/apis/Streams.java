@@ -69,34 +69,33 @@ public final class Streams implements GraylogRestApi {
     }
 
     public String createStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
-        return doCreateStreamWithRefreshWait(title, indexSetId, started, defaultStreamMatches, streamRules);
+        Supplier<String> creationOperation = () -> doCreateStream(title, indexSetId, started, defaultStreamMatches, streamRules);
+        return started ? waitForStreamRouterRefresh(creationOperation) : creationOperation.get();
     }
 
-    private String doCreateStreamWithRefreshWait(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule[] streamRules) {
-        return waitForStreamRouterRefresh(() -> {
-            final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
-            final String streamId = given()
+    private String doCreateStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule[] streamRules) {
+        final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
+        final String streamId = given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(body)
+                .post("/streams")
+                .then()
+                .log().ifError()
+                .statusCode(201)
+                .assertThat().body("stream_id", notNullValue())
+                .extract().body().jsonPath().getString("stream_id");
+
+        if (started) {
+            given()
                     .spec(api.requestSpecification())
                     .when()
-                    .body(body)
-                    .post("/streams")
+                    .post("/streams/" + streamId + "/resume")
                     .then()
                     .log().ifError()
-                    .statusCode(201)
-                    .assertThat().body("stream_id", notNullValue())
-                    .extract().body().jsonPath().getString("stream_id");
-
-            if (started) {
-                given()
-                        .spec(api.requestSpecification())
-                        .when()
-                        .post("/streams/" + streamId + "/resume")
-                        .then()
-                        .log().ifError()
-                        .statusCode(204);
-            }
-            return streamId;
-        });
+                    .statusCode(204);
+        }
+        return streamId;
     }
 
     public void deleteStream(String streamId) {
