@@ -84,7 +84,9 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
 
   const onSave = () => {
     onSaveStreamPipelinesConnection({ streamId, pipelineIds: updatedPipelines.map((p) => p.value) }).then(() => {
-      queryClient.invalidateQueries(['stream', 'pipelines', streamId]);
+      queryClient.invalidateQueries({
+        queryKey: ['stream', 'pipelines', streamId],
+      });
     });
 
     setShowModal(false);

@@ -19,7 +19,6 @@ import { useQuery } from '@tanstack/react-query';
 import { PipelinesPipelines } from '@graylog/server-api';
 
 import type { PipelineType } from 'components/pipelines/types';
-import type FetchError from 'logic/errors/FetchError';
 import { defaultOnError } from 'util/conditional/onError';
 
 import { PIPELINES_QUERY_KEY } from './usePipelines';
@@ -69,18 +68,18 @@ const usePipelinesPaginated = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<PaginatedPipelinesResponse, FetchError>(
-    [...PIPELINES_QUERY_KEY, ...Object.values(params)],
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: [...PIPELINES_QUERY_KEY, ...Object.values(params)],
+
+    queryFn: () =>
       defaultOnError(
         getPaginatedPipelines(params),
         'Loading paginated pipelines failed with status',
         'Could not load  paginated pipelines',
       ),
-    {
-      enabled,
-    },
-  );
+
+    enabled,
+  });
 
   return {
     data: data ?? DEFAULT_DATA,

@@ -24,13 +24,6 @@ import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldT
 
 const urlPrefix = '/system/indices/mappings/remove_profile_from';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -53,9 +46,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
 
   it('should run fetch and display UserNotification', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve({}));
-    const { result } = renderHook(() => useRemoveProfileFromIndexMutation(), {
-      queryClientOptions: { logger },
-    });
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 
     act(() => {
       result.current.removeProfileFromIndex(requestBody);
@@ -71,9 +62,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
   it('should display notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result } = renderHook(() => useRemoveProfileFromIndexMutation(), {
-      queryClientOptions: { logger },
-    });
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 
     act(() => {
       result.current.removeProfileFromIndex(requestBody).catch(() => {});
