@@ -49,7 +49,6 @@ const DataAdapterPicker = ({ dataAdapters = [] }: Props) => {
           placeholder="Select a data adapter"
           clearable={false}
           options={sortedAdapters}
-          matchProp="label"
           onBlur={() => setTouched(true)}
           onChange={setValue}
           value={value}

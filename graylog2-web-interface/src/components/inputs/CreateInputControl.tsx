@@ -132,7 +132,6 @@ const CreateInputControl = () => {
             <Select
               placeholder="Select input"
               options={formatSelectOptions()}
-              matchProp="label"
               onChange={onInputSelect}
               value={selectedInput}
             />

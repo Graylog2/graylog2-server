@@ -352,7 +352,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
             <StyledSelect
               placeholder={selectPlaceholder}
               options={getAvailableSelectOptions()}
-              matchProp="label"
               value={getActiveSelection()}
               onChange={_onSelect}
               clearable={false}

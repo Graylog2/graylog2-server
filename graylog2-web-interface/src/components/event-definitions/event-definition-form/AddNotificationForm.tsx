@@ -148,7 +148,6 @@ class AddNotificationForm extends React.Component<
               <ControlLabel>Choose Notification</ControlLabel>
               <Select
                 id="notification-select"
-                matchProp="label"
                 placeholder="Select Notification"
                 onChange={this.handleSelectNotificationChange}
                 options={this.formatNotifications(notifications)}

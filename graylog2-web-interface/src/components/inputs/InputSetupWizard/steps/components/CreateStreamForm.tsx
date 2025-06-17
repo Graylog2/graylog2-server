@@ -134,7 +134,7 @@ const CreateStreamForm = ({
             id="create_new_pipeline"
             type="checkbox"
           />
-          <SubHeadline>Selet Index Set</SubHeadline>
+          <SubHeadline>Select Index Set</SubHeadline>
           <SelectedIndexSetAlert indexSets={indexSets} selectedIndexSetId={values.index_set_id} />
           <IndexSetInfoText>
             Messages that match this stream will be written to the configured Index Set. Index Sets are used to
