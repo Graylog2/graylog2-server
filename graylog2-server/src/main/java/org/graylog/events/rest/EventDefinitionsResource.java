@@ -268,11 +268,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Get multiple event definitions by id")
     @NoAuditEvent("Bulk retrieval, no data is changed.")
     public List<EventDefinitionDto> getById(@ApiParam(name = "JSON body") @Valid GetByIdRequest request) {
-        for (String id : request.eventDefinitionIds()) {
-            checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, id);
-        }
+        final Set<String> permittedIds = request.eventDefinitionIds().stream()
+                .filter(id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id))
+                .collect(Collectors.toSet());
 
-        return dbService.getByIds(request.eventDefinitionIds());
+        return dbService.getByIds(permittedIds);
     }
 
     @POST
