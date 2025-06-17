@@ -73,7 +73,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Documentation("Initial role for the Datanode. If not set, the default role is opensearch.")
     @Parameter("initial_datanode_role")
-    private String iniitialDataNodeRole = DATANODE_ROLE_OPENSEARCH;
+    private String initialDataNodeRole = DATANODE_ROLE_OPENSEARCH;
 
     @Documentation(visible = false)
     @Parameter(value = "installation_source", validators = StringNotBlankValidator.class)
@@ -371,7 +371,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     }
 
     public List<String> getDataNodeRoles() {
-        return List.of(iniitialDataNodeRole);
+        return List.of(initialDataNodeRole);
     }
 
     /**
