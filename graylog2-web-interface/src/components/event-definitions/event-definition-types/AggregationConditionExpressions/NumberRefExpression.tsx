@@ -36,7 +36,6 @@ type NumberRefExpressionProps = {
   onChange: (...args: any[]) => void;
   renderLabel: boolean;
   validation?: any;
-  parent?: any;
 };
 
 const NumberRefExpression = ({
