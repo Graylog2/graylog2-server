@@ -19,7 +19,7 @@ import React from 'react';
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { GraylogClusterOverview } from 'components/cluster';
+import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import PluginList from 'components/enterprise/PluginList';
 import EnterpriseProductLink from 'components/enterprise/EnterpriseProductLink';
 import HideOnCloud from 'util/conditional/HideOnCloud';

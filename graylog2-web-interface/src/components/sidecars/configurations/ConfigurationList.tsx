@@ -30,7 +30,7 @@ const _headerCellFormatter = (header) => {
   return <th className={className}>{header}</th>;
 };
 
-type ConfigurationListProps = {
+type Props = {
   collectors: any[];
   configurations: any[];
   pagination: any;
@@ -43,12 +43,9 @@ type ConfigurationListProps = {
   validateConfiguration: (...args: any[]) => void;
 };
 
-class ConfigurationList extends React.Component<
-  ConfigurationListProps,
-  {
-    [key: string]: any;
-  }
-> {
+class ConfigurationList extends React.Component<Props> {
+  private openModal: () => void;
+
   _collectorConfigurationFormatter = (configuration) => {
     const { collectors, onClone, onDelete, validateConfiguration } = this.props;
     const configurationCollector = collectors.find((collector) => collector.id === configuration.collector_id);
@@ -64,8 +61,6 @@ class ConfigurationList extends React.Component<
       />
     );
   };
-
-  private openModal: () => void;
 
   render() {
     const { configurations, pagination, query, total, onPageChange, onQueryChange } = this.props;

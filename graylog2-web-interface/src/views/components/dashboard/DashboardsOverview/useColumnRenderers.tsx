@@ -35,7 +35,7 @@ const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; d
       grn={createGRN('dashboard', dashboardId)}
       onChange={(newValue) => {
         queryClient.setQueriesData(
-          ['dashboards', 'overview', searchParams],
+          { queryKey: ['dashboards', 'overview', searchParams] },
           (cur: { list: Readonly<Array<View>>; pagination: { total: number } }) => ({
             ...cur,
             list: cur.list.map((view) => {

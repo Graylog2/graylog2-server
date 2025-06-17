@@ -29,7 +29,7 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.floating;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
-public class DoubleConversion extends AbstractFunction<Double> {
+public class DoubleConversion extends AbstractConversion<Double> {
 
     public static final String NAME = "to_double";
 
@@ -49,7 +49,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
         final Double defaultValue = defaultParam.optional(args, context).orElse(0d);
 
         if (evaluated == null) {
-            return defaultValue;
+            return defaultToNull(args, context) ? null : defaultValue;
         } else if (evaluated instanceof Number) {
             return ((Number) evaluated).doubleValue();
         } else {
@@ -65,7 +65,8 @@ public class DoubleConversion extends AbstractFunction<Double> {
                 .returnType(Double.class)
                 .params(of(
                         valueParam,
-                        defaultParam
+                        defaultParam,
+                        defaultToNullParam
                 ))
                 .description("Converts a value to a double value using its string representation")
                 .ruleBuilderEnabled()

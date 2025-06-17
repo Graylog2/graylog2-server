@@ -24,7 +24,9 @@ const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
     data: dataLake,
     isError,
     isLoading,
-  } = useQuery(['stream', 'data-lake', streamId], () => fetchStreamDataLake(streamId), {
+  } = useQuery({
+    queryKey: ['stream', 'data-lake', streamId],
+    queryFn: () => fetchStreamDataLake(streamId),
     enabled: fetchStreamDataLake && enabled,
   });
 
