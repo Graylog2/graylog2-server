@@ -25,5 +25,8 @@ then
         with_spaces: url.queryParams.with_spaces,
         equal: url.queryParams.equal
     });
+    set_field("default_specified", to_url(url: $message.not_there, default:"http://example.com/"));
+    set_field("default_null", to_url(url: $message.not_there)); // Null
+    set_field("invalid_default_specified", to_url(url: $message.not_there, default:"not-a-url")); // Throw pipeline error
     trigger_test();
 end
