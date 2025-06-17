@@ -134,7 +134,7 @@ public class EntitySharesService {
         requireNonNull(sharingUser, "sharingUser cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
-        EntityShareRequest shareRequest = EntityShareRequest.create(selectedCapabilities, null);
+        EntityShareRequest shareRequest = EntityShareRequest.create(selectedCapabilities);
         Map<GRN, Collection<EntityDescriptor>> missingPermissions = missingPermissions(shareRequest.grantees(), entityGRNs, sharingUserGRN);
 
         Set<Grantee> modifiableGrantees = new HashSet<>();
@@ -382,9 +382,7 @@ public class EntitySharesService {
         EntityShareRequest shareRequest = EntityShareRequest.create(
                 existingGrants.stream()
                         .filter(grant -> modifiableGranteeGRNs.contains(grant.grantee()))
-                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability)),
-                null
-        );
+                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability)));
 
         return updateEntityShares(grnClone, shareRequest, sharingUser);
     }

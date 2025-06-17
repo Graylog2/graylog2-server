@@ -17,10 +17,12 @@
 package org.graylog.security.shares;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 
 import java.util.Set;
 
+@Singleton
 public class EntityCreationRequestService {
     Set<CollectionRequestHandler> collectionRequestHandlers;
 
