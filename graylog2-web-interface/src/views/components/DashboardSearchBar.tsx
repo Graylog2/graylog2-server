@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import { Spinner } from 'components/common';
-import ScrollToHint from 'views/components/ScrollToHint';
+import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
