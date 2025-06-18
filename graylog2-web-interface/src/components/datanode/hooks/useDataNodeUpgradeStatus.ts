@@ -125,19 +125,19 @@ const useDataNodeUpgradeStatus = (): {
   isInitialLoading: boolean;
   error: any;
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery(
-    ['datanode-upgrade-status'],
-    () =>
+  const { data, refetch, isInitialLoading, error } = useQuery({
+    queryKey: ['datanode-upgrade-status'],
+
+    queryFn: () =>
       defaultOnError(
         fetchDataNodeUpgradeStatus(),
         'Loading Data Node upgrade status failed',
         'Could not load Data Node upgrade status',
       ),
-    {
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
-    },
-  );
+
+    notifyOnChangeProps: ['data', 'error'],
+    refetchInterval: 5000,
+  });
 
   return {
     data,
