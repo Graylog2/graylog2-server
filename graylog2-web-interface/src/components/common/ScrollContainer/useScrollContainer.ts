@@ -14,24 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useEffect, useRef } from 'react';
+import { useContext } from 'react';
 
-import UIUtils from 'util/UIUtils';
+import ScrollContainerContext from './ScrollContainerContext';
 
-type Props = {
-  children: React.ReactNode;
-  value: any;
+const useScrollContainer = () => {
+  const contextValue = useContext(ScrollContainerContext);
+
+  if (!contextValue) {
+    throw new Error('useScrollContainer hook needs to be used inside ScrollContainerContext.Provider');
+  }
+
+  return contextValue;
 };
 
-const ScrollToHint = ({ children, value }: Props) => {
-  const spanRef = useRef();
-
-  useEffect(() => {
-    UIUtils.scrollToHint(spanRef.current);
-  }, [value]);
-
-  return <span ref={spanRef}>{children}</span>;
-};
-
-export default ScrollToHint;
+export default useScrollContainer;

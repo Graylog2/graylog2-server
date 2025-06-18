@@ -17,11 +17,13 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
+import { useRef } from 'react';
 
 import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 import useFooterCustomization from 'brand-customization/useFooterCustomization';
+import ScrollContainerProvider from 'components/common/ScrollContainer/ScrollContainerProvider';
 
 type Props = React.PropsWithChildren<{
   className?: string;
@@ -58,16 +60,19 @@ const PageContentLayout = ({
   FooterComponent = Footer,
   NotificationsComponent = WithGlobalAppNotifications,
 }: Props) => {
+  const containerRef = useRef();
   const { enabled } = useFooterCustomization();
 
   return (
-    <Container className={className}>
-      <NotificationsComponent>
-        <StyledGrid fluid className="page-content-grid">
-          {children || <Outlet />}
-        </StyledGrid>
-        <>{enabled && <FooterComponent />}</>
-      </NotificationsComponent>
+    <Container className={className} ref={containerRef}>
+      <ScrollContainerProvider container={containerRef}>
+        <NotificationsComponent>
+          <StyledGrid fluid className="page-content-grid">
+            {children || <Outlet />}
+          </StyledGrid>
+          <>{enabled && <FooterComponent />}</>
+        </NotificationsComponent>
+      </ScrollContainerProvider>
     </Container>
   );
 };
