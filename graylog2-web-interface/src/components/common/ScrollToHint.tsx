@@ -23,22 +23,20 @@ import useScrollContainer from 'components/common/ScrollContainer/useScrollConta
 import Icon from 'components/common/Icon';
 
 const HINT_VISIBILITY_DURATION_MS = 2000;
+const HINT_WIDTH_PX = 200;
 
-const ScrollHint = styled.div(
+const ScrollHint = styled.button(
   ({ theme }) => css`
     position: fixed;
-    left: 50%;
-    margin-left: -125px;
+    left: calc(50% - ${HINT_WIDTH_PX / 2}px);
     top: 50px;
-    /* stylelint-disable function-no-unknown */
     color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
-    font-size: 80px;
-    padding: 25px;
+    font-size: ${theme.fonts.size.huge};
+    padding: 20px;
     z-index: 2000;
-    width: 200px;
-    text-align: center;
-    cursor: pointer;
+    width: ${HINT_WIDTH_PX}px;
     border-radius: 10px;
+    border: 0;
     background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
   `,
 );
@@ -98,6 +96,7 @@ const ScrollToHint = ({ triggerDependency }: Props) => {
       {showHint && (
         <ScrollHint
           onClick={scrollToTarget}
+          aria-label="Scroll to search bar"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}>
           <Icon name="arrow_upward" />
