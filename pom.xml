@@ -86,6 +86,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
+        <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
+        <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
+
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
@@ -1230,6 +1233,10 @@
                       <artifactId>maven-deploy-plugin</artifactId>
                       <configuration>
                         <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                        <!-- We use a local repository for deployment because we handle Maven Central deployments
+                             separately in a later step of the release process. -->
+                        <altDeploymentRepository>local::file://${local.repo.path}</altDeploymentRepository>
+                        <deployAtEnd>true</deployAtEnd>
                       </configuration>
                     </plugin>
                 </plugins>
