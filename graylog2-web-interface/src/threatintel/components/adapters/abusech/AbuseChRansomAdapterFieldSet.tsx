@@ -76,7 +76,6 @@ class AbuseChRansomAdapterFieldSet extends React.Component<
             placeholder="Select the type of blocklist"
             clearable={false}
             options={blocklistTypes}
-            matchProp="label"
             onChange={this._onBlocklistTypeSelect}
             value={config.blocklist_type}
           />
