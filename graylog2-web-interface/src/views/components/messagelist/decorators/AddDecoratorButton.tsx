@@ -141,7 +141,6 @@ class AddDecoratorButton extends React.Component<Props, State> {
               placeholder="Select decorator"
               onChange={this._onTypeChange}
               options={decoratorTypeOptions}
-              matchProp="label"
               disabled={disabled}
               value={typeName}
             />
