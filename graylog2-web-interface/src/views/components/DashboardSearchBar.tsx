@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import { Spinner } from 'components/common';
-import ScrollToHint from 'components/common/ScrollToHint';
+import ScrollToHint from 'views/components/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
@@ -119,7 +119,11 @@ const useInitialFormValues = (timerange: TimeRange, queryString: string) => {
   );
 };
 
-const DashboardSearchBar = () => {
+type Props = {
+  scrollContainer: React.RefObject<HTMLDivElement>;
+};
+
+const DashboardSearchBar = ({ scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const { userTimezone } = useUserDateTime();
@@ -155,7 +159,7 @@ const DashboardSearchBar = () => {
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <FormWarningsProvider>
-          <ScrollToHint triggerDependency={queryString} />
+          <ScrollToHint triggerDependency={queryString} scrollContainer={scrollContainer} />
           <DashboardSearchForm
             initialValues={initialValues}
             limitDuration={limitDuration}

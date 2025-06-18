@@ -19,7 +19,6 @@ import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-import useScrollContainer from 'components/common/ScrollContainer/useScrollContainer';
 import Icon from 'components/common/Icon';
 
 const HINT_VISIBILITY_DURATION_MS = 2000;
@@ -41,20 +40,20 @@ const ScrollHint = styled.button(
   `,
 );
 
-const isElementVisibleInContainer = (target: HTMLElement, container: HTMLElement) => {
-  const containerRect = container.getBoundingClientRect();
+const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLElement) => {
+  const containerRect = scrollContainer.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
 
   return targetRect.top >= containerRect.top && targetRect.bottom <= containerRect.bottom;
 };
 
 type Props = {
+  scrollContainer: React.RefObject<HTMLDivElement>;
   // When the dependency changes, the hint will be displayed if this component is not visible.
   triggerDependency: unknown;
 };
 
-const ScrollToHint = ({ triggerDependency }: Props) => {
-  const { container } = useScrollContainer();
+const ScrollToHint = ({ triggerDependency, scrollContainer }: Props) => {
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -64,12 +63,12 @@ const ScrollToHint = ({ triggerDependency }: Props) => {
   useEffect(() => {
     if (
       scrollTargetRef.current &&
-      container.current &&
-      !isElementVisibleInContainer(scrollTargetRef.current, container.current)
+      scrollContainer.current &&
+      !isElementVisibleInContainer(scrollTargetRef.current, scrollContainer.current)
     ) {
       setShowHint(true);
     }
-  }, [triggerDependency, setShowHint, container]);
+  }, [triggerDependency, setShowHint, scrollContainer]);
 
   // hide the hint automatically
   useEffect(() => {
