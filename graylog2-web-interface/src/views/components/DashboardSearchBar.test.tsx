@@ -34,6 +34,9 @@ jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useAutoRefresh');
+jest.mock('components/common/ScrollContainer/useScrollContainer', () => () => ({
+  container: {},
+}));
 
 jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
   data: 'PT1S',

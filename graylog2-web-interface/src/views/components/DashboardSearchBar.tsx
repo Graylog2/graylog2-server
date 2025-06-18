@@ -154,94 +154,93 @@ const DashboardSearchBar = () => {
   return (
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
-        <ScrollToHint triggerDependency={queryString}>
-          <FormWarningsProvider>
-            <DashboardSearchForm
-              initialValues={initialValues}
-              limitDuration={limitDuration}
-              onSubmit={submitForm}
-              validateQueryString={(values) =>
-                _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
-              }>
-              {({
-                dirty,
-                errors,
-                isSubmitting,
-                isValid,
-                isValidating,
-                handleSubmit,
-                values,
-                setFieldValue,
-                validateForm,
-              }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
+        <FormWarningsProvider>
+          <ScrollToHint triggerDependency={queryString} />
+          <DashboardSearchForm
+            initialValues={initialValues}
+            limitDuration={limitDuration}
+            onSubmit={submitForm}
+            validateQueryString={(values) =>
+              _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
+            }>
+            {({
+              dirty,
+              errors,
+              isSubmitting,
+              isValid,
+              isValidating,
+              handleSubmit,
+              values,
+              setFieldValue,
+              validateForm,
+            }) => {
+              const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
-                return (
-                  <SearchBarContainer>
-                    <ValidateOnParameterChange parameters={parameters} />
-                    <TimeRangeRow>
-                      <StyledTimeRangeFilter
-                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                        value={values?.timerange}
-                        limitDuration={limitDuration}
-                        hasErrorOnMount={!!errors.timerange}
-                        noOverride
+              return (
+                <SearchBarContainer>
+                  <ValidateOnParameterChange parameters={parameters} />
+                  <TimeRangeRow>
+                    <StyledTimeRangeFilter
+                      onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                      value={values?.timerange}
+                      limitDuration={limitDuration}
+                      hasErrorOnMount={!!errors.timerange}
+                      noOverride
+                    />
+                    <ViewsRefreshControls disable={!isValid} />
+                  </TimeRangeRow>
+
+                  <SearchQueryRow>
+                    <SearchButtonAndQuery>
+                      <SearchButton
+                        disabled={disableSearchSubmit}
+                        glyph="filter_alt"
+                        displaySpinner={isSubmitting || isLoadingExecution}
+                        dirty={dirty}
                       />
-                      <ViewsRefreshControls disable={!isValid} />
-                    </TimeRangeRow>
+                      <SearchInputAndValidationContainer>
+                        <Field name="queryString">
+                          {({ field: { name, value, onChange }, meta: { error } }) => (
+                            <FormWarningsContext.Consumer>
+                              {({ warnings }) => (
+                                <PluggableCommands usage="global_override_query">
+                                  {(customCommands) => (
+                                    <ViewsQueryInput
+                                      value={value}
+                                      view={view}
+                                      timeRange={values?.timerange}
+                                      placeholder="Apply filter to all widgets"
+                                      name={name}
+                                      onChange={onChange}
+                                      disableExecution={disableSearchSubmit}
+                                      error={error}
+                                      isValidating={isValidating}
+                                      validate={validateForm}
+                                      warning={warnings.queryString}
+                                      ref={editorRef}
+                                      onExecute={handleSubmit as () => void}
+                                      commands={customCommands}
+                                    />
+                                  )}
+                                </PluggableCommands>
+                              )}
+                            </FormWarningsContext.Consumer>
+                          )}
+                        </Field>
 
-                    <SearchQueryRow>
-                      <SearchButtonAndQuery>
-                        <SearchButton
-                          disabled={disableSearchSubmit}
-                          glyph="filter_alt"
-                          displaySpinner={isSubmitting || isLoadingExecution}
-                          dirty={dirty}
-                        />
-                        <SearchInputAndValidationContainer>
-                          <Field name="queryString">
-                            {({ field: { name, value, onChange }, meta: { error } }) => (
-                              <FormWarningsContext.Consumer>
-                                {({ warnings }) => (
-                                  <PluggableCommands usage="global_override_query">
-                                    {(customCommands) => (
-                                      <ViewsQueryInput
-                                        value={value}
-                                        view={view}
-                                        timeRange={values?.timerange}
-                                        placeholder="Apply filter to all widgets"
-                                        name={name}
-                                        onChange={onChange}
-                                        disableExecution={disableSearchSubmit}
-                                        error={error}
-                                        isValidating={isValidating}
-                                        validate={validateForm}
-                                        warning={warnings.queryString}
-                                        ref={editorRef}
-                                        onExecute={handleSubmit as () => void}
-                                        commands={customCommands}
-                                      />
-                                    )}
-                                  </PluggableCommands>
-                                )}
-                              </FormWarningsContext.Consumer>
-                            )}
-                          </Field>
+                        <QueryValidation />
+                        <QueryHistoryButton editorRef={editorRef} />
+                      </SearchInputAndValidationContainer>
+                    </SearchButtonAndQuery>
 
-                          <QueryValidation />
-                          <QueryHistoryButton editorRef={editorRef} />
-                        </SearchInputAndValidationContainer>
-                      </SearchButtonAndQuery>
-
-                      {!editing && <DashboardActionsMenu />}
-                    </SearchQueryRow>
-                    <PluggableSearchBarControls showLeftControls={false} />
-                  </SearchBarContainer>
-                );
-              }}
-            </DashboardSearchForm>
-          </FormWarningsProvider>
-        </ScrollToHint>
+                    {!editing && <DashboardActionsMenu />}
+                  </SearchQueryRow>
+                  <PluggableSearchBarControls showLeftControls={false} />
+                </SearchBarContainer>
+              );
+            }}
+          </DashboardSearchForm>
+        </FormWarningsProvider>
       )}
     </WidgetFocusContext.Consumer>
   );

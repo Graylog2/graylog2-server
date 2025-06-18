@@ -39,6 +39,10 @@ jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Action
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/hooks/useAutoRefresh');
 
+jest.mock('components/common/ScrollContainer/useScrollContainer', () => () => ({
+  container: {},
+}));
+
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () =>
   jest.fn(() =>
     Promise.resolve({
