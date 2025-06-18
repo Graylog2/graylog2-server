@@ -22,7 +22,7 @@ import chroma from 'chroma-js';
 import useScrollContainer from 'components/common/ScrollContainer/useScrollContainer';
 import Icon from 'components/common/Icon';
 
-const HINT_VISIBILITY_MS = 2000;
+const HINT_VISIBILITY_DURATION_MS = 2000;
 
 const ScrollHint = styled.div(
   ({ theme }) => css`
@@ -59,6 +59,8 @@ const ScrollToHint = ({ triggerDependency }: Props) => {
   const { container } = useScrollContainer();
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const timeoutRef = useRef(null);
 
   // show the scroll hint if necessary
   useEffect(() => {
@@ -73,12 +75,18 @@ const ScrollToHint = ({ triggerDependency }: Props) => {
 
   // hide the hint automatically
   useEffect(() => {
-    const timeout = setTimeout(() => setShowHint(false), HINT_VISIBILITY_MS);
+    if (showHint && !isHovered) {
+      timeoutRef.current = setTimeout(() => setShowHint(false), HINT_VISIBILITY_DURATION_MS);
+    }
 
-    return () => clearTimeout(timeout);
-  }, [showHint]);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [showHint, isHovered]);
 
   const scrollToTarget = () => {
+    setShowHint(false);
+    setIsHovered(false);
     if (scrollTargetRef.current) {
       scrollTargetRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -88,7 +96,10 @@ const ScrollToHint = ({ triggerDependency }: Props) => {
     <>
       <div ref={scrollTargetRef} />
       {showHint && (
-        <ScrollHint onClick={scrollToTarget}>
+        <ScrollHint
+          onClick={scrollToTarget}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
           <Icon name="arrow_upward" />
         </ScrollHint>
       )}
