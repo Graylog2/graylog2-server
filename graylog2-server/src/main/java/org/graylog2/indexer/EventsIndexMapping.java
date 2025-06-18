@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
 
-public abstract class EventsIndexMapping implements IndexMappingTemplate {
+public abstract class EventsIndexMapping extends IndexMapping {
     @Override
     public Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order) {
         final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
@@ -133,12 +133,9 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                 .put("origin_context", map()
                         .put("type", "keyword")
                         .build())
-                .put("timestamp", map()
-                        .put("type", "date")
-                        // Use the same format we use for the "message" mapping to make sure we
-                        // can use the search.
-                        .put("format", dateFormat())
-                        .build())
+                // Use the same format we use for the "message" mapping to make sure we
+                // can use the search.
+                .put(timestampField())
                 .put("timestamp_processing", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
@@ -238,9 +235,5 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
 
     protected ImmutableList.Builder<Object> list() {
         return ImmutableList.builder();
-    }
-
-    protected String dateFormat() {
-        return Constants.ES_DATE_FORMAT;
     }
 }

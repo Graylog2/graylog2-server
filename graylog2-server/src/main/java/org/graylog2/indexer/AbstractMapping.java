@@ -24,6 +24,6 @@ public abstract class AbstractMapping implements IndexMappingTemplate {
     }
 
     protected String dateFormat() {
-        return ConstantsES7.ES_DATE_FORMAT;
+        return Constants.ES_DATE_FORMAT;
     }
 }
