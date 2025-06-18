@@ -243,7 +243,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("{definitionId}")
     @ApiOperation("Get an event definition")
     public EventDefinitionDto get(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
-        checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
+        if (!isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, definitionId)) {
+            return null;
+        }
         return dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
