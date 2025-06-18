@@ -18,10 +18,16 @@ package org.graylog.aws.inputs.cloudtrail.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CloudTrailSessionContext {
-    @JsonProperty("attributes")
-    public CloudTrailSessionContextAttributes attributes;
-    @JsonProperty("sessionIssuer")
-    public CloudTrialSessionContextIssuer sessionIssuer;
+public class CloudTrialSessionContextIssuer {
+    @JsonProperty("type")
+    public String type;
+    @JsonProperty("principalId")
+    public String principalId;
+    @JsonProperty("arn")
+    public String arn;
+    @JsonProperty("accountId")
+    public String accountId;
+    @JsonProperty("userName")
+    public String userName;
 
 }
