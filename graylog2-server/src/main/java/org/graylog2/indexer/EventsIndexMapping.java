@@ -228,12 +228,4 @@ public abstract class EventsIndexMapping extends IndexMapping {
                         .build())
                 .build();
     }
-
-    protected ImmutableMap.Builder<String, Object> map() {
-        return ImmutableMap.builder();
-    }
-
-    protected ImmutableList.Builder<Object> list() {
-        return ImmutableList.builder();
-    }
 }
