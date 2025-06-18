@@ -27,9 +27,11 @@ import { useStore } from 'stores/connect';
 const ProcessBufferDumpPage = () => {
   const { nodeId } = useParams<{ nodeId: string }>();
   const { nodes } = useStore(NodesStore);
-  const { data: processbufferDump } = useQuery(['processBufferDump', nodeId], () =>
-    ClusterOverviewStore.processbufferDump(nodeId),
-  );
+  const { data: processbufferDump } = useQuery({
+    queryKey: ['processBufferDump', nodeId],
+
+    queryFn: () => ClusterOverviewStore.processbufferDump(nodeId),
+  });
 
   const node = nodes?.[nodeId];
 

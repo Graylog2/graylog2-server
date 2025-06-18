@@ -201,7 +201,9 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
-  const isValidatingQuery = !!useIsFetching(['validateSearchQuery']);
+  const isValidatingQuery = !!useIsFetching({
+    queryKey: ['validateSearchQuery'],
+  });
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;

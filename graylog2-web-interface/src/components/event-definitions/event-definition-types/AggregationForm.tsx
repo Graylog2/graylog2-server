@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import defaultTo from 'lodash/defaultTo';
 
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
@@ -107,11 +106,10 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
             </ControlLabel>
             <MultiSelect
               id="group-by"
-              matchProp="label"
               onChange={handleGroupByChange}
               options={formattedFields}
               ignoreAccents={false}
-              value={defaultTo(eventDefinition.config.group_by, []).join(',')}
+              value={(eventDefinition.config.group_by ?? []).join(',')}
               allowCreate
             />
             <HelpBlock>

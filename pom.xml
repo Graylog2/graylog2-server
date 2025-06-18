@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -85,6 +85,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
+
+        <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
+        <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
@@ -180,7 +183,7 @@
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
         <zstd.version>1.5.7-3</zstd.version>
@@ -1230,6 +1233,10 @@
                       <artifactId>maven-deploy-plugin</artifactId>
                       <configuration>
                         <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                        <!-- We use a local repository for deployment because we handle Maven Central deployments
+                             separately in a later step of the release process. -->
+                        <altDeploymentRepository>local::file://${local.repo.path}</altDeploymentRepository>
+                        <deployAtEnd>true</deployAtEnd>
                       </configuration>
                     </plugin>
                 </plugins>

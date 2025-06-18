@@ -120,7 +120,6 @@ const MaxmindAdapterFieldSet = ({
           placeholder="Select the type of database file"
           clearable={false}
           options={databaseTypes}
-          matchProp="label"
           onChange={onDbTypeSelect}
           value={config.database_type}
         />
