@@ -41,7 +41,7 @@ export type LayoutState = {
     share: { isShown: boolean };
     actionsDropdown: { isShown: boolean };
   };
-  searchAreaContainer?: { component: React.ComponentType };
+  searchAreaContainer?: { component: React.ForwardRefExoticComponent<React.RefAttributes<HTMLDivElement>> };
   infoBar?: { component: React.ComponentType };
   synchronizeUrl?: boolean;
 };

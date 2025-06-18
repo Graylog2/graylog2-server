@@ -30,7 +30,7 @@ import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
-import ScrollToHint from 'components/common/ScrollToHint';
+import ScrollToHint from 'views/components/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
@@ -167,9 +167,10 @@ type Props = {
     query: Query,
     restartAutoRefresh: () => void,
   ) => Promise<any>;
+  scrollContainer: React.RefObject<HTMLDivElement>;
 };
 
-const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
+const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const availableStreams = useStore(StreamsStore, ({ streams }) =>
@@ -218,7 +219,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <FormWarningsProvider>
-          <ScrollToHint triggerDependency={query.query_string} />
+          <ScrollToHint scrollContainer={scrollContainer} triggerDependency={query.query_string} />
           <SearchBarForm
             initialValues={initialValues}
             limitDuration={limitDuration}
