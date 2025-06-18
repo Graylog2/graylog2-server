@@ -53,17 +53,17 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
 
     public IpfixAggregator() {
         this.templateCache = CacheBuilder.newBuilder()
-                                         .maximumSize(5000)
-                                         .removalListener(notification -> LOG.debug("Removed [{}] from template cache for reason [{}]", notification.getKey(), notification.getCause()))
-                                         .recordStats()
-                                         .build();
+                .maximumSize(5000)
+                .removalListener(notification -> LOG.debug("Removed [{}] from template cache for reason [{}]", notification.getKey(), notification.getCause()))
+                .recordStats()
+                .build();
         this.packetCache = CacheBuilder.newBuilder()
-                                       .expireAfterWrite(1, TimeUnit.MINUTES)
-                                       .maximumWeight(Size.megabytes(1).toBytes())
-                                       .removalListener((RemovalListener<TemplateKey, Queue<ShallowDataSet>>) notification -> LOG.debug("Removed [{}] from packet cache for reason [{}]", notification.getKey(), notification.getCause()))
-                                       .weigher((key, value) -> value.stream().map(shallowDataSet -> shallowDataSet.content().length).reduce(0, Integer::sum))
-                                       .recordStats()
-                                       .build();
+                .expireAfterWrite(1, TimeUnit.MINUTES)
+                .maximumWeight(Size.megabytes(1).toBytes())
+                .removalListener((RemovalListener<TemplateKey, Queue<ShallowDataSet>>) notification -> LOG.debug("Removed [{}] from packet cache for reason [{}]", notification.getKey(), notification.getCause()))
+                .weigher((key, value) -> value.stream().map(shallowDataSet -> shallowDataSet.content().length).reduce(0, Integer::sum))
+                .recordStats()
+                .build();
     }
 
     @Nonnull
@@ -123,7 +123,7 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
 
             // if we have buffered this packet, don't try to process it now. we still need all the templates for it
             if (packetBuffered) {
-                LOG.debug("Packet has been buffered and will not be processed now, returning result.");
+                LOG.debug("Packet has been buffered until templates are received. Buffer size [{}].", packetCache.size());
                 return new Result(null, true);
             }
 
@@ -158,10 +158,10 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
         LOG.debug("IPFIX data set has been processed for the same template id, adding data set to IPFIX journal.");
         for (ShallowDataSet dataSet : packetsToSendCollection) {
             journalBuilder.addDataSets(IpfixJournal.DataSet.newBuilder()
-                                                           .setTemplateId(dataSet.templateId())
-                                                           .setTimestampEpochSeconds(dataSet.epochSeconds())
-                                                           .setDataRecords(ByteString.copyFrom(dataSet.content()))
-                                                           .build());
+                    .setTemplateId(dataSet.templateId())
+                    .setTimestampEpochSeconds(dataSet.epochSeconds())
+                    .setDataRecords(ByteString.copyFrom(dataSet.content()))
+                    .build());
         }
     }
 
@@ -212,7 +212,7 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
         for (Integer templateId : messageDescription.declaredTemplateIds()) {
             final TemplateKey templateKey = new TemplateKey(remoteAddress, observationDomainId, templateId);
             LOG.debug("Created template key with remote address [{}], observation domain ID [{}] and " +
-                      "template ID [{}].", templateKey.getRemoteAddress(), templateKey.getObservationDomainId(), templateKey.getTemplateId());
+                    "template ID [{}].", templateKey.getRemoteAddress(), templateKey.getObservationDomainId(), templateKey.getTemplateId());
 
             templateCache.put(templateKey, messageDescription.getTemplateRecord(templateId));
             LOG.debug("Saving templates key (raw bytes) in template cache to combine in new message later.");
