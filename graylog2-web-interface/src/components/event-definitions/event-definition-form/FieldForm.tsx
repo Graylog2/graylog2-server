@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 
 import { Select, HoverForHelp } from 'components/common';
@@ -51,7 +50,7 @@ const getProviderPlugin = (type) => {
   return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type);
 };
 
-const getConfigProviderType = (config, defaultValue?) => get(config, 'providers[0].type', defaultValue);
+const getConfigProviderType = (config, defaultValue?) => config?.providers?.[0]?.type ?? defaultValue;
 
 const formatFieldValueProviders = () =>
   PluginStore.exports('fieldValueProviders').map((type) => ({ label: type.displayName, value: type.type }));
@@ -105,7 +104,7 @@ class FieldForm extends React.Component<
     }
 
     requiredFields.forEach((requiredField) => {
-      if (!get(this.state, requiredField)) {
+      if (!this.state.requiredField) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
@@ -115,7 +114,7 @@ class FieldForm extends React.Component<
     }
 
     pluginRequiredFields.forEach((requiredField) => {
-      if (!get(config, `providers[0].${requiredField}`)) {
+      if (!config?.providers?.[0]?.[requiredField]) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
@@ -299,7 +298,6 @@ class FieldForm extends React.Component<
               onChange={this.handleProviderTypeChange}
               options={formatFieldValueProviders()}
               value={getConfigProviderType(config, '')}
-              matchProp="label"
               required
             />
             <HelpBlock>
