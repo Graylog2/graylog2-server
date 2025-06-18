@@ -185,14 +185,16 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
                     bufferedTemplateIdList.add(previousPacket.templateId());
                     addedPackets++;
                 } else {
-                    LOG.debug("Packet contains unknown template id, adding to temporary queue.");
+                    LOG.debug("Packet contains unknown template id, adding to temporary queue.  Temporary queue size [{}].",
+                            tempQueue.size() );
                     tempQueue.add(previousPacket);
                 }
             }
             LOG.debug("Processing [{}] previously buffered packets, [{}] packets require more templates.", addedPackets, tempQueue.size());
             // if we couldn't process some of the buffered packets, add them back to the queue to wait for more templates to come in
             if (!tempQueue.isEmpty()) {
-                LOG.debug("Buffered packets could not be processed, adding to temporary queue to wait for more templates.");
+                LOG.debug("Buffered packets could not be processed, adding to temporary queue to wait for more templates. Temporary queue size [{}].",
+                        tempQueue.size());
                 bufferedPackets.addAll(tempQueue);
             }
         }
