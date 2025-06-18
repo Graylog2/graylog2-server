@@ -40,7 +40,7 @@ const EventDefinitionRenderer = ({
   eventDefinitionId: string;
   meta: EventsAdditionalData;
 }) => {
-  const title = meta?.context?.event_definitions?.[eventDefinitionId]?.title || eventDefinitionId;
+  const title = meta?.context?.event_definitions?.[eventDefinitionId]?.title;
 
   return <EventDefinitionLink id={eventDefinitionId} title={title} />;
 };
