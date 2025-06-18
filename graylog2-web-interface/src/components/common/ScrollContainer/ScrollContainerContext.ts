@@ -17,11 +17,6 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type ColorMapper from 'views/components/visualizations/ColorMapper';
-
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
-export type ChartColorContextType = { colors: ChartColorMap; setColor: ChangeColorFunction };
 
 type ScrollContainerContextType = {
   container: React.RefObject<HTMLDivElement>;
