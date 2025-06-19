@@ -21,6 +21,7 @@ import org.graylog2.shared.SuppressForbidden;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -91,5 +92,17 @@ public class ResolvableInetSocketAddress {
         } else {
             return getAddress().getHostAddress() + ":" + getPort();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        final ResolvableInetSocketAddress that = (ResolvableInetSocketAddress) o;
+        return reverseLookedUp == that.reverseLookedUp && Objects.equals(inetSocketAddress, that.inetSocketAddress);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(inetSocketAddress, reverseLookedUp);
     }
 }
