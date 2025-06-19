@@ -40,6 +40,7 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
+
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
 
 const fetchNotifications = () => {

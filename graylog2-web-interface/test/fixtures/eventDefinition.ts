@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { EventDefinition } from "components/event-definitions/event-definitions-types";
+import type { EventDefinition } from "components/event-definitions/event-definitions-types";
 
 // eslint-disable-next-line import/prefer-default-export
 export const simpleEventDefinition: EventDefinition = {

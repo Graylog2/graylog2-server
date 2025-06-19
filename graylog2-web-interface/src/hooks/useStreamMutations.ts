@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMutation } from '@tanstack/react-query';
+
 import { Streams } from '@graylog/server-api';
 
 import type { Stream as OriginalStream } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
-import { EntityShare } from 'actions/permissions/EntityShareActions';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 export type Stream = OriginalStream;
 
