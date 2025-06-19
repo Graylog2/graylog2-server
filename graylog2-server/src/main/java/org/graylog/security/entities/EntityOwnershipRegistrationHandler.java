@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
@@ -53,6 +54,11 @@ public class EntityOwnershipRegistrationHandler implements EntityRegistrationHan
         // Don't create ownership grants for the admin user.
         // They can access anything anyhow
         if (user.isLocalAdmin()) {
+            return;
+        }
+
+        // Don't create ownership grants for user entities. It wouldn't technically be wrong, but we have no use for it
+        if (GRNTypes.USER.equals(entityGRN.grnType())) {
             return;
         }
 

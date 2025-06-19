@@ -75,6 +75,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -150,9 +151,14 @@ public class UsersResourceTest {
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        when(userService.loadById("creator")).thenReturn(creator);
+        when(subject.getPrincipal()).thenReturn(creator.getName());
+
         final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE)));
         Assert.assertEquals(201, response.getStatus());
-        verify(userManagementService).create(isA(UserImpl.class));
+        verify(userManagementService).create(isA(UserImpl.class), eq(creator));
     }
 
     @Test
