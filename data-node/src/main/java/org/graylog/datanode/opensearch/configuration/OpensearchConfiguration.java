@@ -16,22 +16,22 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.datanode.process.Environment;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,8 +41,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class OpensearchConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfiguration.class);
 
     private final OpensearchDistribution opensearchDistribution;
     private final String hostname;
@@ -68,16 +66,17 @@ public class OpensearchConfiguration {
     }
 
     public Environment getEnv() {
-        final Environment env = new Environment(System.getenv());
+        return new Environment(System.getenv())
+                .withOpensearchJavaHome(opensearchDistribution.getOpensearchJavaHome())
+                .withOpensearchJavaOpts(getJavaOpts())
+                .withOpensearchPathConf(opensearchConfigurationDir.configurationRoot());
+    }
 
-        List<String> javaOpts = new LinkedList<>();
-
-        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
-                .forEach(javaOpts::addAll);
-
-        env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
-        return env;
+    @Nonnull
+    private List<String> getJavaOpts() {
+        return configurationParts.stream()
+                .flatMap(part -> part.javaOpts().stream())
+                .collect(Collectors.toList());
     }
 
     public HttpHost getRestBaseUrl() {
@@ -96,12 +95,11 @@ public class OpensearchConfiguration {
     }
 
 
-    public Map<String, String> getKeystoreItems() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    public Collection<OpensearchKeystoreItem> getKeystoreItems() {
+        final ImmutableList.Builder<OpensearchKeystoreItem> builder = ImmutableList.builder();
         configurationParts.stream()
                 .map(DatanodeConfigurationPart::keystoreItems)
-                .forEach(builder::putAll);
-
+                .forEach(builder::addAll);
         return builder.build();
     }
 
@@ -127,6 +125,12 @@ public class OpensearchConfiguration {
                 .findFirst();
     }
 
+    public List<String> opensearchRoles() {
+        return configurationParts.stream()
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .collect(Collectors.toList());
+    }
+
     public List<DatanodeConfigFile> configFiles() {
 
         final List<DatanodeConfigFile> configFiles = new LinkedList<>();
@@ -150,13 +154,6 @@ public class OpensearchConfiguration {
                 .map(DatanodeConfigurationPart::properties)
                 .forEach(config::putAll);
 
-        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
-        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
-        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
-        getEnv().getEnv().entrySet().stream()
-                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
-                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
-                .forEach(entry -> config.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
         return config;
     }
 
@@ -170,5 +167,11 @@ public class OpensearchConfiguration {
 
     public DatanodeDirectories getDatanodeDirectories() {
         return datanodeDirectories;
+    }
+
+    public List<String> warnings() {
+        return configurationParts.stream()
+                .flatMap(part -> part.warnings().stream())
+                .collect(Collectors.toList());
     }
 }

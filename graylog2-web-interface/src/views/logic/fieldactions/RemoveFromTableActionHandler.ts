@@ -16,7 +16,7 @@
  */
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type Widget from 'views/logic/widgets/Widget';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
@@ -26,7 +26,7 @@ type Contexts = { widget: Widget };
 
 const RemoveFromTableActionHandler =
   ({ field, contexts: { widget } }: ActionHandlerArguments<Contexts>) =>
-  (dispatch: AppDispatch) => {
+  (dispatch: ViewsDispatch) => {
     const newFields = widget.config.fields.filter((f) => f !== field);
     const newConfig = widget.config.toBuilder().fields(newFields).build();
 

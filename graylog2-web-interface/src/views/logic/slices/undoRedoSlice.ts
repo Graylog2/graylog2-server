@@ -17,7 +17,7 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 import { selectRootUndoRedo } from 'views/logic/slices/undoRedoSelectors';
 
@@ -55,7 +55,7 @@ export const { setRevisions, setCurrentRevision } = undoRedoSlice.actions;
 
 export const pushIntoRevisions =
   (revisionItem: RevisionItem, setAsLastRevision: boolean = true) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const { revisions, currentRevision } = selectRootUndoRedo(getState());
     const isLast = currentRevision === revisions.length;
     // if we are in the middle of the buffer, we have to remove all items after current;

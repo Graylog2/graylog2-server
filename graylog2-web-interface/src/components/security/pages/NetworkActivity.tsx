@@ -22,6 +22,7 @@ import TeaserSearch from 'components/security/teaser/TeaserSearch';
 import viewJson from 'components/security/teaser/sample-dashboards/network_activity_view.json';
 import searchJson from 'components/security/teaser/sample-dashboards/network_activity_search.json';
 import resultJson from 'components/security/teaser/sample-dashboards/network_activity_results.json';
+import type { SearchJson } from 'views/logic/search/Search';
 
 const hotspots = [
   {
@@ -54,7 +55,12 @@ const hotspots = [
 
 const NetworkActivity = () => (
   <DocumentTitle title="Network activity">
-    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+    <TeaserSearch
+      viewJson={viewJson}
+      searchJson={searchJson as SearchJson}
+      searchJobResult={resultJson}
+      hotspots={hotspots}
+    />
   </DocumentTitle>
 );
 

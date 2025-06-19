@@ -64,7 +64,7 @@ const PanelBody = styled(Panel.Body)(
   `,
 );
 
-const AccordionItem = ({ children, name, id, ...restProps }: Props) => {
+const AccordionItem = ({ children, name, id = undefined, ...restProps }: Props) => {
   const eventKey = id ?? name.replace(/[^0-9a-zA-Z]/g, '-').toLowerCase();
 
   return (

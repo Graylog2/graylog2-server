@@ -27,10 +27,10 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
@@ -54,6 +54,7 @@ import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
@@ -94,22 +95,22 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     @Override
     public void upgrade() {
         ensureEventsStreamAndIndexSet(
-                "Graylog Events",
-                "Stores Graylog events.",
+                "Events",
+                "Stores events created by event definitions.",
                 elasticsearchConfiguration.getDefaultEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_EVENTS_INDEX_PREFIX,
                 Stream.DEFAULT_EVENTS_STREAM_ID,
                 "All events",
-                "Stream containing all events created by Graylog"
+                "Stream containing all events created"
         );
         ensureEventsStreamAndIndexSet(
-                "Graylog System Events",
-                "Stores Graylog system events.",
+                "System Events",
+                "Stores events created by and related to the system itself.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
                 Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
-                "Stream containing all system events created by Graylog"
+                "Stream containing all system events created"
         );
         ensureSystemNotificationEventsDefinition();
     }
@@ -216,7 +217,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             if (eventDefinitionStream.findAny().isEmpty()) {
                 EventDefinitionDto eventDto =
                         EventDefinitionDto.builder()
-                                .title("System notification events")
+                                .title(SYSTEM_NOTIFICATION_EVENT_DEFINITION)
                                 .description("Reserved event definition for system notification events")
                                 .alert(false)
                                 .priority(1)
@@ -227,7 +228,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                         .build())
                                 .config(SystemNotificationEventProcessorConfig.builder().build())
                                 .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
-                                .scope(SystemNotificationEventEntityScope.NAME)
+                                .scope(NonDeletableSystemScope.NAME)
                                 .build();
                 dbService.save(eventDto);
             }

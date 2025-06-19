@@ -18,7 +18,7 @@ import * as React from 'react';
 import { Popover as MantinePopover } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
-const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
+const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
   const theme = useTheme();
 
   const arrowBackground =
@@ -78,7 +78,7 @@ const dropdownAriaLabelledby = (
   return null;
 };
 
-const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
+const Dropdown = ({ title = undefined, children, ...rest }: DropdownProps) => (
   <MantinePopover.Dropdown aria-labelledby={dropdownAriaLabelledby(rest['aria-labelledby'], rest.id, title)} {...rest}>
     {title && <Title id={rest.id ? titleId(rest.id) : null}>{title}</Title>}
 

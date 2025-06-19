@@ -42,11 +42,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 @Singleton
 public class ConfigurationStateUpdater {
-    private static final RateLimitedLog log = getRateLimitedLog(ConfigurationStateUpdater.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(ConfigurationStateUpdater.class);
 
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ScheduledExecutorService scheduler;
@@ -118,11 +118,11 @@ public class ConfigurationStateUpdater {
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work
     @Subscribe
     public void handleRuleChanges(RulesChangedEvent event) {
-        event.deletedRuleIds().forEach(id -> {
-            log.debug("Invalidated rule {}", id);
-            pipelineMetricRegistry.removeRuleMetrics(id);
+        event.deletedRules().forEach(ref -> {
+            log.debug("Invalidated rule {}", ref.id());
+            pipelineMetricRegistry.removeRuleMetrics(ref.id());
         });
-        event.updatedRuleIds().forEach(id -> log.debug("Refreshing rule {}", id));
+        event.updatedRules().forEach(ref -> log.debug("Refreshing rule {}", ref.id()));
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
     }
 

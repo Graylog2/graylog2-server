@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2.fieldtypes.streams;
 
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
@@ -28,8 +29,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
-
-import jakarta.inject.Inject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +56,12 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
 
 
         final List<Set<String>> streamsPerField = multiSearchResponse.stream()
-                .map(item -> retrieveStreamsFromAggregationInResponse(item.getResponse()))
+                .map(item -> {
+                    if (item.isFailure()) {
+                        throw OpenSearchClient.exceptionFrom(item.getFailure(), "Error while retrieving field types");
+                    }
+                    return retrieveStreamsFromAggregationInResponse(item.getResponse());
+                })
                 .toList();
 
         Map<String, Set<String>> result = new HashMap<>(fieldNames.size());

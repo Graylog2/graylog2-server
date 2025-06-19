@@ -46,6 +46,7 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     }
 
     public static final String COLLECTION_NAME = "access_tokens";
+    public static final String ID_FIELD = "_id";
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";
     public static final String TOKEN_TYPE = "token_type";

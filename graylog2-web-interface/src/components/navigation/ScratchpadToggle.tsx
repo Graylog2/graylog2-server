@@ -18,9 +18,9 @@ import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import NavIcon from 'components/navigation/NavIcon';
 
 import NavItemStateIndicator, { hoverIndicatorStyles } from '../common/NavItemStateIndicator';
 
@@ -33,7 +33,7 @@ const Toggle = styled(Button)(
     color: ${theme.colors.global.textDefault};
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       ${hoverIndicatorStyles(theme)}
       background: transparent;
       color: ${theme.colors.variant.darker.default};
@@ -53,7 +53,7 @@ const ScratchpadToggle = () => {
         id="scratchpad-toggle"
         onClick={toggleScratchpadVisibility}>
         <NavItemStateIndicator>
-          <Icon name="edit_square" size="lg" title="Scratchpad" />
+          <NavIcon type="scratchpad" title="Scratchpad" />
         </NavItemStateIndicator>
       </Toggle>
     </li>

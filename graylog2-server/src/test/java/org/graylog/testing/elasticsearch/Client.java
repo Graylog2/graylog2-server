@@ -84,4 +84,8 @@ public interface Client {
     IndexState getStatus(String indexName);
 
     void openIndex(String indexName);
+
+    default void setRequestCircuitBreakerLimit(String limit) {
+        putSetting("indices.breaker.total.limit", limit);
+    }
 }

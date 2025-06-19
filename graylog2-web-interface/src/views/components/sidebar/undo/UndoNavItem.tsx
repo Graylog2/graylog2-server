@@ -17,8 +17,8 @@
 import React, { useCallback } from 'react';
 
 import NavItem from 'views/components/sidebar/NavItem';
-import useAppDispatch from 'stores/useAppDispatch';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -33,8 +33,8 @@ const TITLE = 'Undo';
 
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const viewType = useViewType();
-  const dispatch = useAppDispatch();
-  const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
+  const dispatch = useViewsDispatch();
+  const { isUndoAvailable } = useViewsSelector(selectUndoRedoAvailability);
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
 

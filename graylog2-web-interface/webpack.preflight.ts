@@ -33,6 +33,7 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'target/preflight/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 const mode = TARGET.startsWith('build') ? 'production' : 'development';
+const disableTsc = process.env.disable_tsc === 'true';
 
 const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
 
@@ -74,10 +75,12 @@ if (mode === 'development') {
       hot: false,
       liveReload: true,
       compress: true,
-      proxy: [{
-        context: ['/api'],
-        target: apiUrl,
-      }],
+      proxy: [
+        {
+          context: ['/api'],
+          target: apiUrl,
+        },
+      ],
     },
     devtool: 'cheap-module-source-map',
     output: {
@@ -88,7 +91,7 @@ if (mode === 'development') {
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
       }),
-      new ForkTsCheckerWebpackPlugin(),
+      ...(disableTsc ? [] : [new ForkTsCheckerWebpackPlugin()]),
     ],
   });
 }
@@ -97,9 +100,11 @@ if (mode === 'production') {
   webpackConfig = merge(baseConfig, {
     optimization: {
       moduleIds: 'deterministic',
-      minimizer: [new EsbuildPlugin({
-        target: supportedBrowsers,
-      })],
+      minimizer: [
+        new EsbuildPlugin({
+          target: supportedBrowsers,
+        }),
+      ],
     },
     plugins: [
       new webpack.DefinePlugin({

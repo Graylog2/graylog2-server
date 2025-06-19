@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { OrderedMap } from 'immutable';
 
@@ -131,6 +131,11 @@ const _allFiltersWithTitle = (
 ): Filters =>
   urlQueryFilters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedAttribute = attributesMetaData?.find(({ id }) => id === attributeId);
+    if (!relatedAttribute) {
+      throw new Error(
+        `Found value for attribute "${attributeId}", which is not in list of registered attributes: ${attributesMetaData?.map(({ id }) => id).join(', ')} - typo in attribute name?`,
+      );
+    }
     const filtersWithTitle: Array<Filter> = filterValues.map((value) => {
       const title = filterTitle(
         relatedAttribute,
@@ -178,15 +183,15 @@ const useFiltersWithTitle = (
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
-  const { data, isInitialLoading, isError } = useQuery(
-    ['entity_titles', payload],
-    () =>
+  const { data, isInitialLoading, isError } = useQuery({
+    queryKey: ['entity_titles', payload],
+
+    queryFn: () =>
       defaultOnError(fetchFilterTitles(payload), 'Loading filter titles failed with status', 'Could not load streams'),
-    {
-      keepPreviousData: true,
-      enabled: enabled && !!payload.entities.length,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    enabled: enabled && !!payload.entities.length,
+  });
 
   const cachedResponse = queryClient.getQueryData(['entity_titles', payload]);
   const requestedFilterTitles = (cachedResponse ?? data)?.entities;

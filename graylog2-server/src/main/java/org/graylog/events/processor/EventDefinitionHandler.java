@@ -18,17 +18,20 @@ package org.graylog.events.processor;
 
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.bson.conversions.Bson;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
+import org.graylog.grn.GRNTypes;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.plugin.database.users.User;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -56,16 +59,22 @@ public class EventDefinitionHandler {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
+
+    // Provider to avoid circular dependency
+    private final Provider<EntitySharesService> entitySharesServiceProvider;
+
     private final JobSchedulerClock clock;
 
     @Inject
     public EventDefinitionHandler(DBEventDefinitionService eventDefinitionService,
                                   DBJobDefinitionService jobDefinitionService,
                                   DBJobTriggerService jobTriggerService,
+                                  Provider<EntitySharesService> entitySharesServiceProvider,
                                   JobSchedulerClock clock) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
+        this.entitySharesServiceProvider = entitySharesServiceProvider;
         this.clock = clock;
     }
 
@@ -101,7 +110,7 @@ public class EventDefinitionHandler {
      * @param user            the user who copied this eventDefinition. If empty, no ownership will be registered.
      * @return the newly created event definition
      */
-    public EventDefinitionDto duplicate(EventDefinitionDto eventDefinition, Optional<User> user) {
+    public EventDefinitionDto duplicate(EventDefinitionDto eventDefinition, User user) {
         var copy = eventDefinition.toBuilder()
                 .id(null)
                 .title("COPY-" + eventDefinition.title())
@@ -110,7 +119,10 @@ public class EventDefinitionHandler {
                 .state(EventDefinition.State.DISABLED)
                 .build();
 
-        return createWithoutSchedule(copy, user);
+        EventDefinitionDto copyDto = createWithoutSchedule(copy, Optional.of(user));
+        entitySharesServiceProvider.get().cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), user);
+
+        return copyDto;
     }
 
     /**
@@ -238,7 +250,7 @@ public class EventDefinitionHandler {
     public void unschedule(String eventDefinitionId) {
         final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
 
-        if (SystemNotificationEventEntityScope.NAME.equals(eventDefinition.scope())) {
+        if (NonDeletableSystemScope.NAME.equals(eventDefinition.scope())) {
             LOG.debug("Ignoring disable for system notification events");
             return;
         }

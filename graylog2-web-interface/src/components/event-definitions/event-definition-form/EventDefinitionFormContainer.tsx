@@ -25,6 +25,7 @@ import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/Ava
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
   EventDefinition,
   EventDefinitionFormControlsProps,
@@ -36,8 +37,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
+import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
 
 const fetchNotifications = () => {
   EventNotificationsActions.listAll();
@@ -45,7 +47,9 @@ const fetchNotifications = () => {
 
 type Props = {
   action?: 'edit' | 'create';
-  eventDefinition?: EventDefinition;
+  eventDefinition?: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
   onCancel?: () => void;
@@ -83,7 +87,7 @@ const EventDefinitionFormContainer = ({
     alert: false,
   },
   formControls = undefined,
-  initialStep = STEP_KEYS[0],
+  initialStep = 'event-details',
   onCancel = undefined,
   onChangeStep = undefined,
   onEventDefinitionChange = () => {},
@@ -102,6 +106,8 @@ const EventDefinitionFormContainer = ({
   const currentUser = useCurrentUser();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const isNew = action === 'create';
+  const currentStepKeys = getStepKeys(isNew);
 
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
   const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
@@ -144,13 +150,14 @@ const EventDefinitionFormContainer = ({
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
+    CurrentUserStore.update(currentUser.username);
 
     onSubmit();
   };
 
   const showValidationErrors = (errors: { errors: unknown }) => {
     setValidation(errors);
-    setActiveStep(STEP_KEYS[STEP_KEYS.length - 1]);
+    setActiveStep(currentStepKeys[currentStepKeys.length - 1]);
   };
 
   const handleSubmitFailureResponse = (errorResponse) => {

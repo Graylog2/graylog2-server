@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Suppress repeated error logging for Whois lookup adapter when following redirects."
+
+issues = ["20571"]
+pulls = ["21838"]

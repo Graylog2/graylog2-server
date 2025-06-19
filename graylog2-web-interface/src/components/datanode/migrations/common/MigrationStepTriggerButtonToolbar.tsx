@@ -108,7 +108,7 @@ const MigrationStepTriggerButtonToolbar = ({
   onTriggerStep,
   args = {},
   hidden = false,
-  children,
+  children = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { currentStep } = useMigrationState();

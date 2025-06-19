@@ -16,7 +16,7 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
 
 const selectQueryTitles = createSelector(selectViewStates, (viewStates) =>
@@ -26,6 +26,6 @@ const selectQueryTitles = createSelector(selectViewStates, (viewStates) =>
     .toMap(),
 );
 
-const useQueryTitles = () => useAppSelector(selectQueryTitles);
+const useQueryTitles = () => useViewsSelector(selectQueryTitles);
 
 export default useQueryTitles;

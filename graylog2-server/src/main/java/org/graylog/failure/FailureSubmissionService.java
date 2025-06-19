@@ -17,16 +17,19 @@
 package org.graylog.failure;
 
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
+import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public class FailureSubmissionService {
     private final FailureSubmissionQueue failureSubmissionQueue;
     private final FailureHandlingConfiguration failureHandlingConfiguration;
 
-    private final MetricRegistry metricRegistry;
+    private final InputDiagnosisMetrics inputDiagnosisMetrics;
     private final ObjectMapper objectMapper;
     private final Meter dummyMeter = new Meter();
 
@@ -61,11 +64,11 @@ public class FailureSubmissionService {
     public FailureSubmissionService(
             FailureSubmissionQueue failureSubmissionQueue,
             FailureHandlingConfiguration failureHandlingConfiguration,
-            MetricRegistry metricRegistry,
+            InputDiagnosisMetrics inputDiagnosisMetrics,
             ObjectMapperProvider objectMapperProvider) {
         this.failureSubmissionQueue = failureSubmissionQueue;
         this.failureHandlingConfiguration = failureHandlingConfiguration;
-        this.metricRegistry = metricRegistry;
+        this.inputDiagnosisMetrics = inputDiagnosisMetrics;
         this.objectMapper = objectMapperProvider.get();
     }
 
@@ -186,6 +189,35 @@ public class FailureSubmissionService {
         }
     }
 
+    public void submitInputFailure(InputProcessingException inputProcessingException, String inputId) {
+        inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputId, "failures.input"));
+        try {
+            RawMessage rawMessage = inputProcessingException.getRawMessage();
+            final String messageId = rawMessage.getId().toString();
+
+            final String message = "Failed to process message with id '%s' from input with id '%s': %s".formatted(
+                    StringUtils.isBlank(messageId) ? "UNKNOWN" : messageId,
+                    inputId,
+                    inputProcessingException.getMessage()
+            );
+
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(inputProcessingException.getCause());
+            final InputFailure processingFailure = new InputFailure(
+                    InputFailureCause.INPUT_PARSE,
+                    message,
+                    rootCauseMessage.isBlank() ? inputProcessingException.getMessage() : rootCauseMessage,
+                    Tools.nowUTC(),
+                    rawMessage,
+                    inputProcessingException.inputMessage().orElse("")
+            );
+
+            failureSubmissionQueue.submitBlocking(FailureBatch.inputFailureBatch(List.of(processingFailure)));
+        } catch (InterruptedException ignored) {
+            logger.warn("Failed to submit an input failure for failure handling. The thread has been interrupted!");
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private IndexingFailure fromIndexingError(IndexingError indexingError) {
         return new IndexingFailure(
                 indexingError.error().type() == MappingError ?
@@ -203,8 +235,7 @@ public class FailureSubmissionService {
     private void updateProcessingFailureMetric(Message message) {
         Object inputId = message.getField(FIELD_GL2_SOURCE_INPUT);
         if (inputId != null) {
-            final String indexingFailureMetricName = name("org.graylog2.inputs", inputId.toString(), "failures.processing");
-            metricRegistry.meter(indexingFailureMetricName).mark();
+            inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputId.toString(), "failures.processing"));
         }
     }
 
@@ -212,8 +243,7 @@ public class FailureSubmissionService {
         final Map<String, Object> searchObject = message.toElasticSearchObject(objectMapper, dummyMeter);
         Object inputId = searchObject.get(FIELD_GL2_SOURCE_INPUT);
         if (inputId != null) {
-            final String indexingFailureMetricName = name("org.graylog2.inputs", inputId.toString(), "failures.indexing");
-            metricRegistry.meter(indexingFailureMetricName).mark();
+            inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputId.toString(), "failures.indexing"));
         }
     }
 }

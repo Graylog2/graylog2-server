@@ -60,7 +60,7 @@ import org.graylog2.shared.rest.resources.system.RemoteSystemPluginResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import org.graylog2.shared.system.stats.SystemStats;
 import org.graylog2.storage.SearchVersion;
-import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.system.stats.ClusterStatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +125,7 @@ public class SupportBundleService {
     private final Path bundleDir;
     private final ObjectMapper objectMapper;
     private final ClusterStatsService clusterStatsService;
-    private final VersionProbe elasticVersionProbe;
+    private final VersionProbeFactory versionProbeFactory;
     private final List<URI> elasticsearchHosts;
     private final ClusterAdapter searchDbClusterAdapter;
     private final DatanodeRestApiProxy datanodeProxy;
@@ -139,7 +139,7 @@ public class SupportBundleService {
                                 @Named("data_dir") Path dataDir,
                                 ObjectMapperProvider objectMapperProvider,
                                 ClusterStatsService clusterStatsService,
-                                VersionProbe searchDbProbe,
+                                VersionProbeFactory searchDbProbeFactory,
                                 @IndexerHosts List<URI> searchDbHosts,
                                 ClusterAdapter searchDbClusterAdapter, DatanodeRestApiProxy datanodeProxy, RemoteReindexingMigrationAdapter migrationService) {
         this.executor = executor;
@@ -149,7 +149,7 @@ public class SupportBundleService {
         objectMapper = objectMapperProvider.get();
         bundleDir = dataDir.resolve(SUPPORT_BUNDLE_DIR_NAME);
         this.clusterStatsService = clusterStatsService;
-        this.elasticVersionProbe = searchDbProbe;
+        this.versionProbeFactory = searchDbProbeFactory;
         this.elasticsearchHosts = searchDbHosts;
         this.searchDbClusterAdapter = searchDbClusterAdapter;
         this.datanodeProxy = datanodeProxy;
@@ -239,7 +239,7 @@ public class SupportBundleService {
                 executorService).thenAccept(stats -> clusterInfo.put("cluster_stats", stats));
 
         final CompletableFuture<?> searchDbVersion =
-                timeLimitedOrErrorString(() -> elasticVersionProbe.probe(elasticsearchHosts)
+                timeLimitedOrErrorString(() -> versionProbeFactory.createDefault().probe(elasticsearchHosts)
                         .map(SearchVersion::toString).orElse("Unknown"), executorService)
                         .thenAccept(version -> searchDb.put("version", version));
         final CompletableFuture<?> searchDbStats = timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats,

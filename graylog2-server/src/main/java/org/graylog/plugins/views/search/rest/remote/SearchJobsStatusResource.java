@@ -23,10 +23,12 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.container.AsyncResponse;
 import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
@@ -70,12 +72,14 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public void asyncSearchJobStatus(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
                                      @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
+                                     @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
+                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
                                      @Context SearchUser searchUser,
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,
                 () -> {
                     try {
-                        final NodeResponse<ResponseBody> nodeResponse = requestOnNode(nodeId, r -> r.jobStatus(jobId), RemoteSearchJobsStatusInterface.class);
+                        final NodeResponse<ResponseBody> nodeResponse = requestOnNode(nodeId, r -> r.jobStatus(jobId, page, perPage), RemoteSearchJobsStatusInterface.class);
                         return RestTools.streamResponse(nodeResponse, MediaType.APPLICATION_JSON, null);
                     } catch (IOException e) {
                         return Response.serverError().entity(e.getMessage()).build();

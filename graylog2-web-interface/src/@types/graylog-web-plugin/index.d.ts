@@ -55,7 +55,7 @@ type PluginNavigation = {
   requiredFeatureFlag?: string;
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: 'last' | undefined;
+  position?: { last: true } | { after: string } | undefined;
   permissions?: string | Array<string>;
   useIsValidLicense?: () => boolean;
 } & (PluginNavigationLink | PluginNavigationDropdown);
@@ -133,6 +133,7 @@ interface InputConfiguration {
 }
 interface ProviderType {
   type: string;
+  title?: string;
   formComponent: React.ComponentType<{
     onErrorChange: (error?: string) => void;
     setLoginFormState: (loginFormState: string) => void;
@@ -157,9 +158,15 @@ type DataTiering = {
 };
 
 type InputSetupWizard = {
-  steps: {
-    [key in InputSetupWizardStep]?: StepType;
-  };
+  EnterpriseInputSetupWizard: React.ComponentType<{
+    openSteps: { [key in InputSetupWizardStep]?: StepType };
+  }>;
+  InputFailureLink: React.ComponentType<{
+    failureType: string;
+    inputId: string;
+    children: React.ReactNode;
+  }>;
+  ExtraSetupWizardStep: React.ComponentType;
 };
 
 type License = {

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { Button, Panel, Input } from 'components/bootstrap';
@@ -23,10 +23,28 @@ import SkipHealthCheck from 'integrations/aws/common/SkipHealthCheck';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import Countdown from 'integrations/aws/common/Countdown';
-import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
+import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import Icon from 'components/common/Icon';
+
+const Notice = styled.span`
+  display: flex;
+  align-items: center;
+
+  > span {
+    margin-left: 6px;
+  }
+`;
+
+const CheckAgain = styled.p`
+  display: flex;
+  align-items: center;
+
+  > strong {
+    margin-right: 9px;
+  }
+`;
 
 type StepHealthCheckProps = {
   onSubmit: (...args: any[]) => void;
@@ -37,6 +55,28 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [pauseCountdown, setPauseCountdown] = useState(false);
+
+  const [fetchStreamArnStatus, setStreamArnFetch] = useFetch(
+    null,
+    (response) => {
+      onChange({ target: { name: 'awsCloudwatchKinesisStreamArn', value: response.result } });
+    },
+    'POST',
+    {
+      region: formData.awsCloudWatchAwsRegion.value,
+      stream_name: formData.awsCloudWatchKinesisStream.value,
+    },
+  );
+
+  useEffect(() => {
+    setStreamArnFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAM_ARN);
+  }, [setStreamArnFetch]);
+
+  useEffect(() => {
+    if (fetchStreamArnStatus.error) {
+      // Proceed even if fetching the stream ARN fails — failure is non-blocking and intentionally ignored
+    }
+  }, [fetchStreamArnStatus]);
 
   const [logDataProgress, setLogDataUrl] = useFetch(
     null,
@@ -51,23 +91,23 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     },
   );
 
-  const checkForLogs = () => {
+  const checkForLogs = useCallback(() => {
     setPauseCountdown(true);
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
-  };
+  }, [setPauseCountdown, setLogDataUrl]);
 
   useEffect(() => {
     if (!logData) {
       checkForLogs();
     }
-  }, []);
+  }, [checkForLogs, logData]);
 
   useEffect(() => {
     if (!logDataProgress.loading && !logDataProgress.data) {
       setPauseCountdown(false);
       setLogDataUrl(null);
     }
-  }, [logDataProgress.loading]);
+  }, [logDataProgress.data, logDataProgress.loading, setLogDataUrl]);
 
   if (!logData) {
     return (
@@ -107,18 +147,11 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
       </Panel>
     );
   }
-
-  const knownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
-  const iconName = knownLog ? 'check_circle' : 'warning';
-  const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
-  const bsStyle = knownLog ? 'success' : 'warning';
-  const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
-  const logType = knownLog ? `a ${logTypeLabel}` : 'an unknown';
-
   const handleSubmit = () => {
     onSubmit();
     onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: logData.type } });
   };
+  const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
 
   return (
     <FormWrap
@@ -126,55 +159,17 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
       buttonContent="Review &amp; Finalize"
       disabled={false}
       title="Create Kinesis Stream"
-      description={
-        <p>
-          We are going to attempt to parse a single log to help you out! If we are unable to, or you would like it
-          parsed differently, head on over to <a href="/system/pipelines">Pipeline Rules</a> to set up your own parser!
-        </p>
-      }>
-      <Panel
-        bsStyle={bsStyle}
-        header={
-          <Notice>
-            <Icon name={iconName} size="2x" />
-            <span>
-              {acknowledgment} looks like <em>{logType}</em> message type.
-            </span>
-          </Notice>
-        }>
-        {knownLog
-          ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'
-          : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}
-      </Panel>
-
+      description={<p>If available, a parsed sample {logTypeLabel} message from the stream will be shown below.</p>}>
       <Input
         id="awsCloudWatchLog"
         type="textarea"
         label="Formatted Log Message"
-        value={logData.message}
+        value={logData.message || 'No messages found in stream.'}
         rows={10}
         disabled
       />
     </FormWrap>
   );
 };
-
-const Notice = styled.span`
-  display: flex;
-  align-items: center;
-
-  > span {
-    margin-left: 6px;
-  }
-`;
-
-const CheckAgain = styled.p`
-  display: flex;
-  align-items: center;
-
-  > strong {
-    margin-right: 9px;
-  }
-`;
 
 export default StepHealthCheck;

@@ -31,12 +31,16 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +59,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_WRITE_INDEX_UPDATE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class MongoIndexSet implements IndexSet {
     public static final String SEPARATOR = "_";
@@ -77,6 +82,7 @@ public class MongoIndexSet implements IndexSet {
     private final SystemJobManager systemJobManager;
     private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
+    private final NotificationService notificationService;
 
     @Inject
     public MongoIndexSet(@Assisted final IndexSetConfig config,
@@ -86,7 +92,7 @@ public class MongoIndexSet implements IndexSet {
                          final AuditEventSender auditEventSender,
                          final SystemJobManager systemJobManager,
                          final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory,
-                         final ActivityWriter activityWriter
+                         final ActivityWriter activityWriter, NotificationService notificationService
     ) {
         this.config = requireNonNull(config);
         this.writeIndexAlias = config.indexPrefix() + SEPARATOR + DEFLECTOR_SUFFIX;
@@ -97,6 +103,7 @@ public class MongoIndexSet implements IndexSet {
         this.systemJobManager = requireNonNull(systemJobManager);
         this.jobFactory = requireNonNull(jobFactory);
         this.activityWriter = requireNonNull(activityWriter);
+        this.notificationService = notificationService;
 
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
         final String indexPattern = isNullOrEmpty(config.indexMatchPattern())
@@ -294,7 +301,17 @@ public class MongoIndexSet implements IndexSet {
         // Create new index.
         LOG.info("Creating target index <{}>.", newTarget);
         if (!indices.create(newTarget, this)) {
-            throw new RuntimeException("Could not create new target index <" + newTarget + ">.");
+            String title = "Error rotating index set";
+            String errorMsg = f("Could not create new target index <%s>.", newTarget);
+            notificationService.publishIfFirst(
+                    notificationService.build()
+                            .addType(Notification.Type.GENERIC)
+                            .addSeverity(Notification.Severity.URGENT)
+                            .addTimestamp(DateTime.now(DateTimeZone.UTC))
+                            .addNode(nodeId.getNodeId())
+                            .addDetail("title", title)
+                            .addDetail("description", errorMsg));
+            throw new RuntimeException(errorMsg);
         }
 
         LOG.info("Waiting for allocation of index <{}>.", newTarget);

@@ -35,6 +35,7 @@ export type Hotkey = KeyboardModifiers & {
   keys: readonly string[];
   scopes: ScopeName;
   description: string;
+  hotkey: string;
 };
 
 export type HotkeysEvent = Hotkey;

@@ -18,10 +18,8 @@ import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import type WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -32,20 +30,22 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import { setTitle } from 'views/logic/slices/titlesActions';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 import type WidgetType from 'views/logic/widgets/Widget';
+import {
+  useSendWidgetEditTelemetry,
+  useSendWidgetEditCancelTelemetry,
+  useSendWidgetConfigUpdateTelemetry,
+} from 'views/components/widgets/telemety';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -61,7 +61,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 
 export type Props = {
   id: string;
-  widget: WidgetModel;
+  widget: WidgetType;
   editing?: boolean;
   title: string;
   position: WidgetPosition;
@@ -82,12 +82,8 @@ const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEdit
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
-  const queryId = useActiveQueryId();
 
-  return useMemo(
-    () => fieldTypes.queryFields.get(queryId, fieldTypes.all),
-    [fieldTypes.all, fieldTypes.queryFields, queryId],
-  );
+  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
 };
 
 const WidgetFooter = styled.div`
@@ -175,11 +171,11 @@ export const EditWrapper = ({
   onCancelEdit,
   onWidgetConfigChange,
   type,
-  showQueryControls,
+  showQueryControls = undefined,
 }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onSubmitEdit = useCallback(
     (newWidget: WidgetType, hasChanges: boolean) => {
       if (hasChanges) {
@@ -215,7 +211,7 @@ export const EditWrapper = ({
   );
 };
 
-const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
+const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
@@ -228,53 +224,41 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
-  const dispatch = useAppDispatch();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const dispatch = useViewsDispatch();
+  const sendWidgetEditTelemetry = useSendWidgetEditTelemetry();
+  const sendWidgetEditCancelTelemetry = useSendWidgetEditCancelTelemetry();
+  const sendWidgetConfigUpdateTelemetry = useSendWidgetConfigUpdateTelemetry();
 
   const isDashboard = viewType === View.Type.Dashboard;
 
   const onToggleEdit = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-button',
-    });
-
     if (editing) {
       unsetWidgetEditing();
       setOldWidget(undefined);
     } else {
+      sendWidgetEditTelemetry();
       stopAutoRefresh();
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, pathname, sendTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
+  }, [editing, sendWidgetEditTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-cancel-button',
-    });
+    sendWidgetEditCancelTelemetry();
 
     if (oldWidget) {
       dispatch(updateWidget(id, oldWidget));
     }
 
     onToggleEdit();
-  }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
+  }, [dispatch, id, oldWidget, onToggleEdit, sendWidgetEditCancelTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
   const onWidgetConfigChange = useCallback(
     async (newWidgetConfig: WidgetConfig) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'search-widget',
-        app_action_value: 'widget-edit-update-button',
-      });
+      sendWidgetConfigUpdateTelemetry();
 
       return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {});
     },
-    [dispatch, id, pathname, sendTelemetry],
+    [dispatch, id, sendWidgetConfigUpdateTelemetry],
   );
   const activeQuery = useActiveQueryId();
 

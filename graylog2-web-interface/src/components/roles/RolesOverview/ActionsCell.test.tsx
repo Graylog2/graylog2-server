@@ -23,6 +23,7 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { adminUser } from 'fixtures/users';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import ActionsCell from './ActionsCell';
 
@@ -65,17 +66,7 @@ describe('ActionsCell', () => {
   );
 
   describe('role deletion', () => {
-    let oldConfirm;
-
-    beforeEach(() => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => true);
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-      jest.clearAllMocks();
-    });
+    useWindowConfirmMock();
 
     it('should be possible if role is not built in', async () => {
       asMock(useCurrentUser).mockReturnValue(

@@ -16,14 +16,18 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useMemo } from 'react';
+import type { PluginNavigation } from 'graylog-web-plugin';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
-import { IfPermitted } from 'components/common';
 import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -52,7 +56,7 @@ const StyledButton = styled(Button)(
     ${activeIndicatorStyles(theme)}
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       ${activeIndicatorStyles(theme)}
     }
 `,
@@ -60,41 +64,52 @@ const StyledButton = styled(Button)(
 
 StyledButton.displayName = 'Button';
 
+type PageNavItem = {
+  description: string;
+  path: string;
+  permissions?: string | Array<string>;
+  exactPathMatch?: boolean;
+  useIsValidLicense?: () => boolean;
+  position?: PluginNavigation['position'];
+};
+
 type Props = {
   /**
-   * List of nav items. Define permissions, if the item should only be displayed for users with specific permissions.
+   * List of nav items. Define permissions if the item should only be displayed for users with specific permissions.
    * By default, an item is active if the current URL starts with the item URL.
    * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
    */
-  items: Array<{
-    title: string;
-    path: string;
-    permissions?: string | Array<string>;
-    exactPathMatch?: boolean;
-  }>;
+  items: Array<PageNavItem>;
 };
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const PageNavigation = ({ items }: Props) => (
-  <Container>
-    {items.map(({ path, title, permissions, exactPathMatch }) => {
-      if (!path) {
-        return null;
-      }
+const PageNavigation = ({ items }: Props) => {
+  const currentUser = useCurrentUser();
 
-      return (
-        <IfPermitted permissions={permissions ?? []} key={path}>
-          <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton bsStyle="transparent">
-              <NavItemStateIndicator>{title}</NavItemStateIndicator>
-            </StyledButton>
-          </LinkContainer>
-        </IfPermitted>
-      );
-    })}
-  </Container>
-);
+  const formatedItems = useMemo(() => {
+    const availableItems = items.filter(
+      (item) =>
+        (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
+        isPermitted(currentUser.permissions, item.permissions) &&
+        !!item.path,
+    );
+
+    return sortNavigationItems<PageNavItem>(availableItems);
+  }, [currentUser.permissions, items]);
+
+  return (
+    <Container>
+      {formatedItems.map(({ path, description, exactPathMatch }) => (
+        <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
+          <StyledButton bsStyle="transparent">
+            <NavItemStateIndicator>{description}</NavItemStateIndicator>
+          </StyledButton>
+        </LinkContainer>
+      ))}
+    </Container>
+  );
+};
 
 export default PageNavigation;

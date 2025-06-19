@@ -71,7 +71,7 @@ const ViewsRefreshControls = ({ disable = false }: Props) => {
   );
 
   const onToggle = useCallback(
-    (enabled) => {
+    (enabled: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
         app_pathname: 'search',
         app_section: 'search-bar',

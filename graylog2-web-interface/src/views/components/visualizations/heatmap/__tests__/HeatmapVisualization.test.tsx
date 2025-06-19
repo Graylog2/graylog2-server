@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -26,29 +26,31 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import asMock from 'helpers/mocking/AsMock';
+import GenericPlot from 'views/components/visualizations/GenericPlot';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
 import HeatmapVisualization from '../HeatmapVisualization';
 
-jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
+jest.mock('../../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 
+// eslint-disable-next-line react/require-default-props
 const WrappedHeatMap = (props: React.ComponentProps<typeof HeatmapVisualization>) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider
-      value={{
-        all: Immutable.List(),
-        queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }),
-      }}>
+    <TestFieldTypesContextProvider>
       <HeatmapVisualization {...props} />
-    </FieldTypesContext.Provider>
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 
 describe('HeatmapVisualization', () => {
   useViewsPlugin();
+
+  beforeEach(() => {
+    asMock(GenericPlot).mockClear();
+  });
 
   it('generates correct props for plot component', () => {
     const columnPivot = Pivot.createValues(['http_status']);
@@ -96,7 +98,7 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(
+    render(
       <WrappedHeatMap
         data={fixtures.validData}
         config={config}
@@ -109,10 +111,14 @@ describe('HeatmapVisualization', () => {
         width={800}
       />,
     );
-    const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', plotLayout);
-    expect(genericPlot).toHaveProp('chartData', plotChartData);
+    expect(GenericPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        layout: plotLayout,
+        chartData: plotChartData,
+      }),
+      {},
+    );
   });
 
   it('generates correct props for plot component with empty data with use smallest value as default', () => {
@@ -149,7 +155,7 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(
+    render(
       <WrappedHeatMap
         data={{ chart: [] }}
         config={config}
@@ -162,9 +168,13 @@ describe('HeatmapVisualization', () => {
         width={800}
       />,
     );
-    const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', plotLayout);
-    expect(genericPlot).toHaveProp('chartData', plotChartData);
+    expect(GenericPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        layout: plotLayout,
+        chartData: plotChartData,
+      }),
+      {},
+    );
   });
 });

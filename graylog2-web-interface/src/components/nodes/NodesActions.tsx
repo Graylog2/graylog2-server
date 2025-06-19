@@ -68,7 +68,7 @@ class NodesActions extends React.Component<
 
     return (
       <ButtonToolbar>
-        <LinkContainer to={Routes.SYSTEM.NODES.SHOW(node.node_id)}>
+        <LinkContainer to={Routes.SYSTEM.CLUSTER.NODE_SHOW(node.node_id)}>
           <Button>Details</Button>
         </LinkContainer>
 

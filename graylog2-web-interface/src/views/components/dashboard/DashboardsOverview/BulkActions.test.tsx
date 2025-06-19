@@ -22,6 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import BulkActions from './BulkActions';
 
@@ -57,9 +58,9 @@ describe('DashboardsOverview BulkActionsRow', () => {
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   };
 
-  beforeEach(() => {
-    window.confirm = jest.fn(() => true);
+  useWindowConfirmMock();
 
+  beforeEach(() => {
     asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
   });
 

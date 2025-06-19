@@ -35,6 +35,8 @@ import java.util.Set;
 @JsonDeserialize(builder = AutoValue_QueryResult.Builder.class)
 public abstract class QueryResult {
 
+    public static final String SEARCH_TYPES_FIELD = "search_types";
+
     public static QueryResult incomplete() {
         return QueryResult.emptyResult().toBuilder().state(State.INCOMPLETE).build();
     }
@@ -45,7 +47,7 @@ public abstract class QueryResult {
     @JsonProperty("execution_stats")
     public abstract QueryExecutionStats executionStats();
 
-    @JsonProperty("search_types")
+    @JsonProperty(SEARCH_TYPES_FIELD)
     public abstract Map<String, SearchType.Result> searchTypes();
 
     @JsonProperty("errors")
@@ -89,7 +91,7 @@ public abstract class QueryResult {
         @JsonProperty("execution_stats")
         public abstract Builder executionStats(QueryExecutionStats stats);
 
-        @JsonProperty("search_types")
+        @JsonProperty(SEARCH_TYPES_FIELD)
         public abstract Builder searchTypes(Map<String, SearchType.Result> results);
 
         @JsonProperty("errors")

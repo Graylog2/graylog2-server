@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
@@ -25,7 +25,7 @@ type Options = {
   enabled: boolean;
 };
 
-export const fetchEventNotifications = (searchParams: SearchParams) =>
+export const fetchEventNotifications = (searchParams: SearchParams): Promise<EventNotificationsResult> =>
   EventNotificationsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
@@ -55,19 +55,18 @@ const useEventNotifications = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<EventNotificationsResult>(
-    keyFn(searchParams),
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
+
+    queryFn: () =>
       defaultOnError(
         fetchEventNotifications(searchParams),
         'Loading event notifications failed with status',
         'Could not load event notifications',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data,

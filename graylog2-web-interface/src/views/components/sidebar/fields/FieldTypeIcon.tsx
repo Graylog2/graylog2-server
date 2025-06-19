@@ -47,6 +47,8 @@ const iconName = (type: string) => {
       return 'cell_tower';
     case 'event-definition-id':
       return 'edit_document';
+    case 'associated-assets':
+      return 'quick_reference';
     default:
       return 'help';
   }

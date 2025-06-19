@@ -73,7 +73,6 @@ export const toTimeGrouping = (grouping: GroupByFormValues): DateGrouping => {
 
 export const onGroupingFieldsChange = ({
   fieldTypes,
-  activeQueryId,
   groupingIndex,
   grouping,
   newFields,
@@ -97,9 +96,9 @@ export const onGroupingFieldsChange = ({
     return;
   }
 
-  const groupingHasValuesField = fieldTypes.queryFields
-    .get(activeQueryId, fieldTypes.all)
-    .some(({ name, type }) => newFields.includes(name) && type.type !== 'date');
+  const groupingHasValuesField = fieldTypes.currentQuery.some(
+    ({ name, type }) => newFields.includes(name) && type.type !== 'date',
+  );
   const newGroupingType = groupingHasValuesField ? ValuesType : DateType;
 
   if (grouping.type === newGroupingType) {

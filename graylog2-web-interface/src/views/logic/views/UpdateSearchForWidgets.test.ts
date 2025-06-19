@@ -25,13 +25,8 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import Parameter from '../parameters/Parameter';
 import ValueParameter from '../parameters/ValueParameter';
 
-jest.mock('bson-objectid', () =>
-  jest.fn(() => ({
-    toString: jest.fn(() => 'new-search-id'),
-  })),
-);
-
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),

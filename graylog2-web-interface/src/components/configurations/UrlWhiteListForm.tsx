@@ -30,6 +30,7 @@ import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsS
 import ToolsStore from 'stores/tools/ToolsStore';
 import { isValidURL } from 'util/URLUtils';
 import generateId from 'logic/generateId';
+import useProductName from 'brand-customization/useProductName';
 
 type ValidationResult = {
   title: { valid: boolean };
@@ -40,7 +41,11 @@ const StyledTable = styled(Table)`
   margin-top: 10px;
 `;
 
-const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => void): Promise<ValidationResult> => {
+const validateUrlEntry = async (
+  idx: number,
+  entry: Url,
+  callback?: (idx: number, entry: Url, validationResult: { [key: string]: { valid: boolean } }) => void,
+): Promise<ValidationResult> => {
   const validationResult = {
     title: { valid: false },
     value: { valid: false },
@@ -74,7 +79,8 @@ type Props = {
   newEntryId?: string;
 };
 
-const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId }: Props) => {
+const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
+  const productName = useProductName();
   const literal = 'literal';
   const regex = 'regex';
   const options = [
@@ -215,7 +221,6 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
             <Select
               clearable={false}
               options={options}
-              matchProp="label"
               placeholder="Select url type"
               onChange={(option: string) => _onUpdateType(idx, option)}
               value={url.type}
@@ -266,7 +271,7 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
         label="Disable Whitelist"
         checked={config.disabled}
         onChange={() => setConfig({ ...config, disabled: !config.disabled })}
-        help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk."
+        help={`Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in ${productName} entities, which may pose a security risk.`}
       />
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
         Add Url

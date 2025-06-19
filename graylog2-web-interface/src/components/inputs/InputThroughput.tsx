@@ -57,6 +57,57 @@ const InputIO = styled.span(
   `,
 );
 
+const formatCount = (count: number) => numeral(count).format('0,0');
+
+const getValueFromMetric = (metric) => {
+  if (metric === null || metric === undefined) {
+    return undefined;
+  }
+
+  switch (metric.type) {
+    case 'meter':
+      return metric.metric.rate.mean;
+    case 'gauge':
+      return metric.metric.value;
+    case 'counter':
+      return metric.metric.count;
+    default:
+      return undefined;
+  }
+};
+
+const Connections = ({ openConnections, totalConnections }: { openConnections: number; totalConnections: number }) => (
+  <span>
+    Active connections: <span className="active">{formatCount(openConnections)} </span>(
+    <span className="total">{formatCount(totalConnections)}</span> total)
+    <br />
+  </span>
+);
+
+const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal }) => (
+  <InputIO>
+    <span>Network IO: </span>
+    <span className="persec">
+      <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
+      <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
+
+      <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
+      <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
+    </span>
+
+    <span className="total">
+      <span> (total: </span>
+      <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
+      <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
+
+      <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
+      <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
+      <span> )</span>
+    </span>
+    <br />
+  </InputIO>
+);
+
 type Props = {
   input: Input;
   metrics: ClusterMetric;
@@ -82,101 +133,44 @@ class InputThroughput extends React.Component<Props, State> {
     this._metricNames().forEach((metricName) => MetricsActions.removeGlobal(metricName));
   }
 
-  _metricNames() {
-    return [
-      this._prefix('incomingMessages'),
-      this._prefix('emptyMessages'),
-      this._prefix('open_connections'),
-      this._prefix('total_connections'),
-      this._prefix('written_bytes_1sec'),
-      this._prefix('written_bytes_total'),
-      this._prefix('read_bytes_1sec'),
-      this._prefix('read_bytes_total'),
-    ];
-  }
+  _toggleShowDetails = (evt) => {
+    evt.preventDefault();
 
-  _prefix(metric) {
+    this.setState(({ showDetails }) => ({ showDetails: !showDetails }));
+  };
+
+  _formatNodeDetails(nodeId, metrics) {
     const { input } = this.props;
+    const openConnections = getValueFromMetric(metrics[this._prefix('open_connections')]);
+    const totalConnections = getValueFromMetric(metrics[this._prefix('total_connections')]);
+    const emptyMessages = getValueFromMetric(metrics[this._prefix('emptyMessages')]);
+    const writtenBytes1Sec = getValueFromMetric(metrics[this._prefix('written_bytes_1sec')]);
+    const writtenBytesTotal = getValueFromMetric(metrics[this._prefix('written_bytes_total')]);
+    const readBytes1Sec = getValueFromMetric(metrics[this._prefix('read_bytes_1sec')]);
+    const readBytesTotal = getValueFromMetric(metrics[this._prefix('read_bytes_total')]);
 
-    return `${input.type}.${input.id}.${metric}`;
-  }
-
-  _getValueFromMetric(metric) {
-    if (metric === null || metric === undefined) {
-      return undefined;
-    }
-
-    switch (metric.type) {
-      case 'meter':
-        return metric.metric.rate.mean;
-      case 'gauge':
-        return metric.metric.value;
-      case 'counter':
-        return metric.metric.count;
-      default:
-        return undefined;
-    }
-  }
-
-  _calculateMetrics(metrics) {
-    const result = {};
-
-    this._metricNames().forEach((metricName) => {
-      result[metricName] = Object.keys(metrics).reduce((previous, nodeId) => {
-        if (!metrics[nodeId][metricName]) {
-          return previous;
-        }
-
-        const _value = this._getValueFromMetric(metrics[nodeId][metricName]);
-
-        if (_value !== undefined) {
-          return isNaN(previous) ? _value : previous + _value;
-        }
-
-        return previous;
-      }, NaN);
-    });
-
-    return result;
-  }
-
-  _formatCount(count) {
-    return numeral(count).format('0,0');
-  }
-
-  _formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal) {
-    const network = (
-      <InputIO>
-        <span>Network IO: </span>
-        <span className="persec">
-          <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
-          <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
-
-          <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
-          <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
-        </span>
-
-        <span className="total">
-          <span> (total: </span>
-          <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
-          <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
-
-          <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
-          <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
-          <span> )</span>
-        </span>
-        <br />
-      </InputIO>
-    );
-
-    return network;
-  }
-
-  _formatConnections(openConnections, totalConnections) {
     return (
-      <span>
-        Active connections: <span className="active">{this._formatCount(openConnections)} </span>(
-        <span className="total">{this._formatCount(totalConnections)}</span> total)
+      <span key={input.id + nodeId}>
+        <LinkToNode nodeId={nodeId} />
+        <br />
+        {!isNaN(writtenBytes1Sec) && (
+          <NetworkStats
+            writtenBytes1Sec={writtenBytes1Sec}
+            writtenBytesTotal={writtenBytesTotal}
+            readBytes1Sec={readBytes1Sec}
+            readBytesTotal={readBytesTotal}
+          />
+        )}
+        {!isNaN(openConnections) && (
+          <Connections openConnections={openConnections} totalConnections={totalConnections} />
+        )}
+        {!isNaN(emptyMessages) && (
+          <span>
+            Empty messages discarded: {formatCount(emptyMessages)}
+            <br />
+          </span>
+        )}
+        {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <span>No metrics available for this node</span>}
         <br />
       </span>
     );
@@ -191,40 +185,45 @@ class InputThroughput extends React.Component<Props, State> {
     );
   }
 
-  _formatNodeDetails(nodeId, metrics) {
-    const { input } = this.props;
-    const openConnections = this._getValueFromMetric(metrics[this._prefix('open_connections')]);
-    const totalConnections = this._getValueFromMetric(metrics[this._prefix('total_connections')]);
-    const emptyMessages = this._getValueFromMetric(metrics[this._prefix('emptyMessages')]);
-    const writtenBytes1Sec = this._getValueFromMetric(metrics[this._prefix('written_bytes_1sec')]);
-    const writtenBytesTotal = this._getValueFromMetric(metrics[this._prefix('written_bytes_total')]);
-    const readBytes1Sec = this._getValueFromMetric(metrics[this._prefix('read_bytes_1sec')]);
-    const readBytesTotal = this._getValueFromMetric(metrics[this._prefix('read_bytes_total')]);
+  _calculateMetrics(metrics) {
+    const result = {};
 
-    return (
-      <span key={input.id + nodeId}>
-        <LinkToNode nodeId={nodeId} />
-        <br />
-        {!isNaN(writtenBytes1Sec) &&
-          this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
-        {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
-        {!isNaN(emptyMessages) && (
-          <span>
-            Empty messages discarded: {this._formatCount(emptyMessages)}
-            <br />
-          </span>
-        )}
-        {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <span>No metrics available for this node</span>}
-        <br />
-      </span>
-    );
+    this._metricNames().forEach((metricName) => {
+      result[metricName] = Object.keys(metrics).reduce((previous, nodeId) => {
+        if (!metrics[nodeId][metricName]) {
+          return previous;
+        }
+
+        const _value = getValueFromMetric(metrics[nodeId][metricName]);
+
+        if (_value !== undefined) {
+          return isNaN(previous) ? _value : previous + _value;
+        }
+
+        return previous;
+      }, NaN);
+    });
+
+    return result;
   }
 
-  _toggleShowDetails(evt) {
-    evt.preventDefault();
-    const { showDetails } = this.state;
+  _prefix(metric) {
+    const { input } = this.props;
 
-    this.setState({ showDetails: !showDetails });
+    return `${input.type}.${input.id}.${metric}`;
+  }
+
+  _metricNames() {
+    return [
+      this._prefix('incomingMessages'),
+      this._prefix('emptyMessages'),
+      this._prefix('open_connections'),
+      this._prefix('total_connections'),
+      this._prefix('written_bytes_1sec'),
+      this._prefix('written_bytes_total'),
+      this._prefix('read_bytes_1sec'),
+      this._prefix('read_bytes_total'),
+    ];
   }
 
   render() {
@@ -255,16 +254,24 @@ class InputThroughput extends React.Component<Props, State> {
           )}
           {!isNaN(incomingMessages) && (
             <span>
-              1 minute average rate: {this._formatCount(incomingMessages)} msg/s
+              1 minute average rate: {formatCount(incomingMessages)} msg/s
               <br />
             </span>
           )}
-          {!isNaN(writtenBytes1Sec) &&
-            this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
-          {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
+          {!isNaN(writtenBytes1Sec) && (
+            <NetworkStats
+              writtenBytes1Sec={writtenBytes1Sec}
+              writtenBytesTotal={writtenBytesTotal}
+              readBytes1Sec={readBytes1Sec}
+              readBytesTotal={readBytesTotal}
+            />
+          )}
+          {!isNaN(openConnections) && (
+            <Connections openConnections={openConnections} totalConnections={totalConnections} />
+          )}
           {!isNaN(emptyMessages) && (
             <span>
-              Empty messages discarded: {this._formatCount(emptyMessages)}
+              Empty messages discarded: {formatCount(emptyMessages)}
               <br />
             </span>
           )}

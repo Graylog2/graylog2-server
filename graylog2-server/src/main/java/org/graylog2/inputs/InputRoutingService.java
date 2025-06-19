@@ -19,19 +19,24 @@ package org.graylog2.inputs;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamDeletedEvent;
+import org.graylog2.streams.events.StreamRenamedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -43,10 +48,11 @@ import java.util.regex.Pattern;
 import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+@Singleton
 public class InputRoutingService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputRoutingService.class);
     private static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
-    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(\\w+)\\[(\\w+)\\]_to_(\\w+)");
+    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(.+)\\[(\\w+)\\]_to_(.+)");
 
     private final RuleService ruleService;
     private final InputService inputService;
@@ -111,6 +117,7 @@ public class InputRoutingService {
                         + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()
+                .scope(DeletableSystemScope.NAME)
                 .title(ruleName)
                 .description("Input setup wizard routing rule")
                 .source(ruleSource)
@@ -119,8 +126,16 @@ public class InputRoutingService {
         return ruleService.save(ruleDao);
     }
 
-    private String getSystemRuleName(String inputName, String inputId, String streamName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "[" + inputId + "]_to_" + streamName;
+    // Create a human-readable name for a routing rule
+    private static String getSystemRuleName(String inputName, String inputId, String streamName) {
+        return GL_ROUTING_RULE_PREFIX + sanitize(inputName)
+                + "[" + inputId + "]_to_"
+                + sanitize(streamName);
+    }
+
+    private static String sanitize(String s) {
+        return s.replace('\"', '*')
+                .replace('\\', '*');
     }
 
     private boolean isSystemRulePattern(String ruleName) {
@@ -128,22 +143,56 @@ public class InputRoutingService {
         return matcher.matches();
     }
 
-    private boolean isSystemRulePattern(String ruleName, String inputId, String inputName) {
-        return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*");
+    private String createSystemRuleInputRegex(String inputId, String inputName) {
+        return GL_ROUTING_RULE_PREFIX + Pattern.quote(sanitize(inputName)) + "\\[" + inputId + "\\]_to_.*";
+    }
+
+    private String createSystemRuleStreamRegex(String streamName) {
+        return GL_ROUTING_RULE_PREFIX + ".*_to_" + Pattern.quote(sanitize(streamName));
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
-        Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
-        if (matcher.matches()) {
-            String inputName = matcher.group(1); // "input"
-            String inputId = matcher.group(2); // "123"
-            String streamName = matcher.group(3); // "stream"
-
-            if (inputName.equals(oldInputName)) {
-                return getSystemRuleName(newInputName, inputId, streamName);
-            }
+        RuleNameParsed ruleNameParsed = RuleNameParsed.create(ruleName);
+        if (ruleNameParsed.inputName().equals(oldInputName)) {
+            return getSystemRuleName(newInputName, ruleNameParsed.inputId(), ruleNameParsed.streamName());
         }
-        throw new IllegalArgumentException("Unexpected rule name not matching naming pattern: " + ruleName);
+        throw new IllegalArgumentException(f("Unexpected rule name %s not matching input name %s", ruleName, oldInputName));
+    }
+
+    private String replaceStreamName(String ruleName, String oldStreamName, String newStreamName) {
+        RuleNameParsed ruleNameParsed = RuleNameParsed.create(ruleName);
+        if (ruleNameParsed.streamName().equals(oldStreamName)) {
+            return getSystemRuleName(ruleNameParsed.inputName(), ruleNameParsed.inputId(), newStreamName);
+        }
+        throw new IllegalArgumentException(f("Unexpected rule name %s not matching stream name %s", ruleName, oldStreamName));
+    }
+
+    record RuleNameParsed(String inputName, String inputId, String streamName) {
+        static RuleNameParsed create(String ruleName) {
+            Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
+            if (matcher.matches()) {
+                String inputName = matcher.group(1);
+                String inputId = matcher.group(2);
+                String streamName = matcher.group(3);
+                return new RuleNameParsed(inputName, inputId, streamName);
+            }
+            throw new IllegalArgumentException("Unexpected rule name not matching naming pattern: " + ruleName);
+        }
+    }
+
+    /**
+     * Update routing rules when a stream is renamed.
+     */
+    @Subscribe
+    public void handleStreamRenamed(StreamRenamedEvent event) {
+        ruleService.loadAllByTitle(createSystemRuleStreamRegex(event.oldStreamTitle()))
+                .forEach(ruleDao -> {
+                    String oldRuleTitle = ruleDao.title();
+                    String newRuleTitle = replaceStreamName(oldRuleTitle, sanitize(event.oldStreamTitle()), sanitize(event.newStreamTitle()));
+                    String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
+                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
+                    handleRuleRenamed(oldRuleTitle, newRuleTitle);
+                });
     }
 
     /**
@@ -151,13 +200,12 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
-        ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.oldInputTitle()))
+        ruleService.loadAllByTitle(createSystemRuleInputRegex(event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
-                    String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
+                    String newRuleTitle = replaceInputName(oldRuleTitle, sanitize(event.oldInputTitle()), sanitize(event.newInputTitle()));
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
-                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build());
+                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);
                 });
     }
@@ -177,10 +225,19 @@ public class InputRoutingService {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             String pipelineSource = pipelineDao.source().replace(oldTitle, newTitle);
-            pipelineService.save(pipelineDao.toBuilder().source(pipelineSource).build());
+            pipelineService.save(pipelineDao.toBuilder().source(pipelineSource).build(), false);
         } catch (NotFoundException e) {
             log.warn("Unable to load pipeline {}", GL_INPUT_ROUTING_PIPELINE, e);
         }
+    }
+
+    /**
+     * Update routing rules when a stream is deleted.
+     */
+    @Subscribe
+    public void handleStreamDeleted(StreamDeletedEvent event) {
+        ruleService.loadAllByTitle(createSystemRuleStreamRegex(event.streamTitle()))
+                .forEach(ruleService::delete);
     }
 
     /**
@@ -188,18 +245,22 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
-        ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.inputTitle()))
-                .forEach(ruleDao -> {
-                    ruleService.delete(ruleDao.id());
-                    handleRuleDeleted(ruleDao.title());
-                });
+        ruleService.loadAllByTitle(createSystemRuleInputRegex(event.inputId(), event.inputTitle()))
+                .forEach(ruleService::delete);
+    }
+
+    @Subscribe
+    public void handleRuleDeleted(RulesChangedEvent event) {
+        event.deletedRules().stream()
+                .map(RulesChangedEvent.Reference::title)
+                .filter(this::isSystemRulePattern)
+                .forEach(this::deleteFromDefaultPipeline);
     }
 
     /**
      * Update default pipeline when a routing rule is deleted.
      */
-    private void handleRuleDeleted(String ruleTitle) {
+    private void deleteFromDefaultPipeline(String ruleTitle) {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
@@ -211,7 +272,7 @@ public class InputRoutingService {
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            PipelineUtils.update(pipelineService, pipelineRuleParser, pipelineDao.id(), pipelineSource);
+            PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, pipelineDao.id(), pipelineSource, false);
         } catch (NotFoundException e) {
             log.warn("Unable to load pipeline {}", GL_INPUT_ROUTING_PIPELINE, e);
         }

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -45,10 +45,6 @@ describe('useUserSearchFilterQuery hook', () => {
     defaultDisplayedAttributes: ['title'],
   };
 
-  beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -71,7 +67,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should return defaults when there are no user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false, refetch: () => {} });
 
     const { result } = renderHook(
       () =>
@@ -93,6 +89,7 @@ describe('useUserSearchFilterQuery hook', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { perPage: layoutPreferences.perPage },
       isInitialLoading: false,
+      refetch: () => {},
     });
     const { result } = renderHook(
       () =>

@@ -17,10 +17,9 @@
 package org.graylog.failure;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexFailureService;
-
-import jakarta.inject.Inject;
 
 /**
  * A fallback failure handler, which persists submitted failures in Mongo via {@link IndexFailureService}.
@@ -39,11 +38,11 @@ public class DefaultFailureHandler implements FailureHandler {
     public void handle(FailureBatch failureBatch) {
         failureBatch.getFailures().forEach(failure ->
                 indexFailureService.saveWithoutValidation(new IndexFailureImpl(ImmutableMap.<String, Object>builder()
-                        .put("letter_id", failure.failedMessage().getId())
+                        .put("letter_id", failure.messageId())
                         .put("index", failure.targetIndex())
                         .put("type", failure.failureType().toString())
                         .put("message", failure.failureDetails())
-                        .put("timestamp", failure.failedMessage().getTimestamp())
+                        .put("timestamp", failure.messageTimestamp())
                         .build())));
     }
 

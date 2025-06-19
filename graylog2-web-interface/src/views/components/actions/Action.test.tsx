@@ -24,7 +24,7 @@ import type { ActionContexts, RootState } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import mockDispatch from 'views/test/mockDispatch';
 import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
@@ -32,7 +32,7 @@ import useExternalValueActions from 'views/hooks/useExternalValueActions';
 import Action from './Action';
 
 jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/hooks/useExternalValueActions');
 
@@ -40,7 +40,7 @@ describe('Action', () => {
   beforeEach(() => {
     const view = createSearch();
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,

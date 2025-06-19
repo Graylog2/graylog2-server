@@ -1,0 +1,5 @@
+type = "c"
+message = "Admin user can no longer cancel search jobs of other users."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9926"]
+pulls = ["21932"]

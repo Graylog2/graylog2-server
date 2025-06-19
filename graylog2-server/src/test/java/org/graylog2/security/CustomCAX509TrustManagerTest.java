@@ -38,10 +38,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
-import static org.graylog.security.certutil.CertConstants.DATANODE_KEY_ALIAS;
 
 public class CustomCAX509TrustManagerTest {
     @TempDir
@@ -77,14 +77,19 @@ public class CustomCAX509TrustManagerTest {
 
         KeyStore nodeKeyStore = KeyStore.getInstance("PKCS12");
         nodeKeyStore.load(new FileInputStream(nodePath.toFile()), "changeme".toCharArray());
-        final Key nodeKey = nodeKeyStore.getKey(DATANODE_KEY_ALIAS, "changeme".toCharArray());
+
+        final Enumeration<String> aliases = nodeKeyStore.aliases();
+        Assertions.assertThat(aliases.hasMoreElements()).isTrue();
+        final String firstAlias = aliases.nextElement();
+
+        final Key nodeKey = nodeKeyStore.getKey(firstAlias, "changeme".toCharArray());
         Assertions.assertThat(nodeKey).isNotNull();
 
-        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate(CA_KEY_ALIAS).getPublicKey()))
+        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(firstAlias).verify(caKeyStore.getCertificate(CA_KEY_ALIAS).getPublicKey()))
                 .doesNotThrowAnyException();
 
         var hostname = Tools.getLocalCanonicalHostname();
-        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(DATANODE_KEY_ALIAS);
+        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(firstAlias);
         Assertions.assertThat(certificateChain)
                 .hasSize(2)
                 .extracting(c -> (X509Certificate) c)
@@ -102,7 +107,7 @@ public class CustomCAX509TrustManagerTest {
         final var default_issuers = defaultTM.getAcceptedIssuers().length;
         Assertions.assertThat(customTM.getAcceptedIssuers().length).isEqualTo(default_issuers + 1);
 
-        final var cert = (X509Certificate) nodeKeyStore.getCertificate(DATANODE_KEY_ALIAS);
+        final var cert = (X509Certificate) nodeKeyStore.getCertificate(firstAlias);
 
         Assertions.assertThatCode(() -> {
             try {

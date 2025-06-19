@@ -23,6 +23,8 @@ import type { SelectCallback } from 'components/bootstrap/types';
 
 import Icon from './Icon';
 
+type BaseStepKey = string;
+
 const SubnavigationCol = styled(Col)(
   ({ theme }) => css`
     border-right: ${theme.colors.gray[80]} solid 1px;
@@ -196,6 +198,10 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
           background-color: ${theme.colors.global.link};
         }
       }
+      
+      &.disabled > a {
+        color: ${theme.colors.text.disabled};
+      }
 
       > a {
         border-radius: 0;
@@ -242,7 +248,10 @@ const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
 
-const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsType) => {
+const isValidActiveStep = <StepKey extends BaseStepKey>(
+  activeStep: StepKey | null | undefined,
+  steps: StepsType<StepKey>,
+) => {
   if (activeStep === undefined || activeStep === null) {
     return false;
   }
@@ -250,7 +259,10 @@ const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsT
   return find(steps, { key: activeStep });
 };
 
-const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsType) => {
+const warnOnInvalidActiveStep = <StepKey extends BaseStepKey>(
+  activeStep: StepKey | null | undefined,
+  steps: StepsType<StepKey>,
+) => {
   if (activeStep === undefined || activeStep === null) {
     return;
   }
@@ -261,29 +273,27 @@ const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: 
   }
 };
 
-export type StepKey = number | string;
-
-export type StepType = {
+export type StepType<StepKey extends string> = {
   key: StepKey;
   title: React.ReactNode;
   component: React.ReactElement;
   disabled?: boolean;
 };
 
-export type StepsType = Array<StepType>;
-type Props = {
-  steps: StepsType;
-  activeStep: StepKey | null | undefined;
-  onStepChange: (StepKey) => void;
-  children: React.ReactNode;
-  horizontal: boolean;
-  justified: boolean;
-  containerClassName: string;
-  hidePreviousNextButtons: boolean;
-  style: 'stepper' | undefined;
+export type StepsType<StepKey extends string> = Array<StepType<StepKey>>;
+type Props<StepKey extends string> = {
+  steps: StepsType<StepKey>;
+  activeStep?: StepKey | null | undefined;
+  onStepChange: (stepKey: StepKey) => void;
+  children?: React.ReactNode;
+  horizontal?: boolean;
+  justified?: boolean;
+  containerClassName?: string;
+  hidePreviousNextButtons?: boolean;
+  style?: 'stepper' | undefined;
 };
 
-type State = {
+type State<StepKey> = {
   selectedStep: StepKey;
 };
 
@@ -293,11 +303,10 @@ type State = {
  * the steps the wizard will take. Second column will render the component of the
  * selected step. In a optional third column the consumer can render a preview.
  */
-class Wizard extends React.Component<Props, State> {
+class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>, State<StepKey>> {
   static defaultProps = {
     children: undefined,
     activeStep: undefined,
-    onStepChange: () => {},
     horizontal: false,
     justified: false,
     containerClassName: 'content',
@@ -305,7 +314,7 @@ class Wizard extends React.Component<Props, State> {
     style: undefined,
   };
 
-  constructor(props: Props) {
+  constructor(props: Props<StepKey>) {
     super(props);
 
     warnOnInvalidActiveStep(props.activeStep, props.steps);

@@ -19,7 +19,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
+import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { FormSubmit } from 'components/common';
@@ -32,19 +33,17 @@ type Props = {
   modal?: boolean;
   save: (pipeline: PipelineType, callback: () => void) => void;
   onCancel?: () => void;
+  disableEdit?: boolean;
 };
 
-const emptyPipeline: PipelineType = {
-  id: undefined,
-  title: '',
-  description: '',
-  stages: [{ stage: 0, rules: [], match: 'EITHER' }],
-  source: '',
-  created_at: '',
-  modified_at: '',
-};
-
-const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, save, onCancel = () => {} }: Props) => {
+const PipelineForm = ({
+  pipeline = DEFAULT_PIPELINE,
+  create = false,
+  modal = true,
+  save,
+  onCancel = () => {},
+  disableEdit = false,
+}: Props) => {
   const currentUser = useCurrentUser();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -107,7 +106,7 @@ const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, 
     return (
       <span>
         <Button
-          disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+          disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
           onClick={_openModal}
           bsStyle="success">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}

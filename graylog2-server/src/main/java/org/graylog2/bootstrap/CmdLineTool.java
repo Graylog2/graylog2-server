@@ -55,11 +55,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.graylog2.Configuration;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
-import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
@@ -77,6 +76,7 @@ import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.plugins.LoggingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
@@ -85,7 +85,6 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
@@ -148,9 +147,11 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     protected CmdLineTool(String commandName, NodeConfiguration configuration) {
+        // Wrap the context class loader to allow logging of failed class and resource lookups.
+        Thread.currentThread().setContextClassLoader(new LoggingClassLoader(Thread.currentThread().getContextClassLoader()));
+
         jadConfig = new JadConfig();
-        jadConfig.addConverterFactory(new GuavaConverterFactory());
-        jadConfig.addConverterFactory(new JodaTimeConverterFactory());
+        addConverters(jadConfig);
 
         if (commandName == null) {
             if (this.getClass().isAnnotationPresent(Command.class)) {
@@ -202,6 +203,11 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         // This needs to run before the first SSLContext is instantiated,
         // because it sets up the default SSLAlgorithmConstraints
         applySecuritySettings(parseAndGetTLSConfiguration(configFile));
+
+        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
+        if (configuration instanceof NativeLibPathConfiguration) {
+            setNettyNativeDefaults(parseAndGetNativeLibPathConfiguration(configFile));
+        }
     }
 
     /**
@@ -251,6 +257,22 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         Security.addProvider(new BouncyCastleProvider());
     }
 
+
+    private void setNettyNativeDefaults(NativeLibPathConfiguration pathConfiguration) {
+        // Give netty a better spot than /tmp to unpack its tcnative libraries
+        if (System.getProperty("io.netty.native.workdir") == null) {
+            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+        }
+        // The jna.tmpdir should reside in the native lib dir. (See: https://github.com/Graylog2/graylog2-server/issues/21223)
+        if (System.getProperty("jna.tmpdir") == null) {
+            System.setProperty("jna.tmpdir", pathConfiguration.getNativeLibDir().toAbsolutePath().resolve("jna").toString());
+        }
+        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
+        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
+            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
+        }
+    }
+
     private static void setSystemPropertyIfEmpty(String key, String value) {
         if (System.getProperty(key) == null) {
             System.setProperty(key, value);
@@ -270,8 +292,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     public void doRun(Level logLevel) {
-        if (configuration instanceof PathConfiguration) {
-            PathConfiguration pathConfiguration = parseAndGetPathConfiguration(configFile);
+        if (configuration instanceof NativeLibPathConfiguration) {
+            NativeLibPathConfiguration pathConfiguration = parseAndGetNativeLibPathConfiguration(configFile);
 
             // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
             // See: https://github.com/Graylog2/graylog2-server/issues/17837
@@ -360,10 +382,6 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         startCommand();
     }
 
-    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
-        return new PluginLoader(pluginDir, classLoader);
-    }
-
     protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
         return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader);
     }
@@ -384,10 +402,24 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         return tlsConfiguration;
     }
 
-    protected PathConfiguration parseAndGetPathConfiguration(String configFile) {
-        final PathConfiguration pathConfiguration = new PathConfiguration();
-        processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
+    protected NativeLibPathConfiguration parseAndGetNativeLibPathConfiguration(String configFile) {
+        final NativeLibPathConfiguration pathConfiguration = (NativeLibPathConfiguration) configuration;
+        final JadConfig config = new JadConfig(getConfigRepositories(configFile), pathConfiguration);
+        addConverters(config);
+        processConfiguration(config);
         return pathConfiguration;
+    }
+
+    /**
+     * The server configuration file contains config values that require these converters.
+     * For example `root_timezone = America/Chicago`.
+     * <p>
+     * The converters must be added to each instance of JadConfig before calling `JadConfig.process()` or else
+     * configuration value parsing might fail which could halt server startup.
+     */
+    private void addConverters(JadConfig config) {
+        config.addConverterFactory(new GuavaConverterFactory());
+        config.addConverterFactory(new JodaTimeConverterFactory());
     }
 
     private void installCommandConfig() {
@@ -476,7 +508,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         for (Plugin plugin : pluginLoader.loadPlugins(bootstrapConfigInjector)) {
             final PluginMetaData metadata = plugin.metadata();
 
-            final Configuration config = bootstrapConfigInjector.getInstance(Configuration.class);
+            final GraylogNodeConfiguration config = bootstrapConfigInjector.getInstance(configuration.getClass());
             // TODO do we want this here? We are also considering removing the deprecated CollectorPlugin entirely
             if (config.isCloud()) {
                 if (metadata.getUniqueId().equals("org.graylog.plugins.collector.CollectorPlugin")) {

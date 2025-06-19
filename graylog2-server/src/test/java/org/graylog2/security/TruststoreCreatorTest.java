@@ -77,8 +77,8 @@ public class TruststoreCreatorTest {
         final KeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
 
         final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
-                .addFromKeystore(root, "root")
-                .addFromKeystore(boot, "boot")
+                .addCertificates(root)
+                .addCertificates(boot)
 
                 .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
 
@@ -135,7 +135,7 @@ public class TruststoreCreatorTest {
         final InMemoryKeystoreInformation keystoreInformation = createInMemoryKeystore(nodeKeys, intermediateCa);
 
         final KeyStore truststore = TruststoreCreator.newEmpty()
-                .addFromKeystore(keystoreInformation, "my-node")
+                .addCertificates(keystoreInformation)
                 .getTruststore();
 
         final X509TrustManager defaultTrustManager = createTrustManager(truststore);

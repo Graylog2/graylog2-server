@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useState } from 'react';
 import moment from 'moment';
 
 import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import UserNotification from 'util/UserNotification';
 import { Spinner } from 'components/common';
 import { Alert, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
@@ -62,7 +62,7 @@ const useDataNodes = () => {
     queryKey: ['data-nodes', 'overview'],
     queryFn: () =>
       defaultOnError(fetchDataNodes(), 'Loading Data Nodes failed with status', 'Could not load data nodes'),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchInterval: 3000,
   });
 

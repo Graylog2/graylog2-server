@@ -107,10 +107,9 @@ const LookupTableFields = ({
             onChange={onTableNameChange}
             options={formatLookupTables(lookupTables.tables)}
             value={selectedTableName}
-            matchProp="label"
             required
           />
-          <HelpBlock>{nameValidation || 'Select the Lookup Table Graylog should use to get the value.'}</HelpBlock>
+          <HelpBlock>{nameValidation || 'Select the Lookup Table which should be used to get the value.'}</HelpBlock>
         </FormGroup>
       </Col>
       {customKeyField ? (
@@ -125,7 +124,6 @@ const LookupTableFields = ({
               onChange={onKeyChange}
               options={formatMessageFields(allFieldTypes)}
               value={selectedKeyName}
-              matchProp="label"
               allowCreate
               required
             />

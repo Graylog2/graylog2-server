@@ -19,9 +19,11 @@ package org.graylog.events.procedures;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog2.database.entities.ScopedEntity;
+import org.graylog2.security.html.HTMLSanitizerConverter;
 
 @AutoValue
 @JsonDeserialize(builder = EventProcedureStep.Builder.class)
@@ -36,6 +38,7 @@ public abstract class EventProcedureStep extends ScopedEntity {
 
     @Nullable
     @JsonProperty(FIELD_DESCRIPTION)
+    @JsonSerialize(converter = HTMLSanitizerConverter.class)
     public abstract String description();
 
     @Nullable

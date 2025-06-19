@@ -91,7 +91,7 @@ const FailureStreamLink = () => {
 
 const ChangeFieldTypeModal = ({
   show,
-  onSubmitCallback,
+  onSubmitCallback = undefined,
   initialSelectedIndexSets,
   onClose,
   showSelectionTable = true,
@@ -119,7 +119,7 @@ const ChangeFieldTypeModal = ({
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
-  const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLading } = usePutFieldTypeMutation();
+  const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLoading } = usePutFieldTypeMutation();
 
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
@@ -197,12 +197,12 @@ const ChangeFieldTypeModal = ({
   return (
     <BootstrapModalForm
       title={<span>Change {fieldName} Field Type</span>}
-      submitButtonText={fieldTypeMutationIsLading ? 'Changing field type...' : 'Change field type'}
+      submitButtonText={fieldTypeMutationIsLoading ? 'Changing field type...' : 'Change field type'}
       onSubmitForm={onSubmit}
       onCancel={onCancel}
       show={show}
       bsSize="large"
-      submitButtonDisabled={fieldTypeMutationIsLading}>
+      submitButtonDisabled={fieldTypeMutationIsLoading || !indexSetSelection?.length}>
       <div>
         {showFieldSelect && (
           <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={setModalData} field={fieldName} />

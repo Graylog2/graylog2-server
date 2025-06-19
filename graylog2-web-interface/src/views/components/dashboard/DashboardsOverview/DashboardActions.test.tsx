@@ -30,6 +30,7 @@ import { adminUser } from 'fixtures/users';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type { ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
@@ -50,10 +51,15 @@ const mockSearchParams = {
   },
 } as const;
 
-const mockContextValue = { searchParams: mockSearchParams, refetch: jest.fn(), attributes: [] };
+const mockContextValue = {
+  searchParams: mockSearchParams,
+  refetch: jest.fn(),
+  attributes: [],
+  entityTableId: 'entity-table',
+};
 
 const DashboardActions = ({
-  contextValue,
+  contextValue = undefined,
   ...props
 }: React.ComponentProps<typeof OriginalDashboardActions> & { contextValue?: ContextValue }) => (
   <TableFetchContext.Provider value={contextValue ?? mockContextValue}>
@@ -62,8 +68,6 @@ const DashboardActions = ({
 );
 
 describe('DashboardActions', () => {
-  let oldWindowConfirm;
-
   const simpleDashboard = simpleView();
   const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
@@ -73,9 +77,9 @@ describe('DashboardActions', () => {
     await waitFor(() => menuIsHidden());
   };
 
+  useWindowConfirmMock();
+
   beforeEach(() => {
-    oldWindowConfirm = window.confirm;
-    window.confirm = jest.fn();
     asMock(useCurrentUser).mockReturnValue(adminUser);
 
     asMock(useSelectedEntities).mockReturnValue({
@@ -85,10 +89,6 @@ describe('DashboardActions', () => {
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
     });
-  });
-
-  afterEach(() => {
-    window.confirm = oldWindowConfirm;
   });
 
   it('does not delete dashboard when user clicks cancel', async () => {

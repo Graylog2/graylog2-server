@@ -16,5 +16,10 @@
  */
 
 export { default as InputSetupWizard } from './InputSetupWizard';
+export * from './steps/components/StepWrapper';
 export * from './types';
-export { INPUT_SETUP_MODE_FEATURE_FLAG } from './constants';
+export { INPUT_SETUP_MODE_FEATURE_FLAG, OPEN_FLOW_STEPS } from './constants';
+export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
+export { default as useInputSetupWizardSteps } from './hooks/useInputSetupWizardSteps';
+export { default as useInputSetupWizardStepsHelper } from './hooks/useInputSetupWizardStepsHelper';
+export { default as ProgressMessage } from './steps/components/ProgressMessage';

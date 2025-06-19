@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 import fetch from 'logic/rest/FetchProvider';
@@ -27,31 +27,38 @@ const preferencesFromJSON = ({
   displayed_attributes,
   sort,
   per_page,
+  custom_preferences,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
   displayedAttributes: displayed_attributes,
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
+  customPreferences: custom_preferences,
 });
 const fetchUserLayoutPreferences = (entityId: string) =>
   fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
 
-const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences; isInitialLoading: boolean } => {
-  const { data, isInitialLoading } = useQuery(
-    ['table-layout', entityId],
-    () =>
+const useUserLayoutPreferences = <T>(
+  entityId: string,
+): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: ['table-layout', entityId],
+
+    queryFn: () =>
       defaultOnError(
         fetchUserLayoutPreferences(entityId),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
-    {
-      keepPreviousData: true,
-      staleTime: 60 * (60 * 1000), // 1 hour
-    },
-  );
+
+    placeholderData: keepPreviousData,
+
+    // 1 hour
+    staleTime: 60 * (60 * 1000),
+  });
 
   return {
     data: data ?? INITIAL_DATA,
     isInitialLoading,
+    refetch,
   };
 };
 

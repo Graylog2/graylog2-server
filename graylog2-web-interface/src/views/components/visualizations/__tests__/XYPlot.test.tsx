@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, waitFor } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
@@ -23,8 +23,8 @@ import type { Props as XYPlotProps } from 'views/components/visualizations/XYPlo
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import Query from 'views/logic/queries/Query';
-import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
+import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import { ALL_MESSAGES_TIMERANGE, DEFAULT_TIMERANGE } from 'views/Constants';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
@@ -33,8 +33,9 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import { setTimerange } from 'views/logic/slices/viewSlice';
+import GenericPlot from 'views/components/visualizations/GenericPlot';
 
-jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
+jest.mock('../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/logic/queries/useCurrentQueryId');
 jest.mock('views/hooks/useViewType');
@@ -44,7 +45,12 @@ jest.mock('views/logic/slices/viewSlice', () => ({
   setTimerange: jest.fn(() => async () => {}),
 }));
 
-const defaultCurrentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
+const defaultCurrentQuery = Query.fromJSON({
+  id: 'dummyquery',
+  query: createElasticsearchQueryString(),
+  timerange: DEFAULT_TIMERANGE,
+  search_types: [],
+});
 
 describe('XYPlot', () => {
   const timestampPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
@@ -83,96 +89,118 @@ describe('XYPlot', () => {
     asMock(useCurrentQuery).mockReturnValue(defaultCurrentQuery);
     asMock(useCurrentQueryId).mockReturnValue(defaultCurrentQuery.id);
     asMock(useViewType).mockReturnValue(View.Type.Search);
+    jest.clearAllMocks();
   });
 
   it('renders generic X/Y-Plot when no timeline config is passed', () => {
     const emptyConfig = AggregationWidgetConfig.builder().build();
     const timerange = { from: 'foo', to: 'bar', type: 'absolute' };
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} config={emptyConfig} />);
-    const genericPlot = wrapper.find('GenericPlot');
+    render(<SimpleXYPlot effectiveTimerange={timerange} config={emptyConfig} />);
 
-    expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
-      xaxis: { fixedrange: true },
-      hovermode: 'x',
-      legend: { y: -0.14 },
-    });
+    expect(GenericPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        layout: {
+          yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
+          xaxis: { fixedrange: true },
+          hovermode: 'x',
+          legend: { y: -0.14 },
+        },
+        chartData: expect.anything(),
+      }),
+      expect.anything(),
+    );
 
-    expect(genericPlot).toHaveProp('chartData', chartData);
-
-    genericPlot.get(0).props.onZoom('from', 'to');
+    const { onZoom } = asMock(GenericPlot).mock.calls[0][0];
+    onZoom('from', 'to');
 
     expect(setTimerange).not.toHaveBeenCalled();
   });
 
-  it('adds zoom handler for timeline plot', () => {
+  it('adds zoom handler for timeline plot', async () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} />);
-    const genericPlot = wrapper.find('GenericPlot');
+    render(<SimpleXYPlot effectiveTimerange={timerange} />);
 
-    expect(genericPlot).toHaveProp(
-      'layout',
+    expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
-        xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+        'layout': expect.objectContaining({
+          xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+        }),
       }),
+      {},
     );
 
-    genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
+    const { onZoom } = asMock(GenericPlot).mock.calls[0][0];
+    onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
 
-    expect(setTimerange).toHaveBeenCalledWith('dummyquery', {
-      type: 'absolute',
-      from: '2018-10-12T04:04:21.723+00:00',
-      to: '2018-10-12T08:04:21.723+00:00',
+    await waitFor(() => {
+      expect(setTimerange).toHaveBeenCalledWith('dummyquery', {
+        type: 'absolute',
+        from: '2018-10-12T04:04:21.723+00:00',
+        to: '2018-10-12T08:04:21.723+00:00',
+      });
     });
   });
 
   it('uses effective time range from pivot result if all messages are selected', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
     const currentQueryForAllMessages = defaultCurrentQuery.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} />);
-    const genericPlot = wrapper.find('GenericPlot');
+    render(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} />);
 
-    expect(genericPlot).toHaveProp(
-      'layout',
+    expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
-        xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+        'layout': expect.objectContaining({
+          xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+        }),
       }),
+      {},
     );
   });
 
   it('sets correct plot legend position for small containers', () => {
-    const wrapper = mount(<SimpleXYPlot height={140} />);
-    const genericPlot = wrapper.find('GenericPlot');
+    render(<SimpleXYPlot height={140} />);
 
-    expect(genericPlot).toHaveProp(
-      'layout',
+    expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
-        legend: { y: -0.6 },
+        'layout': expect.objectContaining({
+          legend: { y: -0.6 },
+        }),
       }),
+      {},
     );
   });
 
   it('sets correct plot legend position for containers with medium height', () => {
-    const wrapper = mount(<SimpleXYPlot height={350} />);
-    const genericPlot = wrapper.find('GenericPlot');
+    render(<SimpleXYPlot height={350} />);
 
-    expect(genericPlot).toHaveProp(
-      'layout',
+    expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
-        legend: { y: -0.2 },
+        'layout': expect.objectContaining({
+          legend: { y: -0.2 },
+        }),
       }),
+      {},
     );
   });
 
   it('sets correct plot legend position for containers with huge height', () => {
-    const wrapper = mount(<SimpleXYPlot height={700} />);
-    const genericPlot = wrapper.find('GenericPlot');
+    render(<SimpleXYPlot height={700} />);
 
-    expect(genericPlot).toHaveProp(
-      'layout',
+    expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
-        legend: { y: -0.14 },
+        'layout': expect.objectContaining({
+          legend: { y: -0.14 },
+        }),
       }),
+      {},
     );
+  });
+
+  it('allows passing `onClickMarker` callback', async () => {
+    const onClick = jest.fn();
+    render(<SimpleXYPlot onClickMarker={onClick} />);
+    const { onClickMarker } = asMock(GenericPlot).mock.calls[0][0];
+    onClickMarker({ x: 'Foo', y: '23' });
+
+    expect(onClick).toHaveBeenCalledWith({ x: 'Foo', y: '23' });
   });
 });

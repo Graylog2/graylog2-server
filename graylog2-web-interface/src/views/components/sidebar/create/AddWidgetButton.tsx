@@ -24,8 +24,8 @@ import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import generateId from 'logic/generateId';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -53,7 +53,7 @@ export type CreatorProps = {
   view: View;
 };
 type CreatorType = 'preset' | 'generic' | 'investigations' | 'events';
-type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
+type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
   func: CreatorFunction;
@@ -90,7 +90,7 @@ const CreateMenuItem = ({
 }) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
 
   const createHandlerFor = () => {

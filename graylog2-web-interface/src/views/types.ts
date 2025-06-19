@@ -18,7 +18,6 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
-import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
@@ -53,15 +52,18 @@ import type { CustomCommand, CustomCommandContext } from 'views/components/searc
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type SearchResult from 'views/logic/SearchResult';
-import type { WidgetMapping } from 'views/logic/views/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 import type { Event } from 'components/events/events/types';
+import type { PluggableReducer } from 'store';
+import type { WidgetMapping } from 'views/logic/views/types';
+import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
+import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -122,11 +124,6 @@ export interface WidgetExport {
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
   exportComponent?: React.ComponentType<{ widget: Widget }>;
-}
-
-export interface VisualizationConfigProps {
-  config: WidgetConfig;
-  onChange: (newConfig: WidgetConfig) => void;
 }
 
 type BaseField = {
@@ -210,7 +207,7 @@ export interface ExportFormat {
 }
 
 export interface SystemConfigurationComponentProps<T = unknown> {
-  config: T;
+  config?: T;
   updateConfig: (newConfig: T) => any;
 }
 
@@ -219,9 +216,10 @@ export interface SystemConfiguration {
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
+  useCondition?: () => boolean;
 }
 
-export type SearchTypeResult = {
+export type GenericResult = {
   type: string;
   effective_timerange: AbsoluteTimeRange;
   total: number;
@@ -234,7 +232,7 @@ export type MessageResult = {
 };
 
 export interface SearchTypeResultTypes {
-  generic: SearchTypeResult;
+  generic: GenericResult;
   messages: MessageResult;
 }
 
@@ -250,7 +248,8 @@ export interface ActionContexts {
   parameterBindings?: ParameterBindings;
 }
 
-export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
+export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
+export type SearchTypeResults = { [id: string]: SearchTypeResult };
 
 export type MessagePreviewOption = {
   title: string;
@@ -313,8 +312,22 @@ type SearchActionModalProps = React.PropsWithRef<{
 };
 
 type AssetInformationComponentProps = {
-  identifiers: unknown;
-  addToQuery: (id: string) => void;
+  assetIds: unknown;
+  direction?: 'col' | 'row';
+  addToQuery?: (id: string) => void;
+};
+
+type EventProcedureFormProps = {
+  eventProcedureID: string | undefined;
+  remediationSteps: string;
+  onClose: () => void;
+  onSave: (eventProcedureId: string) => void;
+};
+
+type EventProcedureSummaryProps = {
+  eventDefinitionEventProcedure: string | undefined;
+  eventId?: string;
+  event?: Event;
 };
 
 type SearchAction = {
@@ -348,6 +361,16 @@ type EventWidgetAction<T> = {
 
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>;
+  key: string;
+};
+
+type EventProcedureForm = {
+  component: React.ComponentType<EventProcedureFormProps>;
+  key: string;
+};
+
+type EventProcedureSummary = {
+  component: React.ComponentType<EventProcedureSummaryProps>;
   key: string;
 };
 
@@ -395,12 +418,12 @@ export interface SearchBarControl {
   id: string;
   onSearchSubmit?: <T extends Query | undefined>(
     values: CombinedSearchBarFormValues,
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     currentQuery?: T,
   ) => Promise<T>;
   onDashboardWidgetSubmit: (
     values: CombinedSearchBarFormValues,
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     currentWidget: Widget,
   ) => Promise<Widget | void>;
   onValidate?: (values: CombinedSearchBarFormValues, context?: HandlerContext) => FormikErrors<{}>;
@@ -447,7 +470,7 @@ export interface ViewState {
 
 export type SearchExecutionResult = {
   result: SearchResult;
-  widgetMapping: WidgetMapping;
+  widgetMapping?: WidgetMapping;
 };
 
 export type JobIdsState = JobIds | null;
@@ -455,7 +478,7 @@ export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
-  widgetsToSearch: Array<string>;
+  searchTypesToSearch: Array<string>;
   jobIds?: JobIds | null;
 }
 
@@ -477,10 +500,7 @@ export interface ExtraArguments {
 
 export type GetState = () => RootState;
 
-export type ViewsReducer = {
-  key: keyof RootState;
-  reducer: Reducer<RootState[keyof RootState], AnyAction>;
-};
+export type ViewsReducer = PluggableReducer<RootState>;
 
 export type Widgets = Immutable.OrderedMap<string, Widget>;
 
@@ -505,18 +525,50 @@ export type SearchDataSource = {
   useCondition: () => boolean;
 };
 
+type LICENSE_SUBJECTS = {
+  enterprise: '/license/enterprise';
+  archive: '/license/enterprise/archive';
+  auditlog: '/license/enterprise/auditlog';
+  illuminate: '/license/enterprise/illuminate';
+  searchFilter: '/license/enterprise/search-filter';
+  customization: '/license/enterprise/customization';
+  views: '/license/enterprise/views';
+  forwarder: '/license/enterprise/forwarder';
+  report: '/license/enterprise/report';
+  security: '/license/security';
+  anomaly: '/license/anomaly';
+};
+
+export type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
+
+export type LicenseCheck = (subject: LicenseSubject) => {
+  data: {
+    valid: boolean;
+    expired: boolean;
+    violated: boolean;
+  };
+  isInitialLoading: boolean;
+  refetch: () => void;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
     fieldActions?: Array<ActionDefinition>;
+    fieldTypeValueRenderer?: Array<{
+      type: string;
+      render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
+    }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
+    'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
+    'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
@@ -565,5 +617,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
+    'licenseCheck'?: Array<LicenseCheck>;
+    entityPermissionsMapper?: EntityPermissionsMapper;
   }
 }

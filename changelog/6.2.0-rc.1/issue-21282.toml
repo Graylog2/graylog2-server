@@ -1,0 +1,5 @@
+type = "f"
+message = "Retrying indexing messages failing due to circuit breaker exception."
+
+issues = ["21282"]
+pulls = ["21313"]

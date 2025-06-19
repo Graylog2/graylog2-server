@@ -33,7 +33,7 @@ const useInputs = () => {
   return useStore(InputsStore, mapInputs);
 };
 
-const InputsProvider = ({ children }: React.PropsWithChildren<{}>) => {
+const InputsProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => {
   const value = useInputs();
 
   return <InputsContext.Provider value={value}>{children}</InputsContext.Provider>;

@@ -30,7 +30,6 @@ import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/E
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
@@ -126,7 +125,6 @@ const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.
 type TableCellProps = {
   value: string;
   fieldTypes: FieldTypes;
-  activeQuery: string;
   labelFields: string[];
 };
 
@@ -172,11 +170,10 @@ const LegendEntry = ({ value, labelsWithField }: LegendEntryProps) => {
   );
 };
 
-const TableCell = ({ value, fieldTypes, activeQuery, labelFields }: TableCellProps) => {
+const TableCell = ({ value, fieldTypes, labelFields }: TableCellProps) => {
   const labelsWithField = value.split(keySeparator).map((label, idx) => {
     const field = labelFields[idx];
-    const fieldType =
-      fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+    const fieldType = fieldTypes?.currentQuery?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
 
     return { label, field, type: fieldType };
   });
@@ -189,26 +186,20 @@ const TableCell = ({ value, fieldTypes, activeQuery, labelFields }: TableCellPro
 };
 
 type LegendComponentProps = Pick<Props, 'config' | 'labelFields'> & {
-  activeQuery: string;
   fieldTypes: FieldTypes;
   labels: Array<string>;
 };
 
-const InteractiveLegend = ({ activeQuery, config, fieldTypes, labelFields, labels }: LegendComponentProps) => {
+const InteractiveLegend = ({ config, fieldTypes, labelFields, labels }: LegendComponentProps) => {
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
   const tableCells = labels
     .sort(stringLenSort)
-    .map((value) => (
-      <TableCell
-        key={value}
-        value={value}
-        labelFields={_labelFields}
-        fieldTypes={fieldTypes}
-        activeQuery={activeQuery}
-      />
-    ));
+    .map((value) => <TableCell key={value} value={value} labelFields={_labelFields} fieldTypes={fieldTypes} />);
 
-  const result = chunk(tableCells, 5).map((cells, index) => <LegendRow key={index}>{cells}</LegendRow>);
+  const result = chunk(tableCells, 5).map((cells, index) => (
+    // eslint-disable-next-line react/no-array-index-key
+    <LegendRow key={index}>{cells}</LegendRow>
+  ));
 
   return (
     <LegendContainer>
@@ -223,7 +214,7 @@ const FlexLegendContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const NoninteractiveLegend = ({ activeQuery, config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
+const NoninteractiveLegend = ({ config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
 
   return (
@@ -231,8 +222,7 @@ const NoninteractiveLegend = ({ activeQuery, config, fieldTypes, labels, labelFi
       {labels.map((value) => {
         const labelsWithField = value.split(keySeparator).map((label, idx) => {
           const field = _labelFields[idx];
-          const fieldType =
-            fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+          const fieldType = fieldTypes?.currentQuery?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
 
           return { label, field, type: fieldType };
         });
@@ -260,7 +250,6 @@ const PlotLegend = ({
   const { limitHeight } = useContext(WidgetRenderingContext);
 
   const labels = labelMapper(chartData);
-  const activeQuery = useActiveQueryId();
   const Container = limitHeight ? FixedContainer : VariableContainer;
 
   if (!neverHide && !focusedWidget?.editing && series.length <= 1 && columnPivots.length <= 0) {
@@ -276,13 +265,7 @@ const PlotLegend = ({
   return (
     <Container $height={height} $width={width}>
       {children}
-      <LegendComponent
-        activeQuery={activeQuery}
-        config={config}
-        fieldTypes={fieldTypes}
-        labelFields={labelFields}
-        labels={labels}
-      />
+      <LegendComponent config={config} fieldTypes={fieldTypes} labelFields={labelFields} labels={labels} />
     </Container>
   );
 };

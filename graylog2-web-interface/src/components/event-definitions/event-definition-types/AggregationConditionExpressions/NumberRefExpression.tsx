@@ -36,7 +36,6 @@ type NumberRefExpressionProps = {
   onChange: (...args: any[]) => void;
   renderLabel: boolean;
   validation?: any;
-  parent?: any;
 };
 
 const NumberRefExpression = ({
@@ -123,7 +122,6 @@ const NumberRefExpression = ({
           <Col md={12 / elements}>
             <Select
               className="aggregation-function"
-              matchProp="label"
               placeholder="Select Function"
               onChange={handleAggregationFunctionChange}
               options={formatFunctions(aggregationFunctions)}
@@ -135,7 +133,6 @@ const NumberRefExpression = ({
             <Col md={12 / elements}>
               <Select
                 className="aggregation-function-strategy"
-                matchProp="label"
                 placeholder="Select Strategy (Optional)"
                 onChange={(newValue) => handleFieldChange('strategy', newValue)}
                 options={percentageStrategyOptions}
@@ -147,7 +144,6 @@ const NumberRefExpression = ({
             <Select
               className="aggregation-function-field"
               ignoreAccents={false}
-              matchProp="label"
               placeholder="Select Field (Optional)"
               onChange={handleAggregationFieldChange}
               options={formattedFields}

@@ -145,7 +145,7 @@ public class SearchJob implements ParameterProvider {
     @JsonProperty("execution")
     public ExecutionInfo execution() {
         final boolean isDone = (resultFuture == null || resultFuture.isDone()) && (queryExecutionFutures.values().stream().allMatch(f -> f == null || f.isDone()));
-        final boolean isCancelled = (queryExecutionFutures.values().stream().allMatch(f -> f != null && f.isCancelled()) || (resultFuture != null && resultFuture.isCancelled()));
+        final boolean isCancelled = (!queryExecutionFutures.isEmpty() && queryExecutionFutures.values().stream().allMatch(f -> f != null && f.isCancelled()) || (resultFuture != null && resultFuture.isCancelled()));
         return new ExecutionInfo(isDone, isCancelled, !errors.isEmpty());
     }
 
