@@ -102,7 +102,7 @@ const UrlWhiteListConfig = () => {
 
   return (
     <div>
-      <h2>URL Whitelist Configuration {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
+      <h2>URL Allowlist Configuration {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
       <p>
         When enabled, outgoing HTTP requests from {productName} servers, such as event notifications or HTTP-based data
         adapter requests, are validated against the whitelists configured here. Because the HTTP requests are made from

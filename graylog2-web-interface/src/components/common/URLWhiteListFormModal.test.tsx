@@ -59,7 +59,7 @@ describe('<URLWhiteListFormModal>', () => {
   it('renders elements to add URL to allow list', async () => {
     renderSUT();
 
-    const addButton = screen.getByRole('button', { name: /add to url whitelist/i });
+    const addButton = screen.getByRole('button', { name: /add to URL Allowlist/i });
 
     expect(addButton).toBeInTheDocument();
 
@@ -76,7 +76,7 @@ describe('<URLWhiteListFormModal>', () => {
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
     renderSUT();
 
-    expect(screen.queryByRole('button', { name: /add to url whitelist/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /add to URL Allowlist/i })).not.toBeInTheDocument();
   });
 
   it('does not render if allow list is not loaded', () => {
@@ -91,7 +91,7 @@ describe('<URLWhiteListFormModal>', () => {
 
     renderSUT();
 
-    expect(screen.queryByRole('button', { name: /add to url whitelist/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /add to URL Allowlist/i })).not.toBeInTheDocument();
   });
 
   it('extends existing allow list with given newUrlEntry', async () => {
@@ -108,7 +108,7 @@ describe('<URLWhiteListFormModal>', () => {
     }));
 
     renderSUT();
-    const addButton = screen.queryByRole('button', { name: /add to url whitelist/i });
+    const addButton = screen.queryByRole('button', { name: /add to URL Allowlist/i });
 
     expect(addButton).toBeInTheDocument();
 
