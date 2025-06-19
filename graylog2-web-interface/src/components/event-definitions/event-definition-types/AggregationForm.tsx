@@ -32,16 +32,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import AggregationConditionsForm from './AggregationConditionsForm';
 
 import commonStyles from '../common/commonStyles.css';
-
-type EventDefinitionConfig = {
-  group_by: Array<string>;
-  streams: Array<string>;
-  stream_categories?: Array<string>;
-};
-
-type EventDefinition = {
-  config: EventDefinitionConfig;
-};
+import { EventDefinition, EventProcessorConfig } from '../event-definitions-types';
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -68,7 +59,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
   const sendTelemetry = useSendTelemetry();
 
   const propagateConfigChange = useCallback(
-    (update: Partial<EventDefinitionConfig>) => {
+    (update: Partial<EventProcessorConfig>) => {
       const nextConfig = { ...eventDefinition.config, ...update };
 
       onChange('config', nextConfig);

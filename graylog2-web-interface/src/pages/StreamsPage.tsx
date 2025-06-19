@@ -47,7 +47,7 @@ const StreamsPage = () => {
 
     return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
-      queryClient.invalidateQueries(KEY_PREFIX)
+      queryClient.invalidateQueries({queryKey: KEY_PREFIX})
     });
   };
 

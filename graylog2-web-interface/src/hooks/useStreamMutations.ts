@@ -47,7 +47,8 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
 };
 
 const useStreamMutations = () => {
-  const createMutation = useMutation(createStream, {
+  const createMutation = useMutation({
+    mutationFn: createStream,
     onError: (errorThrown) => {
       UserNotification.error(`Saving Stream failed with status: ${errorThrown}`, 'Could not save Stream');
     },
