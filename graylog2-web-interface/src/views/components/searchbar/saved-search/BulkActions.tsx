@@ -57,7 +57,9 @@ const BulkActions = () => {
           UserNotification.error(`An error occurred while deleting saved searches. ${error}`);
         })
         .finally(() => {
-          queryClient.invalidateQueries(['saved-searches', 'overview']);
+          queryClient.invalidateQueries({
+            queryKey: ['saved-searches', 'overview'],
+          });
         });
     }
   }, [descriptor, queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities]);

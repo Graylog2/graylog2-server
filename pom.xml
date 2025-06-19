@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -86,6 +86,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
+        <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
+        <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
+
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
@@ -118,7 +121,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.38.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.53.0</gcs.version>
+        <gcs.version>2.53.1</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -128,7 +131,7 @@
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
-        <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.18.3</jackson.version>
         <jadconfig.version>0.15.0</jadconfig.version>
@@ -149,7 +152,7 @@
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.24.3</log4j.version>
+        <log4j.version>2.25.0</log4j.version>
         <lucene.version>9.12.1</lucene.version>
         <metrics.version>4.2.30</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
@@ -180,7 +183,7 @@
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
         <zstd.version>1.5.7-3</zstd.version>
@@ -195,14 +198,14 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.1</equalsverifier.version>
+        <equalsverifier.version>4.0.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <mockito.version>5.18.0</mockito.version>
         <restassured.version>5.5.5</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.21.1</testcontainers.version>
+        <testcontainers.version>1.21.2</testcontainers.version>
         <testcontainers.opensearch.version>2.1.3</testcontainers.opensearch.version>
         <graalvm.version>24.2.1</graalvm.version>
 
@@ -1230,6 +1233,10 @@
                       <artifactId>maven-deploy-plugin</artifactId>
                       <configuration>
                         <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                        <!-- We use a local repository for deployment because we handle Maven Central deployments
+                             separately in a later step of the release process. -->
+                        <altDeploymentRepository>local::file://${local.repo.path}</altDeploymentRepository>
+                        <deployAtEnd>true</deployAtEnd>
                       </configuration>
                     </plugin>
                 </plugins>
