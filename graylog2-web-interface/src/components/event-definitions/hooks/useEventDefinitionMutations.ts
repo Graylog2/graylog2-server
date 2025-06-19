@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMutation } from '@tanstack/react-query';
-import { EventsDefinitions } from '@graylog/server-api';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
 
+import { EventsDefinitions } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import { EventDefinition } from '../event-definitions-types';
-import { EntityShare } from 'actions/permissions/EntityShareActions';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
+
+import type { EventDefinition } from '../event-definitions-types';
 
 const   extractSchedulerInfo = (eventDefinition: EventDefinition) => {
   // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
@@ -38,6 +40,7 @@ const   extractSchedulerInfo = (eventDefinition: EventDefinition) => {
 const createEventDefinition = async (newEventDefinition: EventDefinition & EntityShare) => {
   const { share_request, ...rest } = newEventDefinition;
   const { eventDefinition, isScheduled } = extractSchedulerInfo(rest);
+  
   return EventsDefinitions.create(isScheduled, {
     entity: eventDefinition,
     share_request: {

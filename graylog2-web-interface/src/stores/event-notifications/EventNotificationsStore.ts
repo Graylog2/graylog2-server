@@ -24,6 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
+import { EntityShare } from 'src/actions/permissions/EntityShareActions';
 
 export type TestResult = {
   isLoading: boolean;
@@ -235,8 +236,9 @@ export const EventNotificationsStore = singletonStore('core.EventNotifications',
       EventNotificationsActions.get.promise(promise);
     },
 
-    create(notification) {
-      const promise = fetch('POST', this.eventNotificationsUrl({}), notification);
+    create(notification: EventNotification & EntityShare) {
+      const { share_request, ...rest } = notification;
+      const promise = fetch('POST', this.eventNotificationsUrl({}), { entity: rest, share_request });
 
       promise.then(
         (response) => {
