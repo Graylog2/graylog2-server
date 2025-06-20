@@ -16,27 +16,40 @@
  */
 package org.graylog2.plugin.security;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.grn.GRNType;
+import org.graylog.security.Capability;
 
-import jakarta.validation.constraints.NotBlank;
+import static java.util.Objects.requireNonNull;
 
-@JsonAutoDetect
-@AutoValue
-@WithBeanGetter
-public abstract class Permission {
-    @JsonProperty("permission")
-    public abstract String permission();
+public interface Permission {
+    String permission();
 
-    @JsonProperty("description")
-    public abstract String description();
+    String description();
 
-    @JsonCreator
-    public static Permission create(@JsonProperty("permission") @NotBlank String permission,
-                                    @JsonProperty("description") String description) {
-        return new AutoValue_Permission(permission, description);
+    static Permission create(String permission, String description) {
+        return LegacyPermission.create(permission, description);
+    }
+
+    static Permission create(String permission, String description, GRNTypeCapability... grnTypeCapabilities) {
+        return LegacyPermission.create(permission, description);
+    }
+
+    static GRNTypeCapability viewCapability(GRNType grnType) {
+        return new GRNTypeCapability(grnType, Capability.VIEW);
+    }
+
+    static GRNTypeCapability manageCapability(GRNType grnType) {
+        return new GRNTypeCapability(grnType, Capability.MANAGE);
+    }
+
+    static GRNTypeCapability ownCapability(GRNType grnType) {
+        return new GRNTypeCapability(grnType, Capability.OWN);
+    }
+
+    record GRNTypeCapability(GRNType grnType, Capability capability) {
+        public GRNTypeCapability {
+            requireNonNull(grnType, "grnType must not be null");
+            requireNonNull(capability, "capability must not be null");
+        }
     }
 }
