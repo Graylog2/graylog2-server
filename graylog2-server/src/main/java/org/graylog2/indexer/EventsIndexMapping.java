@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
 
-public abstract class EventsIndexMapping extends IndexMapping {
+public abstract class EventsIndexMapping extends AbstractMapping {
     @Override
     public Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order) {
         final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
