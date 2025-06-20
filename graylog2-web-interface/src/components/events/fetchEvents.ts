@@ -38,7 +38,7 @@ type FiltersResult = {
     alerts: 'only' | 'exclude' | 'include';
     event_definitions?: Array<string>;
     priority?: Array<string>;
-    aggregation_timerange?: { from?: string; to?: string; type: string; range?: number };
+    aggregation_timerange?: { from?: string | number; to?: string | number; type: string; range?: number };
     key?: Array<string>;
     id?: Array<string>;
     part_of_detection_chain?: string;
@@ -58,6 +58,26 @@ export const parseTypeFilter = (alert: string) => {
 };
 
 const allTime = { type: 'relative', range: 0 } as const;
+
+const calculateTimerange = (
+  from?: string,
+  to?: string,
+): { from?: string | number; to?: string | number; type: string; range?: number } => {
+  if (from) {
+    return { type: 'absolute', from, to: to || adjustFormat(moment().utc(), 'internal') };
+  }
+
+  if (to) {
+    return {
+      type: 'absolute',
+      from: adjustFormat(0, 'internal'),
+      to: adjustFormat(moment(to).utc(), 'internal'),
+    };
+  }
+
+  return allTime;
+};
+
 export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRange = allTime) => {
   const result: FiltersResult = {
     filter: {
@@ -70,9 +90,7 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
   if (filters.get('timerange_start')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
 
-    result.filter.aggregation_timerange = from
-      ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
-      : allTime;
+    result.filter.aggregation_timerange = calculateTimerange(from, to);
   }
 
   if (filters.get('key')?.length > 0) {
