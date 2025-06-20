@@ -114,6 +114,10 @@ class Widget {
     return this._value.description;
   }
 
+  withDescription(description: string) {
+    return this.toBuilder().description(description).build();
+  }
+
   // eslint-disable-next-line class-methods-use-this
   get isExportable() {
     return false;

@@ -154,14 +154,13 @@ const WidgetDescription = ({ onChange = undefined, editing, description }: Widge
         required
       />
     </DescriptionInputWrapper>
-  ) : (
-    <EditableTitle key={description} disabled={!onChange} value={description} onChange={onChange} />
-  );
+  ) : null;
 };
 
 type Props = {
   children?: React.ReactNode;
   onRename?: (newTitle: string) => unknown;
+  onUpdateDescription?: (newDescription: string) => unknown;
   hideDragHandle?: boolean;
   title: string;
   description: string;
@@ -179,6 +178,7 @@ const WidgetHeader = ({
   children = undefined,
   titleIcon = undefined,
   onRename = undefined,
+  onUpdateDescription = undefined,
 }: Props) => (
   <Container>
     <Col>
@@ -188,7 +188,7 @@ const WidgetHeader = ({
         </DragHandleContainer>
       )}
       <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
-      <WidgetDescription editing={editing} description={description} onChange={onRename} />
+      <WidgetDescription editing={editing} description={description} onChange={onUpdateDescription} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
     <WidgetActionDropdown>{children}</WidgetActionDropdown>
