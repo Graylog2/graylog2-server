@@ -16,12 +16,14 @@
  */
 package org.graylog2.plugin.security;
 
-public interface Permission {
-    String permission();
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 
-    String description();
-
-    static Permission create(String permission, String description) {
-        return LegacyPermission.create(permission, description);
+@JsonAutoDetect
+public record LegacyPermission(@JsonProperty("permission") @NotBlank String permission,
+                               @JsonProperty("description") String description) implements Permission {
+    public static Permission create(String permission, String description) {
+        return new LegacyPermission(permission, description);
     }
 }
