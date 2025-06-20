@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
@@ -126,18 +125,6 @@ describe('Select', () => {
       selectEvent.select(select, 'label1');
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
-    });
-
-    it('should use matchProp to configure how options are filtered', async () => {
-      render(<SimpleSelect matchProp="value" />);
-
-      const select = await screen.findByLabelText('Select value');
-      selectEvent.openMenu(select);
-      userEvent.type(select, 'value1');
-
-      await screen.findByRole('option', { name: /label1/ });
-
-      expect(screen.queryByRole('option', { name: /label2/ })).not.toBeInTheDocument();
     });
 
     it("should use optionRenderer to customize options' appearance", async () => {

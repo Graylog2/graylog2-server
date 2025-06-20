@@ -594,6 +594,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
+    'views.elements.aside'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
     'views.export.formats'?: Array<ExportFormat>;
