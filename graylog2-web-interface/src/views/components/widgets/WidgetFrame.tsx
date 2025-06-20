@@ -99,6 +99,19 @@ const WidgetWrap = styled.div(
         padding: 0 5px;
       }
     }
+
+    .widget-actions-menu,
+    .widget-drag-handle {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    &:hover .widget-actions-menu,
+    &:hover .widget-drag-handle {
+      opacity: 1;
+      pointer-events: auto;
+    }
   `,
 );
 
