@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
@@ -194,19 +195,23 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public Collection<ViewDTO> forSearch(String searchId) {
-        return MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))
-                .map(this::requirementsForView)
-                .collect(Collectors.toSet());
+        try (var stream = MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))) {
+            return stream
+                    .map(this::requirementsForView)
+                    .collect(Collectors.toSet());
+        }
     }
 
     public Optional<ViewDTO> get(String id) {
         return mongoUtils.getById(id).map(this::requirementsForView);
     }
 
+    @MustBeClosed
     public Stream<ViewDTO> streamAll() {
         return MongoUtils.stream(collection.find()).map(this::requirementsForView);
     }
 
+    @MustBeClosed
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
         return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet))).map(this::requirementsForView);
     }

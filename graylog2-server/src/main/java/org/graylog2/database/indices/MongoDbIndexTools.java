@@ -114,11 +114,13 @@ public class MongoDbIndexTools {
         if (existingIndices == null) {
             return Optional.empty();
         }
-        return MongoUtils.stream(existingIndices)
-                .filter(info ->
-                        info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
-                )
-                .findFirst();
+        try (final var stream = MongoUtils.stream(existingIndices)) {
+            return stream
+                    .filter(info ->
+                            info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
+                    )
+                    .findFirst();
+        }
     }
 
     public void createUniqueIndex(final String field) {

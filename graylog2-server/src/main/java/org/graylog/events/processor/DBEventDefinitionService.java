@@ -17,7 +17,6 @@
 package org.graylog.events.processor;
 
 import com.google.errorprone.annotations.MustBeClosed;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
@@ -27,6 +26,7 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
@@ -227,9 +227,11 @@ public class DBEventDefinitionService {
     }
 
     public List<EventDefinitionDto> getByIds(Collection<String> ids) {
-        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
-                .map(this::getEventDefinitionWithRefetchedFilters)
-                .toList();
+        try (var stream = stream(collection.find(MongoUtils.stringIdsIn(ids)))) {
+            return stream
+                    .map(this::getEventDefinitionWithRefetchedFilters)
+                    .toList();
+        }
     }
 
     /**

@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.export;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -67,11 +68,12 @@ public class MongoCollectionExportService {
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collectionName);
-        final var documents = userCanReadAllEntities
+        try (var documents = userCanReadAllEntities
                 ? getFromMongo(resultsWithoutLimit, limit)
-                : getWithInMemoryPermissionCheck(resultsWithoutLimit, limit, checkPermission);
+                : getWithInMemoryPermissionCheck(resultsWithoutLimit, limit, checkPermission)) {
 
-        return documents.collect(Collectors.toList());
+            return documents.collect(Collectors.toList());
+        }
 
     }
 
@@ -82,12 +84,14 @@ public class MongoCollectionExportService {
                 .toList());
     }
 
+    @MustBeClosed
     private Stream<Document> getWithInMemoryPermissionCheck(FindIterable<Document> result, int limit, Predicate<Document> checkPermission) {
         return MongoUtils.stream(result)
                 .filter(checkPermission)
                 .limit(limit);
     }
 
+    @MustBeClosed
     private Stream<Document> getFromMongo(FindIterable<Document> result, int limit) {
         return MongoUtils.stream(result.limit(limit));
     }
