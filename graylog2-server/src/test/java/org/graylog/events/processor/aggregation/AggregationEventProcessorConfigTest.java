@@ -41,7 +41,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.UserContext;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -107,7 +107,7 @@ public class AggregationEventProcessorConfigTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         this.dbService = new DBEventDefinitionService(mongoCollections, stateService,
-                mock(EntityOwnershipService.class), null, new IgnoreSearchFilters());
+                mock(EntityRegistrar.class), null, new IgnoreSearchFilters());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 

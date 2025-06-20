@@ -24,7 +24,7 @@ import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -54,7 +54,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
-    private final EntityOwnershipService entityOwnerShipService;
+    private final EntityRegistrar entityRegistrar;
     private final ViewSummaryService viewSummaryService;
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
@@ -63,12 +63,12 @@ public class ViewService implements ViewUtils<ViewDTO> {
     @Inject
     protected ViewService(ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
-                          EntityOwnershipService entityOwnerShipService,
+                          EntityRegistrar entityRegistrar,
                           ViewSummaryService viewSummaryService,
                           MongoCollections mongoCollections) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
-        this.entityOwnerShipService = entityOwnerShipService;
+        this.entityRegistrar = entityRegistrar;
         this.viewSummaryService = viewSummaryService;
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
@@ -214,9 +214,9 @@ public class ViewService implements ViewUtils<ViewDTO> {
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
         final ViewDTO savedObject = save(viewDTO);
         if (viewDTO.type().equals(ViewDTO.Type.DASHBOARD)) {
-            entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
+            entityRegistrar.registerNewDashboard(savedObject.id(), user);
         } else {
-            entityOwnerShipService.registerNewSearch(savedObject.id(), user);
+            entityRegistrar.registerNewSearch(savedObject.id(), user);
         }
         return savedObject;
     }
@@ -236,9 +236,9 @@ public class ViewService implements ViewUtils<ViewDTO> {
     public void delete(String id) {
         get(id).ifPresent(view -> {
             if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
-                entityOwnerShipService.unregisterDashboard(id);
+                entityRegistrar.unregisterDashboard(id);
             } else {
-                entityOwnerShipService.unregisterSearch(id);
+                entityRegistrar.unregisterSearch(id);
             }
         });
         mongoUtils.deleteById(id);

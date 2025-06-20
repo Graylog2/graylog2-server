@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -88,7 +88,7 @@ public class StreamCatalogTest {
     @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
     @Mock
-    private EntityOwnershipService entityOwnershipService;
+    private EntityRegistrar entityRegistrar;
     @Mock
     private UserService userService;
     private StreamFacade facade;
@@ -105,7 +105,7 @@ public class StreamCatalogTest {
                 outputService,
                 indexSetService,
                 mongoIndexSetFactory,
-                entityOwnershipService,
+                entityRegistrar,
                 clusterEventBus, Set.of());
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)

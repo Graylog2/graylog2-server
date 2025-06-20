@@ -17,8 +17,11 @@
 package org.graylog2.users;
 
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
@@ -28,9 +31,9 @@ import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.UserManagementService;
 
-import jakarta.inject.Inject;
-
 public class UserManagementServiceImpl extends UserServiceImpl implements UserManagementService {
+
+    private final EntityRegistrar entityRegistrar;
 
     @Inject
     public UserManagementServiceImpl(final MongoConnection mongoConnection,
@@ -41,13 +44,21 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
                                      final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                                      final EventBus serverEventBus,
                                      final GRNRegistry grnRegistry,
-                                     final PermissionAndRoleResolver permissionAndRoleResolver) {
+                                     final PermissionAndRoleResolver permissionAndRoleResolver,
+                                     EntityRegistrar entityRegistrar) {
         super(mongoConnection, configuration, roleService, accessTokenService, userFactory,
                 inMemoryRolePermissionResolver, serverEventBus, grnRegistry, permissionAndRoleResolver);
+        this.entityRegistrar = entityRegistrar;
     }
 
     @Override
-    public String create(User user) throws ValidationException {
+    public String create(User user, User creator) throws ValidationException {
+        final var userId = doCreate(user);
+        entityRegistrar.registerNewEntity(userId, creator, GRNTypes.USER);
+        return userId;
+    }
+
+    protected String doCreate(User user) throws ValidationException {
         return super.save(user);
     }
 

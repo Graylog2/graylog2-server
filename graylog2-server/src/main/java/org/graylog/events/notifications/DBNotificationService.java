@@ -16,10 +16,10 @@
  */
 package org.graylog.events.notifications;
 
-import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -38,18 +38,18 @@ import static org.graylog2.database.utils.MongoUtils.stream;
 public class DBNotificationService {
     private static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
 
-    private final EntityOwnershipService entityOwnerShipService;
+    private final EntityRegistrar entityRegistrar;
     private final MongoCollection<NotificationDto> collection;
     private final MongoUtils<NotificationDto> mongoUtils;
     private final MongoPaginationHelper<NotificationDto> paginationHelper;
 
     @Inject
     public DBNotificationService(MongoCollections mongoCollections,
-                                 EntityOwnershipService entityOwnerShipService) {
+                                 EntityRegistrar entityRegistrar) {
         this.collection = mongoCollections.collection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
-        this.entityOwnerShipService = entityOwnerShipService;
+        this.entityRegistrar = entityRegistrar;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
@@ -63,7 +63,7 @@ public class DBNotificationService {
 
     public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user) {
         final NotificationDto dto = save(notificationDto);
-        entityOwnerShipService.registerNewEventNotification(dto.id(), user);
+        entityRegistrar.registerNewEventNotification(dto.id(), user);
         return dto;
     }
 
@@ -78,7 +78,7 @@ public class DBNotificationService {
     }
 
     public int delete(String id) {
-        entityOwnerShipService.unregisterEventNotification(id);
+        entityRegistrar.unregisterEventNotification(id);
         return (int) collection.deleteOne(idEq(id)).getDeletedCount();
     }
 

@@ -32,20 +32,19 @@ import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class EntityOwnershipServiceTest {
+class EntityOwnershipRegistrationHandlerTest {
 
-    private EntityOwnershipService entityOwnershipService;
+    private EntityOwnershipRegistrationHandler handler;
     private DBGrantService dbGrantService;
-    private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
     private InOrder grnRegistryInOrderVerification;
 
     @BeforeEach
     void setUp() {
         this.dbGrantService = mock(DBGrantService.class);
-        this.entityOwnershipService = new EntityOwnershipService(dbGrantService, grnRegistry);
+        this.handler = new EntityOwnershipRegistrationHandler(dbGrantService, grnRegistry);
         this.grnRegistryInOrderVerification = Mockito.inOrder(dbGrantService);
     }
 
@@ -58,7 +57,7 @@ class EntityOwnershipServiceTest {
 
 
         for (GRNType type : GRNTypes.builtinTypes()) {
-            entityOwnershipService.registerNewEntity(id, mockUser, type);
+            handler.handleRegistration(grnRegistry.newGRN(type, id), mockUser);
             ArgumentCaptor<GrantDTO> grant = ArgumentCaptor.forClass(GrantDTO.class);
             ArgumentCaptor<User> user = ArgumentCaptor.forClass(User.class);
             grnRegistryInOrderVerification.verify(dbGrantService).create(grant.capture(), user.capture());
@@ -76,60 +75,9 @@ class EntityOwnershipServiceTest {
     @Test
     void unregistersEntityForEachType() {
         for (GRNType type : GRNTypes.builtinTypes()) {
-            entityOwnershipService.unregisterEntity("1234", type);
+            handler.handleUnregistration(grnRegistry.newGRN(type, "1234"));
             assertGrantRemoval(type, "1234");
         }
-    }
-
-    @Test
-    void registerNewEventDefinition() {
-        final User mockUser = mock(User.class);
-        when(mockUser.getName()).thenReturn("mockuser");
-        when(mockUser.getId()).thenReturn("mockuser");
-
-        entityOwnershipService.registerNewEventDefinition("1234", mockUser);
-
-        ArgumentCaptor<GrantDTO> grant = ArgumentCaptor.forClass(GrantDTO.class);
-        ArgumentCaptor<User> user = ArgumentCaptor.forClass(User.class);
-        verify(dbGrantService).create(grant.capture(), user.capture());
-
-        assertThat(grant.getValue()).satisfies(g -> {
-            assertThat(g.capability()).isEqualTo(Capability.OWN);
-            assertThat(g.target().type()).isEqualTo(GRNTypes.EVENT_DEFINITION.type());
-            assertThat(g.target().entity()).isEqualTo("1234");
-            assertThat(g.grantee().type()).isEqualTo(GRNTypes.USER.type());
-            assertThat(g.grantee().entity()).isEqualTo("mockuser");
-        });
-    }
-
-    @Test
-    void unregisterDashboard() {
-        entityOwnershipService.unregisterDashboard("1234");
-        assertGrantRemoval(GRNTypes.DASHBOARD, "1234");
-    }
-
-    @Test
-    void unregisterSearch() {
-        entityOwnershipService.unregisterSearch("1234");
-        assertGrantRemoval(GRNTypes.SEARCH, "1234");
-    }
-
-    @Test
-    void unregisterEventDefinition() {
-        entityOwnershipService.unregisterEventDefinition("1234");
-        assertGrantRemoval(GRNTypes.EVENT_DEFINITION, "1234");
-    }
-
-    @Test
-    void unregisterEventNotification() {
-        entityOwnershipService.unregisterEventNotification("1234");
-        assertGrantRemoval(GRNTypes.EVENT_NOTIFICATION, "1234");
-    }
-
-    @Test
-    void unregisterStream() {
-        entityOwnershipService.unregisterStream("123");
-        assertGrantRemoval(GRNTypes.STREAM, "123");
     }
 
     private void assertGrantRemoval(GRNType grnType, String entity) {

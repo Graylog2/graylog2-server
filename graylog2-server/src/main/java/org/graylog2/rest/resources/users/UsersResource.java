@@ -372,7 +372,7 @@ public class UsersResource extends RestResource {
             user.setStartpage(startpage.type(), startpage.id());
         }
 
-        final String id = userManagementService.create(user);
+        final String id = userManagementService.create(user, getCurrentUser());
         LOG.debug("Saved user {} with id {}", user.getName(), id);
 
         final URI userUri = getUriBuilderToSelf().path(UsersResource.class)
