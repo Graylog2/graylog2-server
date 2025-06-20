@@ -18,16 +18,23 @@ package org.graylog2.buffers.processors.fakestreams;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.bson.types.ObjectId;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 
 import java.util.List;
+import java.util.Set;
 
-public class FakeStream extends StreamImpl {
+public class FakeStream extends StreamMock {
     private List<MessageOutput> outputs = Lists.newArrayList();
 
     public FakeStream(String title) {
         super(Maps.<String, Object>newHashMap());
+    }
+
+    @Override
+    public Set<ObjectId> getOutputIds() {
+        return Set.of();
     }
 
     public void addOutput(MessageOutput output) {

@@ -17,6 +17,7 @@
 package org.graylog2.outputs;
 
 import com.google.common.collect.ImmutableSet;
+import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
@@ -48,7 +49,7 @@ public class OutputRouterTest {
     private OutputRegistry outputRegistry;
 
     @Test
-    public void testAlwaysIncludeDefaultOutput() throws Exception {
+    public void testAlwaysIncludeDefaultOutput() {
         final Message message = mock(Message.class);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
 
@@ -59,7 +60,7 @@ public class OutputRouterTest {
     }
 
     @Test
-    public void testGetMessageOutputsForEmptyStream() throws Exception {
+    public void testGetMessageOutputsForEmptyStream() {
         final Stream stream = mock(Stream.class);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
 
@@ -69,13 +70,12 @@ public class OutputRouterTest {
     }
 
     @Test
-    public void testGetMessageOutputsForSingleStream() throws Exception {
+    public void testGetMessageOutputsForSingleStream() {
         final Stream stream = mock(Stream.class);
         final Output output = mock(Output.class);
-        final String outputId = "foobar";
+        final String outputId = "682dd98112d1e85395086cdc";
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<Output> outputSet = ImmutableSet.of(output);
-        when(stream.getOutputs()).thenReturn(outputSet);
+        when(stream.getOutputIds()).thenReturn(Set.of(new ObjectId(outputId)));
         when(output.getId()).thenReturn(outputId);
         when(outputRegistry.getOutputForIdAndStream(eq(outputId), eq(stream))).thenReturn(messageOutput);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
@@ -87,16 +87,16 @@ public class OutputRouterTest {
     }
 
     @Test
-    public void testGetMessageOutputsForStreamWithTwoOutputs() throws Exception {
+    public void testGetMessageOutputsForStreamWithTwoOutputs() {
         final Stream stream = mock(Stream.class);
         final Output output1 = mock(Output.class);
         final Output output2 = mock(Output.class);
-        final String output1Id = "foo";
-        final String output2Id = "bar";
+        final String output1Id = "682dd98112d1e85395086cdc";
+        final String output2Id = "682dd98112d1e8539508beef";
         final MessageOutput messageOutput1 = mock(MessageOutput.class);
         final MessageOutput messageOutput2 = mock(MessageOutput.class);
-        final Set<Output> outputSet = ImmutableSet.of(output1, output2);
-        when(stream.getOutputs()).thenReturn(outputSet);
+        final Set<ObjectId> outputSet = ImmutableSet.of(new ObjectId(output1Id), new ObjectId(output2Id));
+        when(stream.getOutputIds()).thenReturn(outputSet);
         when(output1.getId()).thenReturn(output1Id);
         when(output2.getId()).thenReturn(output2Id);
         when(outputRegistry.getOutputForIdAndStream(eq(output1Id), eq(stream))).thenReturn(messageOutput1);
@@ -111,7 +111,7 @@ public class OutputRouterTest {
     }
 
     @Test
-    public void testGetOutputFromSingleStreams() throws Exception {
+    public void testGetOutputFromSingleStreams() {
         final Stream stream = mock(Stream.class);
         final Message message = mock(Message.class);
         when(message.getStreams()).thenReturn(ImmutableSet.of(stream));
@@ -132,7 +132,7 @@ public class OutputRouterTest {
     }
 
     @Test
-    public void testGetOutputsFromTwoStreams() throws Exception {
+    public void testGetOutputsFromTwoStreams() {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
         final MessageOutput messageOutput1 = mock(MessageOutput.class);
@@ -155,7 +155,7 @@ public class OutputRouterTest {
     }
 
     @Test
-    public void testGetOutputsWithIdenticalMessageOutputs() throws Exception {
+    public void testGetOutputsWithIdenticalMessageOutputs() {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
         final MessageOutput messageOutput = mock(MessageOutput.class);

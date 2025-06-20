@@ -74,8 +74,8 @@ public class StreamListFingerprintTest {
 
     private static Stream makeStream(int id, String title, StreamRule[] rules, Output[] outputs) {
         final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put(StreamImpl.FIELD_TITLE, title);
-        return new StreamImpl(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
+        fields.put(StreamDTO.FIELD_TITLE, title);
+        return new StreamMock(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
                 outputs), null);
     }
 
@@ -97,16 +97,16 @@ public class StreamListFingerprintTest {
     }
 
     @Test
-    public void testGetFingerprint() throws Exception {
+    public void testGetFingerprint() {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
 
         // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
         // implementation changed.
-        assertEquals("d669c1037a49c956ef8f25033abc065c2fb259d4", fingerprint.getFingerprint());
+        assertEquals("8cf3c6555fac8d5e03bd910081b629f12d9697bd", fingerprint.getFingerprint());
     }
 
     @Test
-    public void testIdenticalStreams() throws Exception {
+    public void testIdenticalStreams() {
         final StreamListFingerprint fingerprint1 = new StreamListFingerprint(Lists.newArrayList(stream1));
         final StreamListFingerprint fingerprint2 = new StreamListFingerprint(Lists.newArrayList(stream1));
         final StreamListFingerprint fingerprint3 = new StreamListFingerprint(Lists.newArrayList(stream2));
@@ -116,7 +116,7 @@ public class StreamListFingerprintTest {
     }
 
     @Test
-    public void testWithEmptyStreamList() throws Exception {
+    public void testWithEmptyStreamList() {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.<Stream>newArrayList());
 
         assertEquals(expectedEmptyFingerprint, fingerprint.getFingerprint());

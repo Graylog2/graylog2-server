@@ -56,8 +56,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -561,10 +561,10 @@ public class PivotAggregationSearch implements AggregationSearch {
             // TODO: How to take into consideration StreamPermissions here???
             streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), (streamId) -> true));
         }
-        final Set<String> existingStreams = streamService.loadByIds(streamIds)
-                .stream()
-                .map(Persisted::getId)
-                .collect(toSet());
+        final Set<String> existingStreams;
+        try (var stream = streamService.streamDTOByIds(streamIds)) {
+            existingStreams = stream.map(StreamDTO::id).collect(toSet());
+        }
         final Set<String> nonExistingStreams = streamIds.stream()
                 .filter(stream -> !existingStreams.contains(stream))
                 .collect(toSet());
