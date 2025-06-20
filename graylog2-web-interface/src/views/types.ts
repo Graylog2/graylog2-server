@@ -111,13 +111,13 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   width: number;
 }
 
-export interface WidgetExport {
+export interface WidgetExport<T extends WidgetConfig = WidgetConfig> {
   type: string;
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
-  editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps<T, any>>;
+  editComponent: React.ComponentType<EditWidgetComponentProps<T>>;
   hasEditSubmitButton?: boolean;
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;

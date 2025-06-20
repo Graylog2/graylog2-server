@@ -32,6 +32,7 @@ const EditorStyles = styled.div<{ $width: string }>`
 `;
 
 type Props = {
+  autoFocus?: boolean;
   value: string;
   onChange: (mdValue: string) => void;
   width?: string;
@@ -42,6 +43,7 @@ type Props = {
 };
 
 function MDBaseEditor({
+  autoFocus = false,
   value,
   onChange,
   id = 'md-editor',
@@ -64,6 +66,7 @@ function MDBaseEditor({
   return (
     <EditorStyles $width={width}>
       <SourceCodeEditor
+        focus={autoFocus}
         id={id}
         mode="markdown"
         theme="light"

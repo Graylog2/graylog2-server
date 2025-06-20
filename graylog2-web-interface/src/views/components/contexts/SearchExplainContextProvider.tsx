@@ -57,7 +57,7 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
       widgetId: string,
       widgetMapping: WidgetMapping,
     ): WidgetExplain | undefined => {
-      const searchTypeId = widgetMapping?.get(widgetId).first();
+      const searchTypeId = widgetMapping?.get(widgetId)?.first();
 
       return searchExplain?.search?.queries?.[queryId]?.search_types?.[searchTypeId];
     };
