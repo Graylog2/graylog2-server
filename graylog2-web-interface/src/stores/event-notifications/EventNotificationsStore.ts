@@ -17,6 +17,7 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
 import concat from 'lodash/concat';
+import type { EntityShare } from 'src/actions/permissions/EntityShareActions';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -235,8 +236,9 @@ export const EventNotificationsStore = singletonStore('core.EventNotifications',
       EventNotificationsActions.get.promise(promise);
     },
 
-    create(notification) {
-      const promise = fetch('POST', this.eventNotificationsUrl({}), notification);
+    create(notification: EventNotification & EntityShare) {
+      const { share_request, ...rest } = notification;
+      const promise = fetch('POST', this.eventNotificationsUrl({}), { entity: rest, share_request });
 
       promise.then(
         (response) => {
