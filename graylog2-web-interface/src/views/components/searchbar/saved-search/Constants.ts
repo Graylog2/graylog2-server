@@ -21,6 +21,6 @@ export const ENTITY_TABLE_ID = 'saved-searches';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'summary', 'favorite'],
+  displayedColumns: ['title', 'summary', 'favorite'],
   columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'],
 };
