@@ -44,6 +44,7 @@ const Container = styled.div(
 const Col = styled.div`
   display: flex;
   align-items: center;
+  gap: 10px;
 `;
 
 const DragHandleContainer = styled.div`
@@ -96,25 +97,65 @@ const WidgetTitle = ({ onChange = undefined, editing, title, titleIcon = undefin
     );
   }
 
-  if (editing) {
-    return (
-      <TitleInputWrapper>
-        <TitleInput
-          type="text"
-          id="widget-title"
-          onChange={(e) => onChange(e.target.value)}
-          defaultValue={title}
-          required
-        />
-      </TitleInputWrapper>
-    );
-  }
-
-  return (
+  return editing ? (
+    <TitleInputWrapper>
+      <TitleInput
+        type="text"
+        id="widget-title"
+        onChange={(e) => onChange(e.target.value)}
+        defaultValue={title}
+        required
+      />
+    </TitleInputWrapper>
+  ) : (
     <>
       <EditableTitle key={title} disabled={!onChange} value={title} onChange={onChange} />
       {titleIcon}
     </>
+  );
+};
+
+type WidgetDescriptionProps = {
+  onChange?: (newDescription: string) => void;
+  editing: boolean;
+  description: string;
+};
+
+const DescriptionInputWrapper = styled.div`
+  flex-grow: 1;
+  width: 100%;
+
+  .form-group {
+    margin-bottom: 5px;
+    width: 100%;
+  }
+`;
+
+const DescriptionInput = styled(Input)(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.large};
+    width: 100%;
+  `,
+);
+
+const WidgetDescription = ({ onChange = undefined, editing, description }: WidgetDescriptionProps) => {
+  if (typeof onChange !== 'function') {
+    return <Title>{description}</Title>;
+  }
+
+  return editing ? (
+    <DescriptionInputWrapper>
+      <DescriptionInput
+        type="text"
+        id="widget-description"
+        placeholder="Please add a helpful description to the widget"
+        onChange={(e) => onChange(e.target.value)}
+        defaultValue={description}
+        required
+      />
+    </DescriptionInputWrapper>
+  ) : (
+    <EditableTitle key={description} disabled={!onChange} value={description} onChange={onChange} />
   );
 };
 
@@ -123,6 +164,7 @@ type Props = {
   onRename?: (newTitle: string) => unknown;
   hideDragHandle?: boolean;
   title: string;
+  description: string;
   loading?: boolean;
   editing: boolean;
   titleIcon?: React.ReactNode;
@@ -130,6 +172,7 @@ type Props = {
 
 const WidgetHeader = ({
   title,
+  description,
   editing,
   hideDragHandle = false,
   loading = false,
@@ -145,6 +188,7 @@ const WidgetHeader = ({
         </DragHandleContainer>
       )}
       <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
+      <WidgetDescription editing={editing} description={description} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
     <WidgetActionDropdown>{children}</WidgetActionDropdown>

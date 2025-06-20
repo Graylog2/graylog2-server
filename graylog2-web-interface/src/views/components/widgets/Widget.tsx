@@ -274,6 +274,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader
+              description={widget.description}
               title={title}
               titleIcon={titleIcon}
               hideDragHandle={!interactive || isFocused}
