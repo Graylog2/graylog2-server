@@ -77,6 +77,9 @@ class EntitySharesServiceTest {
     @Mock
     private GranteeService granteeService;
 
+    @Mock
+    private EntityCreationRequestService entityCreationRequestService;
+
     private GRNRegistry grnRegistry;
     private DBGrantService dbGrantService;
 
@@ -95,7 +98,7 @@ class EntitySharesServiceTest {
         final EventBus serverEventBus = mock(EventBus.class);
         this.entitySharesService = new EntitySharesService(
                 dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
-                grnRegistry, granteeService, serverEventBus, new HashSet<>(), new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
+                grnRegistry, granteeService, entityCreationRequestService, serverEventBus, new HashSet<>(), new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
     }
 
     @DisplayName("Validates we cannot remove the last owner")

@@ -46,6 +46,7 @@ import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.CapabilityPermissions;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
+import org.graylog.security.shares.CollectionRequestHandler;
 import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -379,6 +380,11 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addSyncedEntitiesResolver(Class<? extends SyncedEntitiesResolver> resolverClass) {
         final Multibinder<SyncedEntitiesResolver> syncedEntitiesResolverBinder = Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
         syncedEntitiesResolverBinder.addBinding().to(resolverClass);
+    }
+
+    protected void addCollectionRequestHandler(Class<? extends CollectionRequestHandler> handlerClass) {
+        final Multibinder<CollectionRequestHandler> binder = Multibinder.newSetBinder(binder(), CollectionRequestHandler.class);
+        binder.addBinding().to(handlerClass);
     }
 
     protected MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {
