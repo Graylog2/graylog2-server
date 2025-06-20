@@ -61,7 +61,7 @@ public abstract class Configuration implements MongoEntity {
     public abstract Set<String> tags();
 
     @JsonCreator
-    public static Configuration create(@JsonProperty(FIELD_ID) String id,
+    public static Configuration create(@Id @ObjectId @JsonProperty(FIELD_ID) String id,
                                        @JsonProperty(FIELD_COLLECTOR_ID) String collectorId,
                                        @JsonProperty(FIELD_NAME) String name,
                                        @JsonProperty(FIELD_COLOR) String color,
