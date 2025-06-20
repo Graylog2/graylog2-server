@@ -17,9 +17,10 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Spinner, Icon } from 'components/common';
+import { Spinner, Icon, OverlayTrigger } from 'components/common';
 import EditableTitle, { Title } from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
+import IconButton from 'components/common/IconButton';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -138,12 +139,25 @@ const DescriptionInput = styled(Input)(
   `,
 );
 
+const DescriptionPopover = ({ description }: { description: string }) => (
+  <OverlayTrigger
+    trigger="click"
+    rootClose
+    placement="bottom"
+    overlay={description ?? <i>No widget description provided</i>}>
+    <IconButton title="Show description for widget" name="help" />
+  </OverlayTrigger>
+);
+
 const WidgetDescription = ({ onChange = undefined, editing, description }: WidgetDescriptionProps) => {
   if (typeof onChange !== 'function') {
     return <Title>{description}</Title>;
   }
+  if (!editing) {
+    return description ? <DescriptionPopover description={description} /> : null;
+  }
 
-  return editing ? (
+  return (
     <DescriptionInputWrapper>
       <DescriptionInput
         type="text"
@@ -154,7 +168,7 @@ const WidgetDescription = ({ onChange = undefined, editing, description }: Widge
         required
       />
     </DescriptionInputWrapper>
-  ) : null;
+  );
 };
 
 type Props = {
