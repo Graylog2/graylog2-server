@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext, useMemo } from 'react';
+import { useCallback, useEffect, useContext, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
@@ -147,6 +147,7 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
     infoBar,
     synchronizeUrl = true,
   } = useSearchPageLayout();
+  const scrollContainer = useRef<HTMLDivElement | null>(null);
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
   const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
@@ -194,13 +195,15 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                                     </ConnectedSidebar>
                                   )}
                                 </IfInteractive>
-                                <SearchArea as={SearchAreaContainer}>
+                                <SearchArea as={SearchAreaContainer} ref={scrollContainer}>
                                   <IfInteractive>
                                     <HeaderElements />
                                     {InfoBar && <InfoBar />}
-                                    <IfDashboard>{!editingWidget && <DashboardSearchBar />}</IfDashboard>
+                                    <IfDashboard>
+                                      {!editingWidget && <DashboardSearchBar scrollContainer={scrollContainer} />}
+                                    </IfDashboard>
                                     <IfSearch>
-                                      <SearchBar />
+                                      <SearchBar scrollContainer={scrollContainer} />
                                     </IfSearch>
 
                                     <QueryBarElements />
