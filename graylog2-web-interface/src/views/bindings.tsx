@@ -251,7 +251,7 @@ const exports: PluginExports = {
       editComponent: TextWidgetEdit,
       searchTypes: () => [],
       titleGenerator: () => TextWidget.defaultTitle,
-      needsControlledHeight: () => false,
+      needsControlledHeight: () => true,
       searchResultTransformer: () => ({}),
     },
     {
