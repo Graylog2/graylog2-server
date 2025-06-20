@@ -140,7 +140,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const svgDataUrl = (content: string) => `data:image/svg+xml;utf-8,${encodeURIComponent(content)}`;
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${window.btoa(content)}`;
 const useLoginBackground = () =>
   useMemo(
     () =>
