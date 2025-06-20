@@ -217,6 +217,12 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
 };
 
+const updateDescription = (widget: WidgetType, newDescription: string) => async (dispatch: ViewsDispatch) => {
+  const updatedWidget = widget.withDescription(newDescription);
+
+  return dispatch(updateWidget(widget.id, updatedWidget));
+};
+
 const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
@@ -252,6 +258,11 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
     onToggleEdit();
   }, [dispatch, id, oldWidget, onToggleEdit, sendWidgetEditCancelTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
+  const onUpdateDescription = useCallback(
+    (newDescription: string) => dispatch(updateDescription(widget, newDescription)),
+    [dispatch, widget],
+  );
+
   const onWidgetConfigChange = useCallback(
     async (newWidgetConfig: WidgetConfig) => {
       sendWidgetConfigUpdateTelemetry();
@@ -274,12 +285,14 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader
+              description={widget.description}
               title={title}
               titleIcon={titleIcon}
               hideDragHandle={!interactive || isFocused}
               loading={loading}
               editing={editing}
-              onRename={onRenameWidget}>
+              onRename={onRenameWidget}
+              onUpdateDescription={onUpdateDescription}>
               {!editing ? (
                 <WidgetActionsMenu
                   isFocused={isFocused}

@@ -56,6 +56,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
+    public static final String FIELD_DESCRIPTION = "description";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -86,6 +87,10 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
 
     public static Builder builder() {
         return Builder.builder();
@@ -128,6 +133,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 defaultImpl = UnknownWidgetConfigDTO.class)
         public abstract Builder config(WidgetConfigDTO config);
 
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(@Nullable String description);
+
         public abstract WidgetDTO build();
 
         @JsonCreator
@@ -148,6 +156,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 .collect(Collectors.toSet());
         final WidgetEntity.Builder builder = WidgetEntity.builder()
                 .id(this.id())
+                .description(this.description())
                 .config(this.config())
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
