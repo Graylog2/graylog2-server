@@ -16,6 +16,11 @@
  */
 package org.graylog2.plugin.security;
 
+import org.graylog.grn.GRNType;
+import org.graylog.security.Capability;
+
+import static java.util.Objects.requireNonNull;
+
 public interface Permission {
     String permission();
 
@@ -23,5 +28,28 @@ public interface Permission {
 
     static Permission create(String permission, String description) {
         return LegacyPermission.create(permission, description);
+    }
+
+    static Permission create(String permission, String description, GRNTypeCapability... grnTypeCapabilities) {
+        return LegacyPermission.create(permission, description);
+    }
+
+    static GRNTypeCapability viewCapability(GRNType grnType) {
+        return new GRNTypeCapability(grnType, Capability.VIEW);
+    }
+
+    static GRNTypeCapability manageCapability(GRNType grnType) {
+        return new GRNTypeCapability(grnType, Capability.MANAGE);
+    }
+
+    static GRNTypeCapability ownCapability(GRNType grnType) {
+        return new GRNTypeCapability(grnType, Capability.OWN);
+    }
+
+    record GRNTypeCapability(GRNType grnType, Capability capability) {
+        public GRNTypeCapability {
+            requireNonNull(grnType, "grnType must not be null");
+            requireNonNull(capability, "capability must not be null");
+        }
     }
 }
