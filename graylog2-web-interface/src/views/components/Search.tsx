@@ -53,6 +53,7 @@ import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import AsideElements from 'views/components/AsideElements';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -210,6 +211,9 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                                     <SearchResult />
                                   </HighlightMessageInQuery>
                                 </SearchArea>
+                                <IfInteractive>
+                                  <AsideElements />
+                                </IfInteractive>
                               </GridContainer>
                             </HighlightingRulesProvider>
                           </ViewAdditionalContextProvider>
