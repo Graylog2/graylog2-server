@@ -38,7 +38,7 @@ class HTMLSanitizerConverterTest {
         final String result = new HTMLSanitizerConverter().convert(markdownHtmlString);
         final Set<String> forbiddenElements = Set.of("script", "form", "label", "input", "br", "button", "iframe", "footer", "<", ">");
         forbiddenElements.forEach(s -> assertFalse(result.contains(s)));
-        final Set<String> markdownStrings = Set.of("Short Markdown Example", "Introduction", "List", "Item 2");
-        markdownStrings.forEach(s -> assertTrue(result.contains(s)));
+        final Set<String> requiredElements = Set.of("Short Markdown Example", "## Introduction", "### List", "- Item 2", "Quotes and certain chars are ok too \"'@:");
+        requiredElements.forEach(s -> assertTrue(result.contains(s)));
     }
 }

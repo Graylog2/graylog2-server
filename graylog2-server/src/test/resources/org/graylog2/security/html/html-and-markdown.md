@@ -1,7 +1,7 @@
 # Short Markdown Example
 
 ## Introduction
-Markdown should be allowed.
+Markdown should be allowed. Quotes and certain chars are ok too "'@:
 
 ### List
 - Item 1
