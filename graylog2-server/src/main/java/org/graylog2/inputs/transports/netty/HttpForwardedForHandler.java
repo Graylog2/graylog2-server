@@ -22,8 +22,10 @@ import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.util.ReferenceCountUtil;
 import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class HttpForwardedForHandler extends SimpleChannelInboundHandler<HttpRequest> {
+public class HttpForwardedForHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(HttpForwardedForHandler.class);
 
     // Splits comma-separated forwarded-elements
@@ -81,7 +83,7 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<HttpReq
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, HttpRequest msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
         String originalIp = null;
 
         // if we choose to trust X-Forwarded-For or Forwarded headers
@@ -149,10 +151,16 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<HttpReq
             if (!InetAddresses.isInetAddress(originalIp)) {
                 LOG.warn("Ignoring non-literal IP value for original IP address: {}", originalIp);
             }
-            final InetAddress inetAddress = InetAddresses.forString(originalIp);
-            ctx.channel().attr(RawMessageHandler.ORIGINAL_IP_KEY).setIfAbsent(new InetSocketAddress(inetAddress, 0));
+            try {
+                final InetAddress inetAddress = InetAddresses.forString(originalIp);
+                ctx.channel().attr(RawMessageHandler.ORIGINAL_IP_KEY).setIfAbsent(new InetSocketAddress(inetAddress, 0));
+            } catch (IllegalArgumentException e) {
+                LOG.warn("The address extracted for forwarded IP address is not a valid IP literal: {}", originalIp);
+            }
         }
-        ctx.fireChannelRead(msg);
+        // our http channel handlers are using FullHttpMessage instances, so we need to retain them, even though we are
+        // only using header values here (otherwise we'll get ref count exceptions upstream)
+        ctx.fireChannelRead(msg.retain());
     }
 
     private Optional<String> findOriginalIpAndCheckProxies(List<String> ipChain) throws UnknownHostException {
@@ -164,6 +172,9 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<HttpReq
                 LOG.debug("Ignoring invalid X-Forwarded-For header, list of proxies is empty");
                 return Optional.empty();
             } else {
+                if (!iterator.hasNext()) {
+                    LOG.debug("Forwarded-For list only contains a single entry, cannot check relaying proxy addresses.");
+                }
                 // go through the remainder of the list, which should all be proxy addresses we trust
                 // if we hit one that we don't trust, bail out and don't use the candidate IP
                 while (iterator.hasNext()) {
