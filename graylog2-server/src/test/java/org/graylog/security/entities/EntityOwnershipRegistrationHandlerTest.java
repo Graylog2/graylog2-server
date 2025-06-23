@@ -32,6 +32,7 @@ import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 class EntityOwnershipRegistrationHandlerTest {
@@ -55,20 +56,24 @@ class EntityOwnershipRegistrationHandlerTest {
         when(mockUser.getId()).thenReturn("mockuser");
         final String id = "1234";
 
-
         for (GRNType type : GRNTypes.builtinTypes()) {
             handler.handleRegistration(grnRegistry.newGRN(type, id), mockUser);
             ArgumentCaptor<GrantDTO> grant = ArgumentCaptor.forClass(GrantDTO.class);
             ArgumentCaptor<User> user = ArgumentCaptor.forClass(User.class);
-            grnRegistryInOrderVerification.verify(dbGrantService).create(grant.capture(), user.capture());
+            if (type == GRNTypes.USER) {
+                // Don't create ownership grants for user entities
+                grnRegistryInOrderVerification.verify(dbGrantService, never()).create(grant.capture(), user.capture());
+            } else {
+                grnRegistryInOrderVerification.verify(dbGrantService).create(grant.capture(), user.capture());
 
-            assertThat(grant.getValue()).satisfies(g -> {
-                assertThat(g.capability()).isEqualTo(Capability.OWN);
-                assertThat(g.target().type()).isEqualTo(type.type());
-                assertThat(g.target().entity()).isEqualTo(id);
-                assertThat(g.grantee().type()).isEqualTo(GRNTypes.USER.type());
-                assertThat(g.grantee().entity()).isEqualTo("mockuser");
-            });
+                assertThat(grant.getValue()).satisfies(g -> {
+                    assertThat(g.capability()).isEqualTo(Capability.OWN);
+                    assertThat(g.target().type()).isEqualTo(type.type());
+                    assertThat(g.target().entity()).isEqualTo(id);
+                    assertThat(g.grantee().type()).isEqualTo(GRNTypes.USER.type());
+                    assertThat(g.grantee().entity()).isEqualTo("mockuser");
+                });
+            }
         }
     }
 
