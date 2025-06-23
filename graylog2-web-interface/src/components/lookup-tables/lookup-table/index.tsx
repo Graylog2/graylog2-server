@@ -16,28 +16,53 @@
  */
 import * as React from 'react';
 
+import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
-import type { LookupTable } from 'logic/lookup-tables/types';
 
 import { lutListElements } from './constants';
+import columnRenderers from './column-renderers';
+import type { LookupTableEntity } from './types';
+
+import { useFetchLookupTables } from '../hooks/useLookupTablesAPI';
+
+const queryHelpComponent = (
+  <QueryHelper
+    entityName="lookup table"
+    commonFields={['id', 'title', 'name', 'description']}
+    example={
+      <p>
+        searching without a field name matches against the <code>title</code> field:
+        <br />
+        <kbd>geoip</kbd> <br />
+        is the same as
+        <br />
+        <kbd>title:geoip</kbd>
+      </p>
+    }
+  />
+);
 
 function LookupTableList() {
+  const { fetchPaginatedLookupTables, lookupTablesKeyFn } = useFetchLookupTables();
+
   return (
-    <PaginatedEntityTable<LookupTable & { id: string }>
-      humanName="lookup tables"
-      entityActions={null}
-      columnsOrder={lutListElements.columnOrder}
-      queryHelpComponent={<QueryHelper entityName="lookup tables" />}
-      tableLayout={lutListElements.defaultLayout}
-      fetchEntities={handleFetchPacks}
-      keyFn={packEntitiesKeyFn}
-      actionsCellWidth={0}
-      entityAttributesAreCamelCase={false}
-      columnRenderers={columnRenderers}
-      bulkSelection={bulkSelection}
-      expandedSectionsRenderer={expandedSections}
-    />
+    <Row className="content">
+      <Col md={12}>
+        <PaginatedEntityTable<LookupTableEntity>
+          humanName="lookup tables"
+          entityActions={null}
+          columnsOrder={lutListElements.columnOrder}
+          queryHelpComponent={queryHelpComponent}
+          tableLayout={lutListElements.defaultLayout}
+          fetchEntities={fetchPaginatedLookupTables}
+          keyFn={lookupTablesKeyFn}
+          actionsCellWidth={0}
+          entityAttributesAreCamelCase={false}
+          columnRenderers={columnRenderers}
+        />
+      </Col>
+    </Row>
   );
 }
 

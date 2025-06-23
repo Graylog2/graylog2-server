@@ -197,15 +197,16 @@ class LUTTablesPage extends React.Component<
     } else if (!tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
-      content = (
-        <LookupTablesOverview
-          tables={tables}
-          caches={caches}
-          dataAdapters={dataAdapters}
-          pagination={pagination}
-          errorStates={errorStates}
-        />
-      );
+      // content = (
+      //   <LookupTablesOverview
+      //     tables={tables}
+      //     caches={caches}
+      //     dataAdapters={dataAdapters}
+      //     pagination={pagination}
+      //     errorStates={errorStates}
+      //   />
+      // );
+      content = <LookupTablesOverview />;
     }
 
     return (
