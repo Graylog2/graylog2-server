@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
@@ -139,11 +140,13 @@ type Props = {
   children: React.ReactNode;
 };
 
-const svgDataUrl = (content: string) => `data:image/svg+xml;utf-8,${encodeURIComponent(content)}`;
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${window.btoa(content)}`;
 const useLoginBackground = () =>
   useMemo(
     () =>
-      AppConfig.branding()?.login?.background ? svgDataUrl(AppConfig.branding()?.login?.background) : backgroundImage,
+      AppConfig.branding()?.login?.background
+        ? svgDataUrl(DOMPurify.sanitize(AppConfig.branding()?.login?.background))
+        : backgroundImage,
     [],
   );
 
