@@ -215,13 +215,13 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     @MustBeClosed
-    public java.util.stream.Stream<StreamImpl> streamAllDTOs() {
+    public java.util.stream.Stream<Stream> streamAllDTOs() {
         return stream(collection.find()).map(StreamImpl::fromDTO);
     }
 
     @Override
     @MustBeClosed
-    public java.util.stream.Stream<StreamImpl> streamDTOByIds(Collection<String> streamIds) {
+    public java.util.stream.Stream<Stream> streamDTOByIds(Collection<String> streamIds) {
         return stream(collection.find(stringIdsIn(streamIds))).map(StreamImpl::fromDTO);
     }
 

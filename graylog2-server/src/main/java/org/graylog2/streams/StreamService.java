@@ -103,22 +103,24 @@ public interface StreamService {
     java.util.stream.Stream<String> streamAllIds();
 
     /**
-     * Returns only StreamDTOs. The DTO methods skip the full loading of StreamRules, Outputs, and Index Set and should
-     * be used when information stored solely in the 'streams' collection.
+     * Returns Streams with only information on a {@link StreamDTO} populated. The DTO methods skip the full loading
+     * of StreamRules, Outputs, and Index Set and should be used when all information needed is stored solely on the
+     * StreamDTO object.
      *
-     * @return a stream of StreamDTO objects. This must be closed by the caller.
+     * @return a stream of Stream objects. This must be closed by the caller.
      */
     @MustBeClosed
-    java.util.stream.Stream<StreamImpl> streamAllDTOs();
+    java.util.stream.Stream<Stream> streamAllDTOs();
 
     /**
-     * Returns only StreamDTOs with the given IDs. The DTO methods skip the full loading of StreamRules, Outputs, and
-     * Index Set and should be used when information stored solely in the 'streams' collection.
+     * Returns Streams with the given IDs with only information on a {@link StreamDTO} populated. The DTO methods skip
+     * the full loading of StreamRules, Outputs, and Index Set and should be used when all information needed is stored
+     * solely on the StreamDTO object.
      *
-     * @return a stream of StreamDTO objects. This must be closed by the caller.
+     * @return a stream of Stream objects. This must be closed by the caller.
      */
     @MustBeClosed
-    java.util.stream.Stream<StreamImpl> streamDTOByIds(Collection<String> streamIds);
+    java.util.stream.Stream<Stream> streamDTOByIds(Collection<String> streamIds);
 
     /**
      * @return map of stream IDs to number of rules attached to the stream with that ID

@@ -689,7 +689,7 @@ public class StreamResource extends RestResource {
 
         final Set<String> existingStreams;
         try (var stream = streamService.streamDTOByIds(streamIds)) {
-            existingStreams = stream.map(StreamImpl::id).collect(Collectors.toSet());
+            existingStreams = stream.map(Stream::getId).collect(Collectors.toSet());
         }
 
         final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);

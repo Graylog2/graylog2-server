@@ -57,7 +57,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -563,7 +563,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         }
         final Set<String> existingStreams;
         try (var stream = streamService.streamDTOByIds(streamIds)) {
-            existingStreams = stream.map(StreamImpl::id).collect(toSet());
+            existingStreams = stream.map(Stream::getId).collect(toSet());
         }
         final Set<String> nonExistingStreams = streamIds.stream()
                 .filter(stream -> !existingStreams.contains(stream))
