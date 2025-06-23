@@ -15,18 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import moment from 'moment';
-
 import { Events } from '@graylog/server-api';
 
 import * as URLUtils from 'util/URLUtils';
-import { adjustFormat } from 'util/DateTime';
 import type { SearchParams } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import { additionalAttributes } from 'components/events/Constants';
-import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
@@ -59,25 +55,6 @@ export const parseTypeFilter = (alert: string) => {
 
 const allTime = { type: 'relative', range: 0 } as const;
 
-const calculateTimerange = (
-  from?: string,
-  to?: string,
-): { from?: string | number; to?: string | number; type: string; range?: number } => {
-  if (from) {
-    return { type: 'absolute', from, to: to || adjustFormat(moment().utc(), 'internal') };
-  }
-
-  if (to) {
-    return {
-      type: 'absolute',
-      from: adjustFormat(0, 'internal'),
-      to: adjustFormat(moment(to).utc(), 'internal'),
-    };
-  }
-
-  return allTime;
-};
-
 export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRange = allTime) => {
   const result: FiltersResult = {
     filter: {
@@ -87,10 +64,9 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
 
   result.timerange = parseTimerangeFilter(filters.get('timestamp')?.[0], defaultTimerange);
 
-  if (filters.get('timerange_start')?.[0]) {
-    const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
-
-    result.filter.aggregation_timerange = calculateTimerange(from, to);
+  const timerange_start = filters.get('timerange_start')?.[0];
+  if (timerange_start) {
+    result.filter.aggregation_timerange = parseTimerangeFilter(timerange_start, defaultTimerange);
   }
 
   if (filters.get('key')?.length > 0) {
