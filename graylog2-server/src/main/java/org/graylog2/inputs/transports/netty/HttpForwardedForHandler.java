@@ -18,18 +18,18 @@ package org.graylog2.inputs.transports.netty;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.util.ReferenceCountUtil;
 import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -102,7 +102,7 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<FullHtt
                 }
             }
             if (!ipChain.isEmpty()) {
-                final Optional<String> candidate = findOriginalIpAndCheckProxies(ipChain);
+                final Optional<String> candidate = findOriginalIpAndCheckProxies(ipChain, getPeerAddress(ctx));
                 if (candidate.isPresent()) {
                     originalIp = candidate.get();
                     LOG.debug("Found original IP address in X-Forwarded-For header: {}", originalIp);
@@ -125,7 +125,7 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<FullHtt
                 }
             }
             if (!forValues.isEmpty()) {
-                final Optional<String> candidate = findOriginalIpAndCheckProxies(forValues);
+                final Optional<String> candidate = findOriginalIpAndCheckProxies(forValues, getPeerAddress(ctx));
                 if (candidate.isPresent()) {
                     originalIp = candidate.get();
                     LOG.debug("Found original IP address in Forwarded header: {}", originalIp);
@@ -163,7 +163,15 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<FullHtt
         ctx.fireChannelRead(msg.retain());
     }
 
-    private Optional<String> findOriginalIpAndCheckProxies(List<String> ipChain) throws UnknownHostException {
+    // in tests the remote address won't be a real InetSocketAddress
+    @Nullable
+    private static String getPeerAddress(ChannelHandlerContext ctx) {
+        if (ctx.channel().remoteAddress() instanceof InetSocketAddress)
+            return ((InetSocketAddress) ctx.channel().remoteAddress()).getHostString();
+        return null;
+    }
+
+    private Optional<String> findOriginalIpAndCheckProxies(List<String> ipChain, @Nullable String peerAddress) throws UnknownHostException {
         Iterator<String> iterator = ipChain.iterator();
         String candidate = iterator.next();
         if (requireTrustedProxies) {
@@ -173,12 +181,17 @@ public class HttpForwardedForHandler extends SimpleChannelInboundHandler<FullHtt
                 return Optional.empty();
             } else {
                 if (!iterator.hasNext()) {
-                    LOG.debug("Forwarded-For list only contains a single entry, cannot check relaying proxy addresses.");
+                    LOG.debug("Forwarded-For list only contains a single entry, cannot use it for checking addresses, also checking peer address: {}", peerAddress);
+                }
+                Iterator<String> listAndPeer = iterator;
+                // add the peer address if we have one (might be null in tests)
+                if (peerAddress != null) {
+                    listAndPeer = Iterators.concat(iterator, Iterators.singletonIterator(peerAddress));
                 }
                 // go through the remainder of the list, which should all be proxy addresses we trust
                 // if we hit one that we don't trust, bail out and don't use the candidate IP
-                while (iterator.hasNext()) {
-                    final String proxyIp = iterator.next();
+                while (listAndPeer.hasNext()) {
+                    final String proxyIp = listAndPeer.next();
                     boolean trusted = false;
                     for (final IpSubnet subnet : trustedProxies) {
                         if (subnet.contains(proxyIp)) {
