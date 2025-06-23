@@ -23,10 +23,6 @@ import org.jsoup.safety.Safelist;
 
 /**
  * Jackson converter that removes all HTML elements from a specified string.
- * Uses the OWASP Java HTML Sanitizer library, which does not allow any HTML
- * elements by default.
- *
- * @see <a href="https://github.com/OWASP/java-html-sanitizer">OWASP Java HTML Sanitizer</a>
  */
 public class HTMLSanitizerConverter extends StdConverter<String, String> {
     private static final Document.OutputSettings OUTPUT_SETTINGS =
