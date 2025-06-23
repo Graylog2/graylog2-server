@@ -42,6 +42,8 @@ class PermissionWithGRNTypesTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
+            "foo-bar:baz",
+            "foo:bar-baz",
             "foo",
             "foo:",
             ":",
