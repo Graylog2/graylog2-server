@@ -26,7 +26,7 @@ type VersionCheckType = {
   errorMessage?: string;
 };
 
-export const fetchSearchVersionCheck = async ({ queryKey }) => {
+export const fetchSearchVersionCheck = ({ queryKey }): Promise<VersionCheckType> => {
   const [, /* queryName */ { distribution, version }] = queryKey;
 
   return defaultOnError(
@@ -37,8 +37,11 @@ export const fetchSearchVersionCheck = async ({ queryKey }) => {
 
 const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch' | 'datanode', version?: string) => {
   const MAIN_KEY = 'SearchVersionQuery';
-  const queryKey = version ? [MAIN_KEY, { distribution, version }] : [MAIN_KEY, { distribution, version: null }];
-  const { data, isLoading, error } = useQuery<VersionCheckType, Error>(queryKey, fetchSearchVersionCheck);
+  const queryKey = [MAIN_KEY, { distribution, version: version ?? null }];
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: (args) => defaultOnError(fetchSearchVersionCheck(args), 'Could not fetch override data'),
+  });
 
   return {
     data,
