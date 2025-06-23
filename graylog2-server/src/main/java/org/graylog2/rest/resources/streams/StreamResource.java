@@ -103,8 +103,8 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
-import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamGuardException;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -135,14 +135,14 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
-    private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
+    private static final String DEFAULT_SORT_FIELD = StreamImpl.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(StreamDTO.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set")
+            EntityAttribute.builder().id(StreamImpl.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_TITLE).title("Title").searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_INDEX_SET_ID).title("Index set")
                     .relatedCollection(MongoIndexSetService.COLLECTION_NAME)
                     .hidden(true)
                     .filterable(true)
@@ -194,7 +194,7 @@ public class StreamResource extends RestResource {
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineService = pipelineService;
         this.entitySharesService = entitySharesService;
-        this.dbQueryCreator = new DbQueryCreator(StreamDTO.FIELD_TITLE, attributes);
+        this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         this.clusterEventBus = clusterEventBus;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
@@ -258,14 +258,14 @@ public class StreamResource extends RestResource {
                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
-        final PaginatedList<StreamDTO> result = paginatedStreamService
+        final Predicate<StreamImpl> permissionFilter = stream -> isPermitted(RestPermissions.STREAMS_READ, stream.id());
+        final PaginatedList<StreamImpl> result = paginatedStreamService
                 .findPaginated(dbQueryCreator.createDbQuery(filters, query), permissionFilter, page, perPage, sort, order);
 
-        final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
+        final List<String> streamIds = result.stream().map(StreamImpl::id).toList();
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
 
-        final List<StreamDTO> streams = result
+        final List<StreamImpl> streams = result
                 .stream()
                 .map(streamDTO -> {
                     final List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
@@ -588,7 +588,8 @@ public class StreamResource extends RestResource {
                 .map(streamRule -> streamRuleService.copy(null, streamRule))
                 .collect(Collectors.toSet());
 
-        final Stream stream = StreamDTO.builder()
+        final Stream stream = StreamImpl.builder()
+                .id(new ObjectId().toHexString())
                 .title(cr.title().strip())
                 .description(cr.description())
                 .creatorUserId(creatorUser)
@@ -688,7 +689,7 @@ public class StreamResource extends RestResource {
 
         final Set<String> existingStreams;
         try (var stream = streamService.streamDTOByIds(streamIds)) {
-            existingStreams = stream.map(StreamDTO::id).collect(Collectors.toSet());
+            existingStreams = stream.map(StreamImpl::id).collect(Collectors.toSet());
         }
 
         final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
@@ -734,22 +735,22 @@ public class StreamResource extends RestResource {
         );
     }
 
-    private StreamDTOResponse dtoToResponse(StreamDTO dto) {
-        return new StreamDTOResponse(dto.id(),
-                dto.creatorUserId(),
-                dto.outputIds(),
-                dto.matchingType(),
-                dto.description(),
-                dto.createdAt(),
-                dto.rules(),
-                dto.disabled(),
-                dto.title(),
-                dto.contentPack(),
-                firstNonNull(dto.isDefault(), false),
-                dto.removeMatchesFromDefaultStream(),
-                dto.indexSetId(),
-                dto.isEditable(),
-                dto.categories()
+    private StreamDTOResponse dtoToResponse(Stream stream) {
+        return new StreamDTOResponse(stream.getId(),
+                stream.getCreatorUserId(),
+                stream.getOutputIds(),
+                stream.getMatchingType(),
+                stream.getDescription(),
+                stream.getCreatedAt(),
+                stream.getStreamRules(),
+                stream.getDisabled(),
+                stream.getTitle(),
+                stream.getContentPack(),
+                firstNonNull(stream.isDefaultStream(), false),
+                stream.getRemoveMatchesFromDefaultStream(),
+                stream.getIndexSetId(),
+                Stream.streamIsEditable(stream.getId()),
+                stream.getCategories()
         );
     }
 

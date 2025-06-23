@@ -62,7 +62,7 @@ import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -129,7 +129,7 @@ public class DashboardV1FacadeTest {
         final ContentPackV1 contentPackV1 = (ContentPackV1) contentPack;
         final Entity entity = contentPackV1.entities().iterator().next();
 
-        final Stream stream = StreamDTO.builder()
+        final Stream stream = StreamImpl.builder()
                 .id("5400deadbeefdeadbeefaffe")
                 .title("Test Stream")
                 .createdAt(DateTime.now(DateTimeZone.UTC))

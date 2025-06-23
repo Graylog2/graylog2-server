@@ -32,7 +32,7 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -126,7 +126,7 @@ public class LegacyAlarmCallbackSender {
     }
 
     private static Stream missingStream() {
-        return StreamDTO.builder()
+        return StreamImpl.builder()
                 .id("5400deadbeefdeadbeefaffe")
                 .title("Missing stream")
                 .description("We could find a stream")

@@ -21,7 +21,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,7 +76,7 @@ public class V20161116172200_CreateDefaultStreamMigrationTest {
         final Stream stream = streamArgumentCaptor.getValue();
         assertThat(stream.getTitle()).isEqualTo("Default Stream");
         assertThat(stream.getDisabled()).isFalse();
-        assertThat(stream.getMatchingType()).isEqualTo(StreamDTO.MatchingType.DEFAULT);
+        assertThat(stream.getMatchingType()).isEqualTo(StreamImpl.MatchingType.DEFAULT);
     }
 
     @Test

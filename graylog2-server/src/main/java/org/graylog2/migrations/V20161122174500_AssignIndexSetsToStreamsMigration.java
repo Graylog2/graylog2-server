@@ -28,7 +28,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
             if (isNullOrEmpty(stream.getIndexSetId())) {
                 LOG.info("Assigning index set <{}> ({}) to stream <{}> ({})", indexSetConfig.id(),
                         indexSetConfig.title(), stream.getId(), stream.getTitle());
-                StreamDTO dto = (StreamDTO) stream;
+                StreamImpl dto = (StreamImpl) stream;
                 try {
                     streamService.save(dto.toBuilder().indexSetId(indexSetConfig.id()).build());
                     completedStreamIds.add(stream.getId());

@@ -62,18 +62,18 @@ public class StreamMock implements Stream {
 
     public StreamMock(Map<String, Object> stream, List<StreamRule> streamRules) {
         this.id = stream.getOrDefault("_id", ObjectId.get()).toString();
-        this.title = (String) stream.get(StreamDTO.FIELD_TITLE);
-        this.description = (String) stream.get(StreamDTO.FIELD_DESCRIPTION);
-        if (stream.containsKey(StreamDTO.FIELD_DISABLED)) {
-            this.disabled = (boolean) stream.get(StreamDTO.FIELD_DISABLED);
+        this.title = (String) stream.get(StreamImpl.FIELD_TITLE);
+        this.description = (String) stream.get(StreamImpl.FIELD_DESCRIPTION);
+        if (stream.containsKey(StreamImpl.FIELD_DISABLED)) {
+            this.disabled = (boolean) stream.get(StreamImpl.FIELD_DISABLED);
         }
-        this.contentPack = (String) stream.get(StreamDTO.FIELD_CONTENT_PACK);
+        this.contentPack = (String) stream.get(StreamImpl.FIELD_CONTENT_PACK);
         this.streamRules = streamRules;
-        this.matchingType = (MatchingType) stream.getOrDefault(StreamDTO.FIELD_MATCHING_TYPE, MatchingType.AND);
-        this.defaultStream = (boolean) stream.getOrDefault(StreamDTO.FIELD_DEFAULT_STREAM, false);
-        this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamDTO.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
+        this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
+        this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
+        this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
         //noinspection unchecked
-        this.categories = (List<String>) stream.getOrDefault(StreamDTO.FIELD_CATEGORIES, List.of());
+        this.categories = (List<String>) stream.getOrDefault(StreamImpl.FIELD_CATEGORIES, List.of());
         this.outputs = Set.of();
         this.indexSet = new TestIndexSet(IndexSetConfig.create(
                 "index-set-id",

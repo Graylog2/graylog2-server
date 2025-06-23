@@ -16,7 +16,7 @@
  */
 package org.graylog2.database.dbcatalog;
 
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -36,18 +36,18 @@ class DbEntitiesCatalogTest {
 
     @Test
     void returnsEmptyOptionalsOnEntryAbsentInCatalog() {
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read")));
+        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
 
         assertThat(catalog.getByCollectionName("Guadalajara")).isEmpty();
     }
 
     @Test
     void returnsProperDataFromCatalog() {
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read")));
+        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
 
         assertThat(catalog.getByCollectionName("streams"))
                 .isEqualTo(Optional.of(
-                        new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read")
+                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")
                         )
                 );
     }
@@ -57,7 +57,7 @@ class DbEntitiesCatalogTest {
         assertThrows(IllegalStateException.class,
                 () -> new DbEntitiesCatalog(
                         List.of(
-                                new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read"),
+                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
                                 new DbEntityCatalogEntry("streams", "title", String.class, "")
                         )
                 )

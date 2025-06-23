@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.streams.StreamDTO.FIELD_INDEX_SET_ID;
-import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
+import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
+import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

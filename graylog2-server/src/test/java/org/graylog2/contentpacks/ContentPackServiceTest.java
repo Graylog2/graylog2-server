@@ -111,7 +111,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
@@ -369,7 +369,7 @@ public class ContentPackServiceTest {
     public void resolveEntitiesWithNoDependencies() throws NotFoundException {
         final StreamMock streamMock = new StreamMock(ImmutableMap.of(
                 "_id", "stream-1234",
-                StreamDTO.FIELD_TITLE, "Stream Title"
+                StreamImpl.FIELD_TITLE, "Stream Title"
         ));
 
         when(streamService.load("stream-1234")).thenReturn(streamMock);
@@ -388,7 +388,7 @@ public class ContentPackServiceTest {
         final ObjectId outputId = ObjectId.get();
         final StreamMock streamMock = new StreamMock(streamId,
                 ImmutableMap.of(
-                        StreamDTO.FIELD_TITLE, "Stream Title"),
+                        StreamImpl.FIELD_TITLE, "Stream Title"),
                 List.of(),
                 Set.of(OutputImpl.create(
                         outputId.toHexString(),
@@ -599,9 +599,9 @@ public class ContentPackServiceTest {
 
     private Stream createTestStream(String id) {
         final ImmutableMap<String, Object> streamFields = ImmutableMap.of(
-                StreamDTO.FIELD_TITLE, "Stream Title",
-                StreamDTO.FIELD_DESCRIPTION, "Stream Description",
-                StreamDTO.FIELD_DISABLED, false
+                StreamImpl.FIELD_TITLE, "Stream Title",
+                StreamImpl.FIELD_DESCRIPTION, "Stream Description",
+                StreamImpl.FIELD_DISABLED, false
         );
 
         final ImmutableMap<String, Object> streamRuleFields = ImmutableMap.<String, Object>builder()

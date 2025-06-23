@@ -26,19 +26,19 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-import static org.graylog2.streams.StreamDTO.FIELD_CATEGORIES;
-import static org.graylog2.streams.StreamDTO.FIELD_CONTENT_PACK;
-import static org.graylog2.streams.StreamDTO.FIELD_CREATED_AT;
-import static org.graylog2.streams.StreamDTO.FIELD_CREATOR_USER_ID;
-import static org.graylog2.streams.StreamDTO.FIELD_DESCRIPTION;
-import static org.graylog2.streams.StreamDTO.FIELD_DISABLED;
-import static org.graylog2.streams.StreamDTO.FIELD_INDEX_SET_ID;
-import static org.graylog2.streams.StreamDTO.FIELD_IS_EDITABLE;
-import static org.graylog2.streams.StreamDTO.FIELD_MATCHING_TYPE;
-import static org.graylog2.streams.StreamDTO.FIELD_OUTPUTS;
-import static org.graylog2.streams.StreamDTO.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM;
-import static org.graylog2.streams.StreamDTO.FIELD_RULES;
-import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
+import static org.graylog2.streams.StreamImpl.FIELD_CATEGORIES;
+import static org.graylog2.streams.StreamImpl.FIELD_CONTENT_PACK;
+import static org.graylog2.streams.StreamImpl.FIELD_CREATED_AT;
+import static org.graylog2.streams.StreamImpl.FIELD_CREATOR_USER_ID;
+import static org.graylog2.streams.StreamImpl.FIELD_DESCRIPTION;
+import static org.graylog2.streams.StreamImpl.FIELD_DISABLED;
+import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
+import static org.graylog2.streams.StreamImpl.FIELD_IS_EDITABLE;
+import static org.graylog2.streams.StreamImpl.FIELD_MATCHING_TYPE;
+import static org.graylog2.streams.StreamImpl.FIELD_OUTPUTS;
+import static org.graylog2.streams.StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM;
+import static org.graylog2.streams.StreamImpl.FIELD_RULES;
+import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
 public record StreamDTOResponse(@JsonProperty("id") String id,
                                 @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,

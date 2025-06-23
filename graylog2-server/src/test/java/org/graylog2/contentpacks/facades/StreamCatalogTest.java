@@ -49,7 +49,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
@@ -121,9 +121,9 @@ public class StreamCatalogTest {
     @Test
     public void encode() {
         final ImmutableMap<String, Object> streamFields = ImmutableMap.of(
-                StreamDTO.FIELD_TITLE, "Stream Title",
-                StreamDTO.FIELD_DESCRIPTION, "Stream Description",
-                StreamDTO.FIELD_DISABLED, false
+                StreamImpl.FIELD_TITLE, "Stream Title",
+                StreamImpl.FIELD_DESCRIPTION, "Stream Description",
+                StreamImpl.FIELD_DISABLED, false
         );
 
         final ImmutableMap<String, Object> streamRuleFields = ImmutableMap.<String, Object>builder()

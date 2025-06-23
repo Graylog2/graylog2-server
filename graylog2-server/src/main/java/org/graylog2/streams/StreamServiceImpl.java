@@ -27,7 +27,6 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.apache.commons.collections4.CollectionUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -81,11 +80,11 @@ import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.graylog2.streams.StreamDTO.FIELD_CATEGORIES;
-import static org.graylog2.streams.StreamDTO.FIELD_DISABLED;
-import static org.graylog2.streams.StreamDTO.FIELD_INDEX_SET_ID;
-import static org.graylog2.streams.StreamDTO.FIELD_OUTPUTS;
-import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
+import static org.graylog2.streams.StreamImpl.FIELD_CATEGORIES;
+import static org.graylog2.streams.StreamImpl.FIELD_DISABLED;
+import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
+import static org.graylog2.streams.StreamImpl.FIELD_OUTPUTS;
+import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
@@ -148,7 +147,8 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public Stream create(CreateStreamRequest cr, String userId) {
-        return StreamDTO.builder()
+        return StreamImpl.builder()
+                .id(new ObjectId().toHexString())
                 .title(cr.title().strip())
                 .description(cr.description())
                 .creatorUserId(userId)
@@ -215,23 +215,23 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     @MustBeClosed
-    public java.util.stream.Stream<StreamDTO> streamAllDTOs() {
-        return stream(collection.find());
+    public java.util.stream.Stream<StreamImpl> streamAllDTOs() {
+        return stream(collection.find()).map(StreamImpl::fromDTO);
     }
 
     @Override
     @MustBeClosed
-    public java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds) {
-        return stream(collection.find(stringIdsIn(streamIds)));
+    public java.util.stream.Stream<StreamImpl> streamDTOByIds(Collection<String> streamIds) {
+        return stream(collection.find(stringIdsIn(streamIds))).map(StreamImpl::fromDTO);
     }
 
     private List<Stream> loadAllByQuery(Bson query) {
-        final List<StreamDTO> results;
+        final List<StreamImpl> results;
         try (var stream = stream(collection.find(query))) {
-            results = stream.toList();
+            results = stream.map(StreamImpl::fromDTO).toList();
         }
         final List<String> streamIds = results.stream()
-                .map(StreamDTO::id)
+                .map(StreamImpl::id)
                 .toList();
         final Map<String, List<StreamRule>> allStreamRules = streamRuleService.loadForStreamIds(streamIds);
 
@@ -240,7 +240,7 @@ public class StreamServiceImpl implements StreamService {
         final Map<String, IndexSet> indexSets = indexSetsForStreams(results);
 
         final Set<String> outputIds = results.stream()
-                .map(StreamDTO::outputIds)
+                .map(StreamImpl::outputIds)
                 .filter(Objects::nonNull)
                 .flatMap(outputs -> outputs.stream().map(ObjectId::toHexString))
                 .collect(Collectors.toSet());
@@ -250,7 +250,7 @@ public class StreamServiceImpl implements StreamService {
                 .collect(Collectors.toMap(Output::getId, Function.identity()));
 
 
-        for (StreamDTO dto : results) {
+        for (StreamImpl dto : results) {
             final String id = dto.id();
             final List<StreamRule> streamRules = allStreamRules.getOrDefault(id, Collections.emptyList());
             LOG.debug("Found {} rules for stream <{}>", streamRules.size(), id);
@@ -282,9 +282,9 @@ public class StreamServiceImpl implements StreamService {
         return streams.build();
     }
 
-    private Map<String, IndexSet> indexSetsForStreams(List<StreamDTO> streams) {
+    private Map<String, IndexSet> indexSetsForStreams(List<StreamImpl> streams) {
         final Set<String> indexSetIds = streams.stream()
-                .map(StreamDTO::indexSetId)
+                .map(StreamImpl::indexSetId)
                 .filter(s -> !isNullOrEmpty(s))
                 .collect(Collectors.toSet());
         return indexSetService.findByIds(indexSetIds)
@@ -423,16 +423,16 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public String save(Stream stream) throws ValidationException {
-        final StreamDTO dto = dtoToSave(stream);
-        collection.replaceOne(idEq(Objects.requireNonNull(dto.id())), dto, new ReplaceOptions().upsert(true));
+        final StreamImpl streamImpl = (StreamImpl) stream;
+        collection.replaceOne(idEq(Objects.requireNonNull(streamImpl.id())), streamImpl.toDTO(), new ReplaceOptions().upsert(true));
 
-        return dto.id();
+        return streamImpl.id();
     }
 
     @Override
     public Stream update(String streamId, UpdateStreamRequest request) throws NotFoundException, ValidationException {
-        final StreamDTO existingStream = (StreamDTO) load(streamId);
-        final StreamDTO.Builder streamBuilder = existingStream.toBuilder();
+        final StreamImpl existingStream = (StreamImpl) load(streamId);
+        final StreamImpl.Builder streamBuilder = existingStream.toBuilder();
 
         StreamRenamedEvent streamRenamedEvent = null;
         if (!Strings.isNullOrEmpty(request.title())) {
@@ -510,29 +510,5 @@ public class StreamServiceImpl implements StreamService {
             return streamIds.collect(Collectors.toUnmodifiableMap(Function.identity(), streamRuleService::streamRuleCount));
         }
 
-    }
-
-    // Output objects, StreamRules, and the IndexSet object are not saved on this object. These are loaded by
-    // load methods. Here we ensure we are only saving relevant fields in the DB.
-    private StreamDTO dtoToSave(Stream stream) {
-        final StreamDTO.Builder dtoBuilder = StreamDTO.builder()
-                .id(stream.getId() == null ? new ObjectId().toHexString() : stream.getId())
-                .creatorUserId(stream.getCreatorUserId())
-                .matchingType(stream.getMatchingType())
-                .description(stream.getDescription())
-                .createdAt(stream.getCreatedAt())
-                .disabled(stream.getDisabled())
-                .title(stream.getTitle())
-                .contentPack(stream.getContentPack())
-                .isDefault(stream.isDefaultStream())
-                .removeMatchesFromDefaultStream(stream.getRemoveMatchesFromDefaultStream())
-                .indexSetId(stream.getIndexSetId());
-        if (!CollectionUtils.isEmpty(stream.getOutputIds())) {
-            dtoBuilder.outputIds(stream.getOutputIds());
-        }
-        if (!CollectionUtils.isEmpty(stream.getCategories())) {
-            dtoBuilder.categories(stream.getCategories());
-        }
-        return dtoBuilder.build();
     }
 }

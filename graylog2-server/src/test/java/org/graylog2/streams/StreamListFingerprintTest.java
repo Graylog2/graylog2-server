@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -73,10 +74,16 @@ public class StreamListFingerprintTest {
     }
 
     private static Stream makeStream(int id, String title, StreamRule[] rules, Output[] outputs) {
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put(StreamDTO.FIELD_TITLE, title);
-        return new StreamMock(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
-                outputs), null);
+        return StreamImpl.Builder.create()
+                .id(String.format(Locale.ENGLISH, "%024d", id))
+                .creatorUserId("testuser")
+                .createdAt(Tools.nowUTC())
+                .disabled(false)
+                .indexSetId(title + "-index-set")
+                .title(title)
+                .rules(Lists.newArrayList(rules))
+                .outputObjects(Sets.newHashSet(outputs))
+                .build();
     }
 
     private static StreamRule makeStreamRule(int id, String field) {
@@ -102,7 +109,7 @@ public class StreamListFingerprintTest {
 
         // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
         // implementation changed.
-        assertEquals("8cf3c6555fac8d5e03bd910081b629f12d9697bd", fingerprint.getFingerprint());
+        assertEquals("752fe74496eb4ce0c7950b7ff3ac023f5b5250d8", fingerprint.getFingerprint());
     }
 
     @Test

@@ -38,7 +38,7 @@ import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -186,14 +186,14 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void createEventsStream(String streamId, String streamTitle, String streamDescription, IndexSet indexSet) {
-        final Stream stream = StreamDTO.builder()
+        final Stream stream = StreamImpl.builder()
                 .id(streamId)
                 .title(streamTitle)
                 .description(streamDescription)
                 .disabled(false)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .creatorUserId("admin")
-                .matchingType(StreamDTO.MatchingType.DEFAULT)
+                .matchingType(StreamImpl.MatchingType.DEFAULT)
                 .removeMatchesFromDefaultStream(true)
                 .indexSetId(requireNonNull(indexSet.getConfig().id(), "index set ID cannot be null"))
                 .isDefault(false)

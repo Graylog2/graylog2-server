@@ -26,7 +26,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitl
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,8 +48,8 @@ public class EntityTitleServiceMongoTest {
     public void setUp() {
         DbEntitiesCatalog entitiesCatalog = new DbEntitiesCatalog(
                 List.of(
-                        new DbEntityCatalogEntry("streams", "title", StreamDTO.class, "streams:read"),
-                        new DbEntityCatalogEntry("nodes", "node_id", StreamDTO.class, "nodes:read")
+                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
+                        new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read")
                 )
         );
         mongodb.start();

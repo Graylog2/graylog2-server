@@ -22,7 +22,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -64,14 +64,14 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
     private void createDefaultStream() {
         final IndexSet indexSet = indexSetRegistry.getDefault();
 
-        final Stream stream = StreamDTO.builder()
+        final Stream stream = StreamImpl.builder()
                 .id(Stream.DEFAULT_STREAM_ID)
                 .title("Default Stream")
                 .description("Contains messages that are not explicitly routed to other streams")
                 .disabled(false)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .creatorUserId("local:admin")
-                .matchingType(StreamDTO.MatchingType.DEFAULT)
+                .matchingType(StreamImpl.MatchingType.DEFAULT)
                 .removeMatchesFromDefaultStream(false)
                 .isDefault(true)
                 .indexSetId(indexSet.getConfig().id())

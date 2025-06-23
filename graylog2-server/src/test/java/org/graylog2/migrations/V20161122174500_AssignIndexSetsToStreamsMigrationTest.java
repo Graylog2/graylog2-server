@@ -24,7 +24,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -106,7 +106,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
         migration.upgrade();
 
-        ArgumentCaptor<StreamDTO> captor = ArgumentCaptor.forClass(StreamDTO.class);
+        ArgumentCaptor<StreamImpl> captor = ArgumentCaptor.forClass(StreamImpl.class);
         verify(streamService, times(1)).save(captor.capture());
         assertEquals("stream1", captor.getValue().getTitle());
         verify(streamService, never()).save(stream2);
@@ -125,10 +125,10 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         when(indexSetConfig.id()).thenReturn("abc123");
         when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream1, stream2));
 
-        ArgumentCaptor<StreamDTO> captor = ArgumentCaptor.forClass(StreamDTO.class);
+        ArgumentCaptor<StreamImpl> captor = ArgumentCaptor.forClass(StreamImpl.class);
         // Updating stream1 should fail!
         doAnswer(inv -> {
-            StreamDTO captured = inv.getArgument(0);
+            StreamImpl captured = inv.getArgument(0);
             if (captured.getId().equals(stream1.getId())) {
                 throw new ValidationException("Fail on Stream1");
             }
@@ -176,8 +176,8 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         verify(clusterConfigService, never()).write(any(V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.class));
     }
 
-    private StreamDTO testStream(String title, String indexSetId) {
-        return StreamDTO.builder()
+    private StreamImpl testStream(String title, String indexSetId) {
+        return StreamImpl.builder()
                 .id(new ObjectId().toHexString())
                 .title(title)
                 .indexSetId(indexSetId)

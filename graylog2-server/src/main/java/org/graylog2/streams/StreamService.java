@@ -109,7 +109,7 @@ public interface StreamService {
      * @return a stream of StreamDTO objects. This must be closed by the caller.
      */
     @MustBeClosed
-    java.util.stream.Stream<StreamDTO> streamAllDTOs();
+    java.util.stream.Stream<StreamImpl> streamAllDTOs();
 
     /**
      * Returns only StreamDTOs with the given IDs. The DTO methods skip the full loading of StreamRules, Outputs, and
@@ -118,7 +118,7 @@ public interface StreamService {
      * @return a stream of StreamDTO objects. This must be closed by the caller.
      */
     @MustBeClosed
-    java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds);
+    java.util.stream.Stream<StreamImpl> streamDTOByIds(Collection<String> streamIds);
 
     /**
      * @return map of stream IDs to number of rules attached to the stream with that ID
