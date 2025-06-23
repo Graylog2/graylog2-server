@@ -32,7 +32,8 @@ public class DefaultBuiltinCapabilities implements CapabilityPermissions {
                 RestPermissions.EVENT_DEFINITIONS_READ,
                 RestPermissions.EVENT_NOTIFICATIONS_READ,
                 RestPermissions.OUTPUTS_READ,
-                RestPermissions.SEARCH_FILTERS_READ
+                RestPermissions.SEARCH_FILTERS_READ,
+                RestPermissions.USERS_READ
         );
     }
 
@@ -47,7 +48,8 @@ public class DefaultBuiltinCapabilities implements CapabilityPermissions {
                 RestPermissions.EVENT_DEFINITIONS_EDIT,
                 RestPermissions.EVENT_NOTIFICATIONS_EDIT,
                 RestPermissions.OUTPUTS_EDIT,
-                RestPermissions.SEARCH_FILTERS_EDIT
+                RestPermissions.SEARCH_FILTERS_EDIT,
+                RestPermissions.USERS_EDIT
         );
     }
 
