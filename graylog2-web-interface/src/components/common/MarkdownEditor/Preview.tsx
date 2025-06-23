@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import NumberUtils from 'util/NumberUtils';
 import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
@@ -37,7 +38,7 @@ const Container = styled.div<{ $height?: number | string; $noBackground?: boolea
 
   height: ${({ $height }) =>
     // eslint-disable-next-line no-nested-ternary
-    $height ? (Number.isNaN(Number.parseFloat($height)) ? $height : `${$height}px`) : 'auto'};
+    $height ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
   min-height: 100px;
   width: 100%;
 `;
