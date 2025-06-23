@@ -37,7 +37,7 @@ const Container = styled.div<{ $height?: number | string; $noBackground?: boolea
 
   height: ${({ $height }) =>
     // eslint-disable-next-line no-nested-ternary
-    $height ? (Number.isInteger($height) ? `${$height}px` : $height) : 'auto'};
+    $height ? (Number.isNaN(Number.parseFloat($height)) ? $height : `${$height}px`) : 'auto'};
   min-height: 100px;
   width: 100%;
 `;
