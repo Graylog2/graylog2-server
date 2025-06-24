@@ -65,7 +65,7 @@ public class ContainerRuntimeDetection {
         } catch (Exception ignored) {
         }
         // Last attempt to detect that we are running inside a container.
-        try (var pathsStream = canaryPaths.get()) {
+        try (final var pathsStream = canaryPaths.get()) {
             return pathsStream.anyMatch(Files::exists);
         } catch (Exception ignored) {
             return false;

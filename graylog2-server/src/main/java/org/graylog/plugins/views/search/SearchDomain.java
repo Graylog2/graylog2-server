@@ -65,7 +65,7 @@ public class SearchDomain {
     }
 
     public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
-        try (var stream = dbService.streamAll()) {
+        try (final var stream = dbService.streamAll()) {
             return stream
                     .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
                     .collect(Collectors.toList());

@@ -86,7 +86,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Consumer<Map<String, Set<String>>> recordMigratedWidgetIds = widgetIdMigrationMapping::putAll;
 
         final Map<View, Search> newViews;
-        try (var dashboardStream = this.dashboardsService.streamAll()) {
+        try (final var dashboardStream = this.dashboardsService.streamAll()) {
             newViews = dashboardStream
                     .sorted(Comparator.comparing(Dashboard::id))
                     .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))

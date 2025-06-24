@@ -38,7 +38,7 @@ public class QualifyingViewsService {
 
     public Collection<ViewParameterSummaryDTO> forValue() {
         final Set<String> searches;
-        try (var stream = viewService.streamAll()) {
+        try (final var stream = viewService.streamAll()) {
             searches = stream
                     .map(ViewDTO::searchId)
                     .collect(Collectors.toSet());
@@ -47,7 +47,7 @@ public class QualifyingViewsService {
                 .filter(search -> !search.parameters().isEmpty())
                 .collect(Collectors.toMap(Search::id, Functions.identity()));
 
-        try (var stream = viewService.streamAll()) {
+        try (final var stream = viewService.streamAll()) {
             return stream
                     .filter(view -> qualifyingSearches.containsKey(view.searchId()))
                     .map(view -> ViewParameterSummaryDTO.create(view, qualifyingSearches.get(view.searchId())))

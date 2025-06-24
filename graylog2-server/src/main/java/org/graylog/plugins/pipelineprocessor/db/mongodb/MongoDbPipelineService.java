@@ -149,7 +149,7 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
-        try (var stream = MongoUtils.stream(collection.find(stringIdsIn(pipelineIds)))) {
+        try (final var stream = MongoUtils.stream(collection.find(stringIdsIn(pipelineIds)))) {
             return stream.collect(Collectors.toSet());
         }
     }

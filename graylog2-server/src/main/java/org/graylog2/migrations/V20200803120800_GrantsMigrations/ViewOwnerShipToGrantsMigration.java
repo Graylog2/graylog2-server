@@ -55,7 +55,7 @@ public class ViewOwnerShipToGrantsMigration {
     }
 
     public void upgrade() {
-        try (var stream = viewService.streamAll()) {
+        try (final var stream = viewService.streamAll()) {
             stream.forEach(view -> {
                 final Optional<User> user = view.owner().map(userService::load);
                 if (user.isPresent() && !user.get().isLocalAdmin()) {

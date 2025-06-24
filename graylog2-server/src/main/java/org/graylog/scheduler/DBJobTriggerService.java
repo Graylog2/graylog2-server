@@ -583,7 +583,7 @@ public class DBJobTriggerService {
                 )
         ), OverdueTrigger.class);
 
-        try (var stream = stream(result)) {
+        try (final var stream = stream(result)) {
             return stream.collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
         }
     }

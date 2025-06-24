@@ -106,7 +106,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         if (userCanReadAllEntities) {
             total = mongoCollection.countDocuments(bsonFilter);
         } else {
-            try (var stream = MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD)))) {
+            try (final var stream = MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD)))) {
                 total = stream.filter(checkPermission).count();
             }
         }

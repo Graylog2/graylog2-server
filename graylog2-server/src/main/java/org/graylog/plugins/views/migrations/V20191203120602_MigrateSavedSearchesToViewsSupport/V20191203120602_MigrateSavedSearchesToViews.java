@@ -92,7 +92,7 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
         final Map<String, String> savedSearchToViewsMap = new HashMap<>();
 
         final Map<View, Search> newViews;
-        try (var stream = this.savedSearchService.streamAll()) {
+        try (final var stream = this.savedSearchService.streamAll()) {
             newViews = stream
                     .map(savedSearch -> {
                         final Map.Entry<View, Search> newView = migrateSavedSearch(savedSearch);

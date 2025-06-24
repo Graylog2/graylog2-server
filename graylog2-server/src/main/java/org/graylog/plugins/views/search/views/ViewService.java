@@ -195,7 +195,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public Collection<ViewDTO> forSearch(String searchId) {
-        try (var stream = MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))) {
+        try (final var stream = MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))) {
             return stream
                     .map(this::requirementsForView)
                     .collect(Collectors.toSet());

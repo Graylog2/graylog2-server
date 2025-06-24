@@ -86,7 +86,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
 
         //Load corresponding auth-services and extract the title:
         final Map<String, String> authServiceIdToTitle;
-        try (var stream = dbAuthServiceBackendService.streamByIds(allAuthServiceIds)) {
+        try (final var stream = dbAuthServiceBackendService.streamByIds(allAuthServiceIds)) {
             authServiceIdToTitle = stream
                     .collect(Collectors.toMap(AuthServiceBackendDTO::id, AuthServiceBackendDTO::title));
         }

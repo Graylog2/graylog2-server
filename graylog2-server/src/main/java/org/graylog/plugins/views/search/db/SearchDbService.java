@@ -122,7 +122,7 @@ public class SearchDbService {
     }
 
     public Collection<Search> findByIds(Set<String> idSet) {
-        try (var stream = MongoUtils.stream(db.find(MongoUtils.stringIdsIn(idSet)))) {
+        try (final var stream = MongoUtils.stream(db.find(MongoUtils.stringIdsIn(idSet)))) {
             return stream
                     .map(this::getSearchWithRefetchedFilters)
                     .map(this::requirementsForSearch)
@@ -148,7 +148,7 @@ public class SearchDbService {
     }
 
     public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustBeOlderThan) {
-        try (var summariesStream = this.findSummaries()) {
+        try (final var summariesStream = this.findSummaries()) {
             return summariesStream
                     .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustBeOlderThan))
                     .map(SearchSummary::id)
