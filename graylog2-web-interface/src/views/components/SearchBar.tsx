@@ -219,7 +219,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <FormWarningsProvider>
-          <ScrollToHint scrollContainer={scrollContainer} triggerDependency={query.query_string} />
+          <ScrollToHint scrollContainer={scrollContainer} ifValueChanges={query.query_string} />
           <SearchBarForm
             initialValues={initialValues}
             limitDuration={limitDuration}
