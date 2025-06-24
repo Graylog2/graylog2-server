@@ -16,8 +16,6 @@
  */
 package org.graylog.datanode.opensearch;
 
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
@@ -43,11 +41,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +59,7 @@ class CsrRequesterImplTest {
 
         final Configuration configuration = DatanodeTestUtils.datanodeConfiguration(Map.of(
                 "node_name", "my-node-name",
-                "hostname", "my-datanode-machine",
-                "node_id_file", tempDir.resolve("node_id").toAbsolutePath().toString(),
-                "opensearch_logs_location", createDir(tempDir, "opensearch", "logs"),
-                "opensearch_config_location", createDir(tempDir, "opensearch", "config")
+                "hostname", "my-datanode-machine"
         ));
 
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", new EventBus());
@@ -87,13 +80,6 @@ class CsrRequesterImplTest {
                             .isNotNull()
                             .contains("my-node-name", "my-datanode-machine");
                 });
-    }
-
-    @Nonnull
-    private static String createDir(Path tempDir, String... other) throws IOException {
-        final Path path = Path.of(tempDir.toAbsolutePath().toString(), other);
-        Files.createDirectories(path);
-        return path.toAbsolutePath().toString();
     }
 
     public static List<String> getSubjectAlternativeNames(PKCS10CertificationRequest csr) throws IOException {

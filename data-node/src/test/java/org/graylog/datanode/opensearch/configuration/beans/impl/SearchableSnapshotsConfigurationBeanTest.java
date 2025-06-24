@@ -21,7 +21,7 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
@@ -37,13 +37,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 class SearchableSnapshotsConfigurationBeanTest {
 
     @Test
-    void testS3Repo(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testS3Repo(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         final S3RepositoryConfiguration config = s3Configuration(Map.of(
                 "s3_client_default_access_key", "user",
                 "s3_client_default_secret_key", "password",
@@ -52,7 +51,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -90,7 +89,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -117,13 +116,13 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         // no s3 repo configuration properties given by the user
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "path_repo", "/mnt/data/snapshots",
                         "node_search_cache_size", "10gb"
                 )),
@@ -146,13 +145,13 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testNoSnapshotConfiguration(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testNoSnapshotConfiguration(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         // no s3 repo configuration properties given by the user
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -173,7 +172,7 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testCacheSizeValidation(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testCacheSizeValidation(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         final S3RepositoryConfiguration config = s3Configuration(Map.of(
                 "s3_client_default_access_key", "user",
                 "s3_client_default_secret_key", "password",
@@ -182,7 +181,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -197,12 +196,12 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
                         "path_repo", "/mnt/data/snapshots",
                         "node_search_cache_size", "10gb"
@@ -231,15 +230,6 @@ class SearchableSnapshotsConfigurationBeanTest {
     private S3RepositoryConfiguration s3Configuration(Map<String, String> properties) throws RepositoryException, ValidationException {
         final S3RepositoryConfiguration configuration = new S3RepositoryConfiguration();
         new JadConfig(new InMemoryRepository(properties), configuration).process();
-        return configuration;
-    }
-
-    private Configuration datanodeConfiguration(Map<String, String> properties) throws RepositoryException, ValidationException {
-        final Configuration configuration = new Configuration();
-        final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
-                "password_secret", "thisisverysecretpassword"
-        ));
-        new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
         return configuration;
     }
 }
