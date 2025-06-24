@@ -143,7 +143,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
                 .filter(filter)
                 .sort(sort)).filter(selector).count());
 
-        final List<T> documents = stream(getFindIterableBase(1, 0))
+        final List<T> documents = stream(getIterableForAllDocuments())
                 .filter(selector)
                 .skip(perPage > 0 ? perPage * Math.max(0L, pageNumber - 1) : 0)
                 .limit(perPage == 0 ? Integer.MAX_VALUE : perPage)
@@ -155,6 +155,10 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         } else {
             return new PaginatedList<>(documents, total, pageNumber, perPage);
         }
+    }
+
+    private MongoIterable<T> getIterableForAllDocuments() {
+        return getFindIterableBase(1, 0);
     }
 
     private MongoIterable<T> getFindIterableBase(int pageNumber, int pageSize) {

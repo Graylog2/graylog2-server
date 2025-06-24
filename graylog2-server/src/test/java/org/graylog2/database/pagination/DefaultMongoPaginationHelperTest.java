@@ -17,7 +17,6 @@
 package org.graylog2.database.pagination;
 
 import com.google.common.collect.Lists;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationCaseFirst;
 import com.mongodb.client.model.Filters;
@@ -28,6 +27,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
@@ -116,7 +116,7 @@ class DefaultMongoPaginationHelperTest {
     @Test
     void testProjection() {
         final Bson filter = Filters.in("name", "A", "B", "C");
-        PaginatedList<DTO> page = paginationHelper.filter(filter)
+        var page = paginationHelper.filter(filter)
                 .projection(Projections.excludeId())
                 .sort(ascending("name"))
                 .perPage(5)
@@ -148,7 +148,7 @@ class DefaultMongoPaginationHelperTest {
                 .isEqualTo(paginationHelper.perPage(0).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
-        final MongoPaginationHelper<DTO> helper = paginationHelper.perPage(8);
+        final var helper = paginationHelper.perPage(8);
 
         assertThat(helper.page(1)).containsExactlyElementsOf(DTOs.subList(0, 8));
         assertThat(helper.page(1, alwaysTrue())).containsExactlyElementsOf(DTOs.subList(0, 8));

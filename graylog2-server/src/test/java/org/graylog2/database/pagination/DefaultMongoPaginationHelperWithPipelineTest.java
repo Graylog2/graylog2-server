@@ -53,6 +53,17 @@ class DefaultMongoPaginationHelperWithPipelineTest {
     private static final DTO bar = new DTO("67fcc1dfd67032f27e0e9d71", "Bar", new DateTime("2025-04-12T04:36:54.352Z", DateTimeZone.UTC));
     private static final DTO foo = new DTO("67fcc1c4d67032f27e0e9d70", "Foo", new DateTime("2025-04-14T04:36:54.352Z", DateTimeZone.UTC));
 
+    private static final List<Bson> pipelineDef = List.of(
+            Aggregates.lookup(
+                    "test_runs",
+                    List.of(new Variable<>("testId", new Document("$toString", "$_id"))),
+                    List.<Bson>of(new Document("$match", new Document("$expr", new Document("$eq", List.of("$test_id", "$$testId"))))),
+                    "runs"
+            ),
+            Aggregates.addFields(new Field<>(LAST_RUN, new Document("$max", "$runs.created_at"))),
+            Aggregates.project(Projections.exclude("runs"))
+    );
+
     private MongoPaginationHelper<DTO> paginationHelper;
 
     @BeforeEach
@@ -64,16 +75,7 @@ class DefaultMongoPaginationHelperWithPipelineTest {
 
     @Test
     void sortsByLastDate() {
-        final var pipeline = paginationHelper.pipeline(List.of(
-                Aggregates.lookup(
-                        "test_runs",
-                        List.of(new Variable<>("testId", new Document("$toString", "$_id"))),
-                        List.<Bson>of(new Document("$match", new Document("$expr", new Document("$eq", List.of("$test_id", "$$testId"))))),
-                        "runs"
-                ),
-                Aggregates.addFields(new Field<>(LAST_RUN, new Document("$max", "$runs.created_at"))),
-                Aggregates.project(Projections.exclude("runs"))
-        ));
+        final var pipeline = paginationHelper.pipeline(pipelineDef);
 
         assertThat(pipeline
                 .sort(Sorts.ascending(LAST_RUN))
@@ -130,20 +132,40 @@ class DefaultMongoPaginationHelperWithPipelineTest {
                 .page(3)
                 .delegate())
                 .isEmpty();
+
+        assertThat(pipeline
+                .sort(Sorts.ascending(LAST_RUN))
+                .perPage(0)
+                .page(1)
+                .delegate())
+                .containsExactly(bar, foo);
+
+        assertThat(pipeline
+                .sort(Sorts.descending(LAST_RUN))
+                .perPage(0)
+                .page(1)
+                .delegate())
+                .containsExactly(foo, bar);
+
+        assertThat(pipeline
+                .sort(Sorts.ascending(LAST_RUN))
+                .perPage(10)
+                .page(1, dto -> dto.name().equals("Foo"))
+                .delegate())
+                .containsExactly(foo);
+
+        assertThat(pipeline
+                .sort(Sorts.descending(LAST_RUN))
+                .perPage(10)
+                .page(1, dto -> dto.name().equals("Foo"))
+                .delegate())
+                .containsExactly(foo);
     }
 
     @Test
     void sortsByLastDateWithFilter() {
-        final var pipeline = paginationHelper.pipeline(List.of(
-                Aggregates.lookup(
-                        "test_runs",
-                        List.of(new Variable<>("testId", new Document("$toString", "$_id"))),
-                        List.of(new Document("$match", new Document("$expr", new Document("$eq", List.of("$test_id", "$$testId"))))),
-                        "runs"
-                ),
-                Aggregates.addFields(new Field<>(LAST_RUN, new Document("$max", "$runs.created_at"))),
-                Aggregates.project(Projections.exclude("runs"))
-        )).filter(Filters.eq("_id", new ObjectId("67fcc1dfd67032f27e0e9d71")));
+        final var pipeline = paginationHelper.pipeline(pipelineDef)
+                .filter(Filters.eq("_id", new ObjectId("67fcc1dfd67032f27e0e9d71")));
 
         assertThat(pipeline
                 .sort(Sorts.ascending(LAST_RUN))
@@ -184,6 +206,41 @@ class DefaultMongoPaginationHelperWithPipelineTest {
                 .sort(Sorts.descending(LAST_RUN))
                 .perPage(1)
                 .page(2)
+                .delegate())
+                .isEmpty();
+
+        assertThat(pipeline
+                .sort(Sorts.ascending(LAST_RUN))
+                .perPage(0)
+                .page(1)
+                .delegate())
+                .containsExactly(bar);
+
+        assertThat(pipeline
+                .sort(Sorts.descending(LAST_RUN))
+                .perPage(0)
+                .page(1)
+                .delegate())
+                .containsExactly(bar);
+
+        assertThat(pipeline
+                .sort(Sorts.ascending(LAST_RUN))
+                .perPage(10)
+                .page(1, dto -> dto.name().equals("Bar"))
+                .delegate())
+                .containsExactly(bar);
+
+        assertThat(pipeline
+                .sort(Sorts.descending(LAST_RUN))
+                .perPage(10)
+                .page(1, dto -> dto.name().equals("Bar"))
+                .delegate())
+                .containsExactly(bar);
+
+        assertThat(pipeline
+                .sort(Sorts.ascending(LAST_RUN))
+                .perPage(10)
+                .page(1, dto -> dto.name().equals("Foo"))
                 .delegate())
                 .isEmpty();
     }
