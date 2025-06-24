@@ -17,11 +17,12 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import NumberUtils from 'util/NumberUtils';
 import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBorder?: boolean }>`
+const Container = styled.div<{ $height?: number | string; $noBackground?: boolean; $noBorder?: boolean }>`
   position: relative;
   padding: 8px 0;
   background-color: ${({ theme, $noBackground }) =>
@@ -35,7 +36,9 @@ const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBor
   flex-grow: 1;
   overflow: hidden;
 
-  height: ${({ $height }) => ($height ? `${$height}px` : 'auto')};
+  height: ${({ $height }) =>
+    // eslint-disable-next-line no-nested-ternary
+    $height ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
   min-height: 100px;
   width: 100%;
 `;
@@ -108,7 +111,7 @@ const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
 
 type Props = {
   value: string;
-  height?: number;
+  height?: number | string;
   show: boolean;
   withFullView?: boolean;
   noBackground?: boolean;

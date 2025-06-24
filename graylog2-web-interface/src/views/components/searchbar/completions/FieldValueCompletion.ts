@@ -65,7 +65,7 @@ const completionCaption = (fieldValue: string, input: string | number, isQuoted:
     return quotedValue;
   }
 
-  return `${fieldValue} ⭢ ${input}`;
+  return `${input} ⭢ ${fieldValue}`;
 };
 
 const getFieldNameAndInput = ({

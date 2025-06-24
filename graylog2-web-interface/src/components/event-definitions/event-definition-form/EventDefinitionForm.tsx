@@ -44,7 +44,14 @@ import ShareForm from './ShareForm';
 const WizardContainer = styled.div`
   margin-bottom: 10px;
 `;
-export const getStepKeys = (isNew: boolean) => ['event-details', 'condition', 'fields', 'notifications', ...(isNew ? ['Share'] : []), 'summary'];
+export const getStepKeys = (isNew: boolean) => [
+  'event-details',
+  'condition',
+  'fields',
+  'notifications',
+  ...(isNew ? ['Share'] : []),
+  'summary',
+];
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.STEP_CLICKED,
@@ -178,7 +185,6 @@ const EventDefinitionForm = ({
       ),
     },
   ];
-
 
   const handleStepChange = (nextStep: string) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[currentStepKeys.indexOf(nextStep)], {

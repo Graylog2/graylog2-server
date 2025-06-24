@@ -136,16 +136,19 @@ const CustomizableLogo = () => {
   );
 };
 
+const sanitize = (content: string) =>
+  DOMPurify.sanitize(content, { USE_PROFILES: { svg: true }, ADD_TAGS: ['use'], ADD_ATTR: ['xlink:href'] });
+
 type Props = {
   children: React.ReactNode;
 };
 
-const svgDataUrl = (content: string) => `data:image/svg+xml;utf-8,${encodeURIComponent(content)}`;
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${Buffer.from(content).toString('base64')}`;
 const useLoginBackground = () =>
   useMemo(
     () =>
       AppConfig.branding()?.login?.background
-        ? svgDataUrl(DOMPurify.sanitize(AppConfig.branding()?.login?.background))
+        ? svgDataUrl(sanitize(AppConfig.branding()?.login?.background))
         : backgroundImage,
     [],
   );

@@ -112,7 +112,7 @@ type StreamCategorySelectorProps = {
 const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySelectorProps) => {
   const streamCategoryOptions = useMemo(
     () =>
-      [...new Set<string>(streams.flatMap((stream) => stream?.categories))]
+      [...new Set<string>(streams.flatMap((stream) => stream?.categories ?? []))]
         .sort(defaultCompare)
         .map((category) => ({ label: category, value: category })),
     [streams],
