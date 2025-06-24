@@ -159,7 +159,7 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <FormWarningsProvider>
-          <ScrollToHint ifValueChanges={queryString} scrollContainer={scrollContainer} />
+          <ScrollToHint ifValueChanges={queryString} scrollContainer={scrollContainer} title="Scroll to search bar" />
           <DashboardSearchForm
             initialValues={initialValues}
             limitDuration={limitDuration}

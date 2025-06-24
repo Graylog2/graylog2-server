@@ -49,11 +49,12 @@ const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLE
 
 type Props = {
   scrollContainer: React.RefObject<HTMLDivElement>;
+  title: string;
   // When the dependency changes, the hint will be displayed if this component is not visible.
   ifValueChanges: unknown;
 };
 
-const ScrollToHint = ({ ifValueChanges, scrollContainer }: Props) => {
+const ScrollToHint = ({ ifValueChanges, scrollContainer, title }: Props) => {
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -95,7 +96,7 @@ const ScrollToHint = ({ ifValueChanges, scrollContainer }: Props) => {
       {showHint && (
         <ScrollHint
           onClick={scrollToTarget}
-          aria-label="Scroll to search bar"
+          aria-label={title}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}>
           <Icon name="arrow_upward" />
