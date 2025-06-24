@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -792,10 +792,6 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.proto</groupId>
-            <artifactId>opentelemetry-proto</artifactId>
         </dependency>
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->

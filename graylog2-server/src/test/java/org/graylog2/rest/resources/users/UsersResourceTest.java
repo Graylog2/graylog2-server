@@ -93,7 +93,6 @@ public class UsersResourceTest {
     private static final String TOKEN_NAME = "tokenName";
 
     private static final String ADMIN_OBJECT_ID = new ObjectId().toHexString();
-    private static final PeriodDuration PD_30_DAYS = PeriodDuration.parse("P30D");
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -212,7 +211,6 @@ public class UsersResourceTest {
             final UsersResource.GenerateTokenTTL ttl = new UsersResource.GenerateTokenTTL(Optional.of(PeriodDuration.of(Duration.ofDays(30))));
             assertThrows(ForbiddenException.class, () -> usersResource.generateNewToken(USERNAME, TOKEN_NAME, ttl));
         } finally {
-            verify(subject).getPrincipal();
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
@@ -227,7 +225,6 @@ public class UsersResourceTest {
             final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, null);
             assertEquals(expected, actual);
         } finally {
-            verify(subject).getPrincipal();
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verify(accessTokenService).create(USERNAME, TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)));
@@ -246,8 +243,7 @@ public class UsersResourceTest {
             final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, null);
             assertEquals(expected, actual);
         } finally {
-            verify(subject).getPrincipal();
-            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + adminUserName);
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verify(accessTokenService).create(USERNAME, TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)));
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
@@ -264,8 +260,7 @@ public class UsersResourceTest {
         try {
             assertThrows(ForbiddenException.class, () -> usersResource.generateNewToken(USERNAME, TOKEN_NAME, null));
         } finally {
-            verify(subject).getPrincipal();
-            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + otherUserName);
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
     }
@@ -290,14 +285,14 @@ public class UsersResourceTest {
             user.setRoleIds(Set.of(ADMIN_OBJECT_ID));
         }
 
-        when(subject.getPrincipal()).thenReturn(callingUserName);
-        when(userService.loadById(callingUserName)).thenReturn(user);
-        when(roleService.getAdminRoleObjectId()).thenReturn(ADMIN_OBJECT_ID);
+        final boolean allowedToCreateToken = callingUserName.equals(owningUserName) || isAdmin;
         when(userManagementService.loadById(USERNAME)).thenReturn(userImplFactory.create(owningUser));
-        when(subject.isPermitted(USERS_TOKENCREATE + ":" + callingUserName)).thenReturn(callingUserName.equals(owningUserName) || isAdmin);
-        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.of(Duration.ofDays(30))));
-        when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
+        when(subject.isPermitted(USERS_TOKENCREATE + ":" + owningUserName)).thenReturn(allowedToCreateToken);
+        if (allowedToCreateToken) {
+            when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
+                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.of(Duration.ofDays(30))));
+            when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
+        }
 
         return Token.create(tokenId.toHexString(), TOKEN_NAME, token, lastAccess);
 
@@ -308,7 +303,7 @@ public class UsersResourceTest {
         final DateTime lastAccess = Tools.nowUTC();
         final Map<String, Object> tokenProps = Map.of(AccessTokenImpl.NAME, TOKEN_NAME, AccessTokenImpl.TOKEN, token, AccessTokenImpl.LAST_ACCESS, lastAccess);
         final ObjectId tokenId = new ObjectId();
-        final AccessToken accessToken = new AccessTokenImpl(tokenId, tokenProps);
+        final AccessToken accessToken = allowCreateToken ? new AccessTokenImpl(tokenId, tokenProps) : null;
 
         prepareMocks(userProps, accessToken, allowCreateToken);
 
@@ -317,11 +312,11 @@ public class UsersResourceTest {
 
     private void prepareMocks(Map<String, Object> userProps, AccessToken accessToken, boolean allow) {
         final User user = userImplFactory.create(userProps);
-        when(subject.getPrincipal()).thenReturn(USERNAME);
-        when(userService.loadById(USERNAME)).thenReturn(user);
         when(userManagementService.loadById(USERNAME)).thenReturn(user);
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(allow);
-        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        if (allow) {
+            when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        }
         if (accessToken != null) {
             when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
         }

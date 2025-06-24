@@ -32,14 +32,6 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
-
 describe('CAUpload', () => {
   beforeEach(() => {
     asMock(fetchMultiPartFormData).mockReturnValue(Promise.resolve());
@@ -79,7 +71,7 @@ describe('CAUpload', () => {
     asMock(fetchMultiPartFormData).mockRejectedValue(new Error('Something bad happened'));
 
     renderPreflight(
-      <DefaultQueryClientProvider options={{ logger }}>
+      <DefaultQueryClientProvider>
         <CAUpload />
       </DefaultQueryClientProvider>,
     );

@@ -64,7 +64,7 @@ const EventNotificationsContainer = () => {
       });
 
       getNotificationTest(notification);
-      queryClient.invalidateQueries(keyFn());
+      queryClient.invalidateQueries({ queryKey: keyFn() });
     },
     [getNotificationTest, pathname, queryClient, sendTelemetry],
   );

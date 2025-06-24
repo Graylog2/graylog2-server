@@ -30,7 +30,7 @@ import type { TimeRange } from '../queries/Query';
 export default class MessagesWidget extends Widget {
   constructor(
     id: string,
-    config: any,
+    config: MessagesWidgetConfig,
     filter: string | undefined | null,
     timerange: TimeRange | undefined | null,
     query: QueryString | undefined | null,
@@ -103,7 +103,7 @@ export default class MessagesWidget extends Widget {
 }
 
 class Builder extends Widget.Builder {
-  build(): MessagesWidget {
+  build() {
     const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
 
     return new MessagesWidget(id, config, filter, timerange, query, streams, stream_categories, filters);

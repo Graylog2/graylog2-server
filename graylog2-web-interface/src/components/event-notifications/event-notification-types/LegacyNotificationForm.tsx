@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import get from 'lodash/get';
 
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -129,18 +128,14 @@ class LegacyNotificationForm extends React.Component<
             <ControlLabel>Choose Legacy Notification</ControlLabel>
             <Select
               id="notification-legacy-select"
-              matchProp="label"
               placeholder="Select Legacy Notification"
               onChange={this.handleSelectNotificationChange}
               options={formatLegacyTypes(legacyTypes)}
               value={callbackType}
             />
             <HelpBlock>
-              {get(
-                validation,
-                'errors.callback_type[0]',
-                'Select a Legacy Notification to use on this Event Definition.',
-              )}
+              {validation?.errors?.callback_type?.[0] ??
+                'Select a Legacy Notification to use on this Event Definition.'}
             </HelpBlock>
           </FormGroup>
         </fieldset>
