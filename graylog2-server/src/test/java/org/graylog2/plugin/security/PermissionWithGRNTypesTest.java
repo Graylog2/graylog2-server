@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.security;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,7 +37,7 @@ class PermissionWithGRNTypesTest {
             "streams:read:datastream:gl-security-investigations-metrics,streams,read:datastream:gl-security-investigations-metrics",
     })
     void create(String permissionValue, String expectedObject, String expectedAction) {
-        final var permission = (PermissionWithGRNTypes) PermissionWithGRNTypes.create(permissionValue, "description", GRNTypes.STREAM, Capability.VIEW);
+        final var permission = (PermissionWithGRNTypes) PermissionWithGRNTypes.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW));
 
         assertThat(permission.object()).isEqualTo(expectedObject);
         assertThat(permission.action()).isEqualTo(expectedAction);
@@ -54,7 +55,7 @@ class PermissionWithGRNTypesTest {
             "dashboards:read:datastream:gl-security-investigations-metrics"
     })
     void failedCreate(String permissionValue) {
-        assertThatThrownBy(() -> PermissionWithGRNTypes.create(permissionValue, "description", GRNTypes.STREAM, Capability.VIEW))
+        assertThatThrownBy(() -> PermissionWithGRNTypes.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

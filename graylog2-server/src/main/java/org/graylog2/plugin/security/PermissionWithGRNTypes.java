@@ -16,13 +16,13 @@
  */
 package org.graylog2.plugin.security;
 
+import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
-import org.graylog.shaded.kafka09.joptsimple.internal.Strings;
-
-import java.util.List;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
@@ -31,8 +31,7 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 public record PermissionWithGRNTypes(String object,
                                      String action,
                                      String description,
-                                     GRNType grnType,
-                                     Capability capability) implements Permission {
+                                     ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
     public PermissionWithGRNTypes {
         // This is a special case for a legacy permission that was not following the object:action format
         if (!("streams".equals(object) && "read:datastream:gl-security-investigations-metrics".equals(action))) {
@@ -40,8 +39,7 @@ public record PermissionWithGRNTypes(String object,
             validatePart(action, "action");
         }
         requireNonNull(description, "description must not be null");
-        requireNonNull(grnType, "grnType must not be null");
-        requireNonNull(capability, "capability must not be null");
+        requireNonNull(grnTypeCapabilities, "grnTypeCapabilities must not be null");
     }
 
     private static void validatePart(String value, String name) {
@@ -54,10 +52,15 @@ public record PermissionWithGRNTypes(String object,
 
     @Override
     public String permission() {
-        return Strings.join(List.of(object, action), ":");
+        return object + ":" + action;
     }
 
-    public static Permission create(@Nonnull String permission, @Nullable String description, GRNType grnType, Capability capability) {
+    @Override
+    public org.apache.shiro.authz.Permission toShiroPermission(GRN target) {
+        return new CaseSensitiveWildcardPermission(permission() + ":" + target.entity());
+    }
+
+    public static Permission create(@Nonnull String permission, @Nullable String description, ImmutableMap<GRNType, Capability> grnTypeCapabilities) {
         requireNonBlank(permission, "permission must not be blank");
 
         final var parts = permission.split(":", 2);
@@ -69,8 +72,7 @@ public record PermissionWithGRNTypes(String object,
                 parts[0],
                 parts[1],
                 requireNonNullElse(description, "").trim(),
-                grnType,
-                capability
+                grnTypeCapabilities
         );
     }
 }

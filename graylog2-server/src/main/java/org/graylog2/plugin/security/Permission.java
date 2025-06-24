@@ -16,22 +16,37 @@
  */
 package org.graylog2.plugin.security;
 
+import com.google.common.collect.ImmutableMap;
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
+
+import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
 public interface Permission {
+    EntityOwnPermission ENTITY_OWN = EntityOwnPermission.create();
+
     String permission();
 
     String description();
 
+    ImmutableMap<GRNType, Capability> grnTypeCapabilities();
+
+    org.apache.shiro.authz.Permission toShiroPermission(GRN target);
+
     static Permission create(String permission, String description) {
-        return LegacyPermission.create(permission, description);
+        return PermissionWithGRNTypes.create(permission, description, ImmutableMap.of());
     }
 
     static Permission create(String permission, String description, GRNTypeCapability... grnTypeCapabilities) {
-        return LegacyPermission.create(permission, description);
+        return PermissionWithGRNTypes.create(
+                permission,
+                description,
+                Arrays.stream(grnTypeCapabilities)
+                        .collect(ImmutableMap.toImmutableMap(GRNTypeCapability::grnType, GRNTypeCapability::capability))
+        );
     }
 
     static GRNTypeCapability viewCapability(GRNType grnType) {

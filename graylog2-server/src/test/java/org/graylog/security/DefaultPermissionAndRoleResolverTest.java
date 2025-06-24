@@ -16,12 +16,16 @@
  */
 package org.graylog.security;
 
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,14 +35,19 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
+@ExtendWith(GRNExtension.class)
 class DefaultPermissionAndRoleResolverTest {
     private DefaultPermissionAndRoleResolver resolver;
 
     @BeforeEach
-    void setUp(MongoCollections mongoCollections) {
+    void setUp(MongoCollections mongoCollections, GRNRegistry grnRegistry) {
         final var dbService = new DBGrantService(mongoCollections);
+        final var capabilities = new BuiltinCapabilities(grnRegistry, Set.of(
+                new RestPermissions(),
+                new ViewsRestPermissions()
+        ));
 
-        this.resolver = new DefaultPermissionAndRoleResolver(new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())), dbService);
+        this.resolver = new DefaultPermissionAndRoleResolver(capabilities, dbService);
     }
 
     @Test

@@ -16,29 +16,23 @@
  */
 package org.graylog2.plugin.security;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
-import jakarta.validation.constraints.NotBlank;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
-import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
+import org.graylog.security.permissions.GRNPermission;
 
-@JsonAutoDetect
-public record LegacyPermission(@JsonProperty("permission") @NotBlank String permission,
-                               @JsonProperty("description") String description) implements Permission {
-    @Override
-    public ImmutableMap<GRNType, Capability> grnTypeCapabilities() {
-        return ImmutableMap.of();
+public record EntityOwnPermission(String permission,
+                                  String description,
+                                  ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
+    public static EntityOwnPermission create() {
+        // Use a PermissionWithGRNTypes detour to validate the permission string.
+        final var permission = PermissionWithGRNTypes.create("entity:own", "Entity ownership permission.", ImmutableMap.of());
+        return new EntityOwnPermission(permission.permission(), permission.description(), permission.grnTypeCapabilities());
     }
 
     @Override
     public org.apache.shiro.authz.Permission toShiroPermission(GRN target) {
-        return new CaseSensitiveWildcardPermission(permission + ":" + target.entity());
-    }
-
-    public static Permission create(String permission, String description) {
-        return new LegacyPermission(permission, description);
+        return GRNPermission.create(permission, target);
     }
 }

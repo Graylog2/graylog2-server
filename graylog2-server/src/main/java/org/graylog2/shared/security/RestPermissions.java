@@ -195,7 +195,8 @@ public class RestPermissions implements PluginPermissions {
 
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
-    public static final String ENTITY_OWN = "entity:own";
+    public static final Permission ENTITY_OWN_PERMISSION = Permission.ENTITY_OWN;
+    public static final String ENTITY_OWN = ENTITY_OWN_PERMISSION.permission();
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
