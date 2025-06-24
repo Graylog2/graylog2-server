@@ -217,6 +217,7 @@ export interface SystemConfiguration {
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
   useCondition?: () => boolean;
+  viewPermission?: string;
 }
 
 export type GenericResult = {
