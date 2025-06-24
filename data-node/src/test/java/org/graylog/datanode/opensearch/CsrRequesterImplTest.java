@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -58,9 +59,14 @@ class CsrRequesterImplTest {
 
     @Test
     void testSAN(@TempDir Path tempDir) throws Exception {
+
+
         final Configuration configuration = DatanodeTestUtils.datanodeConfiguration(Map.of(
                 "node_name", "my-node-name",
-                "hostname", "my-datanode-machine"
+                "hostname", "my-datanode-machine",
+                "node_id_file", tempDir.resolve("node_id").toAbsolutePath().toString(),
+                "opensearch_logs_location", createDir(tempDir, "opensearch", "logs"),
+                "opensearch_config_location", createDir(tempDir, "opensearch", "config")
         ));
 
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", new EventBus());
@@ -81,6 +87,13 @@ class CsrRequesterImplTest {
                             .isNotNull()
                             .contains("my-node-name", "my-datanode-machine");
                 });
+    }
+
+    @Nonnull
+    private static String createDir(Path tempDir, String... other) throws IOException {
+        final Path path = Path.of(tempDir.toAbsolutePath().toString(), other);
+        Files.createDirectories(path);
+        return path.toAbsolutePath().toString();
     }
 
     public static List<String> getSubjectAlternativeNames(PKCS10CertificationRequest csr) throws IOException {
