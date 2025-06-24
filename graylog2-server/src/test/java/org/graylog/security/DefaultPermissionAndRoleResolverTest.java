@@ -43,7 +43,7 @@ class DefaultPermissionAndRoleResolverTest {
 
     @Test
     @MongoDBFixtures("grants.json")
-    void resolvePermissionsForPrincipal() {
+    void resolvePermissionsForPrincipalJane() {
         final var permissions = resolver.resolvePermissionsForPrincipal(GRNTypes.USER.toGRN("jane"));
 
         assertThat(permissions).containsExactlyInAnyOrder(
@@ -62,11 +62,27 @@ class DefaultPermissionAndRoleResolverTest {
 
     @Test
     @MongoDBFixtures("grants.json")
+    void resolvePermissionsForPrincipalJohn() {
+        final var permissions = resolver.resolvePermissionsForPrincipal(GRNTypes.USER.toGRN("john"));
+
+        assertThat(permissions).containsExactlyInAnyOrder(
+                GRNPermission.create("entity:own", GRNTypes.DASHBOARD.toGRN("54e3deadbeefdeadbeef0001")),
+                new CaseSensitiveWildcardPermission("dashboards:edit:54e3deadbeefdeadbeef0001"),
+                new CaseSensitiveWildcardPermission("dashboards:read:54e3deadbeefdeadbeef0001"),
+                new CaseSensitiveWildcardPermission("streams:read:54e3deadbeefdeadbeef0001"),
+                new CaseSensitiveWildcardPermission("view:delete:54e3deadbeefdeadbeef0001"),
+                new CaseSensitiveWildcardPermission("view:edit:54e3deadbeefdeadbeef0001"),
+                new CaseSensitiveWildcardPermission("view:read:54e3deadbeefdeadbeef0001")
+        );
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
     void resolvePermissionsForPrincipalWithWrongPrincipalType() {
         final var permissions = resolver.resolvePermissionsForPrincipal(GRNTypes.DASHBOARD.toGRN("jane"));
 
         // The stream is shared with everyone, so we expect the read permission for the stream even though the
-        // principal is not a user.
+        // principal is not a user. We might want to change this in the future, but for now this is the expected behavior.
         assertThat(permissions)
                 .containsExactly(new CaseSensitiveWildcardPermission("streams:read:54e3deadbeefdeadbeef0001"));
     }
