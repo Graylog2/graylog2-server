@@ -464,7 +464,7 @@ public class StreamServiceImpl implements StreamService {
         if (!Strings.isNullOrEmpty(request.indexSetId())) {
             final String requestedIndexSet = request.indexSetId();
             final IndexSetConfig indexSetConfig = indexSetService.get(requestedIndexSet)
-                    .orElseThrow(() -> new NotFoundException("Index set with ID <" + requestedIndexSet + "> does not exist!"));
+                    .orElseThrow(() -> new ValidationException("Index set with ID <" + requestedIndexSet + "> does not exist!"));
 
             if (!indexSetConfig.isWritable()) {
                 throw new ValidationException("Assigned index set must be writable!");
