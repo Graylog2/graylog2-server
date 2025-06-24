@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve structure of auto-correct suggestions in search query input."
+
+pulls = ["22944"]
+issues = ["21392"]

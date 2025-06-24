@@ -111,13 +111,13 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   width: number;
 }
 
-export interface WidgetExport {
+export interface WidgetExport<T extends WidgetConfig = WidgetConfig> {
   type: string;
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
-  editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps<T, any>>;
+  editComponent: React.ComponentType<EditWidgetComponentProps<T>>;
   hasEditSubmitButton?: boolean;
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
@@ -594,6 +594,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
+    'views.elements.aside'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
     'views.export.formats'?: Array<ExportFormat>;
