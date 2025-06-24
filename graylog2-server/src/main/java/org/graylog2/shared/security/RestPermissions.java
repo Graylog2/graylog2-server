@@ -17,6 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -25,6 +26,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.security.Permission.create;
+import static org.graylog2.plugin.security.Permission.manageCapability;
+import static org.graylog2.plugin.security.Permission.ownCapability;
+import static org.graylog2.plugin.security.Permission.viewCapability;
 
 public class RestPermissions implements PluginPermissions {
     /**
@@ -214,8 +218,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(CLUSTER_CONFIG_ENTRY_EDIT, ""))
             .add(create(CLUSTER_CONFIG_ENTRY_READ, ""))
             .add(create(DASHBOARDS_CREATE, ""))
-            .add(create(DASHBOARDS_EDIT, ""))
-            .add(create(DASHBOARDS_READ, ""))
+            .add(create(DASHBOARDS_EDIT, "", manageCapability(GRNTypes.DASHBOARD)))
+            .add(create(DASHBOARDS_READ, "", viewCapability(GRNTypes.DASHBOARD)))
             .add(create(DATANODE_READ, ""))
             .add(create(DATANODE_REMOVE, ""))
             .add(create(DATANODE_RESET, ""))
@@ -235,14 +239,14 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DEFLECTOR_READ, ""))
             .add(create(LICENSEINFOS_READ, ""))
             .add(create(EVENT_DEFINITIONS_CREATE, ""))
-            .add(create(EVENT_DEFINITIONS_DELETE, ""))
-            .add(create(EVENT_DEFINITIONS_EDIT, ""))
-            .add(create(EVENT_DEFINITIONS_EXECUTE, ""))
-            .add(create(EVENT_DEFINITIONS_READ, ""))
+            .add(create(EVENT_DEFINITIONS_DELETE, "", ownCapability(GRNTypes.EVENT_DEFINITION)))
+            .add(create(EVENT_DEFINITIONS_EDIT, "", manageCapability(GRNTypes.EVENT_DEFINITION)))
+            .add(create(EVENT_DEFINITIONS_EXECUTE, "", manageCapability(GRNTypes.EVENT_DEFINITION)))
+            .add(create(EVENT_DEFINITIONS_READ, "", viewCapability(GRNTypes.EVENT_DEFINITION)))
             .add(create(EVENT_NOTIFICATIONS_CREATE, ""))
-            .add(create(EVENT_NOTIFICATIONS_DELETE, ""))
-            .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
-            .add(create(EVENT_NOTIFICATIONS_READ, ""))
+            .add(create(EVENT_NOTIFICATIONS_DELETE, "", ownCapability(GRNTypes.EVENT_NOTIFICATION)))
+            .add(create(EVENT_NOTIFICATIONS_EDIT, "", manageCapability(GRNTypes.EVENT_NOTIFICATION)))
+            .add(create(EVENT_NOTIFICATIONS_READ, "", viewCapability(GRNTypes.EVENT_NOTIFICATION)))
             .add(create(FIELDNAMES_READ, ""))
             .add(create(GRANTS_OVERVIEW_READ, ""))
             .add(create(INDEXERCLUSTER_READ, ""))
@@ -305,10 +309,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(STREAM_OUTPUTS_CREATE, ""))
             .add(create(STREAM_OUTPUTS_DELETE, ""))
             .add(create(STREAM_OUTPUTS_READ, ""))
-            .add(create(STREAMS_CHANGESTATE, ""))
+            .add(create(STREAMS_CHANGESTATE, "", manageCapability(GRNTypes.STREAM)))
             .add(create(STREAMS_CREATE, ""))
-            .add(create(STREAMS_EDIT, ""))
-            .add(create(STREAMS_READ, ""))
+            .add(create(STREAMS_EDIT, "", manageCapability(GRNTypes.STREAM)))
+            .add(create(STREAMS_READ, "", viewCapability(GRNTypes.STREAM)))
             .add(create(SYSTEM_READ, ""))
             .add(create(SYSTEMJOBS_CREATE, ""))
             .add(create(SYSTEMJOBS_DELETE, ""))
@@ -322,8 +326,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(URL_WHITELIST_READ, ""))
             .add(create(URL_WHITELIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
-            .add(create(USERS_EDIT, ""))
-            .add(create(USERS_READ, ""))
+            .add(create(USERS_EDIT, "", manageCapability(GRNTypes.USER)))
+            .add(create(USERS_READ, "", viewCapability(GRNTypes.USER)))
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
@@ -331,9 +335,9 @@ public class RestPermissions implements PluginPermissions {
             .add(create(USERS_TOKENCREATE, ""))
             .add(create(USERS_TOKENLIST, ""))
             .add(create(USERS_TOKENREMOVE, ""))
-            .add(create(SEARCH_FILTERS_READ, ""))
-            .add(create(SEARCH_FILTERS_EDIT, ""))
-            .add(create(SEARCH_FILTERS_DELETE, ""))
+            .add(create(SEARCH_FILTERS_READ, "", viewCapability(GRNTypes.SEARCH_FILTER)))
+            .add(create(SEARCH_FILTERS_EDIT, "", manageCapability(GRNTypes.SEARCH_FILTER)))
+            .add(create(SEARCH_FILTERS_DELETE, "", ownCapability(GRNTypes.SEARCH_FILTER)))
             .add(create(TYPE_MAPPINGS_CREATE, ""))
             .add(create(TYPE_MAPPINGS_DELETE, ""))
             .add(create(TYPE_MAPPINGS_EDIT, ""))
