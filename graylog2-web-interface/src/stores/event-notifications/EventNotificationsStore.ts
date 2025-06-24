@@ -17,7 +17,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
 import concat from 'lodash/concat';
-import type { EntityShare } from 'src/actions/permissions/EntityShareActions';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -25,6 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 export type TestResult = {
   isLoading: boolean;

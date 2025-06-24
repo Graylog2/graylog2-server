@@ -42,7 +42,7 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
     entity: rest,
     share_request: {
       selected_collections: share_request?.selected_collections,
-      selected_grantee_capabilities: share_request?.selected_grantee_capabilities.toJS()
+      selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS()
     }
   });
 };
