@@ -47,7 +47,7 @@ public record PermissionWithGRNTypes(String object,
     private static void validatePart(String value, String name) {
         requireNonBlank(value, name + " must not be blank");
 
-        if (!value.matches("^[a-zA-Z0-9_]+$")) {
+        if (!value.matches("^[a-zA-Z0-9_-]+$")) {
             throw new IllegalArgumentException(name + " can only contain alphanumeric characters and underscores, but was: " + value);
         }
     }

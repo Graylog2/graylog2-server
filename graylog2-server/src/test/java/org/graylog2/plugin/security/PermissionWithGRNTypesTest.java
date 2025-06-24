@@ -30,6 +30,8 @@ class PermissionWithGRNTypesTest {
     @CsvSource({
             "foo:bar,foo,bar",
             "foo_test:bar,foo_test,bar",
+            "foo-bar:baz,foo-bar,baz",
+            "foo:bar-baz,foo,bar-baz",
             // Legacy permission that does not follow the object:action format, but we want to support
             "streams:read:datastream:gl-security-investigations-metrics,streams,read:datastream:gl-security-investigations-metrics",
     })
@@ -42,8 +44,6 @@ class PermissionWithGRNTypesTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "foo-bar:baz",
-            "foo:bar-baz",
             "foo",
             "foo:",
             ":",
