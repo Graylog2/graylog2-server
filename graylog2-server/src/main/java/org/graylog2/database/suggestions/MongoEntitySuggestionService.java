@@ -101,7 +101,6 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
             suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
         }
-        ;
 
         final long total;
         if (userCanReadAllEntities) {
