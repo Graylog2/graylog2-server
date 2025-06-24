@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationHelper {
-    public final static Path DATA_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    public final static Path TMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    public final static Path DATA_DIR = TMP_DIR;
 
     public static <T extends PathConfiguration> T initPathConfig(T config) throws ValidationException, RepositoryException {
         return initPathConfig(config, new HashMap<>());
@@ -42,6 +43,7 @@ public class ConfigurationHelper {
         Map<String, String> props = new HashMap<>();
         props.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
         props.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918");
+        props.put("node_id_file", TMP_DIR.resolve("node.id").toString());
         props.putAll(properties);
 
         return initPathConfig(config, props);
