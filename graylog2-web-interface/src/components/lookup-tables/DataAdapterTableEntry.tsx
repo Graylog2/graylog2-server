@@ -17,11 +17,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
-import { Spinner } from 'components/common';
+import { Spinner, TextOverflowEllipsis } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { ErrorPopover } from 'components/lookup-tables';
+import { DataAdapter, ErrorPopover } from 'components/lookup-tables';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
@@ -29,6 +28,8 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
+import LUTDrawer from './LUTDrawer';
 
 const Actions = styled(ButtonToolbar)`
   display: flex;
@@ -43,6 +44,7 @@ type Props = {
 };
 
 const DataAdapterTableEntry = ({ adapter, error }: Props) => {
+  const [showDrawer, setShowDrawer] = React.useState<boolean>(false);
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const sendTelemetry = useSendTelemetry();
@@ -67,12 +69,18 @@ const DataAdapterTableEntry = ({ adapter, error }: Props) => {
     }
   }, [adapterTitle, adapter.id, sendTelemetry]);
 
+  const closeDrawer = () => {
+    setShowDrawer(false);
+  }
+
   return (
     <tbody>
       <tr>
         <td>
           {error && <ErrorPopover errorText={error} title="Lookup table problem" placement="right" />}
-          <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapterName)}>{adapterTitle}</Link>
+          <Button bsStyle="link" onClick={() => setShowDrawer(true)}>
+            {adapterTitle}
+          </Button>
         </td>
         <td>{adapterDescription}</td>
         <td>{adapterName}</td>
@@ -98,6 +106,15 @@ const DataAdapterTableEntry = ({ adapter, error }: Props) => {
           )}
         </td>
       </tr>
+      {showDrawer && (
+        <LUTDrawer
+          onClose={closeDrawer}
+          titleComponent={
+            <TextOverflowEllipsis>{adapterTitle}</TextOverflowEllipsis>
+          }>
+          <DataAdapter dataAdapter={adapter} />
+        </LUTDrawer>
+      )}
     </tbody>
   );
 };

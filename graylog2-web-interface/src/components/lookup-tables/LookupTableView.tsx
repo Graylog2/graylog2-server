@@ -94,8 +94,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
 
   return (
     <Row className="content">
-      <Col md={6}>
-        <h2>{table.title}</h2>
+      <Col md={12}>
         <p>{table.description}</p>
         <dl>
           <dt>Data adapter</dt>
@@ -150,8 +149,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
             </ButtonToolbar>
           </fieldset>
         </form>
-      </Col>
-      <Col md={6}>
+        <hr />
         <h2>Test lookup</h2>
         <p>
           You can manually query the lookup table using this form. The data will be cached as configured by{' '}
