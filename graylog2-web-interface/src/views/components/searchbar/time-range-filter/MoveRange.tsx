@@ -19,6 +19,7 @@ import * as React from 'react';
 import isEqual from 'lodash/isEqual';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
+import { useCallback } from 'react';
 
 import type { TimeRange, AbsoluteTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
@@ -42,7 +43,6 @@ const DIRECTION_ICONS: Record<Direction, IconName> = {
 type Direction = (typeof DIRECTIONS)[keyof typeof DIRECTIONS];
 
 const ArrowButton = styled(Button)`
-  max-height: 34px;
   padding: 0;
   border: 0;
 `;
@@ -72,7 +72,7 @@ const MoveRangeButton = ({
 type Props = React.PropsWithChildren<{
   displayMoveRangeButtons: boolean;
   setCurrentTimeRange: (newRange: TimeRange) => void;
-  effectiveTimerange: AbsoluteTimeRange;
+  effectiveTimerange: AbsoluteTimeRange | undefined;
   queryTimerange: TimeRange | NoTimeRangeOverride;
   searchBarTimerange: TimeRange | NoTimeRangeOverride;
 }>;
@@ -86,33 +86,36 @@ const MoveRange = ({
   children = undefined,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
-  const { submitForm, isValid } = useFormikContext();
+  const { submitForm, isValid } = useFormikContext<{ timerange: TimeRange }>();
+
+  const onMoveRange = useCallback(
+    (direction: Direction) => {
+      // Todo: Add telemetry event
+      const currentFrom = new Date(effectiveTimerange.from);
+      const currentTo = new Date(effectiveTimerange.to);
+      const currentDurationMs = currentTo.getTime() - currentFrom.getTime();
+      const isBackwardDirection = direction === DIRECTIONS.backward;
+
+      const newFrom = (
+        isBackwardDirection ? new Date(currentFrom.getTime() - currentDurationMs) : currentTo
+      ).toISOString();
+      const newTo = (
+        isBackwardDirection ? currentFrom : new Date(currentTo.getTime() + currentDurationMs)
+      ).toISOString();
+
+      setCurrentTimeRange(onInitializingTimerange({ type: 'absolute', from: newFrom, to: newTo }, formatTime));
+      submitForm();
+    },
+    [effectiveTimerange?.from, effectiveTimerange?.to, formatTime, setCurrentTimeRange, submitForm],
+  );
 
   if (!displayMoveRangeButtons) {
     return children;
   }
 
-  const onMoveRange = (direction: Direction) => {
-    // Todo: Add telemetry event
-    const currentFrom = new Date(effectiveTimerange.from);
-    const currentTo = new Date(effectiveTimerange.to);
-    const currentDurationMs = currentTo.getTime() - currentFrom.getTime();
-    const isBackwardDirection = direction === DIRECTIONS.backward;
-
-    const newFrom = (
-      isBackwardDirection ? new Date(currentFrom.getTime() - currentDurationMs) : currentTo
-    ).toISOString();
-    const newTo = (isBackwardDirection ? currentFrom : new Date(currentTo.getTime() + currentDurationMs)).toISOString();
-
-    setCurrentTimeRange(onInitializingTimerange({ type: 'absolute', from: newFrom, to: newTo }, formatTime));
-
-    if (isValid) {
-      submitForm();
-    }
-  };
-
   const disableButton =
     !effectiveTimerange ||
+    !isValid ||
     isNoTimeRangeOverride(searchBarTimerange) ||
     !isEqual(queryTimerange, normalizeFromSearchBarForBackend(searchBarTimerange, userTimezone, 'internalIndexer'));
 
