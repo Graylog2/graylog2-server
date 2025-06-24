@@ -14,15 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SearchParams } from 'stores/PaginationTypes';
-import { fetchPaginatedLookupTables, fetchErrors } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+import * as React from 'react';
 
-export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+const ErrorsContext = React.createContext(null);
 
-export function useFetchLookupTables() {
-  return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+type ProviderProps = {
+  children: React.ReactNode;
+};
+
+export function ErrorsProvider({ children }: ProviderProps) {
+  const [errors, setErrors] = React.useState<{ lutErrors: unknown; cacheErrors: unknown; adapterErrors: unknown }>();
+  const value = React.useMemo(() => ({ errors, setErrors }), [errors, setErrors]);
+
+  return <ErrorsContext.Provider value={value}>{children}</ErrorsContext.Provider>;
 }
 
-export function useFetchErrors() {
-  return { fetchErrors };
+export function useErrorsContext() {
+  return React.useContext(ErrorsContext);
 }

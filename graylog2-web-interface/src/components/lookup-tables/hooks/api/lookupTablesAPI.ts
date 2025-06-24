@@ -14,15 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import type { SearchParams } from 'stores/PaginationTypes';
-import { fetchPaginatedLookupTables, fetchErrors } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+import deserializeLookupTables from 'components/lookup-tables/lookup-table/utils';
 
-export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
+  const { page, pageSize, query } = searchParams;
 
-export function useFetchLookupTables() {
-  return { fetchPaginatedLookupTables, lookupTablesKeyFn };
-}
+  return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
+};
 
-export function useFetchErrors() {
-  return { fetchErrors };
-}
+export const fetchErrors = async ({
+  lutNames = undefined,
+  cacheNames = undefined,
+  adapterNames = undefined,
+}: {
+  lutNames?: Array<string>;
+  cacheNames?: Array<string>;
+  adapterNames?: Array<string>;
+}) => LookupTablesActions.getErrors(lutNames, cacheNames, adapterNames);
