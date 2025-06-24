@@ -62,7 +62,7 @@ const PluginsConfig = () => {
     () =>
       originalPluginSystemConfigs
         .filter((config) => typeof config?.useCondition !== 'function' || config.useCondition())
-        .filter((systemConfig) => (systemConfig.viewPermission ? isPermitted(systemConfig.viewPermission) : true)),
+        .filter((config) => (config.viewPermission ? isPermitted(config.viewPermission) : true)), // defaults to true for backwards compatibility. should be removed once all plugins have a permission added
     [originalPluginSystemConfigs, isPermitted],
   );
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
