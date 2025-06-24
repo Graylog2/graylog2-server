@@ -17,6 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { widgetDragHandleClass, widgetActionsMenuClass } from 'views/components/widgets/Constants';
+
 const WidgetWrap = styled.div(
   ({ theme }) => css`
     height: inherit;
@@ -100,15 +102,13 @@ const WidgetWrap = styled.div(
       }
     }
 
-    .widget-actions-menu,
-    .widget-drag-handle {
+    .${widgetActionsMenuClass}, .${widgetDragHandleClass} {
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s;
     }
 
-    &:hover .widget-actions-menu,
-    &:hover .widget-drag-handle {
+    &:hover .${widgetActionsMenuClass}, &:hover .${widgetDragHandleClass} {
       opacity: 1;
       pointer-events: auto;
     }
