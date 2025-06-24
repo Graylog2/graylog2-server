@@ -23,6 +23,13 @@ type Props = {
   text: string;
 };
 
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node instanceof HTMLAnchorElement && node.getAttribute('href')) {
+    node.setAttribute('target', '_blank');
+    node.setAttribute('rel', 'noopener noreferrer');
+  }
+});
+
 const Markdown = ({ text }: Props) => {
   // Remove dangerous HTML
   const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
