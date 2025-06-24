@@ -19,11 +19,11 @@ package org.graylog2.database.pagination;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.mongodb.client.FindIterable;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Collation;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
 
@@ -168,7 +168,13 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
             if (projection != null) {
                 findIterable = findIterable.projection(projection);
             }
-            return findIterable.skip(skip).limit(pageSize);
+            if (skip > 0) {
+                findIterable = findIterable.skip(skip);
+            }
+            if (pageSize > 0) {
+                findIterable = findIterable.limit(pageSize);
+            }
+            return findIterable;
         }
         final var finalPipeline = ImmutableList.<Bson>builder()
                 .addAll(pipeline);
@@ -181,8 +187,12 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         if (projection != null) {
             finalPipeline.add(Aggregates.project(projection));
         }
-        finalPipeline.add(Aggregates.skip(skip));
-        finalPipeline.add(Aggregates.limit(pageSize));
+        if (skip > 0) {
+            finalPipeline.add(Aggregates.skip(skip));
+        }
+        if (pageSize > 0) {
+            finalPipeline.add(Aggregates.limit(pageSize));
+        }
         return collection.aggregate(finalPipeline.build()).collation(collation);
     }
 
