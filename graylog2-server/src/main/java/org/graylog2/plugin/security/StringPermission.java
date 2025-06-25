@@ -28,11 +28,11 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
-public record PermissionWithGRNTypes(String object,
-                                     String action,
-                                     String description,
-                                     ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
-    public PermissionWithGRNTypes {
+public record StringPermission(String object,
+                               String action,
+                               String description,
+                               ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
+    public StringPermission {
         // This is a special case for a legacy permission that was not following the object:action format
         if (!("streams".equals(object) && "read:datastream:gl-security-investigations-metrics".equals(action))) {
             validatePart(object, "object");
@@ -68,7 +68,7 @@ public record PermissionWithGRNTypes(String object,
             throw new IllegalArgumentException("permission must be in the format 'object:action', but was: " + permission);
         }
 
-        return new PermissionWithGRNTypes(
+        return new StringPermission(
                 parts[0],
                 parts[1],
                 requireNonNullElse(description, "").trim(),

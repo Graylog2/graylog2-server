@@ -27,7 +27,7 @@ public record EntityOwnPermission(String permission,
                                   ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
     public static EntityOwnPermission create() {
         // Use a PermissionWithGRNTypes detour to validate the permission string.
-        final var permission = PermissionWithGRNTypes.create("entity:own", "Entity ownership permission.", ImmutableMap.of());
+        final var permission = StringPermission.create("entity:own", "Entity ownership permission.", ImmutableMap.of());
         return new EntityOwnPermission(permission.permission(), permission.description(), permission.grnTypeCapabilities());
     }
 

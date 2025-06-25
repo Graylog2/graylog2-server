@@ -26,7 +26,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PermissionWithGRNTypesTest {
+class StringPermissionTest {
     @ParameterizedTest
     @CsvSource({
             "foo:bar,foo,bar",
@@ -37,7 +37,7 @@ class PermissionWithGRNTypesTest {
             "streams:read:datastream:gl-security-investigations-metrics,streams,read:datastream:gl-security-investigations-metrics",
     })
     void create(String permissionValue, String expectedObject, String expectedAction) {
-        final var permission = (PermissionWithGRNTypes) PermissionWithGRNTypes.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW));
+        final var permission = (StringPermission) StringPermission.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW));
 
         assertThat(permission.object()).isEqualTo(expectedObject);
         assertThat(permission.action()).isEqualTo(expectedAction);
@@ -55,7 +55,7 @@ class PermissionWithGRNTypesTest {
             "dashboards:read:datastream:gl-security-investigations-metrics"
     })
     void failedCreate(String permissionValue) {
-        assertThatThrownBy(() -> PermissionWithGRNTypes.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW)))
+        assertThatThrownBy(() -> StringPermission.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

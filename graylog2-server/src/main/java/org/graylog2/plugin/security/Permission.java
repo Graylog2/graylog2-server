@@ -37,11 +37,11 @@ public interface Permission {
     org.apache.shiro.authz.Permission toShiroPermission(GRN target);
 
     static Permission create(String permission, String description) {
-        return PermissionWithGRNTypes.create(permission, description, ImmutableMap.of());
+        return StringPermission.create(permission, description, ImmutableMap.of());
     }
 
     static Permission create(String permission, String description, GRNTypeCapability... grnTypeCapabilities) {
-        return PermissionWithGRNTypes.create(
+        return StringPermission.create(
                 permission,
                 description,
                 Arrays.stream(grnTypeCapabilities)
