@@ -20,11 +20,6 @@ import org.apache.commons.exec.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,8 +52,8 @@ public record Environment(Map<String, String> env) {
      * we can be sure that this JVM will be actually used, preventing users to override it.
      */
     public Environment withOpensearchJavaHome(Path javaHome) {
-        if (OS.isFamilyMac()) {
-            put(OPENSEARCH_JAVA_HOME_ENV, resolveMacJdk());
+        if (OS.isFamilyMac() && !javaHome.equals(Path.of(System.getProperty("java.home")))) {
+            put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath() + "-mac");
         } else {
             put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath().toString());
         }
@@ -86,31 +81,5 @@ public record Environment(Map<String, String> env) {
                 .filter(not(entry -> JAVA_HOME_ENV.equals(entry.getKey()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    /**
-     * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
-     * start the DataNode inside IntelliJ.
-     */
-    private String resolveMacJdk() {
-        LOG.warn("MacOS is not supported by OpenSearch. Setting the system java home as OpenSearch java home.");
-        // determine system jdk for OS jdk
-        final ProcessBuilder builder = new ProcessBuilder("/usr/libexec/java_home");
-        builder.redirectErrorStream(true);
-        try {
-            final Process process = builder.start();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
-            var line = reader.readLine();
-            if (line != null && Files.exists(Path.of(line))) {
-                return line;
-            } else {
-                LOG.error("Output of '/usr/libexec/java_home' is not the jdk: {}", line);
-            }
-            // cleanup
-            process.destroy();
-            reader.close();
-        } catch (IOException e) {
-            LOG.error("Could not link jdk.app on macOS: {}", e.getMessage(), e);
-        }
-        return "";
-    }
 }
 
