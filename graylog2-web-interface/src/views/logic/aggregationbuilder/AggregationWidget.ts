@@ -36,8 +36,20 @@ export default class AggregationWidget extends Widget {
     streams?: Array<string>,
     streamCategories?: Array<string>,
     filters?: FiltersType,
+    description?: string,
   ) {
-    super(id, AggregationWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
+    super(
+      id,
+      AggregationWidget.type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      streamCategories,
+      filters,
+      description,
+    );
   }
 
   static type = 'AGGREGATION';
@@ -45,7 +57,7 @@ export default class AggregationWidget extends Widget {
   static defaultTitle = 'Untitled Aggregation';
 
   static fromJSON(value) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description } = value;
 
     return new AggregationWidget(
       id,
@@ -56,14 +68,15 @@ export default class AggregationWidget extends Widget {
       streams,
       stream_categories,
       filters,
+      description,
     );
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
+    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description }));
   }
 
   static builder() {
@@ -90,8 +103,19 @@ export default class AggregationWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description } =
+      this.value.toObject();
 
-    return new AggregationWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
+    return new AggregationWidget(
+      id,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+    );
   }
 }
