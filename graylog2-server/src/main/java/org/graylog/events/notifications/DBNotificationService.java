@@ -16,6 +16,7 @@
  */
 package org.graylog.events.notifications;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.security.entities.EntityRegistrar;
@@ -86,6 +87,7 @@ public class DBNotificationService {
         return mongoUtils.getById(id);
     }
 
+    @MustBeClosed
     public Stream<NotificationDto> streamAll() {
         return stream(collection.find());
     }

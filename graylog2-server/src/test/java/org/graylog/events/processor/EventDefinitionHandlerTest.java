@@ -448,6 +448,7 @@ public class EventDefinitionHandlerTest {
 
     @Test
     @MongoDBFixtures("event-processors-without-schedule.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void schedule() {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
         assertThat(jobDefinitionService.streamAll().count()).isEqualTo(0);

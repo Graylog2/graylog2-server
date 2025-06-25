@@ -227,9 +227,11 @@ public class DBEventDefinitionService {
     }
 
     public List<EventDefinitionDto> getByIds(Collection<String> ids) {
-        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
-                .map(this::getEventDefinitionWithRefetchedFilters)
-                .toList();
+        try (final var stream = stream(collection.find(MongoUtils.stringIdsIn(ids)))) {
+            return stream
+                    .map(this::getEventDefinitionWithRefetchedFilters)
+                    .toList();
+        }
     }
 
     /**
