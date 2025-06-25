@@ -33,8 +33,12 @@ class ObjectActionPermissionTest {
             "foo_test:bar,foo_test,bar",
             "foo-bar:baz,foo-bar,baz",
             "foo:bar-baz,foo,bar-baz",
-            // Legacy permission that does not follow the object:action format, but we want to support
+            // Legacy permissions that do not follow the object:action format, but we want to support
             "streams:read:datastream:gl-security-investigations-metrics,streams,read:datastream:gl-security-investigations-metrics",
+            "customization:theme:read,customization,theme:read",
+            "customization:theme:update,customization,theme:update",
+            "customization:notification:read,customization,notification:read",
+            "customization:notification:update,customization,notification:update",
     })
     void create(String permissionValue, String expectedObject, String expectedAction) {
         final var permission = (ObjectActionPermission) ObjectActionPermission.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW));

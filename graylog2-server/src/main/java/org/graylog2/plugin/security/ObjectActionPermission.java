@@ -42,13 +42,23 @@ record ObjectActionPermission(String object,
                               String description,
                               ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
     public ObjectActionPermission {
-        // This is a special case for a legacy permission that was not following the object:action format
-        if (!("streams".equals(object) && "read:datastream:gl-security-investigations-metrics".equals(action))) {
+        // We have some legacy permissions that do not follow the object:action format, but we want to support them for now.
+        if (!isLegacyPermission(object, action)) {
             validatePart(object, "object");
             validatePart(action, "action");
         }
         requireNonNull(description, "description must not be null");
         requireNonNull(grnTypeCapabilities, "grnTypeCapabilities must not be null");
+    }
+
+    private static boolean isLegacyPermission(String object, String action) {
+        // We MUST NOT add more legacy permissions here, this is only for backwards compatibility.
+        return switch (object) {
+            case "streams" -> "read:datastream:gl-security-investigations-metrics".equals(action);
+            case "customization" -> "theme:read".equals(action) || "theme:update".equals(action) ||
+                    "notification:read".equals(action) || "notification:update".equals(action);
+            default -> false;
+        };
     }
 
     private static void validatePart(String value, String name) {
