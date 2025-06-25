@@ -3,6 +3,8 @@
 ## Introduction
 Markdown should be allowed. Quotes and certain chars are ok too "'`@:
 
+Standard entities should be unescaped: &#34; &quot; &#39; &apos; &#8220; &ldquo; &#8221; &rdquo; &#8216; &lsquo; &#8217; &rsquo; &#8249; &lsaquo; &#8250; &rsaquo; &#171; &laquo; &#187; &raquo;
+
 ### List
 - Item 1
 - Item 2
