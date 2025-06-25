@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
+import Preview from 'components/common/MarkdownEditor/Preview';
+import type { WidgetComponentProps } from 'views/types';
 
-export const ENTITY_TABLE_ID = 'saved-searches';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'summary', 'favorite'],
-  columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'],
-};
+const TextVisualization = ({ config, height }: WidgetComponentProps<TextWidgetConfig>) => (
+  <Preview value={config?.text} height={height} noBorder show />
+);
+export default TextVisualization;
