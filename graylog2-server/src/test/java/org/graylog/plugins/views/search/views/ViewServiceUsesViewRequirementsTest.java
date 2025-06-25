@@ -174,6 +174,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Test
     @MongoDBFixtures("views.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamAllReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamAll().collect(Collectors.toList());
 
@@ -185,6 +186,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Test
     @MongoDBFixtures("views.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamByIdsReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamByIds(
                 ImmutableSet.of("5ced4df1d6e8104c16f50e00", "5ced4a4485b52a86b96a0a63")

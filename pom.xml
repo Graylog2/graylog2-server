@@ -1058,6 +1058,7 @@
                             -Xep:PrimitiveAtomicReference:ERROR
                             -Xep:WildcardImport:ERROR
                             -Xep:JavaDurationGetSecondsToToSeconds:ERROR
+                            -Xep:StreamResourceLeak:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
