@@ -37,11 +37,11 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
  * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
  */
 // This record has package-private visibility to prevent usage outside the security package.
-record StringPermission(String object,
-                        String action,
-                        String description,
-                        ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
-    public StringPermission {
+record ObjectActionPermission(String object,
+                              String action,
+                              String description,
+                              ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
+    public ObjectActionPermission {
         // This is a special case for a legacy permission that was not following the object:action format
         if (!("streams".equals(object) && "read:datastream:gl-security-investigations-metrics".equals(action))) {
             validatePart(object, "object");
@@ -70,12 +70,12 @@ record StringPermission(String object,
     }
 
     /**
-     * Creates a new StringPermission instance.
+     * Creates a new {@link ObjectActionPermission} instance.
      *
      * @param permission          the permission string in the format "object:action"
      * @param description         a human-readable description of the permission
      * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
-     * @return a new StringPermission instance
+     * @return a new Permission instance
      * @throws IllegalArgumentException if the permission string is not in the correct format or is blank
      * @throws NullPointerException     if the permission or grnTypeCapabilities are null
      */
@@ -87,7 +87,7 @@ record StringPermission(String object,
             throw new IllegalArgumentException("permission must be in the format 'object:action', but was: " + permission);
         }
 
-        return new StringPermission(
+        return new ObjectActionPermission(
                 parts[0],
                 parts[1],
                 requireNonNullElse(description, "").trim(),

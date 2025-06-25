@@ -80,7 +80,7 @@ public interface Permission {
      * @return a new Permission instance
      */
     static Permission create(String permission, String description) {
-        return StringPermission.create(permission, description, ImmutableMap.of());
+        return ObjectActionPermission.create(permission, description, ImmutableMap.of());
     }
 
     /**
@@ -94,7 +94,7 @@ public interface Permission {
      * @return a new Permission instance
      */
     static Permission create(String permission, String description, GRNTypeCapability... grnTypeCapabilities) {
-        return StringPermission.create(
+        return ObjectActionPermission.create(
                 permission,
                 description,
                 Arrays.stream(grnTypeCapabilities)
