@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.db;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
@@ -121,12 +122,15 @@ public class SearchDbService {
     }
 
     public Collection<Search> findByIds(Set<String> idSet) {
-        return MongoUtils.stream(db.find(MongoUtils.stringIdsIn(idSet)))
-                .map(this::getSearchWithRefetchedFilters)
-                .map(this::requirementsForSearch)
-                .collect(Collectors.toList());
+        try (final var stream = MongoUtils.stream(db.find(MongoUtils.stringIdsIn(idSet)))) {
+            return stream
+                    .map(this::getSearchWithRefetchedFilters)
+                    .map(this::requirementsForSearch)
+                    .collect(Collectors.toList());
+        }
     }
 
+    @MustBeClosed
     public Stream<Search> streamAll() {
         return MongoUtils.stream(db.find())
                 .map(this::getSearchWithRefetchedFilters)
@@ -138,14 +142,17 @@ public class SearchDbService {
                 .rebuildRequirements(Search::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
     }
 
+    @MustBeClosed
     Stream<SearchSummary> findSummaries() {
         return MongoUtils.stream(summarydb.find());
     }
 
     public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustBeOlderThan) {
-        return this.findSummaries()
-                .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustBeOlderThan))
-                .map(SearchSummary::id)
-                .collect(Collectors.toSet());
+        try (final var summariesStream = this.findSummaries()) {
+            return summariesStream
+                    .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustBeOlderThan))
+                    .map(SearchSummary::id)
+                    .collect(Collectors.toSet());
+        }
     }
 }
