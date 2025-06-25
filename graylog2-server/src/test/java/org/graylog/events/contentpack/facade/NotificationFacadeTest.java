@@ -225,6 +225,7 @@ public class NotificationFacadeTest {
 
     @Test
     @MongoDBFixtures("NotificationFacadeTest.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void delete() {
         long countBefore = notificationService.streamAll().count();
         assertThat(countBefore).isEqualTo(1);
