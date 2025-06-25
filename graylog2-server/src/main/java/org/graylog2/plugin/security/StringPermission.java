@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
-// This record has package-private visibility to prevent usage outside of the security package.
+// This record has package-private visibility to prevent usage outside the security package.
 record StringPermission(String object,
                         String action,
                         String description,
