@@ -82,7 +82,7 @@ const EntityCreateShareFormGroup = ({
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
   const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(null);
-  const AdditionalFormGroup = usePluggableCollectionFormGroup();
+  const PluggableEntityShareFormGroup = usePluggableCollectionFormGroup();
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
@@ -194,7 +194,7 @@ const EntityCreateShareFormGroup = ({
             validationResults={entityShareState.validationResults}
             availableGrantees={entityShareState.availableGrantees}
           />
-          <AdditionalFormGroup onChange={handleAdditionalFormChange} />
+          <PluggableEntityShareFormGroup onChange={handleAdditionalFormChange} />
         </>
       ) : (
         <Spinner />
