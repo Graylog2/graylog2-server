@@ -19,46 +19,15 @@ import * as React from 'react';
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
-import { ErrorsProvider, useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
-import { useFetchLookupTables, useFetchErrors } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
+import { useFetchLookupTables } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 import { lutListElements } from './constants';
 import columnRenderers from './column-renderers';
+import ErrorsConsumer from './errors-consumer';
 import type { LookupTableEntity } from './types';
-
-const ErrorsConsumer = ({
-  lutNames = undefined,
-  cacheNames = undefined,
-  adapterNames = undefined,
-}: {
-  lutNames?: Array<string>;
-  cacheNames?: Array<string>;
-  adapterNames?: Array<string>;
-}) => {
-  const [fetchInterval, setFetchInterval] = React.useState<NodeJS.Timeout>();
-  const { setErrors } = useErrorsContext();
-  const { fetchErrors } = useFetchErrors();
-
-  React.useEffect(() => {
-    if (fetchInterval) clearInterval(fetchInterval);
-
-    setFetchInterval(
-      setInterval(() => {
-        fetchErrors({ lutNames, cacheNames, adapterNames }).then(
-          ({ tables, caches, data_adapters }: { tables: unknown; caches: unknown; data_adapters: unknown }) =>
-            setErrors({ lutErrors: tables, cacheErrors: caches, adapterErrors: data_adapters }),
-        );
-      }, 1000),
-    );
-
-    return () => clearInterval(fetchInterval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lutNames, cacheNames, adapterNames]);
-
-  return null;
-};
 
 const queryHelpComponent = (
   <QueryHelper
