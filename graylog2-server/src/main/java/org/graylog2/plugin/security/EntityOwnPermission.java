@@ -22,6 +22,13 @@ import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
 import org.graylog.security.permissions.GRNPermission;
 
+/**
+ * A special permission that represents ownership of an entity.
+ *
+ * @param permission          the permission string
+ * @param description         the description of the permission
+ * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
+ */
 public record EntityOwnPermission(String permission,
                                   String description,
                                   ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {

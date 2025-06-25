@@ -28,6 +28,14 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
+/**
+ * Represents a permission defined by a string in the format "object:action".
+ *
+ * @param object              the object part of the permission, e.g. "users", "streams"
+ * @param action              the action part of the permission, e.g. "edit", "read"
+ * @param description         a human-readable description of the permission
+ * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
+ */
 // This record has package-private visibility to prevent usage outside the security package.
 record StringPermission(String object,
                         String action,
@@ -61,6 +69,16 @@ record StringPermission(String object,
         return new CaseSensitiveWildcardPermission(permission() + ":" + target.entity());
     }
 
+    /**
+     * Creates a new StringPermission instance.
+     *
+     * @param permission          the permission string in the format "object:action"
+     * @param description         a human-readable description of the permission
+     * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
+     * @return a new StringPermission instance
+     * @throws IllegalArgumentException if the permission string is not in the correct format or is blank
+     * @throws NullPointerException     if the permission or grnTypeCapabilities are null
+     */
     public static Permission create(@Nonnull String permission, @Nullable String description, ImmutableMap<GRNType, Capability> grnTypeCapabilities) {
         requireNonBlank(permission, "permission must not be blank");
 
