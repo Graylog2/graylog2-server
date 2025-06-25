@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.preflight;
+package org.graylog.datanode.bootstrap.preflight.inits;
 
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -23,14 +23,14 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.inject.Inject;
+import org.graylog.datanode.bootstrap.preflight.DatanodeCertReceiver;
+import org.graylog.datanode.bootstrap.preflight.LegacyDatanodeKeystoreProvider;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.opensearch.CsrRequester;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
-import org.graylog2.bootstrap.preflight.PreflightCheck;
-import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
@@ -44,16 +44,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This check verifies that each datanode has a private key configured. It may be needed right now, but at the moment
+ * This init verifies that each datanode has a private key configured. It may be needed right now, but at the moment
  * we'll start provisioning and create certificate signing requests, we may be sure that there is one private key
  * available.
  * ·<br>
  * Additionally, this check is able to restore existing keystore persisted in mongodb. It may hold valid certificate
  * that we want to reuse. Otherwise, the node would undergo signing again.
  */
-public class DatanodeKeystoreCheck implements PreflightCheck {
+public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystoreCheck.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystoreInitService.class);
     public static final Duration DEFAULT_SELFSIGNED_CERT_VALIDITY = Duration.ofDays(99 * 365);
 
     private final DatanodeKeystore datanodeKeystore;
@@ -64,7 +64,7 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public DatanodeKeystoreCheck(
+    public DatanodeKeystoreInitService(
             DatanodeKeystore datanodeKeystore,
             LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider,
             CsrRequester csrRequester,
@@ -79,7 +79,7 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
     }
 
     @Override
-    public void runCheck() throws PreflightCheckException {
+    public void runInit() {
         if (!datanodeKeystore.exists()) {
             LOG.info("Creating keystore for this data node");
             try {
