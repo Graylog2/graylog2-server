@@ -194,7 +194,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
     // This is a special permission that ONLY works with GRNs as ID/target
-    // TODO does this belong here?
     public static final String ENTITY_OWN = Permission.ENTITY_OWN.permission();
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
