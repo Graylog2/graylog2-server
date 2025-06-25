@@ -28,10 +28,11 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
-public record StringPermission(String object,
-                               String action,
-                               String description,
-                               ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
+// This record has package-private visibility to prevent usage outside of the security package.
+record StringPermission(String object,
+                        String action,
+                        String description,
+                        ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
     public StringPermission {
         // This is a special case for a legacy permission that was not following the object:action format
         if (!("streams".equals(object) && "read:datastream:gl-security-investigations-metrics".equals(action))) {
