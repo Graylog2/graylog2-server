@@ -49,15 +49,15 @@ public interface Permission {
         );
     }
 
-    static GRNTypeCapability viewCapability(GRNType grnType) {
+    static GRNTypeCapability addToViewCapabilityFor(GRNType grnType) {
         return new GRNTypeCapability(grnType, Capability.VIEW);
     }
 
-    static GRNTypeCapability manageCapability(GRNType grnType) {
+    static GRNTypeCapability addToManageCapabilityFor(GRNType grnType) {
         return new GRNTypeCapability(grnType, Capability.MANAGE);
     }
 
-    static GRNTypeCapability ownCapability(GRNType grnType) {
+    static GRNTypeCapability addToOwnCapabilityFor(GRNType grnType) {
         return new GRNTypeCapability(grnType, Capability.OWN);
     }
 

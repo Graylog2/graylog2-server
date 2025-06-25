@@ -23,10 +23,10 @@ import org.graylog2.plugin.security.PluginPermissions;
 
 import java.util.Set;
 
+import static org.graylog2.plugin.security.Permission.addToManageCapabilityFor;
+import static org.graylog2.plugin.security.Permission.addToOwnCapabilityFor;
+import static org.graylog2.plugin.security.Permission.addToViewCapabilityFor;
 import static org.graylog2.plugin.security.Permission.create;
-import static org.graylog2.plugin.security.Permission.manageCapability;
-import static org.graylog2.plugin.security.Permission.ownCapability;
-import static org.graylog2.plugin.security.Permission.viewCapability;
 
 public class ViewsRestPermissions implements PluginPermissions {
 
@@ -40,9 +40,15 @@ public class ViewsRestPermissions implements PluginPermissions {
 
     private final ImmutableSet<Permission> permissions = ImmutableSet.of(
             createPermission,
-            create(VIEW_READ, "Read available views", viewCapability(GRNTypes.SEARCH), viewCapability(GRNTypes.DASHBOARD)),
-            create(VIEW_EDIT, "Edit view", manageCapability(GRNTypes.SEARCH), manageCapability(GRNTypes.DASHBOARD)),
-            create(VIEW_DELETE, "Delete view", ownCapability(GRNTypes.SEARCH), ownCapability(GRNTypes.DASHBOARD)),
+            create(VIEW_READ, "Read available views",
+                    addToViewCapabilityFor(GRNTypes.SEARCH),
+                    addToViewCapabilityFor(GRNTypes.DASHBOARD)),
+            create(VIEW_EDIT, "Edit view",
+                    addToManageCapabilityFor(GRNTypes.SEARCH),
+                    addToManageCapabilityFor(GRNTypes.DASHBOARD)),
+            create(VIEW_DELETE, "Delete view",
+                    addToOwnCapabilityFor(GRNTypes.SEARCH),
+                    addToOwnCapabilityFor(GRNTypes.DASHBOARD)),
             create(DEFAULT_VIEW_SET, "Set default view")
     );
 
