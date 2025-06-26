@@ -119,7 +119,7 @@
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.19.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.38.0</error-prone.version>
+        <error-prone.version>2.39.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.53.1</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -150,11 +150,11 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250517</json-org.version>
         <json-path.version>2.9.0</json-path.version>
-        <kafka.version>3.9.0</kafka.version>
+        <kafka.version>4.0.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.0</log4j.version>
         <lucene.version>9.12.2</lucene.version>
-        <metrics.version>4.2.30</metrics.version>
+        <metrics.version>4.2.33</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -637,7 +637,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.26.0</version>
+                    <version>3.27.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -662,7 +662,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.3.0</version>
+                    <version>4.9.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -1058,6 +1058,7 @@
                             -Xep:PrimitiveAtomicReference:ERROR
                             -Xep:WildcardImport:ERROR
                             -Xep:JavaDurationGetSecondsToToSeconds:ERROR
+                            -Xep:StreamResourceLeak:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
