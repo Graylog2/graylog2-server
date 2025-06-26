@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -64,11 +64,14 @@ import IfDashboard from '../dashboard/IfDashboard';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
-const Container = styled.div`
-  > *:not(:last-child) {
-    margin-right: 2px;
-  }
-`;
+const Container = styled.div<{ $actionsDropdownIsOpen: boolean }>(
+  ({ $actionsDropdownIsOpen }) => css`
+    ${$actionsDropdownIsOpen ? 'display: flex !important;' : ''}
+    > *:not(:last-child) {
+      margin-right: 2px;
+    }
+  `,
+);
 
 const _onCopyToDashboard = async (
   view: View,
@@ -167,6 +170,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
+  const [actionsDropdownIsOpen, setActionsDropdownIsOpen] = useState(false);
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
@@ -232,7 +236,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className={widgetActionsMenuClass}>
+    <Container className={widgetActionsMenuClass} $actionsDropdownIsOpen={actionsDropdownIsOpen}>
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton
@@ -260,7 +264,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
         <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
 
-        <WidgetActionDropdown>
+        <WidgetActionDropdown onChange={setActionsDropdownIsOpen}>
           <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <IfSearch>
             <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>
