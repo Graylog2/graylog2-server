@@ -103,13 +103,11 @@ const WidgetWrap = styled.div(
     }
 
     .${widgetActionsMenuClass}, .${widgetDragHandleClass} {
-      opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s;
     }
 
     &:hover .${widgetActionsMenuClass}, &:hover .${widgetDragHandleClass} {
-      opacity: 1;
       pointer-events: auto;
     }
   `,
