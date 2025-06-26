@@ -65,7 +65,7 @@ record ObjectActionPermission(String object,
         requireNonBlank(value, name + " must not be blank");
 
         if (!value.matches("^[a-zA-Z0-9_-]+$")) {
-            throw new IllegalArgumentException(name + " can only contain alphanumeric characters and underscores, but was: " + value);
+            throw new IllegalArgumentException(name + " can only contain alphanumeric characters, hyphens, and underscores, but was: " + value);
         }
     }
 
