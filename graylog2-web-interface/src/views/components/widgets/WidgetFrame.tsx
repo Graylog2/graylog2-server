@@ -111,14 +111,6 @@ const WidgetWrap = styled.div(
       pointer-events: auto;
     }
 
-    .${widgetDragHandleClass} {
-      opacity: 0;
-    }
-
-    &:hover .${widgetDragHandleClass} {
-      opacity: 1;
-    }
-
     .${widgetActionsMenuClass} {
       display: none;
     }
