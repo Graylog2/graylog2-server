@@ -14,13 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.datanode.bootstrap.preflight.inits;
 
-import type { Sort } from 'stores/PaginationTypes';
-
-export const ENTITY_TABLE_ID = 'saved-searches';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'summary', 'favorite'],
-  columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'],
-};
+public interface DatanodeBlockingInit {
+    void runInit();
+}
