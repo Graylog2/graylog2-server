@@ -93,7 +93,7 @@ record ObjectActionPermission(String object,
         requireNonBlank(permission, "permission must not be blank");
 
         final var parts = permission.split(":", 2);
-        if (parts.length != 2) {
+        if (parts.length < 2) {
             throw new IllegalArgumentException("permission must be in the format 'object:action', but was: " + permission);
         }
 
