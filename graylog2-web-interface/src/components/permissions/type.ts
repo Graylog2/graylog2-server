@@ -21,7 +21,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     'components.collection'?: {
       AddCollectionFormGroup: React.ComponentType<{
-        help?: React.ReactElement | string;
+        entityType?: string;
         label?: React.ReactElement | string;
         name?: string;
         error?: any,

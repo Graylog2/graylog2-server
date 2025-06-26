@@ -194,7 +194,11 @@ const EntityCreateShareFormGroup = ({
             validationResults={entityShareState.validationResults}
             availableGrantees={entityShareState.availableGrantees}
           />
-          {PluggableEntityShareFormGroup && <PluggableEntityShareFormGroup onChange={handleAdditionalFormChange} />}
+          {PluggableEntityShareFormGroup && (
+            <PluggableEntityShareFormGroup
+              entityType={entityType}
+              onChange={handleAdditionalFormChange} />
+          )}
         </>
       ) : (
         <Spinner />
