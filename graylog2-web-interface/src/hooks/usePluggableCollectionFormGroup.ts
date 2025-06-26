@@ -19,7 +19,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 const usePluggableCollectionFormGroup = () => {
   const pluggableCollection = usePluginEntities('components.collection');
 
-  return pluggableCollection?.[0]?.AddCollectionFormGroup;
+  return pluggableCollection?.[0]?.AddCollectionFormGroup ?? null;
 };
 
 export default usePluggableCollectionFormGroup;
