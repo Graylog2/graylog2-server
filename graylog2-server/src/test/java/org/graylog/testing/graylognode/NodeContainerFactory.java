@@ -144,6 +144,8 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_SUBJECT_PREFIX", "[graylog]")
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
+                .withEnv("GRAYLOG_INTEGRATIONS_SCRIPTS_DIR", "/tmp")
+
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
                 .withEnv(config.configParams)
                 .withExposedPorts(config.portsToExpose());
