@@ -29,6 +29,7 @@ import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import { Button } from 'components/bootstrap';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import { readableDifference } from 'util/DateTime';
 
 const DIRECTIONS = {
   backward: 'backward',
@@ -51,10 +52,12 @@ const MoveRangeButton = ({
   direction,
   disabled,
   onMoveRange,
+  title,
 }: {
   direction: Direction;
   disabled: boolean;
   onMoveRange: (direction: Direction) => void;
+  title: string;
 }) => {
   const onClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -63,22 +66,20 @@ const MoveRangeButton = ({
   };
 
   return (
-    <ArrowButton onClick={onClick} disabled={disabled}>
-      <Icon name={DIRECTION_ICONS[direction]} title={`Move range ${DIRECTIONS[direction]}`} />
+    <ArrowButton onClick={onClick} disabled={disabled} title={title}>
+      <Icon name={DIRECTION_ICONS[direction]} />
     </ArrowButton>
   );
 };
 
 type Props = React.PropsWithChildren<{
-  displayMoveRangeButtons: boolean;
   setCurrentTimeRange: (newRange: TimeRange) => void;
   effectiveTimerange: AbsoluteTimeRange | undefined;
   queryTimerange: TimeRange | NoTimeRangeOverride;
   searchBarTimerange: TimeRange | NoTimeRangeOverride;
 }>;
 
-const MoveRange = ({
-  displayMoveRangeButtons,
+const MoveRangeInner = ({
   setCurrentTimeRange,
   effectiveTimerange,
   queryTimerange,
@@ -88,12 +89,22 @@ const MoveRange = ({
   const { formatTime, userTimezone } = useUserDateTime();
   const { submitForm, isValid } = useFormikContext<{ timerange: TimeRange }>();
 
+  const readableDuration = effectiveTimerange
+    ? readableDifference(effectiveTimerange.from, effectiveTimerange.to)
+    : undefined;
+
+  if (effectiveTimerange) {
+    readableDifference(effectiveTimerange.from, effectiveTimerange.to);
+  }
+
   const onMoveRange = useCallback(
     (direction: Direction) => {
       // Todo: Add telemetry event
       const currentFrom = new Date(effectiveTimerange.from);
       const currentTo = new Date(effectiveTimerange.to);
+
       const currentDurationMs = currentTo.getTime() - currentFrom.getTime();
+
       const isBackwardDirection = direction === DIRECTIONS.backward;
 
       const newFrom = (
@@ -109,10 +120,6 @@ const MoveRange = ({
     [effectiveTimerange?.from, effectiveTimerange?.to, formatTime, setCurrentTimeRange, submitForm],
   );
 
-  if (!displayMoveRangeButtons) {
-    return children;
-  }
-
   const disableButton =
     !effectiveTimerange ||
     !isValid ||
@@ -121,10 +128,43 @@ const MoveRange = ({
 
   return (
     <>
-      <MoveRangeButton onMoveRange={onMoveRange} disabled={disableButton} direction={DIRECTIONS.backward} />
+      <MoveRangeButton
+        onMoveRange={onMoveRange}
+        disabled={disableButton}
+        direction={DIRECTIONS.backward}
+        title={disableButton ? 'Show previous' : `Show previous ${readableDuration}`}
+      />
       {children}
-      <MoveRangeButton onMoveRange={onMoveRange} disabled={disableButton} direction={DIRECTIONS.forward} />
+      <MoveRangeButton
+        onMoveRange={onMoveRange}
+        disabled={disableButton}
+        direction={DIRECTIONS.forward}
+        title={disableButton ? 'Show next' : `Show next ${readableDuration}`}
+      />
     </>
+  );
+};
+
+const MoveRange = ({
+  displayMoveRangeButtons,
+  setCurrentTimeRange,
+  effectiveTimerange,
+  queryTimerange,
+  searchBarTimerange,
+  children = undefined,
+}: Props & { displayMoveRangeButtons: boolean }) => {
+  if (!displayMoveRangeButtons) {
+    return children;
+  }
+
+  return (
+    <MoveRangeInner
+      setCurrentTimeRange={setCurrentTimeRange}
+      effectiveTimerange={effectiveTimerange}
+      queryTimerange={queryTimerange}
+      searchBarTimerange={searchBarTimerange}>
+      {children}
+    </MoveRangeInner>
   );
 };
 
