@@ -153,7 +153,7 @@ public class DatanodeKeystore {
         }
     }
 
-    public synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
+    private synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
         try (FileInputStream fis = new FileInputStream(keystorePath().toFile())) {
             KeyStore keystore = KeyStore.getInstance(PKCS12);
             keystore.load(fis, passwordSecret.toCharArray());

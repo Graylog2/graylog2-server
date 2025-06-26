@@ -1,0 +1,4 @@
+type = "a"
+message = "Add support for X-Forwarded-For/Forwarded/X-Real-IP type headers in HTTP inputs to better support proxied connections"
+
+pulls = ["22872"]
