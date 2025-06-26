@@ -109,7 +109,7 @@ public interface Permission {
      * @return a new Permission instance
      */
     static Permission create(String permission, String description) {
-        return ObjectActionPermission.create(permission, description, Map.of());
+        return DomainActionPermission.create(permission, description, Map.of());
     }
 
     /**
@@ -123,7 +123,7 @@ public interface Permission {
      * @return a new Permission instance
      */
     static Permission create(String permission, String description, GRNTypeCapability... grnTypeCapabilities) {
-        return ObjectActionPermission.create(
+        return DomainActionPermission.create(
                 permission,
                 description,
                 Arrays.stream(grnTypeCapabilities)

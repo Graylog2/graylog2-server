@@ -27,24 +27,24 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ObjectActionPermissionTest {
+class DomainActionPermissionTest {
     @ParameterizedTest
     @CsvSource({
             "foo:bar,foo,bar",
             "foo_test:bar,foo_test,bar",
             "foo-bar:baz,foo-bar,baz",
             "foo:bar-baz,foo,bar-baz",
-            // Legacy permissions that do not follow the object:action format, but we want to support
+            // Legacy permissions that do not follow the domain:action format, but we want to support
             "streams:read:datastream:gl-security-investigations-metrics,streams,read:datastream:gl-security-investigations-metrics",
             "customization:theme:read,customization,theme:read",
             "customization:theme:update,customization,theme:update",
             "customization:notification:read,customization,notification:read",
             "customization:notification:update,customization,notification:update",
     })
-    void create(String permissionValue, String expectedObject, String expectedAction) {
-        final var permission = (ObjectActionPermission) ObjectActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW));
+    void create(String permissionValue, String expectedDomain, String expectedAction) {
+        final var permission = (DomainActionPermission) DomainActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW));
 
-        assertThat(permission.object()).isEqualTo(expectedObject);
+        assertThat(permission.domain()).isEqualTo(expectedDomain);
         assertThat(permission.action()).isEqualTo(expectedAction);
     }
 
@@ -60,7 +60,7 @@ class ObjectActionPermissionTest {
             "dashboards:read:datastream:gl-security-investigations-metrics"
     })
     void failedCreate(String permissionValue) {
-        assertThatThrownBy(() -> ObjectActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW)))
+        assertThatThrownBy(() -> DomainActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

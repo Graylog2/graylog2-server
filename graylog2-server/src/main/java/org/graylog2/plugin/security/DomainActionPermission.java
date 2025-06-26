@@ -31,31 +31,31 @@ import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 /**
- * Represents a permission defined by a string in the format "object:action".
+ * Represents a permission defined by a string in the format "domain:action".
  *
- * @param object              the object part of the permission, e.g. "users", "streams"
+ * @param domain              the domain part of the permission, e.g. "users", "streams"
  * @param action              the action part of the permission, e.g. "edit", "read"
  * @param description         a human-readable description of the permission
  * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
  */
 // This record has package-private visibility to prevent usage outside the security package.
-record ObjectActionPermission(String object,
+record DomainActionPermission(String domain,
                               String action,
                               String description,
                               Map<GRNType, Capability> grnTypeCapabilities) implements Permission {
-    public ObjectActionPermission {
-        // We have some legacy permissions that do not follow the object:action format, but we want to support them for now.
-        if (!isLegacyPermission(object, action)) {
-            validatePart(object, "object");
+    public DomainActionPermission {
+        // We have some legacy permissions that do not follow the domain:action format, but we want to support them for now.
+        if (!isLegacyPermission(domain, action)) {
+            validatePart(domain, "domain");
             validatePart(action, "action");
         }
         requireNonNull(description, "description must not be null");
         requireNonNull(grnTypeCapabilities, "grnTypeCapabilities must not be null");
     }
 
-    private static boolean isLegacyPermission(String object, String action) {
+    private static boolean isLegacyPermission(String domain, String action) {
         // We MUST NOT add more legacy permissions here, this is only for backwards compatibility.
-        return switch (object) {
+        return switch (domain) {
             case "streams" -> "read:datastream:gl-security-investigations-metrics".equals(action);
             case "customization" -> "theme:read".equals(action) || "theme:update".equals(action) ||
                     "notification:read".equals(action) || "notification:update".equals(action);
@@ -73,7 +73,7 @@ record ObjectActionPermission(String object,
 
     @Override
     public String permission() {
-        return object + ":" + action;
+        return domain + ":" + action;
     }
 
     @Override
@@ -87,13 +87,13 @@ record ObjectActionPermission(String object,
                 .putAll(this.grnTypeCapabilities)
                 .put(grnType, capability)
                 .build();
-        return new ObjectActionPermission(object, action, description, grnTypeCapabilities);
+        return new DomainActionPermission(domain, action, description, grnTypeCapabilities);
     }
 
     /**
-     * Creates a new {@link ObjectActionPermission} instance.
+     * Creates a new {@link DomainActionPermission} instance.
      *
-     * @param permission          the permission string in the format "object:action"
+     * @param permission          the permission string in the format "domain:action"
      * @param description         a human-readable description of the permission
      * @param grnTypeCapabilities a map of GRN types to capabilities that this permission applies to
      * @return a new Permission instance
@@ -105,10 +105,10 @@ record ObjectActionPermission(String object,
 
         final var parts = permission.split(":", 2);
         if (parts.length < 2) {
-            throw new IllegalArgumentException("permission must be in the format 'object:action', but was: " + permission);
+            throw new IllegalArgumentException("permission must be in the format 'domain:action', but was: " + permission);
         }
 
-        return new ObjectActionPermission(
+        return new DomainActionPermission(
                 parts[0],
                 parts[1],
                 requireNonNullElse(description, "").trim(),
