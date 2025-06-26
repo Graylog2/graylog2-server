@@ -29,7 +29,7 @@ import static org.graylog2.plugin.security.Permission.create;
 
 public class RestPermissions implements PluginPermissions {
     /**
-     * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
+     * These should all be in the form of "domain:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
     public static final String AUTH_HTTP_HEADER_CONFIG_EDIT = "authhttpheaderconfig:edit";
