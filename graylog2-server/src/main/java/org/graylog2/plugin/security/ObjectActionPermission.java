@@ -79,6 +79,15 @@ record ObjectActionPermission(String object,
         return new CaseSensitiveWildcardPermission(permission() + ":" + target.entity());
     }
 
+    @Override
+    public Permission withCapabilityFor(GRNType grnType, Capability capability) {
+        final var grnTypeCapabilities = ImmutableMap.<GRNType, Capability>builder()
+                .putAll(this.grnTypeCapabilities)
+                .put(grnType, capability)
+                .build();
+        return new ObjectActionPermission(object, action, description, grnTypeCapabilities);
+    }
+
     /**
      * Creates a new {@link ObjectActionPermission} instance.
      *

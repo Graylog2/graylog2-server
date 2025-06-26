@@ -23,9 +23,6 @@ import org.graylog2.plugin.security.PluginPermissions;
 
 import java.util.Set;
 
-import static org.graylog2.plugin.security.Permission.addToManageCapabilityFor;
-import static org.graylog2.plugin.security.Permission.addToOwnCapabilityFor;
-import static org.graylog2.plugin.security.Permission.addToViewCapabilityFor;
 import static org.graylog2.plugin.security.Permission.create;
 
 public class ViewsRestPermissions implements PluginPermissions {
@@ -40,15 +37,15 @@ public class ViewsRestPermissions implements PluginPermissions {
 
     private final ImmutableSet<Permission> permissions = ImmutableSet.of(
             createPermission,
-            create(VIEW_READ, "Read available views",
-                    addToViewCapabilityFor(GRNTypes.SEARCH),
-                    addToViewCapabilityFor(GRNTypes.DASHBOARD)),
-            create(VIEW_EDIT, "Edit view",
-                    addToManageCapabilityFor(GRNTypes.SEARCH),
-                    addToManageCapabilityFor(GRNTypes.DASHBOARD)),
-            create(VIEW_DELETE, "Delete view",
-                    addToOwnCapabilityFor(GRNTypes.SEARCH),
-                    addToOwnCapabilityFor(GRNTypes.DASHBOARD)),
+            create(VIEW_READ, "Read available views")
+                    .withViewCapabilityFor(GRNTypes.SEARCH)
+                    .withViewCapabilityFor(GRNTypes.DASHBOARD),
+            create(VIEW_EDIT, "Edit view")
+                    .withManageCapabilityFor(GRNTypes.SEARCH)
+                    .withManageCapabilityFor(GRNTypes.DASHBOARD),
+            create(VIEW_DELETE, "Delete view")
+                    .withOwnCapabilityFor(GRNTypes.SEARCH)
+                    .withOwnCapabilityFor(GRNTypes.DASHBOARD),
             create(DEFAULT_VIEW_SET, "Set default view")
     );
 

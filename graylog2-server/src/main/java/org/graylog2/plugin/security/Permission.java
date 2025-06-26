@@ -58,6 +58,11 @@ public interface Permission {
         public org.apache.shiro.authz.Permission toShiroPermission(GRN target) {
             return GRNPermission.create(permission, target);
         }
+
+        @Override
+        public Permission withCapabilityFor(GRNType grnType, Capability capability) {
+            throw new UnsupportedOperationException("ENTITY_OWN permission does not support capabilities.");
+        }
     };
 
     /**
@@ -126,40 +131,43 @@ public interface Permission {
     }
 
     /**
-     * Creates a new {@link Capability#VIEW} capability mapping for the given GRN type.
-     * <p>
-     * Used for specifying which GRN types and capabilities a permission applies to.
+     * Adds the specified GRN type and {@link Capability#VIEW} capability to the permission.
      *
-     * @param grnType the GRN type
-     * @return a GRNTypeCapability instance
+     * @param grnType the GRN type to associate with this permission
+     * @return a new Permission instance with the view capability for the specified GRN type
      */
-    static GRNTypeCapability addToViewCapabilityFor(GRNType grnType) {
-        return new GRNTypeCapability(grnType, Capability.VIEW);
+    default Permission withViewCapabilityFor(GRNType grnType) {
+        return withCapabilityFor(grnType, Capability.VIEW);
     }
 
     /**
-     * Creates a new {@link Capability#MANAGE} capability mapping for the given GRN type.
-     * <p>
-     * Used for specifying which GRN types and capabilities a permission applies to.
+     * Adds the specified GRN type and {@link Capability#MANAGE} capability to the permission.
      *
-     * @param grnType the GRN type
-     * @return a GRNTypeCapability instance
+     * @param grnType the GRN type to associate with this permission
+     * @return a new Permission instance with the manage capability for the specified GRN type
      */
-    static GRNTypeCapability addToManageCapabilityFor(GRNType grnType) {
-        return new GRNTypeCapability(grnType, Capability.MANAGE);
+    default Permission withManageCapabilityFor(GRNType grnType) {
+        return withCapabilityFor(grnType, Capability.MANAGE);
     }
 
     /**
-     * Creates a new {@link Capability#OWN} capability mapping for the given GRN type.
-     * <p>
-     * Used for specifying which GRN types and capabilities a permission applies to.
+     * Adds the specified GRN type and {@link Capability#OWN} capability to the permission.
      *
-     * @param grnType the GRN type
-     * @return a GRNTypeCapability instance
+     * @param grnType the GRN type to associate with this permission
+     * @return a new Permission instance with the own capability for the specified GRN type
      */
-    static GRNTypeCapability addToOwnCapabilityFor(GRNType grnType) {
-        return new GRNTypeCapability(grnType, Capability.OWN);
+    default Permission withOwnCapabilityFor(GRNType grnType) {
+        return withCapabilityFor(grnType, Capability.OWN);
     }
+
+    /**
+     * Creates a new permission with the specified GRN type and capability.
+     *
+     * @param grnType    the GRN type to associate with this permission
+     * @param capability the capability to associate with the GRN type
+     * @return a new Permission instance with the updated GRN type capabilities
+     */
+    Permission withCapabilityFor(GRNType grnType, Capability capability);
 
     /**
      * Represents a mapping of a GRN type to a capability.
