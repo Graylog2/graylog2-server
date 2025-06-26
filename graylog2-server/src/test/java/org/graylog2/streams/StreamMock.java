@@ -217,7 +217,12 @@ public class StreamMock implements Stream {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return getFingerprint();
+    }
+
+    @Override
+    public int getFingerprint() {
+        return Objects.hash(id, removeMatchesFromDefaultStream, matchingType.toString());
     }
 
     @Override

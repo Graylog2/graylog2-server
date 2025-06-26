@@ -115,6 +115,14 @@ public interface Stream {
 
     String getIndexSetId();
 
+    /**
+     * A hash code for the stream based on stream routing related fields to determine if
+     * {@link org.graylog2.streams.StreamRouter} needs to reload its engine.
+     *
+     * @return hash code based on routing related fields
+     */
+    int getFingerprint();
+
     static boolean isSystemStreamId(String id) {
         return ALL_SYSTEM_STREAM_IDS.contains(id);
     }

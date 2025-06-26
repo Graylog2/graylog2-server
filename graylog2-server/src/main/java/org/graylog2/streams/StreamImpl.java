@@ -396,9 +396,8 @@ public abstract class StreamImpl implements Stream {
                 .build();
     }
 
-    // TODO: Possibly remove if StreamListFingerprint does not need to remain completely static.
     @Override
-    public int hashCode() {
+    public int getFingerprint() {
         return Objects.hash(id(), creatorUserId(), matchingType().toString(), description(),
                 contentPack(), disabled(), title(), isDefault(), removeMatchesFromDefaultStream(), indexSetId());
     }
