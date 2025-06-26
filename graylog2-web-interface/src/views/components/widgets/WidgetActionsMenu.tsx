@@ -238,33 +238,11 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   return (
     <Container className={widgetActionsMenuClass} $actionsDropdownIsOpen={actionsDropdownIsOpen}>
       <IfInteractive>
-        <IfDashboard>
-          <ReplaySearchButton
-            queryString={query.query_string}
-            timerange={timerange}
-            streams={streams}
-            streamCategories={streamCategories}
-            parameterBindings={parameterBindings}
-            parameters={parameters}
-          />
-        </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} />
-        {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
-        {!isFocused && (
-          <>
-            <WidgetHorizontalStretch
-              widgetId={widget.id}
-              widgetType={widget.type}
-              onStretch={onPositionsChange}
-              position={position}
-            />
-            <IconButton name="fullscreen" title="Focus this widget" onClick={focusWidget} />
-          </>
-        )}
-
-        <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
-
         <WidgetActionDropdown onChange={setActionsDropdownIsOpen}>
+          <MenuItem onSelect={onDuplicate}>Edit</MenuItem>
+          <MenuItem onSelect={onDuplicate}>Compress Width</MenuItem>
+          <MenuItem divider />
+          <MenuItem onSelect={onDuplicate}>Focus</MenuItem>
           <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <IfSearch>
             <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>
@@ -272,6 +250,9 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>Move to Page</MenuItem>
           </IfDashboard>
+          <MenuItem divider />
+          <MenuItem onSelect={onDuplicate}>Export Widget</MenuItem>
+          <MenuItem onSelect={onDuplicate}>Generate Summary</MenuItem>
           <ExtraDropdownWidgetActions widget={widget} />
           <MenuItem divider />
           <DeleteMenuItem onSelect={onDelete} />

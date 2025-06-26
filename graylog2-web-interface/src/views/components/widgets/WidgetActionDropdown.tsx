@@ -15,15 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
+import { Button } from 'components/bootstrap';
 import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+import { Icon } from 'components/common';
+
+const StyledButton = styled(Button)`
+  height: 25px;
+  width: 25px;
+`;
 
 const WidgetActionDropdown = ({
   children,
   onChange,
 }: React.PropsWithChildren<{ onChange?: (isOpen: boolean) => void }>) => {
-  const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
+  const widgetActionDropdownCaret = (
+    <StyledButton title="Open actions dropdown" bsSize="xs">
+      <Icon name="keyboard_arrow_down" />
+    </StyledButton>
+  );
 
   return (
     <ActionDropdown element={widgetActionDropdownCaret} onChange={onChange}>
