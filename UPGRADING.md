@@ -3,7 +3,11 @@ Upgrading to Graylog 7.0.x
 
 ## Breaking Changes
 
-- tbd
+### Kafka Inputs
+
+The `kafka-clients` library was updated to 4.x which removes support for Kafka
+brokers with version 2.0 and earlier. That means all Graylog 7.0 Kafka inputs
+can only talk to Kafka brokers with version 2.1 or newer.
 
 ## Configuration File Changes
 
