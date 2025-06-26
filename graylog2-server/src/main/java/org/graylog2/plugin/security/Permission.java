@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
+import org.graylog.security.permissions.GRNPermission;
 
 import java.util.Arrays;
 
@@ -35,7 +36,29 @@ public interface Permission {
     /**
      * Special permission that is used to check if a user has ownership of an entity.
      */
-    EntityOwnPermission ENTITY_OWN = EntityOwnPermission.create();
+    Permission ENTITY_OWN = new Permission() {
+        private final static String permission = "entity:own";
+
+        @Override
+        public String permission() {
+            return permission;
+        }
+
+        @Override
+        public String description() {
+            return "Entity ownership permission.";
+        }
+
+        @Override
+        public ImmutableMap<GRNType, Capability> grnTypeCapabilities() {
+            return ImmutableMap.of();
+        }
+
+        @Override
+        public org.apache.shiro.authz.Permission toShiroPermission(GRN target) {
+            return GRNPermission.create(permission, target);
+        }
+    };
 
     /**
      * Returns the permission string, e.g. "users:edit", "stream:read", etc.
