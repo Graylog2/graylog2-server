@@ -16,12 +16,13 @@
  */
 package org.graylog.datanode.bindings;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.bootstrap.preflight.inits.DatanodeBlockingInit;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDnsPreflightCheck;
-import org.graylog.datanode.bootstrap.preflight.DatanodeKeystoreCheck;
+import org.graylog.datanode.bootstrap.preflight.inits.DatanodeKeystoreInitService;
 import org.graylog.datanode.bootstrap.preflight.OpenSearchPreconditionsCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchDataDirCompatibilityCheck;
@@ -35,15 +36,11 @@ import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.certificates.CertificateExchangeImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.graylog2.shared.plugins.GraylogClassLoader;
 
 public class PreflightChecksBindings extends AbstractModule {
 
 
-    private final ChainingClassLoader chainingClassLoader;
-
     public PreflightChecksBindings(ChainingClassLoader chainingClassLoader) {
-        this.chainingClassLoader = chainingClassLoader;
     }
 
     @Override
@@ -61,7 +58,10 @@ public class PreflightChecksBindings extends AbstractModule {
         // Mongodb is needed for legacy datanode storage, where we want to extract the certificate chain from
         // mongodb and store it in local keystore
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-        addPreflightCheck(DatanodeKeystoreCheck.class);
+
+        Multibinder<DatanodeBlockingInit> serviceBinder = Multibinder.newSetBinder(binder(), DatanodeBlockingInit.class);
+        serviceBinder.addBinding().to(DatanodeKeystoreInitService.class);
+
     }
 
     protected void addPreflightCheck(Class<? extends PreflightCheck> preflightCheck) {
