@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.process;
 
-import org.apache.commons.exec.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,11 +51,7 @@ public record Environment(Map<String, String> env) {
      * we can be sure that this JVM will be actually used, preventing users to override it.
      */
     public Environment withOpensearchJavaHome(Path javaHome) {
-        if (OS.isFamilyMac() && !javaHome.equals(Path.of(System.getProperty("java.home")))) {
-            put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath() + "-mac");
-        } else {
-            put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath().toString());
-        }
+        put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath().toString());
         return this;
     }
 
