@@ -16,12 +16,13 @@
  */
 package org.graylog2.plugin.security;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -41,7 +42,7 @@ class ObjectActionPermissionTest {
             "customization:notification:update,customization,notification:update",
     })
     void create(String permissionValue, String expectedObject, String expectedAction) {
-        final var permission = (ObjectActionPermission) ObjectActionPermission.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW));
+        final var permission = (ObjectActionPermission) ObjectActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW));
 
         assertThat(permission.object()).isEqualTo(expectedObject);
         assertThat(permission.action()).isEqualTo(expectedAction);
@@ -59,7 +60,7 @@ class ObjectActionPermissionTest {
             "dashboards:read:datastream:gl-security-investigations-metrics"
     })
     void failedCreate(String permissionValue) {
-        assertThatThrownBy(() -> ObjectActionPermission.create(permissionValue, "description", ImmutableMap.of(GRNTypes.STREAM, Capability.VIEW)))
+        assertThatThrownBy(() -> ObjectActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

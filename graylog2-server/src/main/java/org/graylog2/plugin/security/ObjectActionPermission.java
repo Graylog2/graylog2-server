@@ -24,6 +24,8 @@ import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 
+import java.util.Map;
+
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
@@ -40,7 +42,7 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 record ObjectActionPermission(String object,
                               String action,
                               String description,
-                              ImmutableMap<GRNType, Capability> grnTypeCapabilities) implements Permission {
+                              Map<GRNType, Capability> grnTypeCapabilities) implements Permission {
     public ObjectActionPermission {
         // We have some legacy permissions that do not follow the object:action format, but we want to support them for now.
         if (!isLegacyPermission(object, action)) {
@@ -98,7 +100,7 @@ record ObjectActionPermission(String object,
      * @throws IllegalArgumentException if the permission string is not in the correct format or is blank
      * @throws NullPointerException     if the permission or grnTypeCapabilities are null
      */
-    public static Permission create(@Nonnull String permission, @Nullable String description, ImmutableMap<GRNType, Capability> grnTypeCapabilities) {
+    public static Permission create(@Nonnull String permission, @Nullable String description, Map<GRNType, Capability> grnTypeCapabilities) {
         requireNonBlank(permission, "permission must not be blank");
 
         final var parts = permission.split(":", 2);

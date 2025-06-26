@@ -16,13 +16,14 @@
  */
 package org.graylog2.plugin.security;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
 import org.graylog.security.permissions.GRNPermission;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -50,8 +51,8 @@ public interface Permission {
         }
 
         @Override
-        public ImmutableMap<GRNType, Capability> grnTypeCapabilities() {
-            return ImmutableMap.of();
+        public Map<GRNType, Capability> grnTypeCapabilities() {
+            return Map.of();
         }
 
         @Override
@@ -86,9 +87,9 @@ public interface Permission {
      * <p>
      * This allows for specifying which GRN types this permission is applicable to and what capabilities are granted.
      *
-     * @return an immutable map of GRN types to capabilities
+     * @return a map of GRN types to capabilities
      */
-    ImmutableMap<GRNType, Capability> grnTypeCapabilities();
+    Map<GRNType, Capability> grnTypeCapabilities();
 
     /**
      * Converts this permission to a Shiro permission object using the specified GRN target.
@@ -108,7 +109,7 @@ public interface Permission {
      * @return a new Permission instance
      */
     static Permission create(String permission, String description) {
-        return ObjectActionPermission.create(permission, description, ImmutableMap.of());
+        return ObjectActionPermission.create(permission, description, Map.of());
     }
 
     /**
@@ -126,7 +127,7 @@ public interface Permission {
                 permission,
                 description,
                 Arrays.stream(grnTypeCapabilities)
-                        .collect(ImmutableMap.toImmutableMap(GRNTypeCapability::grnType, GRNTypeCapability::capability))
+                        .collect(Collectors.toUnmodifiableMap(GRNTypeCapability::grnType, GRNTypeCapability::capability))
         );
     }
 
