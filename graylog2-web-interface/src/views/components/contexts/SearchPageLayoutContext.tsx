@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 import { singleton } from 'logic/singleton';
 
@@ -41,7 +42,7 @@ export type LayoutState = {
     share: { isShown: boolean };
     actionsDropdown: { isShown: boolean };
   };
-  searchAreaContainer?: { component: React.ComponentType };
+  searchAreaContainer?: { component: ForwardRefExoticComponent<RefAttributes<HTMLDivElement>> };
   infoBar?: { component: React.ComponentType };
   synchronizeUrl?: boolean;
 };

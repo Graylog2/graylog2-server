@@ -40,7 +40,6 @@ const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
 jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('stores/streams/StreamsStore', () =>
@@ -78,7 +77,7 @@ const SearchBar = () => {
 
   return (
     <TestStoreProvider view={viewWithQuery} initialQuery={mockCurrentQuery.id}>
-      <OriginalSearchBar />
+      <OriginalSearchBar scrollContainer={{ current: null }} />
     </TestStoreProvider>
   );
 };
