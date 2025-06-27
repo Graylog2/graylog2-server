@@ -190,9 +190,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
-    // This is a special permission that ONLY works with GRNs as ID/target
-    public static final String ENTITY_OWN = Permission.ENTITY_OWN.permission();
-
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
             .add(create(AUTH_HTTP_HEADER_CONFIG_READ, ""))
