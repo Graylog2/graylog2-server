@@ -16,10 +16,10 @@
  */
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const usePluggableCollectionFormGroup = () => {
+const usePluggableEntityShareFormGroup = () => {
   const pluggableCollection = usePluginEntities('components.collection');
 
   return pluggableCollection?.[0]?.AddCollectionFormGroup ?? null;
 };
 
-export default usePluggableCollectionFormGroup;
+export default usePluggableEntityShareFormGroup;
