@@ -50,6 +50,7 @@ import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
+import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -231,7 +232,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className="widget-actions-menu">
+    <Container className={widgetActionsMenuClass}>
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton

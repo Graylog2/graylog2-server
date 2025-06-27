@@ -17,6 +17,7 @@
 package org.graylog2.database.utils;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoIterable;
@@ -147,6 +148,7 @@ public class MongoUtils<T extends MongoEntity> {
      * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
+    @MustBeClosed
     public static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
         final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);

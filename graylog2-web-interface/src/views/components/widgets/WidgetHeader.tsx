@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Spinner, Icon } from 'components/common';
 import EditableTitle, { Title } from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
+import { widgetDragHandleClass } from 'views/components/widgets/Constants';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -140,7 +141,7 @@ const WidgetHeader = ({
   <Container>
     <Col>
       {hideDragHandle || (
-        <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}>
+        <DragHandleContainer className={widgetDragHandleClass} title={`Drag handle for ${title}`}>
           <WidgetDragHandle name="drag_indicator" />
         </DragHandleContainer>
       )}

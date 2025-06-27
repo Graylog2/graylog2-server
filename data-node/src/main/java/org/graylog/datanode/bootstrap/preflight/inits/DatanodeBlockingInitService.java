@@ -14,27 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog.datanode.bootstrap.preflight.inits;
 
-import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
-import org.graylog2.database.MongoCollection;
-import org.graylog2.database.MongoCollections;
-import org.graylog2.database.utils.MongoUtils;
 
-import java.util.stream.Stream;
+import java.util.Set;
 
-class DashboardsService {
-    private static final String COLLECTION_NAME = "dashboards";
-    private final MongoCollection<Dashboard> db;
+/**
+ * Datanode init procedures that should be triggered after preflight but before the real injection and server startup
+ * takes place.
+ */
+public class DatanodeBlockingInitService {
+    private final Set<DatanodeBlockingInit> inits;
 
     @Inject
-    DashboardsService(MongoCollections mongoCollections) {
-        this.db = mongoCollections.collection(COLLECTION_NAME, Dashboard.class);
+    public DatanodeBlockingInitService(Set<DatanodeBlockingInit> inits) {
+        this.inits = inits;
     }
 
-    @MustBeClosed
-    Stream<Dashboard> streamAll() {
-        return MongoUtils.stream(db.find());
+    public void runInits() {
+        inits.forEach(DatanodeBlockingInit::runInit);
     }
 }

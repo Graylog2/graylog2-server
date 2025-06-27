@@ -22,6 +22,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import { widgetDragHandleClass, widgetActionsMenuClass } from 'views/components/widgets/Constants';
 
 const StyledCol = styled(Col)`
   footer,
@@ -32,8 +33,7 @@ const StyledCol = styled(Col)`
   .react-resizable-handle,
   button:has(.fa-copy),
   button:has(.fa-chevron-down),
-  .widget-drag-handle,
-  .widget-actions-menu {
+  .${widgetDragHandleClass}, .${widgetActionsMenuClass} {
     display: none;
   }
 

@@ -463,7 +463,7 @@ public class SupportBundleService {
                 if (response.entity().isPresent()) {
                     final String logName = Path.of(logFile.name()).getFileName().toString();
                     try (FileOutputStream fileOutputStream = new FileOutputStream(logDir.resolve(logName).toFile())) {
-                        try (var logFileStream = response.entity().get().byteStream()) {
+                        try (final var logFileStream = response.entity().get().byteStream()) {
                             logFileStream.transferTo(fileOutputStream);
                         }
                     }
