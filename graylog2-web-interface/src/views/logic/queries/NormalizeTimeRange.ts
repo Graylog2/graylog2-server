@@ -72,14 +72,14 @@ export const normalizeFromSearchBarForBackend = (
   switch (type) {
     case 'absolute':
       return {
-        type: type,
+        type,
         from: adjustFormat(toUTCFromTz(timerange.from, userTz), absoluteTimeFormat),
         to: adjustFormat(toUTCFromTz(timerange.to, userTz), absoluteTimeFormat),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {
         return {
-          type: type,
+          type,
           range: timerange.range,
         };
       }
@@ -87,14 +87,14 @@ export const normalizeFromSearchBarForBackend = (
       if (isTypeRelativeWithEnd(timerange)) {
         if ('to' in timerange) {
           return {
-            type: type,
+            type,
             from: timerange.from,
             to: timerange.to,
           };
         }
 
         return {
-          type: type,
+          type,
           from: timerange.from,
         };
       }
