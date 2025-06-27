@@ -76,7 +76,7 @@ public class EntityDependencyPermissionChecker {
     }
 
     private boolean cannotView(GranteeAuthorizer authorizer, EntityDescriptor dependency) {
-        final Set<Permission> permissions = builtinCapabilities.get(Capability.VIEW, dependency.id().grnType());
+        final Set<Permission> permissions = builtinCapabilities.getPermissions(Capability.VIEW, dependency.id().grnType());
 
         // TODO: This only looks at grants permissions, but should also check for permissions through roles
         return permissions.stream()

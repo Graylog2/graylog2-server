@@ -94,7 +94,7 @@ public class BuiltinCapabilities {
         return Optional.ofNullable(capabilities.get(capability));
     }
 
-    public Set<Permission> get(Capability capability, GRNType grnType) {
+    public Set<Permission> getPermissions(Capability capability, GRNType grnType) {
         return requireNonNull(capabilities.get(capability)).permissions().get(grnType);
     }
 }
