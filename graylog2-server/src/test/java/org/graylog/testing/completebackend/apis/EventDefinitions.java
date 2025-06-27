@@ -39,50 +39,51 @@ public class EventDefinitions implements GraylogRestApi {
 
     public String createEventDefinition(String httpNotificationID, List<String> groupByFields, List<String> streams) {
         final String body = """
-                {
-                  "title": "my alert def",
-                  "description": "",
-                  "priority": 2,
-                  "config": {
-                    "query": "",
-                    "query_parameters": [],
-                    "streams": [%s],
-                    "search_within_ms": 5000,
-                    "execute_every_ms": 5000,
-                    "event_limit": 100,
-                    "group_by": [%s],
-                    "series": [
-                      {
-                        "id": "count-",
-                        "type": "count"
-                      }
-                    ],
-                    "conditions": {
-                      "expression": {
-                        "expr": ">",
-                        "left": {
-                          "expr": "number-ref",
-                          "ref": "count-"
+                { "entity":
+                    {
+                      "title": "my alert def",
+                      "description": "",
+                      "priority": 2,
+                      "config": {
+                        "query": "",
+                        "query_parameters": [],
+                        "streams": [%s],
+                        "search_within_ms": 5000,
+                        "execute_every_ms": 5000,
+                        "event_limit": 100,
+                        "group_by": [%s],
+                        "series": [
+                          {
+                            "id": "count-",
+                            "type": "count"
+                          }
+                        ],
+                        "conditions": {
+                          "expression": {
+                            "expr": ">",
+                            "left": {
+                              "expr": "number-ref",
+                              "ref": "count-"
+                            },
+                            "right": {
+                              "expr": "number",
+                              "value": 0
+                            }
+                          }
                         },
-                        "right": {
-                          "expr": "number",
-                          "value": 0
-                        }
-                      }
-                    },
-                    "type": "aggregation-v1"
-                  },
-                  "field_spec": {},
-                  "key_spec": [],
-                  "notification_settings": {
-                    "grace_period_ms": 300000,
-                    "backlog_size": null
-                  },
-                  "notifications": [{
-                    "notification_id": "%s"
-                  }],
-                  "alert": false
-                }
+                        "type": "aggregation-v1"
+                      },
+                      "field_spec": {},
+                      "key_spec": [],
+                      "notification_settings": {
+                        "grace_period_ms": 300000,
+                        "backlog_size": null
+                      },
+                      "notifications": [{
+                        "notification_id": "%s"
+                      }],
+                      "alert": false
+                }}
                 """;
 
         final var streamsList = streams.stream().map(stream -> "\"" + stream + "\"").collect(Collectors.joining(","));

@@ -50,8 +50,8 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -185,8 +185,8 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    public Response create(@ApiParam(name = "JSON Body") UnwrappedCreateEntityRequest<NotificationDto> unwrappedCreateEntityRequest, @Context UserContext userContext) {
-        final NotificationDto dto = unwrappedCreateEntityRequest.getEntity();
+    public Response create(@ApiParam(name = "JSON Body") CreateEntityRequest<NotificationDto> createEntityRequest, @Context UserContext userContext) {
+        final NotificationDto dto = createEntityRequest.entity();
         final ValidationResult validationResult = dto.validate();
         validateEmailConfiguration(dto, validationResult);
         if (validationResult.failed()) {
@@ -195,7 +195,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         var entity = resourceHandler.create(dto, java.util.Optional.ofNullable(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_NOTIFICATION, userContext.getUser());
 
-        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest -> {
+        createEntityRequest.shareRequest().ifPresent(shareRequest -> {
             entitySharesService.updateEntityShares(GRNTypes.EVENT_NOTIFICATION, entity.id(), shareRequest, userContext.getUser());
         });
 

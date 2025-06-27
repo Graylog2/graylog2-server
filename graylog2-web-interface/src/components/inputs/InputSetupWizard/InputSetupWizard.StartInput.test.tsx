@@ -364,7 +364,7 @@ describe('InputSetupWizard Start Input', () => {
       goToStartInputStep();
       startInput();
 
-      await waitFor(() => expect(Streams.create).toHaveBeenCalledWith(expect.objectContaining(newStreamConfig)));
+      await waitFor(() => expect(Streams.create).toHaveBeenCalledWith({entity: expect.objectContaining(newStreamConfig), share_request: undefined}));
     });
 
     it('should start the new stream', async () => {
