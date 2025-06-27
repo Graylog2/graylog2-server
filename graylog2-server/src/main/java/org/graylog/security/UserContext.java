@@ -23,9 +23,8 @@ import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
-import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.shared.users.UserService;
 
 import java.util.Optional;
@@ -149,7 +148,7 @@ public class UserContext implements HasUser {
     }
 
     protected boolean isOwner(GRN entity) {
-        return subject.isPermitted(GRNPermission.create(RestPermissions.ENTITY_OWN, entity));
+        return subject.isPermitted(Permission.ENTITY_OWN.toShiroPermission(entity));
     }
 
     /**

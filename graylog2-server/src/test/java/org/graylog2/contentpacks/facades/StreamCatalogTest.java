@@ -25,6 +25,7 @@ import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -34,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
@@ -48,6 +50,7 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
@@ -99,8 +102,9 @@ public class StreamCatalogTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final StreamRuleService streamRuleService = new StreamRuleServiceImpl(mongoConnection, clusterEventBus);
+        final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoConnection);
         final StreamService streamService = new StreamServiceImpl(
-                mongoConnection,
+                mc,
                 streamRuleService,
                 outputService,
                 indexSetService,
@@ -136,7 +140,7 @@ public class StreamCatalogTest {
         );
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId();
-        final StreamImpl stream = new StreamImpl(streamId, streamFields, streamRules, outputs, null);
+        final Stream stream = new StreamMock(streamId, streamFields, streamRules, outputs, null);
         final EntityDescriptor descriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(stream, entityDescriptorIds);
@@ -158,7 +162,7 @@ public class StreamCatalogTest {
         final ImmutableMap<String, Object> fields = ImmutableMap.of(
                 "title", "Stream Title"
         );
-        final StreamImpl stream = new StreamImpl(fields);
+        final StreamMock stream = new StreamMock(fields);
         final EntityExcerpt excerpt = facade.createExcerpt(stream);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(stream.getId()));
