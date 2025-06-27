@@ -28,7 +28,7 @@ import type Grantee from 'logic/permissions/Grantee';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { createGRN } from 'logic/permissions/GRN';
 import { Section, Spinner } from 'components/common';
-import usePluggableCollectionFormGroup from 'hooks/usePluggableCollectionFormGroup';
+import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
 
 import type { SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -82,7 +82,7 @@ const EntityCreateShareFormGroup = ({
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
   const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(null);
-  const PluggableEntityShareFormGroup = usePluggableCollectionFormGroup();
+  const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);

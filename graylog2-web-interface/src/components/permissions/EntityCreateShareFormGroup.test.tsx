@@ -22,8 +22,8 @@ import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
-import usePluggableCollectionFormGroup from 'hooks/usePluggableCollectionFormGroup';
 import MockComponent from 'helpers/mocking/MockComponent';
+import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
 
@@ -60,7 +60,7 @@ const SUT = ({ ...props }) => (
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
-    asMock(usePluggableCollectionFormGroup).mockReturnValue(MockComponent('FormGroup'));
+    asMock(usePluggableEntityShareFormGroup).mockReturnValue(MockComponent('FormGroup'));
   });
 
   beforeAll(() => {
