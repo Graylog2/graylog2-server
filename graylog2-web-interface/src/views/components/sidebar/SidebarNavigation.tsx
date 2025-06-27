@@ -21,6 +21,7 @@ import type { SidebarAction } from 'views/components/sidebar/sidebarActions';
 import type { IconName } from 'components/common/Icon';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useLocation from 'routing/useLocation';
+import zIndices from 'theme/z-indices';
 
 import NavItem from './NavItem';
 import type { SidebarSection } from './sidebarSections';
@@ -40,7 +41,7 @@ export const Container = styled.div<{ $isOpen?: boolean; $sidebarIsPinned?: bool
     width: 50px;
     height: 100%;
     position: relative;
-    z-index: 1031;
+    z-index: ${zIndices.sidebarContentColumn};
 
     &::before {
       content: '';
@@ -52,7 +53,6 @@ export const Container = styled.div<{ $isOpen?: boolean; $sidebarIsPinned?: bool
       border-top-left-radius: 50%;
       background: transparent;
       box-shadow: -6px -6px 0 3px ${theme.colors.global.navigationBackground};
-      z-index: 4; /* to render over Sidebar ContentColumn */
     }
   `,
 );

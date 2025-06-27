@@ -15,7 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const modalBase = 1040;
+const sidebar = 6;
+
 const zIndices = {
+  sidebar: sidebar,
+  sidebarContentColumn: sidebar + 1,
+  sidebarOverlay: sidebar - 1,
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
   notifications: modalBase + 11,
