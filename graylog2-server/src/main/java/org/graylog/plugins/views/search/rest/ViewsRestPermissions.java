@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRNTypes;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
@@ -36,9 +37,15 @@ public class ViewsRestPermissions implements PluginPermissions {
 
     private final ImmutableSet<Permission> permissions = ImmutableSet.of(
             createPermission,
-            create(VIEW_READ, "Read available views"),
-            create(VIEW_EDIT, "Edit view"),
-            create(VIEW_DELETE, "Delete view"),
+            create(VIEW_READ, "Read available views")
+                    .withViewCapabilityFor(GRNTypes.SEARCH)
+                    .withViewCapabilityFor(GRNTypes.DASHBOARD),
+            create(VIEW_EDIT, "Edit view")
+                    .withManageCapabilityFor(GRNTypes.SEARCH)
+                    .withManageCapabilityFor(GRNTypes.DASHBOARD),
+            create(VIEW_DELETE, "Delete view")
+                    .withOwnCapabilityFor(GRNTypes.SEARCH)
+                    .withOwnCapabilityFor(GRNTypes.DASHBOARD),
             create(DEFAULT_VIEW_SET, "Set default view")
     );
 
