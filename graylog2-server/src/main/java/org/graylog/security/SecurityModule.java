@@ -55,7 +55,7 @@ public class SecurityModule extends PluginModule {
         );
         authServiceBackendBinder();
 
-        bind(BuiltinCapabilities.class).asEagerSingleton();
+        bind(CapabilityRegistry.class).asEagerSingleton();
 
         bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);
 
