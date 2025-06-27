@@ -17,21 +17,19 @@
 package org.graylog2.security.html;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Safelist;
 
 /**
  * Jackson converter that removes all HTML elements from a specified string.
- * Uses the OWASP Java HTML Sanitizer library, which does not allow any HTML
- * elements by default.
- *
- * @see <a href="https://github.com/OWASP/java-html-sanitizer">OWASP Java HTML Sanitizer</a>
  */
 public class HTMLSanitizerConverter extends StdConverter<String, String> {
-    private static final PolicyFactory POLICY = new HtmlPolicyBuilder().toFactory();
-
+    private static final Document.OutputSettings OUTPUT_SETTINGS =
+            new Document.OutputSettings()
+                    .prettyPrint(false); // Prevent removal of carriage returns.
     @Override
     public String convert(String input) {
-        return POLICY.sanitize(input);
+        return Jsoup.clean(input, "", Safelist.none(), OUTPUT_SETTINGS);
     }
 }
