@@ -91,7 +91,7 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
   return (
     <TitleRow>
       {adapterErrorText && (
-        <ErrorPopover placement="bottom" errorText={adapterErrorText} title="Data adapter problem" />
+        <ErrorPopover placement="bottom" errorText={adapterErrorText} title="Data Adapter problem" />
       )}
       <Title onClick={onClick}>{dataAdapters[dataAdapterId].title}</Title>
     </TitleRow>
