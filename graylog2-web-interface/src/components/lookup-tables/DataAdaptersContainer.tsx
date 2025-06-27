@@ -25,7 +25,7 @@ import {
 import { useStore } from 'stores/connect';
 
 type Props = {
-  children: React.ReactElement[];
+  children: React.ReactElement;
 };
 
 const DataAdaptersContainer = ({ children }: Props) => {

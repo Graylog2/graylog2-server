@@ -14,23 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { SearchParams } from 'stores/PaginationTypes';
+import { fetchPaginatedLookupTables, fetchErrors } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
-import { Row, Col } from 'components/bootstrap';
-import { LookupTableForm } from 'components/lookup-tables';
+export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 
-type Props = {
-  saved: (...args: any[]) => void;
-};
+export function useFetchLookupTables() {
+  return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
 
-const LookupTableCreate = ({ saved }: Props) => (
-  <div>
-    <Row className="content">
-      <Col lg={8}>
-        <LookupTableForm saved={saved} create />
-      </Col>
-    </Row>
-  </div>
-);
-
-export default LookupTableCreate;
+export function useFetchErrors() {
+  return { fetchErrors };
+}

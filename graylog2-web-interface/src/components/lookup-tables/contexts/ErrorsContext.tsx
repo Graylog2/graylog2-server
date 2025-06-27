@@ -14,23 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import { Row, Col } from 'components/bootstrap';
-import { LookupTableForm } from 'components/lookup-tables';
+const ErrorsContext = React.createContext(null);
 
-type Props = {
-  saved: (...args: any[]) => void;
+type ProviderProps = {
+  children: React.ReactNode;
 };
 
-const LookupTableCreate = ({ saved }: Props) => (
-  <div>
-    <Row className="content">
-      <Col lg={8}>
-        <LookupTableForm saved={saved} create />
-      </Col>
-    </Row>
-  </div>
-);
+export function ErrorsProvider({ children }: ProviderProps) {
+  const [errors, setErrors] = React.useState<{ lutErrors: unknown; cacheErrors: unknown; adapterErrors: unknown }>();
+  const value = React.useMemo(() => ({ errors, setErrors }), [errors, setErrors]);
 
-export default LookupTableCreate;
+  return <ErrorsContext.Provider value={value}>{children}</ErrorsContext.Provider>;
+}
+
+export function useErrorsContext() {
+  return React.useContext(ErrorsContext);
+}

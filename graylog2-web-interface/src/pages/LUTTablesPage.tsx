@@ -40,24 +40,24 @@ const _saved = (history) => {
 
 const _isCreating = ({ action }: LUTTablesPageProps) => action === 'create';
 
-const _validateTable = (table) => {
-  LookupTablesActions.validate(table);
-};
+// const _validateTable = (table) => {
+//   LookupTablesActions.validate(table);
+// };
 
 type LUTTablesPageProps = HistoryContext &
   PaginationProps &
   ParamsContext &
   LocationContext & {
     table?: any;
-    validationErrors?: any;
+    // validationErrors?: any;
     dataAdapter?: any;
     cache?: any;
     tables?: any[];
-    caches?: any;
+    // caches?: any;
     dataAdapters?: { [key: string]: { name: string } };
     pagination?: any;
     location?: any;
-    errorStates?: any;
+    // errorStates?: any;
     action?: string;
   };
 
@@ -68,12 +68,12 @@ class LUTTablesPage extends React.Component<
   }
 > {
   static defaultProps = {
-    errorStates: null,
-    validationErrors: {},
+    // errorStates: null,
+    // validationErrors: {},
     dataAdapters: null,
     table: null,
     cache: null,
-    caches: null,
+    // caches: null,
     tables: null,
     location: null,
     pagination: null,
@@ -156,14 +156,14 @@ class LUTTablesPage extends React.Component<
     const {
       action,
       table,
-      validationErrors,
+      // validationErrors,
       dataAdapter,
       cache,
       tables,
-      caches,
-      dataAdapters,
-      pagination,
-      errorStates,
+      // caches,
+      // dataAdapters,
+      // pagination,
+      // errorStates,
       history,
     } = this.props;
     let content;
@@ -179,13 +179,7 @@ class LUTTablesPage extends React.Component<
           <Row className="content">
             <Col lg={8}>
               <h2>Lookup Table</h2>
-              <LookupTableForm
-                table={table}
-                create={false}
-                saved={saved}
-                validate={_validateTable}
-                validationErrors={validationErrors}
-              />
+              <LookupTableForm table={table} create={false} saved={saved} />
             </Col>
           </Row>
         );
@@ -193,19 +187,11 @@ class LUTTablesPage extends React.Component<
         content = <LookupTableView dataAdapter={dataAdapter} cache={cache} table={table} />;
       }
     } else if (_isCreating(this.props)) {
-      content = <LookupTableCreate saved={saved} validate={_validateTable} validationErrors={validationErrors} />;
+      content = <LookupTableCreate saved={saved} />;
     } else if (!tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
-      content = (
-        <LookupTablesOverview
-          tables={tables}
-          caches={caches}
-          dataAdapters={dataAdapters}
-          pagination={pagination}
-          errorStates={errorStates}
-        />
-      );
+      content = <LookupTablesOverview />;
     }
 
     return (
