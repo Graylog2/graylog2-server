@@ -115,7 +115,7 @@ const MessageList = ({
   useRenderCompletionCallback();
 
   const handlePageChange = useCallback(
-    (pageNo: number) => {
+    (newCurrentPage: number) => {
       // execute search with new offset
       const { effectiveTimerange } = searchTypes[searchTypeId] as MessageResult;
       const searchTypePayload: SearchTypeOptions<{
@@ -124,20 +124,31 @@ const MessageList = ({
       }> = {
         [searchTypeId]: {
           limit: pageSize,
-          offset: pageSize * (pageNo - 1),
+          offset: pageSize * (newCurrentPage - 1),
         },
       };
 
       stopAutoRefresh();
       setLoadingState(true);
+      setPagination((cur) => ({
+        ...cur,
+        currentPage: newCurrentPage,
+      }));
 
       dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then((response) => {
         const { result } = response.payload;
         setLoadingState(false);
 
-        setPagination({
-          pageErrors: result.errors,
-          currentPage: pageNo,
+        setPagination((cur) => {
+          // do not change pagination when it has been changed while this request was running
+          if (cur.currentPage !== newCurrentPage) {
+            return cur;
+          }
+
+          return {
+            currentPage: newCurrentPage,
+            pageErrors: result.errors,
+          };
         });
       });
     },
@@ -162,6 +173,7 @@ const MessageList = ({
           showPageSizeSelect={false}
           totalItems={totalMessages}
           pageSize={pageSize}
+          enforcePageBounds={false}
           useQueryParameter={false}>
           {!pageErrors?.length ? (
             <MessageTable
