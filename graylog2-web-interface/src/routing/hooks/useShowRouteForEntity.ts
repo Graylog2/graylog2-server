@@ -79,6 +79,8 @@ const useShowRouteForEntity = (id: string, type: string) => {
       return Routes.SYSTEM.AUTHZROLES.show(id);
     case 'output':
       return Routes.SYSTEM.OUTPUTS;
+    case 'collection':
+      return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
     default:
       return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }
