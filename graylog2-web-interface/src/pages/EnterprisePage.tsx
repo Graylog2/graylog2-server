@@ -43,7 +43,7 @@ const EnterprisePage = () => {
   }
 
   return (
-    <DocumentTitle title={title}>
+    <DocumentTitle title={`${productName} Enterprise`}>
       <div>
         <PageHeader title={title}>
           <span>
