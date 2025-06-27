@@ -16,6 +16,7 @@
  */
 const modalBase = 1040;
 const zIndices = {
+  searchSidebar: 6,
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
   notifications: modalBase + 11,

@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import { IconButton } from 'components/common';
+import zIndices from 'theme/z-indices';
 
 type Props = {
   children: React.ReactNode;
@@ -42,7 +43,7 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
     border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
     box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
-    z-index: ${$sidebarIsPinned ? 1030 : 6};
+    z-index: ${zIndices.searchSidebar};
 
     ${$sidebarIsPinned &&
     css`
