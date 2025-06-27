@@ -16,6 +16,7 @@
  */
 import type { Moment } from 'moment';
 import moment from 'moment-timezone';
+import 'moment-precise-range-plugin';
 
 export type DateTime = string | number | Moment | Date;
 
