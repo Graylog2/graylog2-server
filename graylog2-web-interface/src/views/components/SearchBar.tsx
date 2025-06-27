@@ -254,7 +254,8 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                           hasErrorOnMount={!!errors.timerange}
                           moveRangeProps={{
                             effectiveTimerange: results?.effectiveTimerange,
-                            queryTimerange: currentQuery.timerange,
+                            initialTimeRange: currentQuery.timerange,
+                            initialTimeFormat: 'internalIndexer',
                           }}
                         />
                         <StreamsAndRefresh>

@@ -74,17 +74,22 @@ const MoveRangeButton = ({
 
 type Props = React.PropsWithChildren<{
   setCurrentTimeRange: (newRange: TimeRange) => void;
+  // time range of the previously executed search
   effectiveTimerange: AbsoluteTimeRange | undefined;
-  queryTimerange: TimeRange | NoTimeRangeOverride;
-  searchBarTimerange: TimeRange | NoTimeRangeOverride;
+  // initially selected time range
+  initialTimeRange: TimeRange | NoTimeRangeOverride;
+  // current value of time range in form state
+  currentTimeRange: TimeRange | NoTimeRangeOverride;
+  initialTimeFormat: 'internal' | 'internalIndexer';
 }>;
 
 const MoveRangeInner = ({
   setCurrentTimeRange,
   effectiveTimerange,
-  queryTimerange,
-  searchBarTimerange,
+  initialTimeRange,
+  currentTimeRange,
   children = undefined,
+  initialTimeFormat,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const { submitForm, isValid } = useFormikContext<{ timerange: TimeRange }>();
@@ -123,8 +128,8 @@ const MoveRangeInner = ({
   const disableButton =
     !effectiveTimerange ||
     !isValid ||
-    isNoTimeRangeOverride(searchBarTimerange) ||
-    !isEqual(queryTimerange, normalizeFromSearchBarForBackend(searchBarTimerange, userTimezone, 'internalIndexer'));
+    isNoTimeRangeOverride(currentTimeRange) ||
+    !isEqual(initialTimeRange, normalizeFromSearchBarForBackend(currentTimeRange, userTimezone, initialTimeFormat));
 
   return (
     <>
@@ -149,8 +154,9 @@ const MoveRange = ({
   displayMoveRangeButtons,
   setCurrentTimeRange,
   effectiveTimerange,
-  queryTimerange,
-  searchBarTimerange,
+  initialTimeRange,
+  initialTimeFormat,
+  currentTimeRange,
   children = undefined,
 }: Props & { displayMoveRangeButtons: boolean }) => {
   if (!displayMoveRangeButtons) {
@@ -159,10 +165,11 @@ const MoveRange = ({
 
   return (
     <MoveRangeInner
+      initialTimeFormat={initialTimeFormat}
       setCurrentTimeRange={setCurrentTimeRange}
       effectiveTimerange={effectiveTimerange}
-      queryTimerange={queryTimerange}
-      searchBarTimerange={searchBarTimerange}>
+      initialTimeRange={initialTimeRange}
+      currentTimeRange={currentTimeRange}>
       {children}
     </MoveRangeInner>
   );

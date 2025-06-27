@@ -65,6 +65,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -190,7 +191,8 @@ const DashboardSearchBar = () => {
                         hasErrorOnMount={!!errors.timerange}
                         moveRangeProps={{
                           effectiveTimerange: results?.effectiveTimerange,
-                          queryTimerange: timerange,
+                          initialTimeRange: timerange ?? NO_TIMERANGE_OVERRIDE,
+                          initialTimeFormat: 'internal',
                         }}
                         noOverride
                       />
