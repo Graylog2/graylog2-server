@@ -42,8 +42,7 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
     background: ${theme.colors.global.contentBackground};
     border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
     box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
-
-    z-index: ${zIndices.searchSidebar};
+    z-index: ${zIndices.sidebar};
 
     ${$sidebarIsPinned &&
     css`
@@ -57,7 +56,6 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
         border-top-left-radius: 50%;
         background: transparent;
         box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
-        z-index: 5; /* to render over Sidebar ContentColumn */
       }
     `}
   `,
