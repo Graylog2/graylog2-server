@@ -16,14 +16,15 @@
  */
 package org.graylog2.streams;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 
 import javax.annotation.Nullable;
@@ -32,12 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface StreamService extends PersistedService {
-    Stream create(Map<String, Object> fields);
+public interface StreamService {
 
     Stream create(CreateStreamRequest request, String userId);
 
     String save(Stream stream) throws ValidationException;
+
+    Stream update(String streamId, UpdateStreamRequest request) throws NotFoundException, ValidationException;
 
     String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException;
 
@@ -49,7 +51,14 @@ public interface StreamService extends PersistedService {
 
     Set<Stream> loadByIds(Collection<String> streamIds);
 
-    Set<String> mapCategoriesToIds(Collection<String> streamCategories);
+    /**
+     * Returns the IDs of the streams that have the given categories.
+     *
+     * @param streamCategories the categories the returned stream IDs should have
+     * @return a stream of String IDs of the streams containing the given categories. This must be closed by the caller.
+     */
+    @MustBeClosed
+    java.util.stream.Stream<String> mapCategoriesToIds(Collection<String> streamCategories);
 
     Set<String> indexSetIdsByIds(Collection<String> streamIds);
 
@@ -62,7 +71,7 @@ public interface StreamService extends PersistedService {
     Map<String, String> loadStreamTitles(Collection<String> streamIds);
 
     @Nullable
-    public String streamTitleFromCache(String streamId);
+    String streamTitleFromCache(String streamId);
 
     /**
      * @return the total number of streams
@@ -72,8 +81,6 @@ public interface StreamService extends PersistedService {
     void pause(Stream stream) throws ValidationException;
 
     void resume(Stream stream) throws ValidationException;
-
-    void addOutput(Stream stream, Output output);
 
     void addOutputs(ObjectId streamId, Collection<ObjectId> outputIds);
 
@@ -86,4 +93,37 @@ public interface StreamService extends PersistedService {
     List<String> streamTitlesForIndexSet(String indexSetId);
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
+
+    /**
+     * Returns a stream of all Stream IDs.
+     *
+     * @return a stream of Stream IDs. This must be closed by the caller.
+     */
+    @MustBeClosed
+    java.util.stream.Stream<String> streamAllIds();
+
+    /**
+     * Returns Streams with only information on a {@link StreamDTO} populated. The DTO methods skip the full loading
+     * of StreamRules, Outputs, and Index Set and should be used when all information needed is stored solely on the
+     * StreamDTO object.
+     *
+     * @return a stream of Stream objects. This must be closed by the caller.
+     */
+    @MustBeClosed
+    java.util.stream.Stream<Stream> streamAllDTOs();
+
+    /**
+     * Returns Streams with the given IDs with only information on a {@link StreamDTO} populated. The DTO methods skip
+     * the full loading of StreamRules, Outputs, and Index Set and should be used when all information needed is stored
+     * solely on the StreamDTO object.
+     *
+     * @return a stream of Stream objects. This must be closed by the caller.
+     */
+    @MustBeClosed
+    java.util.stream.Stream<Stream> streamDTOByIds(Collection<String> streamIds);
+
+    /**
+     * @return map of stream IDs to number of rules attached to the stream with that ID
+     */
+    Map<String, Long> streamRuleCountByStream();
 }
