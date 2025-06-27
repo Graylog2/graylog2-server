@@ -25,8 +25,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public abstract class GRNType {
     public abstract String type();
 
-    public abstract String permissionPrefix();
-
     public GRN toGRN(String entity) {
         return newGRNBuilder().entity(entity).build();
     }
@@ -35,10 +33,9 @@ public abstract class GRNType {
         return GRN.builder().type(type()).grnType(this);
     }
 
-    public static GRNType create(String type, String permissionPrefix) {
+    public static GRNType create(String type) {
         checkArgument(!isNullOrEmpty(type), "type cannot be null or empty");
-        checkArgument(!isNullOrEmpty(permissionPrefix), "permissionPrefix cannot be null or empty");
 
-        return new AutoValue_GRNType(type, permissionPrefix);
+        return new AutoValue_GRNType(type);
     }
 }
