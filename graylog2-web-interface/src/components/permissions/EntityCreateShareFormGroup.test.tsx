@@ -43,7 +43,7 @@ const mockEntity = {
   entityType: 'stream',
   entityId: null,
 };
-jest.mock('hooks/usePluggableCollectionFormGroup');
+jest.mock('hooks/usePluggableEntityShareFormGroup');
 jest.setTimeout(10000);
 
 const SUT = ({ ...props }) => (
