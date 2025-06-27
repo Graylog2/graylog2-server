@@ -186,7 +186,7 @@ describe('DateTime utils', () => {
 
   describe('readableDifference', () => {
     it('should return a readable difference for two dates', () => {
-      expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-10T10:00:00.000')).toBe('10 days');
+      expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-10T10:00:00.000')).toBe('9 days');
     });
 
     it('should return a readable difference for two dates in ms', () => {
