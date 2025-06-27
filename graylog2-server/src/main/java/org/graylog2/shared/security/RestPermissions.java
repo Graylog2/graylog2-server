@@ -50,6 +50,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
     public static final String CLUSTER_CONFIG_ENTRY_EDIT = "clusterconfigentry:edit";
     public static final String CLUSTER_CONFIG_ENTRY_READ = "clusterconfigentry:read";
+    public static final String CAPABILITIES_READ = "capabilities:read";
     public static final String CONTENT_PACK_CREATE = "contentpack:create";
     public static final String CONTENT_PACK_DELETE = "contentpack:delete";
     public static final String CONTENT_PACK_READ = "contentpack:read";
@@ -190,9 +191,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
-    // This is a special permission that ONLY works with GRNs as ID/target
-    public static final String ENTITY_OWN = Permission.ENTITY_OWN.permission();
-
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
             .add(create(AUTH_HTTP_HEADER_CONFIG_READ, ""))
@@ -204,6 +202,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(AUTH_SERVICE_GLOBAL_CONFIG_EDIT, ""))
             .add(create(AUTH_SERVICE_TEST_BACKEND_EXECUTE, ""))
             .add(create(BUFFERS_READ, ""))
+            .add(create(CAPABILITIES_READ, ""))
             .add(create(CONTENT_PACK_CREATE, ""))
             .add(create(CONTENT_PACK_DELETE, ""))
             .add(create(CONTENT_PACK_READ, ""))

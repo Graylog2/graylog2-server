@@ -28,7 +28,6 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
-import org.graylog.security.permissions.GRNPermission;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
@@ -36,6 +35,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -365,7 +365,7 @@ public class UserServiceImplTest {
         user.setPermissions(Collections.singletonList("hello:world"));
 
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
-        final GRNPermission ownerShipPermission = GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
+        final var ownerShipPermission = Permission.ENTITY_OWN.toShiroPermission(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
         final GRN userGRN = grnRegistry.ofUser(user);
         when(permissionAndRoleResolver.resolvePermissionsForPrincipal(userGRN))
                 .thenReturn(ImmutableSet.of(

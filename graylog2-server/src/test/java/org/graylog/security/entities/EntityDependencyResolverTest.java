@@ -166,7 +166,7 @@ class EntityDependencyResolverTest {
         when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(definitionDescriptor, procedureDescriptor));
 
         final GRN definitionGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
-        grnRegistry.registerType(GRNType.create("event_procedure", "event_procedures:"));
+        grnRegistry.registerType(GRNType.create("event_procedure"));
         final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(definitionGrn);
         assertThat(missingDependencies).hasSize(1);
     }

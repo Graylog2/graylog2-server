@@ -21,24 +21,45 @@ import com.google.auto.value.AutoValue;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+/**
+ * Represents a GRN type, which is a part of the {@link GRN}.
+ */
 @AutoValue
 public abstract class GRNType {
+    /**
+     * Returns the type of the GRN, e.g. "stream", "dashboard", etc.
+     *
+     * @return the type of the GRN
+     */
     public abstract String type();
 
-    public abstract String permissionPrefix();
-
+    /**
+     * Returns the GRN for the given entity ID
+     *
+     * @return the type of the GRN
+     */
     public GRN toGRN(String entity) {
         return newGRNBuilder().entity(entity).build();
     }
 
+    /**
+     * Returns a new {@link GRN.Builder} for this GRN type.
+     *
+     * @return the builder for the GRN
+     */
     public GRN.Builder newGRNBuilder() {
         return GRN.builder().type(type()).grnType(this);
     }
 
-    public static GRNType create(String type, String permissionPrefix) {
+    /**
+     * Creates a new GRNType instance with the specified type.
+     *
+     * @param type the type of the GRN, must not be null or empty
+     * @return a new GRNType instance
+     */
+    public static GRNType create(String type) {
         checkArgument(!isNullOrEmpty(type), "type cannot be null or empty");
-        checkArgument(!isNullOrEmpty(permissionPrefix), "permissionPrefix cannot be null or empty");
 
-        return new AutoValue_GRNType(type, permissionPrefix);
+        return new AutoValue_GRNType(type);
     }
 }
