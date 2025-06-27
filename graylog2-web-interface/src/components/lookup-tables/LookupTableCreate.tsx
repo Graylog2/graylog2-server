@@ -21,15 +21,13 @@ import { LookupTableForm } from 'components/lookup-tables';
 
 type Props = {
   saved: (...args: any[]) => void;
-  validate?: (...args: any[]) => void;
-  validationErrors?: any;
 };
 
-const LookupTableCreate = ({ saved, validate = null, validationErrors = {} }: Props) => (
+const LookupTableCreate = ({ saved }: Props) => (
   <div>
     <Row className="content">
       <Col lg={8}>
-        <LookupTableForm saved={saved} create validate={validate} validationErrors={validationErrors} />
+        <LookupTableForm saved={saved} create />
       </Col>
     </Row>
   </div>
