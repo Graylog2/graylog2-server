@@ -178,7 +178,7 @@ type Props = {
   onUpdateDescription?: (newDescription: string) => unknown;
   hideDragHandle?: boolean;
   title: string;
-  description: string;
+  description: string | undefined;
   loading?: boolean;
   editing: boolean;
   titleIcon?: React.ReactNode;
