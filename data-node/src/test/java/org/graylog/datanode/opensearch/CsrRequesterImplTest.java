@@ -16,8 +16,6 @@
  */
 package org.graylog.datanode.opensearch;
 
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
@@ -46,7 +44,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +55,8 @@ class CsrRequesterImplTest {
 
     @Test
     void testSAN(@TempDir Path tempDir) throws Exception {
+
+
         final Configuration configuration = DatanodeTestUtils.datanodeConfiguration(Map.of(
                 "node_name", "my-node-name",
                 "hostname", "my-datanode-machine"
