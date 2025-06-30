@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security;
+import type { SearchParams } from 'stores/PaginationTypes';
+import { fetchPaginatedLookupTables, fetchErrors } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
-import java.util.Set;
+export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 
-public interface CapabilityPermissions {
-    default Set<String> readPermissions() {
-        return Set.of();
-    }
+export function useFetchLookupTables() {
+  return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
 
-    default Set<String> editPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> deletePermissions() {
-        return Set.of();
-    }
+export function useFetchErrors() {
+  return { fetchErrors };
 }

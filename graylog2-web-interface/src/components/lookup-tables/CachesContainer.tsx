@@ -22,7 +22,7 @@ import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-
 import { useStore } from 'stores/connect';
 
 type Props = {
-  children: React.ReactElement[];
+  children: React.ReactElement;
 };
 
 const CachesContainer = ({ children }: Props) => {

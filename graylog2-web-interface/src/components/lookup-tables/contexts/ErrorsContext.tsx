@@ -14,23 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.migrations;
+import * as React from 'react';
 
-import com.google.common.collect.ImmutableSet;
+const ErrorsContext = React.createContext(null);
 
-import java.util.Set;
+type ProviderProps = {
+  children: React.ReactNode;
+};
 
-class LegacyViewsPermissions {
-    static final String VIEW_USE = "view:use";
-    static final String VIEW_CREATE = "view:create";
-    static final String EXTENDEDSEARCH_CREATE = "extendedsearch:create";
-    static final String EXTENDEDSEARCH_USE = "extendedsearch:use";
+export function ErrorsProvider({ children }: ProviderProps) {
+  const [errors, setErrors] = React.useState<{ lutErrors: unknown; cacheErrors: unknown; adapterErrors: unknown }>();
+  const value = React.useMemo(() => ({ errors, setErrors }), [errors, setErrors]);
 
-    static Set<String> all() {
-        return ImmutableSet.of(
-                VIEW_USE,
-                VIEW_CREATE,
-                EXTENDEDSEARCH_USE,
-                EXTENDEDSEARCH_CREATE);
-    }
+  return <ErrorsContext.Provider value={value}>{children}</ErrorsContext.Provider>;
+}
+
+export function useErrorsContext() {
+  return React.useContext(ErrorsContext);
 }

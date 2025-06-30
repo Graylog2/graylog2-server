@@ -39,7 +39,7 @@ type cacheTypeOptionsType = { value: string; label: string };
 type Props = {
   saved: () => void;
   types: TypesType[];
-  validate: () => void;
+  validate: (adapter: any) => void;
   validationErrors: validationErrorsType;
 };
 
