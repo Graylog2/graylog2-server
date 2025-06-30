@@ -26,6 +26,7 @@ import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.rest.models.SortOrder;
@@ -38,10 +39,13 @@ public class PaginatedStreamService {
     private static final String COLLECTION_NAME = "streams";
     private static final List<String> STRING_FIELDS = List.of("title", "description", "index_set_title");
     private final MongoCollection<StreamDTO> collection;
+    private final EntityScopeService scopeService;
 
     @Inject
-    public PaginatedStreamService(MongoCollections mongoCollections) {
+    public PaginatedStreamService(MongoCollections mongoCollections,
+                                  EntityScopeService scopeService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
+        this.scopeService = scopeService;
     }
 
     public long count() {
@@ -83,7 +87,12 @@ public class PaginatedStreamService {
 
         final List<StreamImpl> streamsList;
         try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build())).map(StreamImpl::fromDTO)) {
-            streamsList = results.filter(predicate).toList();
+            streamsList = results
+                    .filter(predicate)
+                    // Since we are bypassing the StreamService which properly sets the isEditable field when loading
+                    // streams we need to set the field here.
+                    .map(s -> s.toBuilder().isEditable(scopeService.scopeIsMutable(s.scope())).build())
+                    .toList();
         }
 
         final long grandTotal;

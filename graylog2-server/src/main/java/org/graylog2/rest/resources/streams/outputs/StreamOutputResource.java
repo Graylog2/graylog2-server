@@ -23,6 +23,19 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditEventTypes;
@@ -39,25 +52,11 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 
 @RequiresAuthentication
 @Api(value = "StreamOutputs", description = "Manage stream outputs for a given stream")
@@ -139,10 +138,9 @@ public class StreamOutputResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
 
-        checkNotEditable(streamid, "Cannot assign outputs to a non-editable stream.");
-
-        // Check if stream exists
-        streamService.load(streamid);
+        // Check if stream exists and is editable
+        final Stream stream = streamService.load(streamid);
+        checkNotEditable(stream, "Cannot assign outputs to a non-editable stream.");
 
         final Set<String> outputs = aor.outputs();
         final ImmutableSet.Builder<ObjectId> outputIds = ImmutableSet.builderWithExpectedSize(outputs.size());
@@ -180,8 +178,9 @@ public class StreamOutputResource extends RestResource {
         streamService.removeOutput(stream, output);
     }
 
-    private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+    private void checkNotEditable(Stream stream, String message) {
+        // Default stream itself is not editable but can have outputs assigned to it.
+        if (!DEFAULT_STREAM_ID.equals(stream.getId()) && !stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }

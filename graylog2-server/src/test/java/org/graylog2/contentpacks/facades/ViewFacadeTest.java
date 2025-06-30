@@ -73,6 +73,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
@@ -165,7 +166,7 @@ public class ViewFacadeTest {
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
         final EntityDescriptor searchDescriptor = EntityDescriptor.create(viewDTO.id(), ModelTypes.SEARCH_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(searchDescriptor, streamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, searchDescriptor, streamDescriptor);
         final Optional<Entity> optionalEntity = facade.exportEntity(searchDescriptor, entityDescriptorIds);
 
         assertThat(optionalEntity).isPresent();

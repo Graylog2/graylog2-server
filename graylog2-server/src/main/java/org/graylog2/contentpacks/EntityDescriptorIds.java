@@ -19,9 +19,7 @@ package org.graylog2.contentpacks;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.plugin.streams.Stream;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,14 +38,14 @@ public class EntityDescriptorIds {
         return new EntityDescriptorIds(ImmutableMap.of());
     }
 
-    public static EntityDescriptorIds of(EntityDescriptor... entityDescriptors) {
-        return of(Arrays.asList(entityDescriptors));
+    public static EntityDescriptorIds of(Collection<String> systemStreamIds, EntityDescriptor... entityDescriptors) {
+        return of(systemStreamIds, Arrays.asList(entityDescriptors));
     }
 
-    public static EntityDescriptorIds of(Collection<EntityDescriptor> entityDescriptors) {
+    public static EntityDescriptorIds of(Collection<String> systemStreamIds, Collection<EntityDescriptor> entityDescriptors) {
         final ImmutableMap<EntityDescriptor, String> descriptorIds = entityDescriptors.stream()
                 .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> {
-                    if (isSystemStreamDescriptor(d)) {
+                    if (systemStreamIds.contains(d.id().id())) {
                         return d.id().id();
                     } else {
                         return UUID.randomUUID().toString();
@@ -55,10 +53,6 @@ public class EntityDescriptorIds {
                 }));
 
         return new EntityDescriptorIds(descriptorIds);
-    }
-
-    public static boolean isSystemStreamDescriptor(EntityDescriptor descriptor) {
-        return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isSystemStreamId(descriptor.id().id());
     }
 
     private EntityDescriptorIds(ImmutableMap<EntityDescriptor, String> descriptorIds) {

@@ -49,6 +49,7 @@ import org.graylog2.streams.StreamService;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -84,10 +85,10 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
 
-        checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
         // verify the stream exists
         checkPermission(RestPermissions.STREAMS_READ, streamId);
-        streamService.load(streamId);
+        final Stream stream = streamService.load(streamId);
+        checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
 
         // verify the pipelines exist
         for (String s : connection.pipelineIds()) {
@@ -115,9 +116,13 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
-        connection.streamIds().forEach(streamId ->
-                checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
-        );
+        // verify the streams exist and the user has permission to read them
+        final Set<Stream> connectedStreams = streamService.loadByIds(connection.streamIds());
+        connectedStreams.forEach(stream -> {
+            checkPermission(RestPermissions.STREAMS_READ, stream.getId());
+            checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
+        });
+
         // remove deleted pipeline connections
         for (PipelineConnections pipelineConnection : pipelineConnections) {
             if (!connection.streamIds().contains(pipelineConnection.streamId())) {
@@ -131,11 +136,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         }
 
         // update pipeline connections
-        for (String streamId : connection.streamIds()) {
-            // verify the stream exist
-            checkPermission(RestPermissions.STREAMS_READ, streamId);
-            streamService.load(streamId);
-
+        for (Stream stream : connectedStreams) {
+            final String streamId = stream.getId();
             PipelineConnections updatedConnection;
             try {
                 updatedConnection = connectionsService.load(streamId);
@@ -199,8 +201,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         return filteredConnections;
     }
 
-    private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+    private void checkNotEditable(Stream stream, String message) {
+        if (!stream.getId().equals(DEFAULT_STREAM_ID) && !stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }

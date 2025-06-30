@@ -77,7 +77,7 @@ class V20230601104500_AddSourcesPageV2Test {
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null, null);
+            super(null, null, Map.of(), null, null, null, null);
         }
 
         @Override

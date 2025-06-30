@@ -19,8 +19,6 @@ package org.graylog2.database.entities;
 
 import jakarta.inject.Inject;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,22 +38,36 @@ public final class EntityScopeService {
     }
 
     public List<EntityScope> getEntityScopes() {
-        return Collections.unmodifiableList(new ArrayList<>(entityScopes.values()));
+        return List.copyOf(entityScopes.values());
+    }
+
+    public boolean scopeIsMutable(String name) {
+        if (name == null || name.isEmpty()) {
+            return true;
+        }
+        final EntityScope scope = entityScopes.get(name.toUpperCase(Locale.ROOT));
+        if (scope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + name);
+        }
+        return scope.isMutable();
+    }
+
+    public boolean scopeIsDeletable(String name) {
+        if (name == null || name.isEmpty()) {
+            return true;
+        }
+        final EntityScope scope = entityScopes.get(name.toUpperCase(Locale.ROOT));
+        if (scope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + name);
+        }
+        return scope.isDeletable();
     }
 
     public boolean isMutable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
         String scope = scopedEntity.scope();
-        if (scope == null || scope.isEmpty()) {
-            return true;
-        }
 
-        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
-        if (entityScope == null) {
-            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
-        }
-
-        return entityScope.isMutable();
+        return scopeIsMutable(scope);
     }
 
     public boolean isMutable(ScopedEntity existingEntity, ScopedEntity updatedEntity) {
@@ -76,16 +88,8 @@ public final class EntityScopeService {
     public boolean isDeletable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
         String scope = scopedEntity.scope();
-        if (scope == null || scope.isEmpty()) {
-            return true;
-        }
 
-        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
-        if (entityScope == null) {
-            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
-        }
-
-        return entityScope.isDeletable();
+        return scopeIsDeletable(scope);
     }
 
     public boolean hasValidScope(ScopedEntity scopedEntity) {

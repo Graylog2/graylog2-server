@@ -30,10 +30,9 @@ import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
-import org.apache.shiro.authz.annotation.Logical;
+import org.graylog.security.GrantDTO;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
-import org.graylog.security.GrantDTO;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -71,6 +70,7 @@ import org.graylog2.contentpacks.model.parameters.Parameter;
 import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.StreamService;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +101,7 @@ public class ContentPackService {
     private final ObjectMapper objectMapper;
     private final Configuration configuration;
     private final UserService userService;
+    private final StreamService streamService;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
@@ -108,15 +109,16 @@ public class ContentPackService {
                               Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
                               ObjectMapper objectMapper,
                               Configuration configuration,
-                              UserService userService) {
+                              UserService userService,
+                              StreamService streamService) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
         this.objectMapper = objectMapper;
         this.configuration = configuration;
         this.userService = userService;
+        this.streamService = streamService;
     }
-
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
@@ -228,12 +230,13 @@ public class ContentPackService {
     }
 
     private Map<EntityDescriptor, Object> getMapWithSystemStreamEntities() {
+        final Set<String> systemStreamIds = streamService.getSystemStreamIds(true);
         Map<EntityDescriptor, Object> entities = new HashMap<>();
-        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+        for (String id : systemStreamIds) {
             try {
                 final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(id, ModelTypes.STREAM_V1);
                 final StreamFacade streamFacade = (StreamFacade) entityFacades.getOrDefault(ModelTypes.STREAM_V1, UnsupportedEntityFacade.INSTANCE);
-                final Entity streamEntity = streamFacade.exportEntity(streamEntityDescriptor, EntityDescriptorIds.of(streamEntityDescriptor)).get();
+                final Entity streamEntity = streamFacade.exportEntity(streamEntityDescriptor, EntityDescriptorIds.of(systemStreamIds, streamEntityDescriptor)).get();
                 final NativeEntity<Stream> streamNativeEntity = streamFacade.findExisting(streamEntity, Collections.emptyMap()).get();
                 entities.put(streamEntityDescriptor, streamNativeEntity.entity());
             } catch (Exception e) {
@@ -440,11 +443,11 @@ public class ContentPackService {
     public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
         // It's important to only compute the EntityDescriptor IDs once per #collectEntities call! Otherwise we
         // will get broken references between the entities.
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(resolvedEntities);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(streamService.getSystemStreamIds(true), resolvedEntities);
 
         final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            if (EntityDescriptorIds.isSystemStreamDescriptor(entityDescriptor)) {
+            if (ModelTypes.STREAM_V1.equals(entityDescriptor.type()) && streamService.getSystemStreamIds(true).contains(entityDescriptor.id().id())) {
                 continue;
             }
             final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);

@@ -91,7 +91,7 @@ public class LookupCacheFacadeTest {
                 .config(new FallbackCacheConfig())
                 .build();
         final EntityDescriptor descriptor = EntityDescriptor.create(cacheDto.id(), ModelTypes.LOOKUP_CACHE_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Entity entity = facade.exportNativeEntity(cacheDto, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -110,7 +110,7 @@ public class LookupCacheFacadeTest {
     @MongoDBFixtures("LookupCacheFacadeTest.json")
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -284,7 +284,7 @@ public class LookupCacheFacadeTest {
     @MongoDBFixtures("LookupCacheFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

@@ -40,6 +40,7 @@ import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.FallbackAdapterConfig;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -88,7 +89,7 @@ public class LookupDataAdapterFacadeTest {
                 .config(new FallbackAdapterConfig())
                 .build();
         final EntityDescriptor descriptor = EntityDescriptor.create(dataAdapterDto.id(), ModelTypes.LOOKUP_ADAPTER_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Entity entity = facade.exportNativeEntity(dataAdapterDto, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -107,7 +108,7 @@ public class LookupDataAdapterFacadeTest {
     @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void exportEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -268,7 +269,7 @@ public class LookupDataAdapterFacadeTest {
     @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

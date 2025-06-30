@@ -169,7 +169,7 @@ public class EventDefinitionFacadeTest {
                 .thenReturn(Optional.of(mock(JobDefinitionDto.class)));
 
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.EVENT_DEFINITION_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Optional<Entity> entity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(entity).isPresent();
         final EntityV1 entityV1 = (EntityV1) entity.get();
@@ -191,7 +191,7 @@ public class EventDefinitionFacadeTest {
                 .thenReturn(Optional.empty());
 
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.EVENT_DEFINITION_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
         final Optional<Entity> entity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(entity).isPresent();
         final EntityV1 entityV1 = (EntityV1) entity.get();

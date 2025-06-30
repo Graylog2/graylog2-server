@@ -68,6 +68,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.FAILURES_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -101,7 +102,7 @@ public class AggregationSearchUtilsTest {
         );
         final Function<Collection<String>, Stream<String>> categoryMappingFunction = (categories) -> Stream.of();
 
-        permittedStreams = new PermittedStreams(streamIdSupplier, categoryMappingFunction);
+        permittedStreams = new PermittedStreams(streamIdSupplier, categoryMappingFunction, () -> NON_EDITABLE_STREAM_IDS);
         eventStreamService = new EventStreamService(streamService);
     }
 
