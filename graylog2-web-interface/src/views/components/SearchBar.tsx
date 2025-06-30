@@ -247,55 +247,55 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
             }) => {
               const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
-                return (
-                  <>
-                    <ValidateOnParameterChange parameters={parameters} />
-                    <SearchBarContainer>
-                      <TimeRangeRow>
-                        <TimeRangeFilter
-                          limitDuration={limitDuration}
-                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                          value={values?.timerange}
-                          hasErrorOnMount={!!errors.timerange}
-                          moveRangeProps={{
-                            effectiveTimerange: results?.effectiveTimerange,
-                            initialTimeRange: currentQuery.timerange,
-                            initialTimeFormat: 'internalIndexer',
-                          }}
-                        />
-                        <StreamsAndRefresh>
-                          <Field name="streams">
-                            {({ field: { name, value, onChange } }) => (
-                              <StreamsFilter
-                                value={value}
-                                streams={availableStreams}
-                                onChange={(newStreams) =>
-                                  onChange({
-                                    target: {
-                                      value: newStreams,
-                                      name,
-                                    },
-                                  })
-                                }
-                              />
-                            )}
-                          </Field>
-                          <Field name="streamCategories">
-                            {({ field: { name, value, onChange } }) => (
-                              <StreamCategoryFilter
-                                value={value}
-                                streamCategories={availableStreamCategories}
-                                onChange={(newCategories) =>
-                                  onChange({
-                                    target: {
-                                      value: newCategories,
-                                      name,
-                                    },
-                                  })
-                                }
-                              />
-                            )}
-                          </Field>
+              return (
+                <>
+                  <ValidateOnParameterChange parameters={parameters} />
+                  <SearchBarContainer>
+                    <TimeRangeRow>
+                      <TimeRangeFilter
+                        limitDuration={limitDuration}
+                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                        value={values?.timerange}
+                        hasErrorOnMount={!!errors.timerange}
+                        moveRangeProps={{
+                          effectiveTimerange: results?.effectiveTimerange,
+                          initialTimerange: currentQuery.timerange,
+                          initialTimerangeFormat: 'internalIndexer',
+                        }}
+                      />
+                      <StreamsAndRefresh>
+                        <Field name="streams">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamsFilter
+                              value={value}
+                              streams={availableStreams}
+                              onChange={(newStreams) =>
+                                onChange({
+                                  target: {
+                                    value: newStreams,
+                                    name,
+                                  },
+                                })
+                              }
+                            />
+                          )}
+                        </Field>
+                        <Field name="streamCategories">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamCategoryFilter
+                              value={value}
+                              streamCategories={availableStreamCategories}
+                              onChange={(newCategories) =>
+                                onChange({
+                                  target: {
+                                    value: newCategories,
+                                    name,
+                                  },
+                                })
+                              }
+                            />
+                          )}
+                        </Field>
 
                         <ViewsRefreshControls disable={!isValid} />
                       </StreamsAndRefresh>

@@ -39,8 +39,8 @@ describe('MoveRange', () => {
     effectiveTimerange = undefined,
     displayMoveRangeButtons = true,
     setCurrentTimeRange = () => {},
-    initialTimeRange = undefined,
-    currentTimeRange = undefined,
+    initialTimerange = undefined,
+    currentTimerange = undefined,
     children,
   }: SUTProps) => (
     <Formik initialValues={{}} onSubmit={onSubmit}>
@@ -48,9 +48,9 @@ describe('MoveRange', () => {
         <MoveRange
           setCurrentTimeRange={setCurrentTimeRange}
           effectiveTimerange={effectiveTimerange}
-          initialTimeRange={initialTimeRange}
-          initialTimeFormat="internalIndexer"
-          currentTimeRange={currentTimeRange}
+          initialTimerange={initialTimerange}
+          initialTimerangeFormat="internalIndexer"
+          currentTimerange={currentTimerange}
           displayMoveRangeButtons={displayMoveRangeButtons}>
           {children}
         </MoveRange>
@@ -85,8 +85,8 @@ describe('MoveRange', () => {
         onSubmit={onSubmit}
         setCurrentTimeRange={setCurrentTimeRange}
         effectiveTimerange={timeRange}
-        initialTimeRange={timeRange}
-        currentTimeRange={timeRange}
+        initialTimerange={timeRange}
+        currentTimerange={timeRange}
       />,
     );
 
@@ -113,8 +113,8 @@ describe('MoveRange', () => {
         onSubmit={onSubmit}
         setCurrentTimeRange={setCurrentTimeRange}
         effectiveTimerange={timeRange}
-        initialTimeRange={timeRange}
-        currentTimeRange={timeRange}
+        initialTimerange={timeRange}
+        currentTimerange={timeRange}
       />,
     );
 
@@ -143,8 +143,8 @@ describe('MoveRange', () => {
         onSubmit={onSubmit}
         setCurrentTimeRange={setCurrentTimeRange}
         effectiveTimerange={timeRange}
-        initialTimeRange={timeRange}
-        currentTimeRange={timeRange}
+        initialTimerange={timeRange}
+        currentTimerange={timeRange}
       />,
     );
 

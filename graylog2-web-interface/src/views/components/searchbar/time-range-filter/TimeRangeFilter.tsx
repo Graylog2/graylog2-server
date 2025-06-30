@@ -63,8 +63,8 @@ type Props = {
   submitOnPresetChange?: boolean;
   moveRangeProps?: {
     effectiveTimerange: AbsoluteTimeRange;
-    initialTimeRange: TimeRange | NoTimeRangeOverride;
-    initialTimeFormat: 'internal' | 'internalIndexer';
+    initialTimerange: TimeRange | NoTimeRangeOverride;
+    initialTimerangeFormat: 'internal' | 'internalIndexer';
   };
 };
 
@@ -136,10 +136,10 @@ const TimeRangeFilter = ({
           <MoveRange
             displayMoveRangeButtons={!!moveRangeProps}
             setCurrentTimeRange={onChange}
-            initialTimeFormat={moveRangeProps?.initialTimeFormat}
+            initialTimerangeFormat={moveRangeProps?.initialTimerangeFormat}
             effectiveTimerange={moveRangeProps?.effectiveTimerange}
-            initialTimeRange={moveRangeProps?.initialTimeRange}
-            currentTimeRange={value}>
+            initialTimerange={moveRangeProps?.initialTimerange}
+            currentTimerange={value}>
             <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
           </MoveRange>
         </RightCol>

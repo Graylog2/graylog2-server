@@ -77,19 +77,19 @@ type Props = React.PropsWithChildren<{
   // time range of the previously executed search
   effectiveTimerange: AbsoluteTimeRange | undefined;
   // initially selected time range
-  initialTimeRange: TimeRange | NoTimeRangeOverride;
+  initialTimerange: TimeRange | NoTimeRangeOverride;
   // current value of time range in form state
-  currentTimeRange: TimeRange | NoTimeRangeOverride;
-  initialTimeFormat: 'internal' | 'internalIndexer';
+  currentTimerange: TimeRange | NoTimeRangeOverride;
+  initialTimerangeFormat: 'internal' | 'internalIndexer';
 }>;
 
 const MoveRangeInner = ({
   setCurrentTimeRange,
   effectiveTimerange,
-  initialTimeRange,
-  currentTimeRange,
+  initialTimerange,
+  currentTimerange,
   children = undefined,
-  initialTimeFormat,
+  initialTimerangeFormat,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const { submitForm, isValid } = useFormikContext<{ timerange: TimeRange }>();
@@ -128,8 +128,11 @@ const MoveRangeInner = ({
   const disableButton =
     !effectiveTimerange ||
     !isValid ||
-    isNoTimeRangeOverride(currentTimeRange) ||
-    !isEqual(initialTimeRange, normalizeFromSearchBarForBackend(currentTimeRange, userTimezone, initialTimeFormat));
+    isNoTimeRangeOverride(currentTimerange) ||
+    !isEqual(
+      initialTimerange,
+      normalizeFromSearchBarForBackend(currentTimerange, userTimezone, initialTimerangeFormat),
+    );
 
   return (
     <>
@@ -154,9 +157,9 @@ const MoveRange = ({
   displayMoveRangeButtons,
   setCurrentTimeRange,
   effectiveTimerange,
-  initialTimeRange,
-  initialTimeFormat,
-  currentTimeRange,
+  initialTimerange,
+  initialTimerangeFormat,
+  currentTimerange,
   children = undefined,
 }: Props & { displayMoveRangeButtons: boolean }) => {
   if (!displayMoveRangeButtons) {
@@ -165,11 +168,11 @@ const MoveRange = ({
 
   return (
     <MoveRangeInner
-      initialTimeFormat={initialTimeFormat}
+      initialTimerangeFormat={initialTimerangeFormat}
       setCurrentTimeRange={setCurrentTimeRange}
       effectiveTimerange={effectiveTimerange}
-      initialTimeRange={initialTimeRange}
-      currentTimeRange={currentTimeRange}>
+      initialTimerange={initialTimerange}
+      currentTimerange={currentTimerange}>
       {children}
     </MoveRangeInner>
   );

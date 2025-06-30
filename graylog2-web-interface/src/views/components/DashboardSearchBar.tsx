@@ -195,8 +195,8 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
                       hasErrorOnMount={!!errors.timerange}
                       moveRangeProps={{
                         effectiveTimerange: results?.effectiveTimerange,
-                        initialTimeRange: timerange ?? NO_TIMERANGE_OVERRIDE,
-                        initialTimeFormat: 'internal',
+                        initialTimerange: timerange ?? NO_TIMERANGE_OVERRIDE,
+                        initialTimerangeFormat: 'internal',
                       }}
                       noOverride
                     />
