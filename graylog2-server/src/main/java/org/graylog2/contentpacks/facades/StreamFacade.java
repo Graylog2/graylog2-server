@@ -106,8 +106,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
-        final Set<ValueReference> outputIds = stream.getOutputs().stream()
-                .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
+        final Set<ValueReference> outputIds = stream.getOutputIds().stream()
+                .map(output -> entityDescriptorIds.getOrThrow(output.toHexString(), ModelTypes.OUTPUT_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
@@ -314,8 +314,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            stream.getOutputs().stream()
-                    .map(Output::getId)
+            stream.getOutputIds().stream()
+                    .map(ObjectId::toHexString)
                     .map(ModelId::of)
                     .map(id -> EntityDescriptor.create(id, ModelTypes.OUTPUT_V1))
                     .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));

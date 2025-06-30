@@ -14,23 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.migrations;
+package org.graylog.datanode.bootstrap.preflight.inits;
 
-import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 
 import java.util.Set;
 
-class LegacyViewsPermissions {
-    static final String VIEW_USE = "view:use";
-    static final String VIEW_CREATE = "view:create";
-    static final String EXTENDEDSEARCH_CREATE = "extendedsearch:create";
-    static final String EXTENDEDSEARCH_USE = "extendedsearch:use";
+/**
+ * Datanode init procedures that should be triggered after preflight but before the real injection and server startup
+ * takes place.
+ */
+public class DatanodeBlockingInitService {
+    private final Set<DatanodeBlockingInit> inits;
 
-    static Set<String> all() {
-        return ImmutableSet.of(
-                VIEW_USE,
-                VIEW_CREATE,
-                EXTENDEDSEARCH_USE,
-                EXTENDEDSEARCH_CREATE);
+    @Inject
+    public DatanodeBlockingInitService(Set<DatanodeBlockingInit> inits) {
+        this.inits = inits;
+    }
+
+    public void runInits() {
+        inits.forEach(DatanodeBlockingInit::runInit);
     }
 }

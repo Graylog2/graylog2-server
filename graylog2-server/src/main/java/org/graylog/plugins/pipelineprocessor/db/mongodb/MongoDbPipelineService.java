@@ -149,7 +149,9 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
-        return MongoUtils.stream(collection.find(stringIdsIn(pipelineIds))).collect(Collectors.toSet());
+        try (final var stream = MongoUtils.stream(collection.find(stringIdsIn(pipelineIds)))) {
+            return stream.collect(Collectors.toSet());
+        }
     }
 
     public long count(Bson filter) {
