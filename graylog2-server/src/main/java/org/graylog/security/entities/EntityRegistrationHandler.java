@@ -19,8 +19,23 @@ package org.graylog.security.entities;
 import org.graylog.grn.GRN;
 import org.graylog2.plugin.database.users.User;
 
+/**
+ * Handler interface for entity registration and unregistration events.
+ * Implementations can perform additional actions when entities are registered or unregistered.
+ */
 public interface EntityRegistrationHandler {
+    /**
+     * Handles the registration of a new entity.
+     *
+     * @param entityGRN the GRN of the entity being registered
+     * @param user      the user associated with the registration
+     */
     void handleRegistration(GRN entityGRN, User user);
 
+    /**
+     * Handles the unregistration of an entity.
+     *
+     * @param entityGRN the GRN of the entity being unregistered
+     */
     void handleUnregistration(GRN entityGRN);
 }

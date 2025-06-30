@@ -28,6 +28,13 @@ import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+ * Handles the registration and unregistration of entity ownership grants.
+ *
+ * When a new entity is registered, this handler assigns an ownership grant to the user
+ * (unless the user is a local admin or the entity is a user entity).
+ * When an entity is unregistered, it removes all grants for that entity.
+ */
 @Singleton
 public class EntityOwnershipRegistrationHandler implements EntityRegistrationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(EntityOwnershipRegistrationHandler.class);
@@ -35,7 +42,12 @@ public class EntityOwnershipRegistrationHandler implements EntityRegistrationHan
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
 
-
+    /**
+     * Constructs a new EntityOwnershipRegistrationHandler.
+     *
+     * @param dbGrantService the service for managing database grants
+     * @param grnRegistry    the registry for GRN (Graylog Resource Name) objects
+     */
     @Inject
     public EntityOwnershipRegistrationHandler(DBGrantService dbGrantService,
                                               GRNRegistry grnRegistry) {
@@ -43,12 +55,24 @@ public class EntityOwnershipRegistrationHandler implements EntityRegistrationHan
         this.grnRegistry = grnRegistry;
     }
 
+    /**
+     * Handles the unregistration of an entity by removing all grants for the given entity GRN.
+     *
+     * @param entityGRN the GRN of the entity being unregistered
+     */
     @Override
     public void handleUnregistration(GRN entityGRN) {
         LOG.debug("Removing grants for <{}>", entityGRN);
         dbGrantService.deleteForTarget(entityGRN);
     }
 
+    /**
+     * Handles the registration of a new entity by assigning an ownership grant to the user.
+     * Skips grant creation for local admin users and user entities.
+     *
+     * @param entityGRN the GRN of the entity being registered
+     * @param user      the user associated with the registration
+     */
     @Override
     public void handleRegistration(GRN entityGRN, User user) {
         // Don't create ownership grants for the admin user.
