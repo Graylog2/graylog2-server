@@ -146,7 +146,8 @@ class LUTCachesPage extends React.Component<
     } else if (!caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = <CachesOverview caches={caches} pagination={pagination} />;
+      // content = <CachesOverview caches={caches} pagination={pagination} />;
+      content = <CachesOverview />;
     }
 
     return (

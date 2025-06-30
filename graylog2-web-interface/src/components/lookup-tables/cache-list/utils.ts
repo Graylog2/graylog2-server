@@ -14,9 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { EntityBase } from 'components/common/EntityDataTable/types';
-import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
+import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
-export type LookupTableEntity = EntityBase & LookupTable;
-export type CachesMap = { [key: string]: LookupTableCache };
-export type AdaptersMap = { [key: string]: LookupTableAdapter };
+import { attributes } from './constants';
+
+type DeserializeCachesArgs = PaginatedResponseType & {
+  caches: Array<LookupTableCache>;
+};
+
+export default function deserializeCaches({ query, total, page, per_page, count, caches }: DeserializeCachesArgs) {
+  return {
+    attributes,
+    list: caches.map((cache: LookupTableCache) => ({ ...cache, id: cache.id })) ?? [],
+    pagination: { total, page, per_page, count, query },
+  };
+}

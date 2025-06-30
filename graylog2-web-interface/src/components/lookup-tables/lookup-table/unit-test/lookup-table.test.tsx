@@ -45,13 +45,13 @@ const mockFetchPaginatedLookupTables = jest.fn(async () =>
 const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => {}],
+  useQueryParam: () => [undefined, () => { }],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchLookupTables: () => ({
     fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
-    lookupTablesKeyFn: jest.fn((searchParams: SearchParams) => ['lookup-tables', 'search', searchParams]),
+    lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
   }),
   useFetchErrors: () => ({
     fetchErrors: mockFetchErrors,

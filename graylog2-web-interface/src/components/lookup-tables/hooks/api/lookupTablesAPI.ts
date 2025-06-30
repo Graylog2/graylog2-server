@@ -15,14 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import type { SearchParams } from 'stores/PaginationTypes';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table/utils';
-
-export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
-  const { page, pageSize, query } = searchParams;
-
-  return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
-};
+import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 
 export const fetchErrors = async ({
   lutNames = undefined,
@@ -33,3 +29,15 @@ export const fetchErrors = async ({
   cacheNames?: Array<string>;
   adapterNames?: Array<string>;
 }) => LookupTablesActions.getErrors(lutNames, cacheNames, adapterNames);
+
+export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
+  const { page, pageSize, query } = searchParams;
+
+  return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
+};
+
+export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
+  const { page, pageSize, query } = searchParams;
+
+  return LookupTableCachesActions.searchPaginated(page, pageSize, query).then((resp: any) => deserializeCaches(resp));
+};
