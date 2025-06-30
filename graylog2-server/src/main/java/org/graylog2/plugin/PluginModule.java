@@ -43,7 +43,6 @@ import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
-import org.graylog.security.CapabilityPermissions;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.shares.SyncedEntitiesResolver;
@@ -369,11 +368,6 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addGRNTypeProvider(Class<? extends GRNTypeProvider> grnTypeProvider) {
         final Multibinder<GRNTypeProvider> grnTypeProviderBinder = Multibinder.newSetBinder(binder(), GRNTypeProvider.class);
         grnTypeProviderBinder.addBinding().to(grnTypeProvider);
-    }
-
-    protected void addCapabilityPermissions(Class<? extends CapabilityPermissions> capabilityPermissionsClass) {
-        final Multibinder<CapabilityPermissions> capabilityPermissionsBinder = Multibinder.newSetBinder(binder(), CapabilityPermissions.class);
-        capabilityPermissionsBinder.addBinding().to(capabilityPermissionsClass);
     }
 
     protected void addSyncedEntitiesResolver(Class<? extends SyncedEntitiesResolver> resolverClass) {
