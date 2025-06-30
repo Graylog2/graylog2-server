@@ -126,7 +126,10 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
 
     @Override
     public PaginatedList<T> page(int pageNumber) {
-        final List<T> documents = stream(getFindIterableBase(pageNumber, perPage)).toList();
+        final List<T> documents;
+        try (final var stream = stream(getFindIterableBase(pageNumber, perPage))) {
+            documents = stream.toList();
+        }
         final int total = Ints.saturatedCast(collection.countDocuments(filter));
 
         if (includeGrandTotal) {
@@ -139,15 +142,21 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
 
     @Override
     public PaginatedList<T> page(int pageNumber, Predicate<T> selector) {
-        final int total = Ints.saturatedCast(stream(collection.find()
+        final int total;
+        try (final var stream = stream(collection.find()
                 .filter(filter)
-                .sort(sort)).filter(selector).count());
+                .sort(sort))) {
+            total = Ints.saturatedCast(stream.filter(selector).count());
+        }
 
-        final List<T> documents = stream(getIterableForAllDocuments())
-                .filter(selector)
-                .skip(perPage > 0 ? perPage * Math.max(0L, pageNumber - 1) : 0)
-                .limit(perPage == 0 ? Integer.MAX_VALUE : perPage)
-                .toList();
+        final List<T> documents;
+        try (final var stream = stream(getIterableForAllDocuments())) {
+            documents = stream
+                    .filter(selector)
+                    .skip(perPage > 0 ? perPage * Math.max(0L, pageNumber - 1) : 0)
+                    .limit(perPage == 0 ? Integer.MAX_VALUE : perPage)
+                    .toList();
+        }
 
         if (includeGrandTotal) {
             final long grandTotal = collection.countDocuments(grandTotalFilter);

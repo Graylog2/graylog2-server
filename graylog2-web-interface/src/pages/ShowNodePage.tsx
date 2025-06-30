@@ -35,24 +35,30 @@ const ShowNodePage = () => {
   const { nodes } = useStore(NodesStore);
   const { clusterOverview } = useStore(ClusterOverviewStore);
   const { pluginList, isLoading: isLoadingPlugins } = usePluginList(nodeId);
-  const { data: jvmInformation } = useQuery(['jvm', nodeId], () => ClusterOverviewStore.jvm(nodeId));
-  const { data: inputStates } = useQuery(['inputs', 'states', nodeId], () =>
-    InputStatesStore.list().then((newInputStates) => {
-      // We only want the input states for the current node
-      const inputIds = Object.keys(newInputStates);
-      const filteredInputStates = [];
+  const { data: jvmInformation } = useQuery({
+    queryKey: ['jvm', nodeId],
+    queryFn: () => ClusterOverviewStore.jvm(nodeId),
+  });
+  const { data: inputStates } = useQuery({
+    queryKey: ['inputs', 'states', nodeId],
 
-      inputIds.forEach((inputId) => {
-        const inputObject = newInputStates[inputId][nodeId];
+    queryFn: () =>
+      InputStatesStore.list().then((newInputStates) => {
+        // We only want the input states for the current node
+        const inputIds = Object.keys(newInputStates);
+        const filteredInputStates = [];
 
-        if (inputObject) {
-          filteredInputStates.push(inputObject);
-        }
-      });
+        inputIds.forEach((inputId) => {
+          const inputObject = newInputStates[inputId][nodeId];
 
-      return filteredInputStates;
-    }),
-  );
+          if (inputObject) {
+            filteredInputStates.push(inputObject);
+          }
+        });
+
+        return filteredInputStates;
+      }),
+  });
 
   const systemOverview = clusterOverview?.[nodeId];
   const node = nodes?.[nodeId];
