@@ -371,9 +371,9 @@ public abstract class PluginModule extends Graylog2Module {
         grnTypeProviderBinder.addBinding().to(grnTypeProvider);
     }
 
-    protected void addEntityRegistrationHandler(Class<? extends EntityRegistrationHandler> entityRegistratoinHandlerClass) {
+    protected void addEntityRegistrationHandler(Class<? extends EntityRegistrationHandler> entityRegistrationHandlerClass) {
         final var handlerBinder = Multibinder.newSetBinder(binder(), EntityRegistrationHandler.class);
-        handlerBinder.addBinding().to(entityRegistratoinHandlerClass);
+        handlerBinder.addBinding().to(entityRegistrationHandlerClass);
     }
 
     protected void addSyncedEntitiesResolver(Class<? extends SyncedEntitiesResolver> resolverClass) {
