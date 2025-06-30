@@ -169,9 +169,10 @@ type Props = {
     query: Query,
     restartAutoRefresh: () => void,
   ) => Promise<any>;
+  scrollContainer: React.RefObject<HTMLDivElement>;
 };
 
-const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
+const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const availableStreams = useStore(StreamsStore, ({ streams }) =>
@@ -220,27 +221,31 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   return (
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
-        <ScrollToHint value={query.query_string}>
-          <FormWarningsProvider>
-            <SearchBarForm
-              initialValues={initialValues}
-              limitDuration={limitDuration}
-              onSubmit={_onSubmit}
-              validateQueryString={(values) =>
-                _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
-              }>
-              {({
-                dirty,
-                errors,
-                isSubmitting,
-                isValid,
-                isValidating,
-                handleSubmit,
-                values,
-                setFieldValue,
-                validateForm,
-              }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
+        <FormWarningsProvider>
+          <ScrollToHint
+            scrollContainer={scrollContainer}
+            ifValueChanges={query.query_string}
+            title="Scroll to search bar"
+          />
+          <SearchBarForm
+            initialValues={initialValues}
+            limitDuration={limitDuration}
+            onSubmit={_onSubmit}
+            validateQueryString={(values) =>
+              _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
+            }>
+            {({
+              dirty,
+              errors,
+              isSubmitting,
+              isValid,
+              isValidating,
+              handleSubmit,
+              values,
+              setFieldValue,
+              validateForm,
+            }) => {
+              const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
                 return (
                   <>
@@ -292,61 +297,60 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                             )}
                           </Field>
 
-                          <ViewsRefreshControls disable={!isValid} />
-                        </StreamsAndRefresh>
-                      </TimeRangeRow>
-                      <SearchQueryRow>
-                        <SearchButtonAndQuery>
-                          <SearchButton
-                            disabled={disableSearchSubmit}
-                            dirty={dirty}
-                            displaySpinner={isSubmitting || isLoadingExecution}
-                          />
-                          <SearchInputAndValidationContainer>
-                            <Field name="queryString">
-                              {({ field: { name, value, onChange }, meta: { error } }) => (
-                                <FormWarningsContext.Consumer>
-                                  {({ warnings }) => (
-                                    <PluggableCommands usage="search_query">
-                                      {(customCommands) => (
-                                        <ViewsQueryInput
-                                          value={value}
-                                          ref={editorRef}
-                                          view={view}
-                                          timeRange={values.timerange}
-                                          streams={values.streams}
-                                          name={name}
-                                          onChange={onChange}
-                                          placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                          error={error}
-                                          isValidating={isValidating}
-                                          warning={warnings.queryString}
-                                          disableExecution={disableSearchSubmit}
-                                          validate={validateForm}
-                                          onExecute={handleSubmit as () => void}
-                                          commands={customCommands}
-                                        />
-                                      )}
-                                    </PluggableCommands>
-                                  )}
-                                </FormWarningsContext.Consumer>
-                              )}
-                            </Field>
+                        <ViewsRefreshControls disable={!isValid} />
+                      </StreamsAndRefresh>
+                    </TimeRangeRow>
+                    <SearchQueryRow>
+                      <SearchButtonAndQuery>
+                        <SearchButton
+                          disabled={disableSearchSubmit}
+                          dirty={dirty}
+                          displaySpinner={isSubmitting || isLoadingExecution}
+                        />
+                        <SearchInputAndValidationContainer>
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <FormWarningsContext.Consumer>
+                                {({ warnings }) => (
+                                  <PluggableCommands usage="search_query">
+                                    {(customCommands) => (
+                                      <ViewsQueryInput
+                                        value={value}
+                                        ref={editorRef}
+                                        view={view}
+                                        timeRange={values.timerange}
+                                        streams={values.streams}
+                                        name={name}
+                                        onChange={onChange}
+                                        placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                        error={error}
+                                        isValidating={isValidating}
+                                        warning={warnings.queryString}
+                                        disableExecution={disableSearchSubmit}
+                                        validate={validateForm}
+                                        onExecute={handleSubmit as () => void}
+                                        commands={customCommands}
+                                      />
+                                    )}
+                                  </PluggableCommands>
+                                )}
+                              </FormWarningsContext.Consumer>
+                            )}
+                          </Field>
 
-                            <QueryValidation />
-                            <QueryHistoryButton editorRef={editorRef} />
-                          </SearchInputAndValidationContainer>
-                        </SearchButtonAndQuery>
-                        {!editing && <SearchActionsMenu />}
-                      </SearchQueryRow>
-                      <PluggableSearchBarControls />
-                    </SearchBarContainer>
-                  </>
-                );
-              }}
-            </SearchBarForm>
-          </FormWarningsProvider>
-        </ScrollToHint>
+                          <QueryValidation />
+                          <QueryHistoryButton editorRef={editorRef} />
+                        </SearchInputAndValidationContainer>
+                      </SearchButtonAndQuery>
+                      {!editing && <SearchActionsMenu />}
+                    </SearchQueryRow>
+                    <PluggableSearchBarControls />
+                  </SearchBarContainer>
+                </>
+              );
+            }}
+          </SearchBarForm>
+        </FormWarningsProvider>
       )}
     </WidgetFocusContext.Consumer>
   );
