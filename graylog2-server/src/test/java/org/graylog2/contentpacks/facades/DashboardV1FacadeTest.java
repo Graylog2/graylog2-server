@@ -57,19 +57,21 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.users.UserImpl;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -127,7 +129,14 @@ public class DashboardV1FacadeTest {
         final ContentPackV1 contentPackV1 = (ContentPackV1) contentPack;
         final Entity entity = contentPackV1.entities().iterator().next();
 
-        final StreamImpl stream = new StreamImpl(Collections.emptyMap());
+        final Stream stream = StreamImpl.builder()
+                .id("5400deadbeefdeadbeefaffe")
+                .title("Test Stream")
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .indexSetId("index1")
+                .creatorUserId("testuser")
+                .disabled(false)
+                .build();
         final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
         nativeEntities.put(EntityDescriptor.create("58b3d55a-51ad-4b3e-865c-85776016a151", ModelTypes.STREAM_V1), stream);
 

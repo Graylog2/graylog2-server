@@ -56,9 +56,6 @@ public class SecurityModule extends PluginModule {
         );
         authServiceBackendBinder();
 
-        final Multibinder<CapabilityPermissions> capabilityPermissionsMultibinder = Multibinder.newSetBinder(binder(), CapabilityPermissions.class);
-        capabilityPermissionsMultibinder.addBinding().to(DefaultBuiltinCapabilities.class);
-
         bind(BuiltinCapabilities.class).asEagerSingleton();
 
         bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);

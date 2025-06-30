@@ -17,15 +17,11 @@
 package org.graylog.security;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
-import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
-import org.graylog.security.permissions.GRNPermission;
-import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -75,26 +71,18 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
         final ImmutableSet.Builder<Permission> permissionsBuilder = ImmutableSet.builder();
 
         for (GrantDTO grant : grants) {
-            final Optional<CapabilityDescriptor> capability = builtinCapabilities.get(grant.capability());
+            final Set<GRN> targets = resolveTargets(grant.target());
 
-            if (capability.isPresent()) {
-                final Set<GRN> targets = resolveTargets(grant.target());
+            for (GRN target : targets) {
+                final Optional<CapabilityDescriptor> capability = builtinCapabilities.get(grant.capability());
 
-                for (String permission : capability.get().permissions()) {
-                    for (GRN target : targets) {
-                        if (target.isPermissionApplicable(permission)) {
-                            // TODO Find a better way to distinguish between old and new types of permissions
-                            // Possible solution: Don't use strings for the constants
-                            if (permission.equals(RestPermissions.ENTITY_OWN)) {
-                                permissionsBuilder.add(GRNPermission.create(permission, target));
-                            } else {
-                                permissionsBuilder.add(new CaseSensitiveWildcardPermission(permission + ":" + target.entity()));
-                            }
-                        }
-                    }
+                if (capability.isPresent()) {
+                    capability.get()
+                            .permissionsFor(target.grnType())
+                            .forEach(permission -> permissionsBuilder.add(permission.toShiroPermission(target)));
+                } else {
+                    logger.warn("Couldn't find capability <{}>", grant.capability());
                 }
-            } else {
-                logger.warn("Couldn't find capability <{}>", grant.capability());
             }
         }
 

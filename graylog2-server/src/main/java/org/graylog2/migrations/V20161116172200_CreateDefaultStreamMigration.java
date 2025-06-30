@@ -16,8 +16,7 @@
  */
 package org.graylog2.migrations;
 
-import com.google.common.collect.ImmutableMap;
-import org.bson.types.ObjectId;
+import jakarta.inject.Inject;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -30,11 +29,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * Migration creating the default stream if it doesn't exist.
@@ -69,19 +64,18 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
     private void createDefaultStream() {
         final IndexSet indexSet = indexSetRegistry.getDefault();
 
-        final ObjectId id = new ObjectId(Stream.DEFAULT_STREAM_ID);
-        final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
-                .put(StreamImpl.FIELD_TITLE, "Default Stream")
-                .put(StreamImpl.FIELD_DESCRIPTION, "Contains messages that are not explicitly routed to other streams")
-                .put(StreamImpl.FIELD_DISABLED, false)
-                .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
-                .put(StreamImpl.FIELD_CREATOR_USER_ID, "local:admin")
-                .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
-                .put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false)
-                .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
-                .put(StreamImpl.FIELD_INDEX_SET_ID, indexSet.getConfig().id())
+        final Stream stream = StreamImpl.builder()
+                .id(Stream.DEFAULT_STREAM_ID)
+                .title("Default Stream")
+                .description("Contains messages that are not explicitly routed to other streams")
+                .disabled(false)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .creatorUserId("local:admin")
+                .matchingType(StreamImpl.MatchingType.DEFAULT)
+                .removeMatchesFromDefaultStream(false)
+                .isDefault(true)
+                .indexSetId(indexSet.getConfig().id())
                 .build();
-        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), indexSet);
 
         try {
             streamService.save(stream);

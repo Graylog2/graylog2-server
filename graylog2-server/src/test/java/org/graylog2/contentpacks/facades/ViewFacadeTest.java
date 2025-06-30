@@ -77,7 +77,7 @@ import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -230,7 +230,7 @@ public class ViewFacadeTest {
     @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldCreateADTOFromAnEntity() throws Exception {
-        final StreamImpl stream = new StreamImpl(Collections.emptyMap());
+        final StreamMock stream = new StreamMock(Collections.emptyMap());
         final Entity viewEntity = createViewEntity();
         final Map<EntityDescriptor, Object> nativeEntities = Map.of(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),

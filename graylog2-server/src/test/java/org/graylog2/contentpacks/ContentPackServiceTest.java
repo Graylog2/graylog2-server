@@ -133,6 +133,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -228,7 +229,7 @@ public class ContentPackServiceTest {
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar),
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
-                );
+        );
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService);
 
         Map<String, String> entityData = new HashMap<>(2);
@@ -383,35 +384,32 @@ public class ContentPackServiceTest {
 
     @Test
     public void resolveEntitiesWithTransitiveDependencies() throws NotFoundException {
-        final StreamMock streamMock = new StreamMock(ImmutableMap.of(
-                "_id", "stream-1234",
-                StreamImpl.FIELD_TITLE, "Stream Title")) {
-            @Override
-            public Set<Output> getOutputs() {
-                return Collections.singleton(
-                        OutputImpl.create(
-                                "output-1234",
-                                "Output Title",
-                                "org.example.outputs.SomeOutput",
-                                "admin",
-                                Collections.emptyMap(),
-                                new Date(0L),
-                                null
-                        )
-                );
-            }
-        };
+        final ObjectId streamId = ObjectId.get();
+        final ObjectId outputId = ObjectId.get();
+        final StreamMock streamMock = new StreamMock(streamId,
+                ImmutableMap.of(
+                        StreamImpl.FIELD_TITLE, "Stream Title"),
+                List.of(),
+                Set.of(OutputImpl.create(
+                        outputId.toHexString(),
+                        "Output Title",
+                        "org.example.outputs.SomeOutput",
+                        "admin",
+                        Collections.emptyMap(),
+                        new Date(0L),
+                        null
+                )), null);
 
-        when(streamService.load("stream-1234")).thenReturn(streamMock);
+        when(streamService.load(streamId.toHexString())).thenReturn(streamMock);
 
         final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1)
+                EntityDescriptor.create(streamId.toHexString(), ModelTypes.STREAM_V1)
         );
 
         final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
         assertThat(resolvedEntities).containsOnly(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1),
-                EntityDescriptor.create("output-1234", ModelTypes.OUTPUT_V1)
+                EntityDescriptor.create(streamId.toHexString(), ModelTypes.STREAM_V1),
+                EntityDescriptor.create(outputId.toHexString(), ModelTypes.OUTPUT_V1)
         );
     }
 
@@ -430,7 +428,7 @@ public class ContentPackServiceTest {
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSuccess).isEqualTo(expectSuccess);
 
-       /* Test skipped uninstall */
+        /* Test skipped uninstall */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 2);
         ContentPackUninstallation expectSkip = ContentPackUninstallation.builder()
                 .skippedEntities(nativeEntityDescriptors)
@@ -620,7 +618,7 @@ public class ContentPackServiceTest {
         );
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId(id);
-        return new StreamImpl(streamId, streamFields, streamRules, outputs, null);
+        return new StreamMock(streamId, streamFields, streamRules, outputs, null);
     }
 
     private EventDefinitionDto createTestEventDefinitionDto() {

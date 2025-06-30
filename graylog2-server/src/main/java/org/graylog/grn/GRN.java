@@ -18,7 +18,6 @@ package org.graylog.grn;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
-import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Locale;
@@ -52,14 +51,6 @@ public abstract class GRN {
     public abstract String entity();
 
     public abstract GRNType grnType();
-
-    public boolean isPermissionApplicable(String permission) {
-        // ENTITY_OWN is applicable to any target
-        return permission.startsWith(RestPermissions.ENTITY_OWN) ||
-                permission.startsWith(grnType().permissionPrefix()) ||
-                // TODO Dashboard code still uses `view:` permissions
-                (grnType().equals(GRNTypes.DASHBOARD) && permission.startsWith(GRNTypes.SEARCH.permissionPrefix()));
-    }
 
     static GRN parse(String grn, GRNRegistry grnRegistry) {
         final List<String> tokens = SPLITTER.splitToList(grn.toLowerCase(Locale.ENGLISH));
