@@ -20,8 +20,8 @@ import ActionDropdown from 'views/components/common/ActionDropdown';
 import { IconButton } from 'components/common';
 
 const WidgetActionDropdown = ({
-  children,
-  onChange,
+  children = undefined,
+  onChange = undefined,
 }: React.PropsWithChildren<{ onChange?: (isOpen: boolean) => void }>) => {
   const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
 
