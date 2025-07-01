@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -50,7 +50,7 @@ import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
-import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
+import { widgetActionsMenuClass, widgetActionDropdownOpenClass } from 'views/components/widgets/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -64,14 +64,11 @@ import IfDashboard from '../dashboard/IfDashboard';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
-const Container = styled.div<{ $dropdownIsOpen: boolean }>(
-  ({ $dropdownIsOpen }) => css`
-    ${$dropdownIsOpen ? '&& { display: block; }' : ''}
-    > *:not(:last-child) {
-      margin-right: 2px;
-    }
-  `,
-);
+const Container = styled.div`
+  > *:not(:last-child) {
+    margin-right: 2px;
+  }
+`;
 
 const _onCopyToDashboard = async (
   view: View,
@@ -241,7 +238,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className={widgetActionsMenuClass} $dropdownIsOpen={dropdownIsOpen}>
+    <Container className={`${widgetActionsMenuClass} ${dropdownIsOpen ? widgetActionDropdownOpenClass : ''}`}>
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton
