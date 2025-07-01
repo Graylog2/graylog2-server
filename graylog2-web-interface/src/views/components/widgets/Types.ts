@@ -49,7 +49,6 @@ export type WidgetMenuActionComponentProps = {
   disabled?: boolean;
   widget: Widget;
   contexts?: Contexts;
-  onToggleDropdown: () => void;
 };
 
 export type WidgetMenuActionType = {

@@ -25,18 +25,11 @@ type Props = {
   element: React.ReactNode;
   'data-testid'?: string;
   header?: string;
-  onChange?: (isOpen: boolean) => void;
 };
 
-const ActionDropdown = ({
-  children,
-  element,
-  'data-testid': dataTestid = undefined,
-  header = 'Actions',
-  onChange = undefined,
-}: Props) => (
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefined, header = 'Actions' }: Props) => (
   <StopPropagation data-testid={dataTestid}>
-    <Menu position="bottom" withinPortal zIndex={1051} onChange={onChange}>
+    <Menu position="bottom" withinPortal zIndex={1051}>
       <Menu.Target>{element}</Menu.Target>
       <Menu.Dropdown>
         <MenuItem header>{header}</MenuItem>

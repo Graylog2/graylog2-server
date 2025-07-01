@@ -20,23 +20,11 @@ import type { WidgetMenuActionComponentProps } from 'views/components/widgets/Ty
 import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
 import useWidgetExportActionComponent from 'views/components/widgets/useWidgetExportActionComponent';
 
-const ExportWidgetActionDelegate = ({
-  widget,
-  contexts,
-  disabled,
-  onToggleDropdown,
-}: WidgetMenuActionComponentProps) => {
+const ExportWidgetActionDelegate = ({ widget, contexts, disabled }: WidgetMenuActionComponentProps) => {
   const ExportActionComponent = useWidgetExportActionComponent(widget);
   if (!ExportActionComponent) return <ExportWidgetPlug />;
 
-  return (
-    <ExportActionComponent
-      widget={widget}
-      contexts={contexts}
-      disabled={disabled}
-      onToggleDropdown={onToggleDropdown}
-    />
-  );
+  return <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} />;
 };
 
 export default ExportWidgetActionDelegate;

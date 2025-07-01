@@ -50,7 +50,7 @@ import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
-import { widgetActionsMenuClass, widgetActionDropdownOpenClass } from 'views/components/widgets/Constants';
+import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -66,6 +66,8 @@ import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
   line-height: 0;
+  top: 0;
+  right: 0;
 
   > *:not(:last-child) {
     margin-right: 2px;
@@ -169,11 +171,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
-  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
-
-  const onToggleDropdown = useCallback(() => {
-    setDropdownIsOpen((cur) => !cur);
-  }, []);
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
@@ -240,7 +237,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className={`${widgetActionsMenuClass} ${dropdownIsOpen ? widgetActionDropdownOpenClass : ''}`}>
+    <Container className={widgetActionsMenuClass}>
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton
@@ -252,7 +249,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             parameters={parameters}
           />
         </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} onToggleDropdown={onToggleDropdown} />
+        <ExtraMenuWidgetActions widget={widget} />
         {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
         {!isFocused && (
           <>
@@ -268,7 +265,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
         <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
 
-        <WidgetActionDropdown onChange={setDropdownIsOpen}>
+        <WidgetActionDropdown>
           <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <IfSearch>
             <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>

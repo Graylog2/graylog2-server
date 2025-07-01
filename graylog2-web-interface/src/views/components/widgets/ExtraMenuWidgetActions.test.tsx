@@ -27,11 +27,9 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraMenuWidgetActions = ({
-  ...props
-}: Omit<React.ComponentProps<typeof OriginalExtraMenuWidgetActions>, 'onToggleDropdown'>) => (
+const ExtraMenuWidgetActions = ({ ...props }: React.ComponentProps<typeof OriginalExtraMenuWidgetActions>) => (
   <TestStoreProvider>
-    <OriginalExtraMenuWidgetActions onToggleDropdown={() => {}} {...props} />
+    <OriginalExtraMenuWidgetActions {...props} />
   </TestStoreProvider>
 );
 
