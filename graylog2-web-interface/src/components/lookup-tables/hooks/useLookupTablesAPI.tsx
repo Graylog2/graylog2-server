@@ -15,12 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { SearchParams } from 'stores/PaginationTypes';
-import { fetchPaginatedLookupTables, fetchErrors } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+import {
+  fetchPaginatedLookupTables,
+  fetchPaginatedDataAdapters,
+  fetchErrors,
+} from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
-
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+export function useFetchDataAdapters() {
+  return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
 }
 
 export function useFetchErrors() {

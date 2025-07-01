@@ -34,7 +34,8 @@ export { default as CacheCreate } from './CacheCreate';
 export { default as CachePicker } from './CachePicker';
 export { default as CachesContainer } from './CachesContainer';
 
-export { default as DataAdaptersOverview } from './DataAdaptersOverview';
+// export { default as DataAdaptersOverview } from './DataAdaptersOverview';
+export { default as DataAdaptersOverview } from './adapter-list';
 
 export { default as DataAdapterTableEntry } from './DataAdapterTableEntry';
 export { default as DataAdapter } from './DataAdapter';

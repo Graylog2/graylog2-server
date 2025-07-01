@@ -15,13 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { SearchParams } from 'stores/PaginationTypes';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table/utils';
+import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 
 export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
   const { page, pageSize, query } = searchParams;
 
   return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
+};
+
+export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => {
+  const { page, pageSize, query } = searchParams;
+
+  return LookupTableDataAdaptersActions.searchPaginated(page, pageSize, query).then(deserializeDataAdapters);
 };
 
 export const fetchErrors = async ({
