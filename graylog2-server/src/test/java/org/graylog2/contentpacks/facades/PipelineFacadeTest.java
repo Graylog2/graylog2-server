@@ -232,6 +232,7 @@ public class PipelineFacadeTest {
                 return Stream.DEFAULT_STREAM_ID;
             }
         };
+        when(streamService.getSystemStreamIds(true)).thenReturn(Stream.ALL_SYSTEM_STREAM_IDS);
         when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(fakeDefaultStream);
 
         final Map<EntityDescriptor, Object> nativeEntities = Collections.emptyMap();
