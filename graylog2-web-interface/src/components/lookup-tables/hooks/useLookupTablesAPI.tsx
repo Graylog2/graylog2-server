@@ -14,13 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMutation } from '@tanstack/react-query';
+
 import type { SearchParams } from 'stores/PaginationTypes';
-import { fetchPaginatedLookupTables, fetchErrors } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import UserNotification from 'util/UserNotification';
+
+import { fetchPaginatedLookupTables, deleteLookupTable, fetchErrors } from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function useDeleteLookupTable() {
+  const { refetch } = useTableFetchContext();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: deleteLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Lookup table deleted successfully');
+      refetch();
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    deleteLookupTable: mutateAsync,
+    deletingLookupTable: isPending,
+  };
 }
 
 export function useFetchErrors() {

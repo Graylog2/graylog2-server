@@ -16,8 +16,14 @@
  */
 import * as React from 'react';
 
-import { MenuItem, DeleteMenuItem, DropdownButton } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
+import { Icon, Spinner } from 'components/common';
+import useScopePermissions from 'hooks/useScopePermissions';
+import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
 import type { LookupTableEntity } from './types';
 
@@ -26,12 +32,49 @@ type ActionsProps = {
 };
 
 function Actions({ lut }: ActionsProps) {
+  const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
+  const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
+  const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
+
+  const handleEdit = React.useCallback(() => {
+    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
+  }, [history, lut.name]);
+
+  const handleDelete = React.useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
+      app_pathname: 'lut',
+      app_section: 'lut',
+    });
+
+    deleteLookupTable(lut.id).then(() => setShowDeleteModal(false));
+  }, [lut.id, sendTelemetry, deleteLookupTable]);
+
+  if (loadingScopePermissions) return <Spinner text="" />;
+
+  if (!scopePermissions.is_mutable) return null;
+
   return (
-    <DropdownButton bsStyle="transparent" title={<Icon name="more_horiz" size="lg" />} id={lut.id} noCaret pullRight>
-      <MenuItem>Edit</MenuItem>
-      <MenuItem divider />
-      <DeleteMenuItem>Delete</DeleteMenuItem>
-    </DropdownButton>
+    <>
+      <DropdownButton bsStyle="transparent" title={<Icon name="more_horiz" size="lg" />} id={lut.id} noCaret pullRight>
+        <MenuItem onSelect={handleEdit}>Edit</MenuItem>
+        <MenuItem divider />
+        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
+      </DropdownButton>
+      {showDeleteModal && (
+        <BootstrapModalConfirm
+          showModal
+          title="Delete Lookup Table"
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+          cancelButtonDisabled={deletingLookupTable}
+          confirmButtonDisabled={deletingLookupTable}
+          confirmButtonText="Delete">
+          <p>Are you sure you want to delete lookup table &quot;{lut.title}&quot;?</p>
+        </BootstrapModalConfirm>
+      )}
+    </>
   );
 }
 
