@@ -1,10 +1,24 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog.integrations.aws.codecs.KinesisRawLogCodec;
 import org.graylog.integrations.dbconnector.external.model.DBConnectorEndpoints;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -19,14 +33,16 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.INCREMENT;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.TIMESTAMP;
@@ -48,9 +64,8 @@ public class DBConnectorInput extends MessageInput {
     public static final String CK_TABLE_NAME = "table_name";
     public static final String CK_STATE_FIELD_TYPE = "state_field_type";
     public static final String CK_STATE_FILED = "state_field";
-    public static final String CK_MONGO_DATABASE_NAME = "mongo_database_name";
+    public static final String CK_TIMEZONE = "timezone";
     public static final String CK_MONGO_COLLECTION_NAME = "mongo_collection_name";
-    public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
     public static final String CK_OVERRIDE_SOURCE = "override_source";
     private final NotificationService notificationService;
 
@@ -112,6 +127,10 @@ public class DBConnectorInput extends MessageInput {
             Map<String, String> stateFieldType = new HashMap<>();
             stateFieldType.put(TIMESTAMP, TIMESTAMP);
             stateFieldType.put(INCREMENT, INCREMENT);
+            Set<String> zones = DateTimeZone.getAvailableIDs();
+            Map<String, String> timezones = zones.stream()
+                    .collect(Collectors.toMap(zone -> zone, zone -> zone));
+
             addConnectionFields(request);
             request.addField(new DropdownField(
                     CK_DATABASE_TYPE,
@@ -137,6 +156,13 @@ public class DBConnectorInput extends MessageInput {
                     "State Field Type",
                     TIMESTAMP,
                     stateFieldType,
+                    ConfigurationField.Optional.NOT_OPTIONAL));
+            request.addField(new DropdownField(
+                    CK_TIMEZONE,
+                    "Timezone",
+                    "UTC",
+                    timezones,
+                    "Select the timezone used by the source database for storing timestamp values.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
             request.addField(new TextField(
                     CK_STATE_FILED,

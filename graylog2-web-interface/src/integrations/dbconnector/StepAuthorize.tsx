@@ -1,4 +1,20 @@
-import React, { useContext, useState } from "react";
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React, { useEffect, useContext, useState } from "react";
 import { qualifyUrl } from "util/URLUtils";
 import fetch from "logic/rest/FetchProvider";
 
@@ -6,7 +22,6 @@ import styled from 'styled-components';
 
 import type {
   ErrorMessageType,
-  HandleFieldUpdateType,
   FormDataContextType,
   HandleSubmitType,
 } from '../common/utils/types';
@@ -25,7 +40,7 @@ const FieldRow = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 0px;
 `;
 
 const FieldColumn = styled.div`
@@ -36,7 +51,16 @@ const FieldColumn = styled.div`
 
 type StepAuthorizeProps = {
   onSubmit: HandleSubmitType;
-  onChange: HandleFieldUpdateType;
+  onChange: (...args: any[]) => void;
+};
+
+const defaultPorts = {
+  Oracle: '1521',
+  MySQL: '3306',
+ 'Microsoft SQL': '1433',
+  MongoDB: '27017',
+  DB2: '50000',
+  PostgreSQL: '5432',
 };
 
 const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
@@ -53,6 +77,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
     { label: 'DB2', value: 'DB2' },
     { label: 'PostgreSQL', value: 'PostgreSQL' },
   ];
+  const selectedDbType = formData.dbType?.value;
 
   const testButtonText = 'Run Test';
   const handleSubmit = () => {
@@ -124,7 +149,17 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
     formData
   );
 
-  const selectedDbType = formData?.dbType?.value;
+  useEffect(() => {
+    if (selectedDbType && defaultPorts[selectedDbType]) {
+      onChange({
+        target: {
+          name: 'port',
+          value: defaultPorts[selectedDbType],
+        },
+      });
+    }
+  }, [selectedDbType]);
+
 
 
   return (
@@ -148,6 +183,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         buttonContent="Verify Connection &amp; Proceed"
         disabled={isFormValid}
         title=""
+        className="col-md-7"
         error={formError}
         description="">
 
@@ -197,7 +233,9 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
               required
             />
           </FieldColumn>
+        </FieldRow>
 
+        <FieldRow>
           <FieldColumn>
             <ValidatedInput
               id="databaseName"
@@ -210,6 +248,32 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
             />
           </FieldColumn>
 
+          <FieldColumn>
+            {selectedDbType === "MongoDB" ? (
+              <ValidatedInput
+                id="mongoCollectionName"
+                type="text"
+                onChange={onChange}
+                fieldData={formData.mongoCollectionName}
+                help="The collection name of the Mongo database"
+                label="MongoDB Collection Name"
+                required
+              />
+            ) : (
+              <ValidatedInput
+                id="tableName"
+                type="text"
+                onChange={onChange}
+                fieldData={formData.tableName}
+                help="Name of the table containing the logs"
+                label="Table Name"
+                required
+              />
+            )}
+          </FieldColumn>
+        </FieldRow>
+
+        <FieldRow>
           <FieldColumn>
             <ValidatedInput
               id="username"
@@ -234,63 +298,6 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
             />
           </FieldColumn>
         </FieldRow>
-
-        {selectedDbType === "MongoDB" && (
-          <>
-            <ValidatedInput
-              id="mongoCollectionName"
-              type="text"
-              onChange={onChange}
-              fieldData={formData.mongoCollectionName}
-              help="The collection name of the Mongo database"
-              label="MongoDB Collection Name"
-              required
-            />
-          </>
-        )}
-
-        {selectedDbType && selectedDbType !== "MongoDB" && (
-          <ValidatedInput
-            id="tableName"
-            type="text"
-            onChange={onChange}
-            fieldData={formData.tableName}
-            help="Name of the table containing the logs"
-            label="Table Name"
-            required
-          />
-        )}
-
-        {/* {logTypeVal === "MongoDB" &&
-
-          <>
-            <ValidatedInput id="mongoDatabaseName"
-              type="text"
-              onChange={onChange}
-              fieldData={formData.mongoDatabaseName}
-              help="The Database name of the Mongo repository"
-              label="Mongo Database Name"
-              required />
-            <ValidatedInput id="mongoCollectionName"
-              type="text"
-              onChange={onChange}
-              fieldData={formData.mongoCollectionName}
-              help="The collection name of the Mongo database"
-              label="MongoDB Collection Name"
-              required />
-
-          </>
-
-        }
-        {logTypeVal && logTypeVal != "MongoDB" &&
-          <ValidatedInput id="tableName"
-            type="text"
-            onChange={onChange}
-            fieldData={formData.tableName}
-            help="Name of the table containing the logs"
-            label="Table Name"
-            required />
-        } */}
 
         <ControlLabel>Test Connection <small className="text-muted">(Optional)</small></ControlLabel>
         <FormControl.Static>

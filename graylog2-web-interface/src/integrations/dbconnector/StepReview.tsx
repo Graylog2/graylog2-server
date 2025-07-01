@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, DefaultTheme } from 'styled-components';
@@ -105,12 +121,28 @@ const StepReview = ({ onSubmit, externalInputSubmit }: Props) => {
             <span>{formData.dbType.value}</span>
           </li>
           <li>
+            <strong>Hostname: </strong>
+            <span>{formData.hostname.value}</span>
+          </li>
+          <li>
+            <strong>Database Name: </strong>
+            <span>{formData.databaseName.value}</span>
+          </li>
+          <li>
+            <strong>Username: </strong>
+            <span>{formData.username.value}</span>
+          </li>
+          <li>
             <strong>State Field: </strong>
             <span>{formData.stateField.value}</span>
           </li>
           <li>
             <strong>State Field Type: </strong>
             <span>{formData.stateFieldType.value}</span>
+          </li>
+          <li>
+            <strong>Timezone: </strong>
+            <span>{formData.timezone.value}</span>
           </li>
           <li>
             <strong>Override Source: </strong>

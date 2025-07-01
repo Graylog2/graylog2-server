@@ -1,23 +1,45 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector;
 
-public class DBConnectorUtils {
-    public static String buildConnectionString(String dbType, String hostname, int port, String dbName,
-                                         String username, String password) {
-        return switch (dbType.toLowerCase()) {
-            case "postgresql" -> String.format("jdbc:postgresql://%s:%s/%s?user=%s&password=%s",
-                    hostname, port, dbName, username, password);
-            case "mysql" -> String.format("jdbc:mysql://%s:%s/%s?user=%s&password=%s",
-                    hostname, port, dbName, username, password);
-            case "oracle" -> String.format("jdbc:oracle:thin:%s/%s@//%s:%s/%s",
-                    username, password, hostname, port, dbName);
-            case "sqlserver" -> String.format("jdbc:sqlserver://%s:%s;databaseName=%s;user=%s;password=%s",
-                    hostname, port, dbName, username, password);
-            case "db2" -> String.format("jdbc:db2://%s:%s/%s:user=%s;password=%s;",
-                    hostname, port, dbName, username, password);
-            case "mongodb" ->
-                    String.format("mongodb://%s:%s/%s", hostname, port, dbName); // Optional: add user/pass if needed
+import org.graylog.integrations.dbconnector.external.model.DBConnectorEndpoints;
 
-            default -> throw new IllegalArgumentException("Unsupported DB type: " + dbType);
+public class DBConnectorUtils {
+    public static String buildConnectionString(DBConnectorEndpoints dbType, String hostname, int port,
+                                               String dbName, String username, String password) {
+        return switch (dbType) {
+            case POSTGRESQL -> String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s",
+                    hostname, port, dbName, username, password);
+
+            case MYSQL -> String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
+                    hostname, port, dbName, username, password);
+
+            case ORACLE -> String.format("jdbc:oracle:thin:%s/%s@//%s:%d/%s",
+                    username, password, hostname, port, dbName);
+
+            case MICROSOFT_SQL -> String.format("jdbc:sqlserver://%s:%d;databaseName=%s;user=%s;password=%s",
+                    hostname, port, dbName, username, password);
+
+            case DB2 -> String.format("jdbc:db2://%s:%d/%s:user=%s;password=%s;",
+                    hostname, port, dbName, username, password);
+
+            case MONGODB -> String.format("mongodb://%s:%s@%s:%d/%s", username, password,
+                    hostname, port, dbName);
+
         };
     }
 }

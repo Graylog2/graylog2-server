@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,8 +32,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -26,14 +40,11 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DBConnectorCodecTest {
-    // Code Under Test
     DBConnectorCodec cut;
 
-    // Mock Objects
     @Mock
     Configuration mockConfiguration;
 
-    // Test Objects
     ObjectMapper mapper = new ObjectMapper();
     RawMessage rawMessage;
     Message message;
@@ -50,86 +61,57 @@ public class DBConnectorCodecTest {
     @Test(expected = NullPointerException.class)
     public void decode_throwsException_whenNullMessageProvided() throws MisfireException {
         givenNullRawMessage();
-
         whenDecodeIsCalled();
     }
 
     @Test
-    public void decode_returnsSignInLog() throws Exception {
+    public void decode_returnsSampleLog() {
         givenLogs();
-
         whenDecodeIsCalled();
-
         thenMessageFieldIs("app", "contenttypes");
 
     }
 
     @Test
-    public void decode_storesFullMessage_whenStoreFullMessageConfigFlagSet() throws Exception {
+    public void test_decode_when_OverrideSourceIsNotConfigured() {
+        givenGoodConfiguration();
         givenLogs();
-        givenStoreFullMessage(true);
-
         whenDecodeIsCalled();
-
-        thenFullMessageIsStored();
+        assertEquals(message.getSource(), "localhost | test_db | test_table");
     }
 
     @Test
-    public void decode_doesNotStoreFullMessage_whenStoreFullMessageConfigFalse() throws Exception {
+    public void test_decode_when_OverrideSourceIsConfigured() {
+        givenGoodConfiguration();
+        givenOverrideSource();
         givenLogs();
-        givenStoreFullMessage(false);
-
         whenDecodeIsCalled();
-
-        thenFullMessageNotStored();
+        assertEquals(message.getSource(), "testSource");
     }
 
-    @Test
-    public void testPostgresParsing() {
-        given(mockConfiguration.getString(DBConnectorInput.CK_TABLE_NAME)).willReturn("users");
-        String connStr = "jdbc:postgresql://192.168.40.222:5432/mydatabase?user=nithin&password=Loginsoft@123";
-        String result = cut.getSourceFromConnectionString(connStr);
-        assertEquals("192.168.40.222|mydatabase|users", result);
-    }
-
-    @Test
-    public void testSqlServerParsing() {
-        given(mockConfiguration.getString(DBConnectorInput.CK_TABLE_NAME)).willReturn("users");
-        String connStr = "jdbc:sqlserver://192.168.40.222:1433;databaseName=master;user=SA;password=Loginsoft@123";
-        String result = cut.getSourceFromConnectionString(connStr);
-        assertEquals("192.168.40.222|master|users", result);
-    }
-
-    @Test
-    public void testDb2Parsing() {
-        given(mockConfiguration.getString(DBConnectorInput.CK_TABLE_NAME)).willReturn("users");
-        String connStr = "jdbc:db2://192.168.40.222:50000/TESTDB:user=db2inst1;password=Loginsoft@123;";
-        String result = cut.getSourceFromConnectionString(connStr);
-        assertEquals("192.168.40.222|TESTDB|users", result);
-    }
-
-    @Test
-    public void testMongoParsing() {
-        given(mockConfiguration.getString(DBConnectorInput.CK_MONGO_COLLECTION_NAME)).willReturn("users");
-        String connStr = "mongodb://user:pass@localhost:27017/mydb";
-        String result = cut.getSourceFromConnectionString(connStr);
-        assertEquals("localhost|mydb|users", result);
-    }
 
     // GIVENs
     private void givenNullRawMessage() {
         rawMessage = null;
     }
 
-    private void givenLogs()  {
+    private void givenLogs() {
         rawMessage = new RawMessage("{\"_id\": {\"$oid\": \"6061d63407838e1803685a09\"}, \"id\": 1, \"app\": \"contenttypes\", \"name\": \"0001_initial\", \"applied\": {\"$date\": 1617024564527}}".getBytes(StandardCharsets.UTF_8));
         NodeId nodeId = mock(NodeId.class);
         given(nodeId.getNodeId()).willReturn("test-node-id");
         rawMessage.addSourceNode("InputId", nodeId);
 
     }
-    private void givenStoreFullMessage(boolean storeFull) {
-        given(mockConfiguration.getBoolean(DBConnectorInput.CK_STORE_FULL_MESSAGE)).willReturn(storeFull);
+
+    private void givenGoodConfiguration() {
+        given(mockConfiguration.getString(DBConnectorInput.CK_HOSTNAME)).willReturn("localhost");
+        given(mockConfiguration.getString(DBConnectorInput.CK_DATABASE_NAME)).willReturn("test_db");
+        given(mockConfiguration.getString(DBConnectorInput.CK_TABLE_NAME)).willReturn("test_table");
+        given(mockConfiguration.getString(DBConnectorInput.CK_MONGO_COLLECTION_NAME)).willReturn("test_collection");
+    }
+
+    private void givenOverrideSource() {
+        given(mockConfiguration.getString(DBConnectorInput.CK_OVERRIDE_SOURCE)).willReturn("testSource");
     }
 
     // WHENs
@@ -141,15 +123,5 @@ public class DBConnectorCodecTest {
     private void thenMessageFieldIs(String field, String value) {
         assertThat(message.getFieldAs(String.class, field), is(value));
     }
-
-
-    private void thenFullMessageIsStored() {
-        assertThat(message.getField("full_message"), notNullValue());
-    }
-
-    private void thenFullMessageNotStored() {
-        assertThat(message.getField("full_message"), nullValue());
-    }
-
 
 }

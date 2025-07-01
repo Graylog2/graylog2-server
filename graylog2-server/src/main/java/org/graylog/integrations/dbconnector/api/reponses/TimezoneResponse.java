@@ -14,29 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.integrations.dbconnector.api.requests;
+package org.graylog.integrations.dbconnector.api.reponses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
+
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@JsonDeserialize(builder = DBConnectorRequestImpl.Builder.class)
-public abstract class DBConnectorRequestImpl implements DBConnectorRequest {
+@WithBeanGetter
+public abstract class TimezoneResponse {
 
-    public static Builder builder() {
-        return Builder.create();
-    }
+    private static final String REGIONS = "regions";
+    private static final String TOTAL = "total";
 
-    @AutoValue.Builder
-    public static abstract class Builder implements DBConnectorRequest.Builder<Builder> {
-        @JsonCreator
-        public static Builder create() {
-            return new AutoValue_DBConnectorRequestImpl.Builder();
-        }
+    @JsonProperty(REGIONS)
+    public abstract Set<String> regions();
 
-        public abstract DBConnectorRequestImpl build();
+    @JsonProperty(TOTAL)
+    public abstract long total();
+
+    public static TimezoneResponse create(@JsonProperty(REGIONS) Set<String> regions,
+                                          @JsonProperty(TOTAL) long total) {
+        return new AutoValue_TimezoneResponse(regions, total);
     }
 }

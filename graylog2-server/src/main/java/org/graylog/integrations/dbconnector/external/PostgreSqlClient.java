@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector.external;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +53,7 @@ import static org.graylog.integrations.dbconnector.DBConnectorProperty.TEST_QUER
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.TIMESTAMP;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.WHERE_CLAUSE;
 
-public class PostgreSqlClient implements DBConnectorClient{
+public class PostgreSqlClient implements DBConnectorClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(PostgreSqlClient.class);
     private Connection connection;
@@ -58,7 +74,7 @@ public class PostgreSqlClient implements DBConnectorClient{
             ResultSet rs = stmt.executeQuery();
             ResultSetMetaData result = rs.getMetaData();
             int columnsNumber = result.getColumnCount();
-            int count = 1;
+            int count = 0;
             while (rs.next()) {
                 Map<Object, Object> map = new HashMap<>();
                 for (int i = 1; i <= columnsNumber; i++) {
@@ -138,11 +154,7 @@ public class PostgreSqlClient implements DBConnectorClient{
         Pattern valid = Pattern.compile("[^a-z0-9]", Pattern.CASE_INSENSITIVE);
         Matcher matcher = valid.matcher(param);
         if (matcher.find()) {
-            if (dto.databaseType().equals(POSTGRES)) {
-                return "\"" + param + "\"";
-            } else if (dto.databaseType().equals(MYSQL)) {
-                return "`" + param + "`";
-            }
+            return "\"" + param + "\"";
         }
         return param;
     }

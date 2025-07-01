@@ -1,13 +1,29 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.integrations.dbconnector.external.DBConnectorClient;
 import org.graylog.integrations.dbconnector.external.DBConnectorTransferObject;
+import org.graylog.integrations.dbconnector.external.model.DBConnectorEndpoints;
 import org.graylog2.inputs.persistence.InputStatusRecord;
 import org.graylog2.inputs.persistence.InputStatusService;
 import org.graylog2.plugin.InputFailureRecorder;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +32,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +48,7 @@ import static org.graylog.integrations.dbconnector.DBConnectorInput.CK_PORT;
 import static org.graylog.integrations.dbconnector.DBConnectorInput.CK_STATE_FIELD_TYPE;
 import static org.graylog.integrations.dbconnector.DBConnectorInput.CK_STATE_FILED;
 import static org.graylog.integrations.dbconnector.DBConnectorInput.CK_TABLE_NAME;
+import static org.graylog.integrations.dbconnector.DBConnectorInput.CK_TIMEZONE;
 import static org.graylog.integrations.dbconnector.DBConnectorInput.CK_USERNAME;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.DB_CONNECTOR_OFFSET;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.MONGODB;
@@ -84,11 +101,11 @@ public class DBConnectorPollerTask implements Runnable {
         final String databaseName = input.getConfiguration().getString(CK_DATABASE_NAME);
         final String username = input.getConfiguration().getString(CK_USERNAME);
         final String password = input.getConfiguration().getString(CK_PASSWORD);
+        final String timezone = input.getConfiguration().getString(CK_TIMEZONE, "UTC");
 
-        boolean isMongoDb = MONGODB.equalsIgnoreCase(dbType);
         LOG.debug("Input [{}] :: Executing Database PollerTask", input.getId());
-        String connectionString = DBConnectorUtils.buildConnectionString(dbType, hostname, port,
-                databaseName, username, password);
+        String connectionString = DBConnectorUtils.buildConnectionString(
+                DBConnectorEndpoints.getEnum(dbType), hostname, port, databaseName, username, password);
         dbConnectorClient.getConnection(connectionString);
         String stateFieldType = input.getConfiguration().getString(CK_STATE_FIELD_TYPE);
         String stateField = input.getConfiguration().getString(CK_STATE_FILED);
@@ -101,44 +118,29 @@ public class DBConnectorPollerTask implements Runnable {
 
         int processedRecordCount = 0;
 
-        // Initialize startTime, endTime, defaultStartTime, offset depending on DB type
-        Object startTime = null;
-        Object endTime;
-        Object defaultStartTime;
+        ZoneId zoneId = ZoneId.of(timezone);
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        Timestamp defaultStartTime = Timestamp.from(now.minusHours(1).toInstant());
+        Timestamp endTime = Timestamp.from(now.toInstant());
+        Timestamp startTime = null;
+
         long offset = 0;
         List<String> fetchedRecords;
 
-        if (isMongoDb) {
-            endTime = Date.from(Instant.now());
-            defaultStartTime = Date.from(Instant.now().minus(1, ChronoUnit.DAYS));
-            if (stateFieldType.equals(TIMESTAMP)) {
-                startTime = checkpointMap.containsKey(DB_CONNECTOR_OFFSET)
-                        ? Date.from(Instant.parse(checkpointMap.get(DB_CONNECTOR_OFFSET)))
-                        : defaultStartTime;
-            } else {
-                offset = checkpointMap.containsKey(DB_CONNECTOR_OFFSET)
-                        ? Long.parseLong(checkpointMap.get(DB_CONNECTOR_OFFSET))
-                        : 0;
-            }
+        if (stateFieldType.equals(TIMESTAMP)) {
+            startTime = checkpointMap.containsKey(DB_CONNECTOR_OFFSET)
+                    ? parseCheckpointTimestamp(checkpointMap.get(DB_CONNECTOR_OFFSET))
+                    : defaultStartTime;
         } else {
-            endTime = Timestamp.valueOf(Tools.nowUTC().toString().replace('T', ' ').replace("Z", ""));
-            String defaultStartTimeString = Tools.nowUTC().minusHours(24).toString().replace('T', ' ').replace("Z", "");
-            defaultStartTime = Timestamp.valueOf(defaultStartTimeString);
-            if (stateFieldType.equals(TIMESTAMP)) {
-                startTime = checkpointMap.containsKey(DB_CONNECTOR_OFFSET)
-                        ? Timestamp.valueOf(checkpointMap.get(DB_CONNECTOR_OFFSET))
-                        : defaultStartTime;
-            } else {
-                offset = checkpointMap.containsKey(DB_CONNECTOR_OFFSET)
-                        ? Long.parseLong(checkpointMap.get(DB_CONNECTOR_OFFSET))
-                        : 0;
-            }
+            offset = checkpointMap.containsKey(DB_CONNECTOR_OFFSET)
+                    ? Long.parseLong(checkpointMap.get(DB_CONNECTOR_OFFSET))
+                    : 0;
         }
 
         setConfigFields();
 
         dto.stateFieldValue((startTime != null)
-                ? (isMongoDb ? new Timestamp(((Date) startTime).getTime()) : startTime)
+                ? startTime
                 : offset);
 
         fetchedRecords = dbConnectorClient.fetchLogs(dto.build());
@@ -159,12 +161,8 @@ public class DBConnectorPollerTask implements Runnable {
         }
 
         if (stateFieldType.equals(TIMESTAMP)) {
-            if (isMongoDb) {
-                checkpointMap.put(DB_CONNECTOR_OFFSET, ((Date) endTime).toInstant().toString());
-            } else {
-                endTime = !fetchedRecords.isEmpty() ? updateTimestamp(fetchedRecords, stateField) : endTime;
-                checkpointMap.put(DB_CONNECTOR_OFFSET, endTime.toString());
-            }
+            endTime = !fetchedRecords.isEmpty() ? updateTimestamp(fetchedRecords, stateField) : endTime;
+            checkpointMap.put(DB_CONNECTOR_OFFSET, endTime.toString());
         } else {
             offset = !fetchedRecords.isEmpty() ? updateOffset(fetchedRecords, stateField) : 0;
             checkpointMap.put(DB_CONNECTOR_OFFSET, String.valueOf(offset));
@@ -202,30 +200,47 @@ public class DBConnectorPollerTask implements Runnable {
         return checkpoints;
     }
 
-    private Timestamp updateTimestamp(List<String> fetchedRecords, String stateField) throws IOException {
+    private Timestamp parseCheckpointTimestamp(String raw) {
+        try {
+            return Timestamp.from(Instant.parse(raw));
+        } catch (Exception e1) {
+            try {
+                return Timestamp.valueOf(raw);
+            } catch (Exception e2) {
+                throw new IllegalStateException("Unable to parse checkpoint timestamp: " + raw, e2);
+            }
+        }
+    }
 
+    private Timestamp updateTimestamp(List<String> fetchedRecords, String stateField) throws IOException {
         String lastRecord = fetchedRecords.get(fetchedRecords.size() - 1);
         JsonNode root = objectMapper.readTree(lastRecord);
 
         JsonNode targetNode;
-
-        // Handle both array and single object
         if (root.isArray()) {
-            targetNode = root.get(root.size() - 1); // last item in array
+            targetNode = root.get(root.size() - 1);
         } else {
             targetNode = root;
         }
+
         JsonNode timestampNode = targetNode.get(stateField);
-
+        // Handle MongoDB extended JSON format: { "$date": "..." }
+        if (timestampNode != null && timestampNode.isObject() && timestampNode.has("$date")) {
+            timestampNode = timestampNode.get("$date");
+        }
+        if (timestampNode == null || timestampNode.isNull()) {
+            throw new IllegalStateException("Timestamp field '" + stateField + "' not found or is null in record: " + targetNode.toPrettyString());
+        }
+        String rawTimestamp = timestampNode.asText();
         try {
-            String raw = timestampNode.asText();
-            String cleaned = raw.replace('T', ' ')
-                    .replace("Z", "");
-
-            return Timestamp.valueOf(cleaned);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Unable to parse timestamp from state field '"
-                    + stateField + "': " + timestampNode.asText(), e);
+            Instant instant = Instant.parse(rawTimestamp);
+            return Timestamp.from(instant);
+        } catch (Exception e1) {
+            try {
+                return Timestamp.valueOf(rawTimestamp.replace("T", " "));
+            } catch (Exception e2) {
+                throw new IllegalStateException("Unable to parse timestamp from field '" + stateField + "': " + rawTimestamp, e2);
+            }
         }
     }
 

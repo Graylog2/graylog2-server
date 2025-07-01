@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector.external;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,16 +40,12 @@ import static org.graylog.integrations.dbconnector.DBConnectorProperty.CLOSE_DEL
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.COLUMN_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.COUNT_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.DATE_CONDITION;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.DB2;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.FROM;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.LIMIT_CLAUSE;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.LIMIT_RECORDS;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.MYSQL;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.OFFSET_CONDITION;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.ORDER_BY;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.POSTGRES;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.RECORD_COUNT;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.SELECT_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.TEST_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.TIMESTAMP;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.WHERE_CLAUSE;
@@ -59,7 +71,7 @@ public class SQLClient implements DBConnectorClient {
             ResultSet rs = stmt.executeQuery();
             ResultSetMetaData result = rs.getMetaData();
             int columnsNumber = result.getColumnCount();
-            int count = 1;
+            int count = 0;
             while (rs.next()) {
                 Map<Object, Object> map = new HashMap<>();
                 for (int i = 1; i <= columnsNumber; i++) {
@@ -140,10 +152,8 @@ public class SQLClient implements DBConnectorClient {
         Matcher matcher = valid.matcher(param);
         if (matcher.find()) {
             LOG.debug("Parameter contains special characters or spaces: {}", param);
-            if (dto.databaseType().equals(MYSQL)) {
-                return "`" + param + "`";
-            }
-        } else return param;
+            return "`" + param + "`";
+        }
         return param;
     }
 
@@ -166,25 +176,13 @@ public class SQLClient implements DBConnectorClient {
     }
 
     public String prepareQuery() throws SQLException {
-        String columns;
+        String columns = getColumns(dto.tableName());
         StringBuilder query = new StringBuilder();
-        switch (dto.databaseType()) {
-            case MYSQL:
-            case DB2:
-                columns = getColumns(dto.tableName());
-                query.append("select ").append(columns).append(FROM).append(patternCheck(dto.tableName())).append(addQueryCondition(dto.stateField())).append(ORDER_BY).append(dto.stateField()).append(LIMIT_CLAUSE).append(CLOSE_DELIMITER);
-                break;
-            case POSTGRES:
-                query.append("select json_agg(t) from ").append(patternCheck(dto.tableName())).append(" as t").append(addQueryCondition(dto.stateField())).append(ORDER_BY).append(dto.stateField()).append(LIMIT_CLAUSE).append(CLOSE_DELIMITER);
-                break;
-            default:
-                query.append(SELECT_QUERY).append(patternCheck(dto.tableName())).append(addQueryCondition(dto.stateField())).append(dto.stateField()).append(LIMIT_CLAUSE).append(" as json;");
-                break;
-        }
+        query.append("select ").append(columns).append(FROM).append(patternCheck(dto.tableName())).append(addQueryCondition(dto.stateField())).append(ORDER_BY).append(dto.stateField()).append(LIMIT_CLAUSE).append(CLOSE_DELIMITER);
         return query.toString();
     }
 
-    private void setDTO(DBConnectorTransferObject transferObject) {
+    public void setDTO(DBConnectorTransferObject transferObject) {
         dto = transferObject;
     }
 }

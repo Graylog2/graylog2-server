@@ -1,14 +1,30 @@
-import React, { useContext, useState } from "react";
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React, { useContext, useState, useEffect } from "react";
 
 import { Input } from 'components/bootstrap';
 import FormAdvancedOptions from './FormAdvancedOptions';
 
 import FormWrap from '../common/FormWrap';
 import { FormDataContext } from '../common/context/FormData';
+import { ApiRoutes } from './Routes';
 import type {
   ErrorMessageType,
   FormDataContextType,
-  HandleFieldUpdateType,
   HandleSubmitType,
 } from '../common/utils/types';
 import ValidatedInput from "../common/ValidatedInput";
@@ -17,7 +33,7 @@ import { renderOptions } from "../common/Options";
 
 interface Props {
   onSubmit: HandleSubmitType;
-  onChange: HandleFieldUpdateType;
+  onChange: (...args: any[]) => void;
 }
 
 const fieldTypes = [{ label: 'Timestamp', value: 'Timestamp' },
@@ -26,6 +42,31 @@ const StepSubscribe: React.FC<Props> = ({ onSubmit, onChange }) => {
   const { formData } = useContext<FormDataContextType>(FormDataContext);
   const [formError, setFormError] = useState<ErrorMessageType>(null);
   const { pollingInterval } = formData;
+  const selectedFieldType = formData.stateFieldType?.value;
+
+  const [timezones, setTimezones] = useState<{ label: string, value: string }[]>([]);
+  const [loadingTz, setLoadingTz] = useState(false);
+  const [tzError, setTzError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedFieldType === 'Timestamp') {
+      setLoadingTz(true);
+      fetch(`/api${ApiRoutes.INTEGRATIONS.DBConnector.TIMEZONES}`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("TIMEZONES API response:", data);
+          const zones = data.regions || [];
+          const options = zones.map((zone: string) => ({ label: zone, value: zone }));
+          setTimezones(options);
+          setLoadingTz(false);
+        })
+        .catch((err) => {
+          console.error("Failed to load timezones", err);
+          setTzError("Failed to load timezones");
+          setLoadingTz(false);
+        });
+    }
+  }, [selectedFieldType]);
 
 
   const handleSubmit = () => {
@@ -47,6 +88,7 @@ const StepSubscribe: React.FC<Props> = ({ onSubmit, onChange }) => {
     <FormWrap
       onSubmit={handleSubmit}
       buttonContent="Proceed"
+      className="col-md-7"
       title=""
       error={formError}
       description=""
@@ -74,6 +116,22 @@ const StepSubscribe: React.FC<Props> = ({ onSubmit, onChange }) => {
         label="State Field Type">
         {renderOptions(fieldTypes, 'select the checkpointing field', false)}
       </ValidatedInput>
+
+      {selectedFieldType === 'Timestamp' && (
+        <ValidatedInput
+          id="timezone"
+          type="select"
+          onChange={onChange}
+          fieldData={formData.timezone}
+          help="Select the timezone used by the source database for storing timestamp values."
+          label="Timezone"
+          required
+        >
+          {loadingTz && <option>Loading timezones...</option>}
+          {tzError && <option disabled>{tzError}</option>}
+          {!loadingTz && !tzError && renderOptions(timezones, 'Select a timezone', false)}
+        </ValidatedInput>
+      )}
 
       <ValidatedInput id="stateField"
         type="text"

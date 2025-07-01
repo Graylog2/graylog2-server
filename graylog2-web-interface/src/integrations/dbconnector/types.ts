@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 export type DBConnectorGenericInputCreateRequest = {
   type: 'org.graylog.integrations.dbconnector.DBConnectorInput',
   title: string,
@@ -12,6 +28,7 @@ export type DBConnectorGenericInputCreateRequest = {
     username: string,
     password: string,
     state_field_type: string,
+    timezone: string,
     state_field: string,
     table_name: String,
     throttling_allowed: boolean,
@@ -31,6 +48,7 @@ export type DBConnectorInputCreateRequest = {
   username: string,
   password: string,
   state_field_type: string,
+  timezone: string,
   state_field: string,
   table_name: string,
   enable_throttling: boolean,

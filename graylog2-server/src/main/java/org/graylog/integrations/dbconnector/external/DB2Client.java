@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector.external;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,10 +39,10 @@ import java.util.regex.Pattern;
 
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.BATCH_SIZE;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.COUNT_QUERY;
+import static org.graylog.integrations.dbconnector.DBConnectorProperty.DB2_COLUMN_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.FROM;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.LIMIT_CLAUSE;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.LIMIT_RECORDS;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.MSSQL;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.OFFSET_CONDITION;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.ORDER_BY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.RECORD_COUNT;
@@ -129,8 +145,7 @@ public class DB2Client implements DBConnectorClient {
 
     public String getColumns(String tableName) throws SQLException {
 
-        String columnQuery = "SELECT COLNAME AS COLUMN_NAME FROM SYSCAT.COLUMNS WHERE TABNAME = ? ORDER BY COLNO;";
-        PreparedStatement stmt = connection.prepareStatement(columnQuery);
+        PreparedStatement stmt = connection.prepareStatement(DB2_COLUMN_QUERY);
         stmt.setString(1, tableName.toUpperCase());
         ResultSet rs;
         StringBuilder columns = new StringBuilder();
@@ -166,9 +181,7 @@ public class DB2Client implements DBConnectorClient {
         Matcher matcher = valid.matcher(param);
         if (matcher.find()) {
             LOG.debug("Parameter contains special characters or spaces: {}", param);
-            if (dto.databaseType().equals(MSSQL)) {
-                return param;
-            } else return param;
+            return "\"" + param + "\"";
         } else return param;
     }
 
@@ -194,7 +207,7 @@ public class DB2Client implements DBConnectorClient {
         return query.toString();
     }
 
-    private void setDTO(DBConnectorTransferObject transferObject) {
+    public void setDTO(DBConnectorTransferObject transferObject) {
         dto = transferObject;
     }
 }

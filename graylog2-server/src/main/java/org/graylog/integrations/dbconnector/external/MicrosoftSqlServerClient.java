@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector.external;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,10 +36,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.BATCH_SIZE;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.COLUMN_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.COUNT_QUERY;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.LIMIT_RECORDS;
-import static org.graylog.integrations.dbconnector.DBConnectorProperty.MSSQL;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.OFFSET_CONDITION;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.RECORD_COUNT;
 import static org.graylog.integrations.dbconnector.DBConnectorProperty.SELECT_QUERY;
@@ -52,7 +66,7 @@ public class MicrosoftSqlServerClient implements DBConnectorClient {
             ResultSet rs = stmt.executeQuery();
             ResultSetMetaData result = rs.getMetaData();
             int columnsNumber = result.getColumnCount();
-            int count = 1;
+            int count = 0;
             while (rs.next()) {
                 Map<Object, Object> map = new HashMap<>();
                 for (int i = 1; i <= columnsNumber; i++) {
@@ -97,28 +111,6 @@ public class MicrosoftSqlServerClient implements DBConnectorClient {
         return listLogs;
     }
 
-    public String getColumns(String tableName) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement(COLUMN_QUERY);
-        stmt.setString(1, tableName);
-        ResultSet rs;
-        StringBuilder columns = new StringBuilder();
-        try {
-            rs = stmt.executeQuery();
-            columns = new StringBuilder();
-            String col;
-            while (rs.next()) {
-                col = rs.getString(1);
-                columns.append("'").append(col).append("'");
-                columns.append(",").append(col).append(",");
-            }
-            columns.deleteCharAt(columns.length() - 1);
-        } catch (SQLException e) {
-            LOG.error("SQL Connection error ", e);
-        }
-
-        return "JSON_OBJECT(" + columns + ")";
-    }
-
     public int getRowCount() throws SQLException {
         String query = COUNT_QUERY + patternCheck(dto.tableName()) + addQueryCondition(dto.stateField());
         PreparedStatement stmt = getPreparedStatement(query);
@@ -133,9 +125,7 @@ public class MicrosoftSqlServerClient implements DBConnectorClient {
         Matcher matcher = valid.matcher(param);
         if (matcher.find()) {
             LOG.debug("Parameter contains special characters or spaces: {}", param);
-            if (dto.databaseType().equals(MSSQL)) {
-                return param;
-            } else return "\"" + param + "\"";
+            return "\"" + param + "\"";
         } else return param;
     }
 

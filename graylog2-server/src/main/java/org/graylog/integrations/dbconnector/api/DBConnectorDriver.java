@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.integrations.dbconnector.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,6 +27,7 @@ import org.graylog.integrations.dbconnector.api.requests.DBConnectorRequestImpl;
 import org.graylog.integrations.dbconnector.external.DBConnectorClient;
 import org.graylog.integrations.dbconnector.external.DBConnectorClientFactory;
 import org.graylog.integrations.dbconnector.external.DBConnectorTransferObject;
+import org.graylog.integrations.dbconnector.external.model.DBConnectorEndpoints;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -52,7 +69,7 @@ public class DBConnectorDriver {
 
     public JsonNode checkCredentials(DBConnectorRequestImpl request) throws Exception {
         DBConnectorClient dbConnectorClient = DBConnectorClientFactory.getClient(request.dbType());
-        String connectionString = DBConnectorUtils.buildConnectionString(request.dbType(), request.hostname(), request.port(),
+        String connectionString = DBConnectorUtils.buildConnectionString(DBConnectorEndpoints.getEnum(request.dbType()), request.hostname(), request.port(),
                 request.dbName(), request.username(), request.password());
         dbConnectorClient.getConnection(connectionString);
         DBConnectorTransferObject dto;
@@ -85,6 +102,7 @@ public class DBConnectorDriver {
         configuration.put(DBConnectorInput.CK_TABLE_NAME, request.tableName());
         configuration.put(DBConnectorInput.CK_STATE_FILED, request.stateField());
         configuration.put(DBConnectorInput.CK_STATE_FIELD_TYPE, request.stateFieldType());
+        configuration.put(DBConnectorInput.CK_TIMEZONE, request.timezone());
         configuration.put(DBConnectorInput.CK_MONGO_COLLECTION_NAME, request.mongoCollectionName());
         configuration.put(DBConnectorInput.CK_OVERRIDE_SOURCE, request.overrideSource());
 
