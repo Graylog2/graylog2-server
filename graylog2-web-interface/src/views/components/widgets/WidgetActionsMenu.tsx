@@ -66,8 +66,6 @@ import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
   line-height: 0;
-  top: 0;
-  right: 0;
 
   > *:not(:last-child) {
     margin-right: 2px;

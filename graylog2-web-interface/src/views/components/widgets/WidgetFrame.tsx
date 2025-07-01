@@ -105,6 +105,9 @@ const WidgetWrap = styled.div(
     .${widgetActionsMenuClass} {
       position: absolute;
       opacity: 0;
+      transition: opacity 0.2s;
+      top: 0;
+      right: 0;
     }
 
     &:hover
