@@ -14,20 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security;
-
-import java.util.Set;
-
-public interface CapabilityPermissions {
-    default Set<String> readPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> editPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> deletePermissions() {
-        return Set.of();
-    }
-}
+export const widgetDragHandleClass = 'widget-drag-handle';
+export const widgetActionsMenuClass = 'widget-actions-menu';
