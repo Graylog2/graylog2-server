@@ -50,11 +50,6 @@ const Wrapper = styled.div`
   }
 `;
 
-type Pagination = {
-  pageErrors: Array<{ description: string }>;
-  currentPage: number;
-};
-
 export type MessageListResult = {
   messages: Array<BackendMessage>;
   total: number;
