@@ -32,7 +32,7 @@ type Props = {
 const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefined, header = 'Actions' }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleIsOpen = (newIsOpen) => setIsOpen(newIsOpen);
+  const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
   return (
     <StopPropagation data-testid={dataTestid}>
