@@ -261,7 +261,7 @@ public class CIDRPatriciaTrie {
     private static String fromBinaryIPv4(String binary) {
         final int prefixLength = binary.length();
         // Pad to 32 bits
-        binary = String.format("%-32s", binary).replace(' ', '0');
+        binary = String.format(Locale.ROOT, "%-32s", binary).replace(' ', '0');
         StringBuilder ip = new StringBuilder();
         for (int i = 0; i < 32; i += 8) {
             String octet = binary.substring(i, i + 8);
@@ -277,7 +277,7 @@ public class CIDRPatriciaTrie {
     private static String fromBinaryIPv6(String binary) {
         final int prefixLength = binary.length();
         // Pad to 128 bits
-        binary = String.format("%-128s", binary).replace(' ', '0');
+        binary = String.format(Locale.ROOT, "%-128s", binary).replace(' ', '0');
         StringBuilder ip = new StringBuilder();
         for (int i = 0; i < 128; i += 16) {
             String hextet = binary.substring(i, i + 16);
