@@ -16,14 +16,19 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, DefaultTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
+
+import { Icon } from 'components/common';
+
+import { ApiRoutes } from './Routes';
+import { toDBConnectorInputCreateRequest } from './formDataAdapter';
 
 import useFetch from '../common/hooks/useFetch';
 import FormWrap from '../common/FormWrap';
-import { ApiRoutes } from './Routes';
 import { FormDataContext } from '../common/context/FormData';
-import { Icon } from 'components/common';
-import { toDBConnectorInputCreateRequest } from './formDataAdapter';
+
+
 
 const Default = ({ value }) => (
   <>{value} <small>(default)</small></>
@@ -65,10 +70,10 @@ const ReviewItems = styled.ul(({ theme }) => css`
 
 type Props = {
   onSubmit: (FormData?) => void,
-  externalInputSubmit: boolean,
+  externalInputSubmit?: boolean,
 };
 
-const StepReview = ({ onSubmit, externalInputSubmit }: Props) => {
+const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
   const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
 
@@ -156,15 +161,6 @@ const StepReview = ({ onSubmit, externalInputSubmit }: Props) => {
       </Container>
     </FormWrap>
   );
-};
-
-StepReview.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  externalInputSubmit: PropTypes.bool,
-};
-
-StepReview.defaultProps = {
-  externalInputSubmit: false,
 };
 
 export default StepReview;

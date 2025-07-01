@@ -18,7 +18,6 @@ import React, { useContext } from "react";
 import styled from "styled-components";
 
 import { Input } from "components/bootstrap";
-
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 
 import { FormDataContext } from '../common/context/FormData';

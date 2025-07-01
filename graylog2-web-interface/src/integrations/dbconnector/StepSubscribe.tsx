@@ -17,11 +17,12 @@
 import React, { useContext, useState, useEffect } from "react";
 
 import { Input } from 'components/bootstrap';
+
 import FormAdvancedOptions from './FormAdvancedOptions';
+import { ApiRoutes } from './Routes';
 
 import FormWrap from '../common/FormWrap';
 import { FormDataContext } from '../common/context/FormData';
-import { ApiRoutes } from './Routes';
 import type {
   ErrorMessageType,
   FormDataContextType,
@@ -54,14 +55,12 @@ const StepSubscribe: React.FC<Props> = ({ onSubmit, onChange }) => {
       fetch(`/api${ApiRoutes.INTEGRATIONS.DBConnector.TIMEZONES}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log("TIMEZONES API response:", data);
           const zones = data.regions || [];
           const options = zones.map((zone: string) => ({ label: zone, value: zone }));
           setTimezones(options);
           setLoadingTz(false);
         })
-        .catch((err) => {
-          console.error("Failed to load timezones", err);
+        .catch(() => {
           setTzError("Failed to load timezones");
           setLoadingTz(false);
         });

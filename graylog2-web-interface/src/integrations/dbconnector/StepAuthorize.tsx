@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useContext, useState } from "react";
+import styled from 'styled-components';
+
 import { qualifyUrl } from "util/URLUtils";
 import fetch from "logic/rest/FetchProvider";
+import { Button, ControlLabel, FormControl, HelpBlock } from 'components/bootstrap';
+import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
-import styled from 'styled-components';
+import { ApiRoutes } from "./Routes";
 
 import type {
   ErrorMessageType,
@@ -31,9 +35,6 @@ import { FormDataContext } from '../common/context/FormData';
 import formValidation from '../common/utils/formValidation';
 import ValidatedInput from '../common/ValidatedInput';
 
-import { ApiRoutes } from "./Routes";
-import { Button, ControlLabel, FormControl, HelpBlock } from 'components/bootstrap';
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 
 const FieldRow = styled.div`
@@ -57,7 +58,7 @@ type StepAuthorizeProps = {
 const defaultPorts = {
   Oracle: '1521',
   MySQL: '3306',
- 'Microsoft SQL': '1433',
+  'Microsoft SQL': '1433',
   MongoDB: '27017',
   DB2: '50000',
   PostgreSQL: '5432',
@@ -116,7 +117,6 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   };
 
   const verifyConnection = () => {
-    console.log(formData?.dbType.value)
     fetch(
       "POST",
       qualifyUrl(ApiRoutes.INTEGRATIONS.DBConnector.TEST_INPUT),
@@ -132,7 +132,6 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       })
       .then((result: any) => {
         setName(result);
-        console.log(name);
         setShowModal(true);
       })
       .catch((err) => {
@@ -158,7 +157,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         },
       });
     }
-  }, [selectedDbType]);
+  }, [selectedDbType, onChange]);
 
 
 
@@ -172,7 +171,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         onSubmitForm={handleSubmitModal}
         title="Query Results"
         submitButtonText="Close"
-        submitButtonDisabled={true}
+        submitButtonDisabled
         data-telemetry-title="Test DB Connection"
       >
 

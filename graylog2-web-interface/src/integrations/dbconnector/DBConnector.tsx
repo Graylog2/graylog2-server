@@ -78,6 +78,7 @@ const DBConnector = ({ externalInputSubmit = false, onSubmit }: Props) => {
       }
       if (target.type === "number" && NumberUtils.isNumber(value)) {
         setFormData(id, { ...fieldData, value });
+
         return
       }
 
@@ -144,6 +145,8 @@ const DBConnector = ({ externalInputSubmit = false, onSubmit }: Props) => {
     setEnabledStep,
     setFormData,
     externalInputSubmit,
+    history,
+    onSubmit
   ]);
 
   useEffect(() => {

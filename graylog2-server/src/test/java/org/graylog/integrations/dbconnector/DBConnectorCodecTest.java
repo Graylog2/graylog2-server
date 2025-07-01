@@ -77,7 +77,7 @@ public class DBConnectorCodecTest {
         givenGoodConfiguration();
         givenLogs();
         whenDecodeIsCalled();
-        assertEquals(message.getSource(), "localhost | test_db | test_table");
+        assertEquals(message.getSource(), "localhost/test_db/test_table");
     }
 
     @Test

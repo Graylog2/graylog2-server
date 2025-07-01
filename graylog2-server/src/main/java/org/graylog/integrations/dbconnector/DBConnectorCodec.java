@@ -115,7 +115,7 @@ public class DBConnectorCodec extends AbstractCodec {
         String databaseName = configuration.getString(CK_DATABASE_NAME);
         String tableName = configuration.getString(CK_TABLE_NAME);
         String collectionName = configuration.getString(CK_MONGO_COLLECTION_NAME);
-        return hostname + " | " + databaseName + " | " + (StringUtils.isNotBlank(tableName) ? tableName : collectionName);
-
+        return hostname + "/" + databaseName + "/" +
+                (StringUtils.isNotBlank(tableName) ? tableName : collectionName);
     }
 }

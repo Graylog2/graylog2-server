@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from "react";
-import PageHeader from "components/common/PageHeader";
 
-import EmbeddedDBConnectorApp from "./EmbeddedDBConnectorApp";
+import PageHeader from "components/common/PageHeader";
 import { ExternalLink } from "components/common";
 
-const DBConnectorApp = () => {
-  return (
+import EmbeddedDBConnectorApp from "./EmbeddedDBConnectorApp";
+
+const DBConnectorApp = () => (
     <>
       <PageHeader title="Database Connector">
         <span>This feature retrieves logs from your databases - MySQL, Oracle, SQL, DB2, PostgreSQL and MongoDB.</span>
@@ -36,7 +36,6 @@ const DBConnectorApp = () => {
       <EmbeddedDBConnectorApp />
     </>
   );
-};
 
 
 export default DBConnectorApp;
