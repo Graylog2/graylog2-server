@@ -40,12 +40,12 @@ const   extractSchedulerInfo = (eventDefinition: EventDefinition) => {
 const createEventDefinition = async (newEventDefinition: EventDefinition & EntityShare) => {
   const { share_request, ...rest } = newEventDefinition;
   const { eventDefinition, isScheduled } = extractSchedulerInfo(rest);
-  
+
   return EventsDefinitions.create(isScheduled, {
     entity: eventDefinition,
     share_request: {
       selected_collections: share_request?.selected_collections,
-      selected_grantee_capabilities: share_request?.selected_grantee_capabilities.toJS()
+      selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS()
     }
   });
 };
