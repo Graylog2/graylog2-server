@@ -40,19 +40,36 @@ const NodeInfoTH = styled.th`
   width: 51%;
 `;
 
+const StyledTable = styled(Table)`
+  table-layout: fixed;
+  width: 100%;
+
+  th, td {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+`;
+
+const RoleLabel = styled(Label)`
+  display: inline-flex;
+  justify-content: center;
+  gap: 4px;
+`;
+
 type Props = {
   clusterNodes: ClusterNodes;
 };
 
 const getRoleLabels = (roles: string) =>
   roles.split(',').map((role) => (
-    <span key={role}>
-      <Label bsSize="xs">{role}</Label>&nbsp;
-    </span>
+      <span key={role}>
+        <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
+      </span>
   ));
 
 const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
-  <Table>
+  <StyledTable>
     <thead>
       <tr>
         <NodeInfoTH>Node</NodeInfoTH>
@@ -103,7 +120,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
       ))}
     </tbody>
     {clusterNodes.isLoading && <Spinner />}
-  </Table>
+  </StyledTable>
 );
 
 export default ClusterConfigurationListView;
