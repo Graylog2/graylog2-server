@@ -43,7 +43,7 @@ const queryHelpComponent = (
   />
 );
 
-function LookupTableList() {
+function CacheList() {
   const { fetchPaginatedCaches, cachesKeyFn } = useFetchCaches();
 
   return (
@@ -68,4 +68,4 @@ function LookupTableList() {
   );
 }
 
-export default LookupTableList;
+export default CacheList;
