@@ -34,7 +34,7 @@ const Container = styled.div(
     display: grid;
     grid-template-columns: minmax(35px, 1fr) max-content;
     align-items: center;
-    min-height: 27px;
+    min-height: 25px;
 
     .widget-title {
       width: 100%;
