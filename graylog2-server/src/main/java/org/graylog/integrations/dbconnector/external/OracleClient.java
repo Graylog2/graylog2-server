@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,8 +156,8 @@ public class OracleClient implements DBConnectorClient {
         Matcher matcher = valid.matcher(param);
         if (matcher.find()) {
             LOG.debug("Parameter contains special characters or spaces: {}", param);
-            return "\"" + param.toUpperCase() + "\"";
-        } else return param.toUpperCase();
+            return "\"" + StringUtils.toUpperCase(param) + "\"";
+        } else return StringUtils.toUpperCase(param);
     }
 
     public PreparedStatement getPreparedStatement(String query) throws SQLException {

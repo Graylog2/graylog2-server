@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +147,7 @@ public class DB2Client implements DBConnectorClient {
     public String getColumns(String tableName) throws SQLException {
 
         PreparedStatement stmt = connection.prepareStatement(DB2_COLUMN_QUERY);
-        stmt.setString(1, tableName.toUpperCase());
+        stmt.setString(1, StringUtils.toUpperCase(tableName));
         ResultSet rs;
         StringBuilder columns = new StringBuilder();
         try {

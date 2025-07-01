@@ -18,26 +18,28 @@ package org.graylog.integrations.dbconnector;
 
 import org.graylog.integrations.dbconnector.external.model.DBConnectorEndpoints;
 
+import java.util.Locale;
+
 public class DBConnectorUtils {
     public static String buildConnectionString(DBConnectorEndpoints dbType, String hostname, int port,
                                                String dbName, String username, String password) {
         return switch (dbType) {
-            case POSTGRESQL -> String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s",
+            case POSTGRESQL -> String.format(Locale.ENGLISH,"jdbc:postgresql://%s:%d/%s?user=%s&password=%s",
                     hostname, port, dbName, username, password);
 
-            case MYSQL -> String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
+            case MYSQL -> String.format(Locale.ENGLISH,"jdbc:mysql://%s:%d/%s?user=%s&password=%s",
                     hostname, port, dbName, username, password);
 
-            case ORACLE -> String.format("jdbc:oracle:thin:%s/%s@//%s:%d/%s",
+            case ORACLE -> String.format(Locale.ENGLISH,"jdbc:oracle:thin:%s/%s@//%s:%d/%s",
                     username, password, hostname, port, dbName);
 
-            case MICROSOFT_SQL -> String.format("jdbc:sqlserver://%s:%d;databaseName=%s;user=%s;password=%s",
+            case MICROSOFT_SQL -> String.format(Locale.ENGLISH,"jdbc:sqlserver://%s:%d;databaseName=%s;user=%s;password=%s",
                     hostname, port, dbName, username, password);
 
-            case DB2 -> String.format("jdbc:db2://%s:%d/%s:user=%s;password=%s;",
+            case DB2 -> String.format(Locale.ENGLISH,"jdbc:db2://%s:%d/%s:user=%s;password=%s;",
                     hostname, port, dbName, username, password);
 
-            case MONGODB -> String.format("mongodb://%s:%s@%s:%d/%s", username, password,
+            case MONGODB -> String.format(Locale.ENGLISH,"mongodb://%s:%s@%s:%d/%s", username, password,
                     hostname, port, dbName);
 
         };

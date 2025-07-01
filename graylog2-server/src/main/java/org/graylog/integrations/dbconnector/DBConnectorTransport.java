@@ -19,8 +19,8 @@ package org.graylog.integrations.dbconnector;
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import com.google.inject.name.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.integrations.dbconnector.external.DBConnectorClient;
 import org.graylog.integrations.dbconnector.external.DBConnectorClientFactory;
 import org.graylog.integrations.dbconnector.external.DBConnectorTransferObject;
@@ -58,7 +58,7 @@ public class DBConnectorTransport extends ThrottleableTransport2 {
     private final DBConnectorClientFactory DBConnectorClientFactory;
     private ScheduledFuture runningTask = null;
 
-    @AssistedInject
+    @Inject
     public DBConnectorTransport(@Assisted Configuration configuration,
                                 EventBus eventBus,
                                 LocalMetricRegistry localRegistry,

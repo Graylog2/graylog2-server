@@ -20,7 +20,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.integrations.dbconnector.external.model.DBConnectorEndpoints;
-import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
@@ -33,7 +32,6 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,21 +228,5 @@ public class DBConnectorInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL));
 
         }
-    }
-
-    /* package private */ void fail(Throwable cause) {
-        String title = String.format("Input %s is failing to retrieve data", getTitle());
-        String errorMsg = String.format(
-                "The input has encountered errors while fetching data from DBConnector  servers :: %s",
-                cause.getLocalizedMessage());
-        LOG.error(errorMsg, cause);
-        notificationService.publishIfFirst(
-                notificationService.build()
-                        .addType(Notification.Type.GENERIC)
-                        .addSeverity(Notification.Severity.URGENT)
-                        .addTimestamp(DateTime.now())
-                        .addNode(getNodeId())
-                        .addDetail("title", title)
-                        .addDetail("description", errorMsg));
     }
 }
