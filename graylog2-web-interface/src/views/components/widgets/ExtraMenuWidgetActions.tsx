@@ -24,9 +24,10 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 type Props = {
   widget: Widget;
+  onToggleDropdown: () => void;
 };
 
-const ExtraMenuWidgetActions = ({ widget }: Props) => {
+const ExtraMenuWidgetActions = ({ widget, onToggleDropdown }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
 
@@ -40,6 +41,7 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
     <>
       {extraWidgetActions.map(({ component: Component, type, disabled = () => false }) => (
         <Component
+          onToggleDropdown={onToggleDropdown}
           widget={widget}
           contexts={{ widgetFocusContext }}
           key={`${type}-${widget.id}`}

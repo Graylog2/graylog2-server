@@ -25,7 +25,7 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 
 jest.mock('views/components/widgets/useWidgetExportActionComponent');
 const renderExportWidgetActionDelegate = () =>
-  render(<OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} />);
+  render(<OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} onToggleDropdown={() => {}} />);
 
 describe('ExtraMenuWidgetActions', () => {
   const plugExplanation =

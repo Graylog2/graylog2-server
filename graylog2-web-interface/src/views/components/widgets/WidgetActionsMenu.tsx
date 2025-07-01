@@ -64,9 +64,9 @@ import IfDashboard from '../dashboard/IfDashboard';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
-const Container = styled.div<{ $actionsDropdownIsOpen: boolean }>(
-  ({ $actionsDropdownIsOpen }) => css`
-    ${$actionsDropdownIsOpen ? 'display: flex !important;' : ''}
+const Container = styled.div<{ $dropdownIsOpen: boolean }>(
+  ({ $dropdownIsOpen }) => css`
+    ${$dropdownIsOpen ? '&& { display: block; }' : ''}
     > *:not(:last-child) {
       margin-right: 2px;
     }
@@ -170,7 +170,11 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
-  const [actionsDropdownIsOpen, setActionsDropdownIsOpen] = useState(false);
+  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
+
+  const onToggleDropdown = useCallback(() => {
+    setDropdownIsOpen((cur) => !cur);
+  }, []);
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
@@ -181,6 +185,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
+
   const onCopyToDashboard = useCallback(
     (widgetId: string, dashboardId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
@@ -236,7 +241,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className={widgetActionsMenuClass} $actionsDropdownIsOpen={actionsDropdownIsOpen}>
+    <Container className={widgetActionsMenuClass} $dropdownIsOpen={dropdownIsOpen}>
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton
@@ -248,7 +253,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             parameters={parameters}
           />
         </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} />
+        <ExtraMenuWidgetActions widget={widget} onToggleDropdown={onToggleDropdown} />
         {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
         {!isFocused && (
           <>
@@ -264,7 +269,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
         <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
 
-        <WidgetActionDropdown onChange={setActionsDropdownIsOpen}>
+        <WidgetActionDropdown onChange={setDropdownIsOpen}>
           <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <IfSearch>
             <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>
