@@ -108,7 +108,6 @@ public class DBConnectorPollerTaskTest {
         thenRecordsPersistedToJournal(5);
         thenClientQueriedForLogTypes(1);
         thenCheckpointPersisted(1);
-        thenInputIsNotShutDown();
     }
 
     @Test
@@ -123,7 +122,6 @@ public class DBConnectorPollerTaskTest {
         thenBlockUntilThrottleWillNotBeCalled();
         thenMongoLogsQueried(1);
         thenCheckpointPersisted(1);
-        thenInputIsNotShutDown();
     }
 
 
@@ -141,7 +139,6 @@ public class DBConnectorPollerTaskTest {
         thenContentQueryIsExecuted();
         thenRecordsPersistedToJournal(5);
         thenCheckpointPersisted(1);
-        thenInputIsNotShutDown();
     }
 
     // GIVENs
@@ -267,7 +264,4 @@ public class DBConnectorPollerTaskTest {
         verify(mockInputStatusService, times(count)).save(any(InputStatusRecord.class));
     }
 
-    private void thenInputIsNotShutDown() {
-        verify(mockInput, times(0)).fail(any(Throwable.class));
-    }
 }

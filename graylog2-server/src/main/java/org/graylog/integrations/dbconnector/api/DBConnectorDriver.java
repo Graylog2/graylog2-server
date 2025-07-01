@@ -17,7 +17,7 @@
 package org.graylog.integrations.dbconnector.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.integrations.dbconnector.DBConnectorCodec;
 import org.graylog.integrations.dbconnector.DBConnectorInput;
