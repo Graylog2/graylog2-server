@@ -74,8 +74,8 @@ public class SQLClientTest {
         JsonNode result = client.validateConnection(dto);
 
         // THEN
-        assertTrue(result.has("2")); // Starts from 1, increments before putting
-        assertEquals("123", result.get("2").get("id").asText());
+        assertTrue(result.has("1"));
+        assertEquals("123", result.get("1").get("id").asText());
     }
 
     @Test
