@@ -44,7 +44,8 @@ const StyledTable = styled(Table)`
   table-layout: fixed;
   width: 100%;
 
-  th, td {
+  th,
+  td {
     white-space: normal !important;
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -63,9 +64,9 @@ type Props = {
 
 const getRoleLabels = (roles: string) =>
   roles.split(',').map((role) => (
-      <span key={role}>
-        <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
-      </span>
+    <span key={role}>
+      <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
+    </span>
   ));
 
 const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
