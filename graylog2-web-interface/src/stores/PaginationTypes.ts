@@ -78,14 +78,15 @@ export type FilterComponentProps = {
   onSubmit: (filter: { title: string; value: string }, closeDropdown?: boolean) => void;
   allActiveFilters: Filters | undefined;
 };
+
 export type Attribute = {
   id: string;
   title: string;
-  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID';
+  type?: 'STRING' | 'DATE' | 'DOUBLE' | 'INT' | 'LONG' | 'OBJECT_ID' | 'BOOLEAN';
   sortable?: boolean;
   hidden?: boolean;
   searchable?: boolean;
-  filterable?: true;
+  filterable?: boolean;
   filter_options?: Array<{ value: string; title: string }>;
   filter_component?: React.ComponentType<FilterComponentProps>;
   related_collection?: string;

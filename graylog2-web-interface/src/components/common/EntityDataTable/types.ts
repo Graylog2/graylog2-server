@@ -16,7 +16,7 @@
  */
 import type * as React from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export type EntityBase = {
   id: string;
@@ -24,13 +24,7 @@ export type EntityBase = {
 
 export type Column = {
   anyPermissions?: boolean;
-  hidden?: boolean;
-  id: string;
-  permissions?: Array<string>;
-  sortable?: boolean;
-  title: string;
-  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID';
-};
+} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {

@@ -150,7 +150,7 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250517</json-org.version>
         <json-path.version>2.9.0</json-path.version>
-        <jsoup.version>1.20.1</jsoup.version>
+        <jsoup.version>1.21.1</jsoup.version>
         <kafka.version>4.0.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.0</log4j.version>
@@ -662,7 +662,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.3.1</version>
+                    <version>4.9.3.2</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
