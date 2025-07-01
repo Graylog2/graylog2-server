@@ -26,7 +26,7 @@ import static org.graylog2.shared.rest.resources.csp.CSPDynamicFeature.CSP_NONCE
 public class CSPResponseFilter implements ContainerResponseFilter {
     public final static String CSP_HEADER = "Content-Security-Policy";
     private final static String noncePattern = "\\{nonce}";
-    private String group;
+    private final String group;
     private final CSPService cspService;
 
     public CSPResponseFilter(String group, CSPService cspService) {
