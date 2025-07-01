@@ -35,6 +35,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useSearchResult from 'views/hooks/useSearchResult';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -65,12 +66,12 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   pageSize?: number;
 };
 
-const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
+const useResetPaginationOnSearchExecution = (setCurrentPage: (pageNr: number) => void, currentPage) => {
   const resetPagination = useCallback(() => {
     if (currentPage !== 1) {
-      setPagination({ currentPage: 1, pageErrors: [] });
+      setCurrentPage(1);
     }
-  }, [currentPage, setPagination]);
+  }, [currentPage, setCurrentPage]);
   useOnSearchExecution(resetPagination);
 };
 
@@ -102,16 +103,14 @@ const MessageList = ({
   pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
 }: Props) => {
-  const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
-    pageErrors: [],
-    currentPage: 1,
-  });
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const { stopAutoRefresh } = useAutoRefresh();
+  const { result } = useSearchResult();
   const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
   const dispatch = useViewsDispatch();
-  useResetPaginationOnSearchExecution(setPagination, currentPage);
+  useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
   useRenderCompletionCallback();
 
   const handlePageChange = useCallback(
@@ -130,26 +129,10 @@ const MessageList = ({
 
       stopAutoRefresh();
       setLoadingState(true);
-      setPagination((cur) => ({
-        ...cur,
-        currentPage: newCurrentPage,
-      }));
+      setCurrentPage(newCurrentPage);
 
-      dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then((response) => {
-        const { result } = response.payload;
+      dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then(() => {
         setLoadingState(false);
-
-        setPagination((cur) => {
-          // do not change pagination when it has been changed while this request was running
-          if (cur.currentPage !== newCurrentPage) {
-            return cur;
-          }
-
-          return {
-            currentPage: newCurrentPage,
-            pageErrors: result.errors,
-          };
-        });
       });
     },
     [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState, stopAutoRefresh],
@@ -175,7 +158,9 @@ const MessageList = ({
           pageSize={pageSize}
           enforcePageBounds={false}
           useQueryParameter={false}>
-          {!pageErrors?.length ? (
+          {result.errors?.length > 0 ? (
+            <ErrorWidget errors={result.errors} />
+          ) : (
             <MessageTable
               activeQueryId={activeQueryId}
               config={config}
@@ -185,8 +170,6 @@ const MessageList = ({
               setLoadingState={setLoadingState}
               messages={messages}
             />
-          ) : (
-            <ErrorWidget errors={pageErrors} />
           )}
         </PaginatedList>
       </Wrapper>
