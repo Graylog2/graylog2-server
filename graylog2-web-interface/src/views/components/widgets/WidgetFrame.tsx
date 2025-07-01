@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
+import { widgetActionsMenuClass, widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
 
 const WidgetWrap = styled.div(
   ({ theme }) => css`
@@ -107,7 +107,12 @@ const WidgetWrap = styled.div(
       opacity: 0;
     }
 
-    &:hover .${widgetActionsMenuClass}, &:focus-within .${widgetActionsMenuClass} {
+    &:hover
+      .${widgetActionsMenuClass},
+      &:focus-within
+      .${widgetActionsMenuClass},
+      &:has(.${widgetActionsDropdownOpenClass})
+      .${widgetActionsMenuClass} {
       position: relative;
       opacity: 1;
     }
