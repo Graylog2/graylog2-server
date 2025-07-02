@@ -125,8 +125,6 @@ const XYPlot = ({
     });
   }
 
-  console.log({ defaultLayout, plotLayout, layout });
-
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
       <GenericPlot
