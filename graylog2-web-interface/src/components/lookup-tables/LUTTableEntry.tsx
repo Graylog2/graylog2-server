@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
-import { Spinner, TextOverflowEllipsis } from 'components/common';
+import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { ErrorPopover } from 'components/lookup-tables';
@@ -28,9 +28,6 @@ import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lo
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-
-import LUTDrawer from './LUTDrawer';
-import LookupTableView from './LookupTableView';
 
 type Props = {
   table: LookupTable;
@@ -50,16 +47,6 @@ const Actions = styled(ButtonToolbar)`
   justify-content: flex-start;
 `;
 
-const StyledHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacings.sm};
-  justify-content: 'flex-start';
-  align-items: flex-start;
-  flex-wrap: 'wrap';
-  width: '100%';
-`;
-
 const LUTTableEntry = ({
   table,
   cache,
@@ -70,7 +57,6 @@ const LUTTableEntry = ({
     dataAdapter: null,
   },
 }: Props) => {
-  const [showDrawer, setShowDrawer] = React.useState<boolean>(false);
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
 
@@ -96,18 +82,12 @@ const LUTTableEntry = ({
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
   }, [history, table.name]);
 
-  const closeDrawer = () => {
-    setShowDrawer(false);
-  }
-
   return (
     <tbody>
       <tr>
         <td>
           {errors.table && <ErrorPopover placement="right" errorText={errors.table} title="Lookup Table problem" />}
-          <Button bsStyle="link" onClick={() => setShowDrawer(true)}>
-            {table.title}
-          </Button>
+          <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
         </td>
         <td>{table.description}</td>
         <td>{table.name}</td>
@@ -138,17 +118,6 @@ const LUTTableEntry = ({
           )}
         </td>
       </tr>
-      {showDrawer && (
-        <LUTDrawer
-          onClose={closeDrawer}
-          titleComponent={
-            <StyledHeader>
-              <TextOverflowEllipsis>{table.title}</TextOverflowEllipsis>
-            </StyledHeader>
-          }>
-          <LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />
-        </LUTDrawer>
-      )}
     </tbody>
   );
 };

@@ -33,12 +33,26 @@ const StyledDrawer = styled(MantineDrawer)(
     .mantine-Drawer-body {
       flex: 1;
     }
+
+    .mantine-Drawer-title {
+      max-width: 94%;
+    }
   `,
 );
+
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  overflow: hidden;
+`;
 
 const Title = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.h1};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   `,
 );
 type Props = Pick<
@@ -58,7 +72,18 @@ type Props = Pick<
   | 'transitionProps'
 >;
 const Drawer = ({ title, ...props }: Props) => (
-  <StyledDrawer offset={15} padding="lg" radius={5} zIndex={1032} title={<Title>{title}</Title>} {...props} />
+  <StyledDrawer
+    offset={15}
+    padding="lg"
+    radius={5}
+    zIndex={1032}
+    title={
+      <TitleWrapper>
+        <Title>{title}</Title>
+      </TitleWrapper>
+    }
+    {...props}
+  />
 );
 
 export default Drawer;

@@ -18,9 +18,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import useHistory from 'routing/useHistory';
-import { Spinner, TextOverflowEllipsis } from 'components/common';
+import { Link } from 'components/common/router';
+import { Spinner } from 'components/common';
 import { Button } from 'components/bootstrap';
-import { Cache } from 'components/lookup-tables';
 import Routes from 'routing/Routes';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import NumberUtils from 'util/NumberUtils';
@@ -30,8 +30,6 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-
-import LUTDrawer from './LUTDrawer';
 
 type Props = {
   cache: LookupTableCache;
@@ -44,18 +42,7 @@ const Actions = styled(ButtonToolbar)`
   justify-content: flex-start;
 `;
 
-const StyledHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacings.sm};
-  justify-content: 'flex-start';
-  align-items: flex-start;
-  flex-wrap: 'wrap';
-  width: '100%';
-`;
-
 const CacheTableEntry = ({ cache }: Props) => {
-  const [showDrawer, setShowDrawer] = React.useState<boolean>(false);
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const sendTelemetry = useSendTelemetry();
@@ -122,17 +109,11 @@ const CacheTableEntry = ({ cache }: Props) => {
     }
   }, [cache.title, cache.id, sendTelemetry]);
 
-  const closeDrawer = () => {
-    setShowDrawer(false);
-  }
-
   return (
     <tbody>
       <tr>
         <td>
-          <Button bsStyle="link" onClick={() => setShowDrawer(true)}>
-            {cache.title}
-          </Button>
+          <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
         </td>
         <td>{cache.description}</td>
         <td>{cache.name}</td>
@@ -164,17 +145,6 @@ const CacheTableEntry = ({ cache }: Props) => {
           )}
         </td>
       </tr>
-      {showDrawer && (
-        <LUTDrawer
-          onClose={closeDrawer}
-          titleComponent={
-            <StyledHeader>
-              <TextOverflowEllipsis>{cache.title}</TextOverflowEllipsis>
-            </StyledHeader>
-          }>
-          <Cache cache={cache} />
-        </LUTDrawer>
-      )}
     </tbody>
   );
 };

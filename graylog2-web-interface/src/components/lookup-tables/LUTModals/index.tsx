@@ -16,27 +16,29 @@
  */
 import * as React from 'react';
 
-import Drawer from 'components/common/Drawer';
+import { useModalContext } from './ModalContext';
+import LUTdrawer from 'components/lookup-tables/LUTDrawer';
 
-type Props = {
-  onClose: () => void,
-  title: string,
-  children: React.ReactNode,
+export type ModalTypes =
+  | 'LUT'
+  | 'CACHE'
+  | 'DATA-ADAPTER';
+
+function LUTModals() {
+  const { modal, setModal, entity, setEntity, title, setTitle } = useModalContext();
+
+  const onClose = () => {
+    setModal(null);
+    setTitle(null);
+    setEntity(null);
+  };
+
+  switch (modal) {
+    case 'LUT':
+      return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>
+    default:
+      return null;
+  }
 }
 
-const LUTDrawer = ({ onClose, title, children }: Props) => {
-  return (
-    <Drawer
-      opened
-      onClose={onClose}
-      size="lg"
-      position="right"
-      overlayProps={{ zIndex: '1030' }}
-      title={title}
-      >
-      {children}
-    </Drawer>
-  );
-};
-
-export default LUTDrawer;
+export default LUTModals;
