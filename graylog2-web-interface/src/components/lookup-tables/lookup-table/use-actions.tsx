@@ -57,7 +57,13 @@ function Actions({ lut }: ActionsProps) {
 
   return (
     <>
-      <DropdownButton bsStyle="transparent" title={<Icon name="more_horiz" size="lg" />} id={lut.id} noCaret pullRight>
+      <DropdownButton
+        bsStyle="transparent"
+        title={<Icon name="more_horiz" size="lg" />}
+        id={lut.id}
+        buttonTitle={lut.id}
+        noCaret
+        pullRight>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
