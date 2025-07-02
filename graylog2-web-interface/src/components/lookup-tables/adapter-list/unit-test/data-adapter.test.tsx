@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
 import { DATA_ADAPTERS, ERROR_STATE } from './fixtures';
 
@@ -39,6 +41,27 @@ const mockFetchPaginatedCaches = jest.fn(async () =>
 );
 
 const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
+const mockDeleteDataAdapter = jest.fn(async () => Promise.resolve());
+
+jest.mock('hooks/useScopePermissions', () => ({
+  __esModule: true,
+  default: jest.fn((entity: GenericEntityType) => {
+    const scopes = {
+      ILLUMINATE: { is_mutable: false },
+      DEFAULT: { is_mutable: true },
+    };
+
+    return {
+      loadingScopePermissions: false,
+      scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+      checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+        const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+
+        return scopes[entityScope].is_mutable;
+      },
+    };
+  }),
+}));
 
 jest.mock('routing/QueryParams', () => ({
   useQueryParam: () => [undefined, () => { }],
@@ -48,6 +71,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchDataAdapters: () => ({
     fetchPaginatedDataAdapters: mockFetchPaginatedCaches,
     dataAdaptersKeyFn: (searchParams: SearchParams) => ['data-adapters', 'search', searchParams],
+  }),
+  useDeleteDataAdapter: () => ({
+    deleteDataAdapter: mockDeleteDataAdapter,
+    deletingDataAdapter: false,
   }),
   useFetchErrors: () => ({
     fetchErrors: mockFetchErrors,
@@ -67,5 +94,29 @@ describe('Data Adapter List', () => {
     render(<DataAdapterList />);
 
     await screen.findByTestId('data-adapter-problem', { exact: true }, { timeout: 1500 });
+  });
+
+  it('should show an actions menu', async () => {
+    render(<DataAdapterList />);
+
+    await screen.findByRole('button', { name: DATA_ADAPTERS[0].id });
+  });
+
+  it('should be able to edit a data adapter', async () => {
+    render(<DataAdapterList />);
+
+    userEvent.click(await screen.findByRole('button', { name: DATA_ADAPTERS[0].id }));
+
+    await screen.findByRole('menuitem', { name: /edit/i });
+  });
+
+  it('should be able to delete a data adapter', async () => {
+    render(<DataAdapterList />);
+
+    userEvent.click(await screen.findByRole('button', { name: DATA_ADAPTERS[0].id }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+
+    expect(mockDeleteDataAdapter).toHaveBeenLastCalledWith(DATA_ADAPTERS[0].id);
   });
 });

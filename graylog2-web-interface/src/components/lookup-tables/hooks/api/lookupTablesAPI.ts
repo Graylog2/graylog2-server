@@ -20,6 +20,16 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 
+export const fetchErrors = async ({
+  lutNames = undefined,
+  cacheNames = undefined,
+  adapterNames = undefined,
+}: {
+  lutNames?: Array<string>;
+  cacheNames?: Array<string>;
+  adapterNames?: Array<string>;
+}) => LookupTablesActions.getErrors(lutNames, cacheNames, adapterNames);
+
 export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
   const { page, pageSize, query } = searchParams;
 
@@ -32,12 +42,4 @@ export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => 
   return LookupTableDataAdaptersActions.searchPaginated(page, pageSize, query).then(deserializeDataAdapters);
 };
 
-export const fetchErrors = async ({
-  lutNames = undefined,
-  cacheNames = undefined,
-  adapterNames = undefined,
-}: {
-  lutNames?: Array<string>;
-  cacheNames?: Array<string>;
-  adapterNames?: Array<string>;
-}) => LookupTablesActions.getErrors(lutNames, cacheNames, adapterNames);
+export const deleteDataAdapter = async (adapterId: string) => LookupTableDataAdaptersActions.delete(adapterId);

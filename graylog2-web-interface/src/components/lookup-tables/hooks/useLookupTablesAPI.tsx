@@ -14,12 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMutation } from '@tanstack/react-query';
+
 import type { SearchParams } from 'stores/PaginationTypes';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import UserNotification from 'util/UserNotification';
+
 import {
   fetchPaginatedLookupTables,
   fetchPaginatedDataAdapters,
   fetchErrors,
-} from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+  deleteDataAdapter,
+} from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
@@ -29,6 +35,24 @@ export function useFetchLookupTables() {
 export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
+}
+
+export function useDeleteDataAdapter() {
+  const { refetch } = useTableFetchContext();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: deleteDataAdapter,
+    onSuccess: () => {
+      UserNotification.success('Data Adapter deleted successfully');
+      refetch();
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    deleteDataAdapter: mutateAsync,
+    deletingDataAdapter: isPending,
+  };
 }
 
 export function useFetchErrors() {

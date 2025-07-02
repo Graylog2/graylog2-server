@@ -26,6 +26,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 import { adapterListElements } from './constants';
 import columnRenderers from './column-renderers';
+import useActions from './use-actions';
 import type { DataAdapterEntity } from './types';
 
 const queryHelpComponent = (
@@ -50,6 +51,7 @@ function DataAdapterList() {
     adapterNames?: Array<string>;
   }>({ adapterNames: undefined });
   const { fetchPaginatedDataAdapters, dataAdaptersKeyFn } = useFetchDataAdapters();
+  const { renderActions } = useActions();
 
   const handleFetchAdapters = React.useCallback(
     async (searchParams: SearchParams) => {
@@ -71,13 +73,13 @@ function DataAdapterList() {
         <Col md={12}>
           <PaginatedEntityTable<DataAdapterEntity>
             humanName="data adapter"
-            entityActions={null}
+            entityActions={renderActions}
             columnsOrder={adapterListElements.columnOrder}
             queryHelpComponent={queryHelpComponent}
             tableLayout={adapterListElements.defaultLayout}
             fetchEntities={handleFetchAdapters}
             keyFn={dataAdaptersKeyFn}
-            actionsCellWidth={0}
+            actionsCellWidth={100}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
           />
