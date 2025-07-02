@@ -273,7 +273,7 @@ public class StreamServiceImpl implements StreamService {
     @MustBeClosed
     public java.util.stream.Stream<Stream> streamAllDTOs() {
         return stream(collection.find())
-                .map(dto -> dto.toBuilder().isEditable(scopeService.scopeIsMutable(dto.scope())).build())
+                .map(dto -> dto.toBuilder().isEditable(scopeService.isMutable(dto)).build())
                 .map(StreamImpl::fromDTO);
     }
 
@@ -281,7 +281,7 @@ public class StreamServiceImpl implements StreamService {
     @MustBeClosed
     public java.util.stream.Stream<Stream> streamDTOByIds(Collection<String> streamIds) {
         return stream(collection.find(stringIdsIn(streamIds)))
-                .map(dto -> dto.toBuilder().isEditable(scopeService.scopeIsMutable(dto.scope())).build())
+                .map(dto -> dto.toBuilder().isEditable(scopeService.isMutable(dto)).build())
                 .map(StreamImpl::fromDTO);
     }
 
@@ -289,7 +289,7 @@ public class StreamServiceImpl implements StreamService {
         final List<StreamImpl> results;
         try (var stream = stream(collection.find(query))) {
             results = stream
-                    .map(dto -> dto.toBuilder().isEditable(scopeService.scopeIsMutable(dto.scope())).build())
+                    .map(dto -> dto.toBuilder().isEditable(scopeService.isMutable(dto)).build())
                     .map(StreamImpl::fromDTO)
                     .toList();
         }

@@ -56,8 +56,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-
 @RequiresAuthentication
 @Api(value = "StreamOutputs", description = "Manage stream outputs for a given stream")
 @Path("/streams/{streamid}/outputs")
@@ -179,8 +177,7 @@ public class StreamOutputResource extends RestResource {
     }
 
     private void checkNotEditable(Stream stream, String message) {
-        // Default stream itself is not editable but can have outputs assigned to it.
-        if (!DEFAULT_STREAM_ID.equals(stream.getId()) && !stream.isEditable()) {
+        if (!stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }

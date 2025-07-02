@@ -86,12 +86,13 @@ public class PaginatedStreamService {
         }
 
         final List<StreamImpl> streamsList;
-        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build())).map(StreamImpl::fromDTO)) {
+        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()))) {
             streamsList = results
-                    .filter(predicate)
                     // Since we are bypassing the StreamService which properly sets the isEditable field when loading
                     // streams we need to set the field here.
-                    .map(s -> s.toBuilder().isEditable(scopeService.scopeIsMutable(s.scope())).build())
+                    .map(s -> s.toBuilder().isEditable(scopeService.isMutable(s)).build())
+                    .map(StreamImpl::fromDTO)
+                    .filter(predicate)
                     .toList();
         }
 

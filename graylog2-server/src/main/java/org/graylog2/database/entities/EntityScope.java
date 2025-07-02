@@ -29,11 +29,23 @@ public abstract class EntityScope {
 
     public abstract boolean isMutable();
 
+    public boolean isMutable(ScopedEntity entity) {
+        return isMutable();
+    }
+
     public boolean isMutable(ScopedEntity existingEntity, ScopedEntity updatedEntity) {
         return isMutable();
     }
 
     public abstract boolean isDeletable();
+
+    public boolean isDeletable(ScopedEntity entity) {
+        return isDeletable();
+    }
+
+    public boolean isDeletable(ScopedEntity existingEntity, ScopedEntity updatedEntity) {
+        return isDeletable();
+    }
 
     @Override
     public int hashCode() {
