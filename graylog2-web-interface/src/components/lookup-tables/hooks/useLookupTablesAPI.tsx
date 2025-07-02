@@ -14,25 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMutation } from '@tanstack/react-query';
+
 import type { SearchParams } from 'stores/PaginationTypes';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import UserNotification from 'util/UserNotification';
+
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
   fetchPaginatedCaches,
-} from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+  deleteLookupTable,
+} from './api/lookupTablesAPI';
 
 export function useFetchErrors() {
   return { fetchErrors };
 }
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
-
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
 }
 
 export const cachesKeyFn = (searchParams: SearchParams) => ['caches', 'search', searchParams];
-
 export function useFetchCaches() {
   return { fetchPaginatedCaches, cachesKeyFn };
+}
+
+export function useDeleteCache() {
+  const { refetch } = useTableFetchContext();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: deleteLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Cache deleted successfully');
+      refetch();
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    deleteCache: mutateAsync,
+    deletingCache: isPending,
+  };
 }

@@ -24,6 +24,7 @@ import { useFetchCaches } from 'components/lookup-tables/hooks/useLookupTablesAP
 
 import { cacheListElements } from './constants';
 import columnRenderers from './column-renderers';
+import useActions from './use-actions';
 import type { CacheEntity } from './types';
 
 const queryHelpComponent = (
@@ -45,6 +46,7 @@ const queryHelpComponent = (
 
 function CacheList() {
   const { fetchPaginatedCaches, cachesKeyFn } = useFetchCaches();
+  const { renderActions } = useActions();
 
   return (
     <ErrorsProvider>
@@ -52,13 +54,13 @@ function CacheList() {
         <Col md={12}>
           <PaginatedEntityTable<CacheEntity>
             humanName="caches"
-            entityActions={null}
+            entityActions={renderActions}
             columnsOrder={cacheListElements.columnOrder}
             queryHelpComponent={queryHelpComponent}
             tableLayout={cacheListElements.defaultLayout}
             fetchEntities={fetchPaginatedCaches}
             keyFn={cachesKeyFn}
-            actionsCellWidth={0}
+            actionsCellWidth={100}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
           />
