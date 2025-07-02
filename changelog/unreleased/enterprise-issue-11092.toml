@@ -1,0 +1,5 @@
+type = "a"
+message = "Lookup table page UI revamp"
+
+issues = ["Graylog2/graylog-plugin-enterprise#11108"]
+pulls = ["23056"]

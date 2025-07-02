@@ -24,19 +24,17 @@ type Props = {
   children: React.ReactNode,
 }
 
-const LUTDrawer = ({ onClose, title, children }: Props) => {
-  return (
-    <Drawer
-      opened
-      onClose={onClose}
-      size="lg"
-      position="right"
-      overlayProps={{ zIndex: '1030' }}
-      title={title}
-      >
-      {children}
-    </Drawer>
-  );
-};
+const LUTDrawer = ({ onClose, title, children }: Props) => (
+  <Drawer
+    opened
+    onClose={onClose}
+    size="lg"
+    position="right"
+    overlayProps={{ zIndex: '1030' }}
+    title={title}
+    >
+    {children}
+  </Drawer>
+);
 
 export default LUTDrawer;

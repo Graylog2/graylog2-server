@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 
-import { useModalContext } from './ModalContext';
 import LUTdrawer from 'components/lookup-tables/LUTDrawer';
+
+import { useModalContext } from './ModalContext';
 
 export type ModalTypes =
   | 'LUT'
@@ -35,7 +36,11 @@ function LUTModals() {
 
   switch (modal) {
     case 'LUT':
-      return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>
+      return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>;
+    case 'CACHE':
+      return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>;
+    case 'DATA-ADAPTER':
+      return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>;
     default:
       return null;
   }
