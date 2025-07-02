@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix scroll on click behaviour for scroll hint on search page."
+
+issues = ["19329"]
+pulls = ["23027"]

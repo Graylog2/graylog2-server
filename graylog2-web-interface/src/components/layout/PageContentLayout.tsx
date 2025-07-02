@@ -22,6 +22,8 @@ import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNo
 import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 
+export const SCROLL_CONTAINER_ID = 'page-content';
+
 type Props = {
   children?: React.ReactNode;
   className?: string;
@@ -58,7 +60,7 @@ const PageContentLayout = ({
   FooterComponent = Footer,
   NotificationsComponent = WithGlobalAppNotifications,
 }: Props) => (
-  <Container className={className}>
+  <Container className={className} id={SCROLL_CONTAINER_ID}>
     <NotificationsComponent>
       <StyledGrid fluid className="page-content-grid">
         {children || <Outlet />}
