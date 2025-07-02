@@ -106,6 +106,7 @@ const WidgetWrap = styled.div(
       position: absolute;
       opacity: 0;
       transition: opacity 0.2s;
+      transition-delay: 0.5s;
       top: 0;
       right: 0;
     }
@@ -118,6 +119,7 @@ const WidgetWrap = styled.div(
       .${widgetActionsMenuClass} {
       position: relative;
       opacity: 1;
+      transition-delay: 0s;
     }
   `,
 );
