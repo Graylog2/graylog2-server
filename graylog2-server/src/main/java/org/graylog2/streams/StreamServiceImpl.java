@@ -75,11 +75,9 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
-import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.addEachToSet;
 import static com.mongodb.client.model.Updates.pull;
 import static com.mongodb.client.model.Updates.set;
-import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
@@ -186,18 +184,6 @@ public class StreamServiceImpl implements StreamService {
     @Override
     public List<Stream> loadAllEnabled() {
         return loadAllByQuery(eq(FIELD_DISABLED, false));
-    }
-
-    @Override
-    public List<Stream> loadSystemStreams(boolean includeDefaultStream) {
-        Bson filter = eq(FIELD_SCOPE, ImmutableSystemScope.NAME);
-        if (includeDefaultStream) {
-            filter = or(
-                    filter,
-                    idEq(DEFAULT_STREAM_ID)
-            );
-        }
-        return loadAllByQuery(filter);
     }
 
     @Override

@@ -64,8 +64,6 @@ public interface StreamService {
 
     List<Stream> loadAllEnabled();
 
-    List<Stream> loadSystemStreams(boolean includeDefaultStream);
-
     /**
      * Get all streams that are scoped as {@link org.graylog2.database.entities.ImmutableSystemScope}. The default
      * stream is not given this scope because it can have some fields modified, but some calling contexts want to
