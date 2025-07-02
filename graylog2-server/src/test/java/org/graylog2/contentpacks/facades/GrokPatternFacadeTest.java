@@ -37,7 +37,6 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -71,7 +70,7 @@ public class GrokPatternFacadeTest {
     public void exportNativeEntity() {
         final GrokPattern grokPattern = GrokPattern.create("01234567890", "name", "pattern", null);
         final EntityDescriptor descriptor = EntityDescriptor.create(grokPattern.id(), ModelTypes.GROK_PATTERN_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(grokPattern, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -122,7 +121,7 @@ public class GrokPatternFacadeTest {
         grokPatternService.save(GrokPattern.create("Test2", "[a-z]+"));
 
         final EntityDescriptor descriptor = EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Map<String, Object> entity = ImmutableMap.of(
                 "name", "Test1",
                 "pattern", "[a-z]+");

@@ -129,7 +129,7 @@ public class PipelineFacadeTest {
 
         final EntityDescriptor descriptor = EntityDescriptor.create(pipeline.id(), ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, streamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, streamDescriptor);
         final Entity entity = facade.exportNativeEntity(pipeline, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -149,7 +149,7 @@ public class PipelineFacadeTest {
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, streamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, streamDescriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -169,7 +169,7 @@ public class PipelineFacadeTest {
     public void exportNativeEntityWithDefaultStream() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor defaultStreamDescriptor = EntityDescriptor.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, defaultStreamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.withSystemStreams(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, defaultStreamDescriptor);
 
         assertThat(entityDescriptorIds.get(defaultStreamDescriptor)).isEqualTo(Optional.of(Stream.DEFAULT_STREAM_ID));
 
@@ -349,7 +349,7 @@ public class PipelineFacadeTest {
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, streamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, streamDescriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

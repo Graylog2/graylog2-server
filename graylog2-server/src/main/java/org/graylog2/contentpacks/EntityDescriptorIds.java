@@ -38,11 +38,18 @@ public class EntityDescriptorIds {
         return new EntityDescriptorIds(ImmutableMap.of());
     }
 
-    public static EntityDescriptorIds of(Collection<String> systemStreamIds, EntityDescriptor... entityDescriptors) {
-        return of(systemStreamIds, Arrays.asList(entityDescriptors));
+    public static EntityDescriptorIds of(EntityDescriptor... entityDescriptors) {
+        final ImmutableMap<EntityDescriptor, String> descriptorIds = Arrays.stream(entityDescriptors)
+                .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> UUID.randomUUID().toString()));
+
+        return new EntityDescriptorIds(descriptorIds);
     }
 
-    public static EntityDescriptorIds of(Collection<String> systemStreamIds, Collection<EntityDescriptor> entityDescriptors) {
+    public static EntityDescriptorIds withSystemStreams(Collection<String> systemStreamIds, EntityDescriptor... entityDescriptors) {
+        return withSystemStreams(systemStreamIds, Arrays.asList(entityDescriptors));
+    }
+
+    public static EntityDescriptorIds withSystemStreams(Collection<String> systemStreamIds, Collection<EntityDescriptor> entityDescriptors) {
         final ImmutableMap<EntityDescriptor, String> descriptorIds = entityDescriptors.stream()
                 .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> {
                     if (systemStreamIds.contains(d.id().id())) {
@@ -55,7 +62,7 @@ public class EntityDescriptorIds {
         return new EntityDescriptorIds(descriptorIds);
     }
 
-    private EntityDescriptorIds(ImmutableMap<EntityDescriptor, String> descriptorIds) {
+    EntityDescriptorIds(ImmutableMap<EntityDescriptor, String> descriptorIds) {
         this.descriptorIds = descriptorIds;
     }
 

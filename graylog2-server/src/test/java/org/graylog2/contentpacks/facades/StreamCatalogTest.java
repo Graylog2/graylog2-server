@@ -147,7 +147,7 @@ public class StreamCatalogTest {
         final ObjectId streamId = new ObjectId();
         final Stream stream = new StreamMock(streamId, streamFields, streamRules, outputs, null);
         final EntityDescriptor descriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(stream, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -199,7 +199,7 @@ public class StreamCatalogTest {
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
         final EntityDescriptor outputDescriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, outputDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, outputDescriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

@@ -68,7 +68,6 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -184,7 +183,7 @@ public class InputFacadeTest {
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
         final EntityDescriptor descriptor = EntityDescriptor.create(input.getId(), ModelTypes.INPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(inputWithExtractors, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -210,7 +209,7 @@ public class InputFacadeTest {
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
         final EntityDescriptor descriptor = EntityDescriptor.create(input.getId(), ModelTypes.INPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(inputWithExtractors, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -233,7 +232,7 @@ public class InputFacadeTest {
     public void exportEntity() {
         final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -333,7 +332,7 @@ public class InputFacadeTest {
     @MongoDBFixtures("InputFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

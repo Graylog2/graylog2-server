@@ -46,7 +46,6 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.lookup.FallbackAdapterConfig;
 import org.graylog2.plugin.lookup.FallbackCacheConfig;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -90,7 +89,6 @@ public class LookupTableFacadeTest {
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("data-adapter-1234", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptor cacheDescriptor = EntityDescriptor.create("cache-1234", ModelTypes.LOOKUP_CACHE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(
-                Stream.ALL_SYSTEM_STREAM_IDS,
                 tableDescriptor,
                 adapterDescriptor,
                 cacheDescriptor
@@ -133,7 +131,6 @@ public class LookupTableFacadeTest {
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptor cacheDescriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(
-                Stream.ALL_SYSTEM_STREAM_IDS,
                 tableDescriptor,
                 adapterDescriptor,
                 cacheDescriptor
@@ -392,7 +389,6 @@ public class LookupTableFacadeTest {
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptor cacheDescriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(
-                Stream.ALL_SYSTEM_STREAM_IDS,
                 tableDescriptor,
                 adapterDescriptor,
                 cacheDescriptor

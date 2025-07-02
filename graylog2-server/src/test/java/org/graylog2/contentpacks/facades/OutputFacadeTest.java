@@ -41,7 +41,6 @@ import org.graylog2.outputs.LoggingOutput;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -116,7 +115,7 @@ public class OutputFacadeTest {
                 null
         );
         final EntityDescriptor descriptor = EntityDescriptor.create(output.getId(), ModelTypes.OUTPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(output, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -136,7 +135,7 @@ public class OutputFacadeTest {
         final Output output = outputService.load("5adf239e4b900a0fdb4e5197");
 
         final EntityDescriptor descriptor = EntityDescriptor.create(output.getId(), ModelTypes.OUTPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(output, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -258,7 +257,7 @@ public class OutputFacadeTest {
     @MongoDBFixtures("OutputFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

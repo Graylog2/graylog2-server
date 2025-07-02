@@ -50,7 +50,6 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -131,7 +130,7 @@ public class NotificationFacadeTest {
     public void exportEntity() {
         final ModelId id = ModelId.of("5d4d33753d27460ad18e0c4d");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.NOTIFICATION_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Optional<Entity> entity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(entity).isPresent();
         final EntityV1 entityV1 = (EntityV1) entity.get();

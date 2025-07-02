@@ -43,7 +43,6 @@ import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -89,7 +88,7 @@ public class PipelineRuleFacadeTest {
                 .source("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")
                 .build();
         final EntityDescriptor descriptor = EntityDescriptor.create("id", ModelTypes.PIPELINE_RULE_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(pipelineRule, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -107,7 +106,7 @@ public class PipelineRuleFacadeTest {
     @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
         assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
@@ -228,7 +227,7 @@ public class PipelineRuleFacadeTest {
     @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(Stream.ALL_SYSTEM_STREAM_IDS, descriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()

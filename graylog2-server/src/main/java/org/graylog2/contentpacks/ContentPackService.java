@@ -236,7 +236,7 @@ public class ContentPackService {
             try {
                 final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(id, ModelTypes.STREAM_V1);
                 final StreamFacade streamFacade = (StreamFacade) entityFacades.getOrDefault(ModelTypes.STREAM_V1, UnsupportedEntityFacade.INSTANCE);
-                final Entity streamEntity = streamFacade.exportEntity(streamEntityDescriptor, EntityDescriptorIds.of(systemStreamIds, streamEntityDescriptor)).get();
+                final Entity streamEntity = streamFacade.exportEntity(streamEntityDescriptor, EntityDescriptorIds.withSystemStreams(systemStreamIds, streamEntityDescriptor)).get();
                 final NativeEntity<Stream> streamNativeEntity = streamFacade.findExisting(streamEntity, Collections.emptyMap()).get();
                 entities.put(streamEntityDescriptor, streamNativeEntity.entity());
             } catch (Exception e) {
@@ -443,7 +443,7 @@ public class ContentPackService {
     public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
         // It's important to only compute the EntityDescriptor IDs once per #collectEntities call! Otherwise we
         // will get broken references between the entities.
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(streamService.getSystemStreamIds(true), resolvedEntities);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.withSystemStreams(streamService.getSystemStreamIds(true), resolvedEntities);
 
         final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
