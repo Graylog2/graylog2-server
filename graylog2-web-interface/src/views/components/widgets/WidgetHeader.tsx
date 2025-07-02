@@ -34,6 +34,8 @@ const Container = styled.div(
     display: grid;
     grid-template-columns: minmax(35px, 1fr) max-content;
     align-items: center;
+    min-height: 25px;
+    position: relative; // required for absolute positioned widget actions
 
     .widget-title {
       width: 100%;
@@ -57,10 +59,6 @@ const WidgetDragHandle = styled(Icon)`
   cursor: move;
   opacity: 0.3;
   margin-right: 5px;
-`;
-
-const WidgetActionDropdown = styled.span`
-  position: relative;
 `;
 
 const TitleInputWrapper = styled.div`
@@ -148,7 +146,7 @@ const WidgetHeader = ({
       <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
-    <WidgetActionDropdown>{children}</WidgetActionDropdown>
+    {children}
   </Container>
 );
 
