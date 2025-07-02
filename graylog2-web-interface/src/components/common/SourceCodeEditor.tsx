@@ -51,9 +51,9 @@ const SourceCodeContainer = styled.div<ContainerProps>(
 const Toolbar = styled.div(
   ({ theme }) => css`
     background: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.gray[80]};
+    border: 1px solid ${theme.colors.input.border};
     border-bottom: 0;
-    border-radius: 5px 5px 0 0;
+    border-radius: 0;
 
     .btn-link {
       color: ${theme.colors.variant.dark.info};
@@ -70,13 +70,6 @@ const Toolbar = styled.div(
         &:hover {
           color: ${theme.colors.variant.light.default};
         }
-      }
-    }
-
-    & + ${SourceCodeContainer} {
-      /* Do not add border radius if code editor comes after toolbar */
-      .ace_editor {
-        border-radius: 0 0 5px 5px;
       }
     }
   `,
