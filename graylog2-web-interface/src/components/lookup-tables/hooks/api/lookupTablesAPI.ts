@@ -42,4 +42,4 @@ export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
   return LookupTableCachesActions.searchPaginated(page, pageSize, query).then((resp: any) => deserializeCaches(resp));
 };
 
-export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
+export const deleteCache = async (cacheId: string) => LookupTableCachesActions.delete(cacheId);
