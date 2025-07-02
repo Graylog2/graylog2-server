@@ -37,7 +37,7 @@ const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefin
   return (
     <StopPropagation data-testid={dataTestid}>
       <span className={isOpen ? widgetActionsDropdownOpenClass : ''}>
-        <Menu position="bottom" withinPortal zIndex={1051} onChange={toggleIsOpen}>
+        <Menu position="bottom" withinPortal onChange={toggleIsOpen}>
           <Menu.Target>{element}</Menu.Target>
           <Menu.Dropdown>
             <MenuItem header>{header}</MenuItem>
