@@ -65,6 +65,8 @@ import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
+  line-height: 0;
+
   > *:not(:last-child) {
     margin-right: 2px;
   }
@@ -177,6 +179,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
+
   const onCopyToDashboard = useCallback(
     (widgetId: string, dashboardId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
