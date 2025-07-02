@@ -90,6 +90,13 @@ const useRenderCompletionCallback = () => {
   }, [renderCompletionCallback]);
 };
 
+const usePageErrors = (searchTypeId: string) => {
+  const searchResult = useSearchResult();
+  const errors = searchResult?.result?.errors ?? [];
+
+  return errors.filter((error) => error.searchTypeId === searchTypeId);
+};
+
 const MessageList = ({
   config,
   data: { id: searchTypeId, messages, total: totalMessages },
@@ -100,7 +107,8 @@ const MessageList = ({
 }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { stopAutoRefresh } = useAutoRefresh();
-  const { result } = useSearchResult();
+
+  const pageErrors = usePageErrors(searchTypeId);
   const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
@@ -153,8 +161,8 @@ const MessageList = ({
           pageSize={pageSize}
           enforcePageBounds={false}
           useQueryParameter={false}>
-          {result.errors?.length > 0 ? (
-            <ErrorWidget errors={result.errors} />
+          {pageErrors.length > 0 ? (
+            <ErrorWidget errors={pageErrors} />
           ) : (
             <MessageTable
               activeQueryId={activeQueryId}
