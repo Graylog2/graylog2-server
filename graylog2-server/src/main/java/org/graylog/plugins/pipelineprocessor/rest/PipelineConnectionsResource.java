@@ -49,7 +49,6 @@ import org.graylog2.streams.StreamService;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -202,7 +201,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     }
 
     private void checkNotEditable(Stream stream, String message) {
-        if (!stream.getId().equals(DEFAULT_STREAM_ID) && !stream.isEditable()) {
+        if (!stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }
