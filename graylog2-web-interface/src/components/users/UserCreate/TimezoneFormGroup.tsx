@@ -26,12 +26,12 @@ const TimezoneFormGroup = () => (
       <Input
         id="timezone-select"
         label="Time Zone"
-        help="Choose your local time zone or leave it as it is to use the system's default."
+        help="Choose your local time zone or leave it as it is to use the browser's default."
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9">
         <TimezoneSelect
           className="timezone-select"
-          value={value}
+          value={value || "Browser's time zone"}
           name="timezone"
           onChange={(newValue) => onChange({ target: { name, value: newValue } })}
         />
