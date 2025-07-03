@@ -24,6 +24,8 @@ import {
   fetchErrors,
   fetchPaginatedLookupTables,
   deleteLookupTable,
+  fetchPaginatedCaches,
+  deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
 } from './api/lookupTablesAPI';
@@ -48,6 +50,29 @@ export function useDeleteLookupTable() {
   return {
     deleteLookupTable: mutateAsync,
     deletingLookupTable: isPending,
+  };
+}
+
+export const cachesKeyFn = (searchParams: SearchParams) => ['caches', 'search', searchParams];
+export function useFetchCaches() {
+  return { fetchPaginatedCaches, cachesKeyFn };
+}
+
+export function useDeleteCache() {
+  const { refetch } = useTableFetchContext();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: deleteCache,
+    onSuccess: () => {
+      UserNotification.success('Cache deleted successfully');
+      refetch();
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    deleteCache: mutateAsync,
+    deletingCache: isPending,
   };
 }
 

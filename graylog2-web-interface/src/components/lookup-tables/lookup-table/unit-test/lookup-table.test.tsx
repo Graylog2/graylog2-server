@@ -68,13 +68,13 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => {}],
+  useQueryParam: () => [undefined, () => { }],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchLookupTables: () => ({
     fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
-    lookupTablesKeyFn: jest.fn((searchParams: SearchParams) => ['lookup-tables', 'search', searchParams]),
+    lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
   }),
   useDeleteLookupTable: () => ({
     deleteLookupTable: mockDeleteLookupTable,

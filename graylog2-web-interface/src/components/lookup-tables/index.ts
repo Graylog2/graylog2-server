@@ -26,7 +26,8 @@ export { default as LookupTableFields } from './LookupTableFields';
 
 export { default as LookupTableCreate } from './LookupTableCreate';
 
-export { default as CachesOverview } from './CachesOverview';
+// export { default as CachesOverview } from './CachesOverview';
+export { default as CachesOverview } from './cache-list';
 export { default as CacheTableEntry } from './CacheTableEntry';
 export { default as Cache } from './Cache';
 export { default as CacheForm } from './CacheForm';
