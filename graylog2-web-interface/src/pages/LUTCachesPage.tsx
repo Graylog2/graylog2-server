@@ -49,7 +49,6 @@ type LUTCachesPageProps = ParamsContext &
     caches?: any[];
     history: any;
     location: any;
-    pagination: any;
     action?: string;
   };
 
@@ -103,7 +102,7 @@ class LUTCachesPage extends React.Component<
   };
 
   render() {
-    const { action, cache, validationErrors, types, caches, pagination, history } = this.props;
+    const { action, cache, validationErrors, types, caches, history } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
@@ -146,7 +145,8 @@ class LUTCachesPage extends React.Component<
     } else if (!caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = <CachesOverview caches={caches} pagination={pagination} />;
+      // content = <CachesOverview caches={caches} pagination={pagination} />;
+      content = <CachesOverview />;
     }
 
     return (
