@@ -37,6 +37,7 @@ import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 
 import java.util.Optional;
 
@@ -56,6 +57,7 @@ public class FavoritesResource {
 
     @GET
     @ApiOperation("Get the Favorites for the Start Page for the user")
+    @InlinePermissionCheck
     public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") @Min(1) int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") @Min(1) int perPage,
                                                         @ApiParam(name = "type") @QueryParam("type") Optional<String> type,
@@ -67,6 +69,7 @@ public class FavoritesResource {
     @Path("/{grn}")
     @ApiOperation("Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
+    @InlinePermissionCheck
     public void addItemToFavorites(@ApiParam(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
         favoritesService.addFavoriteItemFor(grn, searchUser);
     }
@@ -75,6 +78,7 @@ public class FavoritesResource {
     @Path("/{grn}")
     @ApiOperation("Remove an item from inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
+    @InlinePermissionCheck
     public void removeItemFromFavorites(@ApiParam(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
         favoritesService.removeFavoriteItemFor(grn, searchUser);
     }

@@ -51,6 +51,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @GET
     @ApiOperation(value = "Return shares for a user")
     @Path("user/{userId}")
+    @InlinePermissionCheck
     public PaginatedResponse<EntityDescriptor> get(@ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters,
                                                    @ApiParam(name = "userId", required = true) @PathParam("userId") @NotBlank String userId,
                                                    @ApiParam(name = "capability") @QueryParam("capability") @DefaultValue("") String capabilityFilter,
@@ -113,6 +115,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @ApiOperation(value = "Prepare shares for an entity or collection")
     @Path("entities/{entityGRN}/prepare")
     @NoAuditEvent("This does not change any data")
+    @InlinePermissionCheck
     public EntityShareResponse prepareShare(@ApiParam(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
                                             @ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
         final GRN grn = grnRegistry.parse(entityGRN);
@@ -155,6 +158,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @ApiOperation(value = "Create / update shares for an entity or collection")
     @Path("entities/{entityGRN}")
     @NoAuditEvent("Audit events are created within EntitySharesService")
+    @InlinePermissionCheck
     public Response updateEntityShares(@ApiParam(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
                                        @ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
         final GRN entity = grnRegistry.parse(entityGRN);

@@ -49,6 +49,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -178,6 +179,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation(value = "Get a single role")
     @Path("{roleId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public AuthzRoleDTO get(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         checkPermission(RestPermissions.ROLES_READ, roleId);
         return authzRolesService.get(roleId).orElseThrow(
@@ -221,6 +223,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation("Add user to role")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     @Path("{roleId}/assignees")
+    @InlinePermissionCheck
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "usernames") Set<String> usernames) throws ValidationException {
@@ -231,6 +234,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation("Remove user from role")
     @Path("{roleId}/assignee/{username}")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
+    @InlinePermissionCheck
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
@@ -271,8 +275,9 @@ public class AuthzRolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Delete a role")
+    @InlinePermissionCheck
     public void delete(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
-        checkPermission(RestPermissions.ROLES_EDIT);
+        checkPermission(RestPermissions.ROLES_DELETE, roleId);
         final AuthzRoleDTO roleDTO = authzRolesService.get(roleId).orElseThrow(
                 () -> new NotFoundException("Could not delete role with id: " + roleId));
         if (roleDTO.readOnly()) {

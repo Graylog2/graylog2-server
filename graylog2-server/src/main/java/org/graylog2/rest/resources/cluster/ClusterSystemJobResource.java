@@ -21,6 +21,18 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
@@ -34,25 +46,11 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.constraints.NotEmpty;
-
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,6 +85,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired
     public Map<String, Optional<Map<String, List<SystemJobSummary>>>> list(@Context UserContext userContext) throws IOException, NodeNotFoundException {
         final Map<String, Optional<Map<String, List<SystemJobSummary>>>> forAllNodes = stripCallResult(requestOnAllNodes(RemoteSystemJobResource.class, RemoteSystemJobResource::list));
 
@@ -106,6 +105,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get job with the given ID")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired
     public SystemJobSummary getJob(@Context UserContext userContext,
                                    @ApiParam(name = "jobId", required = true) @PathParam("jobId") String jobId) throws IOException {
         for (Map.Entry<String, Node> entry : nodeService.allActive().entrySet()) {
@@ -137,6 +137,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @ApiOperation(value = "Cancel job with the given ID")
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
+    @NoPermissionCheckRequired
     public SystemJobSummary cancelJob(@Context UserContext userContext,
                                       @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) throws IOException {
         final Optional<Response<SystemJobSummary>> summaryResponse = nodeService.allActive().entrySet().stream()

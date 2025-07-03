@@ -22,20 +22,10 @@ import io.krakens.grok.api.Grok;
 import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.Match;
 import io.krakens.grok.api.exception.GrokException;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.grok.GrokPattern;
-import org.graylog2.grok.GrokPatternService;
-import org.graylog2.rest.models.tools.requests.GrokTestRequest;
-import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -43,6 +33,14 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternService;
+import org.graylog2.rest.models.tools.requests.GrokTestRequest;
+import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,6 +61,7 @@ public class GrokTesterResource extends RestResource {
 
     @GET
     @Timed
+    @NoPermissionCheckRequired("Utility endpoint")
     public GrokTesterResponse grokTest(@QueryParam("pattern") @NotEmpty String pattern,
                                        @QueryParam("string") @NotNull String string,
                                        @QueryParam("named_captures_only") @NotNull boolean namedCapturesOnly) throws GrokException {
@@ -75,6 +74,7 @@ public class GrokTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test Grok patterns")
+    @NoPermissionCheckRequired("Utility endpoint")
     public GrokTesterResponse testGrok(@Valid @NotNull GrokTestRequest grokTestRequest) throws GrokException {
         return doTestGrok(grokTestRequest.string(), grokTestRequest.pattern(), grokTestRequest.namedCapturesOnly());
     }

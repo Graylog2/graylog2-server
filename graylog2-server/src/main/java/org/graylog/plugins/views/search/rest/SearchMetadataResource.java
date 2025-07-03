@@ -44,6 +44,8 @@ import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidato
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Map;
@@ -68,6 +70,7 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     @GET
     @ApiOperation(value = "Metadata for the given Search object", notes = "Used for already persisted search objects")
     @Path("{searchId}")
+    @InlinePermissionCheck
     public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
         final SearchDTO search = searchDomain.getForUser(searchId, searchUser)
                 .map(SearchDTO::fromSearch)
@@ -78,6 +81,7 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     @POST
     @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
+    @NoPermissionCheckRequired("metadata extraction only")
     public SearchMetadata metadataForObject(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchDTO) {
         if (searchDTO == null) {
             throw new IllegalArgumentException("Search must not be null.");

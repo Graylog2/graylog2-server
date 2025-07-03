@@ -27,6 +27,7 @@ import org.graylog2.messageprocessors.MessageProcessorsConfig;
 import org.graylog2.messageprocessors.MessageProcessorsConfigWithDescriptors;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -67,6 +68,7 @@ public class MessageProcessorsResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get message processor configuration")
     @Path("config")
+    @InlinePermissionCheck
     public MessageProcessorsConfigWithDescriptors config() {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_READ);
         final MessageProcessorsConfig config = clusterConfigService.getOrDefault(MessageProcessorsConfig.class,
@@ -80,6 +82,7 @@ public class MessageProcessorsResource extends RestResource {
     @ApiOperation(value = "Update message processor configuration")
     @Path("config")
     @AuditEvent(type = AuditEventTypes.MESSAGE_PROCESSOR_CONFIGURATION_UPDATE)
+    @InlinePermissionCheck
     public MessageProcessorsConfigWithDescriptors updateConfig(@ApiParam(name = "config", required = true) final MessageProcessorsConfigWithDescriptors configWithDescriptors) {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT);
         final MessageProcessorsConfig config = configWithDescriptors.toConfig();

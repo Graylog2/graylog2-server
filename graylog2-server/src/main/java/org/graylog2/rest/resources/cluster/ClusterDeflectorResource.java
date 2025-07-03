@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
 
@@ -61,6 +62,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @ApiOperation(value = "Finds leader node and triggers deflector cycle")
     @Path("/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
+    @NoPermissionCheckRequired
     public void cycle() throws IOException {
         requestOnLeader(RemoteDeflectorResource::cycle, RemoteDeflectorResource.class);
     }
@@ -70,6 +72,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @ApiOperation(value = "Finds leader node and triggers deflector cycle")
     @Path("/{indexSetId}/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
+    @NoPermissionCheckRequired
     public void cycle(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws IOException {
         requestOnLeader(c -> c.cycleIndexSet(indexSetId), RemoteDeflectorResource.class);
     }

@@ -48,6 +48,7 @@ import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
 import org.graylog2.shared.rest.HideOnCloud;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import java.io.IOException;
@@ -72,6 +73,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "List all loggers of all nodes and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired
     public Map<String, Optional<LoggersSummary>> loggers() {
         return stripCallResult(requestOnAllNodes(RemoteLoggersResource.class, RemoteLoggersResource::loggers));
     }
@@ -81,6 +83,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Path("/subsystems")
     @ApiOperation(value = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired
     public Map<String, Optional<SubsystemSummary>> subsystems() {
         return stripCallResult(requestOnAllNodes(RemoteLoggersResource.class, RemoteLoggersResource::subsystems));
     }
@@ -94,6 +97,7 @@ public class ClusterLoggersResource extends ProxiedResource {
             @ApiResponse(code = 404, message = "No such subsystem.")
     })
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
+    @NoPermissionCheckRequired
     public void setSubsystemLoggerLevel(
             @ApiParam(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId,
             @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
@@ -111,6 +115,7 @@ public class ClusterLoggersResource extends ProxiedResource {
                   notes = "Provided level is falling back to DEBUG if it does not exist")
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired
     public Map<String, CallResult<Void>> setClusterSingleLoggerLevel(
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
             @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
@@ -126,6 +131,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     })
     @Produces(MediaType.TEXT_PLAIN)
     @HideOnCloud
+    @NoPermissionCheckRequired
     public Response messages(@ApiParam(name = "nodeId", value = "The nodeId to get logs from") @PathParam("nodeId") @NotEmpty String nodeId,
                              @ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
                                      "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",

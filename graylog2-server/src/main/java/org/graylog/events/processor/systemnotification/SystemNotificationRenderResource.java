@@ -22,7 +22,9 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.notifications.Notification;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,7 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/html/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get HTML formatted message")
+    @InlinePermissionCheck
     public TemplateRenderResponse renderHtml(@ApiParam(name = "type", required = true)
                                              @PathParam("type") Notification.Type type,
                                              @ApiParam(name = "JSON body", required = false)
@@ -72,6 +75,7 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/html/{type}/{key}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get HTML formatted message")
+    @InlinePermissionCheck
     public TemplateRenderResponse renderHtmlWithKey(@ApiParam(name = "type", required = true) @PathParam("type") Notification.Type type,
                                                     @ApiParam(name = "key", required = true) @PathParam("key") String key,
                                                     @ApiParam(name = "JSON body", required = false)
@@ -84,6 +88,7 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/plaintext/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get plaintext formatted message")
+    @InlinePermissionCheck
     public TemplateRenderResponse renderPlainText(@ApiParam(name = "type", required = true)
                                                   @PathParam("type") Notification.Type type,
                                                   @ApiParam(name = "JSON body", required = false)
@@ -96,6 +101,7 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/plaintext/{type}/{key}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get plaintext formatted message")
+    @InlinePermissionCheck
     public TemplateRenderResponse renderPlainTextWithKey(@ApiParam(name = "type", required = true) @PathParam("type") Notification.Type type,
                                                          @ApiParam(name = "key", required = true) @PathParam("key") String key,
                                                          @ApiParam(name = "JSON body", required = false)
@@ -108,6 +114,7 @@ public class SystemNotificationRenderResource extends RestResource {
             @Nullable String key,
             SystemNotificationRenderService.Format format,
             TemplateRenderRequest request) {
+        checkPermission(RestPermissions.NOTIFICATIONS_READ, type.toString());
         Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
         SystemNotificationRenderService.RenderResponse renderResponse =
                 systemNotificationRenderService.render(type, key, format, values);

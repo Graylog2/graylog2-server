@@ -61,6 +61,8 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -153,6 +155,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
     @POST
     @Path("/parse")
+    @NoPermissionCheckRequired
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
@@ -170,6 +173,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/simulate")
+    @NoPermissionCheckRequired
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Message simulate(
             @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
@@ -252,6 +256,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @GET
+    @InlinePermissionCheck
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
         return pipelineRuleService.createRuleSourceFromRuleDao(ruleService.load(id));
@@ -260,6 +265,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Retrieve the named processing rules in bulk")
     @Path("/multiple")
     @POST
+    @InlinePermissionCheck
     @NoAuditEvent("only used to get multiple pipeline rules")
     public Collection<RuleSource> getBulk(@ApiParam("rules") BulkRuleRequest rules) {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
@@ -274,6 +280,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/{id}")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_UPDATE)
+    @InlinePermissionCheck
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
@@ -303,6 +310,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @DELETE
+    @InlinePermissionCheck
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_DELETE)
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_DELETE, id);
@@ -313,6 +321,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Get function descriptors")
     @Path("/functions")
     @GET
+    @NoPermissionCheckRequired
     public Collection<Object> functionDescriptors() {
         return functionRegistry.all().stream()
                 .map(Function::descriptor)
@@ -322,6 +331,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Get function descriptors for rule builder")
     @Path("/rulebuilder/functions")
     @GET
+    @NoPermissionCheckRequired
     public Collection<Object> rulebuilderFunctions() {
         return functionRegistry.all().stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled())
@@ -332,6 +342,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Get condition descriptors for ruleBuilder")
     @Path("/rulebuilder/conditions")
     @GET
+    @NoPermissionCheckRequired
     public Collection<Object> rulebuilderConditions() {
         return functionRegistry.all().stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled() && f.descriptor().returnType().equals(Boolean.class))
@@ -342,6 +353,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Get rule metrics configuration")
     @Path("/config/metrics")
     @GET
+    @NoPermissionCheckRequired
     public RuleMetricsConfigDto metricsConfig() {
         return ruleMetricsConfigService.get();
     }
@@ -350,6 +362,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/config/metrics")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_METRICS_UPDATE)
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_METRICS_EDIT)
     public RuleMetricsConfigDto updateMetricsConfig(RuleMetricsConfigDto config) {
         return ruleMetricsConfigService.save(config);
     }

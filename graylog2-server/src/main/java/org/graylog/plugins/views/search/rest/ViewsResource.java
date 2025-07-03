@@ -83,6 +83,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -145,6 +146,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @GET
     @ApiOperation("Get a list of all views")
+    @InlinePermissionCheck
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @ApiParam(name = "sort",
@@ -179,6 +181,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
+    @InlinePermissionCheck
     public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
@@ -229,6 +232,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    @InlinePermissionCheck
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) {
@@ -353,6 +357,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
+    @InlinePermissionCheck
     public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
                           @Context SearchUser searchUser) {
@@ -378,6 +383,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
     @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
+    @InlinePermissionCheck
     public void setDefault(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
@@ -388,6 +394,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
+    @InlinePermissionCheck
     public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @Context SearchUser searchUser) {
         final ViewDTO view = loadView(id);
@@ -407,6 +414,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Timed
     @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @InlinePermissionCheck
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final SearchUser searchUser) {
 

@@ -37,6 +37,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Map;
@@ -63,6 +64,7 @@ public class TelemetryResource extends RestResource {
 
     @GET
     @ApiOperation(value = "Get telemetry information.")
+    @NoPermissionCheckRequired("settings scoped to authenticated user")
     public ObjectNode get() {
         return telemetryService.getTelemetryResponse(getCurrentUserOrThrow());
     }
@@ -73,6 +75,7 @@ public class TelemetryResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 404, message = "Current user not found.")
     })
+    @NoPermissionCheckRequired("settings scoped to authenticated user")
     public TelemetryUserSettings getTelemetryUserSettings() {
         return telemetryService.getTelemetryUserSettings(getCurrentUserOrThrow());
     }
@@ -82,6 +85,7 @@ public class TelemetryResource extends RestResource {
     @ApiOperation("Update a user's telemetry settings.")
     @ApiResponses({@ApiResponse(code = 404, message = "Current user not found.")})
     @NoAuditEvent("Audit event is sent manually.")
+    @NoPermissionCheckRequired("settings scoped to authenticated user")
     public void saveTelemetryUserSettings(@ApiParam(name = "JSON body", value = "The telemetry settings to assign to the user.", required = true)
                                           @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {
 

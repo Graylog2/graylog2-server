@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.utilities.date.NaturalDateParser;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -63,6 +64,7 @@ public class NaturalDateTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public NaturalDateResponse naturalDateTester(@QueryParam("string") @NotEmpty final String string, @QueryParam("timezone") @NotEmpty final String timezone) {
         try {
             final NaturalDateParser.Result result = new NaturalDateParser(timezone).parse(string);

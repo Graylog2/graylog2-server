@@ -58,6 +58,7 @@ import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
@@ -124,6 +125,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
+    @InlinePermissionCheck
     public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest,
                                                       @Context SearchUser searchUser) {
 
@@ -172,6 +174,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Path("{searchId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
+    @InlinePermissionCheck
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
@@ -189,6 +192,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Path("{searchId}/{searchTypeId}")
     @NoAuditEvent("Has custom audit events")
+    @InlinePermissionCheck
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
@@ -206,6 +210,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @ApiOperation("Retrieve results for export job")
     @GET
     @Path("job/{exportJobId}/{filename}")
+    @InlinePermissionCheck
     public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
                                                                   @PathParam("exportJobId") String exportJobId,
                                                                   @ApiParam(value = "Resulting filename", name = "filename")

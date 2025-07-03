@@ -19,21 +19,20 @@ package org.graylog2.rest.resources.system.processing;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +54,7 @@ public class ClusterProcessingStatusResource extends ProxiedResource {
     @GET
     @Timed
     @ApiOperation(value = "Get processing status from all nodes in the cluster")
+    @NoPermissionCheckRequired
     public Map<String, Optional<ProcessingStatusSummary>> getStatus() {
         return stripCallResult(requestOnAllNodes(RemoteSystemProcessingStatusResource.class, RemoteSystemProcessingStatusResource::getStatus));
     }
@@ -63,6 +63,7 @@ public class ClusterProcessingStatusResource extends ProxiedResource {
     @Path("/persisted")
     @Timed
     @ApiOperation(value = "Get persisted processing status from all nodes in the cluster")
+    @NoPermissionCheckRequired
     public Map<String, Optional<ProcessingStatusSummary>> getPersistedStatus() {
         return stripCallResult(requestOnAllNodes(RemoteSystemProcessingStatusResource.class, RemoteSystemProcessingStatusResource::getPersistedStatus));
     }

@@ -34,6 +34,7 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
@@ -85,6 +86,7 @@ public class AppConfigResource {
 
     @GET
     @Produces(MoreMediaTypes.APPLICATION_JAVASCRIPT)
+    @NoPermissionCheckRequired
     public String get(@Context HttpHeaders headers) {
         final URL templateUrl = this.getClass().getResource("/web-interface/config.js.template");
         final String template;

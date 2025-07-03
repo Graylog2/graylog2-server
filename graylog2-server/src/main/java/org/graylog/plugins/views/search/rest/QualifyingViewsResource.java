@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.views.QualifyingViewsService;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.inject.Inject;
@@ -54,6 +55,7 @@ public class QualifyingViewsResource extends RestResource implements PluginRestR
     @POST
     @ApiOperation("Get all views that match given parameter value")
     @NoAuditEvent("Only returning matching views, not changing any data")
+    @InlinePermissionCheck
     public Collection<ViewParameterSummaryDTO> forParameter(@Context SearchUser searchUser) {
         return qualifyingViewsService.forValue()
                 .stream()

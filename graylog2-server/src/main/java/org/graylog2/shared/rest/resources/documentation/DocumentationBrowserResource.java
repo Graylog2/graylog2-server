@@ -34,6 +34,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 
@@ -68,6 +69,7 @@ public class DocumentationBrowserResource extends RestResource {
     }
 
     @GET
+    @NoPermissionCheckRequired
     public Response root(@Context HttpHeaders httpHeaders) throws IOException {
         final String index = index(httpHeaders);
         return Response.ok(index, MediaType.TEXT_HTML_TYPE)
@@ -79,6 +81,7 @@ public class DocumentationBrowserResource extends RestResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("index.html")
+    @NoPermissionCheckRequired
     public String index(@Context HttpHeaders httpHeaders) throws IOException {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
@@ -94,6 +97,7 @@ public class DocumentationBrowserResource extends RestResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/global/index.html")
+    @NoPermissionCheckRequired
     public String allIndex(@Context HttpHeaders httpHeaders) throws IOException {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
@@ -110,6 +114,7 @@ public class DocumentationBrowserResource extends RestResource {
 
     @GET
     @Path("/{route: .*}")
+    @NoPermissionCheckRequired
     public Response asset(@PathParam("route") String route) throws IOException {
         // Remove path globalModePath before we serve swagger resources
         if (route.startsWith("global/")) {

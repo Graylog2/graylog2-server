@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -34,6 +35,7 @@ import org.graylog2.rest.models.streams.outputs.OutputListResponse;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.OutputService;
@@ -77,20 +79,22 @@ public class OutputResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all outputs")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public OutputListResponse get() {
-        checkPermission(RestPermissions.OUTPUTS_READ);
         final Set<OutputSummary> outputs = new HashSet<>();
 
         for (Output output : outputService.loadAll()) {
-            outputs.add(OutputSummary.create(
-                    output.getId(),
-                    output.getTitle(),
-                    output.getType(),
-                    output.getCreatorUserId(),
-                    new DateTime(output.getCreatedAt()),
-                    new HashMap<>(output.getConfiguration()),
-                    output.getContentPack()
-            ));
+            if (isPermitted(RestPermissions.OUTPUTS_READ, output.getId())) {
+                outputs.add(OutputSummary.create(
+                        output.getId(),
+                        output.getTitle(),
+                        output.getType(),
+                        output.getCreatorUserId(),
+                        new DateTime(output.getCreatedAt()),
+                        new HashMap<>(output.getConfiguration()),
+                        output.getContentPack()
+                ));
+            }
         }
 
         return OutputListResponse.create(outputs);
@@ -104,6 +108,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
     })
+    @InlinePermissionCheck
     public OutputSummary get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_READ, outputId);
         final Output output = outputService.load(outputId);
@@ -119,8 +124,8 @@ public class OutputResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid output specification in input.", response = OutputSummary.class)
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_CREATE)
+    @RequiresPermissions(RestPermissions.OUTPUTS_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
-        checkPermission(RestPermissions.OUTPUTS_CREATE);
         final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type());
 
         if (outputSummary == null) {
@@ -162,9 +167,10 @@ public class OutputResource extends RestResource {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_DELETE)
+    @InlinePermissionCheck
     public void delete(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                        @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
-        checkPermission(RestPermissions.OUTPUTS_TERMINATE);
+        checkPermission(RestPermissions.OUTPUTS_TERMINATE,  outputId);
         final Output output = outputService.load(outputId);
         outputService.destroy(output);
     }
@@ -174,6 +180,7 @@ public class OutputResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get all available output modules")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public Map<String, Map<String, AvailableOutputSummary>> available() {
         checkPermission(RestPermissions.OUTPUTS_READ);
         return ImmutableMap.of("types", messageOutputFactory.getAvailableOutputs());
@@ -188,6 +195,7 @@ public class OutputResource extends RestResource {
             @ApiResponse(code = 404, message = "No such output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_UPDATE)
+    @InlinePermissionCheck
     public Output update(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                          @PathParam("outputId") String outputId,
                          @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {

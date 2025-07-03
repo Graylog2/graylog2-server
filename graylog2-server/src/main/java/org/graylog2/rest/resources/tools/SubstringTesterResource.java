@@ -22,6 +22,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.tools.requests.SubstringTestRequest;
 import org.graylog2.rest.models.tools.responses.SubstringTesterResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.validation.Valid;
@@ -42,6 +43,7 @@ public class SubstringTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired("Utility resource")
     public SubstringTesterResponse substringTester(@QueryParam("begin_index") @Min(0) int beginIndex,
                                                    @QueryParam("end_index") @Min(1) int endIndex,
                                                    @QueryParam("string") @NotNull String string) {
@@ -53,6 +55,7 @@ public class SubstringTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used for testing substring extractor")
+    @NoPermissionCheckRequired("Utility resource")
     public SubstringTesterResponse testSubstring(@Valid @NotNull SubstringTestRequest substringTestRequest) {
         return doSubstringTest(substringTestRequest.string(), substringTestRequest.start(), substringTestRequest.end());
     }
