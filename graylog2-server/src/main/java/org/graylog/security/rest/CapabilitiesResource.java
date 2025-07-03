@@ -23,9 +23,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -78,21 +78,16 @@ public class CapabilitiesResource extends RestResource {
     @Path("/{capability}")
     @ApiOperation("Return the requested capability")
     public CapabilityDescriptorResponse get(@ApiParam("capability") @PathParam("capability") @NotBlank String capabilityString) {
+        final var capability = parseCapability(capabilityString);
 
-        try {
-            final var capability = Capability.valueOf(capabilityString.toUpperCase(Locale.ROOT));
+        checkPermission(RestPermissions.CAPABILITIES_READ, capability.name());
 
-            checkPermission(RestPermissions.CAPABILITIES_READ, capability.name());
-
-            return capabilityRegistry.allSharingCapabilities()
-                    .stream()
-                    .filter(descriptor -> descriptor.capability() == capability)
-                    .map(CapabilityDescriptorResponse::new)
-                    .findFirst()
-                    .orElse(null);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(e.getMessage(), e);
-        }
+        return capabilityRegistry.allSharingCapabilities()
+                .stream()
+                .filter(descriptor -> descriptor.capability() == capability)
+                .map(CapabilityDescriptorResponse::new)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No descriptor found for capability: " + capabilityString));
     }
 
     public record CapabilitiesResponse(@JsonProperty("capabilities") List<CapabilityDescriptorResponse> capabilities) {
@@ -131,27 +126,31 @@ public class CapabilitiesResource extends RestResource {
     @ApiOperation("Get permissions for a specific capability and entity")
     public CapabilityPermissionsResponse entityCapabilityPermissions(@ApiParam("capability") @PathParam("capability") @NotBlank String capabilityString,
                                                                      @ApiParam("entity") @PathParam("entity") @NotBlank String entity) {
-        try {
-            final var entityGrn = grnRegistry.parse(entity);
-            final var capability = Capability.valueOf(capabilityString.toUpperCase(Locale.ROOT));
+        final var entityGrn = grnRegistry.parse(entity);
+        final var capability = parseCapability(capabilityString);
 
-            checkPermission(RestPermissions.CAPABILITIES_READ, capability.name());
+        checkPermission(RestPermissions.CAPABILITIES_READ, capability.name());
 
-            final var permissions = capabilityRegistry.getPermissions(capability, entityGrn.grnType())
-                    .stream()
-                    .map(p -> p.toShiroPermission(entityGrn).toString())
-                    .sorted()
-                    .toList();
+        final var permissions = capabilityRegistry.getPermissions(capability, entityGrn.grnType())
+                .stream()
+                .map(p -> p.toShiroPermission(entityGrn).toString())
+                .sorted()
+                .toList();
 
-            return new CapabilityPermissionsResponse(capability, entityGrn, permissions);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(e.getMessage(), e);
-        }
+        return new CapabilityPermissionsResponse(capability, entityGrn, permissions);
     }
 
     public record CapabilityPermissionsResponse(@JsonProperty("capability") Capability capability,
                                                 @JsonProperty("entity") GRN entity,
                                                 @JsonProperty("permissions") List<String> permissions) {
 
+    }
+
+    private Capability parseCapability(String capabilityString) {
+        try {
+            return Capability.valueOf(capabilityString.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException("Capability not found: " + capabilityString, e);
+        }
     }
 }
