@@ -128,7 +128,7 @@ public class CapabilitiesResource extends RestResource {
 
     @GET
     @Path("/{capability}/{entity}")
-    @ApiOperation("Return a list of all capabilities in the system")
+    @ApiOperation("Get permissions for a specific capability and entity")
     public CapabilityPermissionsResponse entityCapabilityPermissions(@ApiParam("capability") @PathParam("capability") @NotBlank String capabilityString,
                                                                      @ApiParam("entity") @PathParam("entity") @NotBlank String entity) {
         try {
