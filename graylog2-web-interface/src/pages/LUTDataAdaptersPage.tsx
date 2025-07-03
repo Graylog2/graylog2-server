@@ -47,11 +47,9 @@ const _validateAdapter = (adapter) => {
 };
 
 type LUTDataAdaptersPageProps = {
-  errorStates?: any;
   dataAdapter?: any;
   validationErrors?: any;
   types?: any;
-  pagination?: any;
   dataAdapters?: any[];
   location: any;
   action?: string;
@@ -66,11 +64,9 @@ class LUTDataAdaptersPage extends React.Component<
   }
 > {
   static defaultProps = {
-    errorStates: null,
     validationErrors: {},
     dataAdapters: null,
     types: null,
-    pagination: null,
     dataAdapter: null,
     action: undefined,
   };
@@ -144,7 +140,7 @@ class LUTDataAdaptersPage extends React.Component<
   };
 
   render() {
-    const { action, errorStates, dataAdapter, validationErrors, types, dataAdapters, pagination, history } = this.props;
+    const { action, dataAdapter, validationErrors, types, dataAdapters, history } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
@@ -187,7 +183,8 @@ class LUTDataAdaptersPage extends React.Component<
     } else if (!dataAdapters) {
       content = <Spinner text="Loading data adapters" />;
     } else {
-      content = <DataAdaptersOverview dataAdapters={dataAdapters} pagination={pagination} errorStates={errorStates} />;
+      // content = <DataAdaptersOverview dataAdapters={dataAdapters} pagination={pagination} errorStates={errorStates} />;
+      content = <DataAdaptersOverview />;
     }
 
     return (
