@@ -20,7 +20,13 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import UserNotification from 'util/UserNotification';
 
-import { fetchPaginatedLookupTables, deleteLookupTable, fetchErrors } from './api/lookupTablesAPI';
+import {
+  fetchErrors,
+  fetchPaginatedLookupTables,
+  deleteLookupTable,
+  fetchPaginatedCaches,
+  deleteCache,
+} from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
@@ -47,4 +53,27 @@ export function useDeleteLookupTable() {
 
 export function useFetchErrors() {
   return { fetchErrors };
+}
+
+export const cachesKeyFn = (searchParams: SearchParams) => ['caches', 'search', searchParams];
+export function useFetchCaches() {
+  return { fetchPaginatedCaches, cachesKeyFn };
+}
+
+export function useDeleteCache() {
+  const { refetch } = useTableFetchContext();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: deleteCache,
+    onSuccess: () => {
+      UserNotification.success('Cache deleted successfully');
+      refetch();
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    deleteCache: mutateAsync,
+    deletingCache: isPending,
+  };
 }
