@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing issue where navigation dropdown menus were hidden behind the pinned search sidebar."
+
+issues = ["graylog-plugin-enterprise#11200"]
+pulls = ["23051"]

@@ -42,7 +42,7 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
     border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
     box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
-    z-index: ${$sidebarIsPinned ? 1030 : 6};
+    z-index: 6;
 
     ${$sidebarIsPinned &&
     css`
