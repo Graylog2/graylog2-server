@@ -21,15 +21,34 @@ import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import UserNotification from 'util/UserNotification';
 
 import {
-  fetchPaginatedLookupTables,
-  fetchPaginatedDataAdapters,
   fetchErrors,
+  fetchPaginatedLookupTables,
+  deleteLookupTable,
+  fetchPaginatedDataAdapters,
   deleteDataAdapter,
 } from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function useDeleteLookupTable() {
+  const { refetch } = useTableFetchContext();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: deleteLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Lookup table deleted successfully');
+      refetch();
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    deleteLookupTable: mutateAsync,
+    deletingLookupTable: isPending,
+  };
 }
 
 export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];

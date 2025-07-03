@@ -27,6 +27,7 @@ import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/t
 import { lutListElements } from './constants';
 import columnRenderers from './column-renderers';
 import ErrorsConsumer from './errors-consumer';
+import useActions from './use-actions';
 import type { LookupTableEntity } from './types';
 
 const queryHelpComponent = (
@@ -53,6 +54,7 @@ function LookupTableList() {
     adapterNames?: Array<string>;
   }>({ lutNames: undefined, cacheNames: undefined, adapterNames: undefined });
   const { fetchPaginatedLookupTables, lookupTablesKeyFn } = useFetchLookupTables();
+  const { renderActions } = useActions();
 
   const handleFetchTables = React.useCallback(
     async (searchParams: SearchParams) => {
@@ -76,13 +78,13 @@ function LookupTableList() {
         <Col md={12}>
           <PaginatedEntityTable<LookupTableEntity>
             humanName="lookup tables"
-            entityActions={null}
+            entityActions={renderActions}
             columnsOrder={lutListElements.columnOrder}
             queryHelpComponent={queryHelpComponent}
             tableLayout={lutListElements.defaultLayout}
             fetchEntities={handleFetchTables}
             keyFn={lookupTablesKeyFn}
-            actionsCellWidth={0}
+            actionsCellWidth={100}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
           />
