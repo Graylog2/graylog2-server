@@ -241,7 +241,6 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                         id="pull_from_cloud"
                         name="pull_from_cloud"
                         placeholder="Select cloud storage"
-                        required
                         disabled={!values.enabled}
                         options={cloudStorageOptions}
                         matchProp="label"
