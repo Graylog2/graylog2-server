@@ -529,7 +529,12 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava-testlib</artifactId>
+                <version>${guava.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

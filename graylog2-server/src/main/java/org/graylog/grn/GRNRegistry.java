@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -170,6 +171,15 @@ public class GRNRegistry {
         if (REGISTRY.putIfAbsent(toKey(type.type()), type) != null) {
             throw new IllegalStateException("Type <" + type.type() + "> already exists");
         }
+    }
+
+    /**
+     * Performs the given action for each registered GRN type.
+     *
+     * @param action the action to perform for each GRN type
+     */
+    public void forEach(Consumer<GRNType> action) {
+        REGISTRY.values().forEach(action);
     }
 
     private String toKey(String type) {

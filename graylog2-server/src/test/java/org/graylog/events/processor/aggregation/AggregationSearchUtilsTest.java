@@ -43,25 +43,31 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.FAILURES_STREAM_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -78,9 +84,26 @@ public class AggregationSearchUtilsTest {
     @Mock
     private EventFactory eventFactory;
 
-    private PermittedStreams permittedStreams = new PermittedStreams(streamService);
-    private EventStreamService eventStreamService = new EventStreamService(streamService);
+    private PermittedStreams permittedStreams;
+    private EventStreamService eventStreamService;
     private final MessageFactory messageFactory = new TestMessageFactory();
+
+    @BeforeEach
+    public void setup() {
+        final Supplier<Stream<String>> streamIdSupplier = () -> Stream.of(
+                "stream-1",
+                "stream-2",
+                "stream-3",
+                DEFAULT_STREAM_ID,
+                DEFAULT_EVENTS_STREAM_ID,
+                DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                FAILURES_STREAM_ID
+        );
+        final Function<Collection<String>, Stream<String>> categoryMappingFunction = (categories) -> Stream.of();
+
+        permittedStreams = new PermittedStreams(streamIdSupplier, categoryMappingFunction);
+        eventStreamService = new EventStreamService(streamService);
+    }
 
     @Test
     public void testEventsFromAggregationResult() throws EventProcessorException {
@@ -541,16 +564,15 @@ public class AggregationSearchUtilsTest {
 
     @Test
     public void testEventsFromAggregationResultWithEmptyResultAndNoConfiguredStreamsUsesAllStreamsAsSourceStreams() throws EventProcessorException {
-        when(streamService.loadAll()).thenReturn(ImmutableList.of(
-                new StreamMock(Collections.singletonMap("_id", "stream-1"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-2"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-3"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_EVENTS_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.FAILURES_STREAM_ID), emptyList())
+        when(streamService.streamAllIds()).thenReturn(Stream.of(
+                "stream-1",
+                "stream-2",
+                "stream-3",
+                DEFAULT_STREAM_ID,
+                DEFAULT_EVENTS_STREAM_ID,
+                DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                FAILURES_STREAM_ID
         ));
-        permittedStreams = new PermittedStreams(streamService);
         eventStreamService = new EventStreamService(streamService);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
@@ -594,7 +616,7 @@ public class AggregationSearchUtilsTest {
                     "stream-1",
                     "stream-2",
                     "stream-3",
-                    StreamImpl.DEFAULT_STREAM_ID
+                    DEFAULT_STREAM_ID
             );
 
             final Message message = eventWithContext.messageContext().orElse(null);
