@@ -20,6 +20,8 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 
+export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
+
 export const fetchErrors = async ({
   lutNames = undefined,
   cacheNames = undefined,
