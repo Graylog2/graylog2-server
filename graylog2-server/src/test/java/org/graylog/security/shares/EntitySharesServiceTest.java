@@ -39,6 +39,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,7 @@ class EntitySharesServiceTest {
         this.entitySharesService = new EntitySharesService(
                 dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
                 grnRegistry, granteeService, entityCreationRequestService, serverEventBus,
-                new HashSet<>(), new BuiltinCapabilities(grnRegistry, Set.of()));
+                new HashSet<>(), new CapabilityRegistry(grnRegistry, Set.of(new RestPermissions(), new RestPermissions())));
     }
 
     @DisplayName("Validates we cannot remove the last owner")
