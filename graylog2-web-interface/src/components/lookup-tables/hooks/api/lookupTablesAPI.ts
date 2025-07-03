@@ -24,6 +24,8 @@ export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => 
   return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
 };
 
+export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
+
 export const fetchErrors = async ({
   lutNames = undefined,
   cacheNames = undefined,

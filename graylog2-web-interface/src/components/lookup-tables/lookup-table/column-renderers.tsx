@@ -114,7 +114,7 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
 const columnRenderers: ColumnRenderers<LookupTableEntity> = {
   attributes: {
     title: {
-      width: 0.2,
+      width: 0.1,
       renderCell: (title: string, lut: LookupTableEntity, _c: any, meta: { caches: CachesMap, adapters: AdaptersMap; }) =>
         <TitleCol lut={lut} caches={meta.caches} adapters={meta.adapters} title={title}>{title}</TitleCol>,
     },
@@ -123,17 +123,17 @@ const columnRenderers: ColumnRenderers<LookupTableEntity> = {
       renderCell: (description: string) => <span>{description}</span>,
     },
     name: {
-      width: 0.2,
+      width: 0.1,
       renderCell: (name: string) => <span>{name}</span>,
     },
     cache_id: {
-      width: 0.2,
+      width: 0.1,
       renderCell: (cache_id: string, _lut: LookupTableEntity, _c: any, meta: { caches: CachesMap }) => (
         <CacheCol cacheId={cache_id} caches={meta.caches} />
       ),
     },
     data_adapter_id: {
-      width: 0.2,
+      width: 0.1,
       renderCell: (data_adapter_id: string, _lut: LookupTableEntity, _c: any, meta: { adapters: AdaptersMap }) => (
         <DataAdapterCol dataAdapterId={data_adapter_id} dataAdapters={meta.adapters} />
       ),

@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
 import { LOOKUP_TABLES, CACHES, ADAPTERS, ERROR_STATE } from './fixtures';
 
@@ -43,6 +45,27 @@ const mockFetchPaginatedLookupTables = jest.fn(async () =>
 );
 
 const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
+const mockDeleteLookupTable = jest.fn(async () => Promise.resolve());
+
+jest.mock('hooks/useScopePermissions', () => ({
+  __esModule: true,
+  default: jest.fn((entity: GenericEntityType) => {
+    const scopes = {
+      ILLUMINATE: { is_mutable: false },
+      DEFAULT: { is_mutable: true },
+    };
+
+    return {
+      loadingScopePermissions: false,
+      scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+      checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+        const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+
+        return scopes[entityScope].is_mutable;
+      },
+    };
+  }),
+}));
 
 jest.mock('routing/QueryParams', () => ({
   useQueryParam: () => [undefined, () => {}],
@@ -52,6 +75,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchLookupTables: () => ({
     fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
     lookupTablesKeyFn: jest.fn((searchParams: SearchParams) => ['lookup-tables', 'search', searchParams]),
+  }),
+  useDeleteLookupTable: () => ({
+    deleteLookupTable: mockDeleteLookupTable,
+    deletingLookupTable: false,
   }),
   useFetchErrors: () => ({
     fetchErrors: mockFetchErrors,
@@ -81,5 +108,29 @@ describe('Lookup Table List', () => {
     await screen.findByTestId('lookup-table-problem', { exact: true }, { timeout: 1500 });
     screen.getByTestId('cache-problem');
     screen.getByTestId('data-adapter-problem');
+  });
+
+  it('should show an actions menu', async () => {
+    render(<LookupTableList />);
+
+    await screen.findByRole('button', { name: LOOKUP_TABLES[0].id });
+  });
+
+  it('should be able to edit a table', async () => {
+    render(<LookupTableList />);
+
+    userEvent.click(await screen.findByRole('button', { name: LOOKUP_TABLES[0].id }));
+
+    await screen.findByRole('menuitem', { name: /edit/i });
+  });
+
+  it('should be able to delete a table', async () => {
+    render(<LookupTableList />);
+
+    userEvent.click(await screen.findByRole('button', { name: LOOKUP_TABLES[0].id }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+
+    expect(mockDeleteLookupTable).toHaveBeenLastCalledWith(LOOKUP_TABLES[0].id);
   });
 });
