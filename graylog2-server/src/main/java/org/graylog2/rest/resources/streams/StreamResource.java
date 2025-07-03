@@ -731,7 +731,8 @@ public class StreamResource extends RestResource {
                 stream.isDefaultStream(),
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
-                stream.getCategories()
+                stream.getCategories(),
+                stream.isEditable()
         );
     }
 
@@ -749,7 +750,7 @@ public class StreamResource extends RestResource {
                 firstNonNull(stream.isDefaultStream(), false),
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
-                Stream.streamIsEditable(stream.getId()),
+                stream.isEditable(),
                 stream.getCategories()
         );
     }
@@ -762,7 +763,7 @@ public class StreamResource extends RestResource {
     }
 
     private void checkNotEditableStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
+        if (!streamService.isEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }
