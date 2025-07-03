@@ -18,10 +18,12 @@ import React from 'react';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { Stream } from 'views/stores/StreamsStore';
 
 type Props = {
-  stream: Stream;
+  stream: {
+    id: string;
+    title: string;
+  };
 };
 
 const StreamLink = ({ stream }: Props) => {
