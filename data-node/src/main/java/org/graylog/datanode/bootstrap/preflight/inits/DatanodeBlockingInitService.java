@@ -14,20 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security;
+package org.graylog.datanode.bootstrap.preflight.inits;
+
+import jakarta.inject.Inject;
 
 import java.util.Set;
 
-public interface CapabilityPermissions {
-    default Set<String> readPermissions() {
-        return Set.of();
+/**
+ * Datanode init procedures that should be triggered after preflight but before the real injection and server startup
+ * takes place.
+ */
+public class DatanodeBlockingInitService {
+    private final Set<DatanodeBlockingInit> inits;
+
+    @Inject
+    public DatanodeBlockingInitService(Set<DatanodeBlockingInit> inits) {
+        this.inits = inits;
     }
 
-    default Set<String> editPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> deletePermissions() {
-        return Set.of();
+    public void runInits() {
+        inits.forEach(DatanodeBlockingInit::runInit);
     }
 }

@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
-import chroma from 'chroma-js';
+import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
-import { Icon, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import Scratchpad from 'components/scratchpad/Scratchpad';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
@@ -46,26 +45,6 @@ const PageContent = styled.div`
   flex: 1;
 `;
 
-const ScrollToHint = styled.div(
-  ({ theme }) => css`
-    position: fixed;
-    left: 50%;
-    margin-left: -125px;
-    top: 50px;
-    /* stylelint-disable function-no-unknown */
-    color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
-    font-size: 80px;
-    padding: 25px;
-    z-index: 2000;
-    width: 200px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 10px;
-    display: none;
-    background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
-  `,
-);
-
 const App = () => (
   <DefaultQueryParamProvider>
     <CurrentUserContext.Consumer>
@@ -82,9 +61,6 @@ const App = () => (
                 <>
                   <AppLayout>
                     <Navigation />
-                    <ScrollToHint id="scroll-to-hint">
-                      <Icon name="arrow_upward" />
-                    </ScrollToHint>
                     <Scratchpad />
                     <ReportedErrorBoundary>
                       <RuntimeErrorBoundary>

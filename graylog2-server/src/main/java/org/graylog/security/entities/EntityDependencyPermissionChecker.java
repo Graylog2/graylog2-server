@@ -18,16 +18,13 @@ package org.graylog.security.entities;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
-import org.graylog.security.CapabilityDescriptor;
 import org.graylog.security.GranteeAuthorizer;
+import org.graylog2.plugin.security.Permission;
 
-import jakarta.inject.Inject;
-
-import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class EntityDependencyPermissionChecker {
@@ -79,13 +76,11 @@ public class EntityDependencyPermissionChecker {
     }
 
     private boolean cannotView(GranteeAuthorizer authorizer, EntityDescriptor dependency) {
-        final Optional<CapabilityDescriptor> capabilityDescriptor = builtinCapabilities.get(Capability.VIEW);
+        final Set<Permission> permissions = builtinCapabilities.get(Capability.VIEW, dependency.id().grnType());
 
         // TODO: This only looks at grants permissions, but should also check for permissions through roles
-        return capabilityDescriptor.map(CapabilityDescriptor::permissions)
-                .orElse(Collections.emptySet())
-                .stream()
-                .filter(permission -> dependency.id().isPermissionApplicable(permission))
+        return permissions.stream()
+                .map(Permission::permission)
                 .noneMatch(permission -> authorizer.isPermitted(permission, dependency.id()));
     }
 }

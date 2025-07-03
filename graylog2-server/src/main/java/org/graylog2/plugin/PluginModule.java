@@ -35,6 +35,7 @@ import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypeProvider;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -44,6 +45,7 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
+import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
@@ -361,6 +363,16 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addGRNType(GRNType type, Class<? extends GRNDescriptorProvider> descriptorProvider) {
         final MapBinder<GRNType, GRNDescriptorProvider> mapBinder = MapBinder.newMapBinder(binder(), GRNType.class, GRNDescriptorProvider.class);
         mapBinder.addBinding(type).to(descriptorProvider);
+    }
+
+    protected void addGRNTypeProvider(Class<? extends GRNTypeProvider> grnTypeProvider) {
+        final Multibinder<GRNTypeProvider> grnTypeProviderBinder = Multibinder.newSetBinder(binder(), GRNTypeProvider.class);
+        grnTypeProviderBinder.addBinding().to(grnTypeProvider);
+    }
+
+    protected void addSyncedEntitiesResolver(Class<? extends SyncedEntitiesResolver> resolverClass) {
+        final Multibinder<SyncedEntitiesResolver> syncedEntitiesResolverBinder = Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
+        syncedEntitiesResolverBinder.addBinding().to(resolverClass);
     }
 
     protected MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {

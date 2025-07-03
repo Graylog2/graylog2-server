@@ -112,7 +112,7 @@ type StreamCategorySelectorProps = {
 const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySelectorProps) => {
   const streamCategoryOptions = useMemo(
     () =>
-      [...new Set<string>(streams.flatMap((stream) => stream?.categories))]
+      [...new Set<string>(streams.flatMap((stream) => stream?.categories ?? []))]
         .sort(defaultCompare)
         .map((category) => ({ label: category, value: category })),
     [streams],
@@ -125,13 +125,7 @@ const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySele
       <ControlLabel>
         Stream Categories <small className="text-muted">(Optional)</small>
       </ControlLabel>
-      <MultiSelect
-        id="filter-stream-categories"
-        matchProp="label"
-        onChange={onChange}
-        options={streamCategoryOptions}
-        value={value}
-      />
+      <MultiSelect id="filter-stream-categories" onChange={onChange} options={streamCategoryOptions} value={value} />
       <HelpBlock>Select stream categories the search should include.</HelpBlock>
     </FormGroup>
   );
@@ -582,7 +576,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             <ControlLabel>Streams{!isStreamRequired && <small className="text-muted"> (Optional)</small>}</ControlLabel>
             <MultiSelect
               id="filter-streams"
-              matchProp="label"
               required={isStreamRequired}
               onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
               options={formattedStreams}

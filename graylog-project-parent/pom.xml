@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>${opentelemetry.version}</version>
+                <version>${opentelemetry-instrumentation.version}</version>
             </dependency>
             <dependency>
                 <groupId>software.amazon.msk</groupId>
@@ -529,7 +529,12 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava-testlib</artifactId>
+                <version>${guava.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -622,7 +627,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.10</version>
+                                    <version>7.6.11</version>
                                 </plugin>
                             </plugins>
                         </configuration>

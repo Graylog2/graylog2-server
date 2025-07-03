@@ -108,7 +108,6 @@ class DataAdapterCreate extends React.Component<
                   placeholder="Select Data Adapter Type"
                   clearable={false}
                   options={sortedAdapters}
-                  matchProp="label"
                   onChange={this._onTypeSelect}
                   value={null}
                 />
