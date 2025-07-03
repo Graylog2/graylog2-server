@@ -66,7 +66,7 @@ const query = MockQuery.builder()
 
 const SearchBar = () => (
   <TestStoreProvider>
-    <OriginalSearchBar />
+    <OriginalSearchBar scrollContainer={{ current: null }} />
   </TestStoreProvider>
 );
 

@@ -52,16 +52,19 @@ const StyledGrid = styled(Grid)`
  * Provides the basic layout for the page content section.
  * The section includes all page specific components, but not elements like the navigation or sidebar.
  */
-const PageContentLayout = ({
-  children = null,
-  className = undefined,
-  FooterComponent = Footer,
-  NotificationsComponent = WithGlobalAppNotifications,
-}: Props) => {
+const PageContentLayout = (
+  {
+    children = null,
+    className = undefined,
+    FooterComponent = Footer,
+    NotificationsComponent = WithGlobalAppNotifications,
+  }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
   const { enabled } = useFooterCustomization();
 
   return (
-    <Container className={className}>
+    <Container className={className} ref={ref}>
       <NotificationsComponent>
         <StyledGrid fluid className="page-content-grid">
           {children || <Outlet />}
@@ -72,4 +75,4 @@ const PageContentLayout = ({
   );
 };
 
-export default PageContentLayout;
+export default React.forwardRef(PageContentLayout);
