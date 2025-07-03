@@ -130,7 +130,7 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
       <>
         <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-            Add to URL Whitelist
+            Add to URL Allowlist
           </Button>
         </IfPermitted>
         <BootstrapModalForm
