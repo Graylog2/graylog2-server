@@ -21,10 +21,8 @@ import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { QueryValidationState, ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
-import usePluginEntities from 'hooks/usePluginEntities';
-import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
