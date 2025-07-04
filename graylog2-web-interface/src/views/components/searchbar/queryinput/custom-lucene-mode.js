@@ -91,7 +91,7 @@ ace.define(
           },
           {
             token: 'term',
-            regex: /[\w\\/]+/,
+            regex: /[\w\\/.]+/,
           },
           {
             token: 'text',
