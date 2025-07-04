@@ -1,5 +1,5 @@
 type = "f"
 message = "Fix color of comments in pipeline rule editor."
 
-pulls = ["23082"]
+pulls = ["23083"]
 issues = ["19346"]
