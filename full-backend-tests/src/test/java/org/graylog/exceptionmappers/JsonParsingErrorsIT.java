@@ -101,7 +101,7 @@ public class JsonParsingErrorsIT {
     @ContainerMatrixTest
     void extractsReferencePathFromMissingProperty() {
         assertErrorResponse(STREAMS, "{}")
-                .body("reference_path", equalTo("org.graylog2.rest.resources.streams.requests.CreateStreamRequest"));
+                .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
 
         assertErrorResponse(STREAMS, """
                 {
@@ -109,10 +109,7 @@ public class JsonParsingErrorsIT {
                     "rules": [{}]
                 }
                 """)
-                .body("reference_path", equalTo(
-                        "org.graylog2.rest.resources.streams.requests.CreateStreamRequest[\"rules\"]" +
-                                "->java.util.ArrayList[0]" +
-                                "->org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest"));
+                .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
     }
 
     @ContainerMatrixTest

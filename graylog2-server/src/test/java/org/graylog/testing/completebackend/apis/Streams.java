@@ -22,6 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Collection;
@@ -78,7 +79,7 @@ public final class Streams implements GraylogRestApi {
         final String streamId = given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(body)
+                .body(CreateEntityRequest.create(body, null))
                 .post("/streams")
                 .then()
                 .log().ifError()

@@ -45,8 +45,8 @@ import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -131,7 +131,7 @@ public class ViewsResourceTest {
         );
 
 
-        viewsResource.create(new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), mockUserContext(), SEARCH_USER);
+        viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mockUserContext(), SEARCH_USER);
 
         final ArgumentCaptor<ViewDTO> viewCaptor = ArgumentCaptor.forClass(ViewDTO.class);
         final ArgumentCaptor<User> ownerCaptor = ArgumentCaptor.forClass(User.class);
@@ -155,7 +155,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.create(new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -173,7 +173,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.create(new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -191,7 +191,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -213,7 +213,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        viewsResource.update(VIEW_ID, new UnwrappedCreateEntityRequest<>(TEST_SEARCH_VIEW, null), SEARCH_USER);
+        viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_SEARCH_VIEW, null), SEARCH_USER);
         verify(viewService).update(TEST_SEARCH_VIEW);
     }
 
@@ -230,7 +230,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -251,7 +251,7 @@ public class ViewsResourceTest {
                 EMPTY_VIEW_RESOLVERS,
                 SEARCH
         );
-        viewsResource.update(VIEW_ID, new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), SEARCH_USER);
+        viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER);
         verify(viewService).update(TEST_DASHBOARD_VIEW);
     }
 
@@ -352,7 +352,7 @@ public class ViewsResourceTest {
                 .canCreateDashboards(false)
                 .build();
 
-        assertThatThrownBy(() -> viewsResource.create(new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), user))
+        assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), user))
                 .isInstanceOf(ForbiddenException.class);
     }
 
