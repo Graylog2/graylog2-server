@@ -87,7 +87,7 @@ const LUTTableEntry = ({
       <tr>
         <td>
           {errors.table && <ErrorPopover placement="right" errorText={errors.table} title="Lookup Table problem" />}
-          <Link to={Routes.SYSTEM.LOOKUPTABLES.show(table.name)}>{table.title}</Link>
+          <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
         </td>
         <td>{table.description}</td>
         <td>{table.name}</td>

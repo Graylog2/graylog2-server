@@ -62,7 +62,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
 
   return (
     <Row className="content">
-      <Col md={6}>
+      <Col md={12}>
         <h2>
           {adapterTitle} <small>({plugin.displayName})</small>
         </h2>
@@ -72,6 +72,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
             <dd>{adapterDescription || <em>No description.</em>}</dd>
           </dl>
         </ConfigSummaryDefinitionListWrapper>
+        <hr />
         <h4>Configuration</h4>
         <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { dataAdapter: dataAdapter })}
@@ -83,8 +84,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
             </Button>
           </LinkContainer>
         )}
-      </Col>
-      <Col md={6}>
+        <hr />
         <h3>Test lookup</h3>
         <p>You can manually trigger the data adapter using this form. The data will be not cached.</p>
         <form onSubmit={_lookupKey}>
