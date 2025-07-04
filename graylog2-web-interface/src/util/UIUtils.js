@@ -16,6 +16,8 @@
  */
 import $ from 'jquery';
 
+import { SCROLL_CONTAINER_ID } from 'components/layout/PageContentLayout';
+
 const UIUtils = {
   NAVBAR_HEIGHT: 55,
   scrollToHint(element) {
@@ -30,7 +32,7 @@ const UIUtils = {
           event.preventDefault();
           const top = window.pageYOffset - this.NAVBAR_HEIGHT + element.getBoundingClientRect().top;
 
-          $('html, body').animate({ scrollTop: top }, 'fast');
+          $(`#${SCROLL_CONTAINER_ID}`).animate({ scrollTop: top }, 'fast');
           $scrollHint.off('click');
         });
     }
