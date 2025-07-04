@@ -14,9 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { EntityBase } from 'components/common/EntityDataTable/types';
-import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+const iterable = Object.keys([...new Array(10)]);
 
-export type LookupTableEntity = EntityBase & LookupTable;
-export type CachesMap = { [key: string]: LookupTableCache };
-export type AdaptersMap = { [key: string]: LookupTableAdapter };
+// eslint-disable-next-line import/prefer-default-export
+export const CACHES = iterable.map((item: string) => ({
+  config: {
+    type: 'none',
+  },
+  id: `${item}-cache-id`,
+  _scope: 'DEFAULT',
+  title: `${item} cache title`,
+  description: `${item} cache description`,
+  name: `${item} cache name`,
+  content_pack: null,
+}));

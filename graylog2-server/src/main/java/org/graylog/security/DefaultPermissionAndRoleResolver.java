@@ -31,20 +31,20 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
     private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionAndRoleResolver.class);
 
     private final Logger logger;
-    private final BuiltinCapabilities builtinCapabilities;
+    private final CapabilityRegistry capabilityRegistry;
     private final DBGrantService grantService;
 
     @Inject
-    public DefaultPermissionAndRoleResolver(BuiltinCapabilities builtinCapabilities,
+    public DefaultPermissionAndRoleResolver(CapabilityRegistry capabilityRegistry,
                                             DBGrantService grantService) {
-        this(LOG, builtinCapabilities, grantService);
+        this(LOG, capabilityRegistry, grantService);
     }
 
     public DefaultPermissionAndRoleResolver(Logger logger,
-                                            BuiltinCapabilities builtinCapabilities,
+                                            CapabilityRegistry capabilityRegistry,
                                             DBGrantService grantService) {
         this.logger = logger;
-        this.builtinCapabilities = builtinCapabilities;
+        this.capabilityRegistry = capabilityRegistry;
         this.grantService = grantService;
     }
 
@@ -74,7 +74,7 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
             final Set<GRN> targets = resolveTargets(grant.target());
 
             for (GRN target : targets) {
-                final Optional<CapabilityDescriptor> capability = builtinCapabilities.get(grant.capability());
+                final Optional<CapabilityDescriptor> capability = capabilityRegistry.get(grant.capability());
 
                 if (capability.isPresent()) {
                     capability.get()
