@@ -68,8 +68,7 @@ const updateRule = async (rule: RuleBuilderRule) => {
 };
 
 const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { source, ...ruleToValidate }: any = rule;
+  const { source: _source, _scope, ...ruleToValidate }: any = rule;
 
   return fetch('POST', qualifyUrl(ApiRoutes.RuleBuilderController.validate().url), ruleToValidate);
 };
