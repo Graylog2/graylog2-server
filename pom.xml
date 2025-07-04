@@ -421,12 +421,14 @@
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
+                <artifactId>okhttp-bom</artifactId>
                 <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-tls</artifactId>
+                <artifactId>okhttp-jvm</artifactId><!-- This one is not in the bom as of 5.0.0 -->
                 <version>${okhttp.version}</version>
             </dependency>
             <dependency>
