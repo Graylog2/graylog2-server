@@ -22,6 +22,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.annotation.Nonnull;
@@ -131,6 +132,14 @@ public abstract class LookupTable {
         final LookupResult result = dataAdapter().assignTtl(key, ttlSec);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
+    }
+
+    public boolean supportsPreview() {
+        return dataAdapter().supportsPreview();
+    }
+
+    public LookupPreview getPreview(int size) {
+        return dataAdapter().getPreview(size);
     }
 
     @AutoValue.Builder

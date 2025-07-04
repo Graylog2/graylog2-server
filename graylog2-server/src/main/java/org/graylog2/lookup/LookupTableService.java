@@ -38,6 +38,7 @@ import org.graylog2.lookup.events.LookupTablesDeleted;
 import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.system.SystemEntity;
 import org.graylog2.utilities.LoggingServiceListener;
@@ -731,6 +732,22 @@ public class LookupTableService extends AbstractIdleService {
                 return LookupResult.withError();
             }
             return lookupTable.assignTtl(requireValidKey(key), ttlSec);
+        }
+
+        public boolean supportsPreview() {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return false;
+            }
+            return lookupTable.supportsPreview();
+        }
+
+        public LookupPreview getPreview(int size) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupPreview.empty();
+            }
+            return lookupTable.getPreview(size);
         }
     }
 }
