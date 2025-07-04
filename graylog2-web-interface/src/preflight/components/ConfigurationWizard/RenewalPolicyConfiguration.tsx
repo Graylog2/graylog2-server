@@ -20,7 +20,8 @@ import styled from 'styled-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import moment from 'moment';
 
-import { Title, Space, Button, Group, NumberInput, Input } from 'preflight/components/common';
+import { Title, Space, Group, NumberInput, Input } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';

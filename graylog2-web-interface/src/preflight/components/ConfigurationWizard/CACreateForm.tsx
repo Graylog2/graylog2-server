@@ -19,7 +19,8 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Button, FormikInput, Space } from 'preflight/components/common';
+import { FormikInput, Space } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -61,7 +62,7 @@ const CACreateForm = () => {
           <Form>
             <FormikInput placeholder="Organization Name" name="organization" label="Organization Name" required />
             <Space h="md" />
-            <Button disabled={isSubmitting || !isValid} type="submit">
+            <Button bsStyle="info" disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}
             </Button>
           </Form>

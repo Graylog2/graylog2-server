@@ -17,7 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Text } from 'preflight/components/common';
+import { Text } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import DocsHelper from 'util/DocsHelper';
@@ -37,7 +38,7 @@ const HelpMenu = () => {
   return (
     <Menu width={250} position="bottom-end">
       <Menu.Target>
-        <StyledButton variant="default">
+        <StyledButton>
           <Text fw={500} size="sm" mr={3}>
             Get Help
           </Text>
