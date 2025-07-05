@@ -38,7 +38,7 @@ const docsHelper = {
     ES_CLUSTER_STATUS_RED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
     ES_CLUSTER_UNAVAILABLE: 'setting_up_graylog/opensearch.htm#GraylogConfigurationSettings',
     ES_OPEN_FILE_LIMITS: 'setting_up_graylog/opensearch.htm#GraylogConfigurationSettings',
-    EVENT_PROCEDURES: 'what_more_can_graylog_do_for_me/remediation_steps.htm', // placeholder remediation steps
+    EVENT_PROCEDURES: 'what_more_can_graylog_do_for_me/event_procedures.htm',
     EXTRACTORS: 'making_sense_of_your_log_data/extractors.htm',
     GRAYLOG_DATA_NODE: 'downloading_and_installing_graylog/install_graylog_data_node.htm',
     INDEXER_FAILURES: 'getting_in_log_data/indexer_failures.html',
