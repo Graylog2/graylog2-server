@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { widgetDragHandleClass, widgetActionsMenuClass } from 'views/components/widgets/Constants';
+import { widgetActionsMenuClass, widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
 
 const WidgetWrap = styled.div(
   ({ theme }) => css`
@@ -102,15 +102,24 @@ const WidgetWrap = styled.div(
       }
     }
 
-    .${widgetActionsMenuClass}, .${widgetDragHandleClass} {
+    .${widgetActionsMenuClass} {
+      position: absolute;
       opacity: 0;
-      pointer-events: none;
       transition: opacity 0.2s;
+      transition-delay: 0.5s;
+      top: 0;
+      right: 0;
     }
 
-    &:hover .${widgetActionsMenuClass}, &:hover .${widgetDragHandleClass} {
+    &:hover
+      .${widgetActionsMenuClass},
+      &:focus-within
+      .${widgetActionsMenuClass},
+      &:has(.${widgetActionsDropdownOpenClass})
+      .${widgetActionsMenuClass} {
+      position: relative;
       opacity: 1;
-      pointer-events: auto;
+      transition-delay: 0s;
     }
   `,
 );

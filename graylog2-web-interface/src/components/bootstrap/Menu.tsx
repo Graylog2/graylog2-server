@@ -19,6 +19,8 @@ import React from 'react';
 import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
+import zIndices from 'theme/z-indices';
+
 type Props = PropsWithChildren<{
   closeOnItemClick?: boolean;
   keepMounted?: boolean;
@@ -47,7 +49,7 @@ const Menu = ({
   shadow = undefined,
   width = undefined,
   withinPortal = false,
-  zIndex = undefined,
+  zIndex = zIndices.dropdownMenu,
 }: Props) => (
   <MantineMenu
     closeOnItemClick={closeOnItemClick}

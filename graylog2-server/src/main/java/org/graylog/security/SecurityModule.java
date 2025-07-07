@@ -37,6 +37,8 @@ import org.graylog.security.authservice.rest.AuthServicesResource;
 import org.graylog.security.authservice.rest.GlobalAuthServiceConfigResource;
 import org.graylog.security.authservice.rest.HTTPHeaderAuthenticationConfigResource;
 import org.graylog.security.authzroles.AuthzRolesResource;
+import org.graylog.security.rest.CapabilitiesResource;
+import org.graylog.security.entities.EntityOwnershipRegistrationHandler;
 import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
@@ -55,7 +57,7 @@ public class SecurityModule extends PluginModule {
         );
         authServiceBackendBinder();
 
-        bind(BuiltinCapabilities.class).asEagerSingleton();
+        bind(CapabilityRegistry.class).asEagerSingleton();
 
         bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);
 
@@ -65,6 +67,8 @@ public class SecurityModule extends PluginModule {
                 .setDefault().to(DefaultPermissionAndRoleResolver.class);
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
+
+        addEntityRegistrationHandler(EntityOwnershipRegistrationHandler.class);
 
         Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
 
@@ -78,6 +82,7 @@ public class SecurityModule extends PluginModule {
         addSystemRestResource(AuthzRolesResource.class);
         addSystemRestResource(EntitySharesResource.class);
         addSystemRestResource(GrantsOverviewResource.class);
+        addSystemRestResource(CapabilitiesResource.class);
 
         addAuditEventTypes(SecurityAuditEventTypes.class);
 

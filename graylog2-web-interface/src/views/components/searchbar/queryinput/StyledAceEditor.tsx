@@ -58,7 +58,8 @@ const StyledAceEditor = styled(AceEditor)<Props>(
       }
 
       .ace_marker-layer .ace_selection {
-        background: ${$scTheme.colors.variant.lightest.default};
+        background: Highlight;
+        border-radius: 0;
       }
 
       .ace_marker-layer .ace_step {
@@ -80,6 +81,7 @@ const StyledAceEditor = styled(AceEditor)<Props>(
 
       .ace_marker-layer .ace_selected-word {
         border: 1px solid ${$scTheme.colors.gray[80]};
+        background: transparent;
       }
 
       .ace_invisible {
