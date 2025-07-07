@@ -25,6 +25,8 @@ import org.graylog2.inputs.persistence.InputStatusRecord;
 import org.graylog2.inputs.persistence.InputStatusService;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +34,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,10 +118,10 @@ public class DBConnectorPollerTask implements Runnable {
 
         int processedRecordCount = 0;
 
-        ZoneId zoneId = ZoneId.of(timezone);
-        ZonedDateTime now = ZonedDateTime.now(zoneId);
-        Timestamp defaultStartTime = Timestamp.from(now.minusHours(1).toInstant());
-        Timestamp endTime = Timestamp.from(now.toInstant());
+        DateTimeZone zone = DateTimeZone.forID(timezone);
+        DateTime dateTime = new DateTime(zone);
+        Timestamp defaultStartTime = Timestamp.valueOf(dateTime.minusHours(1).toString().substring(0, 23).replace("T", " "));
+        Timestamp endTime = Timestamp.valueOf(dateTime.toString().substring(0, 23).replace("T", " "));
         Timestamp startTime = null;
 
         long offset = 0;

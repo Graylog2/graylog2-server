@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -126,8 +127,10 @@ public class DBConnectorInput extends MessageInput {
             stateFieldType.put(TIMESTAMP, TIMESTAMP);
             stateFieldType.put(INCREMENT, INCREMENT);
             Set<String> zones = DateTimeZone.getAvailableIDs();
-            Map<String, String> timezones = zones.stream()
-                    .collect(Collectors.toMap(zone -> zone, zone -> zone));
+            Map<String, String> timezones = new TreeMap<>();
+            for (String zone : zones) {
+                timezones.put(zone, zone);
+            }
 
             addConnectionFields(request);
             request.addField(new DropdownField(
