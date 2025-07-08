@@ -62,6 +62,7 @@ public class OpensearchConfiguration {
     private String buildRolesList() {
         return configurationParts.stream()
                 .flatMap(cfg -> cfg.nodeRoles().stream())
+                .distinct()
                 .collect(Collectors.joining(","));
     }
 
