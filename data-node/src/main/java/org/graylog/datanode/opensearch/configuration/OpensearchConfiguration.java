@@ -60,10 +60,7 @@ public class OpensearchConfiguration {
 
     @Nonnull
     private String buildRolesList() {
-        return configurationParts.stream()
-                .flatMap(cfg -> cfg.nodeRoles().stream())
-                .distinct()
-                .collect(Collectors.joining(","));
+         return String.join(",", opensearchRoles());
     }
 
     public Environment getEnv() {
@@ -129,6 +126,7 @@ public class OpensearchConfiguration {
     public List<String> opensearchRoles() {
         return configurationParts.stream()
                 .flatMap(cfg -> cfg.nodeRoles().stream())
+                .distinct()
                 .collect(Collectors.toList());
     }
 
