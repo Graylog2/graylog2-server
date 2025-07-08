@@ -19,6 +19,8 @@ import styled from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
+import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import Cache from 'components/lookup-tables/Cache';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import type { CacheEntity } from './types';
@@ -43,9 +45,14 @@ const Title = styled.div`
 `;
 
 const TitleCol = ({ cache, children }: { cache: CacheEntity; children: string }) => {
+  const { setModal, setTitle, setEntity } = useModalContext();
+
   const onClick = React.useCallback(() => {
-    console.debug(cache.id);
-  }, [cache]);
+    console.log('cache click')
+    setModal('CACHE');
+    setTitle(cache.name);
+    setEntity(<Cache cache={cache} />);
+  }, [cache, setModal, setTitle, setEntity]);
 
   return (
     <TitleRow>

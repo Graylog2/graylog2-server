@@ -21,6 +21,8 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
+import LUTModals from 'components/lookup-tables/LUTModals';
 
 import { cacheListElements } from './constants';
 import columnRenderers from './column-renderers';
@@ -49,24 +51,27 @@ function CacheList() {
   const { renderActions } = useActions();
 
   return (
-    <ErrorsProvider>
-      <Row className="content">
-        <Col md={12}>
-          <PaginatedEntityTable<CacheEntity>
-            humanName="caches"
-            entityActions={renderActions}
-            columnsOrder={cacheListElements.columnOrder}
-            queryHelpComponent={queryHelpComponent}
-            tableLayout={cacheListElements.defaultLayout}
-            fetchEntities={fetchPaginatedCaches}
-            keyFn={cachesKeyFn}
-            actionsCellWidth={100}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={columnRenderers}
-          />
-        </Col>
-      </Row>
-    </ErrorsProvider>
+    <ModalProvider>
+      <ErrorsProvider>
+        <Row className="content">
+          <Col md={12}>
+            <PaginatedEntityTable<CacheEntity>
+              humanName="caches"
+              entityActions={renderActions}
+              columnsOrder={cacheListElements.columnOrder}
+              queryHelpComponent={queryHelpComponent}
+              tableLayout={cacheListElements.defaultLayout}
+              fetchEntities={fetchPaginatedCaches}
+              keyFn={cachesKeyFn}
+              actionsCellWidth={100}
+              entityAttributesAreCamelCase={false}
+              columnRenderers={columnRenderers}
+            />
+          </Col>
+        </Row>
+        <LUTModals />
+      </ErrorsProvider>
+    </ModalProvider>
   );
 }
 
