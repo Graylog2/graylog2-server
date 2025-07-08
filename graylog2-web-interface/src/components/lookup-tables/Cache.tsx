@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col, Button, Label } from 'components/bootstrap';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
@@ -46,9 +46,7 @@ const Cache = ({ cache }: Props) => {
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>
-          {cache.title} <small>({plugin.displayName})</small>
-        </h2>
+        <Label>{plugin.displayName}</Label>
         <SummaryContainer>
           <SummaryRow>
             <Title>Description:</Title>

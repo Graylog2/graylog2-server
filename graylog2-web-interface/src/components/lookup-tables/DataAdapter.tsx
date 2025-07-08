@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button, Input } from 'components/bootstrap';
+import { Row, Col, Button, Input, Label } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
@@ -57,15 +57,13 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
   }
 
-  const { title: adapterTitle, description: adapterDescription, name: adapterName } = dataAdapter;
+  const { description: adapterDescription, name: adapterName } = dataAdapter;
   const summary = plugin.summaryComponent;
 
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>
-          {adapterTitle} <small>({plugin.displayName})</small>
-        </h2>
+        <Label>{plugin.displayName}</Label>
         <ConfigSummaryDefinitionListWrapper>
           <dl>
             <dt>Description</dt>

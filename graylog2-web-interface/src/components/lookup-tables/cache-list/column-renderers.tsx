@@ -48,7 +48,6 @@ const TitleCol = ({ cache, children }: { cache: CacheEntity; children: string })
   const { setModal, setTitle, setEntity } = useModalContext();
 
   const onClick = React.useCallback(() => {
-    console.log('cache click')
     setModal('CACHE');
     setTitle(cache.name);
     setEntity(<Cache cache={cache} />);
