@@ -18,6 +18,7 @@ package org.graylog.aws.inputs.cloudtrail.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -60,10 +61,12 @@ public class CloudTrailUserIdentity {
                 m.put("user_session_mfa_authenticated", Boolean.valueOf(sessionContext.attributes.mfaAuthenticated));
             }
             if (sessionContext.sessionIssuer != null) {
-                // Explicitly set the username field. It will only be present in either the parent userIdentity element,
-                // or the sessionIssuer element, but not both.
+                // Explicitly set the user_name field with sessionIssuer value if present. It will only be present in
+                // either the parent userIdentity element, or the sessionIssuer element (for temp creds), but not both.
                 // See documentation https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html#STS-API-source-identity
-                m.put(USER_NAME, sessionContext.sessionIssuer.userName);
+                if (StringUtils.isNotBlank(sessionContext.sessionIssuer.userName)) {
+                    m.put(USER_NAME, sessionContext.sessionIssuer.userName);
+                }
                 // Add session issuer fields with a prefix, since those are unique to the temporary credential role.
                 m.put(SESSION_ISSUER_PREFIX + USER_TYPE, sessionContext.sessionIssuer.type);
                 m.put(SESSION_ISSUER_PREFIX + USER_PRINCIPAL_ID, sessionContext.sessionIssuer.principalId);
