@@ -18,7 +18,7 @@ package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -64,7 +64,7 @@ public class StreamServiceImplTest {
     @Mock
     private MongoIndexSet.Factory factory;
     @Mock
-    private EntityOwnershipService entityOwnershipService;
+    private EntityRegistrar entityRegistrar;
 
     private StreamService streamService;
 
@@ -72,7 +72,7 @@ public class StreamServiceImplTest {
     public void setUp() throws Exception {
         final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
         this.streamService = new StreamServiceImpl(mc, streamRuleService,
-                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                outputService, indexSetService, factory, entityRegistrar, new ClusterEventBus(), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
     }
 
     @Test
