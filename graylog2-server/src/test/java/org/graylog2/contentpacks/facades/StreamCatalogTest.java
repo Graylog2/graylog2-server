@@ -114,8 +114,8 @@ public class StreamCatalogTest {
                 mongoIndexSetFactory,
                 entityRegistrar,
                 clusterEventBus,
-		Set.of(),
-		new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                Set.of(),
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
