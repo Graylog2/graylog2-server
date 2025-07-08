@@ -20,6 +20,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
@@ -32,8 +33,6 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.PaginationParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -134,7 +133,7 @@ public class GranteeSharesService {
         );
     }
 
-    private Map<GRN, Set<Grantee>> getTargetOwners(Set<GRN> targets) {
+    public Map<GRN, Set<Grantee>> getTargetOwners(Set<GRN> targets) {
         return grantService.getOwnersForTargets(targets).entrySet()
                 .stream()
                 .map(entry -> Maps.immutableEntry(entry.getKey(), getOwners(entry)))
