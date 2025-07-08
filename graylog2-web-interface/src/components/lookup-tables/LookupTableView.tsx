@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -24,6 +25,26 @@ import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import useProductName from 'brand-customization/useProductName';
+
+const DataWell = styled.div<{ $color?: 'background' | 'content'; }>`
+  width: 100%;
+  border: 1px solid ${({ theme }) => theme.colors.cards.border};
+  border-radius: 8px;
+  padding: ${({ theme }) => theme.spacings.md};
+  background-color: ${({ theme, $color }) => theme.colors.global[$color || 'background']};
+  gap: 0.5rem;
+`;
+
+const StyledRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+`;
+
+const StyledLink = styled(Link)`
+  display: flex;
+  flex: 3;
+`;
 
 type Props = {
   table: LookupTable;
@@ -94,19 +115,9 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
 
   return (
     <Row className="content">
-      <Col md={6}>
-        <h2>{table.title}</h2>
-        <p>{table.description}</p>
-        <dl>
-          <dt>Data adapter</dt>
-          <dd>
-            <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
-          </dd>
-          <dt>Cache</dt>
-          <dd>
-            <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
-          </dd>
-        </dl>
+      <Col md={12}>
+        <h2>Description</h2>
+        <span>{table.description}</span>
         {!loadingScopePermissions && scopePermissions?.is_mutable && (
           <Button bsStyle="success" onClick={handleEdit(table.name)} role="button" name="edit_square">
             Edit
@@ -125,6 +136,18 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
           </dl>
         )}
         <hr />
+        <h2>Attached</h2>
+        <DataWell>
+          <StyledRow>
+            <span style={{ display: 'flex', flex: 1 }}>Cache</span>
+            <StyledLink to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</StyledLink>
+          </StyledRow>
+          <StyledRow>
+            <span style={{ display: 'flex', flex: 1 }}>Data adapter</span>
+            <StyledLink to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</StyledLink>
+          </StyledRow>
+        </DataWell>
+        <hr />
         <h2>Purge Cache</h2>
         <p>You can purge the complete cache for this lookup table or only the cache entry for a single key.</p>
         <form onSubmit={handlePurgeKey}>
@@ -141,17 +164,16 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
               value={purgeKey.value}
             />
             <ButtonToolbar>
-              <Button type="submit" bsStyle="success" disabled={!purgeKey.valid}>
+              <Button type="submit" bsStyle="info" disabled={!purgeKey.valid}>
                 Purge key
               </Button>
-              <Button type="button" bsStyle="info" onClick={hadlePurgeAll}>
+              <Button type="button" bsStyle="primary" onClick={hadlePurgeAll}>
                 Purge all
               </Button>
             </ButtonToolbar>
           </fieldset>
         </form>
-      </Col>
-      <Col md={6}>
+        <hr />
         <h2>Test lookup</h2>
         <p>
           You can manually query the lookup table using this form. The data will be cached as configured by{' '}
@@ -170,7 +192,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
               help="Key to look up a value for."
               value={lookupKey.value}
             />
-            <Button type="submit" name="lookupbutton" bsStyle="success" disabled={!lookupKey.valid}>
+            <Button type="submit" name="lookupbutton" bsStyle="info" disabled={!lookupKey.valid}>
               Look up
             </Button>
           </fieldset>

@@ -21,6 +21,8 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchLookupTables } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
+import LUTModals from 'components/lookup-tables/LUTModals';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
@@ -72,25 +74,28 @@ function LookupTableList() {
   );
 
   return (
-    <ErrorsProvider>
-      <ErrorsConsumer lutNames={lutNames} cacheNames={cacheNames} adapterNames={adapterNames} />
-      <Row className="content">
-        <Col md={12}>
-          <PaginatedEntityTable<LookupTableEntity>
-            humanName="lookup tables"
-            entityActions={renderActions}
-            columnsOrder={lutListElements.columnOrder}
-            queryHelpComponent={queryHelpComponent}
-            tableLayout={lutListElements.defaultLayout}
-            fetchEntities={handleFetchTables}
-            keyFn={lookupTablesKeyFn}
-            actionsCellWidth={100}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={columnRenderers}
-          />
-        </Col>
-      </Row>
-    </ErrorsProvider>
+    <ModalProvider>
+      <ErrorsProvider>
+        <ErrorsConsumer lutNames={lutNames} cacheNames={cacheNames} adapterNames={adapterNames} />
+        <Row className="content">
+          <Col md={12}>
+            <PaginatedEntityTable<LookupTableEntity>
+              humanName="lookup tables"
+              entityActions={renderActions}
+              columnsOrder={lutListElements.columnOrder}
+              queryHelpComponent={queryHelpComponent}
+              tableLayout={lutListElements.defaultLayout}
+              fetchEntities={handleFetchTables}
+              keyFn={lookupTablesKeyFn}
+              actionsCellWidth={100}
+              entityAttributesAreCamelCase={false}
+              columnRenderers={columnRenderers}
+            />
+          </Col>
+        </Row>
+        <LUTModals />
+      </ErrorsProvider>
+    </ModalProvider>
   );
 }
 
