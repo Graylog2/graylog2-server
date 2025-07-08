@@ -32,11 +32,11 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 
 @Singleton
-public class BuiltinCapabilities {
+public class CapabilityRegistry {
     private final ImmutableMap<Capability, CapabilityDescriptor> capabilities;
 
     @Inject
-    public BuiltinCapabilities(GRNRegistry grnRegistry, Set<PluginPermissions> pluginPermissions) {
+    public CapabilityRegistry(GRNRegistry grnRegistry, Set<PluginPermissions> pluginPermissions) {
         final var viewPermissionBuilder = ImmutableSetMultimap.<GRNType, Permission>builder();
         final var managePermissionBuilder = ImmutableSetMultimap.<GRNType, Permission>builder();
         final var ownPermissionBuilder = ImmutableSetMultimap.<GRNType, Permission>builder();
@@ -94,7 +94,7 @@ public class BuiltinCapabilities {
         return Optional.ofNullable(capabilities.get(capability));
     }
 
-    public Set<Permission> get(Capability capability, GRNType grnType) {
+    public Set<Permission> getPermissions(Capability capability, GRNType grnType) {
         return requireNonNull(capabilities.get(capability)).permissions().get(grnType);
     }
 }
