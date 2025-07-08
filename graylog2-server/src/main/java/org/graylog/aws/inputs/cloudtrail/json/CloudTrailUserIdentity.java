@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class CloudTrailUserIdentity {
     private static final String USER_TYPE = "user_type";
@@ -27,6 +28,7 @@ public class CloudTrailUserIdentity {
     private static final String USER_PRINCIPAL_ID = "user_principal_id";
     private static final String USER_PRINCIPAL_ARN = "user_principal_arn";
     private static final String USER_ACCOUNT_ID = "user_account_id";
+    private static final String SESSION_ISSUER_PREFIX = "session_issuer_";
     @JsonProperty("type")
     public String type;
     @JsonProperty("principalId")
@@ -52,20 +54,36 @@ public class CloudTrailUserIdentity {
         m.put(USER_ACCOUNT_ID, accountId);
         m.put("user_access_key_id", accessKeyId);
 
-        if (sessionContext != null && sessionContext.attributes != null) {
-            m.put("user_session_creation_date", sessionContext.attributes.creationDate);
-            m.put("user_session_mfa_authenticated", Boolean.valueOf(sessionContext.attributes.mfaAuthenticated));
-        }
-
-        if (sessionContext != null && sessionContext.sessionIssuer != null) {
-            m.put(USER_TYPE, sessionContext.sessionIssuer.type);
-            m.put(USER_NAME, sessionContext.sessionIssuer.userName);
-            m.put(USER_PRINCIPAL_ID, sessionContext.sessionIssuer.principalId);
-            m.put(USER_PRINCIPAL_ARN, sessionContext.sessionIssuer.arn);
-            m.put(USER_ACCOUNT_ID, sessionContext.sessionIssuer.accountId);
+        if (sessionContext != null) {
+            if (sessionContext.attributes != null) {
+                m.put("user_session_creation_date", sessionContext.attributes.creationDate);
+                m.put("user_session_mfa_authenticated", Boolean.valueOf(sessionContext.attributes.mfaAuthenticated));
+            }
+            if (sessionContext.sessionIssuer != null) {
+                // Explicitly set the username field. It will only be present in either the parent userIdentity element,
+                // or the sessionIssuer element, but not both.
+                // See documentation https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html#STS-API-source-identity
+                m.put(USER_NAME, sessionContext.sessionIssuer.userName);
+                // Add session issuer fields with a prefix, since those are unique to the temporary credential role.
+                m.put(SESSION_ISSUER_PREFIX + USER_TYPE, sessionContext.sessionIssuer.type);
+                m.put(SESSION_ISSUER_PREFIX + USER_PRINCIPAL_ID, sessionContext.sessionIssuer.principalId);
+                m.put(SESSION_ISSUER_PREFIX + USER_PRINCIPAL_ARN, sessionContext.sessionIssuer.arn);
+                m.put(SESSION_ISSUER_PREFIX + USER_ACCOUNT_ID, sessionContext.sessionIssuer.accountId);
+            }
         }
 
         return m;
     }
 
+    /**
+     * @return top-level userName if available, otherwise the userName from the session context if present.
+     */
+    public Optional<String> resolveUserName() {
+        return Optional.ofNullable(userName)
+                .filter(name -> !name.isEmpty())
+                .or(() -> Optional.ofNullable(sessionContext)
+                        .map(ctx -> ctx.sessionIssuer)
+                        .map(issuer -> issuer.userName)
+                        .filter(name -> !name.isEmpty()));
+    }
 }
