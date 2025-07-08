@@ -22,6 +22,7 @@ import styled from 'styled-components';
 import Button from 'components/bootstrap/Button';
 import useServerVersion from 'routing/useServerVersion';
 import useProductName from 'brand-customization/useProductName';
+import { fullPageReload } from 'util/URLUtils';
 
 type Props = {
   reload?: () => void;
@@ -30,8 +31,7 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
-const defaultReload = () => window.location.reload();
-const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
+const SuggestReloadIfVersionChanged = ({ reload = fullPageReload }: Props) => {
   const productName = useProductName();
   const [versionChanged, setVersionChanged] = useState<boolean>(false);
   const [dismissed, setDismissed] = useState<boolean>(false);

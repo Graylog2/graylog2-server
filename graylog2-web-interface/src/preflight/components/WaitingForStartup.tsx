@@ -23,6 +23,7 @@ import { Space } from '@mantine/core';
 import Spinner from 'components/common/Spinner';
 import { Section } from 'preflight/components/common';
 import useServerAvailability from 'preflight/hooks/useServerAvailability';
+import { fullPageReload } from 'util/URLUtils';
 
 const P = styled.p`
   max-width: 700px;
@@ -33,7 +34,7 @@ const WaitingForStartup = () => {
 
   useEffect(() => {
     if (serverIsAvailable) {
-      window.location.reload();
+      fullPageReload();
     }
   }, [serverIsAvailable]);
 
