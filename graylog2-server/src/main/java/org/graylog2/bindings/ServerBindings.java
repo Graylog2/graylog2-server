@@ -28,7 +28,6 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog.scheduler.capabilities.ServerNodeCapabilitiesModule;
 import org.graylog.security.shares.CollectionRequestHandler;
-import org.graylog.security.shares.DefaultCollectionRequestHandler;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
@@ -220,7 +219,7 @@ public class ServerBindings extends Graylog2Module {
         Multibinder.newSetBinder(binder(), TrafficCounterCalculator.class).addBinding().to(OpenTrafficCounterCalculator.class);
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
 
-        Multibinder.newSetBinder(binder(), CollectionRequestHandler.class).addBinding().to(DefaultCollectionRequestHandler.class);
+        Multibinder.newSetBinder(binder(), CollectionRequestHandler.class);
     }
 
     private void bindDynamicFeatures() {
