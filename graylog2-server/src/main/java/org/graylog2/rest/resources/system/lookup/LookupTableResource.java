@@ -417,7 +417,7 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("tables/preview/{idOrName}")
-    @ApiOperation(value = "Retrieve the named lookup table")
+    @ApiOperation(value = "Preview the entries in a lookup table.")
     public LookupPreview getPreview(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                     @ApiParam(name = "size") @QueryParam("size") @DefaultValue("5") int size) {
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
