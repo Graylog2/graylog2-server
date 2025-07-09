@@ -68,100 +68,100 @@ export const mockEventData = {
 };
 
 export const mockEventDefinitionTwoAggregations: EventDefinition = {
-    _scope: 'DEFAULT',
-    id: 'event-definition-id-1',
-    title: 'Event Definition Title',
-    description: 'Test description',
-    updated_at: '2023-02-21T13:28:09.296Z',
-    priority: 2,
-    alert: true,
-    config: {
-        event_limit: 1000,
-        type: 'aggregation-v1',
-        query: 'http_method: GET',
-        query_parameters: [],
-        _is_scheduled: true,
-        streams: ['001'],
-        stream_categories: ['firewall'],
-        group_by: ['field1', 'field2'],
-        series: [
-            {
-                id: 'count-field1',
-                type: 'count',
-                field: 'field1',
-            },
-            {
-                id: 'count-field2',
-                type: 'count',
-                field: 'field2',
-            },
-        ],
-        filters: [],
-        conditions: {
-            expression: {
-                expr: '||',
-                left: {
-                    expr: '>',
-                    left: {
-                        expr: 'number-ref',
-                        ref: 'count-field1',
-                    },
-                    right: {
-                        expr: 'number',
-                        value: 500.0,
-                    },
-                },
-                right: {
-                    expr: '<',
-                    left: {
-                        expr: 'number-ref',
-                        ref: 'count-field2',
-                    },
-                    right: {
-                        expr: 'number',
-                        value: 8000.0,
-                    },
-                },
-            },
-        },
-        search_within_ms: 60000,
-        execute_every_ms: 60000,
-    },
-    field_spec: {},
-    key_spec: [],
-    notification_settings: {
-        grace_period_ms: 60000,
-        backlog_size: 0,
-    },
-    notifications: [
-        {
-            type: null,
-            notification_id: 'email_notification_id',
-            notification_parameters: null,
-        },
+  _scope: 'DEFAULT',
+  id: 'event-definition-id-1',
+  title: 'Event Definition Title',
+  description: 'Test description',
+  updated_at: '2023-02-21T13:28:09.296Z',
+  priority: 2,
+  alert: true,
+  config: {
+    event_limit: 1000,
+    type: 'aggregation-v1',
+    query: 'http_method: GET',
+    query_parameters: [],
+    _is_scheduled: true,
+    streams: ['001'],
+    stream_categories: ['firewall'],
+    group_by: ['field1', 'field2'],
+    series: [
+      {
+        id: 'count-field1',
+        type: 'count',
+        field: 'field1',
+      },
+      {
+        id: 'count-field2',
+        type: 'count',
+        field: 'field2',
+      },
     ],
-    storage: [
-        {
-            type: 'persist-to-streams-v1',
-            streams: ['0002'],
+    filters: [],
+    conditions: {
+      expression: {
+        expr: '||',
+        left: {
+          expr: '>',
+          left: {
+            expr: 'number-ref',
+            ref: 'count-field1',
+          },
+          right: {
+            expr: 'number',
+            value: 500.0,
+          },
         },
-    ],
-    state: 'ENABLED',
-    remediation_steps: '',
-    event_procedure: '',
-    matched_at: '',
-    scheduler: {
-        data: {
-            type: '',
-            timerange_from: 0,
-            timerange_to: 0
+        right: {
+          expr: '<',
+          left: {
+            expr: 'number-ref',
+            ref: 'count-field2',
+          },
+          right: {
+            expr: 'number',
+            value: 8000.0,
+          },
         },
-        next_time: '',
-        triggered_at: '',
-        queued_notifications: 0,
-        is_scheduled: false,
-        status: 'runnable'
-    }
+      },
+    },
+    search_within_ms: 60000,
+    execute_every_ms: 60000,
+  },
+  field_spec: {},
+  key_spec: [],
+  notification_settings: {
+    grace_period_ms: 60000,
+    backlog_size: 0,
+  },
+  notifications: [
+    {
+      type: null,
+      notification_id: 'email_notification_id',
+      notification_parameters: null,
+    },
+  ],
+  storage: [
+    {
+      type: 'persist-to-streams-v1',
+      streams: ['0002'],
+    },
+  ],
+  state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
+  matched_at: '',
+  scheduler: {
+    data: {
+      type: '',
+      timerange_from: 0,
+      timerange_to: 0,
+    },
+    next_time: '',
+    triggered_at: '',
+    queued_notifications: 0,
+    is_scheduled: false,
+    status: 'runnable',
+  },
 };
 
 export const mockEventDefinitionOneAggregation = {

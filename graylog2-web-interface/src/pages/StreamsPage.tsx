@@ -39,7 +39,6 @@ const StreamsPage = () => {
   const { createStream } = useStreamMutations();
   const queryClient = useQueryClient();
 
-
   const onSave = (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
@@ -47,7 +46,7 @@ const StreamsPage = () => {
 
     return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
-      queryClient.invalidateQueries({queryKey: KEY_PREFIX})
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
     });
   };
 

@@ -33,7 +33,8 @@ export type StreamConfiguration = Pick<
   | 'description'
   | 'rules'
   | 'content_pack'
-> & EntityShare;
+> &
+  EntityShare;
 
 const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => {
   const { share_request, ...rest } = stream;
@@ -42,8 +43,8 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
     entity: rest,
     share_request: {
       selected_collections: share_request?.selected_collections,
-      selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS()
-    }
+      selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS(),
+    },
   });
 };
 

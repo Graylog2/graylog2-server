@@ -24,53 +24,53 @@ import StreamsContext from 'contexts/StreamsContext';
 import FilterPreviewContainer from './FilterPreviewContainer';
 
 const eventDefinition: EventDefinition = {
-    id: 'deadbeef',
-    title: 'Sample Event Definition',
-    description: 'Sample Event Definition',
-    _scope: 'test',
-    priority: 1,
-    alert: true,
-    config: {
-        type: 'foo',
-        query: '*',
-        query_parameters: [],
-        filters: [],
-        streams: [],
-        group_by: [],
-        _is_scheduled: true,
-        series: [],
-        conditions: {
-            expression: {},
-        },
-        search_within_ms: 300,
-        execute_every_ms: 300,
-        event_limit: 10,
+  id: 'deadbeef',
+  title: 'Sample Event Definition',
+  description: 'Sample Event Definition',
+  _scope: 'test',
+  priority: 1,
+  alert: true,
+  config: {
+    type: 'foo',
+    query: '*',
+    query_parameters: [],
+    filters: [],
+    streams: [],
+    group_by: [],
+    _is_scheduled: true,
+    series: [],
+    conditions: {
+      expression: {},
     },
-    field_spec: {},
-    key_spec: [],
-    notification_settings: {
-        grace_period_ms: 300,
-        backlog_size: 10,
+    search_within_ms: 300,
+    execute_every_ms: 300,
+    event_limit: 10,
+  },
+  field_spec: {},
+  key_spec: [],
+  notification_settings: {
+    grace_period_ms: 300,
+    backlog_size: 10,
+  },
+  notifications: [],
+  storage: [],
+  updated_at: null,
+  state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
+  matched_at: '',
+  scheduler: {
+    data: {
+      type: '',
+      timerange_from: 0,
+      timerange_to: 0,
     },
-    notifications: [],
-    storage: [],
-    updated_at: null,
-    state: 'ENABLED',
-    remediation_steps: '',
-    event_procedure: '',
-    matched_at: '',
-    scheduler: {
-        data: {
-            type: '',
-            timerange_from: 0,
-            timerange_to: 0
-        },
-        next_time: '',
-        triggered_at: '',
-        queued_notifications: 0,
-        is_scheduled: false,
-        status: 'runnable'
-    }
+    next_time: '',
+    triggered_at: '',
+    queued_notifications: 0,
+    is_scheduled: false,
+    status: 'runnable',
+  },
 };
 
 const SUT = ({ streams = [] }: { streams?: Array<Stream> }) => (

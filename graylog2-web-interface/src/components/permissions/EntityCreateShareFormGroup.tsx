@@ -103,10 +103,10 @@ const EntityCreateShareFormGroup = ({
       prepare_request: dependenciesGRN,
     };
 
-    setEntityShare({...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
+    setEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
-      onSetEntityShare({ ...entityShare , selected_grantee_capabilities: newSelectedCapabilities });
+      onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       resetSelection();
       setDisableSubmit(false);
 
@@ -124,7 +124,7 @@ const EntityCreateShareFormGroup = ({
       selected_grantee_capabilities: newSelectedCapabilities,
       prepare_request,
     };
-    setEntityShare({...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
+    setEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
       onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
@@ -195,9 +195,7 @@ const EntityCreateShareFormGroup = ({
             availableGrantees={entityShareState.availableGrantees}
           />
           {PluggableEntityShareFormGroup && (
-            <PluggableEntityShareFormGroup
-              entityType={entityType}
-              onChange={handleAdditionalFormChange} />
+            <PluggableEntityShareFormGroup entityType={entityType} onChange={handleAdditionalFormChange} />
           )}
         </>
       ) : (
