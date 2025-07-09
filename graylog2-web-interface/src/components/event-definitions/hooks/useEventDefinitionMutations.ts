@@ -26,7 +26,7 @@ import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 
-const   extractSchedulerInfo = (eventDefinition: EventDefinition) => {
+const extractSchedulerInfo = (eventDefinition: EventDefinition) => {
   // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
   // the flag from the form.
   const clonedEventDefinition = cloneDeep(eventDefinition);
@@ -45,8 +45,8 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
     entity: eventDefinition,
     share_request: {
       selected_collections: share_request?.selected_collections,
-      selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS()
-    }
+      selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS(),
+    },
   });
 };
 
@@ -54,14 +54,17 @@ const useEventDefinitionMutations = () => {
   const createMutation = useMutation({
     mutationFn: createEventDefinition,
     onError: (errorThrown) => {
-      UserNotification.error(`Saving EventDefinition failed with status: ${errorThrown}`, 'Could not save EventDefinition');
+      UserNotification.error(
+        `Saving EventDefinition failed with status: ${errorThrown}`,
+        'Could not save EventDefinition',
+      );
     },
     onSuccess: (eventDefinition: EventDefinition) => {
       UserNotification.success(
         'Event Definition created successfully',
         `Event Definition "${eventDefinition.title}" was created successfully.`,
       );
-    }
+    },
   });
 
   return { createEventDefinition: createMutation.mutateAsync };

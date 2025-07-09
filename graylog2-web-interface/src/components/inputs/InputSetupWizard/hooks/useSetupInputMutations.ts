@@ -41,7 +41,7 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
       description: undefined,
       ...stream,
     },
-    share_request: undefined
+    share_request: undefined,
   });
 
 const startStream = async (streamId) => Streams.resume(streamId);
