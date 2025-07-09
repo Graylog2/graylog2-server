@@ -43,16 +43,17 @@ public final class EntityScopeService {
 
     public boolean isMutable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
-        String scopeName = scopedEntity.scope();
-
-        if (scopeName == null || scopeName.isEmpty()) {
+        String scope = scopedEntity.scope();
+        if (scope == null || scope.isEmpty()) {
             return true;
         }
-        final EntityScope scope = entityScopes.get(scopeName.toUpperCase(Locale.ROOT));
-        if (scope == null) {
-            throw new IllegalArgumentException("Entity Scope does not exist: " + scopeName);
+
+        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
+        if (entityScope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
         }
-        return scope.isMutable(scopedEntity);
+
+        return entityScope.isMutable();
     }
 
     public boolean isMutable(ScopedEntity existingEntity, ScopedEntity updatedEntity) {
@@ -72,16 +73,17 @@ public final class EntityScopeService {
 
     public boolean isDeletable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
-        String scopeName = scopedEntity.scope();
-
-        if (scopeName == null || scopeName.isEmpty()) {
+        String scope = scopedEntity.scope();
+        if (scope == null || scope.isEmpty()) {
             return true;
         }
-        final EntityScope scope = entityScopes.get(scopeName.toUpperCase(Locale.ROOT));
-        if (scope == null) {
-            throw new IllegalArgumentException("Entity Scope does not exist: " + scopeName);
+
+        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
+        if (entityScope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
         }
-        return scope.isDeletable(scopedEntity);
+
+        return entityScope.isDeletable();
     }
 
     public boolean hasValidScope(ScopedEntity scopedEntity) {
