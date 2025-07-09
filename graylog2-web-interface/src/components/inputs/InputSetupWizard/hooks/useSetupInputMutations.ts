@@ -34,12 +34,14 @@ export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remov
 
 const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> =>
   Streams.create({
-    matching_type: undefined,
-    rules: undefined,
-    content_pack: undefined,
-    description: undefined,
-    share_request: undefined,
-    ...stream,
+    entity: {
+      matching_type: undefined,
+      rules: undefined,
+      content_pack: undefined,
+      description: undefined,
+      ...stream,
+    },
+    share_request: undefined
   });
 
 const startStream = async (streamId) => Streams.resume(streamId);
