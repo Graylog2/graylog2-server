@@ -63,10 +63,10 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
-        <ibmdb2.version>11.5.8.0</ibmdb2.version>
+        <ibmdb2.version>12.1.2.0</ibmdb2.version>
         <mysql.version>9.3.0</mysql.version>
-        <postgres.version>42.6.0</postgres.version>
-        <mssql.version>8.2.2.jre8</mssql.version>
+        <postgres.version>42.7.7</postgres.version>
+        <mssql.version>12.8.1.jre8</mssql.version>
         <oracle.version>23.5.0.24.07</oracle.version>
     </properties>
 
