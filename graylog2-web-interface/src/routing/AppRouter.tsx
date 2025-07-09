@@ -257,9 +257,9 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
+            // { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
+            // { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
+            // { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesPage action="create" /> },
@@ -303,10 +303,10 @@ const AppRouter = () => {
             },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&
-              enableDataNodeMigration && {
-                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
-                element: <DataNodesMigrationPage />,
-              },
+            enableDataNodeMigration && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+              element: <DataNodesMigrationPage />,
+            },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
