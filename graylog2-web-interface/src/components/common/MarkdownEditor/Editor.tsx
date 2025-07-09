@@ -41,7 +41,7 @@ const Tab = styled.div<{ $active?: boolean }>`
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   background-color: ${({ theme }) => theme.colors.global.contentBackground};
-  color: ${({ theme, $active }) => ($active ? theme.colors.global.textDefault : theme.colors.input.placeholder)};
+  color: ${({ theme, $active }) => ($active ? theme.colors.text.primary : theme.colors.input.placeholder)};
   cursor: pointer;
 
   ${({ $active }) =>

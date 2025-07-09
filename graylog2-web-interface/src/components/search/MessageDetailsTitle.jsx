@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 const Title = styled.h3(
   ({ theme }) => css`
     a {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
 
     .label {

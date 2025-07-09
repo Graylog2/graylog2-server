@@ -86,7 +86,7 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
 
     a&,
     button& {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
 
       .list-group-item-heading {
         color: ${theme.colors.variant.darkest.default};

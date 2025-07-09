@@ -25,7 +25,7 @@ const PanelHeading = styled(BootstrapPanel.Heading)(
   ({ theme }) => css`
     .panel-title {
       > a {
-        color: ${theme.colors.global.textDefault};
+        color: ${theme.colors.text.primary};
         display: block;
       }
     }

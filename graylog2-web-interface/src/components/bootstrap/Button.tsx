@@ -94,7 +94,7 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
   const isSpecialStyle = isLinkStyle(style) || isTransparentStyle(style);
 
   const colors = isSpecialStyle
-    ? { color: themeColors.global.textDefault, background: 'transparent' }
+    ? { color: themeColors.text.primary, background: 'transparent' }
     : themeColors.disabled[style];
 
   return css`
@@ -122,14 +122,14 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'warning':
     case 'transparent':
       return css`
-        color: ${themeColors.global.textDefault};
+        color: ${themeColors.text.primary};
 
         &:hover {
-          color: ${themeColors.global.textDefault};
+          color: ${themeColors.text.primary};
         }
 
         &:focus {
-          color: ${themeColors.global.textDefault};
+          color: ${themeColors.text.primary};
         }
       `;
     default:
@@ -159,7 +159,7 @@ const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
     case 'link':
       return colors.global.link;
     case 'transparent':
-      return colors.global.textDefault;
+      return colors.text.primary;
     default:
       return colors.button[style].color;
   }

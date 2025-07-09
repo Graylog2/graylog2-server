@@ -58,7 +58,7 @@ const COLUMNS = {
 
 const DashboardWrap = styled(ElementDimensions)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     margin: 0;
     width: 100%;
     height: 100%;

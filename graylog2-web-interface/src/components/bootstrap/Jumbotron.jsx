@@ -21,7 +21,7 @@ import { Jumbotron as BootstrapJumbotron } from 'react-bootstrap';
 
 export const StyledJumbotron = styled(BootstrapJumbotron)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     background-color: ${theme.colors.global.contentBackground};
 
     h2 {

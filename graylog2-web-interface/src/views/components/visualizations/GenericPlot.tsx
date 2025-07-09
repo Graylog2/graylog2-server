@@ -46,7 +46,7 @@ const StyledPlot = styled(Plot)(
       }
 
       .name {
-        fill: ${theme.colors.global.textDefault} !important;
+        fill: ${theme.colors.text.primary} !important;
       }
 
       path {
@@ -123,7 +123,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
 
   return useMemo(() => {
     const fontSettings = {
-      color: theme.colors.global.textDefault,
+      color: theme.colors.text.primary,
       size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
       family: theme.fonts.family.body,
     };
@@ -185,7 +185,7 @@ const usePlotChartData = (
         if (setChartColor && colors) {
           const conf = setChartColor(chart, colors);
 
-          conf.outsidetextfont = { color: theme.colors.global.textDefault };
+          conf.outsidetextfont = { color: theme.colors.text.primary };
 
           if (chart?.name === eventsDisplayName) {
             const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
@@ -202,7 +202,7 @@ const usePlotChartData = (
 
         return chart;
       }),
-    [chartData, colors, setChartColor, theme.colors.global.textDefault],
+    [chartData, colors, setChartColor, theme.colors.text.primary],
   );
 };
 

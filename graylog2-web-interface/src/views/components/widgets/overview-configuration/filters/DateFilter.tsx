@@ -41,7 +41,7 @@ const DateRow = styled(Row)(
     font-size: 0.9rem;
     font-weight: normal;
     background-color: ${theme.colors.global.background};
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   `,
 );
 

@@ -25,7 +25,7 @@ const Tooltip = ({ ...props }: Props) => {
   const styles = () => ({
     tooltip: {
       backgroundColor: theme.colors.global.contentBackground,
-      color: theme.colors.global.textDefault,
+      color: theme.colors.text.primary,
       fontWeight: 400,
       fontSize: theme.fonts.size.root,
     },

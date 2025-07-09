@@ -71,7 +71,7 @@ const ContentGrid = styled.div(
 
     padding: 5px 15px 0;
 
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   `,
 );
 

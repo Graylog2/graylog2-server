@@ -27,7 +27,7 @@ const EditorStyles = styled.div<{ $width: string }>`
   }
 
   & .ace_cursor {
-    border-color: ${({ theme }) => theme.colors.global.textDefault};
+    border-color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 

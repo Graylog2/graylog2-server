@@ -21,7 +21,7 @@ import { List as MantineList } from '@mantine/core';
 
 const StyledList = styled(MantineList)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   `,
 );
 

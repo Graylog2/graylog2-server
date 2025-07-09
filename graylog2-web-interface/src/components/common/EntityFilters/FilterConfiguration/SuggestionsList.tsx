@@ -27,7 +27,7 @@ import Spinner from 'components/common/Spinner';
 
 const Container = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     padding: 3px 10px;
   `,
 );

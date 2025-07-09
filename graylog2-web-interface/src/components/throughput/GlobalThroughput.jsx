@@ -64,7 +64,7 @@ const ThroughputData = styled.span(
     grid-template-columns: 1fr 1.75em;
     grid-template-rows: 1fr 1px;
     grid-gap: 0 3px;
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
 
     > span {
       grid-area: 1 / 1 / 2 / 2;

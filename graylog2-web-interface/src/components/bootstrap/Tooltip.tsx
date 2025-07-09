@@ -64,7 +64,7 @@ const StyledTooltip = styled(BootstrapTooltip)(
     }
 
     .tooltip-inner {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
       background-color: ${theme.colors.global.contentBackground};
       max-width: 300px;
       opacity: 1;

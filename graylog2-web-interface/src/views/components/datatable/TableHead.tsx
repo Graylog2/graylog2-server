@@ -22,7 +22,7 @@ const TableHead = styled.thead(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
     height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     position: sticky;
     top: 0;
     z-index: 1;

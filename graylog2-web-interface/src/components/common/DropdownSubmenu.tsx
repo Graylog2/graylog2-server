@@ -53,7 +53,7 @@ const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<
     gap: 5px;
 
     > a {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
 
     > .dropdown-menu {
