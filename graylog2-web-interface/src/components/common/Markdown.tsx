@@ -21,7 +21,7 @@ import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 import type { HTMLReactParserOptions } from 'html-react-parser';
 
-import Timestamp from 'components/common/Timestamp';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
   text: string;
@@ -37,44 +37,48 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 
 const HTML = ({ html }: { html: string }) => parse(html);
 
-const componentMapping = {
-  'ts': ({ value }: { value: string }) => (
-    <strong>
-      <Timestamp dateTime={value} />
-    </strong>
-  ),
+const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
+  const components = usePluginEntities('markdown.augment.components');
+
+  return useMemo(() => {
+    const componentMapping = Object.fromEntries(components.map(({ id, component }) => [id, component]));
+    const markers = Object.keys(componentMapping).join('|');
+    const componentRegexMatcher = new RegExp(`(#(?:${markers})#.+?#(?:${markers})#)`);
+    const componentRegexExtractor = new RegExp(`(#(?:(${markers}))#(.+?)#(?:${markers})#)`);
+
+    const splitByMarker = (text: string): string[] => text.split(componentRegexMatcher).filter((part) => part !== '');
+    const renderComponent = (element: string, idx: number) => {
+      const matchesComponent = element.match(componentRegexExtractor);
+      if (matchesComponent) {
+        const value = matchesComponent[3];
+        const Component = componentMapping[matchesComponent[2]];
+
+        if (Component) {
+          return <Component key={`${value}-${idx}`} value={value} />;
+        }
+      }
+
+      return element;
+    };
+
+    const replaceCustomComponents = (text: string): Array<string | React.ReactElement> =>
+      splitByMarker(text).map(renderComponent);
+
+    return (node) => {
+      if (node.type === 'text' && node.data.match(componentRegexMatcher)) {
+        return <>{replaceCustomComponents(node.data)}</>;
+      }
+
+      return undefined;
+    };
+  }, [components]);
 };
-const markers = Object.keys(componentMapping).join('|');
-const componentRegexMatcher = new RegExp(`(#(?:${markers})#.+?#(?:${markers})#)`);
-const componentRegexExtractor = new RegExp(`(#(?:(${markers}))#(.+?)#(?:${markers})#)`);
 
-const splitByMarker = (text: string): string[] => text.split(componentRegexMatcher).filter((part) => part !== '');
-const renderComponent = (element: string, idx: number) => {
-  const matchesComponent = element.match(componentRegexExtractor);
-  if (matchesComponent) {
-    const value = matchesComponent[3];
-    const Component = componentMapping[matchesComponent[2]];
+const Augment = ({ html }: { html: string }) => {
+  const transformer = useMarkdownTransformer();
 
-    if (Component) {
-      return <Component key={`${value}-${idx}`} value={value} />;
-    }
-  }
-
-  return element;
+  return parse(html, { replace: transformer });
 };
-
-const replaceCustomComponents = (text: string): Array<string | React.ReactElement> =>
-  splitByMarker(text).map(renderComponent);
-
-const transform: HTMLReactParserOptions['replace'] = (node) => {
-  if (node.type === 'text' && node.data.match(componentRegexMatcher)) {
-    return <>{replaceCustomComponents(node.data)}</>;
-  }
-
-  return undefined;
-};
-
-const Augment = ({ html }: { html: string }) => parse(html, { replace: transform });
 
 const Markdown = ({ augment = false, text }: Props) => {
   // Remove dangerous HTML
