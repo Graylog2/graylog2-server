@@ -157,7 +157,7 @@
         <lucene.version>9.12.2</lucene.version>
         <metrics.version>4.2.33</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
-        <mongojack.version>5.0.2</mongojack.version>
+        <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.121.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
@@ -198,7 +198,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.3</equalsverifier.version>
+        <equalsverifier.version>4.0.4</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
@@ -687,7 +687,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>

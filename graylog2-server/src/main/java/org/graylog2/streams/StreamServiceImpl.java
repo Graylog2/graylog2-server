@@ -30,7 +30,7 @@ import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
@@ -94,7 +94,7 @@ public class StreamServiceImpl implements StreamService {
     private final OutputService outputService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
-    private final EntityOwnershipService entityOwnershipService;
+    private final EntityRegistrar entityRegistrar;
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
     private final LoadingCache<String, String> streamTitleCache;
@@ -105,7 +105,7 @@ public class StreamServiceImpl implements StreamService {
                              OutputService outputService,
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
-                             EntityOwnershipService entityOwnershipService,
+                             EntityRegistrar entityRegistrar,
                              ClusterEventBus clusterEventBus,
                              Set<StreamDeletionGuard> streamDeletionGuards) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
@@ -113,7 +113,7 @@ public class StreamServiceImpl implements StreamService {
         this.outputService = outputService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
-        this.entityOwnershipService = entityOwnershipService;
+        this.entityRegistrar = entityRegistrar;
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
 
@@ -344,7 +344,7 @@ public class StreamServiceImpl implements StreamService {
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
         clusterEventBus.post(new StreamDeletedEvent(streamId, stream.getTitle()));
-        entityOwnershipService.unregisterStream(streamId);
+        entityRegistrar.unregisterStream(streamId);
     }
 
     private void checkDeletionGuards(String streamId) throws StreamGuardException {
@@ -491,7 +491,7 @@ public class StreamServiceImpl implements StreamService {
                 .collect(Collectors.toSet());
         streamRuleService.save(rules);
 
-        entityOwnershipService.registerNewStream(savedStreamId, user);
+        entityRegistrar.registerNewStream(savedStreamId, user);
         clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
 
         return savedStreamId;
