@@ -16,12 +16,47 @@
  */
 
 import React from 'react';
+import { Accordion } from '@mantine/core';
 
 import { Alert } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 
 const CaffeineCacheDocumentation = () => {
   const productName = useProductName();
+
+  const accordionItems = [
+    {
+      value: 'cache_size',
+      content: <p>Every cache has a maximum number of entries, unbounded caches are not supported.</p>,
+    },
+    {
+      value: 'time_based_expiration',
+      content:
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Expire after access</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            The cache will remove entries after a fixed time since they have been used the last time.
+            <br />
+            This results in the cache behaving as a space limited least recently used cache.
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>Expire after write</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            The cache will remove entries after a fixed time since they have been entered into the cache.
+            <br />
+            This results in entries that are never older than the given time, which can be important for regularly changing
+            data, such as configuration state of external systems.
+          </p>
+        </div>,
+    }
+  ];
+
+  const items = accordionItems.map((item) => (
+    <Accordion.Item key={item.value} value={item.value}>
+      <Accordion.Control>{item.value}</Accordion.Control>
+      <Accordion.Panel>{item.content}</Accordion.Panel>
+    </Accordion.Item>
+  ));
 
   return (
     <div>
@@ -38,25 +73,7 @@ const CaffeineCacheDocumentation = () => {
 
       <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Cache size</h3>
-      <p>Every cache has a maximum number of entries, unbounded caches are not supported.</p>
-
-      <h3 style={{ marginBottom: 10 }}>Time-based expiration</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Expire after access</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        The cache will remove entries after a fixed time since they have been used the last time.
-        <br />
-        This results in the cache behaving as a space limited least recently used cache.
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>Expire after write</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        The cache will remove entries after a fixed time since they have been entered into the cache.
-        <br />
-        This results in entries that are never older than the given time, which can be important for regularly changing
-        data, such as configuration state of external systems.
-      </p>
+      <Accordion chevronPosition="left" defaultValue='cache_size'>{items}</Accordion>
     </div>
   );
 };

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -25,6 +25,7 @@ import {
   fetchPaginatedLookupTables,
   deleteLookupTable,
   fetchPaginatedCaches,
+  fetchCacheTypes,
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
@@ -56,6 +57,15 @@ export function useDeleteLookupTable() {
 export const cachesKeyFn = (searchParams: SearchParams) => ['caches', 'search', searchParams];
 export function useFetchCaches() {
   return { fetchPaginatedCaches, cachesKeyFn };
+}
+
+export function useFetchCacheTypes() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['cache-types'],
+    queryFn: fetchCacheTypes,
+  });
+
+  return { fetchingCacheTypes: isLoading, types: data };
 }
 
 export function useDeleteCache() {

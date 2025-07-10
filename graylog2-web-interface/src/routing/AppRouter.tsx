@@ -123,6 +123,7 @@ import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import TokenManagementPage from 'pages/TokenManagementPage';
+import withLUTModalProvider from 'components/lookup-tables/LUTModals/withLUTModalProvider';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -258,7 +259,7 @@ const AppRouter = () => {
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW, element: <LUTDataAdaptersPage /> },
 

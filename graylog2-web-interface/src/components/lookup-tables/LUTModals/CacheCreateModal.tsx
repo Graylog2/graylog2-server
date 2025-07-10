@@ -23,29 +23,22 @@ import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-
 
 type Props = {
   onClose: () => void,
-  types?: any,
-  validationErrors?: any,
 }
 
-const CacheCreateModal = ({ onClose, types = null, validationErrors = {} }: Props) => {
-  React.useEffect(() => {
-    LookupTableCachesActions.getTypes();
-  }, []);
-
+const CacheCreateModal = ({ onClose }: Props) => {
   const validateCache = (adapter) => {
     LookupTableCachesActions.validate(adapter);
   };
 
   return (
-    <Modal show fullScreen onHide={onClose}>
+    <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
       <Modal.Header>
         <Modal.Title>Create Cache</Modal.Title>
       </Modal.Header>
       <CacheCreate
-        types={types}
         saved={onClose}
         validate={validateCache}
-        validationErrors={validationErrors}
+        onCancel={onClose}
       />
     </Modal>
   );

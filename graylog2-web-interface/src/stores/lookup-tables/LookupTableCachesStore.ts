@@ -47,6 +47,7 @@ export const LookupTableCachesActions = singletonActions('core.LookupTableCaches
 
 type StoreState = {
   caches: LookupTableCache[];
+  types: any,
   pagination: {
     page: number;
     per_page: number;

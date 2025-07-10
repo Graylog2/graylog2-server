@@ -46,8 +46,6 @@ const sizeForMantine = (size: BsSize) => {
     case 'lg':
     case 'large':
       return 'xl';
-    case 'fullscreen':
-      return '100vw';
     default:
       return 'lg';
   }
@@ -64,7 +62,7 @@ type Props = {
   transitionProps?: any;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false, transitionProps = { transition: 'fade', duration: 200 } }: Props) => (
+const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false, transitionProps = { transition: 'fade', duration: 500 } }: Props) => (
   <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable} fullScreen={fullScreen} transitionProps={transitionProps}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>

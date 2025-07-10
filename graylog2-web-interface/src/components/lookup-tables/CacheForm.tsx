@@ -24,8 +24,6 @@ import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, FormSubmit } from 'components/common';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -57,6 +55,7 @@ type Props = {
   type: string;
   saved: () => void;
   title: string;
+  onCancel: () => void;
   create?: boolean;
   cache?: LookupTableCache;
   validate?: (arg: LookupTableCache) => void;
@@ -67,6 +66,7 @@ const CacheForm = ({
   type,
   saved,
   title,
+  onCancel,
   create = true,
   cache = INIT_CACHE,
   validate = null,
@@ -137,94 +137,92 @@ const CacheForm = ({
     });
   };
 
-  const history = useHistory();
-  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
     <>
       <Title title={title} typeName={pluginName} create={create} />
-      <Row>
-        <Col lg={6} style={{ marginTop: 10 }}>
-          <Formik
-            initialValues={{ ...INIT_CACHE, ...cache }}
-            validate={handleValidation}
-            validateOnBlur
-            validateOnChange={false}
-            validateOnMount={!create}
-            onSubmit={handleSubmit}
-            enableReinitialize>
-            {({ errors, values, setValues, isSubmitting }) => (
-              <Form className="form form-horizontal">
-                <fieldset>
-                  <FormikFormGroup
-                    type="text"
-                    name="title"
-                    label="* Title"
-                    required
-                    help={errors.title ? null : 'A short title for this cache.'}
-                    onChange={handleTitleChange(values, setValues)}
-                    autoFocus
-                    labelClassName="col-sm-3"
-                    wrapperClassName="col-sm-9"
-                  />
-                  <FormikFormGroup
-                    type="text"
-                    name="description"
-                    label="Description"
-                    help="Cache description."
-                    labelClassName="col-sm-3"
-                    wrapperClassName="col-sm-9"
-                  />
-                  <FormikFormGroup
-                    type="text"
-                    name="name"
-                    label="* Name"
-                    required
-                    error={validationErrors.name ? validationErrors.name[0] : null}
-                    onChange={() => setGenerateName(false)}
-                    help={
-                      errors.name || validationErrors.name
-                        ? null
-                        : 'The name that is being used to refer to this cache. Must be unique.'
-                    }
-                    labelClassName="col-sm-3"
-                    wrapperClassName="col-sm-9"
-                  />
-                </fieldset>
-                {configFieldSet}
-                <fieldset>
-                  <Row>
-                    <Col mdOffset={3} sm={12}>
-                      {create && (
-                        <FormSubmit
-                          submitButtonText="Create cache"
-                          submitLoadingText="Creating cache..."
-                          isSubmitting={isSubmitting}
-                          isAsyncSubmit
-                          onCancel={onCancel}
-                        />
-                      )}
-                      {updatable && (
-                        <FormSubmit
-                          submitButtonText="Update cache"
-                          submitLoadingText="Updating cache..."
-                          isAsyncSubmit
-                          isSubmitting={isSubmitting}
-                          onCancel={onCancel}
-                        />
-                      )}
-                    </Col>
-                  </Row>
-                </fieldset>
-              </Form>
-            )}
-          </Formik>
-        </Col>
-        <Col lg={6} style={{ marginTop: 10 }}>
-          {DocComponent ? <DocComponent /> : null}
-        </Col>
-      </Row>
+        <Formik
+          initialValues={{ ...INIT_CACHE, ...cache }}
+          validate={handleValidation}
+          validateOnBlur
+          validateOnChange={false}
+          validateOnMount={!create}
+          onSubmit={handleSubmit}
+          enableReinitialize>
+          {({ errors, values, setValues, isSubmitting }) => (
+            <>
+              <Row>
+                <Col lg={6} style={{ marginTop: 10 }}>
+                <Form className="form form-horizontal">
+                  <fieldset>
+                    <FormikFormGroup
+                      type="text"
+                      name="title"
+                      label="* Title"
+                      required
+                      help={errors.title ? null : 'A short title for this cache.'}
+                      onChange={handleTitleChange(values, setValues)}
+                      autoFocus
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
+                    />
+                    <FormikFormGroup
+                      type="text"
+                      name="description"
+                      label="Description"
+                      help="Cache description."
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
+                    />
+                    <FormikFormGroup
+                      type="text"
+                      name="name"
+                      label="* Name"
+                      required
+                      error={validationErrors.name ? validationErrors.name[0] : null}
+                      onChange={() => setGenerateName(false)}
+                      help={
+                        errors.name || validationErrors.name
+                          ? null
+                          : 'The name that is being used to refer to this cache. Must be unique.'
+                      }
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
+                    />
+                  </fieldset>
+                  {configFieldSet}
+                </Form>
+                </Col>
+                <Col lg={6} style={{ marginTop: 10 }}>
+                  {DocComponent ? <DocComponent /> : null}
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 20 }}>
+                <Col md={3} mdOffset={9}>
+                  {create && (
+                    <FormSubmit
+                      submitButtonText="Create cache"
+                      submitLoadingText="Creating cache..."
+                      isSubmitting={isSubmitting}
+                      isAsyncSubmit
+                      onCancel={onCancel}
+                    />
+                  )}
+                  {updatable && (
+                    <FormSubmit
+                      submitButtonText="Update cache"
+                      submitLoadingText="Updating cache..."
+                      isAsyncSubmit
+                      isSubmitting={isSubmitting}
+                      onCancel={onCancel}
+                    />
+                  )}
+                </Col>
+              </Row>
+            </>
+          )}
+        </Formik>
     </>
   );
 };

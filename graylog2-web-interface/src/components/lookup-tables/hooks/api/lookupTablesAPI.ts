@@ -16,7 +16,7 @@
  */
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
+import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
@@ -44,6 +44,13 @@ export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
   const { page, pageSize, query } = searchParams;
 
   return LookupTableCachesActions.searchPaginated(page, pageSize, query).then((resp: any) => deserializeCaches(resp));
+};
+
+export const fetchCacheTypes = async () => {
+  await LookupTableCachesActions.getTypes();
+  const state = LookupTableCachesStore.getInitialState();
+
+  return state.types;
 };
 
 export const deleteCache = async (cacheId: string) => LookupTableCachesActions.delete(cacheId);
