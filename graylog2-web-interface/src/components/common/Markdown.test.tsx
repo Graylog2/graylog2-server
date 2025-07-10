@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import Markdown from './Markdown';
 
@@ -48,5 +49,47 @@ describe('Markdown', () => {
     render(<Markdown text="# Title" />);
 
     await screen.findByRole('heading', { name: /title/i });
+  });
+
+  describe('supports extended syntax', () => {
+    const markdownAugmentPlugin = new PluginManifest(
+      {},
+      {
+        'markdown.augment.components': [
+          {
+            id: 'test',
+            component: ({ value }) => <span data-testid="test-component">{value}</span>,
+          },
+        ],
+      },
+    );
+
+    beforeAll(() => {
+      PluginStore.register(markdownAugmentPlugin);
+    });
+
+    afterAll(() => {
+      PluginStore.unregister(markdownAugmentPlugin);
+    });
+
+    it('replaces custom #test# syntax', async () => {
+      render(<Markdown text="This is a #test#Hello world!#test# component." augment />);
+
+      const testComponent = await screen.findByTestId('test-component');
+
+      expect(testComponent).toHaveTextContent('Hello world!');
+    });
+
+    it('does not replace custom #test# syntax by default', async () => {
+      render(<Markdown text="This is a #test#Hello world!#test# component." augment={false} />);
+
+      await screen.findByText('This is a #test#Hello world!#test# component.');
+    });
+
+    it('does not replace custom #test# syntax when `augment` prop is false', async () => {
+      render(<Markdown text="This is a #test#Hello world!#test# component." augment={false} />);
+
+      await screen.findByText('This is a #test#Hello world!#test# component.');
+    });
   });
 });
