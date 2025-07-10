@@ -88,7 +88,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         """
                                 pipeline "pipeline"
                                 stage 0 match all

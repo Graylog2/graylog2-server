@@ -43,10 +43,15 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseI
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.bytes.BytesReference;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXContent;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentFactory;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentHelper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -109,6 +114,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
 
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request,
+    // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
+    // and filter after wards
+    private final int MAX_INDICES_URL_LENGTH = 3000;
+
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StatsApi statsApi,
@@ -169,10 +179,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private CreateIndexRequest createIndexRequest(String index,
                                                   IndexSettings indexSettings,
                                                   @Nullable Map<String, Object> mapping) {
-        final Map<String, Object> settings = new HashMap<>();
-        settings.put("number_of_shards", indexSettings.shards());
-        settings.put("number_of_replicas", indexSettings.replicas());
-        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(indexSettings.map());
         if (mapping != null) {
             request = request.mapping(mapping);
         }
@@ -202,10 +209,28 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .indices(index)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions).mappings().get(index).sourceAsMap(),
                 "Couldn't read mapping of index " + index);
+    }
 
-        return result.mappings().get(index).sourceAsMap();
+    @Override
+    public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
+
+        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            final Settings settings = settingsResponse.getIndexToSettings().get(index);
+            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
+            xContentBuilder.startObject();
+            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
+            xContentBuilder.endObject();
+            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
+
+            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
+        }, "Couldn't read settings of index " + index);
     }
 
     @Override
@@ -424,14 +449,17 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(indices.toArray(new String[]{}))
+
+        final GetSettingsRequest request = new GetSettingsRequest()
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(new String[]{});
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata", "index.blocks.read_only", "index.blocks.read_only_allow_delete");
+
+        final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
+        final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, maxLengthExceeded ? Optional.of(indices) : Optional.empty());
         });
     }
 

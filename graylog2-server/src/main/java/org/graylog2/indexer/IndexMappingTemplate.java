@@ -16,8 +16,13 @@
  */
 package org.graylog2.indexer;
 
+import jakarta.annotation.Nullable;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Template;
+
+import java.util.Map;
 
 /**
  * Implementing classes provide an index mapping template representation that can be stored in Elasticsearch.
@@ -41,4 +46,22 @@ public interface IndexMappingTemplate {
     default Template toTemplate(IndexSetMappingTemplate indexSetConfig) {
         return toTemplate(indexSetConfig, -1L);
     }
+
+    default IndexSettings indexSettings(IndexSetConfig indexSetConfig, @Nullable Map<String, Object> settings) {
+        return createIndexSettings(indexSetConfig);
+    }
+
+    @Nullable
+    default Map<String, Object> indexMappings(IndexSetConfig indexSetConfig, @Nullable Map<String, Object> mappings) {
+        return null;
+    }
+
+    static IndexSettings createIndexSettings(IndexSetConfig indexSetConfig) {
+        return IndexSettings.create(
+                indexSetConfig.shards(),
+                indexSetConfig.replicas(),
+                null
+        );
+    }
+
 }

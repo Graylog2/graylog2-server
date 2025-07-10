@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -27,9 +27,7 @@ import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreatePr
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
 
-const renderCreateNewProfile = () => render(
-  <CreateProfile />,
-);
+const renderCreateNewProfile = () => render(<CreateProfile />);
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
@@ -63,18 +61,16 @@ describe('CreateProfile', () => {
       isLoading: false,
     });
 
-    asMock(useProfileMutations).mockReturnValue(({
+    asMock(useProfileMutations).mockReturnValue({
       editProfile: editMock,
       isEditLoading: false,
       createProfile: createMock,
       isCreateLoading: false,
       isLoading: false,
       deleteProfile: deleteMock,
-    }));
+    });
 
-    asMock(useFieldTypes).mockImplementation(() => (
-      { data: simpleFields().toArray(), refetch: jest.fn() }
-    ));
+    asMock(useFieldTypes).mockImplementation(() => ({ data: simpleFields().toArray(), refetch: jest.fn() }));
   });
 
   it('Run createProfile with form data', async () => {
@@ -82,11 +78,9 @@ describe('CreateProfile', () => {
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
-      hidden: true,
     });
     const description = await screen.findByRole('textbox', {
       name: /description/i,
-      hidden: true,
     });
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 

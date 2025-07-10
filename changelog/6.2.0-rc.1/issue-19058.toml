@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing highlighting of message in message table by id."
+
+issues = ["19058"]
+pulls = ["21389"]

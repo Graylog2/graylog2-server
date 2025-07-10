@@ -19,29 +19,24 @@ package org.graylog.integrations.notifications.types;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
-import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -57,26 +52,22 @@ public class SlackEventNotification implements EventNotification {
     private final EventNotificationService notificationCallbackService;
     private final Engine templateEngine;
     private final NotificationService notificationService;
-    private final ObjectMapperProvider objectMapperProvider;
     private final NodeId nodeId;
     private final SlackClient slackClient;
-    private final URI httpExternalUri;
-
+    private final TemplateModelProvider templateModelProvider;
 
     @Inject
     public SlackEventNotification(EventNotificationService notificationCallbackService,
-                                  ObjectMapperProvider objectMapperProvider,
                                   Engine templateEngine,
                                   NotificationService notificationService,
                                   NodeId nodeId, SlackClient slackClient,
-                                  HttpConfiguration httpConfiguration) {
+                                  TemplateModelProvider templateModelProvider) {
         this.notificationCallbackService = notificationCallbackService;
-        this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
         this.slackClient = requireNonNull(slackClient);
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
+        this.templateModelProvider = templateModelProvider;
     }
 
     /**
@@ -231,13 +222,7 @@ public class SlackEventNotification implements EventNotification {
 
     @VisibleForTesting
     Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog, DateTimeZone timeZone) {
-        EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
-
-        LOG.debug("the custom message model data is {}", modelData.toString());
-        Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-        objectMap.put("type", type);
-        objectMap.put("http_external_uri", this.httpExternalUri);
-        return objectMap;
+        return templateModelProvider.of(ctx, backlog, timeZone, Map.of("type", type));
     }
 
     public interface Factory extends EventNotification.Factory {

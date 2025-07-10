@@ -20,11 +20,11 @@ import type * as Immutable from 'immutable';
 import { MessageDetailsDefinitionList } from 'components/common';
 
 type Props = {
-  timestamp: string,
-  receivedBy: React.ReactElement,
-  index: string,
-  streams: Immutable.Set<React.ReactElement>,
-  assets: React.ReactElement,
+  timestamp: string;
+  receivedBy: React.ReactElement;
+  index: string;
+  streams: Immutable.Set<React.ReactElement>;
+  assets: React.ReactElement;
 };
 
 const MessageMetadata = ({ timestamp, receivedBy, index, streams, assets }: Props) => (
@@ -39,9 +39,7 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams, assets }: Prop
       <>
         <dt>Routed into streams</dt>
         <dd className="stream-list">
-          <ul>
-            {streams.toArray()}
-          </ul>
+          <ul>{streams.toArray()}</ul>
         </dd>
       </>
     )}

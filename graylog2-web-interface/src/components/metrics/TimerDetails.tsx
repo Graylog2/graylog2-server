@@ -14,42 +14,55 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
 import type { TimerMetric } from 'stores/metrics/MetricsStore';
 
 type Props = {
-  metric: TimerMetric,
-}
-const TimerDetails = ({ metric: { metric: { time: timing } } }: Props) => (
+  metric: TimerMetric;
+};
+const TimerDetails = ({
+  metric: {
+    metric: { time: timing },
+  },
+}: Props) => (
   <dl className="metric-def metric-timer">
     <dt>95th percentile:</dt>
-    <dd><span>{numeral(timing['95th_percentile']).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing['95th_percentile']).format('0,0.[00]')}</span>&#956;s
+    </dd>
 
     <dt>98th percentile:</dt>
-    <dd><span>{numeral(timing['98th_percentile']).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing['98th_percentile']).format('0,0.[00]')}</span>&#956;s
+    </dd>
 
     <dt>99th percentile:</dt>
-    <dd><span>{numeral(timing['99th_percentile']).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing['99th_percentile']).format('0,0.[00]')}</span>&#956;s
+    </dd>
 
     <dt>Standard deviation:</dt>
-    <dd><span>{numeral(timing.std_dev).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing.std_dev).format('0,0.[00]')}</span>&#956;s
+    </dd>
 
     <dt>Mean:</dt>
-    <dd><span>{numeral(timing.mean).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing.mean).format('0,0.[00]')}</span>&#956;s
+    </dd>
 
     <dt>Minimum:</dt>
-    <dd><span>{numeral(timing.min).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing.min).format('0,0.[00]')}</span>&#956;s
+    </dd>
 
     <dt>Maximum:</dt>
-    <dd><span>{numeral(timing.max).format('0,0.[00]')}</span>&#956;s</dd>
+    <dd>
+      <span>{numeral(timing.max).format('0,0.[00]')}</span>&#956;s
+    </dd>
   </dl>
 );
-
-TimerDetails.propTypes = {
-  metric: PropTypes.object.isRequired,
-};
 
 export default TimerDetails;

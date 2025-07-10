@@ -21,16 +21,16 @@ import FieldType from './FieldType';
 import type { FieldTypeJSON } from './FieldType';
 
 export type FieldTypeMappingJSON = {
-  name: string,
-  type: FieldTypeJSON,
-  unit?: FieldUnitJson,
+  name: string;
+  type: FieldTypeJSON;
+  unit?: FieldUnitJson;
 };
 
 class FieldTypeMapping {
   value: {
-    name: string,
-    type: FieldType,
-    unit?: FieldUnit,
+    name: string;
+    type: FieldType;
+    unit?: FieldUnit;
   };
 
   constructor(name: string, type: FieldType, unit?: FieldUnit) {

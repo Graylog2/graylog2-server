@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import type SearchResult from 'views/logic/SearchResult';
 import { Icon, TextOverflowEllipsis } from 'components/common';
 import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
@@ -26,45 +27,67 @@ import type { DateTime } from 'util/DateTime';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useSearchResult from 'views/hooks/useSearchResult';
 import SearchQueryExecutionInfoHelper from 'views/components/widgets/SearchQueryExecutionInfoHelper';
+import useView from 'views/hooks/useView';
 
 type Props = {
-  className?: string,
-  widget: Widget,
-  activeQuery?: string,
-  widgetId?: string,
-  returnsAllRecords?: boolean
+  className?: string;
+  widget: Widget;
+  activeQuery?: string;
+  widgetId?: string;
+  returnsAllRecords?: boolean;
 };
 
-const Wrapper = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.tiny};
-  color: ${theme.colors.gray[30]};
-  width: max-content;
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  margin-right: 10px;
-`);
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.tiny};
+    color: ${theme.colors.gray[30]};
+    width: max-content;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-right: 10px;
+  `,
+);
 
-const StyledIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.gray[60]}
-`);
-const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
+const StyledIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
+const getEffectiveWidgetTimerange = (result: SearchResult, activeQuery: string, searchTypeId: string) => {
+  const searchTypeResult = result?.results?.[activeQuery]?.searchTypes[searchTypeId];
 
-const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRecords }: Props) => {
+  return searchTypeResult && 'effective_timerange' in searchTypeResult
+    ? searchTypeResult.effective_timerange
+    : undefined;
+};
+
+const TimerangeInfo = ({
+  className = undefined,
+  widget,
+  activeQuery = undefined,
+  widgetId = undefined,
+  returnsAllRecords = undefined,
+}: Props) => {
   const { formatTime } = useUserDateTime();
-  const { result, widgetMapping } = useSearchResult() ?? {};
+  const { result } = useSearchResult() ?? {};
+  const { widgetMapping } = useView();
   const globalOverride = useGlobalOverride();
 
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
   const toInternalTime = (dateTime: DateTime) => formatTime(dateTime, 'internal');
   const globalTimerangeString = globalOverride?.timerange
-    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}` : undefined;
+    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}`
+    : undefined;
 
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
 
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, toLocalTimeWithMS);
-  const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
-  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
+  const effectiveTimerange =
+    activeQuery && searchTypeId ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
+  const effectiveTimerangeString = effectiveTimerange
+    ? timerangeToString(effectiveTimerange, toInternalTime)
+    : 'Effective widget time range is currently not available.';
   const currentWidgetMapping = widgetMapping?.get(widgetId);
   const timerange = globalTimerangeString || configuredTimerange;
 
@@ -72,9 +95,7 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRec
     return (
       <Wrapper className={className}>
         <StyledIcon name="warning" title="The result of this widget is independent of the current search." />
-        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
-          All Time
-        </TextOverflowEllipsis>
+        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>All Time</TextOverflowEllipsis>
       </Wrapper>
     );
   }
@@ -82,19 +103,10 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRec
   return (
     <SearchQueryExecutionInfoHelper currentWidgetMapping={currentWidgetMapping}>
       <Wrapper className={className}>
-        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
-          {timerange}
-        </TextOverflowEllipsis>
+        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>{timerange}</TextOverflowEllipsis>
       </Wrapper>
     </SearchQueryExecutionInfoHelper>
   );
-};
-
-TimerangeInfo.defaultProps = {
-  className: undefined,
-  activeQuery: undefined,
-  widgetId: undefined,
-  returnsAllRecords: undefined,
 };
 
 export default TimerangeInfo;

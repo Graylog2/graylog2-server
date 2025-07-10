@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities.preferences.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
@@ -57,7 +58,7 @@ public class EntityListPreferencesServiceImplTest {
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        this.toTest = new EntityListPreferencesServiceImpl(mongoConnection, objectMapperProvider);
+        this.toTest = new EntityListPreferencesServiceImpl(new MongoCollections(objectMapperProvider, mongoConnection));
     }
 
     @Test
@@ -70,7 +71,7 @@ public class EntityListPreferencesServiceImplTest {
     public void performsSaveAndGetOperationsCorrectly() {
         final StoredEntityListPreferences existingPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description"), 42, new SingleFieldSortPreferences("title", ASC)))
+                .preferences(EntityListPreferences.create(List.of("title", "description"), 42, new SingleFieldSortPreferences("title", ASC)))
                 .build();
 
         //save
@@ -88,7 +89,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with save
         StoredEntityListPreferences updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description", "owner"), 13, new SingleFieldSortPreferences("title", DESC)))
+                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), 13, new SingleFieldSortPreferences("title", DESC)))
                 .build();
         saved = toTest.save(updatedPreference);
         assertTrue(saved);
@@ -100,7 +101,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with some values cleaned
         updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description", "owner"), null, null))
+                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), null, null))
                 .build();
         saved = toTest.save(updatedPreference);
         assertTrue(saved);

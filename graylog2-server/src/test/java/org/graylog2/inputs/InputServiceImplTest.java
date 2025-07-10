@@ -164,6 +164,8 @@ public class InputServiceImplTest {
         final MessageInput.Config inputConfig = mock(MessageInput.Config.class);
         when(inputConfig.combinedRequestedConfiguration()).thenReturn(ConfigurationRequest.createWithFields(
                 new TextField("encrypted", "", "", "",
+                        ConfigurationField.Optional.OPTIONAL, true),
+                new TextField("encrypted2", "", "", "",
                         ConfigurationField.Optional.OPTIONAL, true)
         ));
         when(messageInputFactory.getConfig("test type")).thenReturn(Optional.of(
@@ -171,23 +173,30 @@ public class InputServiceImplTest {
         ));
 
         final EncryptedValue secret = encryptedValueService.encrypt("secret");
+        final EncryptedValue secret2 = encryptedValueService.encrypt("secret2");
         final String id = inputService.save(new InputImpl(Map.of(
                 FIELD_TYPE, "test type",
                 FIELD_TITLE, "test title",
                 FIELD_CREATED_AT, new Date(),
                 FIELD_CREATOR_USER_ID, "test creator",
                 FIELD_CONFIGURATION, Map.of(
-                        "encrypted", secret
+                        "encrypted", secret,
+                        "encrypted2", secret2
                 )
         )));
 
         assertThat(id).isNotBlank();
 
-        assertThat(inputService.find(id)).satisfies(input ->
-                assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
-                    assertThat(value).isInstanceOf(EncryptedValue.class);
-                    assertThat(value).isEqualTo(secret);
-                }));
+        assertThat(inputService.find(id)).satisfies(input -> {
+            assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
+                assertThat(value).isInstanceOf(EncryptedValue.class);
+                assertThat(value).isEqualTo(secret);
+            });
+            assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted2", value -> {
+                assertThat(value).isInstanceOf(EncryptedValue.class);
+                assertThat(value).isEqualTo(secret2);
+            });
+        });
 
         assertThat(inputService.allByType("test type")).hasSize(1).first().satisfies(input ->
                 assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {

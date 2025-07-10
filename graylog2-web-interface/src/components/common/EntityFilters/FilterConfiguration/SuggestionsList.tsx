@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 
@@ -23,19 +23,14 @@ import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import { PaginatedList, NoSearchResult } from 'components/common';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
-import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
 import Spinner from 'components/common/Spinner';
 
-const DEFAULT_SEARCH_PARAMS = {
-  query: '',
-  pageSize: 10,
-  page: 1,
-};
-
-const Container = styled.div(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  padding: 3px 10px;
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    padding: 3px 10px;
+  `,
+);
 
 const SearchInput = styled(Input)`
   margin-bottom: 6px;
@@ -45,51 +40,89 @@ const StyledListGroup = styled.div`
   margin-bottom: 0;
 `;
 
-const Hint = styled.div(({ theme }) => css`
-  margin-top: 9px;
-  font-size: ${theme.fonts.size.small};
-`);
+const Hint = styled.div(
+  ({ theme }) => css`
+    margin-top: 9px;
+    font-size: ${theme.fonts.size.small};
+  `,
+);
+
+type SearchParams = {
+  query: string;
+  page: number;
+  pageSize: number;
+};
+
+type Suggestion = {
+  id: string;
+  value: string;
+};
 
 type Props = {
-  allActiveFilters: Filters | undefined,
-  attribute: Attribute,
-  filter: Filter | undefined
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
-}
+  allActiveFilters: Filters | undefined;
+  attribute: Attribute;
+  filter: Filter | undefined;
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined;
+  onSubmit: (filter: { title: string; value: string }, closeDropdown: boolean) => void;
+  suggestions: Array<Suggestion>;
+  isLoading: boolean;
+  total: number;
+  page: number;
+  pageSize: number;
+  setSearchParams: (updater: (current: SearchParams) => SearchParams) => void;
+};
 
-const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter }: Props) => {
+const SuggestionsList = ({
+  attribute,
+  filterValueRenderer,
+  onSubmit,
+  allActiveFilters,
+  filter,
+  isLoading,
+  suggestions,
+  total,
+  setSearchParams,
+  page,
+  pageSize,
+}: Props) => {
   const isShiftHeld = useIsKeyHeld('Shift');
-  const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-  const { data: { pagination, suggestions }, isInitialLoading } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams, attribute.related_property);
-  const handleSearchChange = useCallback((newSearchQuery: string) => {
-    setSearchParams((cur) => ({ ...cur, page: DEFAULT_SEARCH_PARAMS.page, query: newSearchQuery }));
-  }, [setSearchParams]);
+  const handleSearchChange = useCallback(
+    (newSearchQuery: string) => {
+      setSearchParams((cur) => ({ ...cur, page: 1, query: newSearchQuery }));
+    },
+    [setSearchParams],
+  );
 
-  const handlePaginationChange = useCallback((page: number) => {
-    setSearchParams((cur) => ({ ...cur, page }));
-  }, []);
+  const handlePaginationChange = useCallback(
+    (newPage: number) => {
+      setSearchParams((cur) => ({ ...cur, page: newPage }));
+    },
+    [setSearchParams],
+  );
 
   const debounceOnSearch = debounce((value: string) => handleSearchChange(value), 1000);
 
   return (
     <Container>
-      <SearchInput type="text"
-                   id="search-filters-input"
-                   formGroupClassName=""
-                   placeholder={`Search for ${attribute.title.toLowerCase()}`}
-                   onChange={({ target: { value } }) => debounceOnSearch(value)} />
-      {isInitialLoading && <Spinner />}
+      <SearchInput
+        type="text"
+        id="search-filters-input"
+        formGroupClassName=""
+        placeholder={`Search for ${attribute.title.toLowerCase()}`}
+        onChange={({ target: { value } }) => debounceOnSearch(value)}
+      />
+      {isLoading && <Spinner />}
 
       {!!suggestions?.length && (
-        <PaginatedList showPageSizeSelect={false}
-                       totalItems={pagination.total}
-                       hidePreviousAndNextPageLinks
-                       hideFirstAndLastPageLinks
-                       activePage={searchParams.page}
-                       pageSize={searchParams.pageSize}
-                       onChange={handlePaginationChange}
-                       useQueryParameter={false}>
+        <PaginatedList
+          showPageSizeSelect={false}
+          totalItems={total}
+          hidePreviousAndNextPageLinks
+          hideFirstAndLastPageLinks
+          activePage={page}
+          pageSize={pageSize}
+          onChange={handlePaginationChange}
+          useQueryParameter={false}>
           <StyledListGroup>
             {suggestions.map((suggestion) => {
               const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === suggestion.id);
@@ -99,16 +132,17 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
                   return;
                 }
 
-                onSubmit({
-                  value: suggestion.id,
-                  title: suggestion.value,
-                }, !isShiftHeld);
+                onSubmit(
+                  {
+                    value: suggestion.id,
+                    title: suggestion.value,
+                  },
+                  !isShiftHeld,
+                );
               };
 
               return (
-                <ListGroupItem onClick={onClick}
-                               key={`filter-value-${suggestion.id}`}
-                               disabled={disabled}>
+                <ListGroupItem onClick={onClick} key={`filter-value-${suggestion.id}`} disabled={disabled}>
                   {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
                 </ListGroupItem>
               );
@@ -121,9 +155,7 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
 
       {!filter && (
         <Hint>
-          <i>
-            Hold Shift to select multiple
-          </i>
+          <i>Hold Shift to select multiple</i>
         </Hint>
       )}
     </Container>

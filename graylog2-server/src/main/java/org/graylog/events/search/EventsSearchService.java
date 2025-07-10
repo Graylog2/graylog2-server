@@ -18,24 +18,23 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
-import jakarta.inject.Inject;
-
+import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,38 +58,29 @@ public class EventsSearchService {
         this.objectMapper = objectMapper;
     }
 
-    private String eventDefinitionFilter(String id) {
-        return String.format(Locale.ROOT, "%s:%s", EventDto.FIELD_EVENT_DEFINITION_ID, id);
+    private String buildFilter(EventsSearchParameters parameters) {
+        return new EventsFilterBuilder(parameters).build();
+    }
+
+    private Set<String> allowedEventStreams(Subject subject) {
+        final var eventStreams = Set.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
+            return eventStreams;
+        }
+
+        return eventStreams.stream()
+                .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)) || streamId.equals(DEFAULT_EVENTS_STREAM_ID))
+                .collect(Collectors.toSet());
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
-        final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.<String>builder()
-                // Make sure we only filter for actual events and ignore anything else that might be in the event
-                // indices. (fixes an issue when users store non-event messages in event indices)
-                .add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
-
-        if (!parameters.filter().eventDefinitions().isEmpty()) {
-            final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()
-                    .map(this::eventDefinitionFilter)
-                    .collect(Collectors.joining(" OR "));
-
-            filterBuilder.addAll(Collections.singleton("(" + eventDefinitionFilter + ")"));
+        final var eventStreams = allowedEventStreams(subject);
+        if (eventStreams.isEmpty()) {
+            return EventsSearchResult.empty();
         }
 
-        switch (parameters.filter().alerts()) {
-            case INCLUDE:
-                // Nothing to do
-                break;
-            case EXCLUDE:
-                filterBuilder.add("NOT alert:true");
-                break;
-            case ONLY:
-                filterBuilder.add("alert:true");
-                break;
-        }
+        final var filter = buildFilter(parameters);
 
-        final String filter = String.join(" AND ", filterBuilder.build());
-        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
@@ -107,8 +97,8 @@ public class EventsSearchService {
                 }).collect(Collectors.toList());
 
         final EventsSearchResult.Context context = EventsSearchResult.Context.create(
-                lookupEventDefinitions(eventDefinitionIdsBuilder.build()),
-                lookupStreams(streamIdsBuilder.build())
+                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
+                lookupStreams(streamIdsBuilder.build(), subject)
         );
 
         return EventsSearchResult.builder()
@@ -121,6 +111,35 @@ public class EventsSearchService {
                 .build();
     }
 
+    public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
+        final var eventStreams = allowedEventStreams(subject);
+        if (eventStreams.isEmpty()) {
+            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
+        }
+
+        final var filter = buildFilter(parameters);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
+
+        return EventsHistogramResult.fromResult(result);
+    }
+
+    public EventsSearchResult searchByIds(Collection<String> eventIds, Subject subject) {
+        final var query = eventIds.stream()
+                .map(eventId -> EventDto.FIELD_ID + ":" + eventId)
+                .collect(Collectors.joining(" OR "));
+        final EventsSearchParameters parameters = EventsSearchParameters.builder()
+                .page(1)
+                .perPage(eventIds.size())
+                .timerange(RelativeRange.allTime())
+                .query(query)
+                .filter(EventsSearchFilter.empty())
+                .sortBy(Message.FIELD_TIMESTAMP)
+                .sortDirection(EventsSearchParameters.SortDirection.DESC)
+                .build();
+
+        return search(parameters, subject);
+    }
+
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
@@ -131,31 +150,27 @@ public class EventsSearchService {
             return Collections.emptySet();
         }
 
-        return streamService.loadAll().stream()
-                .map(Persisted::getId)
-                // Select all streams the user is NOT permitted to access
-                .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                .collect(Collectors.toSet());
+        try (var stream = streamService.streamAllIds()) {
+            return stream
+                    // Select all streams the user is NOT permitted to access
+                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                    .collect(Collectors.toSet());
+        }
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
-        return streams.stream()
-                .map(streamId -> {
-                    try {
-                        return streamService.load(streamId);
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(Persisted::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
+    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams, final Subject subject) {
+        final var allowedStreams = streams.stream().filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId))).collect(Collectors.toSet());
+
+        return streamService.loadByIds(allowedStreams)
+                .stream()
+                .collect(Collectors.toMap(Stream::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions) {
-        return eventDefinitions.stream()
-                .map(eventDefinitionService::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions, final Subject subject) {
+        final var allowedEventDefinitions = eventDefinitions.stream().filter(eventDefinitionId -> subject.isPermitted(String.join(":", RestPermissions.EVENT_DEFINITIONS_READ, eventDefinitionId))).collect(Collectors.toSet());
+
+        return eventDefinitionService.getByIds(allowedEventDefinitions)
+                .stream()
                 .collect(Collectors.toMap(EventDefinitionDto::id,
                         d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
     }

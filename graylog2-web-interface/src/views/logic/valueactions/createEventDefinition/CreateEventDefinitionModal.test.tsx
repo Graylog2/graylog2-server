@@ -38,20 +38,17 @@ const checked = {
   streams: true,
 };
 const onClose = jest.fn();
-const renderCreateDefinitionModal = ({
-  modalData = modalDataResult,
-  mappedData = mappedDataResult,
-}) => render(
-  <CreateEventDefinitionModal onClose={onClose} modalData={modalData} mappedData={mappedData} show />,
-);
+const renderCreateDefinitionModal = ({ modalData = modalDataResult, mappedData = mappedDataResult }) =>
+  render(<CreateEventDefinitionModal onClose={onClose} modalData={modalData} mappedData={mappedData} show />);
 
-const renderWithAllChecked = () => renderCreateDefinitionModal({
-  mappedData: {
-    ...mappedDataResult,
-    rowValuePath: 'action:login',
-    columnValuePath: 'action:login',
-  },
-});
+const renderWithAllChecked = () =>
+  renderCreateDefinitionModal({
+    mappedData: {
+      ...mappedDataResult,
+      rowValuePath: 'action:login',
+      columnValuePath: 'action:login',
+    },
+  });
 const mockedDispatch = jest.fn();
 
 describe('CreateEventDefinitionModal', () => {
@@ -263,7 +260,6 @@ describe('CreateEventDefinitionModal', () => {
 
     const linkButton = await screen.findByRole<HTMLAnchorElement>('link', {
       name: /continue configuration/i,
-      hidden: true,
     });
 
     expect(linkButton.href).toContain('/alerts/definitions/new?step=condition&session-id=cedfv-session-id');

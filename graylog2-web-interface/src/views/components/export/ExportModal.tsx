@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import type { List } from 'immutable';
 import { OrderedSet } from 'immutable';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Field, Formik, Form } from 'formik';
 
@@ -50,9 +49,9 @@ const Content = styled.div`
 `;
 
 export type Props = {
-  closeModal: () => void,
-  directExportWidgetId?: string,
-  view: View,
+  closeModal?: () => void;
+  directExportWidgetId?: string;
+  view: View;
 };
 
 const _getInitialWidgetFields = (selectedWidget: Widget): OrderedSet<string> => {
@@ -70,14 +69,14 @@ const _getInitialFields = (selectedWidget: Widget) => {
 };
 
 type FormState = {
-  selectedWidget: Widget | undefined,
-  limit: number,
-  selectedFields: Array<{ field: string }>,
-  customSettings: ExportSettingsType,
-  format: string,
+  selectedWidget: Widget | undefined;
+  limit: number;
+  selectedFields: Array<{ field: string }>;
+  customSettings: ExportSettingsType;
+  format: string;
 };
 
-const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
+const ExportModal = ({ closeModal = () => {}, view, directExportWidgetId = null }: Props) => {
   const executionState = useSearchExecutionState();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -90,7 +89,10 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
     shouldAllowWidgetSelection,
     downloadFile,
   } = ExportStrategy.createExportStrategy(view.type);
-  const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
+  const exportableWidgets = viewStates
+    .map((state) => state.widgets.filter((widget) => widget.isExportable).toList())
+    .toList()
+    .flatten(true) as List<Widget>;
   const currentUser = useCurrentUser();
   const currentQuery = useCurrentQuery();
 
@@ -108,7 +110,18 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
 
     setLoading(true);
 
-    return startDownload(format, downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings, currentUser, currentQuery)
+    return startDownload(
+      format,
+      downloadFile,
+      view,
+      executionState,
+      selectedWidget,
+      selectedFields,
+      limit,
+      customSettings,
+      currentUser,
+      currentQuery,
+    )
       .then(closeModal)
       .finally(() => setLoading(false));
   };
@@ -122,18 +135,20 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
   };
 
   return (
-    <Formik<FormState> onSubmit={_startDownload}
-                       initialValues={initialValues}>
+    <Formik<FormState> onSubmit={_startDownload} initialValues={initialValues}>
       {({ values: { selectedWidget, selectedFields }, setFieldValue }) => {
         const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, exportableWidgets);
-        const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, exportableWidgets);
+        const allowWidgetSelection = shouldAllowWidgetSelection(
+          singleWidgetDownload,
+          showWidgetSelection,
+          exportableWidgets,
+        );
         const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
         const resetSelectedWidget = () => setFieldValue('selectedWidget', undefined);
         const setSelectedFields = (newFields) => setFieldValue('selectedFields', newFields);
 
         return (
-          <BootstrapModalWrapper showModal
-                                 onHide={closeModal}>
+          <BootstrapModalWrapper showModal onHide={closeModal}>
             <Form>
               <Modal.Header>
                 <Modal.Title>{title}</Modal.Title>
@@ -150,34 +165,35 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
                         };
 
                         return (
-                          <ExportWidgetSelection selectWidget={onChangeSelectWidget}
-                                                 view={view}
-                                                 widgets={exportableWidgets.toList()} />
+                          <ExportWidgetSelection
+                            selectWidget={onChangeSelectWidget}
+                            view={view}
+                            widgets={exportableWidgets.toList()}
+                          />
                         );
                       }}
                     </Field>
                   )}
-                  {!showWidgetSelection && (
-                    <ExportSettings selectedWidget={initialSelectedWidget}
-                                    view={view} />
-                  )}
+                  {!showWidgetSelection && <ExportSettings selectedWidget={initialSelectedWidget} view={view} />}
                 </Content>
               </Modal.Body>
               <Modal.Footer>
-                <ModalSubmit leftCol={
-                  allowWidgetSelection && (
-                    <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">
-                      Select different message table
-                    </Button>
-                  )
-                }
-                             onCancel={closeModal}
-                             disabledSubmit={!enableDownload}
-                             isSubmitting={loading}
-                             isAsyncSubmit
-                             submitLoadingText="Downloading..."
-                             submitIcon="download"
-                             submitButtonText="Start Download" />
+                <ModalSubmit
+                  leftCol={
+                    allowWidgetSelection && (
+                      <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">
+                        Select different message table
+                      </Button>
+                    )
+                  }
+                  onCancel={closeModal}
+                  disabledSubmit={!enableDownload}
+                  isSubmitting={loading}
+                  isAsyncSubmit
+                  submitLoadingText="Downloading..."
+                  submitIcon="download"
+                  submitButtonText="Start Download"
+                />
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>
@@ -185,17 +201,6 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
       }}
     </Formik>
   );
-};
-
-ExportModal.propTypes = {
-  closeModal: PropTypes.func,
-  directExportWidgetId: PropTypes.string,
-};
-
-ExportModal.defaultProps = {
-  closeModal: () => {
-  },
-  directExportWidgetId: null,
 };
 
 export default ExportModal;

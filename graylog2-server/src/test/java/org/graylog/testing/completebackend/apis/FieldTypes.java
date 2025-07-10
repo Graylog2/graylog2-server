@@ -18,8 +18,10 @@ package org.graylog.testing.completebackend.apis;
 
 import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +53,19 @@ public class FieldTypes implements GraylogRestApi {
                 .post("/views/fields")
                 .as(MappedFieldTypeDTO[].class);
         return Arrays.asList(as);
+    }
+
+    public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(Set<String> streams, String... fieldName) {
+        final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
+        return waitForObject(() -> {
+            final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(RelativeRange.allTime(), streams);
+            final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
+            if (filtered.size() == expectedFields.size()) {
+                return Optional.of(filtered);
+            } else {
+                return Optional.empty();
+            }
+        }, "Timed out waiting for field definition", Duration.ofSeconds(30));
     }
 
     public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(String... fieldName) {

@@ -1,0 +1,5 @@
+type = "a"
+message = "Add preflight check for data node and graylog server, veryfing that password_secret is configured to the same value everywhere."
+
+pulls = ["21491"]
+issues = ["21504"]

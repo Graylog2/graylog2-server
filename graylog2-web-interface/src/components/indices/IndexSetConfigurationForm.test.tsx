@@ -71,11 +71,7 @@ const retentionStrategies = [
         },
         index_action: {
           type: 'string',
-          enum: [
-            'NONE',
-            'CLOSE',
-            'DELETE',
-          ],
+          enum: ['NONE', 'CLOSE', 'DELETE'],
         },
         type: {
           type: 'string',
@@ -248,23 +244,31 @@ jest.mock('components/indices/IndexSetTemplates/hooks/useSelectedTemplate', () =
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
-    asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
-    asMock(useIndexSetTemplateDefaults).mockReturnValue(({ loadingIndexSetTemplateDefaults: false, indexSetTemplateDefaults }));
-    asMock(useSelectedIndexSetTemplate).mockReturnValue(({ selectedIndexSetTemplate: undefined, setSelectedIndexSetTemplate: jest.fn() }));
+    asMock(useProfileOptions).mockReturnValue({ isLoading: false, options: [], refetch: () => {} });
+    asMock(useIndexSetTemplateDefaults).mockReturnValue({
+      loadingIndexSetTemplateDefaults: false,
+      indexSetTemplateDefaults,
+    });
+    asMock(useSelectedIndexSetTemplate).mockReturnValue({
+      selectedIndexSetTemplate: undefined,
+      setSelectedIndexSetTemplate: jest.fn(),
+    });
   });
 
   const onSave = jest.fn();
   const cancelLink = '/cancelLink';
 
   const SUT = (props: Partial<React.ComponentProps<typeof IndexSetConfigurationForm>>) => (
-    <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                               rotationStrategies={rotationStrategies}
-                               retentionStrategies={retentionStrategies}
-                               cancelLink={cancelLink}
-                               onUpdate={onSave}
-                               submitButtonText="Save"
-                               submitLoadingText="Saving..."
-                               {...props} />
+    <IndexSetConfigurationForm
+      retentionStrategiesContext={retentionStrategiesContext}
+      rotationStrategies={rotationStrategies}
+      retentionStrategies={retentionStrategies}
+      cancelLink={cancelLink}
+      onUpdate={onSave}
+      submitButtonText="Save"
+      submitLoadingText="Saving..."
+      {...props}
+    />
   );
 
   it('Should render IndexSetConfigurationForm', async () => {

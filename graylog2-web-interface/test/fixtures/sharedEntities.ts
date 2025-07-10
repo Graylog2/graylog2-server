@@ -22,14 +22,8 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 import type { Pagination } from 'stores/PaginationTypes';
 
 export const paginatedShares = ({ page, perPage, query, additionalQueries }: Pagination) => {
-  const entityOwner = Grantee
-    .builder()
-    .id('grn::::user:jane')
-    .type('user')
-    .title('Jane Doe')
-    .build();
-  const sharedEntity = SharedEntity
-    .builder()
+  const entityOwner = Grantee.builder().id('grn::::user:jane').type('user').title('Jane Doe').build();
+  const sharedEntity = SharedEntity.builder()
     .id('grn::::stream:57bc9188e62a2373778d9e03')
     .type('stream')
     .title('Security Data')

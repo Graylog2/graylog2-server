@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { Formik, Form } from 'formik';
-import type { $PropertyType } from 'utility-types';
 import styled from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
@@ -33,12 +32,12 @@ import EmailFormGroup from '../UserCreate/EmailFormGroup';
 
 const isCloud = AppConfig.isCloud();
 type Props = {
-  user: User,
+  user: User;
   onSubmit: (payload: {
-    first_name: $PropertyType<User, 'firstName'>,
-    last_name: $PropertyType<User, 'lastName'>,
-    email: $PropertyType<User, 'email'>,
-  }) => Promise<void>,
+    first_name: User['firstName'];
+    last_name: User['lastName'];
+    email: User['email'];
+  }) => Promise<void>;
 };
 
 const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
@@ -47,26 +46,15 @@ const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
   }
 `;
 
-const ProfileSection = ({
-  user,
-  onSubmit,
-}: Props) => {
-  const {
-    username,
-    fullName,
-    firstName,
-    lastName,
-    email,
-  } = user;
+const ProfileSection = ({ user, onSubmit }: Props) => {
+  const { username, fullName, firstName, lastName, email } = user;
 
   const _getUserNameGroup = () => {
     if (isCloud) {
       return <StyledReadOnlyFormGroup label="Email" value={email} />;
     }
 
-    return (
-      <StyledReadOnlyFormGroup label="Username" value={username} />
-    );
+    return <StyledReadOnlyFormGroup label="Username" value={username} />;
   };
 
   const _getEmailGroup = () => {
@@ -74,18 +62,15 @@ const ProfileSection = ({
       return null;
     }
 
-    return (
-      <EmailFormGroup />
-    );
+    return <EmailFormGroup />;
   };
 
-  const isOldUser = () => fullName && (!firstName && !lastName);
+  const isOldUser = () => fullName && !firstName && !lastName;
 
   return (
     <SectionComponent title="Profile">
       {isOldUser() && <ProfileUpdateInfo />}
-      <Formik onSubmit={onSubmit}
-              initialValues={{ email, first_name: firstName, last_name: lastName }}>
+      <Formik onSubmit={onSubmit} initialValues={{ email, first_name: firstName, last_name: lastName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             {isOldUser() && <StyledReadOnlyFormGroup label="Full Name" value={fullName} />}
@@ -96,10 +81,7 @@ const ProfileSection = ({
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid}
-                          title="Update Profile"
-                          type="submit">
+                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Update Profile" type="submit">
                     Update Profile
                   </Button>
                 </div>

@@ -1,0 +1,4 @@
+type = "c"
+message = "Adjust Event Priority field choices for consistency with Graylog Security."
+
+pulls = ["21123"]

@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, act, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -28,9 +28,7 @@ import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/ho
 import { simpleFields } from 'fixtures/fields';
 import { profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
-const renderEditProfile = () => render(
-  <EditProfile profile={profile1} />,
-);
+const renderEditProfile = () => render(<EditProfile profile={profile1} />);
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
@@ -65,18 +63,16 @@ describe('EditProfile', () => {
       isLoading: false,
     });
 
-    asMock(useProfileMutations).mockReturnValue(({
+    asMock(useProfileMutations).mockReturnValue({
       editProfile: editMock,
       isEditLoading: false,
       createProfile: createMock,
       isCreateLoading: false,
       isLoading: false,
       deleteProfile: deleteMock,
-    }));
+    });
 
-    asMock(useFieldTypes).mockImplementation(() => (
-      { data: simpleFields().toArray(), refetch: jest.fn() }
-    ));
+    asMock(useFieldTypes).mockImplementation(() => ({ data: simpleFields().toArray(), refetch: jest.fn() }));
   });
 
   it('Run editProfile with changed form data', async () => {
@@ -84,7 +80,6 @@ describe('EditProfile', () => {
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
-      hidden: true,
     });
 
     const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);

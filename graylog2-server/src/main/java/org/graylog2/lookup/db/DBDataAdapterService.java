@@ -16,12 +16,13 @@
  */
 package org.graylog2.lookup.db;
 
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
@@ -33,9 +34,9 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.events.DataAdaptersDeleted;
 import org.graylog2.lookup.events.DataAdaptersUpdated;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.idEq;
@@ -124,12 +125,13 @@ public class DBDataAdapterService {
         });
     }
 
-    public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
-        return stream(collection.find(stringIdsIn(idSet))).toList();
-
+    @MustBeClosed
+    public Stream<DataAdapterDto> streamByIds(Set<String> idSet) {
+        return stream(collection.find(stringIdsIn(idSet)));
     }
 
-    public Collection<DataAdapterDto> findAll() {
-        return stream(collection.find()).toList();
+    @MustBeClosed
+    public Stream<DataAdapterDto> streamAll() {
+        return stream(collection.find());
     }
 }

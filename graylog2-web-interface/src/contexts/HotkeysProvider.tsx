@@ -25,6 +25,7 @@ import Immutable from 'immutable';
 
 import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
+import { isMacOS } from 'util/OSUtils';
 
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
@@ -68,7 +69,10 @@ export const hotKeysCollections: HotkeyCollections = {
       'submit-search': { keys: 'return', description: 'Execute the search' },
       'insert-newline': { keys: 'shift+return', description: 'Create a new line' },
       'create-search-filter': { keys: 'alt+return', description: 'Create search filter based on current query' },
-      'show-suggestions': { keys: 'alt+space', description: 'Show suggestions, displays query history when input is empty' },
+      'show-suggestions': {
+        keys: isMacOS() ? 'alt+space' : 'mod+space',
+        description: 'Show suggestions, displays query history when input is empty',
+      },
       'show-history': { keys: 'alt+shift+h', description: 'View your search query history' },
     },
   },
@@ -87,44 +91,48 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   const { enabledScopes } = useOriginalHotkeysContext();
   const [showHotkeysModal, setShowHotkeysModal] = useState(false);
 
-  const addActiveHotkey = useCallback(({ scope, actionKey, options }: {
-    scope: ScopeName,
-    actionKey: string,
-    options: Options & { scope: ScopeName }
-  }) => {
-    setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
-  }, []);
+  const addActiveHotkey = useCallback(
+    ({
+      scope,
+      actionKey,
+      options,
+    }: {
+      scope: ScopeName;
+      actionKey: string;
+      options: Options & { scope: ScopeName };
+    }) => {
+      setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
+    },
+    [],
+  );
 
-  const removeActiveHotkey = useCallback(({ scope, actionKey }: { scope: ScopeName, actionKey: string }) => {
+  const removeActiveHotkey = useCallback(({ scope, actionKey }: { scope: ScopeName; actionKey: string }) => {
     setActiveHotkeys((cur) => cur.delete(`${scope}.${actionKey}`));
   }, []);
 
-  const value = useMemo(() => ({
-    enabledScopes: enabledScopes as Array<ScopeName>,
-    hotKeysCollections,
-    activeHotkeys,
-    addActiveHotkey,
-    removeActiveHotkey,
-    showHotkeysModal,
-    setShowHotkeysModal,
-  }), [activeHotkeys, addActiveHotkey, enabledScopes, removeActiveHotkey, showHotkeysModal]);
-
-  return (
-    <HotkeysContext.Provider value={value}>
-      {children}
-    </HotkeysContext.Provider>
+  const value = useMemo(
+    () => ({
+      enabledScopes: enabledScopes as Array<ScopeName>,
+      hotKeysCollections,
+      activeHotkeys,
+      addActiveHotkey,
+      removeActiveHotkey,
+      showHotkeysModal,
+      setShowHotkeysModal,
+    }),
+    [activeHotkeys, addActiveHotkey, enabledScopes, removeActiveHotkey, showHotkeysModal],
   );
+
+  return <HotkeysContext.Provider value={value}>{children}</HotkeysContext.Provider>;
 };
 
 type Props = {
-  children: React.ReactElement,
-}
+  children: React.ReactElement;
+};
 
 const HotkeysProvider = ({ children }: Props) => (
   <OriginalHotkeysProvider>
-    <CustomHotkeysProvider>
-      {children}
-    </CustomHotkeysProvider>
+    <CustomHotkeysProvider>{children}</CustomHotkeysProvider>
   </OriginalHotkeysProvider>
 );
 

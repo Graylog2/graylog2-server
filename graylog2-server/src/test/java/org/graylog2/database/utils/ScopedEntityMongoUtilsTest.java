@@ -16,7 +16,7 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
@@ -78,6 +78,7 @@ public class ScopedEntityMongoUtilsTest {
         assertThatThrownBy(() -> scopedEntityMongoUtils.deleteById(id))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(scopedEntityMongoUtils.forceDelete(id)).isEqualTo(1L);
+        assertThat(scopedEntityMongoUtils.forceUpdate(updated)).isEqualTo(updated);
     }
 
     @Test

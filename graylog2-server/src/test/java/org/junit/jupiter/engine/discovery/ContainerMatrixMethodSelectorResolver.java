@@ -145,7 +145,7 @@ public class ContainerMatrixMethodSelectorResolver implements SelectorResolver {
             @Override
             protected TestDescriptor createTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method method,
                                                           JupiterConfiguration configuration) {
-                return new TestMethodTestDescriptor(uniqueId, testClass, method, configuration);
+                return new TestMethodTestDescriptor(uniqueId, testClass, method, () -> List.of(), configuration);
             }
         }; /*,
 

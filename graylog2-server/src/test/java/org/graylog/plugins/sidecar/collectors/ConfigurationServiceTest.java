@@ -27,6 +27,7 @@ import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +51,8 @@ public class ConfigurationServiceTest {
     @Mock
     private NodeDetails nodeDetails;
 
-    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -74,8 +76,11 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationVariableService = new ConfigurationVariableService(mongodb.mongoConnection(), mongoJackObjectMapperProvider);
-        this.configurationService = new ConfigurationService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, configurationVariableService, new SecureFreemarkerConfigProvider());
+        this.configurationVariableService = new ConfigurationVariableService(
+                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
+        this.configurationService = new ConfigurationService(
+                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
+                configurationVariableService, new SecureFreemarkerConfigProvider());
     }
 
     @Test

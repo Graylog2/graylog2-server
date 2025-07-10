@@ -19,8 +19,4 @@ const LOGIN_INITIALIZING_STATE = 'INITIALIZING'; // Initial State for the plugin
 const LOGIN_INITIALIZED_STATE = 'INITIALIZED'; // Should be set once the plugin based login form is initialized
 const LOGIN_TRANSITIONING_STATE = 'TRANSITIONING'; // value when the plugin based form is in transition state for example handling login callback
 
-export {
-  LOGIN_INITIALIZING_STATE,
-  LOGIN_INITIALIZED_STATE,
-  LOGIN_TRANSITIONING_STATE,
-};
+export { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE, LOGIN_TRANSITIONING_STATE };

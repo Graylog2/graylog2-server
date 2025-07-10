@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -23,13 +23,6 @@ import { qualifyUrl } from 'util/URLUtils';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 
 const urlPrefix = '/system/indices/mappings';
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
@@ -56,7 +49,7 @@ describe('useFieldTypeMutation', () => {
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
-      const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useFieldTypeMutation());
 
       act(() => {
         result.current.putFieldTypeMutation(requestBody);
@@ -64,21 +57,26 @@ describe('useFieldTypeMutation', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully', 'Success!'),
+      );
     });
 
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useFieldTypeMutation());
 
       act(() => {
         result.current.putFieldTypeMutation(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Changing the field type failed with status: Error: Error',
-        'Could not change the field type'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Changing the field type failed with status: Error: Error',
+          'Could not change the field type',
+        ),
+      );
     });
   });
 });

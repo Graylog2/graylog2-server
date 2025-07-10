@@ -15,26 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import useLocation from 'routing/useLocation';
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
-import { ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
+import {
+  ReactErrorType,
+  NotFoundErrorType,
+  UnauthorizedErrorType,
+  StreamPermissionErrorType,
+} from 'logic/errors/ReportedErrors';
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
+import useProductName from 'brand-customization/useProductName';
 
-const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => (
-  <ErrorPage title="Something went wrong"
-             description={<p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>}>
-    <pre>
-      {JSON.stringify(reportedError)}
-    </pre>
-  </ErrorPage>
-);
+const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => {
+  const productName = useProductName();
+
+  return (
+    <ErrorPage
+      title="Something went wrong"
+      description={
+        <p>
+          An unknown error has occurred. Please have a look at the following message and the {productName} server log
+          for more information.
+        </p>
+      }>
+      <pre>{JSON.stringify(reportedError)}</pre>
+    </ErrorPage>
+  );
+};
 
 const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) => {
   switch (reportedError.type) {
@@ -52,37 +66,23 @@ const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) 
 };
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const ReportedErrorBoundary = ({ children }: Props) => {
   const [reportedError, setReportedError] = useState<ReportedError | undefined>();
 
-  const report = (newError: ReportedError) => setReportedError(newError);
+  const report = useCallback((newError: ReportedError) => setReportedError(newError), []);
 
-  useEffect(() => {
-    const unlistenErrorsReport = ErrorsActions.report.listen(report);
-
-    return () => {
-      unlistenErrorsReport();
-    };
-  }, []);
+  useEffect(() => ErrorsActions.report.listen(report), [report]);
 
   const location = useLocation();
 
   useEffect(() => {
-    if (reportedError) {
-      setReportedError(null);
-    }
-  },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [location]);
+    setReportedError(null);
+  }, [location]);
 
-  if (reportedError) {
-    return <ReportedErrorPage reportedError={reportedError} />;
-  }
-
-  return <>{children}</>;
+  return reportedError ? <ReportedErrorPage reportedError={reportedError} /> : <>{children}</>;
 };
 
 export default ReportedErrorBoundary;

@@ -24,6 +24,7 @@ import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,7 +56,9 @@ public class DBJobDefinitionServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventProcessorExecutionJob.Config.class, EventProcessorExecutionJob.TYPE_NAME));
 
-        this.service = new DBJobDefinitionService(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
+        this.service = new DBJobDefinitionService(
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),
+                new MongoJackObjectMapperProvider(objectMapper));
     }
 
     @Test

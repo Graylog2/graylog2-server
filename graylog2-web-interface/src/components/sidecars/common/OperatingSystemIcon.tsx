@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -29,10 +28,21 @@ const Container = styled.div`
 `;
 
 type Props = {
-  operatingSystem: string,
+  operatingSystem?: string;
 };
 
-const matchIcon = (os: string) => {
+const defaultIcon = {
+  iconName: 'help',
+  iconType: 'default',
+} as const;
+
+const matchIcon = (_os: string) => {
+  if (!_os) {
+    return defaultIcon;
+  }
+
+  const os = _os.trim().toLowerCase();
+
   if (os.includes('darwin') || os.includes('mac os')) {
     return {
       iconName: 'apple',
@@ -61,30 +71,13 @@ const matchIcon = (os: string) => {
     } as const;
   }
 
-  return {
-    iconName: 'help',
-    iconType: 'default',
-  } as const;
+  return defaultIcon;
 };
 
-const OperatingSystemIcon = ({ operatingSystem }: Props) => {
-  const { iconName, iconType } = matchIcon(operatingSystem.trim().toLowerCase());
+const OperatingSystemIcon = ({ operatingSystem = undefined }: Props) => {
+  const { iconName, iconType } = matchIcon(operatingSystem);
 
-  return (
-    <Container>
-      {iconType === 'brand'
-        ? <BrandIcon name={iconName} />
-        : <Icon name={iconName} />}
-    </Container>
-  );
-};
-
-OperatingSystemIcon.propTypes = {
-  operatingSystem: PropTypes.string,
-};
-
-OperatingSystemIcon.defaultProps = {
-  operatingSystem: undefined,
+  return <Container>{iconType === 'brand' ? <BrandIcon name={iconName} /> : <Icon name={iconName} />}</Container>;
 };
 
 export default OperatingSystemIcon;

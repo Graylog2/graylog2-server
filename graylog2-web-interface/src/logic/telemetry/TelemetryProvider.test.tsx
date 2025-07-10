@@ -19,10 +19,10 @@ import { render } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock, MockStore } from 'helpers/mocking';
-import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 
 const mockedTelemetryConfig = {
   api_key: 'key',
@@ -74,11 +74,9 @@ const renderSUT = () => {
   const consume = jest.fn();
 
   render(
-    <TelemetryInit>
-      <TelemetryContext.Consumer>
-        {consume}
-      </TelemetryContext.Consumer>
-    </TelemetryInit>,
+    <TelemetryProvider>
+      <TelemetryContext.Consumer>{consume}</TelemetryContext.Consumer>
+    </TelemetryProvider>,
   );
 
   return consume;

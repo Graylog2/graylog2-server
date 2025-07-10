@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import asMock from 'helpers/mocking/AsMock';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -28,24 +26,25 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
-const getData = (list = [profile1]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [profile1]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypeProfilesList = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <TestStoreProvider>
-      <ProfilesList />
-    </TestStoreProvider>,
-  </QueryParamProvider>,
-);
+const renderIndexSetFieldTypeProfilesList = () =>
+  render(
+    <DefaultQueryParamProvider>
+      <TestStoreProvider>
+        <ProfilesList />
+      </TestStoreProvider>
+      ,
+    </DefaultQueryParamProvider>,
+  );
 
 jest.mock('routing/useParams', () => jest.fn());
 
@@ -61,12 +60,10 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['name',
-          'description',
-          'type',
-          'custom_field_mappings'],
+        displayedAttributes: ['name', 'description', 'type', 'custom_field_mappings'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypesForMappings).mockReturnValue({

@@ -25,9 +25,9 @@ import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutpu
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-type Props ={
-  streamId: string,
-  filterOutputRule: StreamOutputFilterRule,
+type Props = {
+  streamId: string;
+  filterOutputRule: StreamOutputFilterRule;
 };
 
 const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
@@ -38,7 +38,9 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
 
   const onConfirmDelete = async () => {
     await removeStreamOutputRule({ streamId, filterId: filterOutputRule.id }).then(() => {
-      queryClient.invalidateQueries(['streams']);
+      queryClient.invalidateQueries({
+        queryKey: ['streams'],
+      });
     });
 
     setShowDialog(false);
@@ -54,19 +56,13 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
 
   return (
     <>
-      <Button bsStyle="danger"
-              bsSize="xsmall"
-              onClick={onDelete}
-              title="View">
+      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete} title="View">
         <Icon name="delete" type="regular" />
       </Button>
       {showDialog && (
-      <ConfirmDialog title="Delete Rule"
-                     show
-                     onConfirm={onConfirmDelete}
-                     onCancel={() => setShowDialog(false)}>
-        {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
-      </ConfirmDialog>
+        <ConfirmDialog title="Delete Rule" show onConfirm={onConfirmDelete} onCancel={() => setShowDialog(false)}>
+          {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
+        </ConfirmDialog>
       )}
     </>
   );

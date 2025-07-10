@@ -15,25 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'preflight/util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { type Attribute } from 'stores/PaginationTypes';
+import { defaultOnError } from 'util/conditional/onError';
 
-export type PaginatedResponse<T> = {
-  list: Array<T>,
+export type PaginatedResponse<T, M = unknown> = {
+  list: Array<T>;
   pagination: {
-    total: number
-  },
-  attributes: Array<Attribute>,
-}
-
-export type FetchOptions = {
-  refetchInterval?: number,
+    total: number;
+  };
+  attributes: Array<Attribute>;
+  meta?: M;
 };
 
-const useFetchEntities = <T>({
+export type FetchOptions = {
+  refetchInterval?: number;
+};
+
+const useFetchEntities = <T, M = unknown>({
   fetchKey,
   searchParams,
   fetchEntities,
@@ -41,35 +42,36 @@ const useFetchEntities = <T>({
   humanName,
   fetchOptions = {},
 }: {
-  fetchKey: Array<unknown>,
-  searchParams: SearchParams,
-  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T>>
-  enabled: boolean,
-  humanName: string
-  fetchOptions?: FetchOptions,
+  fetchKey: Array<unknown>;
+  searchParams: SearchParams;
+  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T, M>>;
+  enabled: boolean;
+  humanName: string;
+  fetchOptions?: FetchOptions;
 }): {
-  isInitialLoading: boolean,
-  data: PaginatedResponse<T>,
-  refetch: () => void,
+  isInitialLoading: boolean;
+  data: PaginatedResponse<T, M>;
+  refetch: () => void;
 } => {
-  const { data, isInitialLoading, refetch } = useQuery(
-    fetchKey,
-    () => fetchEntities(searchParams),
-    {
-      enabled,
-      onError: (error) => {
-        UserNotification.error(`Fetching ${humanName} failed with status: ${error}`, `Could not retrieve ${humanName}`);
-      },
-      keepPreviousData: true,
-      ...fetchOptions,
-    },
-  );
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: fetchKey,
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchEntities(searchParams),
+        `Fetching ${humanName} failed with status`,
+        `Could not retrieve ${humanName}`,
+      ),
+    enabled,
+    placeholderData: keepPreviousData,
+    ...fetchOptions,
+  });
+
+  return {
     data,
     isInitialLoading,
     refetch,
-  });
+  };
 };
 
 export default useFetchEntities;

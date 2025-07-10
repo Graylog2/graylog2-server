@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 import { useState } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
@@ -43,13 +42,15 @@ const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeStat
   }
 };
 
-const Container = styled.li<{ $currentState: CurrentGranteeState }>(({ theme, $currentState }) => css`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 5px;
-  border-left: 5px solid ${currentStateColor(theme, $currentState)};
-`);
+const Container = styled.li<{ $currentState: CurrentGranteeState }>(
+  ({ theme, $currentState }) => css`
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 5px;
+    border-left: 5px solid ${currentStateColor(theme, $currentState)};
+  `,
+);
 
 const GranteeInfo = styled.div`
   display: flex;
@@ -83,17 +84,23 @@ const Actions = styled.div`
 `;
 
 type Props = {
-  availableCapabilities: CapabilitiesList,
-  currentGranteeState: CurrentGranteeState,
-  grantee: SelectedGrantee,
-  onDelete: (grantee: $PropertyType<Grantee, 'id'>) => Promise<EntityShareState | undefined | null>,
+  availableCapabilities: CapabilitiesList;
+  currentGranteeState: CurrentGranteeState;
+  grantee: SelectedGrantee;
+  onDelete: (grantee: Grantee['id']) => Promise<EntityShareState | undefined | null>;
   onCapabilityChange: (payload: {
-    granteeId: $PropertyType<Grantee, 'id'>,
-    capabilityId: $PropertyType<Capability, 'id'>,
-  }) => Promise<EntityShareState | undefined | null>,
+    granteeId: Grantee['id'];
+    capabilityId: Capability['id'];
+  }) => Promise<EntityShareState | undefined | null>;
 };
 
-const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee: { id, capabilityId, type, title }, onDelete, onCapabilityChange }: Props) => {
+const GranteesListItem = ({
+  availableCapabilities,
+  currentGranteeState,
+  grantee: { id, capabilityId, type, title },
+  onDelete,
+  onCapabilityChange,
+}: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
@@ -110,9 +117,11 @@ const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee:
             <StyledGranteeIcon type={type} />
             <Title>{title}</Title>
           </GranteeInfo>
-          <StyledCapabilitySelect onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
-                                  capabilities={availableCapabilities}
-                                  title={`Change the capability for ${title}`} />
+          <StyledCapabilitySelect
+            onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
+            capabilities={availableCapabilities}
+            title={`Change the capability for ${title}`}
+          />
           <Actions>
             {isDeleting ? (
               <Spinner text="" />

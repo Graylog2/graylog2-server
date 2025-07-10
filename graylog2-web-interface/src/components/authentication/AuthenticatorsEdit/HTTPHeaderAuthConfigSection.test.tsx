@@ -23,10 +23,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import HTTPHeaderAuthConfigSection from './HTTPHeaderAuthConfigSection';
 
-const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder()
-  .usernameHeader('Remote-User')
-  .enabled(true)
-  .build();
+const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder().usernameHeader('Remote-User').enabled(true).build();
 
 jest.mock('stores/authentication/HTTPHeaderAuthConfigStore', () => ({
   HTTPHeaderAuthConfigActions: {

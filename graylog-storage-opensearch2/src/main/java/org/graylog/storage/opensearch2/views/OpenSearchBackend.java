@@ -280,10 +280,11 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     }
                     return searchRequest;
                 })
+                .map(request -> request.preference(job.getId()))
                 .toList();
 
         final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
-        job.setSearchEngineTaskFuture(mSearchFuture);
+        job.setQueryExecutionFuture(query.id(), mSearchFuture);
         final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, searches.size());
 
         for (SearchType searchType : query.searchTypes()) {

@@ -17,16 +17,19 @@
 import * as React from 'react';
 
 import { Icon } from 'components/common';
-import type { StepKey } from 'components/common/Wizard';
 
 type Props = {
-  invalidStepKeys: Array<StepKey>,
-  stepKey: string,
+  invalidStepKeys: Array<string> | undefined;
+  stepKey: string;
 };
 
-const StepTitleWarning = ({ invalidStepKeys = [], stepKey }: Props) => {
-  if (invalidStepKeys.includes(stepKey)) {
-    return <><Icon name="warning" />{' '}</>;
+const StepTitleWarning = ({ invalidStepKeys, stepKey }: Props) => {
+  if (invalidStepKeys?.includes(stepKey)) {
+    return (
+      <>
+        <Icon name="warning" />{' '}
+      </>
+    );
   }
 
   return null;

@@ -51,12 +51,12 @@ const ValueActions = styled.div`
 `;
 
 type Props = {
-  columnTitle: (column: string) => string,
-  filterComponents: FilterComponents,
-  onDelete: (filterIndex: number, value: string) => void,
-  onEdit: (columnIndex: number, valueIndex: number, value: string) => void,
-  selectedFilters: Immutable.OrderedSet<Filter>,
-}
+  columnTitle: (column: string) => string;
+  filterComponents: FilterComponents;
+  onDelete: (filterIndex: number, value: string) => void;
+  onEdit: (columnIndex: number, valueIndex: number, value: string) => void;
+  selectedFilters: Immutable.OrderedSet<Filter>;
+};
 
 const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, onDelete, onEdit }: Props) => {
   const container = useRef(null);
@@ -69,10 +69,11 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
 
         return (
           <FilterContainer key={column}>
-            <Input id={`${column}-filter-configuration`}
-                   label={_columnTitle === 'unknown' ? <UnknownAttributeTitle /> : _columnTitle}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
+            <Input
+              id={`${column}-filter-configuration`}
+              label={_columnTitle === 'unknown' ? <UnknownAttributeTitle /> : _columnTitle}
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9">
               {values.map((value, valueIndex) => {
                 const _onEdit = (newValue: string) => {
                   onEdit(filterIndex, valueIndex, newValue);
@@ -80,23 +81,25 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
 
                 return (
                   <FilterValue key={value}>
-                    <ValueTitle>
-                      {filterComponent ? filterComponent.renderValue?.(value) ?? value : ''}
-                    </ValueTitle>
+                    <ValueTitle>{filterComponent ? (filterComponent.renderValue?.(value) ?? value) : ''}</ValueTitle>
                     <ValueActions>
                       {filterComponent && (
-                        <FilterEditButton filterComponent={filterComponent}
-                                          onEdit={_onEdit}
-                                          onDelete={() => onDelete(filterIndex, value)}
-                                          selectedValues={values}
-                                          columnTitle={columnTitle}
-                                          containerWidth={container.current?.offsetWidth}
-                                          column={column}
-                                          value={value} />
+                        <FilterEditButton
+                          filterComponent={filterComponent}
+                          onEdit={_onEdit}
+                          onDelete={() => onDelete(filterIndex, value)}
+                          selectedValues={values}
+                          columnTitle={columnTitle}
+                          containerWidth={container.current?.offsetWidth}
+                          column={column}
+                          value={value}
+                        />
                       )}
-                      <IconButton name="delete"
-                                  onClick={() => onDelete(filterIndex, value)}
-                                  title={`Delete ${_columnTitle} filter`} />
+                      <IconButton
+                        name="delete"
+                        onClick={() => onDelete(filterIndex, value)}
+                        title={`Delete ${_columnTitle} filter`}
+                      />
                     </ValueActions>
                   </FilterValue>
                 );

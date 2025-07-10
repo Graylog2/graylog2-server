@@ -19,10 +19,7 @@ import { useCallback, useMemo } from 'react';
 import type { Layout } from 'plotly.js';
 import { useTheme } from 'styled-components';
 
-import {
-  generateLayouts,
-  generateMappersForYAxis,
-} from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { generateLayouts, generateMappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
@@ -31,18 +28,25 @@ import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import generateDomain from 'views/components/visualizations/utils/generateDomain';
 
-const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
-  config: AggregationWidgetConfig,
-  barmode?: BarMode,
-  chartData: Array<ChartDefinition>,
+const useChartLayoutSettingsWithCustomUnits = ({
+  config,
+  barmode,
+  chartData,
+}: {
+  config: AggregationWidgetConfig;
+  barmode?: BarMode;
+  chartData: Array<ChartDefinition>;
 }) => {
   const theme = useTheme();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { unitTypeMapper } = useMemo(
+    () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
+    [config.series, widgetUnits],
+  );
 
   return useCallback(() => {
-    if (!unitFeatureEnabled) return ({});
+    if (!unitFeatureEnabled) return {};
 
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
@@ -53,11 +57,11 @@ const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
       theme,
     });
 
-    const _layouts: Partial<Layout> = ({
+    const _layouts: Partial<Layout> = {
       ...generatedLayouts,
       hovermode: 'x',
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
-    });
+    };
 
     return _layouts;
   }, [barmode, chartData, config, theme, unitFeatureEnabled, unitTypeMapper, widgetUnits]);

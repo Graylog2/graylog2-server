@@ -48,7 +48,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationCon
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -77,7 +77,7 @@ import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -111,16 +111,13 @@ public class ViewFacadeTest {
         protected TestViewService(ClusterConfigService clusterConfigService,
                                   MongoCollections mongoCollections) {
             super(clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class), mongoCollections);
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mongoCollections);
         }
     }
 
     public static class TestViewSummaryService extends ViewSummaryService {
-        protected TestViewSummaryService(MongoConnection mongoConnection,
-                                         MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                         MongoCollections mongoCollections) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mongoCollections);
-
+        protected TestViewSummaryService(MongoCollections mongoCollections) {
+            super(mongoCollections);
         }
     }
 
@@ -132,7 +129,7 @@ public class ViewFacadeTest {
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
     private UserService userService;
-
+    private EntityRegistrar entityRegistrar;
 
     @Before
     public void setUp() {
@@ -154,10 +151,11 @@ public class ViewFacadeTest {
         final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
         searchDbService = new TestSearchDBService(mongoConnection, mapper);
         viewService = new TestViewService(null, mongoCollections);
-        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper, mongoCollections);
+        viewSummaryService = new TestViewSummaryService(mongoCollections);
         userService = mock(UserService.class);
+        entityRegistrar = mock(EntityRegistrar.class);
 
-        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
+        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityRegistrar);
     }
 
     @Test
@@ -232,7 +230,7 @@ public class ViewFacadeTest {
     @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldCreateADTOFromAnEntity() throws Exception {
-        final StreamImpl stream = new StreamImpl(Collections.emptyMap());
+        final StreamMock stream = new StreamMock(Collections.emptyMap());
         final Entity viewEntity = createViewEntity();
         final Map<EntityDescriptor, Object> nativeEntities = Map.of(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),

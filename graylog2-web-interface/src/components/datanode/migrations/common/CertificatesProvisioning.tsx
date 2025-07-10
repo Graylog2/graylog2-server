@@ -25,33 +25,38 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import { Alert } from 'components/bootstrap';
 
 const CertificatesProvisioning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { currentStep: step, isLoading } = useMigrationState(3000);
+  const { currentStep: step, isLoading } = useMigrationState({ refetchInterval: 3000 });
 
   if (isLoading) {
     return <Spinner text="Loading migration state." />;
   }
 
-  const isProvisioningOverview = (step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key) || (step.state === MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key);
-  const isProvisioningRunning = (step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key) || (step.state === MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key);
+  const isProvisioningOverview =
+    step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key ||
+    step.state === MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key;
+  const isProvisioningRunning =
+    step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key ||
+    step.state === MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key;
   const haveNextStep = step?.next_steps?.length > 0;
 
   return (
     <>
       {isProvisioningOverview && (
-      <p>
-        Certificate authority has been configured successfully.<br />
-        You can now provision certificate for your Data Nodes.
-      </p>
+        <p>
+          Certificate authority has been configured successfully.
+          <br />
+          You can now provision certificate for your Data Nodes.
+        </p>
       )}
-      {(isProvisioningRunning && !haveNextStep) && (
-      <Spinner text="Provisioning certificate" />
-      )}
-      {(isProvisioningRunning && haveNextStep) && (
-      <Alert bsStyle="success">Provisioning the Data Node finished.</Alert>
-      )}
+      {isProvisioningRunning && !haveNextStep && <Spinner text="Provisioning certificate" />}
+      {isProvisioningRunning && haveNextStep && <Alert bsStyle="success">Provisioning the Data Node finished.</Alert>}
       <MigrationDatanodeList />
       <br />
-      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        nextSteps={currentStep.next_steps}
+        onTriggerStep={onTriggerStep}
+      />
     </>
   );
 };

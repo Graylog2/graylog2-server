@@ -22,7 +22,7 @@ import type { WidgetConfigFormValues } from 'views/components/aggregationwizard'
 import DataTable from './DataTable';
 
 type DataTableVisualizationConfigFormValues = {
-  pinnedColumns: Array<string>,
+  pinnedColumns: Array<string>;
 };
 const dataTable: VisualizationType<typeof DataTable.type> = {
   type: DataTable.type,
@@ -30,19 +30,24 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
   component: DataTable,
   config: {
     createConfig: () => ({ pinnedColumns: [] }),
-    fromConfig: (config: DataTableVisualizationConfig | undefined) => ({ pinnedColumns: config?.pinnedColumns.toJS() ?? [] }),
-    toConfig: (formValues: DataTableVisualizationConfigFormValues) => DataTableVisualizationConfig.create(formValues.pinnedColumns),
-    fields: [{
-      name: 'pinnedColumns',
-      title: 'Pinned Columns',
-      type: 'multi-select',
-      options: ({ formValues }: { formValues: WidgetConfigFormValues }) => formValues?.groupBy?.groupings
-        .filter((grouping) => (grouping?.direction === 'row' && grouping?.fields))
-        .flatMap((grouping) => grouping.fields) ?? [],
-      required: false,
-    }],
+    fromConfig: (config: DataTableVisualizationConfig | undefined) => ({
+      pinnedColumns: config?.pinnedColumns.toJS() ?? [],
+    }),
+    toConfig: (formValues: DataTableVisualizationConfigFormValues) =>
+      DataTableVisualizationConfig.create(formValues.pinnedColumns),
+    fields: [
+      {
+        name: 'pinnedColumns',
+        title: 'Pinned Columns',
+        type: 'multi-select',
+        options: ({ formValues }: { formValues: WidgetConfigFormValues }) =>
+          formValues?.groupBy?.groupings
+            .filter((grouping) => grouping?.direction === 'row' && grouping?.fields)
+            .flatMap((grouping) => grouping.fields) ?? [],
+        required: false,
+      },
+    ],
   },
-
 };
 
 export default dataTable;

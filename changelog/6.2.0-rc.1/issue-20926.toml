@@ -1,0 +1,5 @@
+type = "c"
+message = "Data node: store keystore and truststore passwords in Opensearch keystore"
+
+issues = ["20926"]
+pulls = ["20923"]

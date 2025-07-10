@@ -79,7 +79,10 @@ export default class ContentPack {
   }
 
   get constraints() {
-    return this._value.entities.reduce((acc, entity) => entity.constraints.reduce((result, constraint) => result.add(constraint), acc), Set());
+    return this._value.entities.reduce(
+      (acc, entity) => entity.constraints.reduce((result, constraint) => result.add(constraint), acc),
+      Set(),
+    );
   }
 
   get parameters() {
@@ -91,47 +94,27 @@ export default class ContentPack {
   }
 
   toBuilder() {
-    const {
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    } = this._value;
+    const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = this._value;
 
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Map({
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    }));
+    return new Builder(
+      Map({
+        v,
+        id,
+        rev,
+        name,
+        summary,
+        description,
+        vendor,
+        url,
+        parameters,
+        entities,
+      }),
+    );
   }
 
   toJSON() {
-    const {
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    } = this._value;
+    const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = this._value;
 
     const entitiesJSON = entities.map((e) => e.toJSON());
 
@@ -150,31 +133,9 @@ export default class ContentPack {
   }
 
   static fromJSON(value) {
-    const {
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    } = value;
+    const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = value;
 
-    return new ContentPack(
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    );
+    return new ContentPack(v, id, rev, name, summary, description, vendor, url, parameters, entities);
   }
 
   static builder() {
@@ -277,30 +238,8 @@ class Builder {
   }
 
   build() {
-    const {
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    } = this.value.toObject();
+    const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = this.value.toObject();
 
-    return new ContentPack(
-      v,
-      id,
-      rev,
-      name,
-      summary,
-      description,
-      vendor,
-      url,
-      parameters,
-      entities,
-    );
+    return new ContentPack(v, id, rev, name, summary, description, vendor, url, parameters, entities);
   }
 }

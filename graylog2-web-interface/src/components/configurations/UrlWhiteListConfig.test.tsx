@@ -17,7 +17,6 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import 'helpers/mocking/react-dom_mock';
 import MockStore from 'helpers/mocking/StoreMock';
 
 import UrlWhiteListConfig from './UrlWhiteListConfig';
@@ -47,11 +46,14 @@ const mockConfig = {
 };
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore(['getInitialState', () => ({
-    configuration: {
-      'org.graylog2.system.urlwhitelist.UrlWhitelist': mockConfig,
-    },
-  })]),
+  ConfigurationsStore: MockStore([
+    'getInitialState',
+    () => ({
+      configuration: {
+        'org.graylog2.system.urlwhitelist.UrlWhitelist': mockConfig,
+      },
+    }),
+  ]),
   ConfigurationsActions: {
     list: jest.fn(() => Promise.resolve()),
   },

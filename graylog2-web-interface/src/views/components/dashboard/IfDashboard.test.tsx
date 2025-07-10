@@ -33,14 +33,12 @@ describe('IfDashboard', () => {
   it('should render children with dashboard context', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
-    render((
+    render(
       <>
         <span>I must not fear.</span>
-        <IfDashboard>
-          Fear is the mind-killer.
-        </IfDashboard>
-      </>
-    ));
+        <IfDashboard>Fear is the mind-killer.</IfDashboard>
+      </>,
+    );
 
     await screen.findByText(/Fear is the mind-killer/i);
   });
@@ -48,27 +46,27 @@ describe('IfDashboard', () => {
   it('should not render children without dashboard context', () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
-    render((
+    render(
       <>
         <span>I must not fear.</span>
         <IfDashboard>
           <span>Fear is the mind-killer.</span>
         </IfDashboard>
-      </>
-    ));
+      </>,
+    );
 
     expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });
 
   it('should not render children without context', () => {
-    render((
+    render(
       <>
         <span>I must not fear.</span>
         <IfDashboard>
           <span>Fear is the mind-killer.</span>
         </IfDashboard>
-      </>
-    ));
+      </>,
+    );
 
     expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });

@@ -21,15 +21,17 @@ import { Label } from 'components/bootstrap';
 
 import type { StreamOutputFilterRule } from './Types';
 
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`);
+const StatusLabel = styled(Label)<{ $clickable: boolean }>(
+  ({ $clickable }) => css`
+    cursor: ${$clickable ? 'pointer' : 'default'};
+    display: inline-flex;
+    justify-content: center;
+    gap: 4px;
+  `,
+);
 
 type Props = {
-  filterOutputRule: StreamOutputFilterRule,
+  filterOutputRule: StreamOutputFilterRule;
 };
 
 const FilterStatusCell = ({ filterOutputRule }: Props) => {
@@ -37,11 +39,12 @@ const FilterStatusCell = ({ filterOutputRule }: Props) => {
   const title = isEnabled ? 'Enabled' : 'Disabled';
 
   return (
-    <StatusLabel bsStyle={isEnabled ? 'success' : 'warning'}
-                 title={title}
-                 aria-label={title}
-                 role="button"
-                 $clickable={false}>
+    <StatusLabel
+      bsStyle={isEnabled ? 'success' : 'warning'}
+      title={title}
+      aria-label={title}
+      role="button"
+      $clickable={false}>
       {title}
     </StatusLabel>
   );

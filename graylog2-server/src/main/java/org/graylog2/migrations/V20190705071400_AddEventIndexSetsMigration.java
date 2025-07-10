@@ -17,18 +17,19 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
+import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.MongoIndexSet;
@@ -41,17 +42,15 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
@@ -92,22 +91,22 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     @Override
     public void upgrade() {
         ensureEventsStreamAndIndexSet(
-                "Graylog Events",
-                "Stores Graylog events.",
+                "Events",
+                "Stores events created by event definitions.",
                 elasticsearchConfiguration.getDefaultEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_EVENTS_INDEX_PREFIX,
                 Stream.DEFAULT_EVENTS_STREAM_ID,
                 "All events",
-                "Stream containing all events created by Graylog"
+                "Stream containing all events created"
         );
         ensureEventsStreamAndIndexSet(
-                "Graylog System Events",
-                "Stores Graylog system events.",
+                "System Events",
+                "Stores events created by and related to the system itself.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
                 Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
-                "Stream containing all system events created by Graylog"
+                "Stream containing all system events created"
         );
         ensureSystemNotificationEventsDefinition();
     }
@@ -130,9 +129,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
+        final Bson query = Filters.and(
+                Filters.ne(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                Filters.eq(FIELD_INDEX_PREFIX, indexPrefix)
         );
 
         if (indexSetService.findOne(query).isPresent()) {
@@ -143,9 +142,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
+        final Bson query = Filters.and(
+                Filters.eq(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                Filters.eq(FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
     }
@@ -177,26 +176,28 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             LOG.info("Successfully created events index-set <{}/{}>", savedIndexSet.id(), savedIndexSet.title());
 
             return mongoIndexSetFactory.create(savedIndexSet);
-        } catch (DuplicateKeyException e) {
-            LOG.error("Couldn't create index-set <{}/{}>", indexSetTitle, indexPrefix);
-            throw new RuntimeException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                LOG.error("Couldn't create index-set <{}/{}>", indexSetTitle, indexPrefix);
+                throw new RuntimeException(e.getMessage());
+            }
+            throw e;
         }
     }
 
     private void createEventsStream(String streamId, String streamTitle, String streamDescription, IndexSet indexSet) {
-        final ObjectId id = new ObjectId(streamId);
-        final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
-                .put(StreamImpl.FIELD_TITLE, streamTitle)
-                .put(StreamImpl.FIELD_DESCRIPTION, streamDescription)
-                .put(StreamImpl.FIELD_DISABLED, false)
-                .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
-                .put(StreamImpl.FIELD_CREATOR_USER_ID, "admin")
-                .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
-                .put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, true)
-                .put(StreamImpl.FIELD_INDEX_SET_ID, requireNonNull(indexSet.getConfig().id(), "index set ID cannot be null"))
-                .put(StreamImpl.FIELD_DEFAULT_STREAM, false)
+        final Stream stream = StreamImpl.builder()
+                .id(streamId)
+                .title(streamTitle)
+                .description(streamDescription)
+                .disabled(false)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .creatorUserId("admin")
+                .matchingType(StreamImpl.MatchingType.DEFAULT)
+                .removeMatchesFromDefaultStream(true)
+                .indexSetId(requireNonNull(indexSet.getConfig().id(), "index set ID cannot be null"))
+                .isDefault(false)
                 .build();
-        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), indexSet);
 
         try {
             streamService.save(stream);
@@ -207,23 +208,25 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void ensureSystemNotificationEventsDefinition() {
-        if (dbService.getSystemEventDefinitions().isEmpty()) {
-            EventDefinitionDto eventDto =
-                    EventDefinitionDto.builder()
-                            .title("System notification events")
-                            .description("Reserved event definition for system notification events")
-                            .alert(false)
-                            .priority(1)
-                            .keySpec(ImmutableList.of())
-                            .notificationSettings(EventNotificationSettings.builder()
-                                    .gracePeriodMs(0) // Defaults to 0 in the UI
-                                    .backlogSize(0) // Defaults to 0 in the UI
-                                    .build())
-                            .config(SystemNotificationEventProcessorConfig.builder().build())
-                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
-                            .scope(SystemNotificationEventEntityScope.NAME)
-                            .build();
-            dbService.save(eventDto);
+        try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
+            if (eventDefinitionStream.findAny().isEmpty()) {
+                EventDefinitionDto eventDto =
+                        EventDefinitionDto.builder()
+                                .title(SYSTEM_NOTIFICATION_EVENT_DEFINITION)
+                                .description("Reserved event definition for system notification events")
+                                .alert(false)
+                                .priority(1)
+                                .keySpec(ImmutableList.of())
+                                .notificationSettings(EventNotificationSettings.builder()
+                                        .gracePeriodMs(0) // Defaults to 0 in the UI
+                                        .backlogSize(0) // Defaults to 0 in the UI
+                                        .build())
+                                .config(SystemNotificationEventProcessorConfig.builder().build())
+                                .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                                .scope(NonDeletableSystemScope.NAME)
+                                .build();
+                dbService.save(eventDto);
+            }
         }
     }
 }

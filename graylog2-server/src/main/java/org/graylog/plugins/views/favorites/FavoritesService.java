@@ -18,9 +18,9 @@ package org.graylog.plugins.views.favorites;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DuplicateKeyException;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
@@ -29,8 +29,8 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -74,8 +74,12 @@ public class FavoritesService {
                 )
                 .flatMap(Optional::stream)
                 .toList();
+        var itemsToShow = items.stream()
+                .skip(perPage * Math.max(0L, page - 1))
+                .limit(perPage)
+                .toList();
 
-        return PaginatedResponse.create("favorites", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("favorites", new PaginatedList<>(itemsToShow, items.size(), page, perPage));
     }
 
     public void save(FavoritesForUserDTO favorite) {
@@ -118,9 +122,10 @@ public class FavoritesService {
     }
 
     Optional<FavoritesForUserDTO> findForUser(final String userId) {
-        return MongoUtils.stream(db.find(Filters.eq(FavoritesForUserDTO.FIELD_USER_ID, userId))).findAny();
+        return Optional.ofNullable(db.find(Filters.eq(FavoritesForUserDTO.FIELD_USER_ID, userId)).first());
     }
 
+    @MustBeClosed
     public Stream<FavoritesForUserDTO> streamAll() {
         return MongoUtils.stream(db.find());
     }
@@ -129,8 +134,11 @@ public class FavoritesService {
         try {
             final var result = db.insertOne(favorite);
             return mongoUtils.getById(MongoUtils.insertedId(result));
-        } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new IllegalStateException("Unable to create favorites. Favorites with this id already exist: " + favorite.id());
+            }
+            throw e;
         }
     }
 

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -31,16 +30,15 @@ import type WidgetType from 'views/logic/widgets/Widget';
 import useWidget from 'views/hooks/useWidget';
 import useActiveViewState from 'views/hooks/useActiveViewState';
 
-import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
-  editing: boolean,
-  onPositionsChange: (position: BackendWidgetPosition) => void,
-  position: WidgetPosition,
-  widgetId: string,
+  editing: boolean;
+  onPositionsChange?: (position: BackendWidgetPosition) => void;
+  position: WidgetPosition;
+  widgetId: string;
 };
 
 const useTitle = (widget: WidgetType) => {
@@ -49,18 +47,14 @@ const useTitle = (widget: WidgetType) => {
   return activeViewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
 };
 
-const WidgetComponent = ({
-  editing,
-  onPositionsChange = () => undefined,
-  position,
-  widgetId,
-}: Props) => {
+const WidgetComponent = ({ editing, onPositionsChange = () => undefined, position, widgetId }: Props) => {
   const widget = useWidget(widgetId);
   const viewType = useViewType();
   const title = useTitle(widget);
   const additionalContext = useMemo(() => ({ widget }), [widget]);
 
-  const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
+  const WidgetFieldTypesIfDashboard =
+    viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
   return (
     <DrilldownContextProvider widget={widget}>
@@ -68,28 +62,20 @@ const WidgetComponent = ({
         <AdditionalContext.Provider value={additionalContext}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
-              <Widget editing={editing}
-                      id={widget.id}
-                      onPositionsChange={onPositionsChange}
-                      position={position}
-                      title={title}
-                      widget={widget} />
+              <Widget
+                editing={editing}
+                id={widget.id}
+                onPositionsChange={onPositionsChange}
+                position={position}
+                title={title}
+                widget={widget}
+              />
             </WidgetFieldTypesIfDashboard>
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>
     </DrilldownContextProvider>
   );
-};
-
-WidgetComponent.propTypes = {
-  editing: PropTypes.bool.isRequired,
-  onPositionsChange: PropTypes.func,
-  position: PropTypes.shape(Position).isRequired,
-};
-
-WidgetComponent.defaultProps = {
-  onPositionsChange: () => {},
 };
 
 export default WidgetComponent;

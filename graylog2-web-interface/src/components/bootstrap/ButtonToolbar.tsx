@@ -23,7 +23,7 @@ const StyledButtonToolbar = styled(OriginalButtonGroup)`
   gap: 0.25em;
 `;
 
-const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
+const ButtonToolbar = ({ ...props }: React.ComponentProps<typeof StyledButtonToolbar>) => (
   <StyledButtonToolbar {...props} />
 );
 

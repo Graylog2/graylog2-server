@@ -31,25 +31,25 @@ import com.google.common.collect.Multimap;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
+import org.graylog2.utilities.CIDRPatriciaTrie;
 import org.graylog2.utilities.IpSubnet;
 import org.graylog2.utilities.ReservedIpChecker;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +61,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -87,6 +88,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final AtomicReference<CIDRPatriciaTrie> cidrLookupRef = new AtomicReference<>(new CIDRPatriciaTrie());
     private final String name;
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -118,7 +120,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         // Set file info before parsing the data for the first time
         fileInfo = getNewFileInfo();
-        lookupRef.set(parseCSVFile());
+        setLookupRefFromCSV();
     }
 
     @Override
@@ -152,7 +154,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             }
 
             LOG.debug("CSV file {} has changed, updating data", config.path());
-            lookupRef.set(parseCSVFile());
+            setLookupRefFromCSV();
             cachePurge.purgeAll();
             // If the file has been moved, then moved back, the fileInfo might have been disconnected.
             // In this case, create a new fileInfo.
@@ -164,10 +166,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private Map<String, String> parseCSVFile() throws IOException {
+    private void setLookupRefFromCSV() throws IOException {
         final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
         final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
+        final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
 
         try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
@@ -225,17 +228,18 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     } else {
                         Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(key);
                         if (optSubnet.isPresent()) {
-                            newLookupBuilder.put(key, value);
+                            cidrLookupTrie.insertCIDR(key, value);
                         } else {
                             // If key in a CIDR lookup adapter is not already a valid CIDR range, check if it is an IP
                             String cidr = ipAddressToCIDR(key);
                             if (cidr != null) {
-                                newLookupBuilder.put(cidr, value);
+                                cidrLookupTrie.insertCIDR(cidr, value);
                             }
                         }
                     }
                 }
             }
+
         } catch (Exception e) {
             LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
                     config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
@@ -243,7 +247,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException(e);
         }
 
-        return newLookupBuilder.build();
+        if (config.isCidrLookup()) {
+            cidrLookupRef.set(cidrLookupTrie);
+        } else {
+            lookupRef.set(newLookupBuilder.build());
+        }
     }
 
     private String ipAddressToCIDR(String ip) {
@@ -285,24 +293,34 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         return LookupResult.single(value);
     }
 
-    public LookupResult getResultForCIDRRange(Object ip) {
+    @Override
+    public boolean supportsPreview() {
+        return true;
+    }
+
+    @Override
+    public LookupPreview getPreview(int size) {
+        if (config.isCidrLookup()) {
+            return cidrLookupRef.get().getPreview(size);
+        } else {
+            final Map<Object, Object> result = new HashMap<>();
+            final Map<String, String> lookup = lookupRef.get();
+            for (Map.Entry<String, String> entries : lookup.entrySet()) {
+                if (result.size() == size) {
+                    break;
+                }
+                result.put(entries.getKey(), entries.getValue());
+            }
+            return new LookupPreview(lookup.size(), result);
+        }
+    }
+
+    private LookupResult getResultForCIDRRange(Object ip) {
         LookupResult result = getEmptyResult();
         try {
-            // Convert directly to InetAddress to avoid long timeouts using name service lookups
-            InetAddress address = InetAddresses.forString(String.valueOf(ip));
-            int longestMatch = 0;
-            for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
-                String range = entry.getKey();
-                Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(range);
-                if (optSubnet.isEmpty()) {
-                    LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
-                } else {
-                    IpSubnet subnet = optSubnet.get();
-                    if (subnet.contains(address) && (result.isEmpty() || longestMatch < subnet.getPrefixLength())) {
-                        longestMatch = subnet.getPrefixLength();
-                        result = LookupResult.single(entry.getValue());
-                    }
-                }
+            final String resultValue = cidrLookupRef.get().longestPrefixRangeLookup(String.valueOf(ip));
+            if (resultValue != null) {
+                result = LookupResult.single(resultValue);
             }
         } catch (IllegalArgumentException e) {
             LOG.debug("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
@@ -336,7 +354,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         public Config defaultConfiguration() {
             return Config.builder()
                     .type(NAME)
-                    .path("/etc/graylog/lookup-table.csv")
+                    .path("/tmp/lookup-table.csv")
                     .separator(",")
                     .quotechar("\"")
                     .keyColumn("key")

@@ -16,7 +16,17 @@
  */
 import * as Immutable from 'immutable';
 
-import entityShareStateFixture, { alice, bob, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
+import entityShareStateFixture, {
+  alice,
+  bob,
+  john,
+  jane,
+  everyone,
+  security,
+  viewer,
+  owner,
+  manager,
+} from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import readJsonFixture from 'helpers/readJsonFixture';
 
@@ -47,20 +57,13 @@ describe('EntityShareState', () => {
     });
 
     it('should order by type', () => {
-      const janeIsOwner = ActiveShare
-        .builder()
-        .grant('grant-jane-id')
-        .grantee(jane.id)
-        .capability(owner.id)
-        .build();
-      const everyoneIsViewer = ActiveShare
-        .builder()
+      const janeIsOwner = ActiveShare.builder().grant('grant-jane-id').grantee(jane.id).capability(owner.id).build();
+      const everyoneIsViewer = ActiveShare.builder()
         .grant('grant-everyone-id')
         .grantee(everyone.id)
         .capability(viewer.id)
         .build();
-      const securityIsManager = ActiveShare
-        .builder()
+      const securityIsManager = ActiveShare.builder()
         .grant('grant-security-id')
         .grantee(security.id)
         .capability(manager.id)
@@ -73,7 +76,8 @@ describe('EntityShareState', () => {
         [securityIsManager.grantee]: securityIsManager.capability,
       });
 
-      const { selectedGrantees } = entityShareStateFixture.toBuilder()
+      const { selectedGrantees } = entityShareStateFixture
+        .toBuilder()
         .activeShares(activeShares)
         .selectedGranteeCapabilities(selection)
         .build();
@@ -86,26 +90,10 @@ describe('EntityShareState', () => {
     });
 
     it('should order alphabetically', () => {
-      const janeIsOwner = ActiveShare
-        .builder()
-        .grant('grant-jane-id')
-        .grantee(jane.id)
-        .capability(owner.id)
-        .build();
-      const aliceIsOwner = ActiveShare
-        .builder()
-        .grant('grant-jane-id')
-        .grantee(alice.id)
-        .capability(owner.id)
-        .build();
-      const bobIsViewer = ActiveShare
-        .builder()
-        .grant('grant-bob-id')
-        .grantee(bob.id)
-        .capability(viewer.id)
-        .build();
-      const johnIsManager = ActiveShare
-        .builder()
+      const janeIsOwner = ActiveShare.builder().grant('grant-jane-id').grantee(jane.id).capability(owner.id).build();
+      const aliceIsOwner = ActiveShare.builder().grant('grant-jane-id').grantee(alice.id).capability(owner.id).build();
+      const bobIsViewer = ActiveShare.builder().grant('grant-bob-id').grantee(bob.id).capability(viewer.id).build();
+      const johnIsManager = ActiveShare.builder()
         .grant('grant-john-id')
         .grantee(john.id)
         .capability(manager.id)
@@ -119,44 +107,25 @@ describe('EntityShareState', () => {
         [johnIsManager.grantee]: johnIsManager.capability,
       });
 
-      const { selectedGrantees } = entityShareStateFixture.toBuilder()
+      const { selectedGrantees } = entityShareStateFixture
+        .toBuilder()
         .activeShares(activeShares)
         .selectedGranteeCapabilities(selection)
         .build();
 
       const [first, second, third, forth] = selectedGrantees.toArray();
 
-      expect(first.title).toBe('Alice Muad\'Dib');
+      expect(first.title).toBe("Alice Muad'Dib");
       expect(second.title).toBe('Bob Bobson');
       expect(third.title).toBe('Jane Doe');
       expect(forth.title).toBe('John Wick');
     });
 
     it('should put new selections to the beginning', () => {
-      const janeIsOwner = ActiveShare
-        .builder()
-        .grant('grant-jane-id')
-        .grantee(jane.id)
-        .capability(owner.id)
-        .build();
-      const aliceIsOwner = ActiveShare
-        .builder()
-        .grant('grant-jane-id')
-        .grantee(alice.id)
-        .capability(owner.id)
-        .build();
-      const bobIsViewer = ActiveShare
-        .builder()
-        .grant('grant-bob-id')
-        .grantee(bob.id)
-        .capability(viewer.id)
-        .build();
-      const newSelection = ActiveShare
-        .builder()
-        .grant('grant-john-id')
-        .grantee(john.id)
-        .capability(manager.id)
-        .build();
+      const janeIsOwner = ActiveShare.builder().grant('grant-jane-id').grantee(jane.id).capability(owner.id).build();
+      const aliceIsOwner = ActiveShare.builder().grant('grant-jane-id').grantee(alice.id).capability(owner.id).build();
+      const bobIsViewer = ActiveShare.builder().grant('grant-bob-id').grantee(bob.id).capability(viewer.id).build();
+      const newSelection = ActiveShare.builder().grant('grant-john-id').grantee(john.id).capability(manager.id).build();
       const activeShares = Immutable.List([janeIsOwner, aliceIsOwner, bobIsViewer]);
 
       const selection = Immutable.Map({
@@ -166,7 +135,8 @@ describe('EntityShareState', () => {
         [newSelection.grantee]: newSelection.capability,
       });
 
-      const { selectedGrantees } = entityShareStateFixture.toBuilder()
+      const { selectedGrantees } = entityShareStateFixture
+        .toBuilder()
         .activeShares(activeShares)
         .selectedGranteeCapabilities(selection)
         .build();
@@ -174,7 +144,7 @@ describe('EntityShareState', () => {
       const [first, second, third, forth] = selectedGrantees.toArray();
 
       expect(first.title).toBe('John Wick');
-      expect(second.title).toBe('Alice Muad\'Dib');
+      expect(second.title).toBe("Alice Muad'Dib");
       expect(third.title).toBe('Bob Bobson');
       expect(forth.title).toBe('Jane Doe');
     });

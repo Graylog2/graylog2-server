@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-env browser */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import chroma from 'chroma-js';
 import flatten from 'lodash/flatten';
@@ -28,24 +27,21 @@ import style from './MapVisualization.css';
 
 import InteractiveContext from '../../contexts/InteractiveContext';
 
-const DEFAULT_VIEWPORT = {
-  center: [0, 0],
-  zoom: 1,
-};
+const DEFAULT_VIEWPORT = Viewport.create([0, 0], 1);
 
 type MapVisualizationProps = {
-  attribution?: string,
-  onRenderComplete?: () => void,
-  markerRadiusSize?: number,
-  markerRadiusIncrementSize?: number,
-  id: string,
-  url?: string,
-  locked?: boolean,
-  viewport?: Viewport,
-  height: number,
-  width: number,
-  onChange: (newViewport: Viewport) => void,
-  data: Array<{ keys: any, name: any, values: { [key: string]: number } }>
+  attribution?: string;
+  onRenderComplete?: () => void;
+  markerRadiusSize?: number;
+  markerRadiusIncrementSize?: number;
+  id: string;
+  url?: string;
+  locked?: boolean;
+  viewport?: Viewport;
+  height: number;
+  width: number;
+  onChange: (newViewport: Viewport) => void;
+  data: Array<{ keys: any; name: any; values: { [key: string]: number } }>;
 };
 
 const _getBucket = (value: number, bucketCount: number, minValue: number, maxValue: number, increment: number) => {
@@ -59,36 +55,45 @@ const _getBucket = (value: number, bucketCount: number, minValue: number, maxVal
 
 // Coordinates are given as "lat,long"
 type MarkerProps = {
-  coordinates: string,
-  value: number,
-  min: number,
-  max: number,
-  radiusSize: number,
-  increment: number,
-  color: chroma.Color,
-  name: JSX.Element,
-  keys: { [s: string]: unknown; } | ArrayLike<unknown>,
+  coordinates: string;
+  value: number;
+  min: number;
+  max: number;
+  radiusSize: number;
+  increment: number;
+  color: chroma.Color;
+  name: JSX.Element;
+  keys: { [s: string]: unknown } | ArrayLike<unknown>;
 };
 
 const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, name, keys }: MarkerProps) => {
-  // eslint-disable-next-line no-restricted-globals
-  const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
+  const formattedCoordinates = coordinates
+    .split(',')
+    .map((component) => Number(component))
+    // eslint-disable-next-line no-restricted-globals
+    .filter((n) => !isNaN(n));
 
   if (formattedCoordinates.length !== 2) {
     return null;
   }
 
   const radius = _getBucket(value, radiusSize, min, max, increment);
-  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v as React.ReactNode}</dd>]));
+  const markerKeys = flatten(
+    Object.entries(keys).map(([k, v]) => [
+      <dt key={`dt-${k}-${v}`}>{k}</dt>,
+      <dd key={`dd-${k}-${v}`}>{v as React.ReactNode}</dd>,
+    ]),
+  );
 
   return (
-    <CircleMarker key={`${name}-${coordinates}`}
-                  center={formattedCoordinates as [number, number]}
-                  radius={radius}
-                  color={color.hex()}
-                  fillColor={color.hex()}
-                  weight={2}
-                  opacity={0.8}>
+    <CircleMarker
+      key={`${name}-${coordinates}`}
+      center={formattedCoordinates as [number, number]}
+      radius={radius}
+      color={color.hex()}
+      fillColor={color.hex()}
+      weight={2}
+      opacity={0.8}>
       <Popup>
         <dl>
           <dt>Name</dt>
@@ -96,26 +101,31 @@ const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, na
           {markerKeys}
           <dt>Coordinates:</dt>
           <dd>{coordinates}</dd>
-          {value
-            && (
-              <>
-                <dt>Value:</dt>
-                <dd>{value}</dd>
-              </>
-            )}
+          {value && (
+            <>
+              <dt>Value:</dt>
+              <dd>{value}</dd>
+            </>
+          )}
         </dl>
       </Popup>
     </CircleMarker>
   );
 };
 
-const MapEvents = ({ onViewportChanged }: { onViewportChanged: React.ComponentProps<typeof MapVisualization>['onChange'] }) => {
+const MapEvents = ({
+  onViewportChanged,
+}: {
+  onViewportChanged: React.ComponentProps<typeof MapVisualization>['onChange'];
+}) => {
   const map = useMap();
 
   const _onViewportChanged = () => {
     const { lat, lng } = map.getCenter();
 
-    return onViewportChanged(Viewport.create([lat, lng], map.getZoom()));
+    return onViewportChanged(
+      Viewport.create([Number.parseFloat(lat.toFixed(4)), Number.parseFloat(lng.toFixed(4))], map.getZoom()),
+    );
   };
 
   useMapEvents({
@@ -126,126 +136,127 @@ const MapEvents = ({ onViewportChanged }: { onViewportChanged: React.ComponentPr
   return null;
 };
 
-class MapVisualization extends React.Component<MapVisualizationProps> {
-  _isMapReady = false;
+type MapRef = React.ComponentProps<typeof MapContainer>['ref'];
 
-  _areTilesReady = false;
+const defaultOnRenderComplete = () => {};
+const MapVisualization = ({
+  attribution = '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+  data,
+  height,
+  id,
+  locked = false,
+  markerRadiusIncrementSize = 10,
+  markerRadiusSize = 10,
+  onChange,
+  onRenderComplete = defaultOnRenderComplete,
+  url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  viewport = DEFAULT_VIEWPORT,
+  width,
+}: MapVisualizationProps) => {
+  const [_isMapReady, setIsMapReady] = useState<boolean>(false);
+  const [_areTilesReady, setAreTilesReady] = useState<boolean>(false);
+  const [_viewport, setViewport] = useState<Viewport>(DEFAULT_VIEWPORT);
+  const _map: MapRef = useRef();
 
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-    data: PropTypes.arrayOf(PropTypes.object),
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
-    url: PropTypes.string,
-    attribution: PropTypes.string,
-    onRenderComplete: PropTypes.func,
-    onChange: PropTypes.func.isRequired,
-    locked: PropTypes.bool, // Disables zoom and dragging
-    markerRadiusSize: PropTypes.number,
-    markerRadiusIncrementSize: PropTypes.number,
-    viewport: PropTypes.shape({
-      center: PropTypes.arrayOf(PropTypes.number),
-      zoom: PropTypes.number,
-    }),
-  };
-
-  static defaultProps = {
-    data: {},
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-    onRenderComplete: () => {},
-    locked: false,
-    viewport: DEFAULT_VIEWPORT,
-    markerRadiusSize: 10,
-    markerRadiusIncrementSize: 10,
-  };
-
-  componentDidMount() {
+  useEffect(() => {
     leafletStyles.use();
-  }
 
-  componentWillUnmount() {
-    leafletStyles.unuse();
-  }
+    return leafletStyles.unuse;
+  }, []);
 
-  _handleRenderComplete = () => {
-    if (this._areTilesReady && this._isMapReady) {
-      const { onRenderComplete } = this.props;
+  useEffect(() => {
+    if (_viewport && _map?.current) {
+      if (viewport.center !== _viewport.center || viewport.zoom !== _viewport.zoom) {
+        _map.current.setView([viewport.center[0], viewport.center[1]], viewport.zoom);
+      }
+    }
+    // Leaving out _viewport from dependencies, so it only runs when prop has changed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewport.center, viewport.zoom]);
 
+  const _handleRenderComplete = useCallback(() => {
+    if (_areTilesReady && _isMapReady) {
       onRenderComplete();
     }
-  };
+  }, [_areTilesReady, _isMapReady, onRenderComplete]);
 
-  _handleMapReady = () => {
-    this._isMapReady = true;
-    this._handleRenderComplete();
-  };
+  const _handleMapReady = useCallback(() => {
+    setIsMapReady(true);
+    _handleRenderComplete();
+  }, [_handleRenderComplete]);
 
-  _handleTilesReady = () => {
-    this._areTilesReady = true;
-    this._handleRenderComplete();
-  };
+  const _handleTilesReady = useCallback(() => {
+    setAreTilesReady(true);
+    _handleRenderComplete();
+  }, [_handleRenderComplete]);
 
-  render() {
-    const { data, id, height, width, url, attribution, locked, viewport, onChange, markerRadiusSize, markerRadiusIncrementSize } = this.props;
+  const _onChange = useCallback(
+    (newViewport: Viewport) => {
+      setViewport(newViewport);
 
-    const noOfKeys = data.length;
-    const chromaScale = chroma.scale('Spectral');
+      return onChange(newViewport);
+    },
+    [onChange],
+  );
 
-    const markers = data.flatMap(({ keys, name, values }, idx) => {
-      const y = Object.values(values);
-      const min = Math.min(...y);
-      const max = Math.max(...y);
-      const color = chromaScale(idx * (1 / noOfKeys));
+  const noOfKeys = data.length;
+  const chromaScale = chroma.scale('Spectral');
 
-      return Object.entries(values)
-        .map(([coord, value], valueIdx) => (
+  const markers = data.flatMap(({ keys, name, values }, idx) => {
+    const y = Object.values(values);
+    const min = Math.min(...y);
+    const max = Math.max(...y);
+    const color = chromaScale(idx * (1 / noOfKeys));
 
-          <Marker key={`${name}-${coord}-${value}`}
-                  coordinates={coord}
-                  value={value}
-                  min={min}
-                  max={max}
-                  radiusSize={markerRadiusSize}
-                  increment={markerRadiusIncrementSize}
-                  color={color}
-                  name={name}
-                  keys={keys[valueIdx]} />
-        ));
-    });
+    return Object.entries(values).map(([coord, value], valueIdx) => (
+      <Marker
+        key={`${name}-${coord}-${value}`}
+        coordinates={coord}
+        value={value}
+        min={min}
+        max={max}
+        radiusSize={markerRadiusSize}
+        increment={markerRadiusIncrementSize}
+        color={color}
+        name={name}
+        keys={keys[valueIdx]}
+      />
+    ));
+  });
 
-    return (
-      <InteractiveContext.Consumer>
-        {(interactive) => (
-          <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
-            {locked && <div className={style.overlay} style={{ height, width }} />}
-            <MapContainer boundsOptions={{ maxZoom: 19, animate: interactive }}
-                          center={viewport.center}
-                          className={style.map}
-                          closePopupOnClick={interactive}
-                          doubleClickZoom={interactive}
-                          dragging={interactive}
-                          fadeAnimation={interactive}
-                          id={`visualization-${id}`}
-                          key={`visualization-${id}-${width}-${height}`}
-                          markerZoomAnimation={interactive}
-                          scrollWheelZoom={interactive}
-                          style={{ height, width }}
-                          touchZoom={interactive}
-                          trackResize={interactive}
-                          whenReady={this._handleMapReady}
-                          zoom={viewport.zoom}
-                          zoomAnimation={interactive}
-                          zoomControl={interactive}>
-              <MapEvents onViewportChanged={onChange} />
-              <TileLayer url={url} attribution={attribution} eventHandlers={{ load: this._handleTilesReady }} />
-              {markers}
-            </MapContainer>
-          </div>
-        )}
-      </InteractiveContext.Consumer>
-    );
-  }
-}
+  return (
+    <InteractiveContext.Consumer>
+      {(interactive) => (
+        <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
+          {locked && <div className={style.overlay} style={{ height, width }} />}
+          <MapContainer
+            ref={_map}
+            boundsOptions={{ maxZoom: 19, animate: interactive }}
+            center={viewport.center}
+            className={style.map}
+            closePopupOnClick={interactive}
+            doubleClickZoom={interactive}
+            dragging={interactive}
+            fadeAnimation={interactive}
+            id={`visualization-${id}`}
+            key={`visualization-${id}-${width}-${height}`}
+            markerZoomAnimation={interactive}
+            scrollWheelZoom={interactive}
+            style={{ height, width }}
+            touchZoom={interactive}
+            trackResize={interactive}
+            whenReady={_handleMapReady}
+            zoom={viewport.zoom}
+            zoomAnimation={interactive}
+            zoomControl={interactive}>
+            <MapEvents onViewportChanged={_onChange} />
+            <TileLayer url={url} attribution={attribution} eventHandlers={{ load: _handleTilesReady }} />
+            {markers}
+          </MapContainer>
+        </div>
+      )}
+    </InteractiveContext.Consumer>
+  );
+};
 
 export default MapVisualization;

@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 type Props = {
-  widgetClassName: string,
+  widgetClassName: string;
 };
 
 const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
@@ -31,14 +30,10 @@ const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
 
   return (
     <Alert bsStyle="danger">
-      Widget Visualization (<i>{widgetClassName}</i>) not found.
-      It looks like the plugin supplying this widget is not loaded.
+      Widget Visualization (<i>{widgetClassName}</i>) not found. It looks like the plugin supplying this widget is not
+      loaded.
     </Alert>
   );
-};
-
-WidgetVisualizationNotFound.propTypes = {
-  widgetClassName: PropTypes.string.isRequired,
 };
 
 export default WidgetVisualizationNotFound;

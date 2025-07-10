@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
@@ -46,7 +46,7 @@ describe('useProfiles custom hook', () => {
 
   it('Test return initial data and take from fetch', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
-    const { result, waitFor } = renderUseProfilesHook();
+    const { result } = renderUseProfilesHook();
 
     await waitFor(() => !result.current.isFetched);
     await waitFor(() => result.current.isFetched);
@@ -59,7 +59,7 @@ describe('useProfiles custom hook', () => {
   it('Test trigger notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseProfilesHook();
+    const { result } = renderUseProfilesHook();
 
     await suppressConsole(async () => {
       await waitFor(() => !result.current.isFetched);
@@ -68,6 +68,7 @@ describe('useProfiles custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading index field type profile failed with status: Error: Error',
-      'Could not load index field type profile');
+      'Could not load index field type profile',
+    );
   });
 });

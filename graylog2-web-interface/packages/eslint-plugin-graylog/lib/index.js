@@ -18,11 +18,13 @@
 module.exports = {
   rules: {
     'prefer-hook': require('./rules/prefer-hook'),
+    'use-arrow-function-for-event-handlers-in-classes': require('./rules/use-arrow-function-for-event-handlers-in-classes'),
   },
   configs: {
     recommended: {
       rules: {
         'graylog/prefer-hook': 'warn',
+        'graylog/use-arrow-function-for-event-handlers-in-classes': 'error',
       },
     },
   },

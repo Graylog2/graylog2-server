@@ -1,1 +1,1 @@
-org.graylog.datanode.commands.ServerCommandsProvider
+org.graylog.datanode.commands.DatanodeCommandsProvider

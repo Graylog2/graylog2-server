@@ -1,0 +1,5 @@
+type="c"
+message="Datanode preflight check that verifies if hostname is bound to an IP"
+
+issues=["20503"]
+pulls=["20492"]

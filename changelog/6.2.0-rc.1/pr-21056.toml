@@ -1,0 +1,5 @@
+type = "a"
+message = "Allowing to filter events based on event definition, priority, key & aggregation time range."
+
+issues = ["21055"]
+pulls = ["21056"]

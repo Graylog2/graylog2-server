@@ -27,11 +27,12 @@ const setScratchpadVisibility = jest.fn();
 document.execCommand = jest.fn();
 
 const SUT = () => (
-  <ScratchpadContext.Provider value={{
-    isScratchpadVisible: true,
-    localStorageItem: 'gl-scratchpad-jest',
-    setScratchpadVisibility,
-  }}>
+  <ScratchpadContext.Provider
+    value={{
+      isScratchpadVisible: true,
+      localStorageItem: 'gl-scratchpad-jest',
+      setScratchpadVisibility,
+    }}>
     <Scratchpad />
   </ScratchpadContext.Provider>
 );
@@ -112,16 +113,12 @@ describe('<Scratchpad />', () => {
 
     fireEvent.click(btnClear);
 
-    await screen.findByRole('alertdialog', { hidden: true });
-
-    const confirmBtn = screen.getByRole('button', { name: /confirm/i, hidden: true });
+    const confirmBtn = await screen.findByRole('button', { name: /confirm/i });
 
     fireEvent.click(confirmBtn);
 
     await screen.findByText(/cleared\./i);
 
-    await waitFor(() => {
-      expect(textarea.value).toBe('');
-    });
+    await waitFor(() => expect(textarea.value).toBe(''));
   });
 });

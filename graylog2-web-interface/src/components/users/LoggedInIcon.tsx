@@ -19,9 +19,11 @@ import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
 
-const Wrapper = styled.div<{ $active: boolean }>(({ theme, $active }) => css`
-  color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-`);
+const Wrapper = styled.div<{ $active: boolean }>(
+  ({ theme, $active }) => css`
+    color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
+  `,
+);
 
 const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
   <Wrapper $active={active}>

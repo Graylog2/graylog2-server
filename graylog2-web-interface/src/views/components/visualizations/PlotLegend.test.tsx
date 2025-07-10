@@ -30,35 +30,37 @@ import asMock from 'helpers/mocking/AsMock';
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useExternalValueActions');
 
 const colors = ColorMapper.create();
 const setColor = jest.fn();
-const chartData = [
-  { name: 'name1' },
-  { name: 'name2' },
-  { name: 'name3' },
-];
+const chartData = [{ name: 'name1' }, { name: 'name2' }, { name: 'name3' }];
 const columnPivots = [Pivot.create(['field1'], 'unknown')];
-const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
+const config = AggregationWidgetConfig.builder()
+  .series([Series.forFunction('count')])
+  .columnPivots(columnPivots)
+  .build();
 
-// eslint-disable-next-line react/require-default-props
-const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig, neverHide?: boolean }) => (
-  <WidgetFocusContext.Provider value={{
-    focusedWidget: undefined,
-    setWidgetFocusing: jest.fn(),
-    unsetWidgetFocusing: jest.fn(),
-    unsetWidgetEditing: jest.fn(),
-    setWidgetEditing: jest.fn(),
-  }}>
-
+const SUT = ({
+  chartDataProp = chartData,
+  plotConfig = config,
+  neverHide = false,
+}: {
+  chartDataProp?: Array<{ name: string }>;
+  plotConfig?: AggregationWidgetConfig;
+  neverHide?: boolean;
+}) => (
+  <WidgetFocusContext.Provider
+    value={{
+      focusedWidget: undefined,
+      setWidgetFocusing: jest.fn(),
+      unsetWidgetFocusing: jest.fn(),
+      unsetWidgetEditing: jest.fn(),
+      setWidgetEditing: jest.fn(),
+    }}>
     <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig}
-                  chartData={chartDataProp}
-                  height={480}
-                  width={640}
-                  neverHide={neverHide}>
+      <PlotLegend config={plotConfig} chartData={chartDataProp} height={480} width={640} neverHide={neverHide}>
         <div>Plot</div>
       </PlotLegend>
     </ChartColorContext.Provider>
@@ -115,7 +117,9 @@ describe('PlotLegend', () => {
   });
 
   it('should hide with a single value', async () => {
-    const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
+    const plotConfig = AggregationWidgetConfig.builder()
+      .series([Series.forFunction('count')])
+      .build();
     render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} />);
 
     expect(screen.queryByText('name1')).not.toBeInTheDocument();
@@ -131,7 +135,9 @@ describe('PlotLegend', () => {
   });
 
   it('should not hide with a single value if configured', async () => {
-    const plotConfig = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).build();
+    const plotConfig = AggregationWidgetConfig.builder()
+      .series([Series.forFunction('count')])
+      .build();
     render(<SUT chartDataProp={[{ name: 'name1' }]} plotConfig={plotConfig} neverHide />);
 
     await screen.findByText('name1');

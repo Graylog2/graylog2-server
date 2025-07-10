@@ -20,7 +20,7 @@ import { MantineProvider } from '@mantine/core';
 import SawmillMantine from '@graylog/sawmill/mantine';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 const GlobalStyles = createGlobalStyle`
@@ -32,10 +32,7 @@ const GlobalStyles = createGlobalStyle`
 
 const ThemeWrapper = ({ children }: Props) => {
   const theme = useTheme();
-  const mantineTheme = useMemo(
-    () => SawmillMantine({ colorScheme: theme.mode }),
-    [theme.mode],
-  );
+  const mantineTheme = useMemo(() => SawmillMantine({ colorScheme: theme.mode }), [theme.mode]);
 
   return (
     <MantineProvider theme={mantineTheme}>

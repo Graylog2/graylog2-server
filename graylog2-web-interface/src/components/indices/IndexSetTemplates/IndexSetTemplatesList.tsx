@@ -18,10 +18,8 @@ import React, { useCallback } from 'react';
 
 import { PaginatedEntityTable } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
-import type { IndexSetTemplate }
-  from 'components/indices/IndexSetTemplates/types';
-import { fetchIndexSetTemplates, keyFn }
-  from 'components/indices/IndexSetTemplates/hooks/useTemplates';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import { fetchIndexSetTemplates, keyFn } from 'components/indices/IndexSetTemplates/hooks/useTemplates';
 import TemplateActions from 'components/indices/IndexSetTemplates/TemplateActions';
 import customColumnRenderers from 'components/indices/IndexSetTemplates/helpers/customColumnRenderers';
 
@@ -35,20 +33,25 @@ export const DEFAULT_LAYOUT = {
 const COLUMNS_ORDER = ['title', 'built_in', 'description'];
 
 const IndexSetTemplatesList = () => {
-  const templateActions = useCallback(({ id, title, built_in, default: isDefault, enabled: isEnabled }: IndexSetTemplate) => (
-    <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} isEnabled={isEnabled} />
-  ), []);
+  const templateActions = useCallback(
+    ({ id, title, built_in, default: isDefault, enabled: isEnabled }: IndexSetTemplate) => (
+      <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} isEnabled={isEnabled} />
+    ),
+    [],
+  );
 
   return (
-    <PaginatedEntityTable<IndexSetTemplate> humanName="index set templates"
-                                            columnsOrder={COLUMNS_ORDER}
-                                            entityActions={templateActions}
-                                            tableLayout={DEFAULT_LAYOUT}
-                                            fetchEntities={fetchIndexSetTemplates}
-                                            keyFn={keyFn}
-                                            entityAttributesAreCamelCase={false}
-                                            columnRenderers={customColumnRenderers}
-                                            searchPlaceholder="Search for index set template" />
+    <PaginatedEntityTable<IndexSetTemplate>
+      humanName="index set templates"
+      columnsOrder={COLUMNS_ORDER}
+      entityActions={templateActions}
+      tableLayout={DEFAULT_LAYOUT}
+      fetchEntities={fetchIndexSetTemplates}
+      keyFn={keyFn}
+      entityAttributesAreCamelCase={false}
+      columnRenderers={customColumnRenderers}
+      searchPlaceholder="Search for index set template"
+    />
   );
 };
 

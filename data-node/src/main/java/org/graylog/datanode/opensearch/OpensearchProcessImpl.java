@@ -17,15 +17,18 @@
 package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.cli.OpensearchCommandLineProcess;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.rest.OpensearchRestClient;
@@ -35,7 +38,6 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.periodicals.ClusterStateResponse;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
-import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -50,43 +52,42 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.datanode.DataNodeNotficationEvent;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerAggregator;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import oshi.SystemInfo;
+import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
+import java.security.KeyStore;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
-    public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
+    private static final long MEMORY_RATIO_THRESHOLD = 2;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
@@ -103,12 +104,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private final Queue<String> stdout;
     private final Queue<String> stderr;
     private final CustomCAX509TrustManager trustManager;
-    private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
     private final ObjectMapper objectMapper;
     private final String nodeName;
     private final NodeId nodeId;
     private final EventBus eventBus;
+    private final ClusterEventBus clusterEventBus;
 
 
     static final String CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING = "cluster.routing.allocation.exclude._name";
@@ -117,26 +118,26 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
-                          final Configuration configuration, final NodeService<DataNodeDto> nodeService,
-                          ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus) {
+                          final Configuration configuration,
+                          ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus,
+                          ClusterEventBus clusterEventBus) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
         this.stderr = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
         this.trustManager = trustManager;
-        this.nodeService = nodeService;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
         this.nodeName = configuration.getDatanodeNodeName();
         this.nodeId = nodeId;
         this.eventBus = eventBus;
+        this.clusterEventBus = clusterEventBus;
+        eventBus.register(this);
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
 
-        final TrustManager trustManager = configuration.opensearchSecurityConfiguration().getTruststore()
-                .map(this::createAggregatedTrustManager)
-                .orElse(this.trustManager);
+        final TrustManager trustManager = createAggregatedTrustManager(configuration.trustStore());
 
         return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
     }
@@ -144,16 +145,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     /**
      * We have to combine the system-wide trust manager with a manager that trusts certificates used to secure
      * the datanode's opensearch process.
+     *
      * @param truststore truststore containing certificates used to secure datanode's opensearch
      * @return combined trust manager
      */
     @Nonnull
-    private X509TrustManager createAggregatedTrustManager(FilesystemKeystoreInformation truststore) {
-        try {
-            return new TrustManagerAggregator(List.of(this.trustManager, TrustManagerAggregator.trustManagerFromKeystore(truststore.loadKeystore())));
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+    private X509TrustManager createAggregatedTrustManager(KeyStore truststore) {
+        return new TrustManagerAggregator(List.of(this.trustManager, TrustManagerAggregator.trustManagerFromKeystore(truststore)));
     }
 
     @Override
@@ -175,7 +173,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(),  getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -196,13 +194,16 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public String getDatanodeRestApiUrl() {
-        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::opensearchSecurityConfiguration)
-                .map(OpensearchSecurityConfiguration::securityEnabled)
-                .orElse(false);
+        final boolean secured = opensearchConfiguration.flatMap(OpensearchConfiguration::httpCertificate).isPresent();
         String protocol = secured ? "https" : "http";
         String host = configuration.getHostname();
         final int port = configuration.getDatanodeHttpPort();
         return String.format(Locale.ROOT, "%s://%s:%d", protocol, host, port);
+    }
+
+    @Override
+    public List<String> getOpensearchRoles() {
+        return opensearchConfiguration.map(OpensearchConfiguration::opensearchRoles).orElse(List.of());
     }
 
     public void onEvent(OpensearchEvent event) {
@@ -225,37 +226,58 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 (config -> {
                     // refresh TM if the SSL certs changed
                     trustManager.refresh();
-                    // refresh the seed hosts
-                    writeSeedHostsList();
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
     }
 
-    private void writeSeedHostsList() {
-        try {
-            final Path hostsfile = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(UNICAST_HOSTS_FILE);
-            final Set<String> current = nodeService.allActive().values().stream().map(DataNodeDto::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
-            Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-        } catch (IOException iox) {
-            LOG.error("Could not write to file: {} - {}", UNICAST_HOSTS_FILE, iox.getMessage());
+    @VisibleForTesting
+    void checkConfiguredHeap() {
+        Size heap = Size.parse(configuration.getOpensearchHeap());
+        long heapBytes = heap.toBytes();
+        final GlobalMemory memory = getGlobalMemory();
+        long buffer = 2 * 1024 * 1024 * 1024L;
+        long freeMemory = memory.getAvailable() - buffer;
+        float memoryRatio = (float) freeMemory / heapBytes;
+        if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
+            LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
+            clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
+                    Map.of("hostname", configuration.getHostname(),
+                            "memoryRatio", f("%.1f", memoryRatio),
+                            "totalMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()),
+                            "availableMemory", FileUtils.byteCountToDisplaySize(memory.getAvailable()),
+                            "recommendedMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()/2),
+                            "heapSize", FileUtils.byteCountToDisplaySize(heapBytes))));
         }
-
     }
+
+    protected GlobalMemory getGlobalMemory() {
+        SystemInfo systemInfo = new SystemInfo();
+        GlobalMemory memory = systemInfo.getHardware().getMemory();
+        return memory;
+    }
+
+    @Subscribe
+    public void onNotificationEvent(DataNodeNotficationEvent event) {
+        // we need a subscriber in the data node, otherwise this event will be ignored due to it having no subscribers
+    }
+
     @Override
     public synchronized void start() {
-            opensearchConfiguration.ifPresentOrElse(
-                    (config -> {
-                        boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
-                        if (startedPreviously) {
-                            stop();
-                        }
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
+                    if (startedPreviously) {
+                        stop();
+                    }
 
-                        commandLineProcess = new OpensearchCommandLineProcess(config, this);
-                        commandLineProcess.start();
+                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
+                    commandLineProcess.start();
 
-                        restClient = Optional.of(createRestClient(config));
-                        openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+                    restClient = Optional.of(createRestClient(config));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+                    checkConfiguredHeap();
+
                     }),
                     () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
             );
@@ -404,6 +426,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 .map(r -> r.nodes().get(r.clusterManagerNode()))
                 .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
                 .orElse(false);
+    }
+
+    @Override
+    public List<String> configurationWarnings() {
+        return opensearchConfiguration.map(OpensearchConfiguration::warnings).orElse(List.of());
     }
 
     private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {

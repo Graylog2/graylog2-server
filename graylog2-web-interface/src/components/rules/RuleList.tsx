@@ -15,64 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataTable } from 'components/common';
-import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
 
 import RuleListEntry from './RuleListEntry';
 
+const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
+
+const headerCellFormatter = (header: React.ReactNode) => <th>{header}</th>;
+
 type Props = {
-  rules: Array<RuleType>,
-  metricsConfig?: MetricsConfigType,
-  rulesContext?: RulesContext,
-  onDelete: (RuleType) => () => void,
-  searchFilter: React.ReactNode,
+  rules: Array<RuleType>;
+  rulesContext?: RulesContext;
+  onDelete: (ruleType: RuleType) => () => void;
+  searchFilter: React.ReactNode;
 };
 
-type State = {
-  openMetricsConfig: boolean,
+const RuleList = ({ rules, searchFilter, onDelete, rulesContext = undefined }: Props) => {
+  const ruleInfoFormatter = (rule) => (
+    <RuleListEntry
+      key={rule.id}
+      rule={rule}
+      usingPipelines={rulesContext?.used_in_pipelines[rule.id]}
+      onDelete={onDelete}
+    />
+  );
+
+  return (
+    <DataTable
+      id="rule-list"
+      className="table-hover"
+      headers={headers}
+      headerCellFormatter={headerCellFormatter}
+      sortByKey="title"
+      rows={rules}
+      customFilter={searchFilter}
+      dataRowFormatter={ruleInfoFormatter}
+      filterKeys={[]}
+    />
+  );
 };
-
-class RuleList extends React.Component<Props, State> {
-  static propTypes = {
-    rules: PropTypes.array.isRequired,
-
-    rulesContext: PropTypes.exact({
-      used_in_pipelines: PropTypes.objectOf(PropTypes.any),
-    }),
-    onDelete: PropTypes.func.isRequired,
-    searchFilter: PropTypes.node.isRequired,
-  };
-
-  static defaultProps = {
-    rulesContext: undefined,
-  };
-
-  _headerCellFormatter = (header) => <th>{header}</th>;
-
-  _ruleInfoFormatter = (rule) => {
-    const { onDelete, rulesContext: { used_in_pipelines: usingPipelines } = {} } = this.props;
-
-    return <RuleListEntry key={rule.id} rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
-  };
-
-  render() {
-    const { rules, searchFilter } = this.props;
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
-
-    return (
-      <DataTable id="rule-list"
-                 className="table-hover"
-                 headers={headers}
-                 headerCellFormatter={this._headerCellFormatter}
-                 sortByKey="title"
-                 rows={rules}
-                 customFilter={searchFilter}
-                 dataRowFormatter={this._ruleInfoFormatter}
-                 filterKeys={[]} />
-    );
-  }
-}
 
 export default RuleList;

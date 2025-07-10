@@ -23,6 +23,8 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.google.common.base.Preconditions;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.collections.CollectionUtils;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSLogMessage;
@@ -32,8 +34,8 @@ import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.CreateRolePermissionRequest;
-import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
+import org.graylog.integrations.aws.resources.requests.KinesisRequest;
 import org.graylog.integrations.aws.resources.responses.CreateRolePermissionResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisNewStreamResponse;
@@ -55,6 +57,7 @@ import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
@@ -69,13 +72,10 @@ import software.amazon.awssdk.services.kinesis.model.ShardIteratorType;
 import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.BadRequestException;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -136,7 +136,7 @@ public class KinesisService {
      * @return a {@code KinesisHealthCheckResponse}, which indicates the type of detected message and a sample parsed
      * message.
      */
-    public KinesisHealthCheckResponse healthCheck(KinesisHealthCheckRequest request) throws ExecutionException, IOException {
+    public KinesisHealthCheckResponse healthCheck(KinesisRequest request) throws ExecutionException, IOException {
 
         LOG.debug("Executing healthCheck");
         LOG.debug("Requesting a list of streams to find out if the indicated stream exists.");
@@ -155,8 +155,14 @@ public class KinesisService {
         KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
-        if (records.size() == 0) {
-            throw new BadRequestException(String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()));
+
+        if (records.isEmpty()) {
+            LOG.debug("The Kinesis stream [{}] is empty.", request.streamName());
+            return KinesisHealthCheckResponse.create(
+                    AWSMessageType.KINESIS_RAW,
+                    String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()),
+                    new HashMap<>()
+            );
         }
 
         Record record = selectRandomRecord(records);
@@ -167,7 +173,7 @@ public class KinesisService {
         }
 
         DateTime timestamp = new DateTime(record.approximateArrivalTimestamp().toEpochMilli(), DateTimeZone.UTC);
-        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "", "", compressed);
+        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "test-graylog", "", compressed, request);
     }
 
     public StreamsResponse getKinesisStreamNames(AWSRequest request) throws ExecutionException {
@@ -223,7 +229,7 @@ public class KinesisService {
      * message.
      * @see <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"/>
      */
-    private KinesisHealthCheckResponse handleCompressedMessages(KinesisHealthCheckRequest request, byte[] payloadBytes) throws IOException {
+    private KinesisHealthCheckResponse handleCompressedMessages(KinesisRequest request, byte[] payloadBytes) throws IOException {
         LOG.debug("The supplied payload is GZip compressed. Proceeding to decompress.");
 
         // Assume that the payload is from CloudWatch.
@@ -240,7 +246,7 @@ public class KinesisService {
         CloudWatchLogEvent logEntry = logEntryOptional.get();
         DateTime timestamp = new DateTime(logEntry.timestamp(), DateTimeZone.UTC);
         return detectAndParseMessage(logEntry.message(), timestamp,
-                request.streamName(), data.logGroup(), data.logStream(), true);
+                request.streamName(), data.logGroup(), data.logStream(), true, request);
     }
 
     /**
@@ -329,7 +335,7 @@ public class KinesisService {
      * @return A {@code KinesisHealthCheckResponse} with the fully parsed message and type.
      */
     private KinesisHealthCheckResponse detectAndParseMessage(String logMessage, DateTime timestamp, String kinesisStreamName,
-                                                             String logGroupName, String logStreamName, boolean compressed) {
+                                                             String logGroupName, String logStreamName, boolean compressed, KinesisRequest request) {
 
         LOG.debug("Attempting to detect the type of log message. message [{}] stream [{}] log group [{}].",
                 logMessage, kinesisStreamName, logGroupName);
@@ -342,7 +348,7 @@ public class KinesisService {
         final String responseMessage = String.format(Locale.ROOT, "Success. The message is a %s message.", awsMessageType.getLabel());
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create(kinesisStreamName, logGroupName, logStreamName,
-                timestamp, logMessage);
+                timestamp, logMessage, "", awsMessageType.getLabel(), new ArrayList<>());
 
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
@@ -359,11 +365,9 @@ public class KinesisService {
             throw new BadRequestException("Encoding the message to bytes failed.", e);
         }
 
-        final Message fullyParsedMessage = codec.decode(new RawMessage(payload));
-        if (fullyParsedMessage == null) {
-            throw new BadRequestException(String.format(Locale.ROOT, "Message decoding failed. More information might be " +
-                    "available by enabling Debug logging. message [%s]", logMessage));
-        }
+        final Message fullyParsedMessage = codec.decodeSafe(new RawMessage(payload)).orElseThrow(() ->
+                new BadRequestException(String.format(Locale.ROOT, "Message decoding failed. More information might be " +
+                        "available by enabling Debug logging. message [%s]", logMessage)));
 
         LOG.debug("Successfully parsed message type [{}] with codec [{}].", awsMessageType, awsMessageType.getCodecName());
 
@@ -537,5 +541,20 @@ public class KinesisService {
     private static String getRolePermissionsArn(IamClient iamClient, String roleName) {
         LOG.debug("Acquiring the role ARN associated to the role [{}]", roleName);
         return iamClient.getRole(r -> r.roleName(roleName)).role().arn();
+    }
+
+    public String getStreamArn(KinesisRequest arnRequest) {
+        try (KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, arnRequest)) {
+            DescribeStreamRequest request = DescribeStreamRequest.builder()
+                    .streamName(arnRequest.streamName())
+                    .build();
+
+            DescribeStreamResponse response = kinesisClient.describeStream(request);
+            StreamDescription description = response.streamDescription();
+            return description.streamARN();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to get stream ARN. Please " +
+                    "ensure the IAM role includes the 'kinesis:DescribeStream' permission.", e);
+        }
     }
 }

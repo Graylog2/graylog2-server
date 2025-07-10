@@ -285,7 +285,8 @@ public abstract class MessageInput implements Stoppable {
 
     public void setDesiredState(IOState.Type newDesiredState) {
         if (newDesiredState.equals(IOState.Type.RUNNING)
-                || newDesiredState.equals(IOState.Type.STOPPED)) {
+                || newDesiredState.equals(IOState.Type.STOPPED)
+                || newDesiredState.equals(IOState.Type.SETUP)) {
             desiredState = newDesiredState;
         } else {
             LOG.error("Ignoring unexpected desired state {} for input {}", newDesiredState, title);
@@ -459,6 +460,10 @@ public abstract class MessageInput implements Stoppable {
 
             return r;
         }
+    }
+
+    public boolean supportsSetupMode() {
+        return true;
     }
 
     public abstract static class Descriptor extends AbstractDescriptor {

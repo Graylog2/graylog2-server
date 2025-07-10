@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
-import { Icon } from 'components/common';
-import { Button } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
+import Button from 'components/bootstrap/Button';
 import ErrorPage from 'components/errors/ErrorPage';
-import { SupportSources } from 'components/support';
+import SupportSources from 'components/support/SupportSources';
 import ClipboardButton from 'components/common/ClipboardButton';
+import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
 const ToggleDetails = styled.div`
   font-weight: normal;
@@ -37,13 +37,15 @@ const description = (
 );
 
 type Props = {
-  error: Error,
-  componentStack: string,
-}
+  error: Error;
+  componentStack: string;
+};
 
 const RuntimeErrorPage = ({ error, componentStack }: Props) => {
   const [showDetails, setShowDetails] = useState(AppConfig.gl2DevMode());
   const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${componentStack}`;
+  const productName = useProductName();
+  const isDefaultProduct = productName === DEFAULT_PRODUCT_NAME;
 
   const _toggleDetails = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -52,9 +54,11 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
 
   return (
     <ErrorPage title="Something went wrong." description={description}>
-      <div className="content" style={{ padding: '2em' }}>
-        <SupportSources />
-      </div>
+      {isDefaultProduct && (
+        <div className="content" style={{ padding: '2em' }}>
+          <SupportSources />
+        </div>
+      )}
       <dl>
         <dt>
           Error:
@@ -67,10 +71,12 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
         <dt>
           <pre className="content" id="render-error">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="content_copy" />}
-                               bsSize="sm"
-                               text={`${error.message}\n${errorDetails}`}
-                               buttonTitle="Copy error details to clipboard" />
+              <ClipboardButton
+                title={<Icon name="content_copy" />}
+                bsSize="sm"
+                text={`${error.message}\n${errorDetails}`}
+                buttonTitle="Copy error details to clipboard"
+              />
             </div>
             {error.message}
             {showDetails && errorDetails}
@@ -79,14 +85,6 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
       </dl>
     </ErrorPage>
   );
-};
-
-RuntimeErrorPage.propTypes = {
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-    stack: PropTypes.string,
-  }).isRequired,
-  componentStack: PropTypes.string.isRequired,
 };
 
 export default RuntimeErrorPage;

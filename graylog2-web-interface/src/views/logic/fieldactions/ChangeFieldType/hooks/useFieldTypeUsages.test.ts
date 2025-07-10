@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+
+import { SystemIndexSetsTypes } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
-import { SystemIndexSetsTypes } from '@graylog/server-api';
 
 const mockFieldTypeUsages = {
   attributes: [],
@@ -36,7 +37,7 @@ const mockFieldTypeUsages = {
     sort: {
       id: 'index_set_id',
       direction: 'ASC',
-    } as { id: string, direction: 'ASC' | 'DESC'},
+    } as { id: string; direction: 'ASC' | 'DESC' },
   },
   total: 1,
   sort: 'index_set_title',
@@ -45,12 +46,8 @@ const mockFieldTypeUsages = {
     {
       index_set_id: '0001',
       index_set_title: 'Index set title',
-      stream_titles: [
-        'Stream title',
-      ],
-      types: [
-        'string',
-      ],
+      stream_titles: ['Stream title'],
+      types: ['string'],
     },
   ],
 };
@@ -61,12 +58,8 @@ const expectedState = {
     {
       id: '0001',
       indexSetTitle: 'Index set title',
-      streamTitles: [
-        'Stream title',
-      ],
-      types: [
-        'string',
-      ],
+      streamTitles: ['Stream title'],
+      types: ['string'],
     },
   ],
   pagination: {
@@ -81,7 +74,13 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const renderUseFieldTypeUsagesHook = () => renderHook(() => useFieldTypeUsages({ streams: ['001'], field: 'field' }, { page: 1, pageSize: 10, sort: { attributeId: 'index_set_title', direction: 'asc' } }));
+const renderUseFieldTypeUsagesHook = () =>
+  renderHook(() =>
+    useFieldTypeUsages(
+      { streams: ['001'], field: 'field' },
+      { page: 1, pageSize: 10, sort: { attributeId: 'index_set_title', direction: 'asc' } },
+    ),
+  );
 
 describe('useFieldTypeUsages custom hook', () => {
   afterEach(() => {
@@ -90,15 +89,21 @@ describe('useFieldTypeUsages custom hook', () => {
 
   it('Test return initial data and take from fetch', async () => {
     asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.resolve(mockFieldTypeUsages));
-    const { result, waitFor } = renderUseFieldTypeUsagesHook();
+    const { result } = renderUseFieldTypeUsagesHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(SystemIndexSetsTypes.fieldTypeSummaries).toHaveBeenCalledWith({
-      field: 'field',
-      streams: ['001'],
-    }, 'index_set_title', 1, 10, 'asc');
+    expect(SystemIndexSetsTypes.fieldTypeSummaries).toHaveBeenCalledWith(
+      {
+        field: 'field',
+        streams: ['001'],
+      },
+      'index_set_title',
+      1,
+      10,
+      'asc',
+    );
 
     expect(result.current.data).toEqual(expectedState);
   });
@@ -106,7 +111,7 @@ describe('useFieldTypeUsages custom hook', () => {
   it('Test trigger notification on fail', async () => {
     asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseFieldTypeUsagesHook();
+    const { result } = renderUseFieldTypeUsagesHook();
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isLoading);
@@ -115,6 +120,7 @@ describe('useFieldTypeUsages custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading field types failed with status: Error: Error',
-      'Could not load field types');
+      'Could not load field types',
+    );
   });
 });

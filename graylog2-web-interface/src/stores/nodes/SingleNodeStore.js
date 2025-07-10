@@ -20,16 +20,14 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const SingleNodeActions = singletonActions(
-  'core.SingleNode',
-  () => Reflux.createActions({
+export const SingleNodeActions = singletonActions('core.SingleNode', () =>
+  Reflux.createActions({
     get: { asyncResult: true },
   }),
 );
 
-export const SingleNodeStore = singletonStore(
-  'core.SingleNode',
-  () => Reflux.createStore({
+export const SingleNodeStore = singletonStore('core.SingleNode', () =>
+  Reflux.createStore({
     listenables: [SingleNodeActions],
     sourceUrl: '/system/cluster/node',
     node: undefined,
@@ -51,11 +49,13 @@ export const SingleNodeStore = singletonStore(
     },
 
     get(nodeId) {
-      const promise = fetch('GET', URLUtils.qualifyUrl(nodeId ? URLUtils.concatURLPath(this.sourceUrl, nodeId) : this.sourceUrl))
-        .then((response) => {
-          this.node = response;
-          this._propagateState();
-        });
+      const promise = fetch(
+        'GET',
+        URLUtils.qualifyUrl(nodeId ? URLUtils.concatURLPath(this.sourceUrl, nodeId) : this.sourceUrl),
+      ).then((response) => {
+        this.node = response;
+        this._propagateState();
+      });
 
       SingleNodeActions.get.promise(promise);
     },

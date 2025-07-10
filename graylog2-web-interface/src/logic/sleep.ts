@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const sleep = async (milliseconds: number): Promise<ReturnType<typeof setTimeout>> => new Promise((resolve) => {
-  const timerID = setTimeout(() => resolve(timerID), milliseconds);
-});
+const sleep = async (milliseconds: number): Promise<ReturnType<typeof setTimeout>> =>
+  new Promise((resolve) => {
+    const timerID = setTimeout(() => resolve(timerID), milliseconds);
+  });
 
 export default sleep;

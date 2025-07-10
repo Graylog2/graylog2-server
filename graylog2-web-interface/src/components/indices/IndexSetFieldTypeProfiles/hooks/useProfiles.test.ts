@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
@@ -38,7 +38,7 @@ const mockData = {
     sort: {
       id: 'name',
       direction: 'ASC',
-    } as { id: string, direction: 'ASC' | 'DESC'},
+    } as { id: string; direction: 'ASC' | 'DESC' },
   },
   total: 1,
   sort: 'name',
@@ -62,7 +62,13 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const renderUseProfilesHook = () => renderHook(() => useProfiles({ page: 1, query: '', pageSize: 10, sort: { attributeId: 'name', direction: 'asc' } }, { enabled: true }));
+const renderUseProfilesHook = () =>
+  renderHook(() =>
+    useProfiles(
+      { page: 1, query: '', pageSize: 10, sort: { attributeId: 'name', direction: 'asc' } },
+      { enabled: true },
+    ),
+  );
 
 describe('useProfiles custom hook', () => {
   afterEach(() => {
@@ -71,12 +77,15 @@ describe('useProfiles custom hook', () => {
 
   it('Test return initial data and take from fetch', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
-    const { result, waitFor } = renderUseProfilesHook();
+    const { result } = renderUseProfilesHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/paginated?page=1&per_page=10&sort=name&order=asc'));
+    expect(fetch).toHaveBeenCalledWith(
+      'GET',
+      qualifyUrl('/system/indices/index_sets/profiles/paginated?page=1&per_page=10&sort=name&order=asc'),
+    );
 
     expect(result.current.data).toEqual(expectedState);
   });
@@ -84,7 +93,7 @@ describe('useProfiles custom hook', () => {
   it('Test trigger notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseProfilesHook();
+    const { result } = renderUseProfilesHook();
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isLoading);
@@ -93,6 +102,7 @@ describe('useProfiles custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading index field type profiles failed with status: Error: Error',
-      'Could not load index field type profiles');
+      'Could not load index field type profiles',
+    );
   });
 });

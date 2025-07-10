@@ -23,7 +23,7 @@ import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -70,13 +70,16 @@ public class DBEventProcessorServiceTest {
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
 
         this.dbService = new DBEventDefinitionService(mongoCollections,
-                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
+                stateService, mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
     }
 
     @Test
     @MongoDBFixtures("event-processors.json")
     public void loadPersisted() {
-        final List<EventDefinitionDto> dtos = dbService.streamAll().collect(Collectors.toList());
+        final List<EventDefinitionDto> dtos;
+        try (var stream = dbService.streamAll()) {
+            dtos = stream.collect(Collectors.toList());
+        }
 
         assertThat(dtos).hasSize(1);
 

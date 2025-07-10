@@ -23,22 +23,18 @@ import MapVisualization from '../MapVisualization';
 
 describe('MapVisualization', () => {
   it('renders with minimal props', async () => {
-    const { container } = render(<MapVisualization id="somemap"
-                                                   onChange={() => {}}
-                                                   data={[]}
-                                                   height={1600}
-                                                   width={900} />);
+    const { container } = render(
+      <MapVisualization id="somemap" onChange={() => {}} data={[]} height={1600} width={900} />,
+    );
 
     // eslint-disable-next-line testing-library/no-container
     expect(container.querySelector('div.map#visualization-somemap')).toBeInTheDocument();
   });
 
   it('does not render circle markers for invalid data', async () => {
-    const { container } = render(<MapVisualization id="somemap"
-                                                   onChange={() => {}}
-                                                   data={fixtures.invalidData}
-                                                   height={1600}
-                                                   width={900} />);
+    const { container } = render(
+      <MapVisualization id="somemap" onChange={() => {}} data={fixtures.invalidData} height={1600} width={900} />,
+    );
 
     /* eslint-disable testing-library/no-container */
     expect(container.querySelector('div.map#visualization-somemap')).toBeInTheDocument();

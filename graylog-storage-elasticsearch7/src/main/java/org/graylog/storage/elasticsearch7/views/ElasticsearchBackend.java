@@ -273,11 +273,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .indices(indices.toArray(new String[0]))
                             .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
                 })
+                .map(request -> request.preference(job.getId()))
                 .toList();
 
         //ES does not support per-request cancel_after_time_interval. We have to use simplified solution - the whole multi-search will be cancelled if it takes more than configured max. exec. time.
         final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
-        job.setSearchEngineTaskFuture(mSearchFuture);
+        job.setQueryExecutionFuture(query.id(), mSearchFuture);
         final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, job.getCancelAfterSeconds(), searches.size());
 
         for (SearchType searchType : query.searchTypes()) {

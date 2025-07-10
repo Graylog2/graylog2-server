@@ -17,6 +17,7 @@
 package org.graylog2.inputs;
 
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
@@ -114,4 +115,6 @@ public interface InputService extends PersistedService {
     MessageInput getMessageInput(Input io) throws NoSuchInputTypeException;
 
     List<Map.Entry<String, String>> getStaticFields(Input input);
+
+    void persistDesiredState(Input input, IOState.Type desiredState);
 }

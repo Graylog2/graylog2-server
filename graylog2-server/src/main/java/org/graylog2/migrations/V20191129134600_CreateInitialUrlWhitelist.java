@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
@@ -41,8 +42,6 @@ import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.graylog2.system.urlwhitelist.WhitelistEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -100,10 +99,11 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
     private UrlWhitelist createWhitelist() {
         final Set<WhitelistEntry> entries = new HashSet<>();
 
-        dataAdapterService.findAll()
-                .stream()
-                .map(this::extractFromDataAdapter)
-                .forEach(e -> e.ifPresent(entries::add));
+        try (Stream<DataAdapterDto> dataAdapterStream = dataAdapterService.streamAll()) {
+            dataAdapterStream
+                    .map(this::extractFromDataAdapter)
+                    .forEach(e -> e.ifPresent(entries::add));
+        }
 
         try (final Stream<NotificationDto> notificationsStream = notificationService.streamAll()) {
             notificationsStream.map(this::extractFromNotification)

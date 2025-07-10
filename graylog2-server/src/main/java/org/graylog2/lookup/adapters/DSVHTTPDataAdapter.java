@@ -26,6 +26,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import okhttp3.HttpUrl;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dsvhttp.DSVParser;
@@ -33,6 +37,7 @@ import org.graylog2.lookup.adapters.dsvhttp.HTTPFileRetriever;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.system.urlwhitelist.UrlNotWhitelistedException;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
@@ -41,13 +46,8 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
-
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -162,6 +162,24 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         }
 
         return LookupResult.single(value);
+    }
+
+    @Override
+    public boolean supportsPreview() {
+        return true;
+    }
+
+    @Override
+    public LookupPreview getPreview(int size) {
+        final Map<Object, Object> result = new HashMap<>();
+        final Map<String, String> lookup = lookupRef.get();
+        for (Map.Entry<String, String> entries : lookup.entrySet()) {
+            if (result.size() == size) {
+                break;
+            }
+            result.put(entries.getKey(), entries.getValue());
+        }
+        return new LookupPreview(lookup.size(), result);
     }
 
     @Override

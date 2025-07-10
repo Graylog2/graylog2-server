@@ -74,73 +74,75 @@ const variantRowStyles = css(({ theme }) => {
 
   return css`
     ${styles}
-`;
+  `;
 });
 
-const tableCss = css(({ theme }) => css`
-  &.table {
-    > thead > tr,
-    > tbody > tr,
-    > tfoot > tr {
-      > th,
-      > td {
+const tableCss = css(
+  ({ theme }) => css`
+    &.table {
+      > thead > tr,
+      > tbody > tr,
+      > tfoot > tr {
+        > th,
+        > td {
+          border-top-color: ${theme.colors.table.row.divider};
+          border-width: 1px;
+        }
+      }
+
+      > thead > tr > th {
+        background: ${theme.colors.table.head.background};
+        white-space: nowrap;
+        border-bottom-color: ${theme.colors.table.row.divider};
+        border-width: 1px;
+      }
+
+      > tbody > tr {
+        background-color: ${theme.colors.global.contentBackground};
+        transition: background-color 150ms ease-in-out;
+      }
+
+      > tbody + tbody {
         border-top-color: ${theme.colors.table.row.divider};
         border-width: 1px;
       }
-    }
 
-    > thead > tr > th {
-      background: ${theme.colors.table.head.background};
-      white-space: nowrap;
-      border-bottom-color: ${theme.colors.table.row.divider};
-      border-width: 1px;
-    }
-
-    > tbody > tr {
-      background-color: ${theme.colors.global.contentBackground};
-      transition: background-color 150ms ease-in-out;
-    }
-
-    > tbody + tbody {
-      border-top-color: ${theme.colors.table.row.divider};
-      border-width: 1px;
-    }
-
-    .table {
-      background-color: ${theme.colors.table.row.background};
-    }
-  }
-
-  &.table-bordered {
-    border-color: ${theme.colors.table.row.divider};
-
-    > thead > tr,
-    > tfoot > tr,
-    > tbody > tr {
-      > td,
-      > th {
-        border-color: ${theme.colors.table.row.divider};
+      .table {
+        background-color: ${theme.colors.table.row.background};
       }
     }
-  }
 
-  &.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: ${theme.colors.table.row.backgroundStriped};
-  }
+    &.table-bordered {
+      border-color: ${theme.colors.table.row.divider};
 
-  &.table-hover > tbody > tr:hover {
-    background-color: ${theme.colors.table.row.backgroundHover};
-  }
-
-  ${variantRowStyles}
-  
-  @media print {
-    &.table > thead > tr > th {
-      white-space: break-spaces;
-      word-break: break-all;
+      > thead > tr,
+      > tfoot > tr,
+      > tbody > tr {
+        > td,
+        > th {
+          border-color: ${theme.colors.table.row.divider};
+        }
+      }
     }
-  }
-`);
+
+    &.table-striped > tbody > tr:nth-of-type(odd) {
+      background-color: ${theme.colors.table.row.backgroundStriped};
+    }
+
+    &.table-hover > tbody > tr:hover {
+      background-color: ${theme.colors.table.row.backgroundHover};
+    }
+
+    ${variantRowStyles}
+
+    @media print {
+      &.table > thead > tr > th {
+        white-space: break-spaces;
+        word-break: break-all;
+      }
+    }
+  `,
+);
 
 const Table = styled(BootstrapTable)`
   ${tableCss}

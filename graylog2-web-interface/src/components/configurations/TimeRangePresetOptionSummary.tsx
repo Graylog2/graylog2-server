@@ -14,19 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
 import assertUnreachable from 'logic/assertUnreachable';
 import type { TimeRangePreset } from 'components/configurations/TimeRangePresetForm';
-import type {
-  KeywordTimeRange,
-  TimeRange,
-} from 'views/logic/queries/Query';
+import type { KeywordTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { range } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
 
-type Props = { options : Array<TimeRangePreset>};
+type Props = { options: Array<TimeRangePreset> };
 
 const StyledDL = styled.dl`
   && {
@@ -34,7 +30,7 @@ const StyledDL = styled.dl`
       display: flex;
       gap: 5px;
     }
-    
+
     dt {
       white-space: nowrap;
       flex-basis: 175px;
@@ -56,7 +52,7 @@ export const getTimeRangeValueSummary = (timerange: TimeRange) => {
     case 'keyword':
       return (timerange as KeywordTimeRange).keyword;
     default:
-      return assertUnreachable(timerange, 'Timerange type doesn\'t not exist');
+      return assertUnreachable(timerange, "Timerange type doesn't not exist");
   }
 };
 
@@ -70,9 +66,5 @@ const TimeRangePresetOptionSummary = ({ options }: Props) => (
     ))}
   </StyledDL>
 );
-
-TimeRangePresetOptionSummary.propTypes = {
-  options: PropTypes.object.isRequired,
-};
 
 export default TimeRangePresetOptionSummary;

@@ -125,26 +125,20 @@ export default class Entity {
   }
 
   toBuilder() {
-    const {
-      v,
-      type,
-      id,
-      data,
-      constraints,
-      fromServer,
-      parameters,
-    } = this._value;
+    const { v, type, id, data, constraints, fromServer, parameters } = this._value;
 
     /* eslint-disable-next-line no-use-before-define */
-    return new Builder(Map({
-      v,
-      type,
-      id,
-      data,
-      constraints,
-      fromServer,
-      parameters,
-    }));
+    return new Builder(
+      Map({
+        v,
+        type,
+        id,
+        data,
+        constraints,
+        fromServer,
+        parameters,
+      }),
+    );
   }
 
   static builder() {
@@ -153,13 +147,7 @@ export default class Entity {
   }
 
   toJSON() {
-    const {
-      v,
-      type,
-      id,
-      data,
-      constraints,
-    } = this._value;
+    const { v, type, id, data, constraints } = this._value;
 
     return {
       v,
@@ -219,15 +207,7 @@ class Builder {
   }
 
   build() {
-    const {
-      v,
-      type,
-      id,
-      data,
-      constraints,
-      fromServer,
-      parameters,
-    } = this.value.toObject();
+    const { v, type, id, data, constraints, fromServer, parameters } = this.value.toObject();
 
     return new Entity(v, type, id, data, fromServer, constraints, parameters);
   }

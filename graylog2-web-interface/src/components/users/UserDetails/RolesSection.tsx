@@ -25,29 +25,34 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import RolesQueryHelper from 'components/roles/RolesQueryHelper';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
 const RolesSection = ({ user: { username } }: Props) => {
   const [loading, setLoading] = useState(false);
 
-  const _onLoad = useCallback((pagination, isSubscribed: boolean) => {
-    setLoading(true);
+  const _onLoad = useCallback(
+    (pagination, isSubscribed: boolean) => {
+      setLoading(true);
 
-    return AuthzRolesDomain.loadRolesForUser(username, pagination).then((paginatedRoles): PaginatedListType => {
-      if (isSubscribed) {
-        setLoading(false);
-      }
+      return AuthzRolesDomain.loadRolesForUser(username, pagination).then((paginatedRoles): PaginatedListType => {
+        if (isSubscribed) {
+          setLoading(false);
+        }
 
-      return paginatedRoles;
-    });
-  }, [username]);
+        return paginatedRoles;
+      });
+    },
+    [username],
+  );
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <PaginatedItemOverview noDataText="No selected roles have been found."
-                             onLoad={_onLoad}
-                             queryHelper={<RolesQueryHelper />} />
+      <PaginatedItemOverview
+        noDataText="No selected roles have been found."
+        onLoad={_onLoad}
+        queryHelper={<RolesQueryHelper />}
+      />
     </SectionComponent>
   );
 };

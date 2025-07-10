@@ -77,17 +77,17 @@ public class ClusterEventPeriodicalTest {
     private ClusterEventBus clusterEventBus;
     private MongoConnection mongoConnection;
     private ClusterEventPeriodical clusterEventPeriodical;
+    private MongoJackObjectMapperProvider objectMapperProvider;
 
     @Before
     public void setUpService() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
         this.mongoConnection = mongodb.mongoConnection();
-
-        MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
+        this.objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clusterEventPeriodical = new ClusterEventPeriodical(
-                provider,
+                objectMapperProvider,
                 mongodb.mongoConnection(),
                 nodeId,
                 new RestrictedChainingClassLoader(new ChainingClassLoader(getClass().getClassLoader()),
@@ -287,9 +287,9 @@ public class ClusterEventPeriodicalTest {
         assertThat(original.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
 
-        DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
-        assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(2);
+        final var collection = ClusterEventPeriodical.prepareCollection(mongoConnection, objectMapperProvider);
+        assertThat(collection.getNamespace().getCollectionName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
+        assertThat(collection.listIndexes()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
@@ -299,10 +299,10 @@ public class ClusterEventPeriodicalTest {
         final DB database = mongoConnection.getDatabase();
         database.getCollection(ClusterEventPeriodical.COLLECTION_NAME).drop();
         assertThat(database.collectionExists(ClusterEventPeriodical.COLLECTION_NAME)).isFalse();
-        DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
+        final var collection = ClusterEventPeriodical.prepareCollection(mongoConnection, objectMapperProvider);
 
-        assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(2);
+        assertThat(collection.getNamespace().getCollectionName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
+        assertThat(collection.listIndexes()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 

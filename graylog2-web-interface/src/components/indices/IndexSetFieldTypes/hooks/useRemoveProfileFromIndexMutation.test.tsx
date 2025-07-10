@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -24,13 +24,6 @@ import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldT
 
 const urlPrefix = '/system/indices/mappings/remove_profile_from';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -53,7 +46,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
 
   it('should run fetch and display UserNotification', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve({}));
-    const { result, waitFor } = renderHook(() => useRemoveProfileFromIndexMutation(), { queryClientOptions: { logger } });
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 
     act(() => {
       result.current.removeProfileFromIndex(requestBody);
@@ -61,20 +54,25 @@ describe('useRemoveProfileFromIndexMutation', () => {
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-    await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Removed profile from index successfully', 'Success!'));
+    await waitFor(() =>
+      expect(UserNotification.success).toHaveBeenCalledWith('Removed profile from index successfully', 'Success!'),
+    );
   });
 
   it('should display notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderHook(() => useRemoveProfileFromIndexMutation(), { queryClientOptions: { logger } });
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 
     act(() => {
       result.current.removeProfileFromIndex(requestBody).catch(() => {});
     });
 
-    await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-      'Removing profile from index failed with status: Error: Error',
-      'Could not remove profile from index'));
+    await waitFor(() =>
+      expect(UserNotification.error).toHaveBeenCalledWith(
+        'Removing profile from index failed with status: Error: Error',
+        'Could not remove profile from index',
+      ),
+    );
   });
 });

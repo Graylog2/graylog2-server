@@ -20,10 +20,10 @@ import type Immutable from 'immutable';
 
 import type { Sort } from 'stores/PaginationTypes';
 
-const getStreamDataWarehouseTableElements = PluginStore.exports('dataWarehouse')?.[0]?.getStreamDataWarehouseTableElements;
+const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 
 const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineColumnPermitted: boolean) => {
-  const streamDataWarehouseTableElements = getStreamDataWarehouseTableElements?.(permissions);
+  const streamDataLakeTableElements = getStreamDataLakeTableElements?.(permissions);
 
   const defaultLayout = {
     entityTableId: 'streams',
@@ -33,7 +33,7 @@ const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineC
       'title',
       'index_set_title',
       'archiving',
-      ...streamDataWarehouseTableElements?.attributeName ? [streamDataWarehouseTableElements.attributeName] : [],
+      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
       'rules',
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
       'outputs',
@@ -45,7 +45,7 @@ const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineC
     'title',
     'index_set_title',
     'archiving',
-    ...streamDataWarehouseTableElements?.attributeName ? [streamDataWarehouseTableElements.attributeName] : [],
+    ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
     'rules',
     ...(isPipelineColumnPermitted ? ['pipelines'] : []),
     'outputs',
@@ -60,7 +60,7 @@ const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineC
     ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
     { id: 'outputs', title: 'Outputs' },
     { id: 'archiving', title: 'Archiving' },
-    ...(streamDataWarehouseTableElements?.attributes || []),
+    ...(streamDataLakeTableElements?.attributes || []),
   ];
 
   return {

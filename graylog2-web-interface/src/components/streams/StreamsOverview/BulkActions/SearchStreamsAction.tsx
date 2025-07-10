@@ -17,18 +17,19 @@
 
 import * as React from 'react';
 
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import SearchLink from 'views/logic/search/SearchLink';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
-const buildSearchLink = (streamIds: Array<string>) => SearchLink.builder()
-  .timerange(DEFAULT_TIMERANGE)
-  .query(createElasticsearchQueryString())
-  .streams(streamIds)
-  .build()
-  .toURL();
+const buildSearchLink = (streamIds: Array<string>) =>
+  SearchLink.builder()
+    .timerange(DEFAULT_TIMERANGE)
+    .query(createElasticsearchQueryString())
+    .streams(streamIds)
+    .build()
+    .toURL();
 
 const SearchStreamsAction = () => {
   const { selectedEntities } = useSelectedEntities();

@@ -15,23 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { ConfigurationField } from 'components/configurationforms';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const KEY_PREFIX = ['outputs', 'types'];
 export const keyFn = () => [...KEY_PREFIX];
 
 export type AvailableOutputRequestedConfiguration = {
-  [key: string]: ConfigurationField,
+  [key: string]: ConfigurationField;
 };
 export type AvailableOutputSummary = {
   human_name: string;
-  requested_configuration: AvailableOutputRequestedConfiguration,
+  requested_configuration: AvailableOutputRequestedConfiguration;
   link_to_docs: string;
   name: string;
   type: string;
@@ -49,32 +49,30 @@ export const fetchOutputsTypes = () => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useAvailableOutputTypes = ({ enabled }: Options = { enabled: true }): {
-  data: AvailableOutputTypes,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useAvailableOutputTypes = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: AvailableOutputTypes;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(),
-    () => fetchOutputsTypes(),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream outputs failed with status: ${errorThrown}`,
-          'Could not load stream outputs');
-      },
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(),
 
-  return ({
+    queryFn: () =>
+      defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useAvailableOutputTypes;

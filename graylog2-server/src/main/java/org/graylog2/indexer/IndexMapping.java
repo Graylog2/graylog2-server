@@ -33,7 +33,7 @@ import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
  * Representing the message type mapping in Elasticsearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  */
-public abstract class IndexMapping implements IndexMappingTemplate {
+public abstract class IndexMapping extends AbstractMapping {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
@@ -57,12 +57,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                                     final CustomFieldMappings customFieldMappings) {
         var settings = new Template.Settings(Map.of(
                 "index", Map.of(
-                        "analysis", Map.of("analyzer", analyzerKeyword())
+                        "analysis", analysisSettings()
                 )
         ));
         var mappings = mapping(analyzer, customFieldMappings);
 
         return createTemplate(indexPattern, order, settings, mappings);
+    }
+
+    public Map<String, Object> analysisSettings() {
+        return Map.of("analyzer", analyzerKeyword());
     }
 
     Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
@@ -110,6 +114,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
+                .put(Message.FIELD_GL2_ORIGINAL_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
                 .put(FIELD_GL2_MESSAGE_ID, notAnalyzedString())
@@ -169,9 +174,5 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     private Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
-    }
-
-    protected String dateFormat() {
-        return Constants.ES_DATE_FORMAT;
     }
 }

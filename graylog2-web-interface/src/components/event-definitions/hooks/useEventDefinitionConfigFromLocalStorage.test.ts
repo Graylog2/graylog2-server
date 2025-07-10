@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import asMock from 'helpers/mocking/AsMock';
@@ -40,10 +40,10 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   it('return data with conditions part when function, field and value exist', async () => {
     Store.set('session-id', urlConfigWithAgg);
 
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
-    await waitFor(() => expect(result.current).toEqual(
-      {
+    await waitFor(() =>
+      expect(result.current).toEqual({
         configFromLocalStorage: {
           conditions: {
             expression: {
@@ -57,11 +57,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
               },
             },
           },
-          group_by: [
-            'action',
-            'action',
-            'http_method',
-          ],
+          group_by: ['action', 'action', 'http_method'],
           query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
           query_parameters: [
             {
@@ -84,24 +80,21 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
               id: 'count-action',
             },
           ],
-          streams: [
-            'streamId-1',
-            'streamId-2',
-          ],
+          streams: ['streamId-1', 'streamId-2'],
           type: 'aggregation-v1',
         },
         hasLocalStorageConfig: true,
-      },
-    ));
+      }),
+    );
   });
 
   it('return data with conditions part when only function and value exist', async () => {
     Store.set('session-id', urlConfigWithFunctionAgg);
 
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
-    await waitFor(() => expect(result.current).toEqual(
-      {
+    await waitFor(() =>
+      expect(result.current).toEqual({
         configFromLocalStorage: {
           conditions: {
             expression: {
@@ -115,11 +108,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
               },
             },
           },
-          group_by: [
-            'action',
-            'action',
-            'http_method',
-          ],
+          group_by: ['action', 'action', 'http_method'],
           query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
           query_parameters: [
             {
@@ -141,23 +130,20 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
               id: 'count-undefined',
             },
           ],
-          streams: [
-            'streamId-1',
-            'streamId-2',
-          ],
+          streams: ['streamId-1', 'streamId-2'],
           type: 'aggregation-v1',
         },
         hasLocalStorageConfig: true,
-      },
-    ));
+      }),
+    );
   });
 
   it('return data without conditions part when function not exist', async () => {
     Store.set('session-id', urlConfigWithoutAgg);
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
-    await waitFor(() => expect(result.current).toEqual(
-      {
+    await waitFor(() =>
+      expect(result.current).toEqual({
         configFromLocalStorage: {
           group_by: [],
           query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
@@ -175,25 +161,22 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
             },
           ],
           search_within_ms: 300000,
-          streams: [
-            'streamId-1',
-            'streamId-2',
-          ],
+          streams: ['streamId-1', 'streamId-2'],
           type: 'aggregation-v1',
         },
         hasLocalStorageConfig: true,
-      },
-    ));
+      }),
+    );
   });
 
   it('return hasUrlConfig when no url config data', async () => {
-    const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
-    await waitFor(() => expect(result.current).toEqual(
-      {
+    await waitFor(() =>
+      expect(result.current).toEqual({
         configFromLocalStorage: undefined,
         hasLocalStorageConfig: false,
-      },
-    ));
+      }),
+    );
   });
 });

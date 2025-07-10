@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import suppressConsole from 'helpers/suppressConsole';
@@ -27,7 +27,6 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import MessageTable from './MessageTable';
 
-import { TableBody } from '../messagelist/MessageTableEntry';
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
@@ -50,113 +49,122 @@ const messages = [
       timestamp: '2018-09-26T12:42:49.234Z',
     },
   },
-
 ];
 const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
 const activeQueryId = 'some-query-id';
 
-const SimpleMessageTable = (props) => (
-  <MessageTable activeQueryId={activeQueryId}
-                config={config}
-                fields={Immutable.List(fields)}
-                messages={messages}
-                onSortChange={() => Promise.resolve()}
-                selectedFields={Immutable.Set()}
-                setLoadingState={() => {}}
-                {...props} />
+const SimpleMessageTable = (props: Partial<Pick<React.ComponentProps<typeof MessageTable>, 'config' | 'fields'>>) => (
+  <MessageTable
+    activeQueryId={activeQueryId}
+    config={config}
+    fields={Immutable.List(fields)}
+    messages={messages}
+    onSortChange={() => Promise.resolve()}
+    setLoadingState={() => {}}
+    scrollContainerRef={undefined}
+    {...props}
+  />
 );
 
-describe('MessageTable', () => {
-  it('lists provided field in table head', () => {
-    const wrapper = mount(<SimpleMessageTable />);
-    const th = wrapper.find('th').at(0);
+const highlightedStyle = 'border-left: 7px solid #45E5A8';
 
-    expect(th.text()).toContain('file_name');
+describe('MessageTable', () => {
+  it('lists provided field in table head', async () => {
+    render(<SimpleMessageTable />);
+
+    await screen.findByText(/file_name/i);
   });
 
-  it('renders a table entry for messages', () => {
-    const wrapper = mount(<SimpleMessageTable />);
-    const messageTableEntry = wrapper.find('MessageTableEntry');
-    const td = messageTableEntry.find('td').at(0);
+  it('renders a table entry for messages', async () => {
+    render(<SimpleMessageTable />);
 
-    expect(td.text()).toContain('frank.txt');
+    await screen.findByText(/frank.txt/i);
   });
 
   it('renders a table entry for messages, even if fields are `undefined`', async () => {
     // Suppressing console to disable props warning because of `fields` being `undefined`.
-    const wrapper = await suppressConsole(() => mount(<SimpleMessageTable fields={undefined} />));
+    await suppressConsole(() => render(<SimpleMessageTable fields={undefined} />));
 
-    const messageTableEntry = wrapper.find('MessageTableEntry');
-
-    expect(messageTableEntry).not.toBeEmptyRender();
+    await screen.findByText(/file_name/i);
   });
 
   it('renders config fields in table head with correct order', () => {
-    const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input', 'gl2_message_id', 'ingest_time', 'http_method', 'action', 'source', 'ingest_time_hour', 'ingest_time_epoch'];
+    const configFields = [
+      'gl2_receive_timestamp',
+      'user_id',
+      'gl2_source_input',
+      'gl2_message_id',
+      'ingest_time',
+      'http_method',
+      'action',
+      'source',
+      'ingest_time_hour',
+      'ingest_time_epoch',
+    ];
     const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
-    const wrapper = mount(<SimpleMessageTable config={configWithFields} />);
+    render(<SimpleMessageTable config={configWithFields} />);
 
-    const tableHeadFields = wrapper.find('Field').map((field) => field.text());
-
-    expect(tableHeadFields).toEqual(configFields);
+    configFields.forEach((field) => {
+      expect(screen.getByText(field)).toBeInTheDocument();
+    });
   });
 
   it('renders config fields in table head in non interactive mode', () => {
     const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input'];
     const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
-    const wrapper = mount(
+    render(
       <InteractiveContext.Provider value={false}>
         <SimpleMessageTable config={configWithFields} />
       </InteractiveContext.Provider>,
     );
 
-    const tableHeadFields = wrapper.find('Field').map((field) => field.text());
-
-    expect(tableHeadFields).toEqual(configFields);
+    configFields.forEach((field) => {
+      expect(screen.getByText(field)).toBeInTheDocument();
+    });
   });
 
-  it('highlights message with id passed in `HighlightMessageContext`', () => {
-    const wrapper = mount((
+  it('highlights message with id passed in `HighlightMessageContext`', async () => {
+    render(
       <HighlightMessageContext.Provider value="message-id-1">
         <SimpleMessageTable />
-      </HighlightMessageContext.Provider>
-    ));
+      </HighlightMessageContext.Provider>,
+    );
 
-    const highlightedMessage = wrapper.find(TableBody);
+    const message = await screen.findByText('frank.txt');
 
-    expect(highlightedMessage).toHaveProp('$highlighted', true);
+    expect(message.closest('tbody')).toHaveStyle(highlightedStyle);
   });
 
-  it('does not highlight non-existing message id', () => {
-    const wrapper = mount((
+  it('does not highlight non-existing message id', async () => {
+    render(
       <HighlightMessageContext.Provider value="message-id-42">
         <SimpleMessageTable />
-      </HighlightMessageContext.Provider>
-    ));
+      </HighlightMessageContext.Provider>,
+    );
 
-    const highlightedMessage = wrapper.find(TableBody);
+    const message = await screen.findByText('frank.txt');
 
-    expect(highlightedMessage).toHaveProp('$highlighted', false);
+    expect(message.closest('tbody')).not.toHaveStyle(highlightedStyle);
   });
 
-  it('shows sort icons next to table headers', () => {
-    const wrapper = mount(<SimpleMessageTable />);
+  it('shows sort icons next to table headers', async () => {
+    render(<SimpleMessageTable />);
 
-    const fieldHeader = wrapper.find('th');
+    await screen.findByText(/frank.txt/i);
 
-    expect(fieldHeader.find('FieldSortIcon')).toExist();
+    expect(screen.getByText('sort')).toBeInTheDocument();
   });
 
-  it('does not show sort icons in non-interactive context', () => {
-    const wrapper = mount((
+  it('does not show sort icons in non-interactive context', async () => {
+    render(
       <InteractiveContext.Provider value={false}>
         <SimpleMessageTable />
-      </InteractiveContext.Provider>
-    ));
+      </InteractiveContext.Provider>,
+    );
 
-    const fieldHeader = wrapper.find('th');
+    await screen.findByText(/frank.txt/i);
 
-    expect(fieldHeader.find('FieldSortIcon')).not.toExist();
+    expect(screen.queryByText('sort')).not.toBeInTheDocument();
   });
 });

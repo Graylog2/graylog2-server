@@ -22,12 +22,7 @@ import useMappedData from 'views/logic/valueactions/createEventDefinition/hooks/
 import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
 import { ActionContext } from 'views/logic/ActionContext';
 
-const CreateEventDefinition = ({
-  value,
-  field,
-  queryId,
-  onClose,
-}: ActionComponentProps) => {
+const CreateEventDefinition = ({ value, field, queryId, onClose }: ActionComponentProps) => {
   const contexts = useContext(ActionContext);
 
   const mappedData = useMappedData({ contexts, field, queryId, value });
@@ -38,7 +33,9 @@ const CreateEventDefinition = ({
     onClose();
   }, [onClose]);
 
-  return show ? <CreateEventDefinitionModal modalData={modalData} mappedData={mappedData} onClose={handleOnClose} show={show} /> : null;
+  return show ? (
+    <CreateEventDefinitionModal modalData={modalData} mappedData={mappedData} onClose={handleOnClose} show={show} />
+  ) : null;
 };
 
 export default CreateEventDefinition;

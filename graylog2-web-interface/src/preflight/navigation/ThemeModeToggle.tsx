@@ -26,18 +26,20 @@ import Icon from 'components/common/Icon';
 const ThemeModeToggleWrap = styled.div`
   display: flex;
   align-items: center;
-  gap: 6px
+  gap: 6px;
 `;
 
 type ModeIconProps = {
-  $currentMode: boolean,
-  name: React.ComponentProps<typeof Icon>['name'],
-  spin: boolean
+  $currentMode: boolean;
+  name: React.ComponentProps<typeof Icon>['name'];
+  spin: boolean;
 };
-const ModeIcon: React.ComponentType<ModeIconProps> = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
-  opacity: ${$currentMode ? '1' : '0.5'};
-  color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
-`);
+const ModeIcon: React.ComponentType<ModeIconProps> = styled(Icon)<{ $currentMode: boolean }>(
+  ({ theme, $currentMode }) => css`
+    opacity: ${$currentMode ? '1' : '0.5'};
+    color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+  `,
+);
 
 const ThemeModeToggle = () => {
   const theme = useTheme();
@@ -61,15 +63,21 @@ const ThemeModeToggle = () => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'progress_activity' : 'light_mode'}
-                spin={loadingLightMode}
-                $currentMode={currentMode === COLOR_SCHEME_LIGHT} />
-      <Switch checked={currentMode === COLOR_SCHEME_DARK}
-              disabled={loadingLightMode || loadingDarkMode}
-              onChange={toggleThemeMode} />
-      <ModeIcon name={loadingDarkMode ? 'progress_activity' : 'dark_mode'}
-                spin={loadingDarkMode}
-                $currentMode={currentMode === COLOR_SCHEME_DARK} />
+      <ModeIcon
+        name={loadingLightMode ? 'progress_activity' : 'light_mode'}
+        spin={loadingLightMode}
+        $currentMode={currentMode === COLOR_SCHEME_LIGHT}
+      />
+      <Switch
+        checked={currentMode === COLOR_SCHEME_DARK}
+        disabled={loadingLightMode || loadingDarkMode}
+        onChange={toggleThemeMode}
+      />
+      <ModeIcon
+        name={loadingDarkMode ? 'progress_activity' : 'dark_mode'}
+        spin={loadingDarkMode}
+        $currentMode={currentMode === COLOR_SCHEME_DARK}
+      />
     </ThemeModeToggleWrap>
   );
 };

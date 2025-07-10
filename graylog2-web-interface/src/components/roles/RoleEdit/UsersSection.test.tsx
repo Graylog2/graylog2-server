@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob, charlie } from 'fixtures/userOverviews';
 import mockAction from 'helpers/mocking/MockAction';
@@ -87,7 +87,11 @@ describe('UsersSection', () => {
 
     await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, { page: 1, perPage: 5, query: 'name of an assigned user' });
+    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, {
+      page: 1,
+      perPage: 5,
+      query: 'name of an assigned user',
+    });
   });
 
   it('should unassign a user', async () => {

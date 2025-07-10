@@ -1,0 +1,5 @@
+type="a"
+message="Added new Configuration to define default for restricting access tokens to admins only."
+
+issues=["21509"]
+pulls=["21619"]

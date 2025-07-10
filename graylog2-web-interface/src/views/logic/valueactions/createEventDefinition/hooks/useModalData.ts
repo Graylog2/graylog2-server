@@ -23,11 +23,13 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { useStore } from 'stores/connect';
 
 const useModalData = (mappedData) => {
-  const normalizedStreams: {[name: string]: Stream} = useStore(StreamsStore, ({ streams }) => streams.reduce((res, stream) => {
-    res[stream.id] = { id: stream.id, title: stream.title };
+  const normalizedStreams: { [name: string]: Stream } = useStore(StreamsStore, ({ streams }) =>
+    streams.reduce((res, stream) => {
+      res[stream.id] = { id: stream.id, title: stream.title };
 
-    return res;
-  }, {}));
+      return res;
+    }, {}),
+  );
 
   return useMemo<ModalData>(() => {
     const {

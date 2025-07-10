@@ -18,23 +18,26 @@
 package org.graylog.plugins.map.geoip;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 @AutoValue
 @JsonDeserialize(builder = GeoLocationInformation.Builder.class)
 public abstract class GeoLocationInformation {
-    private static final String FIELD_LATITUDE = "latitude";
-    private static final String FIELD_LONGITUDE = "longitude";
+    public static final String FIELD_LATITUDE = "latitude";
+    public static final String FIELD_LONGITUDE = "longitude";
     private static final String FIELD_COUNTRY_ISO_CODE = "country_iso_code";
     private static final String FIELD_COUNTRY_NAME = "country_name";
     private static final String FIELD_CITY_NAME = "city_name";
     private static final String FIELD_REGION = "region";
     private static final String FIELD_TIME_ZONE = "time_zone";
+    private static final String GEO_INDEXED_FIELD_PREFIX = "geo_";
 
     @Nullable
     @JsonProperty(FIELD_LATITUDE)
@@ -107,5 +110,18 @@ public abstract class GeoLocationInformation {
         }
 
         public abstract GeoLocationInformation build();
+    }
+
+    @JsonIgnore
+    public Map<String, Object> toIndexable() {
+        return Map.of(
+                GEO_INDEXED_FIELD_PREFIX + FIELD_LATITUDE, latitude(),
+                GEO_INDEXED_FIELD_PREFIX + FIELD_LONGITUDE, longitude(),
+                GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_ISO_CODE, countryIsoCode(),
+                GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_NAME, countryName(),
+                GEO_INDEXED_FIELD_PREFIX + FIELD_CITY_NAME, cityName(),
+                GEO_INDEXED_FIELD_PREFIX + FIELD_REGION, region(),
+                GEO_INDEXED_FIELD_PREFIX + FIELD_TIME_ZONE, timeZone()
+        );
     }
 }

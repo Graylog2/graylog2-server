@@ -22,8 +22,8 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
-import com.mongodb.DuplicateKeyException;
-import com.mongodb.MongoCommandException;
+import com.mongodb.MongoException;
+import org.graylog2.database.utils.MongoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,16 +33,20 @@ import java.util.concurrent.ExecutionException;
 /**
  * MongoDB upsert requests can fail when they are creating a new entry concurrently.
  * https://jira.mongodb.org/browse/SERVER-14322
- * This helper can be used to retry upserts if they throw a {@link DuplicateKeyException}
+ * This helper can be used to retry upserts if they throw a duplicate key error
+ *
+ * @deprecated This class should not be used anymore. It was intended for usage with MongoDB versions < 4.2 which are
+ * not supported for usage with Graylog anymore. Recent versions of MongoDB implement server-side retries for certain
+ * upsert scenarios.
  */
+@Deprecated(forRemoval = true)
 public class MongoDBUpsertRetryer {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBUpsertRetryer.class);
 
     public static <T> T run(Callable<T> c) {
         final Retryer<T> retryer = RetryerBuilder.<T>newBuilder()
-                .retryIfException(t -> t instanceof DuplicateKeyException && ((DuplicateKeyException) t).getErrorCode() == 11000 ||
-                        t instanceof MongoCommandException && ((MongoCommandException) t).getErrorCode() == 11000)
-                .withStopStrategy(StopStrategies.stopAfterAttempt(2))
+                .retryIfException(t -> t instanceof MongoException e && MongoUtils.isDuplicateKeyError(e))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
@@ -57,8 +61,8 @@ public class MongoDBUpsertRetryer {
         } catch (ExecutionException e) {
             throw new RuntimeException(e.getCause());
         } catch (RetryException e) {
-            if (e.getCause() instanceof DuplicateKeyException) {
-                throw (DuplicateKeyException) e.getCause();
+            if (e.getCause() instanceof RuntimeException re) {
+                throw re;
             }
             throw new RuntimeException(e.getCause());
         }

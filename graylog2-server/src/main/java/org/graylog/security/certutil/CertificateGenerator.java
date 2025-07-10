@@ -17,6 +17,8 @@
 package org.graylog.security.certutil;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -33,6 +35,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
@@ -40,11 +43,12 @@ import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 public class CertificateGenerator {
     public static KeyPair generate(CertRequest request) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen.initialize(4096);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
-        X500Name name = new X500Name("CN=" + request.cnName());
 
-        // TODO: cert serial number?
-        BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final X500Name name = getX500Name(request.cnName());
+
+        BigInteger serialNumber = new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16);
         Instant validFrom = Instant.now();
 
         Instant validUntil = validFrom.plus(request.validity());
@@ -83,5 +87,11 @@ public class CertificateGenerator {
         X509CertificateHolder certHolder = builder.build(signer);
         X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
         return new KeyPair(certKeyPair.getPrivate(), certKeyPair.getPublic(), cert);
+    }
+
+    private static X500Name getX500Name(String cname) {
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.CN, cname);
+        return builder.build();
     }
 }

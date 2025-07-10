@@ -16,12 +16,13 @@
  */
 package org.graylog2.migrations;
 
-import com.mongodb.DBCollection;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
+import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.users.UserImpl;
-import org.mongojack.DBSort;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 
@@ -40,9 +41,9 @@ public class V20230210102500_UniqueUserMigration extends Migration {
 
     @Override
     public void upgrade() {
-        DBCollection coll = mongoConnection.getDatabase().getCollection(UserImpl.COLLECTION_NAME);
+        MongoCollection<Document> coll = mongoConnection.getMongoDatabase().getCollection(UserImpl.COLLECTION_NAME);
 
         // NOOP, if index already exists
-        coll.createIndex(DBSort.asc(UserImpl.USERNAME), "unique_username", true);
+        coll.createIndex(Indexes.ascending(UserImpl.USERNAME), new IndexOptions().name("unique_username").unique(true));
     }
 }

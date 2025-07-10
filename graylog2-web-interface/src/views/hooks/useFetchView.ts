@@ -24,13 +24,20 @@ import { createFromFetchError } from 'logic/errors/ReportedErrors';
 const useFetchView = (viewId: string) => {
   const viewJsonPromise = useMemo(() => ViewManagementActions.get(viewId), [viewId]);
 
-  return useMemo(() => viewJsonPromise.then((viewJson) => ViewDeserializer(viewJson), (error) => {
-    if (error.status === 404) {
-      ErrorsActions.report(createFromFetchError(error));
-    }
+  return useMemo(
+    () =>
+      viewJsonPromise.then(
+        (viewJson) => ViewDeserializer(viewJson),
+        (error) => {
+          if (error.status === 404) {
+            ErrorsActions.report(createFromFetchError(error));
+          }
 
-    throw error;
-  }), [viewJsonPromise]);
+          throw error;
+        },
+      ),
+    [viewJsonPromise],
+  );
 };
 
 export default useFetchView;

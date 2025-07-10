@@ -25,15 +25,17 @@ import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserService;
-import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +53,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GRNExtension.class)
-@ExtendWith(TestUserServiceExtension.class)
 @MongoDBFixtures("MigrateUserPermissionsToGrantsTest.json")
 class UserPermissionsToGrantsMigrationTest {
     private UserPermissionsToGrantsMigration migration;
@@ -59,23 +60,23 @@ class UserPermissionsToGrantsMigrationTest {
     private GRNRegistry grnRegistry;
     private UserService userService;
     private int userSelfEditPermissionCount;
+    @Mock
     private ViewService viewService;
+    @Mock
+    private ClusterConfigService configService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-               GRNRegistry grnRegistry,
-               TestUserService userService,
-               @Mock ViewService viewService) {
+               GRNRegistry grnRegistry) {
 
         this.grnRegistry = grnRegistry;
-        this.viewService = viewService;
 
-        this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy").size();
+        //By default, only admins (having "*") are allowed to create tokens, thus 'false':
+        this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy", false).size();
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        this.userService = userService;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
+        this.userService = new TestUserService(mongodb.mongoConnection(), configService);
         migration = new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, viewService, "admin");
     }
 
@@ -88,11 +89,12 @@ class UserPermissionsToGrantsMigrationTest {
         when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(viewService.get("5c40ad603c034441a56943be")).thenReturn(Optional.of(view1));
         when(viewService.get("5c40ad603c034441a56943c0")).thenReturn(Optional.of(view2));
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         User testuser1 = userService.load("testuser1");
         assertThat(testuser1).isNotNull();
 
-        assertThat(testuser1.getPermissions().size()).isEqualTo(11 + userSelfEditPermissionCount);
+        assertThat(testuser1.getPermissions()).hasSize(11 + userSelfEditPermissionCount);
         assertThat(dbGrantService.getForGranteesOrGlobal(ImmutableSet.of(grnRegistry.ofUser(testuser1)))).isEmpty();
 
         migration.upgrade();
@@ -107,12 +109,12 @@ class UserPermissionsToGrantsMigrationTest {
         assertGrantInSet(grants, "grn::::search:5c40ad603c034441a56943c0", Capability.VIEW);
         assertGrantInSet(grants, "grn::::event_definition:5c40ad603c034441a56942bf", Capability.MANAGE);
         assertGrantInSet(grants, "grn::::event_definition:5c40ad603c034441a56942c0", Capability.VIEW);
-        assertThat(grants.size()).isEqualTo(8);
+        assertThat(grants).hasSize(8);
 
         // reload user and check that all migrated permissions have been removed
         testuser1 = userService.load("testuser1");
         assertThat(testuser1).isNotNull();
-        assertThat(testuser1.getPermissions().size()).isEqualTo(userSelfEditPermissionCount);
+        assertThat(testuser1.getPermissions()).hasSize(userSelfEditPermissionCount);
     }
 
     @Test
@@ -121,7 +123,9 @@ class UserPermissionsToGrantsMigrationTest {
         User testuser2 = userService.load("testuser2");
         assertThat(testuser2).isNotNull();
 
-        assertThat(testuser2.getPermissions().size()).isEqualTo(6 + userSelfEditPermissionCount);
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        assertThat(testuser2.getPermissions()).hasSize(6 + userSelfEditPermissionCount);
         assertThat(dbGrantService.getForGranteesOrGlobal(ImmutableSet.of(grnRegistry.ofUser(testuser2)))).isEmpty();
 
         migration.upgrade();
@@ -129,12 +133,12 @@ class UserPermissionsToGrantsMigrationTest {
         // check created grants for testuser2
         final ImmutableSet<GrantDTO> grants = dbGrantService.getForGranteesOrGlobal(ImmutableSet.of(grnRegistry.ofUser(testuser2)));
         assertGrantInSet(grants, "grn::::dashboard:5e2afc66cd19517ec2dabadf", Capability.MANAGE);
-        assertThat(grants.size()).isEqualTo(1);
+        assertThat(grants).hasSize(1);
 
         // reload user and check that all migrated permissions have been removed. (should be only two less)
         testuser2 = userService.load("testuser2");
         assertThat(testuser2).isNotNull();
-        assertThat(testuser2.getPermissions().size()).isEqualTo(4 + userSelfEditPermissionCount);
+        assertThat(testuser2.getPermissions()).hasSize(4 + userSelfEditPermissionCount);
     }
 
 

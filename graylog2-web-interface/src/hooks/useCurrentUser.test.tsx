@@ -23,10 +23,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 describe('useCurrentUser', () => {
   it('should return value of CurrentUserContext', () => {
-    const Wrapper = ({ children }: {children: React.ReactNode}) => (
-      <CurrentUserContext.Provider value={adminUser}>
-        {children}
-      </CurrentUserContext.Provider>
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
+      <CurrentUserContext.Provider value={adminUser}>{children}</CurrentUserContext.Provider>
     );
 
     const { result } = renderHook(() => useCurrentUser(), { wrapper: Wrapper });
@@ -35,8 +33,8 @@ describe('useCurrentUser', () => {
   });
 
   it('should throw error when being used outside of CurrentUserContext.Provider', () => {
-    const result = renderHook(() => useCurrentUser());
-
-    expect(result.result.error).toEqual(new Error('useCurrentUser hook needs to be used inside CurrentUserContext.Provider'));
+    expect(() => renderHook(() => useCurrentUser())).toThrow(
+      'useCurrentUser hook needs to be used inside CurrentUserContext.Provider',
+    );
   });
 });

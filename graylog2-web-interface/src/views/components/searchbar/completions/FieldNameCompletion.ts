@@ -28,10 +28,10 @@ import type { CompletionResult, Token } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 export type Suggestion = Readonly<{
-  name: string,
+  name: string;
   type: Readonly<{
-    type: string,
-  }>,
+    type: string;
+  }>;
 }>;
 
 const _fieldResult = (field: Suggestion, score: number = 1, valuePosition: boolean = false): CompletionResult => {
@@ -52,7 +52,7 @@ export const existsOperator: Suggestion = {
   },
 };
 
-const _matchesFieldName = (prefix: string) => (field: Readonly<{ name: string, type: Readonly<{type: string}> }>) => {
+const _matchesFieldName = (prefix: string) => (field: Readonly<{ name: string; type: Readonly<{ type: string }> }>) => {
   const result = field.name.indexOf(prefix);
 
   if (result < 0) {
@@ -63,7 +63,15 @@ const _matchesFieldName = (prefix: string) => (field: Readonly<{ name: string, t
   return result === 0 ? 2 : 1;
 };
 
-const shouldShowSuggestions = ({ tokens, currentTokenIdx, prefix }: { tokens: Array<Token>, currentTokenIdx: number, prefix: string }) => {
+const shouldShowSuggestions = ({
+  tokens,
+  currentTokenIdx,
+  prefix,
+}: {
+  tokens: Array<Token>;
+  currentTokenIdx: number;
+  prefix: string;
+}) => {
   const currentToken = tokens[currentTokenIdx];
   const prevToken = tokens[currentTokenIdx - 1] ?? null;
 
@@ -73,17 +81,13 @@ const shouldShowSuggestions = ({ tokens, currentTokenIdx, prefix }: { tokens: Ar
 
   if (isTypeTerm(currentToken)) {
     if (
-      (isCompleteFieldName(prevToken) && !isExistsOperator(prevToken))
-      || getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx)
+      (isCompleteFieldName(prevToken) && !isExistsOperator(prevToken)) ||
+      getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx)
     ) {
       return false;
     }
 
-    if (
-      !prevToken
-      || isSpace(prevToken)
-      || isExistsOperator(prevToken)
-    ) {
+    if (!prevToken || isSpace(prevToken) || isExistsOperator(prevToken)) {
       return true;
     }
   }
@@ -114,9 +118,11 @@ class FieldNameCompletion implements Completer {
     const fieldsToMatchIn = valuePosition
       ? [...currentQueryFields.toArray()]
       : [...this.staticSuggestions, ...currentQueryFields.toArray()];
-    const currentQuery = fieldsToMatchIn.filter((field) => (matchesFieldName(field) > 0))
+    const currentQuery = fieldsToMatchIn
+      .filter((field) => matchesFieldName(field) > 0)
       .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
-    const allFields = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
+    const allFields = allButInCurrent
+      .filter((field) => matchesFieldName(field) > 0)
       .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 

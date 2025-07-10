@@ -20,11 +20,21 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 type Props = {
-  text: string,
-}
+  text: string;
+};
+
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node instanceof HTMLAnchorElement && node.getAttribute('href')) {
+    node.setAttribute('target', '_blank');
+    node.setAttribute('rel', 'noopener noreferrer');
+  }
+});
 
 const Markdown = ({ text }: Props) => {
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '')), [text]);
+  // Remove dangerous HTML
+  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
+  // Remove dangerous markdown
+  const markdown = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
 
   // eslint-disable-next-line react/no-danger
   return <div dangerouslySetInnerHTML={{ __html: markdown }} />;

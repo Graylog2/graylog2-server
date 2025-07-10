@@ -30,14 +30,14 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  table: LookupTable,
-  cache: LookupTableCache,
-  dataAdapter: LookupTableAdapter,
+  table: LookupTable;
+  cache: LookupTableCache;
+  dataAdapter: LookupTableAdapter;
   errors?: {
-    table: string,
-    cache: string,
-    dataAdapter: string,
-  },
+    table: string;
+    cache: string;
+    dataAdapter: string;
+  };
 };
 
 const Actions = styled(ButtonToolbar)`
@@ -47,7 +47,16 @@ const Actions = styled(ButtonToolbar)`
   justify-content: flex-start;
 `;
 
-const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
+const LUTTableEntry = ({
+  table,
+  cache,
+  dataAdapter,
+  errors = {
+    table: null,
+    cache: null,
+    dataAdapter: null,
+  },
+}: Props) => {
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
 
@@ -60,9 +69,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
     });
 
     // eslint-disable-next-line no-alert
-    const shouldDelete = window.confirm(
-      `Are you sure you want to delete lookup table "${table.title}"?`,
-    );
+    const shouldDelete = window.confirm(`Are you sure you want to delete lookup table "${table.title}"?`);
 
     if (shouldDelete) {
       LookupTablesActions.delete(table.id).then(() => {
@@ -79,17 +86,13 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
     <tbody>
       <tr>
         <td>
-          {errors.table && (
-            <ErrorPopover placement="right" errorText={errors.table} title="Lookup Table problem" />
-          )}
+          {errors.table && <ErrorPopover placement="right" errorText={errors.table} title="Lookup Table problem" />}
           <Link to={Routes.SYSTEM.LOOKUPTABLES.show(table.name)}>{table.title}</Link>
         </td>
         <td>{table.description}</td>
         <td>{table.name}</td>
         <td>
-          {errors.cache && (
-            <ErrorPopover placement="bottom" errorText={errors.cache} title="Cache problem" />
-          )}
+          {errors.cache && <ErrorPopover placement="bottom" errorText={errors.cache} title="Cache problem" />}
           <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
         </td>
         <td>
@@ -99,35 +102,24 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
         </td>
         <td>
-          {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
-            <Actions>
-              <Button bsSize="xsmall"
-                      onClick={handleEdit}
-                      role="button"
-                      name="edit_square">
-                Edit
-              </Button>
-              <Button bsSize="xsmall"
-                      bsStyle="danger"
-                      onClick={handleDelete}
-                      role="button"
-                      name="delete">
-                Delete
-              </Button>
-            </Actions>
+          {loadingScopePermissions ? (
+            <Spinner />
+          ) : (
+            scopePermissions.is_mutable && (
+              <Actions>
+                <Button bsSize="xsmall" onClick={handleEdit} role="button" name="edit_square">
+                  Edit
+                </Button>
+                <Button bsSize="xsmall" bsStyle="danger" onClick={handleDelete} role="button" name="delete">
+                  Delete
+                </Button>
+              </Actions>
+            )
           )}
         </td>
       </tr>
     </tbody>
   );
-};
-
-LUTTableEntry.defaultProps = {
-  errors: {
-    table: null,
-    cache: null,
-    dataAdapter: null,
-  },
 };
 
 export default LUTTableEntry;

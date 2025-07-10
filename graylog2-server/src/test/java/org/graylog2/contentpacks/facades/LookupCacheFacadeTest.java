@@ -53,6 +53,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -137,7 +138,9 @@ public class LookupCacheFacadeTest {
                         ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
                 ), JsonNode.class))
                 .build();
-        assertThat(cacheService.findAll()).isEmpty();
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).isEmpty();
+        }
 
         final NativeEntity<CacheDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
         final NativeEntityDescriptor descriptor = nativeEntity.descriptor();
@@ -150,7 +153,9 @@ public class LookupCacheFacadeTest {
         assertThat(cacheDto.description()).isEqualTo("No-op cache");
         assertThat(cacheDto.config().type()).isEqualTo("none");
 
-        assertThat(cacheService.findAll()).hasSize(1);
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).hasSize(1);
+        }
     }
 
     @Test
@@ -235,11 +240,15 @@ public class LookupCacheFacadeTest {
     public void delete() {
         final Optional<CacheDto> cacheDto = cacheService.get("5adf24b24b900a0fdb4e52dd");
 
-        assertThat(cacheService.findAll()).hasSize(1);
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).hasSize(1);
+        }
         cacheDto.ifPresent(facade::delete);
 
         assertThat(cacheService.get("5adf24b24b900a0fdb4e52dd")).isEmpty();
-        assertThat(cacheService.findAll()).isEmpty();
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).isEmpty();
+        }
     }
 
     @Test

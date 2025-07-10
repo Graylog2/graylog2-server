@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import type { Pagination } from 'stores/PaginationTypes';
 import DataTable from 'components/common/DataTable';
@@ -31,7 +30,7 @@ const DEFAULT_PAGINATION = {
 };
 
 const _paginatedRows = (rows: Array<unknown>, perPage: number, currentPage: number) => {
-  const begin = (perPage * (currentPage - 1));
+  const begin = perPage * (currentPage - 1);
   const end = begin + perPage;
 
   return rows.slice(begin, end);
@@ -39,57 +38,59 @@ const _paginatedRows = (rows: Array<unknown>, perPage: number, currentPage: numb
 
 type Props = {
   /** DataTable class */
-  className?: string,
-  /** Object key that should be used to display data in the data filter input. */
-  displayKey?: string,
+  className?: string;
   /**
    * Function that renders a row in the table. It receives two arguments: the row, and its index.
    * It usually returns a `<tr>` element with the formatted row.
    */
-  dataRowFormatter: (row: unknown) => React.ReactNode,
-  /** Label to use next to the suggestions for the data filter input. */
-  filterBy?: string,
+  dataRowFormatter: (row: unknown) => React.ReactElement;
   /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
-  filterKeys?: Array<string>,
-  /** Label to use next to the data filter input. */
-  filterLabel?: string,
+  filterKeys?: Array<string>;
   /**
    * Function that renders a single header cell in the table. It receives two arguments: the header, and its index.
    * It usually returns a `<th>` element with the header.
    * Default will wrap the headers in a <th> tag.
    */
-  headerCellFormatter?: (header: string) => React.ReactNode,
+  headerCellFormatter?: (header: string) => React.ReactElement;
   /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
-  headers: Array<string>
+  headers: Array<string>;
   /** Element id to use in the table container */
-  id: string,
+  id: string;
   /** Text or element to show when there is no data. */
-  noDataText?: React.ReactNode,
+  noDataText?: React.ReactNode;
   /** Initial pagination. */
-  pagination: Pagination,
+  pagination?: Pagination;
   /** Adds a custom class to the row element. */
-  rowClassName?: string,
+  rowClassName?: string;
   /** Array of objects to be rendered in the table. The render of those values is controlled by `dataRowFormatter`. */
-  rows: Array<unknown>,
+  rows: Array<unknown>;
   /**
    * Indicates whether the table should use a bootstrap responsive table or not:
    * https://getbootstrap.com/docs/3.3/css/#tables-responsive
    *
    * The main reason to disable this is if the table is clipping a dropdown menu or another component in a table edge.
    */
-  useResponsiveTable?: boolean,
+  useResponsiveTable?: boolean;
 };
 
 type DataTablePagination = {
-  perPage: number,
-  page: number,
+  perPage: number;
+  page: number;
 };
 
 /**
  * Component that renders a paginated data table. Should only be used for lists which are not already paginated.
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
-const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, id, ...rest }: Props) => {
+const PaginatedDataTable = ({
+  // eslint-disable-next-line react/require-default-props
+  rows = [],
+  pagination: initialPagination = DEFAULT_PAGINATION,
+  filterKeys = undefined,
+  id,
+  useResponsiveTable = false,
+  ...rest
+}: Props) => {
   const [{ perPage, page }, setPagination] = useState<DataTablePagination>(initialPagination);
   const [filteredRows, setFilteredRows] = useState(rows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
@@ -99,7 +100,7 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
     setPagination(initialPagination);
   }, [rows, initialPagination]);
 
-  const _onPageChange = (newPage, newPerPage) => {
+  const _onPageChange = (newPage: number, newPerPage: number) => {
     setPagination({ page: newPage, perPage: newPerPage });
   };
 
@@ -108,44 +109,30 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
   };
 
   return (
-    <PaginatedList totalItems={filteredRows.length}
-                   pageSize={perPage}
-                   activePage={page}
-                   onChange={_onPageChange}
-                   showPageSizeSelect
-                   useQueryParameter={false}>
-      <DataTable {...rest}
-                 id={id}
-                 customFilter={(
-                   <Filter id={id}
-                           filterKeys={filterKeys}
-                           setFilteredRows={setFilteredRows}
-                           rows={rows}
-                           resetPagination={_resetPagination}
-                           displayKey={displayKey}
-                           filterBy={filterBy}
-                           filterLabel={filterLabel} />
-                 )}
-                 rows={paginatedRows} />
+    <PaginatedList
+      totalItems={filteredRows.length}
+      pageSize={perPage}
+      activePage={page}
+      onChange={_onPageChange}
+      showPageSizeSelect
+      useQueryParameter={false}>
+      <DataTable
+        {...rest}
+        useResponsiveTable={useResponsiveTable}
+        id={id}
+        customFilter={
+          <Filter
+            id={id}
+            filterKeys={filterKeys}
+            setFilteredRows={setFilteredRows}
+            rows={rows}
+            resetPagination={_resetPagination}
+          />
+        }
+        rows={paginatedRows}
+      />
     </PaginatedList>
   );
-};
-
-PaginatedDataTable.defaultProps = {
-  className: undefined,
-  displayKey: undefined,
-  filterBy: undefined,
-  filterKeys: undefined,
-  filterLabel: 'Filter',
-  headerCellFormatter: undefined,
-  noDataText: undefined,
-  pagination: DEFAULT_PAGINATION,
-  rowClassName: undefined,
-  useResponsiveTable: false,
-};
-
-PaginatedDataTable.propTypes = {
-  pagination: PropTypes.object,
 };
 
 export default PaginatedDataTable;

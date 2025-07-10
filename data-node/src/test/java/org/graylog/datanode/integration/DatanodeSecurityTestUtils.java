@@ -22,36 +22,20 @@ import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.graylog2.security.TruststoreCreator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 public class DatanodeSecurityTestUtils {
-    public static KeyStore buildTruststore(FilesystemKeystoreInformation ca) throws IOException, GeneralSecurityException {
-        try (FileInputStream fis = new FileInputStream(ca.location().toFile())) {
-
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(fis, ca.password());
-
-            KeyStore trustStore = KeyStore.getInstance("PKCS12");
-            trustStore.load(null, null);
-
-            final Enumeration<String> aliases = caKeystore.aliases();
-            while (aliases.hasMoreElements()) {
-                final String alias = aliases.nextElement();
-                final Certificate cert = caKeystore.getCertificate(alias);
-                if (cert instanceof final X509Certificate x509Certificate) {
-                    trustStore.setCertificateEntry(alias, x509Certificate);
-                }
-            }
-            return trustStore;
-        }
+    public static KeyStore buildTruststore(KeystoreInformation ca) throws IOException, GeneralSecurityException {
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newEmpty();
+        truststoreCreator.addCertificates(ca);
+        return truststoreCreator.getTruststore();
     }
 
     public static FilesystemKeystoreInformation generateCa(Path dir) {
@@ -61,14 +45,14 @@ public class DatanodeSecurityTestUtils {
                 .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, password);
         final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
         command.run();
-        return new FilesystemKeystoreInformation(certPath, password);
+        return new FilesystemKeystoreInformation(certPath, password.toCharArray());
     }
 
     public static FilesystemKeystoreInformation generateTransportCert(Path dir, FilesystemKeystoreInformation ca, String... containerHostnames) {
         final Path transportPath = dir.resolve("transport-" + RandomStringUtils.randomAlphabetic(10) + ".p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         TestableConsole inputCert = TestableConsole.empty().silent()
-                .register(CertutilCert.PROMPT_ENTER_CA_PASSWORD, ca.passwordAsString())
+                .register(CertutilCert.PROMPT_ENTER_CA_PASSWORD, new String(ca.password()))
                 .register(CertutilCert.PROMPT_ENTER_CERTIFICATE_PASSWORD, password)
                 .register(CertutilCert.PROMPT_ENTER_CERT_ALTERNATIVE_NAMES, String.join(",", containerHostnames));
         CertutilCert certutilCert = new CertutilCert(
@@ -76,7 +60,7 @@ public class DatanodeSecurityTestUtils {
                 transportPath.toAbsolutePath().toString(),
                 inputCert);
         certutilCert.run();
-        return new FilesystemKeystoreInformation(transportPath, password);
+        return new FilesystemKeystoreInformation(transportPath, password.toCharArray());
     }
 
     public static FilesystemKeystoreInformation generateHttpCert(Path dir, FilesystemKeystoreInformation ca, String... containerHostnames) {
@@ -84,7 +68,7 @@ public class DatanodeSecurityTestUtils {
         final String password = RandomStringUtils.randomAlphabetic(10);
         TestableConsole inputHttp = TestableConsole.empty().silent()
                 .register(CertutilHttp.PROMPT_USE_OWN_CERTIFICATE_AUTHORITY, "n")
-                .register(CertutilHttp.PROMPT_ENTER_CA_PASSWORD, ca.passwordAsString())
+                .register(CertutilHttp.PROMPT_ENTER_CA_PASSWORD, new String(ca.password()))
                 .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_VALIDITY_IN_DAYS, "90")
                 .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES, String.join(",", containerHostnames))
                 .register(CertutilHttp.PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD, password);
@@ -93,6 +77,6 @@ public class DatanodeSecurityTestUtils {
                 httpPath.toAbsolutePath().toString(),
                 inputHttp);
         certutilCert.run();
-        return new FilesystemKeystoreInformation(httpPath, password);
+        return new FilesystemKeystoreInformation(httpPath, password.toCharArray());
     }
 }

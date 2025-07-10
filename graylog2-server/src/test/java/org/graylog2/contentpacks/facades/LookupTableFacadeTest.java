@@ -190,7 +190,9 @@ public class LookupTableFacadeTest {
         final Map<EntityDescriptor, Object> nativeEntities = ImmutableMap.of(
                 cacheDescriptor, cacheDto,
                 dataAdapterDescriptor, dataAdapterDto);
-        assertThat(lookupTableService.findAll()).isEmpty();
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         final NativeEntity<LookupTableDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
 
@@ -205,7 +207,9 @@ public class LookupTableFacadeTest {
         assertThat(nativeEntity.entity().defaultMultiValue()).isEqualTo("Default multi value");
         assertThat(nativeEntity.entity().defaultMultiValueType()).isEqualTo(LookupDefaultValue.Type.OBJECT);
 
-        assertThat(lookupTableService.findAll()).hasSize(1);
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
     }
 
     @Test
@@ -333,10 +337,14 @@ public class LookupTableFacadeTest {
     public void delete() {
         final Optional<LookupTableDto> lookupTableDto = lookupTableService.get("5adf24dd4b900a0fdb4e530d");
 
-        assertThat(lookupTableService.findAll()).hasSize(1);
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
         lookupTableDto.ifPresent(facade::delete);
 
-        assertThat(lookupTableService.findAll()).isEmpty();
+        try (var stream = lookupTableService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
         assertThat(lookupTableService.get("5adf24dd4b900a0fdb4e530d")).isEmpty();
     }
 

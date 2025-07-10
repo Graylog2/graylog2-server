@@ -21,6 +21,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -45,7 +46,7 @@ class TrafficCounterServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider objectMapperProvider) {
-        service = new TrafficCounterService(mongodb.mongoConnection(), objectMapperProvider);
+        service = new TrafficCounterService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
     }
 
     static DateTime getDayBucket(DateTime time) {
@@ -62,16 +63,13 @@ class TrafficCounterServiceTest {
             final DateTime today = getDayBucket(now);
 
             // Record traffic for each hour of the current day - 9 hours (it's 08:20, so we are in the 9th hour of the day)
-            IntStream.rangeClosed(0, now.hourOfDay().get()).forEach(hour -> {
-                service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1);
-            });
+            IntStream.rangeClosed(0, now.hourOfDay().get()).forEach(hour ->
+                    service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1));
 
             // Record traffic for all previous days - 30 x 24 hours
-            IntStream.rangeClosed(1, 30).forEach(day -> {
-                IntStream.rangeClosed(0, 23).forEach(hour -> {
-                    service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1);
-                });
-            });
+            IntStream.rangeClosed(1, 30).forEach(day ->
+                    IntStream.rangeClosed(0, 23).forEach(hour ->
+                            service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1)));
 
             // Verify that today is included from the histogram.
             final TrafficCounterService.TrafficHistogram trafficHistogramIncludesToday =
@@ -132,19 +130,16 @@ class TrafficCounterServiceTest {
             final DateTime today = getDayBucket(now);
 
             // Record traffic for each hour of the current day (now)
-            IntStream.rangeClosed(0, now.hourOfDay().get()).forEach(hour -> {
-                service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1);
-            });
+            IntStream.rangeClosed(0, now.hourOfDay().get()).forEach(hour ->
+                    service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1));
 
             // Record traffic for all previous days
-            IntStream.rangeClosed(1, 30).forEach(day -> {
-                IntStream.rangeClosed(0, 23).forEach(hour -> {
-                    service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1);
-                });
-            });
+            IntStream.rangeClosed(1, 30).forEach(day ->
+                    IntStream.rangeClosed(0, 23).forEach(hour ->
+                            service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1)));
 
             final TrafficCounterService.TrafficHistogram histogramIncludesToday =
-                    service.clusterTrafficOfLastDays( Duration.standardDays(30), TrafficCounterService.Interval.HOURLY, true);
+                    service.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.HOURLY, true);
             assertThat(histogramIncludesToday.from()).isEqualTo(getDayBucket(now).minusDays(30));
             assertThat(histogramIncludesToday.to()).isEqualTo(now);
 
@@ -155,7 +150,7 @@ class TrafficCounterServiceTest {
             verifyHourTraffic(histogramIncludesToday, 729);
 
             final TrafficCounterService.TrafficHistogram histogramExcludesToday =
-                    service.clusterTrafficOfLastDays( Duration.standardDays(30), TrafficCounterService.Interval.HOURLY, false);
+                    service.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.HOURLY, false);
             assertThat(histogramExcludesToday.from()).isEqualTo(getDayBucket(now).minusDays(30));
             assertThat(histogramExcludesToday.to()).isEqualTo(getDayBucket(now).minusMillis(1));
 

@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 import { asMock } from 'helpers/mocking';
 import mockHistory from 'helpers/mocking/mockHistory';
+import selectEvent from 'helpers/selectEvent';
 
 import ServiceSelect from './ServiceSelect';
 
@@ -47,7 +47,9 @@ describe('ServiceSelect', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')));
+    await waitFor(() =>
+      expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')),
+    );
   });
 
   it('should redirect correctly after selecting active directory', async () => {
@@ -61,6 +63,10 @@ describe('ServiceSelect', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory')));
+    await waitFor(() =>
+      expect(history.push).toHaveBeenCalledWith(
+        Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory'),
+      ),
+    );
   });
 });

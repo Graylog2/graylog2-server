@@ -44,8 +44,4 @@ function TeamsNotificationSummary({ notification, ...restProps }: TeamsNotificat
   );
 }
 
-TeamsNotificationSummary.defaultProps = {
-  notification: {},
-};
-
 export default TeamsNotificationSummary;

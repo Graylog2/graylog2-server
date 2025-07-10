@@ -19,6 +19,7 @@ package org.graylog2.bootstrap.preflight;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import org.graylog2.database.MongoConnection;
 
 import jakarta.inject.Inject;
@@ -41,14 +42,14 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
     }
 
     @Override
-    public PreflightConfig setConfigResult(PreflightConfigResult result) {
-        getCollection()
+    public ConfigResultState setConfigResult(PreflightConfigResult result) {
+        final WriteResult writeResult = getCollection()
                 .update(new BasicDBObject("type", "preflight_result"),
                         new BasicDBObject("$set", new BasicDBObject("value", result)),
                         true,
                         false
                 );
-        return new PreflightConfig(result);
+        return writeResult.isUpdateOfExisting() ? ConfigResultState.UPDATED : ConfigResultState.CREATED;
     }
 
     @Override

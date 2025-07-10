@@ -22,13 +22,27 @@ const MessageFormatter = {
   formatMessageSummary(messageSummary) {
     const { message } = messageSummary;
 
-    return this.formatMessage(message._id, messageSummary.index, message, message, messageSummary.highlight_ranges, messageSummary.decoration_stats);
+    return this.formatMessage(
+      message._id,
+      messageSummary.index,
+      message,
+      message,
+      messageSummary.highlight_ranges,
+      messageSummary.decoration_stats,
+    );
   },
 
   formatResultMessage(resultMessage) {
     const { message } = resultMessage;
 
-    return this.formatMessage(message.id, resultMessage.index, message, message.fields, resultMessage.highlight_ranges, resultMessage.decoration_stats);
+    return this.formatMessage(
+      message.id,
+      resultMessage.index,
+      message,
+      message.fields,
+      resultMessage.highlight_ranges,
+      resultMessage.decoration_stats,
+    );
   },
 
   formatMessage(id, index, message, fields, highlightRanges, decorationStats) {

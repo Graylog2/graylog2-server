@@ -25,9 +25,10 @@ import { createWidget } from 'views/logic/WidgetTestHelpers';
 import GenerateNextPosition from './GenerateNextPosition';
 
 describe('GenerateNextPosition', () => {
-  PluginStore.exports = (key: keyof PluginExports) => ({
-    enterpriseWidgets: [{ ...createWidget('MESSAGES'), defaultHeight: 5, defaultWidth: 6 }],
-  }[key]);
+  PluginStore.exports = (key: keyof PluginExports) =>
+    ({
+      enterpriseWidgets: [{ ...createWidget('MESSAGES'), defaultHeight: 5, defaultWidth: 6 }],
+    })[key];
 
   it('should add a new widget to the first row and column', () => {
     const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
@@ -41,12 +42,7 @@ describe('GenerateNextPosition', () => {
   it('should add a new widget to the first row and column to other widgets', () => {
     const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
     const oldMessageList = Widget.builder().id('foo').type('MESSAGES').build();
-    const oldWidgetPosition = WidgetPosition.builder()
-      .col(1)
-      .row(1)
-      .width(3)
-      .height(8)
-      .build();
+    const oldWidgetPosition = WidgetPosition.builder().col(1).row(1).width(3).height(8).build();
     const widgets = [newMessageList, oldMessageList];
     const positions = Immutable.Map({ foo: oldWidgetPosition });
     const newPositions = GenerateNextPosition(positions, widgets);

@@ -29,7 +29,7 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraWidgetActionsWithoutMenu = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
+const ExtraWidgetActionsWithoutMenu = ({ ...props }: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
   <TestStoreProvider>
     <OriginalExtraWidgetActions {...props} />
   </TestStoreProvider>
@@ -105,14 +105,18 @@ describe('ExtraWidgetActions', () => {
 
     await userEvent.click(menuItem);
 
-    await waitFor(() => expect(dummyActionWhichIsNotHidden.action)
-      .toHaveBeenCalledWith(widget, expect.objectContaining({
-        widgetFocusContext: expect.objectContaining({
-          focusedWidget: undefined,
-          setWidgetFocusing: expect.any(Function),
-          setWidgetEditing: expect.any(Function),
+    await waitFor(() =>
+      expect(dummyActionWhichIsNotHidden.action).toHaveBeenCalledWith(
+        widget,
+        expect.objectContaining({
+          widgetFocusContext: expect.objectContaining({
+            focusedWidget: undefined,
+            setWidgetFocusing: expect.any(Function),
+            setWidgetEditing: expect.any(Function),
+          }),
         }),
-      })));
+      ),
+    );
   });
 
   it('renders divider if at least one action is present', async () => {

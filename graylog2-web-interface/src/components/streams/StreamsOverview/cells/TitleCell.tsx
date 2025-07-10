@@ -24,7 +24,7 @@ import { Label } from 'components/bootstrap';
 import { Text } from 'components/common';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -32,14 +32,20 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
-const StyledText = styled(Text)(({ theme }) => css`
-  color: ${theme.colors.gray[50]};
-`);
+const StyledText = styled(Text)(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[50]};
+  `,
+);
 
 const TitleCell = ({ stream }: Props) => (
   <>
     <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-    {stream.is_default && <DefaultLabel bsStyle="primary" bsSize="xsmall">Default</DefaultLabel>}
+    {stream.is_default && (
+      <DefaultLabel bsStyle="primary" bsSize="xsmall">
+        Default
+      </DefaultLabel>
+    )}
     <StyledText>{stream.description}</StyledText>
   </>
 );

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing text color of bar labels in bar chart, which are displayed outside of a bar."
+
+issues = ["20789"]
+pulls = ["20948"]

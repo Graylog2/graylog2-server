@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import type { SyntheticEvent } from 'react';
 
 import Button from 'components/bootstrap/Button';
@@ -25,97 +26,106 @@ import Spinner from 'components/common/Spinner';
 import ModalButtonToolbar from 'components/common/ModalButtonToolbar';
 
 type WithCancelProps = {
-  displayCancel: true,
-  disabledCancel?: boolean,
-  onCancel: () => void,
-}
+  displayCancel?: true;
+  disabledCancel?: boolean;
+  onCancel: () => void;
+};
 
 type WithoutCancelProps = {
-  displayCancel: false
-}
+  displayCancel?: false;
+};
 
 type WithAsyncSubmit = {
-  isAsyncSubmit: true,
-  submitLoadingText: string,
-  isSubmitting: boolean,
-}
+  isAsyncSubmit?: true;
+  submitLoadingText: string;
+  isSubmitting: boolean;
+};
 
 type WithSyncSubmit = {
-  isAsyncSubmit: false,
-}
+  isAsyncSubmit?: false;
+};
 
 type Props = {
-  bsSize?: 'large' | 'small' | 'xsmall',
-  className?: string,
-  disabledSubmit?: boolean,
-  displayCancel?: boolean,
-  formId?: string,
-  isAsyncSubmit?: boolean,
-  isSubmitting?: boolean,
-  leftCol?: React.ReactNode,
-  onSubmit?: (event?: SyntheticEvent) => void,
-  submitButtonText: React.ReactNode,
-  submitButtonType?: 'submit' | 'button',
-  submitIcon?: IconName,
-} & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
+  autoFocus?: boolean;
+  bsSize?: 'large' | 'small' | 'xsmall';
+  className?: string;
+  disabledSubmit?: boolean;
+  displayCancel?: boolean;
+  formId?: string;
+  isAsyncSubmit?: boolean;
+  isSubmitting?: boolean;
+  leftCol?: React.ReactNode;
+  onSubmit?: (event?: SyntheticEvent) => void;
+  submitButtonText: React.ReactNode;
+  submitButtonType?: 'submit' | 'button';
+  submitIcon?: IconName;
+} & (WithCancelProps | WithoutCancelProps) &
+  (WithAsyncSubmit | WithSyncSubmit);
 
-const ModalSubmit = (props: Props) => {
+// @ts-expect-error
+const isWithCancelProps = (props: Props): props is WithCancelProps =>
+  props.displayCancel === undefined || props.displayCancel === true;
+// @ts-expect-error
+const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
+
+const ModalSubmit = ({ ...props }: Props) => {
   const {
-    isAsyncSubmit,
+    autoFocus = false,
     bsSize,
     className,
-    displayCancel,
-    disabledSubmit,
+    disabledSubmit = false,
     formId,
     leftCol,
     onSubmit,
     submitButtonText,
-    submitButtonType,
+    submitButtonType = 'submit',
     submitIcon,
   } = props;
 
   const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
+  const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
+  const confirmRef = useRef<HTMLButtonElement>();
+  useEffect(() => {
+    if (autoFocus && !disabledSubmit && confirmRef.current) {
+      confirmRef.current.focus();
+    }
+    // Should only run once during mount to avoid refocussing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ModalButtonToolbar className={className}>
       {leftCol}
-      {displayCancel && (
-        <Button type="button"
-                bsSize={bsSize}
-                onClick={props.onCancel}
-                title="Cancel"
-                aria-label="Cancel"
-                disabled={props.disabledCancel || (isAsyncSubmit && props.isSubmitting)}>
+      {isWithCancelProps(props) && (
+        <Button
+          type="button"
+          bsSize={bsSize}
+          onClick={props.onCancel}
+          title="Cancel"
+          aria-label="Cancel"
+          disabled={props.disabledCancel || submittingAsync}>
           Cancel
         </Button>
       )}
-      <Button bsStyle="success"
-              bsSize={bsSize}
-              disabled={disabledSubmit || (isAsyncSubmit && props.isSubmitting)}
-              form={formId}
-              title={title}
-              aria-label={title}
-              type={submitButtonType}
-              onClick={onSubmit}>
-        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
-        {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
+      <Button
+        ref={confirmRef}
+        bsStyle="success"
+        bsSize={bsSize}
+        disabled={disabledSubmit || submittingAsync}
+        form={formId}
+        title={title}
+        aria-label={title}
+        type={submitButtonType}
+        onClick={onSubmit}>
+        {submitIcon && !submittingAsync && (
+          <>
+            <Icon name={submitIcon} />{' '}
+          </>
+        )}
+        {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
     </ModalButtonToolbar>
   );
-};
-
-ModalSubmit.defaultProps = {
-  bsSize: undefined,
-  className: undefined,
-  disabledSubmit: false,
-  displayCancel: true,
-  isAsyncSubmit: false,
-  formId: undefined,
-  isSubmitting: false,
-  leftCol: undefined,
-  onSubmit: undefined,
-  submitButtonType: 'submit',
-  submitIcon: undefined,
 };
 
 export default ModalSubmit;

@@ -101,7 +101,7 @@ public class JsonParsingErrorsIT {
     @ContainerMatrixTest
     void extractsReferencePathFromMissingProperty() {
         assertErrorResponse(STREAMS, "{}")
-                .body("reference_path", equalTo("org.graylog2.rest.resources.streams.requests.CreateStreamRequest"));
+                .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
 
         assertErrorResponse(STREAMS, """
                 {
@@ -109,10 +109,7 @@ public class JsonParsingErrorsIT {
                     "rules": [{}]
                 }
                 """)
-                .body("reference_path", equalTo(
-                        "org.graylog2.rest.resources.streams.requests.CreateStreamRequest[\"rules\"]" +
-                                "->java.util.ArrayList[0]" +
-                                "->org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest"));
+                .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
     }
 
     @ContainerMatrixTest
@@ -143,7 +140,7 @@ public class JsonParsingErrorsIT {
                     "foo": 23
                 }
                 """)
-                .body("message", equalTo("Unable to map property foo.\nKnown properties include: parameters, id, queries"))
+                .body("message", equalTo("Unable to map property foo.\nKnown properties include: parameters, id, queries, skip_no_streams_check"))
                 .body("line", equalTo(2))
                 .body("column", equalTo(14))
                 .body("path", equalTo("foo"))

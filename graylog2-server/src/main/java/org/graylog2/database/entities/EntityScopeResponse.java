@@ -26,20 +26,23 @@ import java.util.Objects;
 public abstract class EntityScopeResponse {
 
     private static final String FIELD_IS_MUTABLE = "is_mutable";
+    private static final String FIELD_IS_DELETABLE = "is_deletable";
 
 
     @JsonProperty(FIELD_IS_MUTABLE)
     public abstract boolean mutable();
 
+    @JsonProperty(FIELD_IS_DELETABLE)
+    public abstract boolean deletable();
+
     @JsonCreator
-    public static EntityScopeResponse create(@JsonProperty(FIELD_IS_MUTABLE) boolean mutable) {
-        return new AutoValue_EntityScopeResponse(mutable);
+    public static EntityScopeResponse create(@JsonProperty(FIELD_IS_MUTABLE) boolean mutable,
+                                             @JsonProperty(FIELD_IS_DELETABLE) boolean deletable) {
+        return new AutoValue_EntityScopeResponse(mutable, deletable);
     }
 
     public static EntityScopeResponse of(EntityScope scope) {
-
         Objects.requireNonNull(scope, "Entity Scope must not be null");
-
-        return create(scope.isMutable());
+        return create(scope.isMutable(), scope.isDeletable());
     }
 }

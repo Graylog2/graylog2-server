@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { Telemetry } from '@graylog/server-api';
 
@@ -22,32 +22,35 @@ const TELEMETRY_CLUSTER_INFO_QUERY_KEY = 'telemetry.cluster.info';
 
 export type TelemetryDataType = {
   current_user?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   user_telemetry_settings?: {
-    [key: string]: boolean,
-  },
+    [key: string]: boolean;
+  };
   cluster?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   license?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   plugin?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   search_cluster?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   data_nodes?: {
-    data_nodes_count: number,
-  }
-}
+    data_nodes_count: number;
+  };
+};
 
-const useTelemetryData = () => useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get() as Promise<TelemetryDataType>, {
-  retry: 0,
-  keepPreviousData: true,
-  notifyOnChangeProps: ['data', 'error'],
-});
+const useTelemetryData = () =>
+  useQuery({
+    queryKey: [TELEMETRY_CLUSTER_INFO_QUERY_KEY],
+    queryFn: () => Telemetry.get() as Promise<TelemetryDataType>,
+    retry: 0,
+    placeholderData: keepPreviousData,
+    notifyOnChangeProps: ['data', 'error'],
+  });
 
 export default useTelemetryData;

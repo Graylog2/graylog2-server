@@ -20,9 +20,9 @@ import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 type Props = {
-  messageIndex: string | undefined,
-  messageId: string,
-}
+  messageIndex: string | undefined;
+  messageId: string;
+};
 
 const MessagePermalinkButton = ({ messageIndex, messageId }: Props) => {
   const messageUrl = messageIndex ? Routes.message_show(messageIndex, messageId) : '#';

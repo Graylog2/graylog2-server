@@ -21,7 +21,7 @@ import type SharedEntity from 'logic/permissions/SharedEntity';
 export type GRN = string;
 
 export type GRNType =
-  'user'
+  | 'user'
   | 'team'
   | 'dashboard'
   | 'event_definition'
@@ -32,27 +32,27 @@ export type GRNType =
   | 'search_filter';
 
 export type CapabilityType = {
-  id: GRN,
-  title: 'Viewer' | 'Manager' | 'Owner',
+  id: GRN;
+  title: 'Viewer' | 'Manager' | 'Owner';
 };
 
 export type GranteeType = {
-  id: GRN,
-  title: string,
-  type: 'global' | 'team' | 'user' | 'error',
+  id: GRN;
+  title: string;
+  type: 'global' | 'team' | 'user' | 'error';
 };
 
 export type ActiveShareType = {
-  grant: GRN,
-  grantee: GRN,
-  capability: GRN,
+  grant: GRN;
+  grantee: GRN;
+  capability: GRN;
 };
 
 export type SharedEntityType = {
-  id: GRN,
-  owners: Array<GranteeType>,
-  title: string,
-  type: string,
+  id: GRN;
+  owners: Array<GranteeType>;
+  title: string;
+  type: string;
 };
 
 export type SharedEntities = Immutable.List<SharedEntity>;

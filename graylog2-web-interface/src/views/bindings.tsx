@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import get from 'lodash/get';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { WidgetComponentProps } from 'views/types';
@@ -56,9 +55,14 @@ import {
   StreamSearchPage,
   EventDefinitionReplaySearchPage,
   EventReplaySearchPage,
+  BulkEventReplayPage,
 } from 'views/pages';
-import AddMessageCountActionHandler, { CreateMessageCount } from 'views/logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler, { CreateMessagesWidget } from 'views/logic/fieldactions/AddMessageTableActionHandler';
+import AddMessageCountActionHandler, {
+  CreateMessageCount,
+} from 'views/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler, {
+  CreateMessagesWidget,
+} from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import AddCustomAggregation, { CreateCustomAggregation } from 'views/logic/creatoractions/AddCustomAggregation';
@@ -102,7 +106,9 @@ import ChangeFieldType, {
   ChangeFieldTypeHelp,
   isChangeFieldTypeEnabled,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
-import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
+import AddEventsWidgetActionHandler, {
+  CreateEventsWidget,
+} from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
 import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
 import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
@@ -110,6 +116,11 @@ import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
 import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
+import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
+import AddTextWidget, { CreateTextWidget } from 'views/logic/creatoractions/AddTextWidget';
+import TextWidget from 'views/logic/widgets/TextWidget';
+import TextVisualization from 'views/components/widgets/text/TextVisualization';
+import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -139,7 +150,8 @@ VisualizationConfig.registerSubtype(ScatterVisualization.type, ScatterVisualizat
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
-const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
+const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) =>
+  analysisDisabledFields.includes(field);
 
 const exports: PluginExports = {
   pages: {
@@ -161,8 +173,17 @@ const exports: PluginExports = {
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
-    { path: Routes.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
-    { path: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId'), component: EventDefinitionReplaySearchPage, parentComponent: App },
+    {
+      path: Routes.unqualified.ALERTS.replay_search(':alertId'),
+      component: EventReplaySearchPage,
+      parentComponent: App,
+    },
+    { path: Routes.unqualified.ALERTS.BULK_REPLAY_SEARCH, component: BulkEventReplayPage, parentComponent: App },
+    {
+      path: Routes.unqualified.ALERTS.DEFINITIONS.replay_search(':definitionId'),
+      component: EventDefinitionReplaySearchPage,
+      parentComponent: App,
+    },
   ],
   enterpriseWidgets: [
     {
@@ -188,10 +209,8 @@ const exports: PluginExports = {
       editComponent: AggregationWizard,
       hasEditSubmitButton: true,
       needsControlledHeight: (widget: Widget) => {
-        const widgetVisualization = get(widget, 'config.visualization');
-        const flexibleHeightWidgets = [
-          DataTable.type,
-        ];
+        const widgetVisualization = widget?.config?.visualization;
+        const flexibleHeightWidgets = [DataTable.type];
 
         return !flexibleHeightWidgets.find((visualization) => visualization === widgetVisualization);
       },
@@ -221,6 +240,19 @@ const exports: PluginExports = {
       titleGenerator: () => EventsWidget.defaultTitle,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data?.[0],
+    },
+    {
+      type: 'TEXT',
+      displayName: 'Text (Markdown) Widget',
+      defaultHeight: 3,
+      defaultWidth: 3,
+      hasEditSubmitButton: false,
+      visualizationComponent: TextVisualization,
+      editComponent: TextWidgetEdit,
+      searchTypes: () => [],
+      titleGenerator: () => TextWidget.defaultTitle,
+      needsControlledHeight: () => false,
+      searchResultTransformer: () => ({}),
     },
     {
       type: 'default',
@@ -262,21 +294,18 @@ const exports: PluginExports = {
       type: 'aggregate',
       title: 'Show top values',
       thunk: AggregateActionHandler,
-      isEnabled: (({
-        field,
-        type,
-        contexts: { analysisDisabledFields },
-      }) => (!isFunction(field) && type.isEnumerable() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
+        !isFunction(field) &&
+        type.isEnumerable() &&
+        !type.isDecorated() &&
+        !isAnalysisDisabled(field, analysisDisabledFields),
       resetFocus: true,
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({
-        field,
-        type,
-        contexts: { analysisDisabledFields },
-      }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
+        !isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields),
       thunk: FieldStatisticsHandler,
       resetFocus: false,
     },
@@ -300,14 +329,14 @@ const exports: PluginExports = {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       thunk: AddToAllTablesActionHandler,
-      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       thunk: RemoveFromAllTablesActionHandler,
-      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
     {
@@ -326,75 +355,89 @@ const exports: PluginExports = {
       help: ChangeFieldTypeHelp,
     },
   ],
-  valueActions: filterCloudValueActions([
-    {
-      type: 'exclude',
-      title: 'Exclude from results',
-      thunk: ExcludeFromQueryHandler,
-      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
-      resetFocus: false,
-    },
-    {
-      type: 'add-to-query',
-      title: 'Add to query',
-      thunk: AddToQueryHandler,
-      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
-      resetFocus: false,
-    },
-    {
-      type: 'show-bucket',
-      title: 'Show documents for value',
-      thunk: ShowDocumentsHandler,
-      isEnabled: ShowDocumentsHandler.isEnabled,
-      resetFocus: true,
-    },
-    {
-      type: 'create-extractor',
-      title: 'Create extractor',
-      isEnabled: ({ type, contexts }) => (!!contexts.message && !type.isDecorated() && !!contexts.isLocalNode),
-      component: SelectExtractorType,
-      resetFocus: false,
-    },
-    {
-      type: 'highlight-value',
-      title: 'Highlight this value',
-      thunk: HighlightValueHandler,
-      isEnabled: HighlightValueHandler.isEnabled,
-      resetFocus: false,
-    },
-    {
-      type: 'copy-value-to-clipboard',
-      title: 'Copy value to clipboard',
-      handler: CopyValueToClipboard,
-      isEnabled: () => true,
-      resetFocus: false,
-    },
-    {
-      type: 'create-event-definition-from-value',
-      title: 'Create event definition',
-      isEnabled: () => true,
-      resetFocus: false,
-      component: CreateEventDefinition,
-    },
-  ], ['create-extractor']),
+  valueActions: filterCloudValueActions(
+    [
+      {
+        type: 'exclude',
+        title: 'Exclude from results',
+        thunk: ExcludeFromQueryHandler,
+        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        resetFocus: false,
+      },
+      {
+        type: 'add-to-query',
+        title: 'Add to query',
+        thunk: AddToQueryHandler,
+        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        resetFocus: false,
+      },
+      {
+        type: 'show-bucket',
+        title: 'Show documents for value',
+        thunk: ShowDocumentsHandler,
+        isEnabled: ShowDocumentsHandler.isEnabled,
+        resetFocus: true,
+      },
+      {
+        type: 'create-extractor',
+        title: 'Create extractor',
+        isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
+        component: SelectExtractorType,
+        resetFocus: false,
+      },
+      {
+        type: 'highlight-value',
+        title: 'Highlight this value',
+        thunk: HighlightValueHandler,
+        isEnabled: HighlightValueHandler.isEnabled,
+        resetFocus: false,
+      },
+      {
+        type: 'copy-value-to-clipboard',
+        title: 'Copy value to clipboard',
+        handler: CopyValueToClipboard,
+        isEnabled: () => true,
+        resetFocus: false,
+      },
+      {
+        type: 'create-event-definition-from-value',
+        title: 'Create event definition',
+        isEnabled: () => true,
+        resetFocus: false,
+        component: CreateEventDefinition,
+      },
+    ],
+    ['create-extractor'],
+  ),
+  fieldTypeValueRenderer: FieldTypeValueRenderer,
   visualizationTypes: visualizationBindings,
-  widgetCreators: [{
-    title: 'Message Count',
-    func: CreateMessageCount,
-    icon: () => <Icon name="tag" />,
-  }, {
-    title: 'Message Table',
-    func: CreateMessagesWidget,
-    icon: () => <Icon name="list" />,
-  }, {
-    title: 'Custom Aggregation',
-    func: CreateCustomAggregation,
-    icon: () => <Icon name="monitoring" />,
-  }, {
-    title: 'Events Overview',
-    func: CreateEventsWidget,
-    icon: () => <Icon name="report" type="regular" />,
-  }],
+  widgetCreators: [
+    {
+      title: 'Message Count',
+      func: CreateMessageCount,
+      icon: () => <Icon name="tag" />,
+    },
+    {
+      title: 'Message Table',
+      func: CreateMessagesWidget,
+      icon: () => <Icon name="list" />,
+    },
+    {
+      title: 'Custom Aggregation',
+      func: CreateCustomAggregation,
+      icon: () => <Icon name="monitoring" />,
+    },
+    {
+      title: 'Events Overview',
+      func: CreateEventsWidget,
+      icon: () => <Icon name="report" type="regular" />,
+    },
+    {
+      title: 'Text (Markdown) Widget',
+      func: CreateTextWidget,
+      icon: () => <Icon name="description" />,
+    },
+  ],
   creators: [
     {
       type: 'preset',
@@ -416,18 +459,20 @@ const exports: PluginExports = {
       title: 'Events Overview',
       func: AddEventsWidgetActionHandler,
     },
+    {
+      type: 'generic',
+      title: 'Text (Markdown) Widget',
+      func: AddTextWidget,
+    },
   ],
-  'views.completers': [
-    new FieldNameCompletion(),
-    new FieldValueCompletion(),
-    new OperatorCompletion(),
-  ],
-  'views.hooks.loadingView': [
-    requirementsProvided,
-    bindSearchParamsFromQuery,
-  ],
+  'views.completers': [new FieldNameCompletion(), new FieldValueCompletion(), new OperatorCompletion()],
+  'views.hooks.loadingView': [requirementsProvided, bindSearchParamsFromQuery],
   'views.elements.header': [
-    () => <IfSearch><MigrateFieldCharts /></IfSearch>,
+    () => (
+      <IfSearch>
+        <MigrateFieldCharts />
+      </IfSearch>
+    ),
     ViewHeader,
   ],
   'views.export.formats': [

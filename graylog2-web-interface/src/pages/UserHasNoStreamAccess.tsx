@@ -28,8 +28,8 @@ const UserHasNoStreamAccess = () => (
       <Row className="content">
         <Col md={12}>
           <Alert bsStyle="warning">
-            We cannot start a search right now, because you are not allowed to access any stream.
-            If you feel this is an error, please contact your administrator.
+            We cannot start a search right now, because you are not allowed to access any stream. If you feel this is an
+            error, please contact your administrator.
           </Alert>
         </Col>
       </Row>

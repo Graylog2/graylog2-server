@@ -22,6 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import BulkActions from './BulkActions';
 
@@ -36,18 +37,20 @@ jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 describe('SavedSearches BulkActions', () => {
   const openActionsDropdown = async () => {
-    await userEvent.click(await screen.findByRole('button', {
-      name: /bulk actions/i,
-    }));
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /bulk actions/i,
+      }),
+    );
   };
 
   const deleteSavedSearch = async () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
   };
 
-  beforeEach(() => {
-    window.confirm = jest.fn(() => true);
+  useWindowConfirmMock();
 
+  beforeEach(() => {
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: [],
       setSelectedEntities: () => {},
@@ -76,22 +79,22 @@ describe('SavedSearches BulkActions', () => {
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 saved searches?');
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/views/bulk_delete'),
-      { entity_ids: ['saved-search-id-1', 'saved-search-id-2'] },
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+        entity_ids: ['saved-search-id-1', 'saved-search-id-2'],
+      }),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('2 saved searches were deleted successfully.', 'Success');
     expect(setSelectedEntities).toHaveBeenCalledWith([]);
   });
 
   it('should display warning and not reset saved searches which could not be deleted', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve({
-      failures: [
-        { entity_id: 'saved-search-id-1', failure_explanation: 'The saved search cannot be deleted.' },
-      ],
-    }));
+    asMock(fetch).mockReturnValue(
+      Promise.resolve({
+        failures: [{ entity_id: 'saved-search-id-1', failure_explanation: 'The saved search cannot be deleted.' }],
+      }),
+    );
 
     const setSelectedEntities = jest.fn();
 
@@ -110,11 +113,11 @@ describe('SavedSearches BulkActions', () => {
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 saved searches?');
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/views/bulk_delete'),
-      { entity_ids: ['saved-search-id-1', 'saved-search-id-2'] },
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+        entity_ids: ['saved-search-id-1', 'saved-search-id-2'],
+      }),
+    );
 
     expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected saved searches could not be deleted.');
     expect(setSelectedEntities).toHaveBeenCalledWith(['saved-search-id-1']);

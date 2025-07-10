@@ -15,42 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
 
 import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
 import StopPropagation from 'views/components/common/StopPropagation';
+import { widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
 
 type Props = {
-  children: React.ReactNode,
-  element: React.ReactNode,
-  'data-testid'?: string,
-  header?: string,
+  children: React.ReactNode;
+  element: React.ReactNode;
+  'data-testid'?: string;
+  header?: string;
 };
 
-const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header }: Props) => (
-  <StopPropagation data-testid={dataTestid}>
-    <Menu position="bottom" withinPortal>
-      <Menu.Target>
-        {element}
-      </Menu.Target>
-      <Menu.Dropdown>
-        <MenuItem header>{header}</MenuItem>
-        {children}
-      </Menu.Dropdown>
-    </Menu>
-  </StopPropagation>
-);
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefined, header = 'Actions' }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-ActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-  element: PropTypes.node.isRequired,
-  'data-testid': PropTypes.string,
-};
+  const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
-ActionDropdown.defaultProps = {
-  'data-testid': undefined,
-  header: 'Actions',
+  return (
+    <StopPropagation data-testid={dataTestid}>
+      <span className={isOpen ? widgetActionsDropdownOpenClass : ''}>
+        <Menu position="bottom" withinPortal onChange={toggleIsOpen}>
+          <Menu.Target>{element}</Menu.Target>
+          <Menu.Dropdown>
+            <MenuItem header>{header}</MenuItem>
+            {children}
+          </Menu.Dropdown>
+        </Menu>
+      </span>
+    </StopPropagation>
+  );
 };
 
 export default ActionDropdown;

@@ -27,7 +27,7 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraMenuWidgetActions = (props: React.ComponentProps<typeof OriginalExtraMenuWidgetActions>) => (
+const ExtraMenuWidgetActions = ({ ...props }: React.ComponentProps<typeof OriginalExtraMenuWidgetActions>) => (
   <TestStoreProvider>
     <OriginalExtraMenuWidgetActions {...props} />
   </TestStoreProvider>
@@ -38,7 +38,11 @@ describe('ExtraMenuWidgetActions', () => {
   const dummyActionWithoutIsHidden: WidgetActionType = {
     position: 'menu',
     type: 'dummy-action',
-    component: ({ disabled }) => <button type="button" title="dummy action" disabled={disabled}>dummy action</button>,
+    component: ({ disabled }) => (
+      <button type="button" title="dummy action" disabled={disabled}>
+        dummy action
+      </button>
+    ),
   };
   const dummyActionWhichIsHidden = {
     ...dummyActionWithoutIsHidden,

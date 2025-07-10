@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
 
@@ -32,16 +32,16 @@ import useLocation from 'routing/useLocation';
 import type { SelectCallback } from 'components/bootstrap/types';
 
 type PluginSectionLinkProps = {
-  configType: string,
-  displayName: string,
-}
+  configType: string;
+  displayName: string;
+};
 
 const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) => {
   const absolutePath = useResolvedPath(configType);
   const location = useLocation();
 
-  const isActive = URI(location.pathname).equals(absolutePath.pathname)
-    || location.pathname.startsWith(absolutePath.pathname);
+  const isActive =
+    URI(location.pathname).equals(absolutePath.pathname) || location.pathname.startsWith(absolutePath.pathname);
 
   return (
     <LinkContainer key={`plugin-nav-${configType}`} to={configType}>
@@ -55,7 +55,14 @@ const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) 
 const PluginsConfig = () => {
   const [activeSectionKey, setActiveSectionKey] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
-  const pluginSystemConfigs = usePluginEntities('systemConfigurations');
+  const originalPluginSystemConfigs = usePluginEntities('systemConfigurations');
+  const pluginSystemConfigs = useMemo(
+    () =>
+      originalPluginSystemConfigs.filter(
+        (config) => typeof config?.useCondition !== 'function' || config.useCondition(),
+      ),
+    [originalPluginSystemConfigs],
+  );
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
   useEffect(() => {
@@ -77,10 +84,7 @@ const PluginsConfig = () => {
   return (
     <>
       <Col md={2}>
-        <Nav bsStyle="pills"
-             stacked
-             activeKey={activeSectionKey}
-             onSelect={setActiveSectionKey as SelectCallback}>
+        <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={setActiveSectionKey as SelectCallback}>
           {pluginSystemConfigs.map(({ displayName, configType }) => {
             const name = displayName || configType;
 
@@ -91,18 +95,21 @@ const PluginsConfig = () => {
       <Col md={8} lg={5}>
         <Routes>
           <Route path="/" element={<Navigate to={pluginSystemConfigs[0].configType} replace />} />
-          {pluginSystemConfigs
-            .map(({ component: SystemConfigComponent, configType }) => (
-              <Route path={configType}
-                     key={configType}
-                     element={(
-                       <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
-                         <SystemConfigComponent key={`system-configuration-${configType}`}
-                                                config={getConfig(configType, configuration) ?? undefined}
-                                                updateConfig={onUpdate(configType)} />
-                       </ConfigletContainer>
-              )} />
-            ))}
+          {pluginSystemConfigs.map(({ component: SystemConfigComponent, configType }) => (
+            <Route
+              path={configType}
+              key={configType}
+              element={
+                <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
+                  <SystemConfigComponent
+                    key={`system-configuration-${configType}`}
+                    config={getConfig(configType, configuration) ?? undefined}
+                    updateConfig={onUpdate(configType)}
+                  />
+                </ConfigletContainer>
+              }
+            />
+          ))}
         </Routes>
       </Col>
     </>

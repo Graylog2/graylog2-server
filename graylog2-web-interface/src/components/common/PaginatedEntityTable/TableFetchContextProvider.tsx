@@ -22,23 +22,30 @@ import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import TableFetchContext from './TableFetchContext';
 
 type Props = React.PropsWithChildren<{
-  attributes: Array<Attribute>,
-  refetch: () => void,
-  searchParams: SearchParams,
-}>
+  attributes: Array<Attribute>;
+  refetch: () => void;
+  searchParams: SearchParams;
+  entityTableId: string;
+}>;
 
-const TableFetchContextProvider = ({ children, searchParams, refetch, attributes }: Props) => {
-  const contextValue = useMemo(() => ({
-    searchParams,
-    refetch,
-    attributes,
-  }), [searchParams, refetch, attributes]);
-
-  return (
-    <TableFetchContext.Provider value={contextValue}>
-      {children}
-    </TableFetchContext.Provider>
+const TableFetchContextProvider = ({
+  children = undefined,
+  searchParams,
+  refetch,
+  attributes,
+  entityTableId,
+}: Props) => {
+  const contextValue = useMemo(
+    () => ({
+      searchParams,
+      refetch,
+      attributes,
+      entityTableId,
+    }),
+    [searchParams, refetch, attributes, entityTableId],
   );
+
+  return <TableFetchContext.Provider value={contextValue}>{children}</TableFetchContext.Provider>;
 };
 
 export default TableFetchContextProvider;

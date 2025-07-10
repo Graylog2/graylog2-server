@@ -66,12 +66,12 @@ public class DatanodeLifecycleIT {
 
             // configure transport security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", transportCert.passwordAsString());
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", new String(transportCert.password()));
             datanodeContainer.withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "false");
 
             // configure http security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", httpCert.passwordAsString());
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", new String(httpCert.password()));
 
             // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
             // to be able to reach opensearch from outside the container and docker network (true?)
@@ -96,7 +96,7 @@ public class DatanodeLifecycleIT {
         final RestOperationParameters restParameters = RestOperationParameters.builder()
                 .port(backend.getDatanodeRestPort())
                 .truststore(trustStore)
-                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                 .build();
         final DatanodeRestApiWait waitApi = new DatanodeRestApiWait(restParameters);
         final DatanodeStatusChangeOperation statusApi = new DatanodeStatusChangeOperation(restParameters);

@@ -19,7 +19,7 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 type WidgetRendering = {
-  limitHeight: boolean,
+  limitHeight: boolean;
 };
 
 const defaultWidgetRendering = {

@@ -25,26 +25,34 @@ import AppConfig from 'util/AppConfig';
  * The `ignoredRoutes` prop is an array of routes that should not trigger the confirmation dialog.
  */
 type Props = {
-  question?: string,
-  ignoredRoutes?: Array<string>,
+  question?: string;
+  ignoredRoutes?: Array<string>;
 };
 
-const locationHasChanged = (currentLocation: Location, newLocation: Location, question: string, ignoredRoutes: Array<string>) => (
-  (newLocation.pathname !== currentLocation.pathname && !ignoredRoutes.includes(newLocation.pathname))
-    // eslint-disable-next-line no-alert
-    ? !window.confirm(question)
-    : false);
+const locationHasChanged = (
+  currentLocation: Location,
+  newLocation: Location,
+  question: string,
+  ignoredRoutes: Array<string>,
+) =>
+  newLocation.pathname !== currentLocation.pathname && !ignoredRoutes.includes(newLocation.pathname)
+    ? // eslint-disable-next-line no-alert
+      !window.confirm(question)
+    : false;
 
-const ConfirmLeaveDialog = ({ question, ignoredRoutes }: Props) => {
-  const handleLeavePage = useCallback((e) => {
-    if (AppConfig.gl2DevMode()) {
-      return null;
-    }
+const ConfirmLeaveDialog = ({ question = 'Are you sure?', ignoredRoutes = [] }: Props) => {
+  const handleLeavePage = useCallback(
+    (e) => {
+      if (AppConfig.gl2DevMode()) {
+        return null;
+      }
 
-    e.returnValue = question;
+      e.returnValue = question;
 
-    return question;
-  }, [question]);
+      return question;
+    },
+    [question],
+  );
 
   useEffect(() => {
     window.addEventListener('beforeunload', handleLeavePage);
@@ -54,14 +62,13 @@ const ConfirmLeaveDialog = ({ question, ignoredRoutes }: Props) => {
     };
   }, [handleLeavePage]);
 
-  useBlocker((history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question, ignoredRoutes));
+  useBlocker(
+    (history) =>
+      !AppConfig.gl2DevMode() &&
+      locationHasChanged(history.currentLocation, history.nextLocation, question, ignoredRoutes),
+  );
 
   return null;
-};
-
-ConfirmLeaveDialog.defaultProps = {
-  question: 'Are you sure?',
-  ignoredRoutes: [],
 };
 
 /** @component */

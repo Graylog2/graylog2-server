@@ -23,8 +23,8 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
 type Props = {
-  stream: Stream
-}
+  stream: Stream;
+};
 
 const PipelinesCell = ({ stream }: Props) => {
   const buttonRef = useRef();

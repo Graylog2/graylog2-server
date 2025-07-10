@@ -24,13 +24,13 @@ export const DEFAULT_BARMODE = 'group';
 export type BarMode = 'stack' | 'group' | 'overlay' | 'relative';
 
 export type BarVisualizationConfigType = {
-  barmode: BarMode,
-  axisType: AxisType,
+  barmode: BarMode;
+  axisType: AxisType;
 };
 
 export type BarVisualizationConfigJson = {
-  barmode: BarMode,
-  axis_type: AxisType,
+  barmode: BarMode;
+  axis_type: AxisType;
 };
 
 export default class BarVisualizationConfig extends VisualizationConfig implements XYVisualization {
@@ -85,8 +85,8 @@ export default class BarVisualizationConfig extends VisualizationConfig implemen
 }
 
 type InternalBuilderState = {
-  barmode: BarMode,
-  axisType: AxisType,
+  barmode: BarMode;
+  axisType: AxisType;
 };
 
 class Builder {

@@ -17,34 +17,36 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, Label } from 'components/bootstrap';
 import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
-const StyledHorizontalDl = styled.dl(({ theme }) => css`
-  margin: ${theme.spacings.md} 0;
-  
-  > dt {
-    clear: left;
-    float: left;
-    margin-bottom: ${theme.spacings.md};
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 160px;
-  }
-  
-  > *:not(dt) {
-    margin-bottom: ${theme.spacings.md};
-    margin-left: 140px;
-  }
-`);
+const StyledHorizontalDl = styled.dl(
+  ({ theme }) => css`
+    margin: ${theme.spacings.md} 0;
+
+    > dt {
+      clear: left;
+      float: left;
+      margin-bottom: ${theme.spacings.md};
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 160px;
+    }
+
+    > *:not(dt) {
+      margin-bottom: ${theme.spacings.md};
+      margin-left: 140px;
+    }
+  `,
+);
 const StatusLabel = styled(Label)`
   display: inline-flex;
   justify-content: center;
@@ -72,12 +74,14 @@ const DataNodePage = () => {
 
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
-      <DataNodesPageNavigation />
-      <PageHeader title={`Data Nodes: ${datanode.hostname}`}
-                  documentationLink={{
-                    title: 'Data Nodes documentation',
-                    path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                  }} />
+      <ClusterConfigurationPageNavigation />
+      <PageHeader
+        title={`Data Nodes: ${datanode.hostname}`}
+        documentationLink={{
+          title: 'Data Nodes documentation',
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}
+      />
       <Row className="content">
         <Col xs={12}>
           <Col xs={9}>
@@ -89,16 +93,18 @@ const DataNodePage = () => {
               <dd>{datanode.transport_address || '-'}</dd>
               <dt>Status:</dt>
               <dd>
-                <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                             title={datanode.data_node_status}
-                             aria-label={datanode.data_node_status}
-                             role="button">
+                <StatusLabel
+                  bsStyle={datanodeDisabled ? 'warning' : 'success'}
+                  title={datanode.data_node_status}
+                  aria-label={datanode.data_node_status}
+                  role="button">
                   {datanode.data_node_status || 'N/A'}
                 </StatusLabel>
               </dd>
               <dt>Certificate valid until:</dt>
-              <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id}
-                                                                                           status={datanode.status} />
+              <dd>
+                <RelativeTime dateTime={datanode.cert_valid_until} />{' '}
+                <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} />
               </dd>
               <dt>Datanode version:</dt>
               <dd>{datanode.datanode_version}</dd>

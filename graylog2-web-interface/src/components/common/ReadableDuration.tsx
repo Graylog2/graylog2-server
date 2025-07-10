@@ -22,8 +22,8 @@ import { durationInSeconds, durationInMinutes } from 'util/DateTime';
 import Pluralize from './Pluralize';
 
 type Props = {
-  duration: number | string
-}
+  duration: number | string;
+};
 
 /**
  * Takes a duration (e.g. in milliseconds or seconds, or as a ISO8601 duration) and displays it in a readable format.
@@ -35,17 +35,15 @@ const ReadableDuration = ({ duration }: Props) => {
 
   if (durationInSec < 60) {
     return (
-      <span>{durationInSec} <Pluralize singular="second"
-                                       plural="seconds"
-                                       value={durationInSec} />
+      <span>
+        {durationInSec} <Pluralize singular="second" plural="seconds" value={durationInSec} />
       </span>
     );
   }
 
   return (
-    <span>{durationInMin} <Pluralize singular="minute"
-                                     plural="minutes"
-                                     value={durationInMin} />
+    <span>
+      {durationInMin} <Pluralize singular="minute" plural="minutes" value={durationInMin} />
     </span>
   );
 };

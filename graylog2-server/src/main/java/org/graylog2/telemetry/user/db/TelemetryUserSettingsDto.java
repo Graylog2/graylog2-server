@@ -19,13 +19,15 @@ package org.graylog2.telemetry.user.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.BuildableMongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class TelemetryUserSettingsDto {
+public abstract class TelemetryUserSettingsDto
+        implements BuildableMongoEntity<TelemetryUserSettingsDto, TelemetryUserSettingsDto.Builder> {
 
     public static final String FIELD_USER_ID = "user_id";
 
@@ -62,7 +64,7 @@ public abstract class TelemetryUserSettingsDto {
     public abstract Boolean telemetryPermissionAsked();
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<TelemetryUserSettingsDto, Builder> {
 
         public abstract Builder id(String id);
 

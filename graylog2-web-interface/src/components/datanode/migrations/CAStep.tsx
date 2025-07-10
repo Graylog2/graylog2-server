@@ -27,8 +27,12 @@ const CaStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepCompon
     <MigrationError errorMessage={currentStep.error_message} />
     <CAConfiguration />
     <Space h="xs" />
-    {(currentStep.next_steps.length <= 0) && (<p>Please create a certificate Authority before proceeding.</p>)}
-    <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    {currentStep.next_steps.length <= 0 && <p>Please create a certificate Authority before proceeding.</p>}
+    <MigrationStepTriggerButtonToolbar
+      hidden={hideActions}
+      nextSteps={currentStep.next_steps}
+      onTriggerStep={onTriggerStep}
+    />
   </>
 );
 export default CaStep;

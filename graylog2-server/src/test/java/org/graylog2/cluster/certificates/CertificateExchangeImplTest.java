@@ -54,6 +54,7 @@ public class CertificateExchangeImplTest {
 
     private final String encryptionPassword = RandomStringUtils.randomAlphabetic(20);
     private final char[] keystorePassword = RandomStringUtils.randomAlphabetic(20).toCharArray();
+    private final String keyAlias = RandomStringUtils.randomAlphabetic(20);
     private KeyStore keystore;
 
     private KeyPair ca;
@@ -62,7 +63,7 @@ public class CertificateExchangeImplTest {
     public void setUp() throws Exception {
         EncryptedValueService encryptedValueService = new EncryptedValueService(encryptionPassword);
         certificateExchange = new CertificateExchangeImpl(mongodb.mongoConnection(), encryptedValueService);
-        this.keystore = generateNodeKeypair().toKeystore(CertConstants.DATANODE_KEY_ALIAS, keystorePassword);
+        this.keystore = generateNodeKeypair().toKeystore(keyAlias, keystorePassword);
         this.ca = generateCa();
     }
 
@@ -157,11 +158,11 @@ public class CertificateExchangeImplTest {
 
     private PKCS10CertificationRequest createCertificateSigningRequest(String hostname) throws CSRGenerationException {
         final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(this.keystore, keystorePassword);
-        return CsrGenerator.generateCSR(keystore, CertConstants.DATANODE_KEY_ALIAS, hostname, Collections.emptyList());
+        return CsrGenerator.generateCSR(keystore, keyAlias, hostname, Collections.emptyList());
     }
 
-    private static KeyPair generateNodeKeypair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(CertConstants.DATANODE_KEY_ALIAS)
+    private KeyPair generateNodeKeypair() throws Exception {
+        final CertRequest certRequest = CertRequest.selfSigned(keyAlias)
                 .isCA(false)
                 .validity(Duration.ofDays(99 * 365));
 

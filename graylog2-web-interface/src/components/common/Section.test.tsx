@@ -40,6 +40,16 @@ describe('Section', () => {
     await screen.findByText(/the actions/i);
   });
 
+  it('should render preHeaderSection', async () => {
+    render(
+      <Section title="The Title" preHeaderSection="Preheader section">
+        The children
+      </Section>,
+    );
+
+    await screen.findByText(/preheader section/i);
+  });
+
   it('should render headerLeftSection', async () => {
     render(
       <Section title="The Title" headerLeftSection="The left section">
@@ -65,5 +75,25 @@ describe('Section', () => {
     const children = await screen.findByText(/the children/i);
 
     expect(children).not.toBeVisible();
+  });
+
+  it('should execute onCollapse', async () => {
+    const onCollapse = jest.fn();
+
+    render(
+      <Section title="The Title" collapsible onCollapse={onCollapse}>
+        The children
+      </Section>,
+    );
+
+    await screen.findByRole('heading', { name: /the title/i });
+    await screen.findByText(/the children/i);
+
+    userEvent.click(screen.getByTestId('collapseButton'));
+
+    const children = await screen.findByText(/the children/i);
+
+    expect(children).not.toBeVisible();
+    expect(onCollapse).toHaveBeenCalledWith(true);
   });
 });

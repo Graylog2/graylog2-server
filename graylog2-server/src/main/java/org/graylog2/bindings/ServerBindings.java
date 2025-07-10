@@ -27,11 +27,12 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog.scheduler.capabilities.ServerNodeCapabilitiesModule;
+import org.graylog.security.shares.CollectionRequestHandler;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
-import org.graylog2.bindings.providers.ClusterEventBusProvider;
+import org.graylog2.bindings.providers.DefaultJmteEngineProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
@@ -45,7 +46,6 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
@@ -100,15 +100,17 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.system.traffic.OpenTrafficCounterCalculator;
+import org.graylog2.system.traffic.TrafficCounterCalculator;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.system.traffic.TrafficUpdater;
-import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
-import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.graylog2.users.GrantsCleanupListener;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
+
+import java.time.Clock;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
@@ -158,7 +160,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindProviders() {
-        bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(freemarker.template.Configuration.class).toProvider(SecureFreemarkerConfigProvider.class);
     }
 
@@ -192,10 +193,11 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
-        bind(Engine.class).toInstance(Engine.createEngine());
+        bind(Engine.class).toProvider(DefaultJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("JsonSafe")).toProvider(JsonSafeEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
+        bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
     }
 
     private void bindInterfaces() {
@@ -208,14 +210,16 @@ public class ServerBindings extends Graylog2Module {
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
-        OptionalBinder.newOptionalBinder(binder(), TelemetryEnterpriseDataProvider.class).setDefault().to(DefaultTelemetryEnterpriseDataProvider.class);
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), DataTieringStatusService.class).setDefault().to(DefaultDataTieringStatusService.class);
 
+        Multibinder.newSetBinder(binder(), TrafficCounterCalculator.class).addBinding().to(OpenTrafficCounterCalculator.class);
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
+
+        Multibinder.newSetBinder(binder(), CollectionRequestHandler.class);
     }
 
     private void bindDynamicFeatures() {

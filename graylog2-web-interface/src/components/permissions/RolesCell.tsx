@@ -32,16 +32,18 @@ const Role = styled(Label)`
 `;
 
 type Props = {
-  roles: Immutable.Set<string>,
+  roles: Immutable.Set<string>;
 };
 
 const RolesCell = ({ roles }: Props) => (
   <Td>
-    {roles.map((role) => (
-      <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
-        {role}
-      </Role>
-    )).toArray()}
+    {roles
+      .map((role) => (
+        <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
+          {role}
+        </Role>
+      ))
+      .toArray()}
   </Td>
 );
 

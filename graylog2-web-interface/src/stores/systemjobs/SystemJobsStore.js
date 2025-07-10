@@ -21,9 +21,8 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const SystemJobsActions = singletonActions(
-  'core.SystemJobs',
-  () => Reflux.createActions({
+export const SystemJobsActions = singletonActions('core.SystemJobs', () =>
+  Reflux.createActions({
     list: { asyncResult: true },
     getJob: { asyncResult: true },
     acknowledgeJob: { asyncResult: true },
@@ -31,9 +30,8 @@ export const SystemJobsActions = singletonActions(
   }),
 );
 
-export const SystemJobsStore = singletonStore(
-  'core.SystemJobs',
-  () => Reflux.createStore({
+export const SystemJobsStore = singletonStore('core.SystemJobs', () =>
+  Reflux.createStore({
     listenables: [SystemJobsActions],
 
     jobsById: {},
@@ -54,25 +52,28 @@ export const SystemJobsStore = singletonStore(
     },
     getJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.getJob(jobId).url);
-      const promise = fetch('GET', url).then((response) => {
-        this.jobsById = { ...this.jobsById, [response.id]: response };
-        this.trigger({ jobsById: this.jobsById });
+      const promise = fetch('GET', url).then(
+        (response) => {
+          this.jobsById = { ...this.jobsById, [response.id]: response };
+          this.trigger({ jobsById: this.jobsById });
 
-        return response;
-      }, () => {
-      // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
-        const { [jobId]: currentJob, ...rest } = this.jobsById;
+          return response;
+        },
+        () => {
+          // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
+          const { [jobId]: currentJob, ...rest } = this.jobsById;
 
-        this.jobsById = rest;
-        this.trigger({ jobsById: this.jobsById });
-      });
+          this.jobsById = rest;
+          this.trigger({ jobsById: this.jobsById });
+        },
+      );
 
       SystemJobsActions.getJob.promise(promise);
     },
     acknowledgeJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.acknowledgeJob(jobId).url);
       const promise = fetch('DELETE', url).then((response) => {
-        delete (this.jobsById[response.id]);
+        delete this.jobsById[response.id];
       });
 
       SystemJobsActions.acknowledgeJob.promise(promise);
@@ -80,7 +81,7 @@ export const SystemJobsStore = singletonStore(
     cancelJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);
       const promise = fetch('DELETE', url).then((response) => {
-        delete (this.jobsById[response.id]);
+        delete this.jobsById[response.id];
       });
 
       SystemJobsActions.cancelJob.promise(promise);

@@ -27,7 +27,7 @@ import { LinkContainer } from 'components/common/router';
 import { IfPermitted } from 'components/common';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const RulesSectionActions = ({ stream }: Props) => {
@@ -40,9 +40,13 @@ const RulesSectionActions = ({ stream }: Props) => {
     setShowAddRuleModal((cur) => !cur);
   }, []);
 
-  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => (
-    StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'))
-  ), [stream.id]);
+  const onSaveStreamRule = useCallback(
+    (_streamRuleId: string, streamRule: StreamRule) =>
+      StreamRulesStore.create(stream.id, streamRule, () =>
+        UserNotification.success('Stream rule was created successfully.', 'Success'),
+      ),
+    [stream.id],
+  );
 
   return (
     <>
@@ -59,11 +63,13 @@ const RulesSectionActions = ({ stream }: Props) => {
         </Button>
       </IfPermitted>
       {showAddRuleModal && (
-        <StreamRuleModal onClose={toggleAddRuleModal}
-                         title="New Stream Rule"
-                         submitButtonText="Create Rule"
-                         submitLoadingText="Creating Rule..."
-                         onSubmit={onSaveStreamRule} />
+        <StreamRuleModal
+          onClose={toggleAddRuleModal}
+          title="New Stream Rule"
+          submitButtonText="Create Rule"
+          submitLoadingText="Creating Rule..."
+          onSubmit={onSaveStreamRule}
+        />
       )}
     </>
   );

@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2.testing;
 
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.datanode.DatanodeDevContainerInstanceProvider;
 import org.graylog2.storage.SearchVersion;
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -33,13 +33,13 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
     private final String mongoDBUri;
     private final String passwordSecret;
-    private final String rootPasswordSha2;
+    private final PluginJarsProvider datanodePluginJarsProvider;
 
-    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String heapSize, final List<String> featureFlags, Map<String, String> env, PluginJarsProvider datanodePluginJarsProvider) {
         super(version, hostname, network, heapSize, featureFlags, env);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
-        this.rootPasswordSha2 = rootPasswordSha2;
+        this.datanodePluginJarsProvider = datanodePluginJarsProvider;
     }
 
     @Override
@@ -65,13 +65,13 @@ public class DatanodeDevInstance extends OpenSearchInstance {
         return builder
                 .nodeName(hostname)
                 .passwordSecret(passwordSecret)
-                .rootPasswordSha2(rootPasswordSha2)
                 .network(network)
                 .mongoDbUri(mongoDBUri)
                 .restPort(8999)
                 .openSearchHttpPort(9200)
                 .openSearchTransportPort(9300)
                 .env(getContainerEnv())
+                .pluginJarsProvider(datanodePluginJarsProvider)
                 .build();
     }
 }

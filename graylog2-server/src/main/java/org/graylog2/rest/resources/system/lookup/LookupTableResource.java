@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -54,6 +54,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.lookup.CachePurge;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
@@ -68,6 +69,7 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
@@ -226,7 +228,7 @@ public class LookupTableResource extends RestResource {
     public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                              @ApiParam(name = "key") @QueryParam("key") String key) {
         final Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
-        if (!lookupTableDto.isPresent()) {
+        if (lookupTableDto.isEmpty()) {
             throw new NotFoundException("Lookup table <" + idOrName + "> not found");
         }
 
@@ -279,8 +281,11 @@ public class LookupTableResource extends RestResource {
                     dataAdapterIds.add(dto.dataAdapterId());
                 });
 
-                dbCacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
-                dbDataAdapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+                try (Stream<DataAdapterDto> dataAdapterStream = dbDataAdapterService.streamByIds(dataAdapterIds.build());
+                     Stream<CacheDto> cacheStream = dbCacheService.streamByIds(cacheIds.build())) {
+                    dataAdapterStream.forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+                    cacheStream.forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
+                }
             }
 
             return new LookupTablePage(query,
@@ -300,7 +305,7 @@ public class LookupTableResource extends RestResource {
                                @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
-        if (!lookupTableDto.isPresent()) {
+        if (lookupTableDto.isEmpty()) {
             throw new NotFoundException();
         }
         LookupTableDto tableDto = lookupTableDto.get();
@@ -311,8 +316,11 @@ public class LookupTableResource extends RestResource {
         Set<DataAdapterApi> adapters = Collections.emptySet();
 
         if (resolveObjects) {
-            caches = dbCacheService.findByIds(Collections.singleton(tableDto.cacheId())).stream().map(CacheApi::fromDto).collect(Collectors.toSet());
-            adapters = dbDataAdapterService.findByIds(Collections.singleton(tableDto.dataAdapterId())).stream().map(DataAdapterApi::fromDto).collect(Collectors.toSet());
+            try (Stream<DataAdapterDto> dataAdapterStream = dbDataAdapterService.streamByIds(Collections.singleton(tableDto.dataAdapterId()));
+                 Stream<CacheDto> cacheStream = dbCacheService.streamByIds(Collections.singleton(tableDto.cacheId()))) {
+                caches = cacheStream.map(CacheApi::fromDto).collect(Collectors.toSet());
+                adapters = dataAdapterStream.map(DataAdapterApi::fromDto).collect(Collectors.toSet());
+            }
         }
 
         final PaginatedList<LookupTableApi> result = PaginatedList.singleton(LookupTableApi.fromDto(tableDto), 1, 1);
@@ -334,8 +342,11 @@ public class LookupTableResource extends RestResource {
             LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
             return LookupTableApi.fromDto(saved);
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -359,7 +370,7 @@ public class LookupTableResource extends RestResource {
     public LookupTableApi removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use, how?
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
-        if (!lookupTableDto.isPresent()) {
+        if (lookupTableDto.isEmpty()) {
             throw new NotFoundException();
         }
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, lookupTableDto.get().id());
@@ -402,6 +413,25 @@ public class LookupTableResource extends RestResource {
         }
 
         return validation;
+    }
+
+    @GET
+    @Path("tables/preview/{idOrName}")
+    @ApiOperation(value = "Preview the entries in a lookup table.")
+    public LookupPreview getPreview(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                    @ApiParam(name = "size") @QueryParam("size") @DefaultValue("5") int size) {
+        Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
+        if (lookupTableDto.isEmpty()) {
+            throw new NotFoundException();
+        }
+        LookupTableDto tableDto = lookupTableDto.get();
+
+        checkPermission(RestPermissions.LOOKUP_TABLES_READ, tableDto.id());
+        final var service = lookupTableService.newBuilder().lookupTable(tableDto.name()).build();
+        if (!service.supportsPreview()) {
+            throw new UnsupportedOperationException("Backing data adapter does not support preview.");
+        }
+        return service.getPreview(size);
     }
 
     @JsonAutoDetect
@@ -559,8 +589,11 @@ public class LookupTableResource extends RestResource {
             DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(dto);
 
             return DataAdapterApi.fromDto(saved);
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -570,12 +603,15 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
     public DataAdapterApi deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
-        if (!dataAdapterDto.isPresent()) {
+        if (dataAdapterDto.isEmpty()) {
             throw new NotFoundException();
         }
         DataAdapterDto dto = dataAdapterDto.get();
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
-        boolean unused = dbTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
+        final boolean unused;
+        try (Stream<LookupTableDto> lookupTableStream = dbTableService.streamByDataAdapterIds(singleton(dto.id()))) {
+            unused = lookupTableStream.findAny().isEmpty();
+        }
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
         }
@@ -709,8 +745,11 @@ public class LookupTableResource extends RestResource {
         try {
             final CacheDto saved = dbCacheService.saveAndPostEvent(newCache.toDto());
             return CacheApi.fromDto(saved);
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -720,12 +759,15 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
     public CacheApi deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
-        if (!cacheDto.isPresent()) {
+        if (cacheDto.isEmpty()) {
             throw new NotFoundException();
         }
         CacheDto dto = cacheDto.get();
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
-        boolean unused = dbTableService.findByCacheIds(singleton(dto.id())).isEmpty();
+        final boolean unused;
+        try (Stream<LookupTableDto> lookupTableStream = dbTableService.streamByCacheIds(singleton(dto.id()))) {
+            unused = lookupTableStream.findAny().isEmpty();
+        }
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
         }

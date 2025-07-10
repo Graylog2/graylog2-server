@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+
+import { SystemFieldTypes } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import { SystemFieldTypes } from '@graylog/server-api';
 
 const mockFieldType = {
   string: 'String',
@@ -51,7 +52,7 @@ describe('useFieldType custom hook', () => {
 
   it('Test return initial data and take from fetch', async () => {
     asMock(SystemFieldTypes.getAllFieldTypes).mockImplementation(() => Promise.resolve(mockFieldType));
-    const { result, waitFor } = renderUseFieldTypeHook();
+    const { result } = renderUseFieldTypeHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
@@ -64,7 +65,7 @@ describe('useFieldType custom hook', () => {
   it('Test trigger notification on fail', async () => {
     asMock(SystemFieldTypes.getAllFieldTypes).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseFieldTypeHook();
+    const { result } = renderUseFieldTypeHook();
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isLoading);
@@ -73,6 +74,7 @@ describe('useFieldType custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading field type options failed with status: Error: Error',
-      'Could not load field type options');
+      'Could not load field type options',
+    );
   });
 });

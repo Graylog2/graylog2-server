@@ -17,10 +17,9 @@
 import type { OrderedMap } from 'immutable';
 
 export type Filter = {
-  value: string,
-  title: string,
-
-}
+  value: string;
+  title: string;
+};
 
 export type Filters = OrderedMap<string, Array<Filter>>;
-export type UrlQueryFilters = OrderedMap<string, Array<string>>
+export type UrlQueryFilters = OrderedMap<string, Array<string>>;

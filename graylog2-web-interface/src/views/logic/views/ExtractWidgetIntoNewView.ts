@@ -35,34 +35,43 @@ const ExtractViewStateDataForWidget = ({ widgetId, view, queryId }) => {
   });
   const widgetPosition = currentViewState.widgetPositions[widgetId].toBuilder().col(0).row(0).build();
 
-  return ({ titles, widgetPosition, widgetMapping });
+  return { titles, widgetPosition, widgetMapping };
 };
 
 type GetViewStateProps = {
-  titles: TitlesMap,
-  widget: Widget,
-  widgetPosition: WidgetPosition,
-  widgetMapping: WidgetMapping,
-}
-const GetViewState = ({ widget, titles, widgetPosition, widgetMapping }: GetViewStateProps): ViewState => ViewState.create()
-  .toBuilder()
-  .widgets([widget])
-  .titles(titles)
-  .widgetPositions({ [widget.id]: widgetPosition })
-  .widgetMapping(widgetMapping)
-  .build();
+  titles: TitlesMap;
+  widget: Widget;
+  widgetPosition: WidgetPosition;
+  widgetMapping: WidgetMapping;
+};
+const GetViewState = ({ widget, titles, widgetPosition, widgetMapping }: GetViewStateProps): ViewState =>
+  ViewState.create()
+    .toBuilder()
+    .widgets([widget])
+    .titles(titles)
+    .widgetPositions({ [widget.id]: widgetPosition })
+    .widgetMapping(widgetMapping)
+    .build();
 
 type CreateViewWithOneWidgetProps = {
-  titles: TitlesMap,
-  search: Search,
-  widget: Widget,
-  widgetPosition: WidgetPosition,
-  widgetMapping: WidgetMapping,
-  queryId: string,
-  viewType?: ViewType,
-}
+  titles: TitlesMap;
+  search: Search;
+  widget: Widget;
+  widgetPosition: WidgetPosition;
+  widgetMapping: WidgetMapping;
+  queryId: string;
+  viewType?: ViewType;
+};
 
-const CreateViewWithOneWidget = ({ titles, search, widget, widgetPosition, widgetMapping, queryId, viewType = View.Type.Search }: CreateViewWithOneWidgetProps) => {
+const CreateViewWithOneWidget = ({
+  titles,
+  search,
+  widget,
+  widgetPosition,
+  widgetMapping,
+  queryId,
+  viewType = View.Type.Search,
+}: CreateViewWithOneWidgetProps) => {
   const viewState = GetViewState({ widget, widgetPosition, widgetMapping, titles });
 
   return View.create()

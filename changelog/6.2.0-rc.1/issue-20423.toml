@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing keyboard shortcut conflicts for opening query history by changing it to ctrl+space on win and linux os"
+
+issues = ["20423"]
+pulls = ["21336"]

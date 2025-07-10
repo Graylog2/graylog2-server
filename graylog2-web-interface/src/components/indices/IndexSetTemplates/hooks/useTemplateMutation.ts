@@ -19,13 +19,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import type {
-  IndexSetTemplate,
-} from 'components/indices/IndexSetTemplates/types';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 
 export const urlPrefix = '/system/indices/index_sets/templates';
 
-const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: string }) => {
+const putTemplate = async ({ template, id }: { template: IndexSetTemplate; id: string }) => {
   const url = qualifyUrl(`${urlPrefix}/${id}`);
   const body: Omit<IndexSetTemplate, 'id' | 'built_in' | 'default' | 'enabled' | 'disabled_reason'> = {
     title: template.title,
@@ -36,7 +34,7 @@ const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: s
   return fetch('PUT', url, body);
 };
 
-const putTemplateDefault = async (id : string) => {
+const putTemplateDefault = async (id: string) => {
   const url = qualifyUrl('/system/indices/index_set_defaults');
   const body: Pick<IndexSetTemplate, 'id'> = {
     id,
@@ -65,11 +63,16 @@ const deleteProfile = async (id: string) => {
 const useTemplate = () => {
   const queryClient = useQueryClient();
 
-  const post = useMutation(postTemplate, {
+  const post = useMutation({
+    mutationFn: postTemplate,
+
     onError: (errorThrown) => {
-      UserNotification.error(`Creating index set template failed with status: ${errorThrown}`,
-        'Could not create index set template');
+      UserNotification.error(
+        `Creating index set template failed with status: ${errorThrown}`,
+        'Could not create index set template',
+      );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully created.', 'Success!');
 
@@ -77,24 +80,36 @@ const useTemplate = () => {
     },
   });
 
-  const put = useMutation(putTemplate, {
+  const put = useMutation({
+    mutationFn: putTemplate,
+
     onError: (errorThrown) => {
-      UserNotification.error(`Updating index set template failed with status: ${errorThrown}`,
-        'Could not update index set template');
+      UserNotification.error(
+        `Updating index set template failed with status: ${errorThrown}`,
+        'Could not update index set template',
+      );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully updated.', 'Success!');
-      queryClient.invalidateQueries(['indexSetTemplate']);
+      queryClient.invalidateQueries({
+        queryKey: ['indexSetTemplate'],
+      });
 
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },
   });
 
-  const setAsDefault = useMutation(putTemplateDefault, {
+  const setAsDefault = useMutation({
+    mutationFn: putTemplateDefault,
+
     onError: (errorThrown) => {
-      UserNotification.error(`Setting template as default failed with status: ${errorThrown}`,
-        'Could set template as default');
+      UserNotification.error(
+        `Setting template as default failed with status: ${errorThrown}`,
+        'Could set template as default',
+      );
     },
+
     onSuccess: () => {
       UserNotification.success('Template has successfully been set as default.', 'Success!');
 
@@ -102,11 +117,16 @@ const useTemplate = () => {
     },
   });
 
-  const remove = useMutation(deleteProfile, {
+  const remove = useMutation({
+    mutationFn: deleteProfile,
+
     onError: (errorThrown) => {
-      UserNotification.error(`Deleting index set template failed with status: ${errorThrown}`,
-        'Could not delete index set template');
+      UserNotification.error(
+        `Deleting index set template failed with status: ${errorThrown}`,
+        'Could not delete index set template',
+      );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully deleted.', 'Success!');
 
@@ -114,15 +134,15 @@ const useTemplate = () => {
     },
   });
 
-  return ({
+  return {
     updateTemplate: put.mutateAsync,
-    isEditLoading: put.isLoading,
+    isEditLoading: put.isPending,
     createTemplate: post.mutateAsync,
-    isCreateLoading: post.isLoading,
-    isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
+    isCreateLoading: post.isPending,
+    isLoading: post.mutateAsync || post.isPending || remove.isPending,
     deleteTemplate: remove.mutateAsync,
     setAsDefault: setAsDefault.mutateAsync,
-  });
+  };
 };
 
 export default useTemplate;

@@ -52,16 +52,16 @@ const SubNavIconOpen = styled(Icon)`
 `;
 
 type SectionLinkProps = {
-  name: string,
-  showCaret: boolean,
-}
+  name: string;
+  showCaret: boolean;
+};
 
 const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
   const absolutePath = useResolvedPath(name);
   const location = useLocation();
 
-  const isActive = URI(location.pathname).equals(absolutePath.pathname)
-    || location.pathname.startsWith(absolutePath.pathname);
+  const isActive =
+    URI(location.pathname).equals(absolutePath.pathname) || location.pathname.startsWith(absolutePath.pathname);
 
   return (
     <LinkContainer key={`nav-${name}`} to={name}>
@@ -77,93 +77,94 @@ const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();
 
   const configurationSections: Array<{
-    name: string,
-    hide?: boolean,
-    SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>,
-    props?: ConfigurationSectionProps,
-    showCaret?: boolean,
-    catchAll?: boolean,
-  }> = useMemo(() => [
-    {
-      name: 'Search',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: SearchesConfig,
-        title: 'Search',
-      },
-    },
-    {
-      name: 'Message Processors',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: MessageProcessorsConfig,
-        title: 'Message Processors',
-      },
-    },
-    {
-      name: 'Sidecars',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: SidecarConfig,
-        title: 'Sidecars',
-      },
-    },
-    {
-      name: 'Events',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: EventsConfig,
-        title: 'Events',
-      },
-
-    },
-    {
-      name: 'URL Whitelist',
-      hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: UrlWhiteListConfig,
-        title: 'URL Whitelist',
-      },
-    },
-    {
-      name: 'Decorators',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: DecoratorsConfig,
-        title: 'Decorators',
-      },
-    },
-    {
-      name: 'Permissions',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: PermissionsConfig,
-        title: 'Permissions',
-      },
-    },
-    {
-      name: 'Users',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: UserConfig,
-        title: 'Index Set Defaults',
-      },
-    },
-    {
-      name: 'Plugins',
-      SectionComponent: PluginsConfig,
-      showCaret: true,
-      catchAll: true,
-    },
-  ].filter(({ hide }) => !hide), [currentUser?.permissions]);
+    name: string;
+    hide?: boolean;
+    SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>;
+    props?: ConfigurationSectionProps;
+    showCaret?: boolean;
+    catchAll?: boolean;
+  }> = useMemo(
+    () =>
+      [
+        {
+          name: 'Search',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: SearchesConfig,
+            title: 'Search',
+          },
+        },
+        {
+          name: 'Message Processors',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: MessageProcessorsConfig,
+            title: 'Message Processors',
+          },
+        },
+        {
+          name: 'Sidecars',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: SidecarConfig,
+            title: 'Sidecars',
+          },
+        },
+        {
+          name: 'Events',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: EventsConfig,
+            title: 'Events',
+          },
+        },
+        {
+          name: 'URL Whitelist',
+          hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: UrlWhiteListConfig,
+            title: 'URL Whitelist',
+          },
+        },
+        {
+          name: 'Decorators',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: DecoratorsConfig,
+            title: 'Decorators',
+          },
+        },
+        {
+          name: 'Permissions',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: PermissionsConfig,
+            title: 'Permissions',
+          },
+        },
+        {
+          name: 'Users',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: UserConfig,
+            title: 'Index Set Defaults',
+          },
+        },
+        {
+          name: 'Plugins',
+          SectionComponent: PluginsConfig,
+          showCaret: true,
+          catchAll: true,
+        },
+      ].filter(({ hide }) => !hide),
+    [currentUser?.permissions],
+  );
 
   return (
     <DocumentTitle title="Configurations">
       <PageHeader title="Configurations">
-        <span>
-          You can configure system settings for different sub systems on this page.
-        </span>
+        <span>You can configure system settings for different sub systems on this page.</span>
       </PageHeader>
 
       <ConfigletRow className="content">
@@ -178,9 +179,11 @@ const ConfigurationsPage = () => {
         <Routes>
           <Route path="/" element={<Navigate to={configurationSections[0].name} replace />} />
           {configurationSections.flatMap(({ catchAll, name, props = {}, SectionComponent }) => (
-            <Route path={catchAll ? `${name}/*` : name}
-                   key={name}
-                   element={<SectionComponent {...props} key={name} />} />
+            <Route
+              path={catchAll ? `${name}/*` : name}
+              key={name}
+              element={<SectionComponent {...props} key={name} />}
+            />
           ))}
         </Routes>
       </ConfigletRow>

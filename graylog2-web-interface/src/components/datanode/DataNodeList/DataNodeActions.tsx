@@ -18,9 +18,9 @@ import * as React from 'react';
 import { useState, useRef } from 'react';
 import styled from 'styled-components';
 
-import { ConfirmDialog } from 'components/common';
+import { ConfirmDialog, IfPermitted } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import sleep from 'logic/sleep';
@@ -40,9 +40,9 @@ const ActionButton = styled(Button)`
 `;
 
 type Props = {
-  dataNode: DataNode,
-  displayAs?: 'dropdown'|'buttons',
-  refetch?: () => void,
+  dataNode: DataNode;
+  displayAs?: 'dropdown' | 'buttons';
+  refetch?: () => void;
 };
 
 const DIALOG_TYPES = {
@@ -67,7 +67,7 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode, refetch, displayAs }: Props) => {
+const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown' }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
@@ -152,46 +152,64 @@ const DataNodeActions = ({ dataNode, refetch, displayAs }: Props) => {
   const isRemovingDatanode = dataNode.data_node_status === 'REMOVING';
 
   return (
-    <>
+    <IfPermitted permissions="datanode:start">
       {displayAs === 'dropdown' && (
         <MoreActions>
           <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
           {!isDatanodeRunning && <MenuItem onSelect={handleStartDatanode}>Start</MenuItem>}
           {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
           {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
-          {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
+          )}
           <MenuItem onSelect={() => setShowLogsDialog(true)}>Show logs</MenuItem>
         </MoreActions>
       )}
       {displayAs === 'buttons' && (
         <>
-          {!isDatanodeRunning && <ActionButton onClick={handleStartDatanode} bsSize="small">Start</ActionButton>}
-          {isDatanodeRunning && <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">Stop</ActionButton>}
-          {isDatanodeRemoved && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">Rejoin</ActionButton>}
-          {(!isDatanodeRemoved || isRemovingDatanode) && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">Remove</ActionButton>}
-          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">Show logs</ActionButton>
+          {!isDatanodeRunning && (
+            <ActionButton onClick={handleStartDatanode} bsSize="small">
+              Start
+            </ActionButton>
+          )}
+          {isDatanodeRunning && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">
+              Stop
+            </ActionButton>
+          )}
+          {isDatanodeRemoved && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">
+              Rejoin
+            </ActionButton>
+          )}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">
+              Remove
+            </ActionButton>
+          )}
+          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">
+            Show logs
+          </ActionButton>
         </>
       )}
       {showConfirmDialog && (
-        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
-                       show
-                       onConfirm={handleConfirm}
-                       onCancel={handleClearState}>
+        <ConfirmDialog
+          title={DIALOG_TEXT[dialogType].dialogTitle}
+          show
+          onConfirm={handleConfirm}
+          onCancel={handleClearState}>
           {DIALOG_TEXT[dialogType].dialogBody(dataNode.hostname)}
         </ConfirmDialog>
       )}
       {showLogsDialog && (
-        <DataNodeLogsDialog show={showLogsDialog}
-                            hostname={dataNode?.hostname}
-                            onHide={() => setShowLogsDialog(false)} />
+        <DataNodeLogsDialog
+          show={showLogsDialog}
+          hostname={dataNode?.hostname}
+          onHide={() => setShowLogsDialog(false)}
+        />
       )}
-    </>
+    </IfPermitted>
   );
-};
-
-DataNodeActions.defaultProps = {
-  displayAs: 'dropdown',
-  refetch: undefined,
 };
 
 export default DataNodeActions;

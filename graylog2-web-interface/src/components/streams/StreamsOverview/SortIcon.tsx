@@ -44,12 +44,13 @@ const SortIcon = ({
   activeSort,
   column,
 }: {
-  onChange: (newSort: Sort) => void,
-  column: Column,
-  activeSort: Sort | undefined,
+  onChange: (newSort: Sort) => void;
+  column: Column;
+  activeSort: Sort | undefined;
 }) => {
   const columnSortIsActive = activeSort?.attributeId === column.id;
-  const nextSortDirection = !columnSortIsActive || activeSort.direction === SORT_DIRECTIONS.DESC ? SORT_DIRECTIONS.ASC : SORT_DIRECTIONS.DESC;
+  const nextSortDirection =
+    !columnSortIsActive || activeSort.direction === SORT_DIRECTIONS.DESC ? SORT_DIRECTIONS.ASC : SORT_DIRECTIONS.DESC;
   const title = `Sort ${column.title.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`;
 
   const _onChange = () => {
@@ -57,11 +58,13 @@ const SortIcon = ({
   };
 
   return (
-    <StyledCommonSortIcon activeDirection={columnSortIsActive ? activeSort.direction : undefined}
-                          onChange={_onChange}
-                          title={title}
-                          ascId={SORT_DIRECTIONS.ASC}
-                          descId={SORT_DIRECTIONS.DESC} />
+    <StyledCommonSortIcon
+      activeDirection={columnSortIsActive ? activeSort.direction : undefined}
+      onChange={_onChange}
+      title={title}
+      ascId={SORT_DIRECTIONS.ASC}
+      descId={SORT_DIRECTIONS.DESC}
+    />
   );
 };
 

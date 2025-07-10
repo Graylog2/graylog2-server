@@ -14,27 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { StreamRuleType } from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
-  const { data } = useQuery(
-    ['streams', 'rule-types'],
-    () => StreamRulesStore.types(),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream rule types failed with status: ${errorThrown}`,
-          'Could not load stream rule types');
-      },
-      keepPreviousData: true,
-      staleTime: 60 * (60 * 1000), // 1 hour
-    },
-  );
+  const { data } = useQuery({
+    queryKey: ['streams', 'rule-types'],
 
-  return ({ data });
+    queryFn: () =>
+      defaultOnError<Array<StreamRuleType>>(
+        StreamRulesStore.types(),
+        'Loading stream rule types failed with status',
+        'Could not load stream rule types',
+      ),
+
+    placeholderData: keepPreviousData,
+
+    // 1 hour
+    staleTime: 60 * (60 * 1000),
+  });
+
+  return { data };
 };
 
 export default useStreamRuleTypes;

@@ -31,7 +31,8 @@ export const message = {
   filtered_fields: {
     level: 6,
     source: 'babbage',
-    message: 'babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]',
+    message:
+      'babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]',
     hostname: 'message-hostname',
     facility: 'user-level',
     timestamp: '2019-07-17T11:20:33.000Z',
@@ -39,7 +40,8 @@ export const message = {
   formatted_fields: {
     level: 6,
     source: 'babbage',
-    message: 'babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]',
+    message:
+      'babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]',
     hostname: 'message-hostname',
     facility: 'user-level',
     timestamp: '2019-07-17T11:20:33.000Z',
@@ -51,7 +53,8 @@ export const message = {
     streams: ['000000000000000000000001'],
     gl2_message_id: '01DFZKQF4D3642JY91FM6Z1WQG',
     source: 'babbage',
-    message: 'babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]',
+    message:
+      'babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]',
     gl2_source_input: '5c26a37b3885e50480aa12a2',
     hostname: 'message-hostname',
     gl2_source_node: '4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0',

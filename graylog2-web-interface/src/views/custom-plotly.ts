@@ -22,12 +22,6 @@ import Scatter from 'plotly.js/lib/scatter';
 import Scatterpolar from 'plotly.js/lib/scatterpolar';
 
 // @ts-ignore
-Plotly.register([
-  Bar,
-  Pie,
-  Scatter,
-  Heatmap,
-  Scatterpolar,
-]);
+Plotly.register([Bar, Pie, Scatter, Heatmap, Scatterpolar]);
 
 export default Plotly;

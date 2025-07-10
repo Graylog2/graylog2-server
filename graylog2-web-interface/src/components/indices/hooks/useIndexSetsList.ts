@@ -14,52 +14,60 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { IndexSet, IndexSetsResponseType, IndexSetsStats } from 'stores/indices/IndexSetsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type State = {
-  indexSetsCount: number,
-  indexSets: Array<IndexSet>,
-  indexSetStats: IndexSetsStats | null,
-}
-const getUrl = (stats:boolean) => qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
-const fetchIndexSetsList = (stats:boolean): Promise<State> => fetch('GET', getUrl(stats)).then((response: IndexSetsResponseType) => ({
-  indexSetsCount: response.total,
-  indexSets: response.index_sets,
-  indexSetStats: response.stats,
-}));
+  indexSetsCount: number;
+  indexSets: Array<IndexSet>;
+  indexSetStats: IndexSetsStats | null;
+};
+const getUrl = (stats: boolean, security: boolean) =>
+  qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats, security).url);
+const fetchIndexSetsList = (stats: boolean, only_open: boolean): Promise<State> =>
+  fetch('GET', getUrl(stats, only_open)).then((response: IndexSetsResponseType) => ({
+    indexSetsCount: response.total,
+    indexSets: response.index_sets,
+    indexSetStats: response.stats,
+  }));
 
 const initialData: State = { indexSets: [], indexSetsCount: null, indexSetStats: null };
 
-const useIndexSetsList = (stats: boolean = false) : {
-  data: State,
-  refetch: () => void,
-  isSuccess: boolean,
-  isInitialLoading: boolean,
+const useIndexSetsList = (
+  stats: boolean = false,
+  refetchInterval: number | false = false,
+  only_open: boolean = false,
+): {
+  data: State;
+  refetch: () => void;
+  isSuccess: boolean;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isSuccess } = useQuery<State>(
-    ['IndexSetsList', stats],
-    () => fetchIndexSetsList(stats),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index sets with list failed with status: ${errorThrown}`,
-          'Could not load index sets list');
-      },
-      keepPreviousData: true,
-    },
-  );
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery({
+    queryKey: ['IndexSetsList', stats],
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchIndexSetsList(stats, only_open),
+        'Loading index sets with list failed with status',
+        'Could not load index sets list',
+      ),
+
+    placeholderData: keepPreviousData,
+    refetchInterval,
+  });
+
+  return {
     data: data ?? initialData,
     refetch,
     isSuccess,
     isInitialLoading,
-  });
+  };
 };
 
 export default useIndexSetsList;

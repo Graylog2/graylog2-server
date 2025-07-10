@@ -23,7 +23,7 @@ import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
@@ -65,16 +65,15 @@ public class MongoDbGrokPatternServiceTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        collection = mongoConnection.getMongoDatabase().getCollection(MongoDbGrokPatternService.COLLECTION_NAME);
         clusterEventBus = spy(new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor()));
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final var mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         service = new MongoDbGrokPatternService(
-                mongodb.mongoConnection(),
-                mapperProvider,
+                mongoCollections,
                 clusterEventBus);
+        collection = mongoCollections.nonEntityCollection(MongoDbGrokPatternService.COLLECTION_NAME, Document.class);
     }
 
     @Test

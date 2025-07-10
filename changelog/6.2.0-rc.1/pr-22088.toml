@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix archive restore and data lake retrieval for index metadata with array fields."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9984"]
+pulls = ["22088"]

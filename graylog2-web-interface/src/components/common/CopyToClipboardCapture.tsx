@@ -17,16 +17,19 @@
 import * as React from 'react';
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
-  formatSelection: (originalSelection: Selection) => Selection | string
-}
+  children: React.ReactNode;
+  className?: string;
+  formatSelection: (originalSelection: Selection) => Selection | string;
+};
 
 /**
  * This component calls `formatSelection` every time the user copies encapsulated content (`children`) to the clipboard.
  * `formatSelection` allows to format the selected content before it gets stored in the clipboard.
  */
-const CopyToClipboardCapture = React.forwardRef<HTMLDivElement, Props>(({ formatSelection, children, className }: Props, ref) => {
+const CopyToClipboardCapture = (
+  { formatSelection, children, className = undefined }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
   const _onCopy = (event) => {
     const selection = formatSelection(document.getSelection());
     event.clipboardData.setData('text/plain', selection);
@@ -38,10 +41,6 @@ const CopyToClipboardCapture = React.forwardRef<HTMLDivElement, Props>(({ format
       {children}
     </div>
   );
-});
-
-CopyToClipboardCapture.defaultProps = {
-  className: undefined,
 };
 
-export default CopyToClipboardCapture;
+export default React.forwardRef(CopyToClipboardCapture);

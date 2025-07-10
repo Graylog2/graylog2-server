@@ -14,44 +14,46 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { ProfileOptions } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = [];
 
 const fetchProfileOptions = async () => {
   const url = qualifyUrl('/system/indices/index_sets/profiles/all');
 
-  return fetch('GET', url).then((profiles: Array<{name: string, id: string }>) => profiles
-    .map(({ name, id }) => ({ value: id, label: name })));
+  return fetch('GET', url).then((profiles: Array<{ name: string; id: string }>) =>
+    profiles.map(({ name, id }) => ({ value: id, label: name })),
+  );
 };
 
 const useProfileOptions = (): {
-  options: ProfileOptions,
-  isLoading: boolean,
-  refetch: () => void,
+  options: ProfileOptions;
+  isLoading: boolean;
+  refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypeProfileOptions'],
-    () => fetchProfileOptions(),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index field type profile options failed with status: ${errorThrown}`,
-          'Could not load index field type profile options');
-      },
-      keepPreviousData: true,
-    },
-  );
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypeProfileOptions'],
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchProfileOptions(),
+        'Loading index field type profile options failed with status',
+        'Could not load index field type profile options',
+      ),
+
+    placeholderData: keepPreviousData,
+  });
+
+  return {
     options: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useProfileOptions;

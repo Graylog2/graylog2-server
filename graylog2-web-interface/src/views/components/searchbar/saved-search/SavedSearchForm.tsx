@@ -20,86 +20,104 @@ import styled from 'styled-components';
 
 import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { GRN } from 'logic/permissions/types';
 
 import styles from './SavedSearchForm.css';
 
 type Props = React.PropsWithChildren<{
-  show: boolean,
-  saveSearch: (newTitle: string) => void,
-  saveAsSearch: (newTitle: string) => void,
-  toggleModal: () => void,
-  isCreateNew: boolean,
-  value: string,
+  show: boolean;
+  saveSearch: (newTitle: string, entityShare?: EntitySharePayload) => void;
+  saveAsSearch: (newTitle: string, entityShare?: EntitySharePayload) => void;
+  toggleModal: () => void;
+  isCreateNew: boolean;
+  value: string;
+  viewId?: string;
+  selectedStreamGRN?: Array<GRN>;
 }>;
-
-const StyledForm = styled.form`
-  width: 210px;
-`;
 
 const stopEvent = (e) => {
   e.preventDefault();
   e.stopPropagation();
 };
+const StyledPopoverDropdown = styled(Popover.Dropdown)``;
 
-const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
+const SavedSearchForm = ({
+  children = undefined,
+  show,
+  isCreateNew,
+  saveSearch,
+  saveAsSearch,
+  toggleModal,
+  value,
+  viewId = null,
+  selectedStreamGRN = null,
+}: Props) => {
   const [title, setTitle] = useState(value);
-  const onChangeTitle = useCallback((e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value), []);
+  const [sharePayload, setSharePayload] = useState(null);
+  const onChangeTitle = useCallback(
+    (e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value),
+    [],
+  );
 
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
   const createNewButtonTitle = isCreateNew ? 'Create new search' : 'Save as new search';
   const pluggableSaveViewControls = useSaveViewFormControls();
-  const _saveSearch = useCallback(() => saveSearch(title), [saveSearch, title]);
-  const _saveAsSearch = useCallback(() => saveAsSearch(title), [saveAsSearch, title]);
+  const _saveSearch = useCallback(() => saveSearch(title, sharePayload), [saveSearch, title, sharePayload]);
+  const _saveAsSearch = useCallback(() => saveAsSearch(title, sharePayload), [saveAsSearch, title, sharePayload]);
 
   return (
-    <Popover position="left" opened={show} withArrow withinPortal>
-      <Popover.Target>
-        {children}
-      </Popover.Target>
-      <Popover.Dropdown title="Name of search"
-                        id="saved-search-popover">
-        <StyledForm onSubmit={stopEvent}>
+    <Popover position="left" width={500} opened={show} withArrow withinPortal>
+      <Popover.Target>{children}</Popover.Target>
+      <StyledPopoverDropdown title="Name of search" id="saved-search-popover">
+        <form onSubmit={stopEvent}>
           <FormGroup>
             <ControlLabel htmlFor="title">Title</ControlLabel>
-            <FormControl type="text"
-                         value={title}
-                         id="title"
-                         placeholder="Enter title"
-                         onChange={onChangeTitle} />
+            <FormControl type="text" value={title} id="title" placeholder="Enter title" onChange={onChangeTitle} />
           </FormGroup>
-          {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component
-              && <Component key={id} disabledViewCreation={disableSaveAs} />))}
+          {pluggableSaveViewControls?.map(
+            ({ component: Component, id }) => Component && <Component key={id} disabledViewCreation={disableSaveAs} />,
+          )}
+          <EntityCreateShareFormGroup
+            description="Search for a User or Team to add as collaborator on this search."
+            entityType="search"
+            entityTitle=""
+            entityId={isCreateNew ? null : viewId}
+            dependenciesGRN={selectedStreamGRN}
+            onSetEntityShare={(payload) => setSharePayload(payload)}
+          />
           <ButtonToolbar>
             {!isCreateNew && (
-              <Button bsStyle="primary"
-                      className={styles.button}
-                      type="submit"
-                      bsSize="sm"
-                      title="Save search"
-                      onClick={_saveSearch}>
+              <Button
+                bsStyle="primary"
+                className={styles.button}
+                type="submit"
+                bsSize="sm"
+                title="Save search"
+                onClick={_saveSearch}>
                 Save
               </Button>
             )}
-            <Button disabled={disableSaveAs}
-                    bsStyle="info"
-                    className={styles.button}
-                    type="submit"
-                    bsSize="sm"
-                    title={createNewButtonTitle}
-                    onClick={_saveAsSearch}>
+            <Button
+              disabled={disableSaveAs}
+              bsStyle="info"
+              className={styles.button}
+              type="submit"
+              bsSize="sm"
+              title={createNewButtonTitle}
+              onClick={_saveAsSearch}>
               {createNewTitle}
             </Button>
-            <Button className={styles.button}
-                    onClick={toggleModal}
-                    bsSize="sm">
+            <Button className={styles.button} onClick={toggleModal} bsSize="sm">
               Cancel
             </Button>
           </ButtonToolbar>
-        </StyledForm>
-      </Popover.Dropdown>
+        </form>
+      </StyledPopoverDropdown>
     </Popover>
   );
 };

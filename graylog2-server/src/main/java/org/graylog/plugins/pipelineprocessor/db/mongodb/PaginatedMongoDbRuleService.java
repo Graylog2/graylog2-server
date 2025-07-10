@@ -16,31 +16,30 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
-import jakarta.inject.Inject;
-
-public class PaginatedMongoDbRuleService extends PaginatedDbService<RuleDao> implements PaginatedRuleService {
+public class PaginatedMongoDbRuleService implements PaginatedRuleService {
     private static final String COLLECTION_NAME = "pipeline_processor_rules";
+    private final MongoPaginationHelper<RuleDao> paginationHelper;
 
     @Inject
-    public PaginatedMongoDbRuleService(MongoConnection mongoConnection,
-                                       MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, RuleDao.class, COLLECTION_NAME);
+    public PaginatedMongoDbRuleService(MongoCollections mongoCollections) {
+        paginationHelper = mongoCollections.paginationHelper(COLLECTION_NAME, RuleDao.class);
     }
 
     @Override
     public PaginatedList<RuleDao> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+        return paginationHelper
+                .filter(searchQuery.toBson())
+                .perPage(perPage)
+                .sort(SortOrder.fromString(order).toBsonSort(sortField))
+                .page(page);
     }
 }

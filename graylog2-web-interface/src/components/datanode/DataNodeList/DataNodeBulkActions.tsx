@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import ConfirmDialog from 'components/common/ConfirmDialog';
@@ -28,7 +28,7 @@ import { bulkRemoveDataNode, bulkStartDataNode, bulkStopDataNode } from '../hook
 
 const DataNodeBulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const [showDialogType, setShowDialogType] = useState<'REMOVE'|'STOP'|null>(null);
+  const [showDialogType, setShowDialogType] = useState<'REMOVE' | 'STOP' | null>(null);
   const { refetch } = useTableFetchContext();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
 
@@ -79,12 +79,13 @@ const DataNodeBulkActions = () => {
         <MenuItem onSelect={() => setShowDialogType('REMOVE')}>Remove</MenuItem>
       </BulkActionsDropdown>
       {showDialogType && (
-      <ConfirmDialog title={CONFIRM_DIALOG[showDialogType].dialogTitle}
-                     show
-                     onConfirm={CONFIRM_DIALOG[showDialogType].handleConfirm}
-                     onCancel={() => setShowDialogType(null)}>
-        {CONFIRM_DIALOG[showDialogType].dialogBody}
-      </ConfirmDialog>
+        <ConfirmDialog
+          title={CONFIRM_DIALOG[showDialogType].dialogTitle}
+          show
+          onConfirm={CONFIRM_DIALOG[showDialogType].handleConfirm}
+          onCancel={() => setShowDialogType(null)}>
+          {CONFIRM_DIALOG[showDialogType].dialogBody}
+        </ConfirmDialog>
       )}
     </>
   );

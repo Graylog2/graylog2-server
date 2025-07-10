@@ -17,9 +17,6 @@
 package org.graylog.plugins.views.aggregations;
 
 import io.restassured.response.ValidatableResponse;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.rest.QueryDTO;
-import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -27,21 +24,17 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static io.restassured.RestAssured.given;
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
-import static org.graylog.testing.utils.SerializationUtils.serialize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -56,9 +49,6 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     @SuppressWarnings("unused")
     //use this fixtureType:474877 in all fixtures to assure this test isolation from the others
     private static final String FIXTURE_TYPE_FIELD_VALUE = "474877";
-    private static final String QUERY_ID = "q1";
-    private static final String SEARCH_TYPE_ID = "st1";
-    private static final String PIVOT_RESULTS_PATH = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
 
     private final GraylogApis api;
 
@@ -72,31 +62,8 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     private ValidatableResponse execute(Pivot pivot) {
-        final Pivot pivotWithId = pivot.toBuilder()
-                .id(SEARCH_TYPE_ID)
-                .build();
-
-        final SearchDTO search = SearchDTO.builder()
-                .queries(QueryDTO.builder()
-                        .timerange(RelativeRange.create(0))
-                        .id(QUERY_ID)
-                        .query(ElasticsearchQueryString.of("fixtureType:" + FIXTURE_TYPE_FIELD_VALUE))
-                        .searchTypes(Set.of(pivotWithId))
-                        .build())
-                .build();
-
-        return given()
-                .spec(api.requestSpecification())
-                .when()
-                .body(serialize(search))
-                .post("/views/search/sync")
-                .then()
-                .log().ifError()
-                .log().ifValidationFails()
-                .statusCode(200)
-                .body("execution.done", equalTo(true))
-                .body("execution.completed_exceptionally", equalTo(false))
-                .body(PIVOT_RESULTS_PATH + ".total", equalTo(5));
+        return api.search().executePivot(pivot, "fixtureType:" + FIXTURE_TYPE_FIELD_VALUE)
+                .body(".total", equalTo(5));
     }
 
     @ContainerMatrixTest
@@ -109,7 +76,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(5))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
@@ -146,7 +113,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(4))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
@@ -181,7 +148,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(tupledItemPath(MISSING_BUCKET_NAME, "Cooper"), hasItems(List.of(1, 60.0f)))
                 .body(tupledItemPath("Bob", MISSING_BUCKET_NAME), hasItems(List.of(1, 60.0f)))
                 .body(tupledItemPath("Joe", "Smith"), hasItems(List.of(1, 50.0f)))
@@ -212,7 +179,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(4))
                 .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
                 .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
@@ -238,7 +205,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(6))
                 .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
                 .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
@@ -263,7 +230,6 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse
-                .rootPath(PIVOT_RESULTS_PATH)
                 .body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
     }
 
@@ -277,8 +243,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.body("execution.done", equalTo(true))
-                .rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(5))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key == ['60'] }", notNullValue())

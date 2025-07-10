@@ -102,7 +102,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.collect.ImmutableSortedSet.orderedBy;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class PipelineRuleParser {
 
@@ -115,7 +115,7 @@ public class PipelineRuleParser {
         this.functionRegistry = functionRegistry;
     }
 
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineRuleParser.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineRuleParser.class);
 
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 

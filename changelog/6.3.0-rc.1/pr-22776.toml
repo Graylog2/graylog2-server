@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixes links into the security app for Last Opened and Favourites by adding a pluggable Entity Permission Mapper to resolve mappings in the enterprise modules."
+
+issues = ["graylog-plugin-enterprise#10894"]
+pulls = ["22776"]

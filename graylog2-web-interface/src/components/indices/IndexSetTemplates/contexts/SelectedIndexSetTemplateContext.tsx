@@ -20,10 +20,12 @@ import type { SetStateAction } from 'react';
 import { singleton } from 'logic/singleton';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 
-type ContextValue = {
-  selectedIndexSetTemplate: IndexSetTemplate,
-  setSelectedIndexSetTemplate: (template: SetStateAction<IndexSetTemplate>) => void,
-} | undefined
+type ContextValue =
+  | {
+      selectedIndexSetTemplate: IndexSetTemplate;
+      setSelectedIndexSetTemplate: (template: SetStateAction<IndexSetTemplate>) => void;
+    }
+  | undefined;
 
 const SelectedIndexSetTemplateContext = React.createContext<ContextValue>(undefined);
 

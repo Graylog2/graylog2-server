@@ -18,11 +18,11 @@ package org.graylog2.system.processing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -38,10 +38,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mongojack.JacksonDBCollection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.system.processing.DBProcessingStatusService.COLLECTION_NAME;
 import static org.graylog2.system.processing.DBProcessingStatusService.ProcessingNodesState;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -63,7 +61,6 @@ public class DBProcessingStatusServiceTest {
     private DBProcessingStatusService dbService;
     private JobSchedulerTestClock clock;
     private Duration updateThreshold;
-    private JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
 
     @Before
     public void setUp() throws Exception {
@@ -72,11 +69,8 @@ public class DBProcessingStatusServiceTest {
 
         clock = spy(new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z")));
         updateThreshold = spy(Duration.minutes(1));
-        dbService = new DBProcessingStatusService(mongodb.mongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider, baseConfiguration);
-        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(COLLECTION_NAME),
-                ProcessingStatusDto.class,
-                ObjectId.class,
-                mapperProvider.get());
+        dbService = new DBProcessingStatusService(new MongoCollections(mapperProvider, mongodb.mongoConnection()),
+                nodeId, clock, updateThreshold, 1, baseConfiguration);
     }
 
     @Test

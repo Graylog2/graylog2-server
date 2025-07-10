@@ -25,19 +25,21 @@ import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import jakarta.annotation.Nonnull;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.journal.Journal;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Command(name = "decode", description = "Decodes messages from the journal")
 public class JournalDecode extends AbstractJournalCommand {
@@ -51,11 +53,11 @@ public class JournalDecode extends AbstractJournalCommand {
     }
 
     @Override
-    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
+    protected @Nonnull List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
         return ImmutableList.<Module>builder()
-                .addAll(super.getCommandBindings(featureFlags))
+                .addAll(super.getNodeCommandBindings(featureFlags))
                 .add(new CodecsModule())
-                .add(new ObjectMapperModule(getClass().getClassLoader()))
+                .add(new MessageBindings())
                 .add(new Graylog2Module() {
                     @Override
                     protected void configure() {
@@ -108,14 +110,14 @@ public class JournalDecode extends AbstractJournalCommand {
             }
 
             final Codec codec = codecFactory.get(raw.getCodecName()).create(raw.getCodecConfig());
-            final Message message = codec.decode(raw);
-            if (message == null) {
+            final Optional<Message> message = codec.decodeSafe(raw);
+            if (message.isEmpty()) {
                 System.err.println(MessageFormatter.format(
                         "Could not use codec {} to decode raw message id {} at offset {}",
                         new Object[]{raw.getCodecName(), raw.getId(), entry.getOffset()}));
             } else {
-                message.setMessageQueueId(raw.getMessageQueueId());
-                message.setSequenceNr(raw.getSequenceNr());
+                message.get().setMessageQueueId(raw.getMessageQueueId());
+                message.get().setSequenceNr(raw.getSequenceNr());
             }
 
             final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
@@ -128,9 +130,9 @@ public class JournalDecode extends AbstractJournalCommand {
                     .append(" at offset ").append(raw.getMessageQueueId()).append('\n')
                     .append(" seq number ").append(raw.getSequenceNr()).append('\n')
                     .append(" received from remote address ").append(remote).append('\n')
-                    .append(" (source field: ").append(message == null ? "unparsed" : message.getSource()).append(')').append('\n');
-            if (message != null) {
-                sb.append(" contains ").append(message.getFieldNames().size()).append(" fields.");
+                    .append(" (source field: ").append(message.isEmpty() ? "unparsed" : message.get().getSource()).append(')').append('\n');
+            if (message.isPresent()) {
+                sb.append(" contains ").append(message.get().getFieldNames().size()).append(" fields.");
             } else {
                 sb.append("The message could not be parse by the given codec.");
             }

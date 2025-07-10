@@ -30,16 +30,19 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const TimeRangeInfo = styled.div(({ theme }) => `
+const TimeRangeInfo = styled.div(
+  ({ theme }) => `
   margin-left: 10px;
   border: 1px dashed ${theme.colors.input.border};
   width: 100%;
   border-radius: 4px;
   padding: 0 5px;
   min-height: 34px;
-`);
+`,
+);
 
-const TimeRangeString = styled.div(({ theme }) => `
+const TimeRangeString = styled.div(
+  ({ theme }) => `
   display: inline-block;
   margin-left: 0;
   margin-top: 5px;
@@ -49,7 +52,8 @@ const TimeRangeString = styled.div(({ theme }) => `
   color: ${theme.colors.variant.darker.primary};
   font-size: ${theme.fonts.size.body};
   font-family: ${theme.fonts.family.monospace};
-`);
+`,
+);
 
 const ResetButton = styled(Button)`
   margin-top: 5px;
@@ -60,8 +64,8 @@ const ResetButton = styled(Button)`
 `;
 
 type Props = {
-  onReset: () => void,
-  value: TimeRange,
+  onReset: () => void;
+  value: TimeRange;
 };
 
 const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {

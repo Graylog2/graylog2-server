@@ -32,7 +32,6 @@ public class PermittedStreams {
     private final Supplier<Stream<String>> allStreamsProvider;
     private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
-
     public PermittedStreams(Supplier<Stream<String>> allStreamsProvider, Function<Collection<String>, Stream<String>> streamCategoryMapper) {
         this.allStreamsProvider = allStreamsProvider;
         this.streamCategoryMapper = streamCategoryMapper;
@@ -40,8 +39,7 @@ public class PermittedStreams {
 
     @Inject
     public PermittedStreams(StreamService streamService) {
-        this(() -> streamService.loadAll().stream().map(org.graylog2.plugin.streams.Stream::getId),
-                (categories) -> streamService.mapCategoriesToIds(categories).stream());
+        this(streamService::streamAllIds, streamService::mapCategoriesToIds);
     }
 
     public ImmutableSet<String> loadAllMessageStreams(final StreamPermissions streamPermissions) {
@@ -56,15 +54,19 @@ public class PermittedStreams {
     }
 
     public ImmutableSet<String> loadAll(final StreamPermissions streamPermissions) {
-        return allStreamsProvider.get()
-                .filter(streamPermissions::canReadStream)
-                .collect(ImmutableSet.toImmutableSet());
+        try (var stream = allStreamsProvider.get()) {
+            return stream
+                    .filter(streamPermissions::canReadStream)
+                    .collect(ImmutableSet.toImmutableSet());
+        }
     }
 
     public ImmutableSet<String> loadWithCategories(final Collection<String> categories,
                                                    final StreamPermissions streamPermissions) {
-        return streamCategoryMapper.apply(categories)
-                .filter(streamPermissions::canReadStream)
-                .collect(ImmutableSet.toImmutableSet());
+        try (var stream = streamCategoryMapper.apply(categories)) {
+            return stream
+                    .filter(streamPermissions::canReadStream)
+                    .collect(ImmutableSet.toImmutableSet());
+        }
     }
 }

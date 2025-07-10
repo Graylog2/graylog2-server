@@ -14,118 +14,95 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
+
+import useDisclosure from 'util/hooks/useDisclosure';
 
 import styles from './EditableTitle.css';
 
-const StyledStaticSpan = styled.span(({ theme }) => css`
-  border: 1px solid ${theme.colors.global.contentBackground};
-  font-size: ${theme.fonts.size.large};
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-`);
+export const Title = styled.span(
+  ({ theme }) => css`
+    border: 1px solid ${theme.colors.global.contentBackground};
+    font-size: ${theme.fonts.size.large};
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  `,
+);
 
-const StyledInput = styled.input(({ theme }) => css`
-  border: 1px solid ${theme.colors.input.border};
-  background-color: ${theme.colors.input.background};
-  color: ${theme.colors.input.color};
-  border-radius: 4px;
-  padding: 2px 3px;
-  font-size: ${theme.fonts.size.large};
-  
-  &:focus {
-    border-color: ${theme.colors.input.borderFocus};
-    outline: none;
-  }
-`);
+const StyledInput = styled.input(
+  ({ theme }) => css`
+    border: 1px solid ${theme.colors.input.border};
+    background-color: ${theme.colors.input.background};
+    color: ${theme.colors.input.color};
+    border-radius: 4px;
+    padding: 2px 3px;
+    font-size: ${theme.fonts.size.large};
+
+    &:focus {
+      border-color: ${theme.colors.input.borderFocus};
+      outline: none;
+    }
+  `,
+);
 
 type Props = {
-  disabled?: boolean,
-  onChange: (newTitle: string) => void,
-  value: string,
+  disabled?: boolean;
+  onChange: (newTitle: string) => void;
+  value: string;
 };
 
-type State = {
-  editing: boolean,
-  value: string,
-};
+const EditableTitle = ({ disabled = false, value: propsValue, onChange }: Props) => {
+  const [value, setValue] = React.useState(propsValue);
+  const [editing, { toggle }] = useDisclosure(false);
 
-export default class EditableTitle extends React.Component<Props, State> {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    onChange: PropTypes.func,
-    value: PropTypes.string.isRequired,
-  };
-
-  static defaultProps = {
-    disabled: false,
-    onChange: () => {},
-  };
-
-  constructor(props: Props) {
-    super(props);
-    const { value } = props;
-
-    this.state = {
-      editing: false,
-      value,
-    };
-  }
-
-  _toggleEditing = () => {
-    const { disabled } = this.props;
-
+  const _toggleEditing = useCallback(() => {
     if (!disabled) {
-      this.setState((state) => ({ editing: !state.editing }));
+      toggle();
     }
-  };
+  }, [disabled, toggle]);
 
-  _onBlur = () => {
-    this._toggleEditing();
-    this._submitValue();
-  };
-
-  _onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+  const _onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
     evt.preventDefault();
-    this.setState({ value: evt.target.value });
-  };
+    setValue(evt.target.value);
+  }, []);
 
-  _submitValue = () => {
-    const { value } = this.state;
-    const { onChange, value: propsValue } = this.props;
-
+  const _submitValue = useCallback(() => {
     if (value !== '') {
-      onChange(value);
+      onChange?.(value);
     } else {
-      this.setState({ value: propsValue });
+      setValue(propsValue);
     }
-  };
+  }, [onChange, propsValue, value]);
 
-  _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    this._toggleEditing();
-    this._submitValue();
-  };
+  const _onBlur = useCallback(() => {
+    _toggleEditing();
+    _submitValue();
+  }, [_submitValue, _toggleEditing]);
 
-  render() {
-    const { editing, value } = this.state;
+  const _onSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      _toggleEditing();
+      _submitValue();
+    },
+    [_submitValue, _toggleEditing],
+  );
 
-    return editing ? (
-      <span>
-        <form onSubmit={this._onSubmit} className={styles.inlineForm}>
-          {}
-          <StyledInput autoFocus
-                       type="text"
-                       value={value}
-                       onBlur={this._onBlur}
-                       title="Edit title"
-                       onChange={this._onChange} />
-        </form>
-      </span>
-    ) : <StyledStaticSpan onDoubleClick={this._toggleEditing} title={`${value} - Double click the title to edit it.`}>{value}</StyledStaticSpan>;
-  }
-}
+  return editing ? (
+    <span>
+      <form onSubmit={_onSubmit} className={styles.inlineForm}>
+        <StyledInput autoFocus type="text" value={value} onBlur={_onBlur} title="Edit title" onChange={_onChange} />
+      </form>
+    </span>
+  ) : (
+    <Title onDoubleClick={_toggleEditing} title={`${value} - Double click the title to edit it.`}>
+      {value}
+    </Title>
+  );
+};
+
+export default EditableTitle;

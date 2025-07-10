@@ -28,9 +28,11 @@ jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
 describe('TimeRangePresetDropdown', () => {
   const openTimeRangePresetSelect = async () => {
-    userEvent.click(await screen.findByRole('button', {
-      name: /open time range preset select/i,
-    }));
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /open time range preset select/i,
+      }),
+    );
 
     await screen.findByRole('menu');
   };
@@ -42,7 +44,7 @@ describe('TimeRangePresetDropdown', () => {
     });
 
     const onSelectOption = jest.fn();
-    render(<TimeRangePresetDropdown onChange={onSelectOption} />);
+    render(<TimeRangePresetDropdown onChange={onSelectOption} limitDuration={0} />);
 
     await openTimeRangePresetSelect();
     await screen.findByRole('menuitem', { name: /15 minutes/i });
@@ -62,10 +64,10 @@ describe('TimeRangePresetDropdown', () => {
   });
 
   it('filtrate options by limit', async () => {
+    const limitDuration = 36000; // 6 Minutes
     asMock(useSearchConfiguration).mockReturnValue({
       config: {
         ...mockSearchClusterConfig,
-        query_time_range_limit: 'PT6M',
         quick_access_timerange_presets: [
           {
             id: '639843f5-049a-4532-8a54-102da850b7f1',
@@ -91,7 +93,7 @@ describe('TimeRangePresetDropdown', () => {
 
     const onSelectOption = jest.fn();
 
-    render(<TimeRangePresetDropdown onChange={onSelectOption} />);
+    render(<TimeRangePresetDropdown onChange={onSelectOption} limitDuration={limitDuration} />); //
 
     await openTimeRangePresetSelect();
 

@@ -23,53 +23,61 @@ import type { Message } from 'views/components/messagelist/Types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MessageFieldRow from 'views/components/messagelist/MessageFieldRow';
 
-const TableRow = styled.tr(({ theme }) => css`
-  && {
-    cursor: pointer;
-  
-    td {
-      border-top: 0;
-      padding-top: 0;
-      padding-bottom: 4px;
-      font-family: ${theme.fonts.family.monospace};
-      color: ${theme.colors.variant.dark.info};
+const TableRow = styled.tr(
+  ({ theme }) => css`
+    && {
+      cursor: pointer;
+
+      td {
+        border-top: 0;
+        padding-top: 0;
+        padding-bottom: 4px;
+        font-family: ${theme.fonts.family.monospace};
+        color: ${theme.colors.variant.dark.info};
+      }
     }
-  }
-`);
+  `,
+);
 
 const renderMessageFieldRow = (message, messageFieldType) => (
-  <MessageFieldRow message={message}
-                   messageFieldType={messageFieldType} />
+  <MessageFieldRow message={message} messageFieldType={messageFieldType} />
 );
 
 type Props = {
-  onRowClick: () => void,
-  colSpanFixup: number,
-  message: Message,
-  showMessageRow?: boolean,
-  messageFieldType: FieldType,
-  config: MessagesWidgetConfig,
+  onRowClick: () => void;
+  colSpanFixup: number;
+  message: Message;
+  showMessageRow?: boolean;
+  messageFieldType: FieldType;
+  config: MessagesWidgetConfig;
 };
 
-const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, showMessageRow, config }: Props) => {
+const MessagePreview = ({
+  onRowClick,
+  colSpanFixup,
+  message,
+  messageFieldType,
+  showMessageRow = false,
+  config,
+}: Props) => {
   const MessageRowOverride = usePluginEntities('views.components.widgets.messageTable.messageRowOverride')?.[0];
 
-  return showMessageRow && (
-    <TableRow onClick={onRowClick}>
-      <td colSpan={colSpanFixup}>
-        {!!MessageRowOverride && (
-          <MessageRowOverride messageFields={message.fields}
-                              config={config}
-                              renderMessageRow={() => renderMessageFieldRow(message, messageFieldType)} />
-        )}
-        {(!MessageRowOverride) && renderMessageFieldRow(message, messageFieldType)}
-      </td>
-    </TableRow>
+  return (
+    showMessageRow && (
+      <TableRow onClick={onRowClick}>
+        <td colSpan={colSpanFixup}>
+          {!!MessageRowOverride && (
+            <MessageRowOverride
+              messageFields={message.fields}
+              config={config}
+              renderMessageRow={() => renderMessageFieldRow(message, messageFieldType)}
+            />
+          )}
+          {!MessageRowOverride && renderMessageFieldRow(message, messageFieldType)}
+        </td>
+      </TableRow>
+    )
   );
-};
-
-MessagePreview.defaultProps = {
-  showMessageRow: false,
 };
 
 export default MessagePreview;

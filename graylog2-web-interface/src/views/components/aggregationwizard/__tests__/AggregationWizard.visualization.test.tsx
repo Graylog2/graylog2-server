@@ -20,97 +20,112 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
-  .visualization('table')
-  .build();
+const widgetConfig = AggregationWidgetConfig.builder().visualization('table').build();
 
 const SimpleAggregationWizard = (props) => (
-  <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
+  <AggregationWizard
+    config={widgetConfig}
+    editing
+    id="widget-id"
+    type="AGGREGATION"
+    fields={Immutable.List([])}
+    onChange={() => {}}
+    {...props}
+  />
 );
 
 const dataTableVisualization = makeVisualization(() => <span>This is the chart.</span>, 'table');
 const mapVisualization = makeVisualization(() => <span>This is the map.</span>, 'map');
 
 interface ExtraConfigSettings {
-  mode: 'onemode' | 'anothermode' | 'thirdmode',
-  color?: 'red' | 'green' | 'blue',
-  invert: boolean,
-  factor: number,
+  mode: 'onemode' | 'anothermode' | 'thirdmode';
+  color?: 'red' | 'green' | 'blue';
+  invert: boolean;
+  factor: number;
 }
 
 interface ExtraConfigWidget extends VisualizationConfig, ExtraConfigSettings {}
 
 const fromConfig = (config: ExtraConfigWidget): ExtraConfigSettings => ({ ...config });
-const createVisualizationConfig = (config: ExtraConfigSettings) => (({
-  ...config,
-}) as ExtraConfigWidget);
+const createVisualizationConfig = (config: ExtraConfigSettings) =>
+  ({
+    ...config,
+  }) as ExtraConfigWidget;
 const toConfig = (config: ExtraConfigSettings): ExtraConfigWidget => createVisualizationConfig(config);
 
 const visualizationPlugin: PluginRegistration = {
   exports: {
-    visualizationTypes: [{
-      type: 'table',
-      component: dataTableVisualization,
-      displayName: 'Data Table',
-    }, {
-      type: 'map',
-      displayName: 'World Map',
-      component: mapVisualization,
-      config: {
-        fromConfig,
-        toConfig,
-        fields: [],
+    visualizationTypes: [
+      {
+        type: 'table',
+        component: dataTableVisualization,
+        displayName: 'Data Table',
       },
-    }, {
-      type: 'visualizationWithConfig',
-      displayName: 'Extra Config Required',
-      component: dataTableVisualization,
-      config: {
-        fromConfig,
-        toConfig,
-        fields: [{
-          name: 'mode',
-          title: 'Mode',
-          type: 'select',
-          options: ['onemode', 'anothermode', 'thirdmode'],
-          required: false,
-        }, {
-          name: 'color',
-          title: 'Favorite Color',
-          type: 'select',
-          options: ['red', ['Yellow', 'green'], 'blue'],
-          required: true,
-          isShown: (formValues: ExtraConfigSettings) => formValues.mode === 'anothermode',
-        }, {
-          name: 'invert',
-          title: 'Invert',
-          type: 'boolean',
-        }, {
-          name: 'factor',
-          title: 'Important Factor',
-          type: 'numeric',
-          required: true,
-        }],
+      {
+        type: 'map',
+        displayName: 'World Map',
+        component: mapVisualization,
+        config: {
+          fromConfig,
+          toConfig,
+          fields: [],
+        },
       },
-    }, {
-      type: 'withoutConfig',
-      component: dataTableVisualization,
-      displayName: 'Without Config',
-    }],
+      {
+        type: 'visualizationWithConfig',
+        displayName: 'Extra Config Required',
+        component: dataTableVisualization,
+        config: {
+          fromConfig,
+          toConfig,
+          fields: [
+            {
+              name: 'mode',
+              title: 'Mode',
+              type: 'select',
+              options: ['onemode', 'anothermode', 'thirdmode'],
+              required: false,
+            },
+            {
+              name: 'color',
+              title: 'Favorite Color',
+              type: 'select',
+              options: ['red', ['Yellow', 'green'], 'blue'],
+              required: true,
+              isShown: (formValues: ExtraConfigSettings) => formValues.mode === 'anothermode',
+            },
+            {
+              name: 'invert',
+              title: 'Invert',
+              type: 'boolean',
+            },
+            {
+              name: 'factor',
+              title: 'Important Factor',
+              type: 'numeric',
+              required: true,
+            },
+          ],
+        },
+      },
+      {
+        type: 'withoutConfig',
+        component: dataTableVisualization,
+        displayName: 'Without Config',
+      },
+    ],
   },
 };
 
-const selectEventConfig = { container: document.body };
 const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
@@ -122,7 +137,7 @@ const expectSubmitButtonToBeDisabled = async () => {
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option, selectEventConfig);
+  await selectEvent.select(select, option);
 };
 
 describe('AggregationWizard/Visualizations', () => {
@@ -144,11 +159,15 @@ describe('AggregationWizard/Visualizations', () => {
     const visualizationSelect = await screen.findByLabelText('Select visualization type');
 
     await selectEvent.openMenu(visualizationSelect);
-    await selectEvent.select(visualizationSelect, 'Without Config', selectEventConfig);
+    await selectEvent.select(visualizationSelect, 'Without Config');
 
     userEvent.click(await findWidgetConfigSubmitButton());
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ visualization: 'withoutConfig', visualizationConfig: undefined })));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ visualization: 'withoutConfig', visualizationConfig: undefined }),
+      ),
+    );
   });
 
   it('performs proper validation for required fields', async () => {
@@ -185,14 +204,18 @@ describe('AggregationWizard/Visualizations', () => {
 
     userEvent.click(submitButton);
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
-      visualization: 'visualizationWithConfig',
-      visualizationConfig: {
-        color: 'green',
-        factor: 10,
-        mode: 'anothermode',
-      },
-    })));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          visualization: 'visualizationWithConfig',
+          visualizationConfig: {
+            color: 'green',
+            factor: 10,
+            mode: 'anothermode',
+          },
+        }),
+      ),
+    );
   });
 
   it('should update visualization config when changing config inside visualization', async () => {
@@ -203,32 +226,34 @@ describe('AggregationWizard/Visualizations', () => {
       const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
       return (
-        <button type="button" onClick={() => onVisualizationConfigChange({ zoom: 2, centerX: 40, centerY: 50 })}>Change
-          Viewport
+        <button type="button" onClick={() => onVisualizationConfigChange({ zoom: 2, centerX: 40, centerY: 50 })}>
+          Change Viewport
         </button>
       );
     };
 
-    WorldMap.defaultProps = { onVisualizationConfigChange: undefined };
-
-    render((
+    render(
       <SimpleAggregationWizard onChange={onChange} config={worldMapConfig}>
         <WorldMap />
-      </SimpleAggregationWizard>
-    ));
+      </SimpleAggregationWizard>,
+    );
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
     userEvent.click(updateViewportButton);
     const submitButton = await findWidgetConfigSubmitButton();
     userEvent.click(submitButton);
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
-      visualization: 'map',
-      visualizationConfig: {
-        zoom: 2,
-        centerX: 40,
-        centerY: 50,
-      },
-    })));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          visualization: 'map',
+          visualizationConfig: {
+            zoom: 2,
+            centerX: 40,
+            centerY: 50,
+          },
+        }),
+      ),
+    );
   });
 });

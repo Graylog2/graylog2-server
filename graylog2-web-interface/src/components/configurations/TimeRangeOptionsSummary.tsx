@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 type Props = { options: { [key: string]: string } };
@@ -31,15 +30,7 @@ const TimeRangeOptionsSummary = ({ options }: Props) => {
     ));
   }
 
-  return (
-    <dl className="deflist">
-      {timerangeOptionsSummary}
-    </dl>
-  );
-};
-
-TimeRangeOptionsSummary.propTypes = {
-  options: PropTypes.object.isRequired,
+  return <dl className="deflist">{timerangeOptionsSummary}</dl>;
 };
 
 export default TimeRangeOptionsSummary;

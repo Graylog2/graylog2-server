@@ -15,21 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
 
-import { WidgetErrorsList } from './WidgetPropTypes';
 import styles from './MessageWidgets.css';
 
 type WidgetError = {
-  description: string,
+  description: string;
 };
 
 type Props = {
-  errors: Array<WidgetError>,
-  title?: string,
+  errors: Array<WidgetError>;
+  title?: string;
 };
 
 const Description = styled.div`
@@ -48,7 +46,10 @@ const Row = styled.div`
   }
 `;
 
-const ErrorWidget = ({ errors, title }: Props) => (
+const ErrorWidget = ({
+  errors,
+  title = 'While retrieving data for this widget, the following error(s) occurred:',
+}: Props) => (
   <Center>
     <Icon name="warning" size="3x" className={styles.iconMargin} />
     <Description>
@@ -56,19 +57,14 @@ const ErrorWidget = ({ errors, title }: Props) => (
         <strong>{title}</strong>
       </Row>
       <ErrorList>
-        {errors.map((e) => <Row as="li" key={e.description}>{e.description}</Row>)}
+        {errors.map((e) => (
+          <Row as="li" key={e.description}>
+            {e.description}
+          </Row>
+        ))}
       </ErrorList>
     </Description>
   </Center>
 );
-
-ErrorWidget.propTypes = {
-  errors: WidgetErrorsList.isRequired,
-  title: PropTypes.string,
-};
-
-ErrorWidget.defaultProps = {
-  title: 'While retrieving data for this widget, the following error(s) occurred:',
-};
 
 export default ErrorWidget;

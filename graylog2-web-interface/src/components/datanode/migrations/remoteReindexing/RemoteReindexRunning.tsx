@@ -18,18 +18,20 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
-import { useQueryParam, StringParam } from 'use-query-params';
 
+import { useQueryParam, StringParam } from 'routing/QueryParams';
 import { ConfirmDialog } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useProductName from 'brand-customization/useProductName';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 import { MIGRATION_ACTIONS } from '../../Constants';
 import RemoteReindexTasksProgress from '../common/RemoteReindexProgressBar';
+import MigrationError from '../common/MigrationError';
 
 const IndicesContainer = styled.div`
   max-height: 100px;
@@ -49,11 +51,13 @@ const LogsContainer = styled.div`
   }
 `;
 
-const StyledLog = styled.span<{ $colorVariant: ColorVariant }>(({ $colorVariant, theme }) => css`
-  color: ${$colorVariant ? theme.colors.variant[$colorVariant] : 'inherit'};
-`);
+const StyledLog = styled.span<{ $colorVariant: ColorVariant }>(
+  ({ $colorVariant, theme }) => css`
+    color: ${$colorVariant ? theme.colors.variant[$colorVariant] : 'inherit'};
+  `,
+);
 
-const getColorVariantFromLogLevel = (logLovel: string): ColorVariant|undefined => {
+const getColorVariantFromLogLevel = (logLovel: string): ColorVariant | undefined => {
   switch (logLovel) {
     case 'ERROR':
       return 'danger';
@@ -73,6 +77,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
   const [showRetryMigrationConfirmDialog, setShowRetryMigrationConfirmDialog] = useState<boolean>(false);
   const [showLogsQuery, setShowLogsQuery] = useQueryParam('show_logs', StringParam);
   const sendTelemetry = useSendTelemetry();
+  const productName = useProductName();
 
   const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
 
@@ -121,12 +126,13 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
 
   return (
     <>
-      We are currently migrating your existing data asynchronically (Graylog can be used while the reindexing is running),
-      once the data migration is finished you will be automatically transitioned to the next step.
+      We are currently migrating your existing data asynchronically ({productName} can be used while the reindexing is
+      running), once the data migration is finished you will be automatically transitioned to the next step.
       <br />
       <br />
       <RemoteReindexTasksProgress migrationStatus={migrationStatus} />
-      {(indicesWithErrors.length > 0) && (
+      <MigrationError errorMessage={currentStep.error_message} />
+      {indicesWithErrors.length > 0 && (
         <Alert title="Migration failed" bsStyle="danger">
           <IndicesContainer>
             {indicesWithErrors.map((index) => (
@@ -138,24 +144,30 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
           </IndicesContainer>
         </Alert>
       )}
-      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
-        <Button bsStyle="default" bsSize="small" onClick={handleLogViewClick}>Log View</Button>
-        <Button bsStyle="default" bsSize="small" onClick={handleRetryClick}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)}
+        onTriggerStep={handleTriggerStep}>
+        <Button bsStyle="default" bsSize="small" onClick={handleLogViewClick}>
+          Log View
+        </Button>
+        <Button bsStyle="default" bsSize="small" onClick={handleRetryClick}>
+          {MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}
+        </Button>
       </MigrationStepTriggerButtonToolbar>
       {showRetryMigrationConfirmDialog && (
-        <ConfirmDialog show={showRetryMigrationConfirmDialog}
-                       title="Retry migrating existing data"
-                       onCancel={() => setShowRetryMigrationConfirmDialog(false)}
-                       onConfirm={handleRetryConfirmClick}>
-          Are you sure you want to stop the current running remote reindexing migration and retry migrating existing data?
+        <ConfirmDialog
+          show={showRetryMigrationConfirmDialog}
+          title="Retry migrating existing data"
+          onCancel={() => setShowRetryMigrationConfirmDialog(false)}
+          onConfirm={handleRetryConfirmClick}>
+          Are you sure you want to stop the current running remote reindexing migration and retry migrating existing
+          data?
         </ConfirmDialog>
       )}
       {showLogView && (
-        <BootstrapModalWrapper showModal={showLogView}
-                               onHide={handleCloseLogView}
-                               bsSize="large"
-                               backdrop>
-          <Modal.Header closeButton>
+        <BootstrapModalWrapper showModal={showLogView} onHide={handleCloseLogView} bsSize="large" backdrop>
+          <Modal.Header>
             <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -167,14 +179,26 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
                       {migrationStatus.logs.map((log) => (
                         <tr>
                           <td width={180}>{new Date(log.timestamp).toLocaleString()}</td>
-                          <td width={80}>[<StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.log_level}</StyledLog>]</td>
-                          <td><StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.message}</StyledLog></td>
+                          <td width={80}>
+                            [
+                            <StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>
+                              {log.log_level}
+                            </StyledLog>
+                            ]
+                          </td>
+                          <td>
+                            <StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>
+                              {log.message}
+                            </StyledLog>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </LogsContainer>
-              ) : ('No logs.')}
+              ) : (
+                'No logs.'
+              )}
             </pre>
           </Modal.Body>
         </BootstrapModalWrapper>

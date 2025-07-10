@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Use msearch instead of search to avoid creating too long HTTP request lines for getting the next chunk in pagination calls"
+
+issues = ["21554"]
+pulls = ["22162"]

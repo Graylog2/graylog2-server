@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding 'Replay Search' Bulk action to alerts & events."
+
+pulls = ["21262"]
