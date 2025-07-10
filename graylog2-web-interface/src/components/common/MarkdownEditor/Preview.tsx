@@ -110,7 +110,6 @@ const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
 `;
 
 type Props = {
-  augment?: boolean;
   value: string;
   height?: number | string;
   show: boolean;
@@ -121,7 +120,6 @@ type Props = {
 };
 
 function Preview({
-  augment = false,
   value,
   height = 100,
   show,
@@ -136,7 +134,7 @@ function Preview({
     show && (
       <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
         <MarkdownStyles $noPadding={noPadding}>
-          <Markdown augment={augment} text={value} />
+          <Markdown text={value} />
         </MarkdownStyles>
         {withFullView && (
           <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />
