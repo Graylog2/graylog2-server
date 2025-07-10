@@ -30,9 +30,8 @@ import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDescriptor;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.EntityPaginationHelper;
 import org.graylog2.rest.PaginationParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,15 +41,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 public class GranteeSharesService {
-    private static final Logger LOG = LoggerFactory.getLogger(GranteeSharesService.class);
 
     private final DBGrantService grantService;
     private final GRNDescriptorService descriptorService;
@@ -68,7 +63,7 @@ public class GranteeSharesService {
                                                 PaginationParameters paginationParameters,
                                                 String capabilityFilterString,
                                                 String entityTypeFilterString) {
-        final Optional<Capability> capability = parseCapabilityFilter(capabilityFilterString);
+        final Optional<Capability> capability = EntityPaginationHelper.parseCapabilityFilter(capabilityFilterString);
         // Get all aliases for the grantee to make sure we find all entities the grantee has access to
         final Set<GRN> granteeAliases = granteeService.getGranteeAliases(grantee);
         final ImmutableSet<GrantDTO> grants = capability
@@ -81,8 +76,8 @@ public class GranteeSharesService {
 
         final Supplier<Stream<EntityDescriptor>> filteredStream = () -> targets.stream()
                 .map(descriptorService::getDescriptor)
-                .filter(queryPredicate(paginationParameters))
-                .filter(entityTypeFilterPredicate(entityTypeFilterString))
+                .filter(EntityPaginationHelper.queryPredicate(paginationParameters.getQuery()))
+                .filter(EntityPaginationHelper.entityFilterPredicate(entityTypeFilterString))
                 .map(toEntityDescriptor(targetOwners))
                 .sorted(Comparator.comparing(EntityDescriptor::title, (t1, t2) -> {
                     if (paginationParameters.getOrder().toLowerCase(Locale.US).equals("desc")) {
@@ -151,41 +146,6 @@ public class GranteeSharesService {
                         }
                 )
                 .collect(Collectors.toSet());
-    }
-
-    private Optional<Capability> parseCapabilityFilter(String capabilityFilterString) {
-        final String capabilityFilter = firstNonNull(capabilityFilterString, "").trim().toUpperCase(Locale.US);
-
-        if (capabilityFilter.isEmpty()) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(Capability.valueOf(capabilityFilter));
-        } catch (IllegalArgumentException e) {
-            LOG.warn("Unknown capability", e);
-            return Optional.empty();
-        }
-    }
-
-    private Predicate<GRNDescriptor> queryPredicate(PaginationParameters paginationParameters) {
-        final String query = firstNonNull(paginationParameters.getQuery(), "").trim().toLowerCase(Locale.US);
-
-        if (query.isEmpty()) {
-            return descriptor -> true;
-        }
-
-        return descriptor -> descriptor.title().toLowerCase(Locale.US).contains(query);
-    }
-
-    private Predicate<GRNDescriptor> entityTypeFilterPredicate(String entityTypeFilter) {
-        final String type = firstNonNull(entityTypeFilter, "").trim().toLowerCase(Locale.US);
-
-        if (type.isEmpty()) {
-            return descriptor -> true;
-        }
-
-        return descriptor -> descriptor.grn().type().equals(type);
     }
 
     @AutoValue
