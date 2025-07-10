@@ -119,12 +119,12 @@ const ConfigurationsPage = () => {
           },
         },
         {
-          name: 'URL Whitelist',
+          name: 'URL Allowlist',
           hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: UrlWhiteListConfig,
-            title: 'URL Whitelist',
+            title: 'URL Allowlist',
           },
         },
         {
