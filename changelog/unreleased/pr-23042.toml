@@ -1,0 +1,4 @@
+type = "added"
+message = "Added new input for collecting and ingesting database logs."
+
+pulls = ["23042"]
