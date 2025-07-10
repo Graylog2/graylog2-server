@@ -116,7 +116,7 @@
         <commons-exec.version>1.5.0</commons-exec.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <commons-net.version>3.11.1</commons-net.version>
-        <commons-validator.version>1.9.0</commons-validator.version>
+        <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.19.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.39.0</error-prone.version>
