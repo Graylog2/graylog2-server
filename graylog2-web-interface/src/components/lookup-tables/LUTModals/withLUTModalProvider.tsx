@@ -14,6 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export type SelectCallback = (eventKey: any) => void;
-export type BsSize = 'xs' | 'xsmall' | 'sm' | 'small' | 'md' | 'medium' | 'lg' | 'large' | 'fullscreen';
+import { ModalProvider } from './ModalContext';
+
+const withLUTModalProvider = (Component, props = {}) => (
+  <ModalProvider>
+    <Component {...props} />
+  </ModalProvider>
+);
+
+export default withLUTModalProvider;

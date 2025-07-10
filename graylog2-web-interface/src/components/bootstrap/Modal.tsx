@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import type { BsSize } from 'components/bootstrap/types';
 import zIndices from 'theme/z-indices';
 
-export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
+export type ModalSize = 'lg' | 'large' | 'sm' | 'small' | 'fullscreen';
 
 const ModalOverlay = styled(MantineModal.Overlay)`
   z-index: ${zIndices.modalOverlay};
@@ -29,6 +29,7 @@ const ModalOverlay = styled(MantineModal.Overlay)`
 
 const ModalContent = styled(MantineModal.Content)`
   z-index: ${zIndices.modalBody};
+  border-radius: 10px;
 `;
 
 const ModalRoot = styled(MantineModal.Root)(
@@ -45,6 +46,8 @@ const sizeForMantine = (size: BsSize) => {
     case 'lg':
     case 'large':
       return 'xl';
+    case 'fullscreen':
+      return '100vw';
     default:
       return 'lg';
   }
@@ -57,10 +60,12 @@ type Props = {
   bsSize?: ModalSize;
   backdrop?: boolean;
   closable?: boolean;
+  fullScreen?: boolean;
+  transitionProps?: any;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true }: Props) => (
-  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable}>
+const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false, transitionProps = { transition: 'fade', duration: 200 } }: Props) => (
+  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable} fullScreen={fullScreen} transitionProps={transitionProps}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </ModalRoot>
