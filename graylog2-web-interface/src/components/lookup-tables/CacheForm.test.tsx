@@ -75,6 +75,7 @@ const renderedCache = ({
       create={create}
       validate={validate}
       validationErrors={validationErrors}
+      onCancel={() => {}}
     />,
   );
 };
