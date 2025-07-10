@@ -42,10 +42,12 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This opensearch configuration bean manages searchable snapshots and their S3 or local filesystem configuration.
@@ -170,7 +172,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         if (isSharedFileSystemRepo()) {
             // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
             if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-                builder.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+                builder.put("path.repo", serialize(localConfiguration.getPathRepo()));
             }
         }
 
@@ -178,6 +180,11 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             builder.putAll(s3RepositoryConfiguration.toOpensearchProperties());
         }
         return builder.build();
+    }
+
+    @Nonnull
+    private String serialize(List<Path> pathRepo) {
+        return pathRepo.stream().map(Path::toString).collect(Collectors.joining(","));
     }
 
     private Collection<OpensearchKeystoreItem> keystoreItems() {
