@@ -14,23 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
-import { Row, Col } from 'components/bootstrap';
-import { LookupTableForm } from 'components/lookup-tables';
+import { attributes } from './constants';
 
-type Props = {
-  saved: (...args: any[]) => void;
+type DeserializeCachesArgs = PaginatedResponseType & {
+  data_adapters: Array<LookupTableAdapter>;
 };
 
-const LookupTableCreate = ({ saved }: Props) => (
-  <div>
-    <Row className="content">
-      <Col lg={8}>
-        <LookupTableForm saved={saved} create />
-      </Col>
-    </Row>
-  </div>
-);
-
-export default LookupTableCreate;
+export default function deserializeDataAdapters({
+  query,
+  total,
+  page,
+  per_page,
+  count,
+  data_adapters,
+}: DeserializeCachesArgs) {
+  return {
+    attributes,
+    list: data_adapters.map((adapter: LookupTableAdapter) => ({ ...adapter, id: adapter.id })) ?? [],
+    pagination: { total, page, per_page, count, query },
+  };
+}

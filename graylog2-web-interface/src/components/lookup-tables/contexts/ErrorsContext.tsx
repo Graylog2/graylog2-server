@@ -16,24 +16,19 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LUTLayout, LookupTablesOverview } from 'components/lookup-tables';
+const ErrorsContext = React.createContext(null);
 
-function LUTTablesPage() {
-  return (
-    <LUTLayout
-      documentTitle="Lookup Tables"
-      pageTitle="Lookup Tables"
-      pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
-      actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-          Create lookup table
-        </Button>
-      }>
-      <LookupTablesOverview />
-    </LUTLayout>
-  );
+type ProviderProps = {
+  children: React.ReactNode;
+};
+
+export function ErrorsProvider({ children }: ProviderProps) {
+  const [errors, setErrors] = React.useState<{ lutErrors: unknown; cacheErrors: unknown; adapterErrors: unknown }>();
+  const value = React.useMemo(() => ({ errors, setErrors }), [errors, setErrors]);
+
+  return <ErrorsContext.Provider value={value}>{children}</ErrorsContext.Provider>;
 }
 
-export default LUTTablesPage;
+export function useErrorsContext() {
+  return React.useContext(ErrorsContext);
+}

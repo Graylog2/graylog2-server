@@ -14,23 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { EntityBase } from 'components/common/EntityDataTable/types';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
-import { Row, Col } from 'components/bootstrap';
-import { LookupTableForm } from 'components/lookup-tables';
-
-type Props = {
-  saved: (...args: any[]) => void;
-};
-
-const LookupTableCreate = ({ saved }: Props) => (
-  <div>
-    <Row className="content">
-      <Col lg={8}>
-        <LookupTableForm saved={saved} create />
-      </Col>
-    </Row>
-  </div>
-);
-
-export default LookupTableCreate;
+export type DataAdapterEntity = EntityBase & LookupTableAdapter;

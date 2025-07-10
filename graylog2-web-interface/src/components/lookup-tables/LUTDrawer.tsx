@@ -16,24 +16,25 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LUTLayout, LookupTablesOverview } from 'components/lookup-tables';
+import Drawer from 'components/common/Drawer';
 
-function LUTTablesPage() {
-  return (
-    <LUTLayout
-      documentTitle="Lookup Tables"
-      pageTitle="Lookup Tables"
-      pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
-      actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-          Create lookup table
-        </Button>
-      }>
-      <LookupTablesOverview />
-    </LUTLayout>
-  );
+type Props = {
+  onClose: () => void,
+  title: string,
+  children: React.ReactNode,
 }
 
-export default LUTTablesPage;
+const LUTDrawer = ({ onClose, title, children }: Props) => (
+  <Drawer
+    opened
+    onClose={onClose}
+    size="lg"
+    position="right"
+    overlayProps={{ zIndex: '1030' }}
+    title={title}
+    >
+    {children}
+  </Drawer>
+);
+
+export default LUTDrawer;
