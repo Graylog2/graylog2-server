@@ -14,26 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.security.shares;
 
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LUTLayout, CachesOverview } from 'components/lookup-tables';
+import org.graylog.grn.GRN;
 
-function LUTCachesPage() {
-  return (
-    <LUTLayout
-      documentTitle="Lookup Tables - Caches"
-      pageTitle="Caches for Lookup Tables"
-      pageDescription="Caches provide the actual values for lookup tables."
-      actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
-          Create cache
-        </Button>
-      }>
-      <CachesOverview />
-    </LUTLayout>
-  );
+import java.util.Set;
+
+public interface CollectionRequestHandler {
+    /**
+     * Pluggable handler to add given entity to the specified collections.
+     */
+    default void addToCollection(GRN entity, Set<GRN> collections) {
+        // Intentionally left empty - ignore this in the community edition.
+    }
 }
-
-export default LUTCachesPage;

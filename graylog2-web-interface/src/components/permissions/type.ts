@@ -14,26 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LUTLayout, CachesOverview } from 'components/lookup-tables';
-
-function LUTCachesPage() {
-  return (
-    <LUTLayout
-      documentTitle="Lookup Tables - Caches"
-      pageTitle="Caches for Lookup Tables"
-      pageDescription="Caches provide the actual values for lookup tables."
-      actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
-          Create cache
-        </Button>
-      }>
-      <CachesOverview />
-    </LUTLayout>
-  );
+declare module 'graylog-web-plugin/plugin' {
+  export interface PluginExports {
+    'components.collection'?: {
+      AddCollectionFormGroup: React.ComponentType<{
+        entityType?: string;
+        label?: React.ReactElement | string;
+        name?: string;
+        error?: any;
+        value?: Array<string>;
+        onChange: (values: Pick<EntitySharePayload, 'selected_collections'>) => void;
+      }>;
+    };
+  }
 }
-
-export default LUTCachesPage;

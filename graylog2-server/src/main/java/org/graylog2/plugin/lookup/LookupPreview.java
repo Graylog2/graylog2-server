@@ -14,26 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.plugin.lookup;
 
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LUTLayout, CachesOverview } from 'components/lookup-tables';
+import java.util.Map;
 
-function LUTCachesPage() {
-  return (
-    <LUTLayout
-      documentTitle="Lookup Tables - Caches"
-      pageTitle="Caches for Lookup Tables"
-      pageDescription="Caches provide the actual values for lookup tables."
-      actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
-          Create cache
-        </Button>
-      }>
-      <CachesOverview />
-    </LUTLayout>
-  );
+public record LookupPreview(long total, Map<Object, Object> results) {
+    public static LookupPreview empty() {
+        return new LookupPreview(0, Map.of());
+    }
 }
-
-export default LUTCachesPage;

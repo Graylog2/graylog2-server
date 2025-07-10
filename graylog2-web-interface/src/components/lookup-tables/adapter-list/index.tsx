@@ -20,7 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
-import ErrorsConsumer from 'components/lookup-tables/lookup-table/errors-consumer';
+import ErrorsConsumer from 'components/lookup-tables/lookup-table-list/errors-consumer';
 import { useFetchDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
 import LUTModals from 'components/lookup-tables/LUTModals';

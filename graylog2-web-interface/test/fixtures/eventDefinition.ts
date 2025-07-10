@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+
 // eslint-disable-next-line import/prefer-default-export
-export const simpleEventDefinition = {
+export const simpleEventDefinition: EventDefinition = {
   alert: false,
   config: {
     conditions: { expression: null },
@@ -51,4 +53,20 @@ export const simpleEventDefinition = {
   ],
   title: 'Event Definition 1',
   _scope: 'DEFAULT',
+  state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
+  matched_at: '',
+  scheduler: {
+    data: {
+      type: '',
+      timerange_from: 0,
+      timerange_to: 0,
+    },
+    next_time: '',
+    triggered_at: '',
+    queued_notifications: 0,
+    is_scheduled: false,
+    status: 'runnable',
+  },
 };

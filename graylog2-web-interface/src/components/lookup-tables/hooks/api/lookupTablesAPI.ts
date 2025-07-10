@@ -17,7 +17,7 @@
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
-import deserializeLookupTables from 'components/lookup-tables/lookup-table/utils';
+import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 import type { SearchParams } from 'stores/PaginationTypes';
