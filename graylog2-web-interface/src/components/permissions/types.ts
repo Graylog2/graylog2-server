@@ -17,6 +17,10 @@
 
 import type React from 'react';
 
+import type { Attribute } from 'stores/PaginationTypes';
+
+import type { ColumnRenderer, EntityBase } from '../common/EntityDataTable/types';
+
 export type ModalHandler = {
   toggle?: () => void;
   onConfirm?: () => void;
@@ -42,10 +46,18 @@ export type EntitySharedAction<T, M> = {
   modal?: React.ComponentType<EntityActionModalProps<T, M>>;
   useCondition?: () => boolean;
 };
+export type TableElement<T extends EntityBase> = {
+  attributeName: string;
+  attributes: Array<Attribute>;
+  getColumnRenderer: (entityType: string) => ColumnRenderer<T, unknown>;
+  expandedSection: any;
+  useCondition: () => true,
+}
 
 declare module 'graylog-web-plugin/plugin' {
 
   export interface PluginExports {
     'components.shared.entityActions'?: Array<EntitySharedAction<unknown, unknown>>;
+    'components.shared.entityTableElements'?: Array<TableElement<EntityBase>>;
   }
 }

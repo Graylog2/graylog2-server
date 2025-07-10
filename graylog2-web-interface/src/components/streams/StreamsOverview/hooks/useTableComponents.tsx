@@ -22,8 +22,12 @@ import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRulesSection';
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
+import { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
-const useTableElements = ({ indexSets }: { indexSets: Array<IndexSet> }) => {
+const useTableElements = ({ indexSets, pluggableExpandedSections }: {
+  indexSets: Array<IndexSet>,
+  pluggableExpandedSections: { [sectionName: string]: ExpandedSectionRenderer<Stream> },
+}) => {
   const entityActions = useCallback(
     (listItem: Stream) => <StreamActions stream={listItem} indexSets={indexSets} />,
     [indexSets],
@@ -31,7 +35,7 @@ const useTableElements = ({ indexSets }: { indexSets: Array<IndexSet> }) => {
 
   const renderExpandedRules = useCallback((stream: Stream) => <ExpandedRulesSection stream={stream} />, []);
   const renderExpandedRulesActions = useCallback((stream: Stream) => <ExpandedRulesActions stream={stream} />, []);
-
+  
   const expandedSections = useMemo(
     () => ({
       rules: {
@@ -39,6 +43,7 @@ const useTableElements = ({ indexSets }: { indexSets: Array<IndexSet> }) => {
         content: renderExpandedRules,
         actions: renderExpandedRulesActions,
       },
+      ...pluggableExpandedSections,
     }),
     [renderExpandedRules, renderExpandedRulesActions],
   );

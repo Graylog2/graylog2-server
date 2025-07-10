@@ -31,6 +31,7 @@ import StreamRulesCell from './cells/StreamRulesCell';
 import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
+import { ColumnRenderersByAttribute } from 'src/components/common/EntityDataTable/types';
 
 const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 const pipelineRenderer = {
@@ -43,6 +44,7 @@ const customColumnRenderers = (
   indexSets: Array<IndexSet>,
   isPipelineColumnPermitted: boolean,
   permissions: Immutable.List<string>,
+  pluggableColumnRenderers?: ColumnRenderersByAttribute<Stream>,
 ): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
@@ -75,6 +77,7 @@ const customColumnRenderers = (
       staticWidth: 100,
     },
     ...(getStreamDataLakeTableElements?.(permissions)?.columnRenderer || {}),
+    ...(pluggableColumnRenderers || {}),
   },
 });
 

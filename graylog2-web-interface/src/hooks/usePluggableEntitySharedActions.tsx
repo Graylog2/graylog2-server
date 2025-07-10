@@ -24,7 +24,7 @@ import type { EntitySharedAction, ModalHandler } from 'components/permissions/ty
 function usePluggableEntitySharedActions<T>(entity: T, entityType: string) {
   const modalRefs = useRef({});
   const pluginActions = usePluginEntities('components.shared.entityActions');
-
+  
   const availableActions = pluginActions.filter((action) =>
     action.useCondition ? !!action.useCondition() : true
   );
