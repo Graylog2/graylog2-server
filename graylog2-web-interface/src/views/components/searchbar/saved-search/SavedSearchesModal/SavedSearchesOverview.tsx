@@ -29,6 +29,7 @@ import SearchActions from './SearchActions';
 
 import BulkActions from '../BulkActions';
 import { DEFAULT_LAYOUT } from '../Constants';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 type Props = {
   activeSavedSearchId: string;
@@ -56,6 +57,8 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
     refetch,
   } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
 
+  const { pluggableAttributes } = usePluggableEntityTableElements<View>(null, 'search');
+
   const renderSavedSearchActions = useCallback(
     (search: View) => (
       <SearchActions
@@ -75,6 +78,9 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
   }
 
   const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
+  const columnDefinitions = [...attributes, ...pluggableAttributes.attributes];
+  const visibleColumns = [...layoutConfig.displayedAttributes, ...pluggableAttributes.attributeNames];
+  const columnsOrder = [...DEFAULT_LAYOUT.columnsOrder, ...pluggableAttributes.attributeNames];
 
   return (
     <PaginatedList
@@ -102,8 +108,8 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       {!!savedSearches?.length && (
         <EntityDataTable<View>
           entities={savedSearches}
-          visibleColumns={layoutConfig.displayedAttributes}
-          columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+          visibleColumns={visibleColumns}
+          columnsOrder={columnsOrder}
           onColumnsChange={onColumnsChange}
           bulkSelection={{ actions: <BulkActions /> }}
           onSortChange={onSortChange}
@@ -114,7 +120,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
           actionsCellWidth={120}
           entityActions={renderSavedSearchActions}
           columnRenderers={customColumnRenderers}
-          columnDefinitions={attributes}
+          columnDefinitions={columnDefinitions}
         />
       )}
     </PaginatedList>
