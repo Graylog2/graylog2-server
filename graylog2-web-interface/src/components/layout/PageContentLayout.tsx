@@ -23,6 +23,8 @@ import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 import useFooterCustomization from 'brand-customization/useFooterCustomization';
 
+export const SCROLL_CONTAINER_ID = 'page-content';
+
 type Props = React.PropsWithChildren<{
   className?: string;
   FooterComponent?: React.ComponentType;
@@ -61,7 +63,7 @@ const PageContentLayout = ({
   const { enabled } = useFooterCustomization();
 
   return (
-    <Container className={className}>
+    <Container className={className} id={SCROLL_CONTAINER_ID}>
       <NotificationsComponent>
         <StyledGrid fluid className="page-content-grid">
           {children || <Outlet />}
