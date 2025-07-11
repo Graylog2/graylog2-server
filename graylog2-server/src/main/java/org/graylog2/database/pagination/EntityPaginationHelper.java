@@ -50,9 +50,12 @@ public class EntityPaginationHelper {
     }
 
     public static Predicate<GRNDescriptor> entityFilterPredicate(List<String> filters) {
+        if (filters == null || filters.isEmpty()) {
+            return descriptor -> true;
+        }
         return filters.stream()
                 .map(EntityPaginationHelper::entityFilterPredicate)
-                .reduce(descriptor -> true, Predicate::or); // Combine all predicates with OR
+                .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
     }
 
     public static Predicate<GRNDescriptor> entityFilterPredicate(String entityFilter) {
@@ -66,7 +69,7 @@ public class EntityPaginationHelper {
             final String key = m.group(1);
             final String value = m.group(2);
             if (key.equals("type")) {
-                return descriptor -> descriptor.grn().type().toLowerCase(Locale.US).contains(value);
+                return descriptor -> descriptor.grn().grnType().type().toLowerCase(Locale.US).contains(value);
             }
         }
 
@@ -86,7 +89,7 @@ public class EntityPaginationHelper {
             final String value = m.group(2);
             switch (key) {
                 case "type":
-                    return descriptor -> descriptor.grn().type().toLowerCase(Locale.US).contains(value);
+                    return descriptor -> descriptor.grn().grnType().type().toLowerCase(Locale.US).contains(value);
                 case "title":
                     return descriptor -> descriptor.title().toLowerCase(Locale.US).contains(value);
             }
