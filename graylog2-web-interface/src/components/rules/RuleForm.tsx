@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
@@ -30,24 +29,6 @@ type Props = {
   create?: boolean;
   isManaged?: boolean;
 };
-
-const StyledContainer = styled.div`
-  & .source-code-editor div {
-    border-color: ${({ theme }) => theme.colors.input.border};
-    border-radius: 0;
-
-    & .ace_editor {
-      border-radius: 0;
-    }
-  }
-
-  & .ace_tooltip.ace-graylog {
-    background-color: ${({ theme }) => theme.colors.global.background};
-    padding: 4px;
-    padding-left: 0;
-    line-height: 1.5;
-  }
-`;
 
 const RuleForm = ({ create = false, isManaged = false }: Props) => {
   const {
@@ -135,16 +116,14 @@ const RuleForm = ({ create = false, isManaged = false }: Props) => {
           label="Rule source"
           help="Rule source, see quick reference for more information."
           error={errorMessage}>
-          <StyledContainer>
-            <SourceCodeEditor
-              id={`source${create ? '-create' : '-edit'}`}
-              mode="pipeline"
-              onLoad={onAceLoaded}
-              onChange={handleSourceChange}
-              value={ruleSource}
-              innerRef={ruleSourceRef}
-            />
-          </StyledContainer>
+          <SourceCodeEditor
+            id={`source${create ? '-create' : '-edit'}`}
+            mode="pipeline"
+            onLoad={onAceLoaded}
+            onChange={handleSourceChange}
+            value={ruleSource}
+            innerRef={ruleSourceRef}
+          />
         </Input>
 
         <RuleSimulation />
