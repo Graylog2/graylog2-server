@@ -33,7 +33,7 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
@@ -335,7 +335,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     )}
                   </Field>
 
-                  <QueryValidation />
+                  <ViewsQueryValidation />
                   <QueryHistoryButton editorRef={editorRef} />
                 </SearchInputAndValidation>
 
