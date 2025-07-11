@@ -15,17 +15,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import usePluginEntities from 'hooks/usePluginEntities';
-import { ColumnRenderersByAttribute, EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
+import * as React from 'react';
 
-const  usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, entityType: string): {
-  pluggableColumnRenderers:  ColumnRenderersByAttribute<T>,
-  pluggableAttributes: {
-    attributeNames: string[];
-    attributes: Array<{ id: string; title: string }>;
-  };
-  pluggableExpandedSections?: {[sectionName: string]: ExpandedSectionRenderer<T>};
-} => {
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { EntityBase } from 'components/common/EntityDataTable/types';
+
+const usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, entityType: string) => {
   const pluginTableElements = usePluginEntities('components.shared.entityTableElements');
 
   const tableElements = pluginTableElements.filter((action) =>
@@ -33,11 +28,25 @@ const  usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, enti
   const pluggableColumnRenderers = tableElements.reduce((acc, curr) =>
     ({ ...acc, ...curr.getColumnRenderer(entityType) }), {});
   const pluggableAttributes = tableElements.reduce((acc, curr) =>
-    ([ ...acc, ...curr.attributes ]), []);
+    ([...acc, ...curr.attributes]), []);
   const pluggableAttributeNames = tableElements.reduce((acc, curr) =>
-    ([ ...acc, curr.attributeName ]), []);
+    ([...acc, curr.attributeName]), []);
   const pluggableExpandedSections = tableElements.reduce((acc, curr) =>
     ({ ...acc, ...curr.expandedSection(entityType) }), {});
+
+  const getPluggableTableCells = (entityId: string) => tableElements.reduce((acc, curr) =>
+    ([...acc, {
+      component: curr.tableCellComponent,
+    }]), []).map(({ component: PluggableTableCell }) => (
+      <PluggableTableCell key={entityId} entityId={entityId} entityType={entityType} />
+    ));
+
+  const pluggableTableHeaders = tableElements.reduce((acc, curr) =>
+    ([...acc, ...curr.attributes]), []).map((attribute) => (
+      <th key={attribute.id} className={`entity-table-header-${attribute.id}`}>
+        {attribute.title}
+      </th>
+    ));
 
   return {
     pluggableColumnRenderers,
@@ -46,6 +55,8 @@ const  usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, enti
       attributes: pluggableAttributes,
     },
     pluggableExpandedSections,
+    getPluggableTableCells,
+    pluggableTableHeaders,
   };
 }
 
