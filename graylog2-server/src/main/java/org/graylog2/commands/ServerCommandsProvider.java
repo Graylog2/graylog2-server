@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
 import org.graylog2.bootstrap.commands.MigrateCmd;
+import org.graylog2.commands.Token.AutomationTokenCommand;
 import org.graylog2.commands.journal.JournalDecode;
 import org.graylog2.commands.journal.JournalShow;
 import org.graylog2.commands.journal.JournalTruncate;
@@ -41,6 +42,7 @@ public class ServerCommandsProvider implements CliCommandsProvider {
                                 JournalTruncate.class,
                                 JournalDecode.class
                         ));
+        builder.withCommand(AutomationTokenCommand.class);
 
     }
 }
