@@ -25,19 +25,18 @@ type Props = {
   onClose: () => void,
 }
 
-const CacheCreateModal = ({ onClose }: Props) => {
-  return (
-    <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
-      <Modal.Header>
-        <Modal.Title>Create Cache</Modal.Title>
-      </Modal.Header>
-      <CacheCreate
-        saved={onClose}
-        onCancel={onClose}
-      />
-    </Modal>
-  );
-}
+const CacheCreateModal = ({ onClose, validationErrors }: Props & { validationErrors: any }) => (
+  <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
+    <Modal.Header>
+      <Modal.Title>Create Cache</Modal.Title>
+    </Modal.Header>
+    <CacheCreate
+      saved={onClose}
+      onCancel={onClose}
+      validationErrors={validationErrors}
+    />
+  </Modal>
+);
 
 export default connect(
   CacheCreateModal,

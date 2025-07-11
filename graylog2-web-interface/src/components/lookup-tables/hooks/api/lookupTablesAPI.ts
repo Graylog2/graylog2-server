@@ -61,13 +61,9 @@ export const validateCache = async (cache) => {
   return state.validationErrors;
 };
 
-export const createCache = async (payload: LookupTableCache) => {
-  return LookupTableCachesActions.create(payload);
-};
+export const createCache = async (payload: LookupTableCache) => LookupTableCachesActions.create(payload);
 
-export const updateCache = async (payload: LookupTableCache) => {
-  return LookupTableCachesActions.update(payload);
-}
+export const updateCache = async (payload: LookupTableCache) => LookupTableCachesActions.update(payload);
 
 export const deleteCache = async (cacheId: string) => LookupTableCachesActions.delete(cacheId);
 
