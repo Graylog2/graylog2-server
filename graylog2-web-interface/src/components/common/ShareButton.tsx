@@ -34,6 +34,7 @@ type Props = {
   onClick: () => void;
   bsStyle?: StyleProps;
   bsSize?: BsSize;
+  title?: string;
 };
 
 const ShareButton = ({
@@ -43,6 +44,7 @@ const ShareButton = ({
   entityType,
   onClick,
   disabledInfo = undefined,
+  title = undefined,
 }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => (
@@ -52,7 +54,7 @@ const ShareButton = ({
         onClick={onClick}
         disabled={!!disabledInfo || hasMissingPermissions}
         title="Share">
-        <Icon name="person_add" /> Share{' '}
+        <Icon name="person_add" /> {title ?? 'Share'}{' '}
         {(!!disabledInfo || hasMissingPermissions) && (
           <SharingDisabledPopover type={entityType} description={disabledInfo} />
         )}

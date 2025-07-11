@@ -24,7 +24,7 @@ const FiltersForQueryParams = (filters: UrlQueryFilters) => {
 
   return filters
     .entrySeq()
-    .flatMap(([attributeId, filterValues]) => filterValues.map((value) => `${attributeId}:${value}`))
+    .flatMap<string, string>(([attributeId, filterValues]) => filterValues.map((value) => `${attributeId}:${value}`))
     .toArray();
 };
 
