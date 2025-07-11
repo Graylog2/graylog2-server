@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog2.commands.Token;
 
 import com.google.common.collect.ImmutableMap;
@@ -19,7 +35,7 @@ import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 
-public class TokenCommandExecution {
+public class AutomationTokenCommandExecution {
     public static final String TOKEN_NAME = "Cloud Automation";
     public static final String TOKEN_ID = "000000000000000000000001";
 
@@ -29,8 +45,8 @@ public class TokenCommandExecution {
     private final NodeId nodeId;
 
     @Inject
-    public TokenCommandExecution(AccessTokenService accessTokenService, Configuration configuration,
-                                 AuditEventSender auditEventSender, NodeId nodeId) {
+    public AutomationTokenCommandExecution(AccessTokenService accessTokenService, Configuration configuration,
+                                           AuditEventSender auditEventSender, NodeId nodeId) {
         this.accessTokenService = accessTokenService;
         this.rootUsername = configuration.getRootUsername();
         this.auditEventSender = auditEventSender;
