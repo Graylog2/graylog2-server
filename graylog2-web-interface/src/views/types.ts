@@ -551,6 +551,11 @@ export type LicenseCheck = (subject: LicenseSubject) => {
   refetch: () => void;
 };
 
+type MarkdownAugmentation = {
+  id: string;
+  component: React.ComponentType<{ value: string }>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -620,5 +625,6 @@ declare module 'graylog-web-plugin/plugin' {
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: Array<LicenseCheck>;
     entityPermissionsMapper?: EntityPermissionsMapper;
+    'markdown.augment.components'?: Array<MarkdownAugmentation>;
   }
 }
