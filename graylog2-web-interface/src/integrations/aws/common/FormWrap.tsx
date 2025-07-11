@@ -73,9 +73,9 @@ const ErrorToggleInfo = styled.button(
   `,
 );
 
-const MoreIcon = styled(Icon)<{ expanded: boolean }>(
-  ({ expanded }) => css`
-    transform: rotate(${expanded ? '90deg' : '0deg'});
+const MoreIcon = styled(Icon)<{ $expanded: boolean }>(
+  ({ $expanded }) => css`
+    transform: rotate(${$expanded ? '90deg' : '0deg'});
     transition: 150ms transform ease-in-out;
   `,
 );
@@ -89,7 +89,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
       {niceMessage && (
         <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
-          More Info <MoreIcon name="chevron_right" expanded={expanded} />
+          More Info <MoreIcon name="chevron_right" $expanded={expanded} />
         </ErrorToggleInfo>
       )}
     </>
