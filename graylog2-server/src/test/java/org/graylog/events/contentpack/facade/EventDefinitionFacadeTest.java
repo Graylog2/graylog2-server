@@ -70,6 +70,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -137,6 +138,8 @@ public class EventDefinitionFacadeTest {
     private EntityRegistrar entityRegistrar;
     @Mock
     private EventProcessorConfig mockEventProcessorConfig;
+    @Mock
+    private ClusterEventBus clusterEventBus;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -155,7 +158,7 @@ public class EventDefinitionFacadeTest {
         jobSchedulerClock = mock(JobSchedulerClock.class);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityRegistrar, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock);
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock, clusterEventBus);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar);
     }
