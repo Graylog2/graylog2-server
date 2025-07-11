@@ -63,6 +63,14 @@ const SourceCodeContainer = styled.div<ContainerProps>(
       .ace_cursor {
         border-color: ${theme.colors.global.textDefault};
       }
+
+      .ace_comment {
+        color: ${theme.colors.text.secondary};
+      }
+
+      .ace_selection {
+        background: Highlight;
+      }
     }
   `,
 );
