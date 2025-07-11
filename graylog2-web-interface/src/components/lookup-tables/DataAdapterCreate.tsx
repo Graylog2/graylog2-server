@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -22,117 +22,116 @@ import { Select } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import { DataAdapterForm } from 'components/lookup-tables';
 import ObjectUtils from 'util/ObjectUtils';
+import { useFetchDataAdapterTypes } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
 type DataAdapterCreateProps = {
   saved: (...args: any[]) => void;
-  types: any;
+  onCancel: () => void;
   validate?: (...args: any[]) => void;
   validationErrors?: any;
 };
 
-class DataAdapterCreate extends React.Component<
-  DataAdapterCreateProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    validate: null,
-    validationErrors: {},
-  };
+const DataAdapterCreate = ({
+  saved,
+  onCancel,
+  validate = null,
+  validationErrors = {},
+}: DataAdapterCreateProps) => {
+  const [type, setType] = React.useState<string | undefined>(undefined);
+  const [dataAdapter, setDataAdapter] = React.useState<any>(undefined);
+  const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      dataAdapter: undefined,
-      type: undefined,
-    };
-  }
-
-  _onTypeSelect = (adapterType) => {
-    const { types } = this.props;
-
-    this.setState({
-      type: adapterType,
-      dataAdapter: {
-        id: null,
-        title: '',
-        name: '',
-        description: '',
-        config: ObjectUtils.clone(types[adapterType].default_config),
-      },
-    });
-  };
-
-  render() {
-    const { types, validate, validationErrors, saved } = this.props;
-    const { type, dataAdapter } = this.state;
-    const adapterPlugins = {};
-
+  const adapterPlugins = React.useMemo(() => {
+    const plugins = {};
     PluginStore.exports('lookupTableAdapters').forEach((p) => {
-      adapterPlugins[p.type] = p;
+      plugins[p.type] = p;
     });
+    return plugins;
+  }, []);
 
-    const sortedAdapters = Object.keys(types)
-      .map((key) => {
-        const typeItem = types[key];
+  const sortedAdapters = React.useMemo(() => {
+    if (!fetchingDataAdapterTypes) {
+      return Object.keys(types)
+        .map((key) => {
+          const typeItem = types[key];
 
-        if (adapterPlugins[typeItem.type] === undefined) {
-          // eslint-disable-next-line no-console
-          console.error(
-            `Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`,
-          );
+          if (!adapterPlugins[typeItem.type]) {
+            // eslint-disable-next-line no-console
+            console.error(`Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`);
 
-          return { value: typeItem.type, disabled: true, label: `${typeItem.type} - missing or invalid plugin` };
-        }
+            return {
+              value: typeItem.type,
+              disabled: true,
+              label: `${typeItem.type} - missing or invalid plugin`,
+            };
+          }
 
-        return { value: typeItem.type, label: adapterPlugins[typeItem.type].displayName };
-      })
-      .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+          return {
+            value: typeItem.type,
+            label: adapterPlugins[typeItem.type].displayName,
+          };
+        })
+        .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+    }
 
-    return (
-      <div>
+    return [];
+  }, [types, fetchingDataAdapterTypes, adapterPlugins]);
+
+  const handleTypeSelect = React.useCallback((adapterType: string) => {
+    const defaultConfig = ObjectUtils.clone(types[adapterType].default_config);
+
+    setType(adapterType);
+    setDataAdapter({
+      id: null,
+      title: '',
+      name: '',
+      description: '',
+      config: defaultConfig,
+    });
+  }, [types]);
+
+  return (
+    <div>
+      <Row className="content">
+        <Col lg={8}>
+          <form className="form form-horizontal" onSubmit={(e) => e.preventDefault()}>
+            <Input
+              id="data-adapter-type-select"
+              label="Data Adapter Type"
+              required
+              autoFocus
+              help="The type of data adapter to configure."
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9">
+              <Select
+                placeholder="Select Data Adapter Type"
+                clearable={false}
+                options={sortedAdapters}
+                onChange={handleTypeSelect}
+                value={null}
+              />
+            </Input>
+          </form>
+        </Col>
+      </Row>
+
+      {dataAdapter && (
         <Row className="content">
-          <Col lg={8}>
-            <form className="form form-horizontal" onSubmit={() => {}}>
-              <Input
-                id="data-adapter-type-select"
-                label="Data Adapter Type"
-                required
-                autoFocus
-                help="The type of data adapter to configure."
-                labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9">
-                <Select
-                  placeholder="Select Data Adapter Type"
-                  clearable={false}
-                  options={sortedAdapters}
-                  onChange={this._onTypeSelect}
-                  value={null}
-                />
-              </Input>
-            </form>
+          <Col lg={12}>
+            <DataAdapterForm
+              dataAdapter={dataAdapter}
+              type={type}
+              create
+              title="Configure Adapter"
+              validate={validate}
+              validationErrors={validationErrors}
+              saved={saved}
+            />
           </Col>
         </Row>
-        {dataAdapter && (
-          <Row className="content">
-            <Col lg={12}>
-              <DataAdapterForm
-                dataAdapter={dataAdapter}
-                type={type}
-                create
-                title="Configure Adapter"
-                validate={validate}
-                validationErrors={validationErrors}
-                saved={saved}
-              />
-            </Col>
-          </Row>
-        )}
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
 
 export default DataAdapterCreate;

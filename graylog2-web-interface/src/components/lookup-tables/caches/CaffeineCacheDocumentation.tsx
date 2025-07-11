@@ -27,10 +27,12 @@ const CaffeineCacheDocumentation = () => {
   const accordionItems = [
     {
       value: 'cache_size',
+      label: 'Cache Size',
       content: <p>Every cache has a maximum number of entries, unbounded caches are not supported.</p>,
     },
     {
       value: 'time_based_expiration',
+      label: 'Time Based Expiration',
       content:
         <div>
           <h5 style={{ marginBottom: 10 }}>Expire after access</h5>
@@ -53,7 +55,7 @@ const CaffeineCacheDocumentation = () => {
 
   const items = accordionItems.map((item) => (
     <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control>{item.value}</Accordion.Control>
+      <Accordion.Control>{item.label}</Accordion.Control>
       <Accordion.Panel>{item.content}</Accordion.Panel>
     </Accordion.Item>
   ));

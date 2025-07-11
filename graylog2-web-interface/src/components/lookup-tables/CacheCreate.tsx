@@ -22,9 +22,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { useFetchCacheTypes } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { useFetchCacheTypes, useValidateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import CacheForm from 'components/lookup-tables/CacheForm';
 
-import CacheForm from './CacheForm';
 import type { CachePluginType } from './types';
 
 const INIT_CACHE: LookupTableCache = {
@@ -40,8 +40,8 @@ type cacheTypeOptionsType = { value: string; label: string };
 
 type Props = {
   saved: () => void;
-  validate: (adapter: any) => void;
   onCancel: () => void;
+  validationErrors?: any;
 };
 
 const StyledRow = styled(Row)`
@@ -50,10 +50,11 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const CacheCreate = ({ saved, validate, onCancel }: Props) => {
+const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
   const [type, setType] = React.useState<string>(null);
   const cachePlugins = usePluginEntities('lookupTableCaches');
   const { types: cacheTypesFromAPI, fetchingCacheTypes } = useFetchCacheTypes();
+  const { validateCache } = useValidateCache();
 
   const plugins = React.useMemo(
     () =>
@@ -95,6 +96,10 @@ const CacheCreate = ({ saved, validate, onCancel }: Props) => {
     setType(selectedType);
   };
 
+  const validate = (adapter) => {
+    validateCache(adapter);
+  };
+
   return (
     <>
       <StyledRow>
@@ -126,6 +131,7 @@ const CacheCreate = ({ saved, validate, onCancel }: Props) => {
               saved={saved}
               onCancel={onCancel}
               validate={validate}
+              validationErrors={validationErrors}
             />
           </Col>
         </StyledRow>

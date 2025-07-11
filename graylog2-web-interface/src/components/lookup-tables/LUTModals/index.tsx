@@ -20,12 +20,14 @@ import LUTdrawer from 'components/lookup-tables/LUTDrawer';
 
 import { useModalContext } from './ModalContext';
 import CacheCreateModal from './CacheCreateModal';
+import DataAdapterCreateModal from './DataAdapterCreateModal';
 
 export type ModalTypes =
   | 'LUT'
   | 'CACHE'
   | 'DATA-ADAPTER'
-  | 'CACHE-CREATE';
+  | 'CACHE-CREATE'
+  | 'DATA-ADAPTER-CREATE';
 
 function LUTModals() {
   const { modal, setModal, entity, setEntity, title, setTitle } = useModalContext();
@@ -44,7 +46,9 @@ function LUTModals() {
     case 'DATA-ADAPTER':
       return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>;
     case 'CACHE-CREATE':
-      return <CacheCreateModal onClose={onClose} />
+      return <CacheCreateModal onClose={onClose} />;
+    case 'DATA-ADAPTER-CREATE':
+      return <DataAdapterCreateModal onClose={onClose} />;
     default:
       return null;
   }

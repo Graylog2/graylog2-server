@@ -55,6 +55,7 @@ type StoreState = {
     count: number;
     query: string | null;
   };
+  validationErrors: any,
 };
 export const LookupTableCachesStore = singletonStore('core.LookupTableCaches', () =>
   Reflux.createStore<StoreState>({

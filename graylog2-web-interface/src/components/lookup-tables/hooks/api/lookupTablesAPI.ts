@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
 
@@ -53,6 +54,21 @@ export const fetchCacheTypes = async () => {
   return state.types;
 };
 
+export const validateCache = async (cache) => {
+  await LookupTableCachesActions.validate(cache);
+  const state = LookupTableCachesStore.getInitialState();
+
+  return state.validationErrors;
+};
+
+export const createCache = async (payload: LookupTableCache) => {
+  return LookupTableCachesActions.create(payload);
+};
+
+export const updateCache = async (payload: LookupTableCache) => {
+  return LookupTableCachesActions.update(payload);
+}
+
 export const deleteCache = async (cacheId: string) => LookupTableCachesActions.delete(cacheId);
 
 export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => {
@@ -60,5 +76,14 @@ export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => 
 
   return LookupTableDataAdaptersActions.searchPaginated(page, pageSize, query).then(deserializeDataAdapters);
 };
+
+export const fetchDataAdapterTypes = async () => {
+  await LookupTableDataAdaptersActions.getTypes();
+  const state = LookupTableDataAdaptersStore.getInitialState();
+
+  return state.types;
+};
+
+export const validateDataAdapter = async (adapter) => LookupTableDataAdaptersActions.validate(adapter);
 
 export const deleteDataAdapter = async (adapterId: string) => LookupTableDataAdaptersActions.delete(adapterId);

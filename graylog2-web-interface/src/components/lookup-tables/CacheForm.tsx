@@ -22,7 +22,7 @@ import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-ta
 
 import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, FormSubmit } from 'components/common';
-import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
+import { useCreateCache, useUpdateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -75,6 +75,8 @@ const CacheForm = ({
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
+  const { createCache, creatingCache } = useCreateCache();
+  const { updateCache, updatingCache } = useUpdateCache();
   const sendTelemetry = useSendTelemetry();
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableCaches').find((p) => p.type === type), [type]);
@@ -122,7 +124,7 @@ const CacheForm = ({
   };
 
   const handleSubmit = (values: LookupTableCache) => {
-    const promise = create ? LookupTableCachesActions.create(values) : LookupTableCachesActions.update(values);
+    const promise = create ? createCache(values) : updateCache(values);
 
     return promise.then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
@@ -151,48 +153,46 @@ const CacheForm = ({
           onSubmit={handleSubmit}
           enableReinitialize>
           {({ errors, values, setValues, isSubmitting }) => (
-            <>
+            <Form className="form form-horizontal">
               <Row>
                 <Col lg={6} style={{ marginTop: 10 }}>
-                <Form className="form form-horizontal">
-                  <fieldset>
-                    <FormikFormGroup
-                      type="text"
-                      name="title"
-                      label="* Title"
-                      required
-                      help={errors.title ? null : 'A short title for this cache.'}
-                      onChange={handleTitleChange(values, setValues)}
-                      autoFocus
-                      labelClassName="col-sm-3"
-                      wrapperClassName="col-sm-9"
-                    />
-                    <FormikFormGroup
-                      type="text"
-                      name="description"
-                      label="Description"
-                      help="Cache description."
-                      labelClassName="col-sm-3"
-                      wrapperClassName="col-sm-9"
-                    />
-                    <FormikFormGroup
-                      type="text"
-                      name="name"
-                      label="* Name"
-                      required
-                      error={validationErrors.name ? validationErrors.name[0] : null}
-                      onChange={() => setGenerateName(false)}
-                      help={
-                        errors.name || validationErrors.name
-                          ? null
-                          : 'The name that is being used to refer to this cache. Must be unique.'
-                      }
-                      labelClassName="col-sm-3"
-                      wrapperClassName="col-sm-9"
-                    />
-                  </fieldset>
-                  {configFieldSet}
-                </Form>
+                    <fieldset>
+                      <FormikFormGroup
+                        type="text"
+                        name="title"
+                        label="* Title"
+                        required
+                        help={errors.title ? null : 'A short title for this cache.'}
+                        onChange={handleTitleChange(values, setValues)}
+                        autoFocus
+                        labelClassName="col-sm-3"
+                        wrapperClassName="col-sm-9"
+                      />
+                      <FormikFormGroup
+                        type="text"
+                        name="description"
+                        label="Description"
+                        help="Cache description."
+                        labelClassName="col-sm-3"
+                        wrapperClassName="col-sm-9"
+                      />
+                      <FormikFormGroup
+                        type="text"
+                        name="name"
+                        label="* Name"
+                        required
+                        error={validationErrors.name ? validationErrors.name[0] : null}
+                        onChange={() => setGenerateName(false)}
+                        help={
+                          errors.name || validationErrors.name
+                            ? null
+                            : 'The name that is being used to refer to this cache. Must be unique.'
+                        }
+                        labelClassName="col-sm-3"
+                        wrapperClassName="col-sm-9"
+                      />
+                    </fieldset>
+                    {configFieldSet}
                 </Col>
                 <Col lg={6} style={{ marginTop: 10 }}>
                   {DocComponent ? <DocComponent /> : null}
@@ -204,7 +204,7 @@ const CacheForm = ({
                     <FormSubmit
                       submitButtonText="Create cache"
                       submitLoadingText="Creating cache..."
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSubmitting || creatingCache}
                       isAsyncSubmit
                       onCancel={onCancel}
                     />
@@ -214,13 +214,13 @@ const CacheForm = ({
                       submitButtonText="Update cache"
                       submitLoadingText="Updating cache..."
                       isAsyncSubmit
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSubmitting || updatingCache}
                       onCancel={onCancel}
                     />
                   )}
                 </Col>
               </Row>
-            </>
+            </Form>
           )}
         </Formik>
     </>

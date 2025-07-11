@@ -18,20 +18,20 @@ import * as React from 'react';
 
 import connect from 'stores/connect';
 import { Modal } from 'components/bootstrap';
-import { CacheCreate } from 'components/lookup-tables';
-import { LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
+import { DataAdapterCreate } from 'components/lookup-tables';
+import { LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 type Props = {
   onClose: () => void,
 }
 
-const CacheCreateModal = ({ onClose }: Props) => {
+const DataAdapterCreateModal = ({ onClose }: Props) => {
   return (
-    <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
+    <Modal show fullScreen onHide={onClose}>
       <Modal.Header>
-        <Modal.Title>Create Cache</Modal.Title>
+        <Modal.Title>Create Data Adapter</Modal.Title>
       </Modal.Header>
-      <CacheCreate
+      <DataAdapterCreate
         saved={onClose}
         onCancel={onClose}
       />
@@ -40,10 +40,10 @@ const CacheCreateModal = ({ onClose }: Props) => {
 }
 
 export default connect(
-  CacheCreateModal,
-  { cachesStore: LookupTableCachesStore },
-  ({ cachesStore, ...otherProps }) => ({
+  DataAdapterCreateModal,
+  { dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, ...otherProps }) => ({
     ...otherProps,
-    ...cachesStore,
+    ...dataAdaptersStore,
   }),
-);
+)

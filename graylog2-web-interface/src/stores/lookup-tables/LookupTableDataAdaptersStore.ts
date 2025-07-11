@@ -50,6 +50,7 @@ export const LookupTableDataAdaptersActions = singletonActions('core.LookupTable
 type StoreState = {
   dataAdapters: LookupTableAdapter[];
   dataAdapter: LookupTableAdapter;
+  types: any;
   pagination: {
     page: number;
     per_page: number;

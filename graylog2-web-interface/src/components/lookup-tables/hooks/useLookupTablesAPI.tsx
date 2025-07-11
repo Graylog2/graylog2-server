@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -29,6 +29,10 @@ import {
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
+  fetchDataAdapterTypes,
+  createCache,
+  updateCache,
+  validateCache,
 } from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
@@ -68,6 +72,51 @@ export function useFetchCacheTypes() {
   return { fetchingCacheTypes: isLoading, types: data };
 }
 
+export function useValidateCache() {
+  const { mutateAsync } = useMutation({
+    mutationFn: validateCache,
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return { validateCache: mutateAsync };
+}
+
+export function useCreateCache() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: createCache,
+    onSuccess: () => {
+      UserNotification.success('Cache created successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    createCache: mutateAsync,
+    creatingCache: isLoading,
+  };
+}
+
+export function useUpdateCache() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: updateCache,
+    onSuccess: () => {
+      UserNotification.success('Cache updated successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateCache: mutateAsync,
+    updatingCache: isLoading,
+  };
+}
+
 export function useDeleteCache() {
   const { refetch } = useTableFetchContext();
 
@@ -89,6 +138,15 @@ export function useDeleteCache() {
 export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
+}
+
+export function useFetchDataAdapterTypes() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['data-adapter-types'],
+    queryFn: fetchDataAdapterTypes,
+  });
+
+  return { fetchingDataAdapterTypes: isLoading, types: data };
 }
 
 export function useDeleteDataAdapter() {
