@@ -24,9 +24,9 @@ const Container = styled.div`
   margin: 0 0 35px;
 `;
 
-const AdditionalFieldsContent = styled.div<{ visible: boolean }>(
-  ({ visible }) => css`
-    display: ${visible ? 'block' : 'none'};
+const AdditionalFieldsContent = styled.div<{ $visible: boolean }>(
+  ({ $visible }) => css`
+    display: ${$visible ? 'block' : 'none'};
     padding: 0 100px 0 25px;
   `,
 );
@@ -69,7 +69,7 @@ const AdditionalFields = ({
         {title} <Icon name={fieldsVisible ? 'keyboard_arrow_down' : 'chevron_right'} />
       </ToggleAdditionalFields>
 
-      <AdditionalFieldsContent visible={fieldsVisible}>{children}</AdditionalFieldsContent>
+      <AdditionalFieldsContent $visible={fieldsVisible}>{children}</AdditionalFieldsContent>
     </Container>
   );
 };
