@@ -32,6 +32,7 @@ import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 type Props = {
   isTestLoading: boolean;
@@ -46,6 +47,10 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
   const [showShareNotification, setShowShareNotification] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<EventNotification>(notification, 'notification');
+  const moreActions = [
+    pluggableActions.length ? pluggableActions : null,
+  ].filter(Boolean);
 
   const onDelete = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_DELETE_CLICKED, {
@@ -109,6 +114,7 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
                 {isTestLoading ? 'Testing...' : 'Test Notification'}
               </MenuItem>
             </IfPermitted>
+            {moreActions}
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
               <DeleteMenuItem onClick={onDelete} />
@@ -130,6 +136,7 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
           onClose={() => setShowShareNotification(undefined)}
         />
       )}
+      {pluggableActionModals}
     </>
   );
 };
