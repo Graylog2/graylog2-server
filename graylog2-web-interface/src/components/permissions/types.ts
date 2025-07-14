@@ -18,7 +18,6 @@
 import type React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
-
 import type { ColumnRenderer, EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 

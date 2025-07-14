@@ -22,7 +22,7 @@ import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRulesSection';
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
-import { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
+import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
 const useTableElements = ({ indexSets, pluggableExpandedSections }: {
   indexSets: Array<IndexSet>,
@@ -45,7 +45,7 @@ const useTableElements = ({ indexSets, pluggableExpandedSections }: {
       },
       ...pluggableExpandedSections,
     }),
-    [renderExpandedRules, renderExpandedRulesActions],
+    [pluggableExpandedSections, renderExpandedRules, renderExpandedRulesActions],
   );
 
   return {

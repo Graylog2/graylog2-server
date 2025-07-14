@@ -24,12 +24,13 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
 import useSavedSearchPaginationAndTableLayout from 'views/components/searchbar/saved-search/useSavedSearchPaginationAndTableLayout';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 import SearchActions from './SearchActions';
 
 import BulkActions from '../BulkActions';
 import { DEFAULT_LAYOUT } from '../Constants';
-import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+
 
 type Props = {
   activeSavedSearchId: string;

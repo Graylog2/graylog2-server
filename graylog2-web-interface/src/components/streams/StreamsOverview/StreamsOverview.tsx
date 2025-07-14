@@ -28,10 +28,11 @@ import getStreamTableElements from 'components/streams/StreamsOverview/Constants
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
-import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -61,11 +62,11 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const columnRenderers = useMemo(
     () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
-    [indexSets, isPipelineColumnPermitted, currentUser.permissions],
+    [indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers],
   );
   const { columnOrder, additionalAttributes, defaultLayout } = useMemo(
     () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes),
-    [currentUser.permissions, isPipelineColumnPermitted],
+    [currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes],
   );
   
   return (
