@@ -69,6 +69,7 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
@@ -227,7 +228,7 @@ public class LookupTableResource extends RestResource {
     public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                              @ApiParam(name = "key") @QueryParam("key") String key) {
         final Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
-        if (!lookupTableDto.isPresent()) {
+        if (lookupTableDto.isEmpty()) {
             throw new NotFoundException("Lookup table <" + idOrName + "> not found");
         }
 
@@ -304,7 +305,7 @@ public class LookupTableResource extends RestResource {
                                @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
-        if (!lookupTableDto.isPresent()) {
+        if (lookupTableDto.isEmpty()) {
             throw new NotFoundException();
         }
         LookupTableDto tableDto = lookupTableDto.get();
@@ -369,7 +370,7 @@ public class LookupTableResource extends RestResource {
     public LookupTableApi removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use, how?
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
-        if (!lookupTableDto.isPresent()) {
+        if (lookupTableDto.isEmpty()) {
             throw new NotFoundException();
         }
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, lookupTableDto.get().id());
@@ -412,6 +413,25 @@ public class LookupTableResource extends RestResource {
         }
 
         return validation;
+    }
+
+    @GET
+    @Path("tables/preview/{idOrName}")
+    @ApiOperation(value = "Preview the entries in a lookup table.")
+    public LookupPreview getPreview(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                    @ApiParam(name = "size") @QueryParam("size") @DefaultValue("5") int size) {
+        Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
+        if (lookupTableDto.isEmpty()) {
+            throw new NotFoundException();
+        }
+        LookupTableDto tableDto = lookupTableDto.get();
+
+        checkPermission(RestPermissions.LOOKUP_TABLES_READ, tableDto.id());
+        final var service = lookupTableService.newBuilder().lookupTable(tableDto.name()).build();
+        if (!service.supportsPreview()) {
+            throw new UnsupportedOperationException("Backing data adapter does not support preview.");
+        }
+        return service.getPreview(size);
     }
 
     @JsonAutoDetect
