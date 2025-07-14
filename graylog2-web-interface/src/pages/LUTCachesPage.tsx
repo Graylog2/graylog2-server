@@ -18,11 +18,12 @@ import * as React from 'react';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import { LUTLayout, CachesOverview } from 'components/lookup-tables';
+import { CachesOverview } from 'components/lookup-tables';
+import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 
 function LUTCachesPage() {
   return (
-    <LUTLayout
+    <LUTPageLayout
       documentTitle="Lookup Tables - Caches"
       pageTitle="Caches for Lookup Tables"
       pageDescription="Caches provide the actual values for lookup tables."
@@ -32,7 +33,7 @@ function LUTCachesPage() {
         </Button>
       }>
       <CachesOverview />
-    </LUTLayout>
+    </LUTPageLayout>
   );
 }
 

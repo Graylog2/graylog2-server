@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
@@ -21,6 +23,7 @@ import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { LookupPreviewType } from 'components/lookup-tables/types';
 
 export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
 
@@ -55,3 +58,6 @@ export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => 
 };
 
 export const deleteDataAdapter = async (adapterId: string) => LookupTableDataAdaptersActions.delete(adapterId);
+
+export const fetchLookupPreview = async (idOrName: string, size: number): Promise<LookupPreviewType> =>
+  fetch('GET', qualifyUrl(`/system/lookup/tables/preview/${idOrName}?size=${size}`));

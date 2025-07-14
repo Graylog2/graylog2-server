@@ -18,11 +18,12 @@ import * as React from 'react';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import { LUTLayout, DataAdaptersOverview } from 'components/lookup-tables';
+import { DataAdaptersOverview } from 'components/lookup-tables';
+import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 
 function LUTDataAdaptersPage() {
   return (
-    <LUTLayout
+    <LUTPageLayout
       documentTitle="Lookup Tables - Data Adapters"
       pageTitle="Data Adapters for Lookup Tables"
       pageDescription="Data adapters provide the actual values for lookup tables."
@@ -32,7 +33,7 @@ function LUTDataAdaptersPage() {
         </Button>
       }>
       <DataAdaptersOverview />
-    </LUTLayout>
+    </LUTPageLayout>
   );
 }
 

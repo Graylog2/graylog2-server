@@ -24,8 +24,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-
-import type { CacheEntity } from './types';
+import type { CacheEntity } from 'components/lookup-tables/types';
 
 type ActionsProps = {
   cache: CacheEntity;

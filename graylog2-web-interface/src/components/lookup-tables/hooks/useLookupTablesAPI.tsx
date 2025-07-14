@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { defaultOnError } from 'util/conditional/onError';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import UserNotification from 'util/UserNotification';
@@ -28,6 +29,7 @@ import {
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
+  fetchLookupPreview,
 } from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
@@ -101,4 +103,17 @@ export function useDeleteDataAdapter() {
 
 export function useFetchErrors() {
   return { fetchErrors };
+}
+
+export function useFetchLookupPreview(idOrName: string, size: number = 5) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['lookup-preview', idOrName, size],
+    queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), 'Failed to fetch lookup preview'),
+    retry: false,
+  });
+
+  return {
+    lookupPreview: data ?? { results: [], total: 0 },
+    loadingLookupPreview: isLoading,
+  };
 }

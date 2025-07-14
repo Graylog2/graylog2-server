@@ -24,8 +24,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-
-import type { LookupTableEntity } from './types';
+import type { LookupTableEntity } from 'components/lookup-tables/types';
 
 type ActionsProps = {
   lut: LookupTableEntity;

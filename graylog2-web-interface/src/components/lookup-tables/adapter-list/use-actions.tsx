@@ -24,8 +24,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-
-import type { DataAdapterEntity } from './types';
+import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
 type ActionsProps = {
   adapter: DataAdapterEntity;

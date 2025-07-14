@@ -17,7 +17,6 @@
 import './adapters';
 import './caches';
 
-export { default as LUTLayout } from './lut-layout';
 export { default as LookupTablesOverview } from './lookup-table-list';
 export { default as LUTTableEntry } from './LUTTableEntry';
 export { default as LookupTableView } from './LookupTableView';
