@@ -71,6 +71,10 @@ public abstract class GRN {
         return builder.build();
     }
 
+    public boolean isType(GRNType grnType) {
+        return this.grnType().equals(grnType);
+    }
+
     public static Builder builder() {
         return new AutoValue_GRN.Builder().cluster("").tenant("").scope("");
     }

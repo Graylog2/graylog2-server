@@ -114,12 +114,12 @@
         <commons-csv.version>1.14.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.5.0</commons-exec.version>
-        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <commons-net.version>3.11.1</commons-net.version>
-        <commons-validator.version>1.9.0</commons-validator.version>
+        <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.19.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.39.0</error-prone.version>
+        <error-prone.version>2.40.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.53.2</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -157,14 +157,14 @@
         <lucene.version>9.12.2</lucene.version>
         <metrics.version>4.2.33</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
-        <mongojack.version>5.0.2</mongojack.version>
+        <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.121.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.51.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.17.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.17.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -172,7 +172,7 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.0.4</shiro.version>
+        <shiro.version>2.0.5</shiro.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
         <oshi.version>6.8.2</oshi.version>
@@ -198,7 +198,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.3</equalsverifier.version>
+        <equalsverifier.version>4.0.5</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
@@ -687,7 +687,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>
