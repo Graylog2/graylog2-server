@@ -36,7 +36,7 @@ import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 
 public class AutomationTokenCommandExecution {
-    public static final String TOKEN_NAME = "Cloud Automation";
+    public static final String TOKEN_NAME = "Automation Automation";
     public static final String TOKEN_ID = "000000000000000000000001";
 
     private final AccessTokenService accessTokenService;
@@ -56,7 +56,7 @@ public class AutomationTokenCommandExecution {
     public void run(String tokenValue) {
         AccessToken existingToken = accessTokenService.loadById(TOKEN_ID);
         if (existingToken != null && existingToken.getToken().equals(tokenValue)) {
-            System.out.println("A token with name '" + existingToken.getName() +
+            System.out.println("A automation token with name '" + existingToken.getName() +
                     "' and the provided value was already created by a previous run of this command. All good!");
             return;
         }
@@ -92,7 +92,7 @@ public class AutomationTokenCommandExecution {
     }
 
     private AccessToken createToken(String tokenValue) {
-        Map<String, Object> fields = Maps.newHashMap();
+        final Map<String, Object> fields = Maps.newHashMap();
         fields.put(AccessTokenImpl.TOKEN, tokenValue);
         fields.put(AccessTokenImpl.USERNAME, rootUsername);
         fields.put(AccessTokenImpl.NAME, TOKEN_NAME);
