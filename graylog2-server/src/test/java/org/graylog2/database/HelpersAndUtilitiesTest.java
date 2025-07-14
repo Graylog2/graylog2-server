@@ -17,7 +17,6 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.annotation.Nullable;
@@ -196,6 +195,7 @@ class HelpersAndUtilitiesTest {
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamAll() {
         collection.insertOne(newDto("hello1"));
         collection.insertOne(newDto("hello2"));

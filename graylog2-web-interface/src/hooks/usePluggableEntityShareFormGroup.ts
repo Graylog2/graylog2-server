@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security;
+import usePluginEntities from 'hooks/usePluginEntities';
 
-import java.util.Set;
+const usePluggableEntityShareFormGroup = () => {
+  const pluggableCollection = usePluginEntities('components.collection');
 
-public interface CapabilityPermissions {
-    default Set<String> readPermissions() {
-        return Set.of();
-    }
+  return pluggableCollection?.[0]?.AddCollectionFormGroup ?? null;
+};
 
-    default Set<String> editPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> deletePermissions() {
-        return Set.of();
-    }
-}
+export default usePluggableEntityShareFormGroup;

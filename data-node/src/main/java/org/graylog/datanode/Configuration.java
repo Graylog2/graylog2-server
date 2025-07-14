@@ -327,8 +327,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
      * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
      */
     @Documentation("Filesystem path where searchable snapshots should be stored")
-    @Parameter(value = "path_repo", converter = StringListConverter.class)
-    private List<String> pathRepo;
+    @Parameter(value = "path_repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
+    private List<Path> pathRepo;
 
     @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
@@ -704,7 +704,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return searchCacheSize;
     }
 
-    public List<String> getPathRepo() {
+    public List<Path> getPathRepo() {
         return pathRepo;
     }
 
