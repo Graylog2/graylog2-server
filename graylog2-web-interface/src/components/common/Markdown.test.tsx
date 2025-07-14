@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
+import { usePluginExports } from 'views/test/testPlugins';
 
 import Markdown from './Markdown';
 
@@ -52,24 +53,13 @@ describe('Markdown', () => {
   });
 
   describe('supports extended syntax', () => {
-    const markdownAugmentPlugin = new PluginManifest(
-      {},
-      {
-        'markdown.augment.components': [
-          {
-            id: 'test',
-            component: ({ value }) => <span data-testid="test-component">{value}</span>,
-          },
-        ],
-      },
-    );
-
-    beforeAll(() => {
-      PluginStore.register(markdownAugmentPlugin);
-    });
-
-    afterAll(() => {
-      PluginStore.unregister(markdownAugmentPlugin);
+    usePluginExports({
+      'markdown.augment.components': [
+        {
+          id: 'test',
+          component: ({ value }) => <span data-testid="test-component">{value}</span>,
+        },
+      ],
     });
 
     it('replaces custom #test# syntax', async () => {
