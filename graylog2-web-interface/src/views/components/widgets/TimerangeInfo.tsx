@@ -37,17 +37,13 @@ type Props = {
   returnsAllRecords?: boolean;
 };
 
-const Wrapper = styled.div(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.tiny};
-    color: ${theme.colors.gray[30]};
-    width: max-content;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    margin-right: 10px;
-  `,
-);
+const Wrapper = styled.div`
+  width: max-content;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-right: 10px;
+`;
 
 const StyledIcon = styled(Icon)(
   ({ theme }) => css`
