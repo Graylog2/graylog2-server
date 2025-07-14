@@ -18,6 +18,7 @@ package org.graylog.plugins.views.startpage.recentActivities;
 
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Singleton;
 import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
@@ -37,6 +38,7 @@ import org.graylog2.rest.models.SortOrder;
 
 import java.util.HashSet;
 
+@Singleton
 public class RecentActivityService {
     public static final String COLLECTION_NAME = "recent_activity";
     private final EventBus eventBus;
