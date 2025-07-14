@@ -15,12 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type {
-  AdditionalSettings,
-  GenerateLayoutsParams,
-} from 'views/components/visualizations/utils/chartLayoutGenerators';
+import type { GenerateLayoutsParams } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import {
-  getBarChartTraceOffsetSettings,
+  getBarChartTraceOffsetGroup,
   generateMappersForYAxis,
   generateLayouts,
   getHoverTemplateSettings,
@@ -41,77 +38,28 @@ import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 describe('Chart Layout Generators', () => {
   describe('getBarChartTraceOffsetSettings', () => {
-    const defaultProps: AdditionalSettings = {
-      yaxis: 'y3',
-      totalAxis: 4,
-      axisNumber: 1,
-      traceIndex: 2,
-      totalTraces: 4,
-      effectiveTimerange: {
-        from: '2024-08-11T14:56:10.000Z',
-        to: '2024-08-12T15:01:10.000Z',
-        type: 'absolute',
-      },
-      isTimeline: false,
-      xAxisItemsLength: 10,
-    };
-
     it('return correct offset for barmode, mode group, non timeline', () => {
-      const result = getBarChartTraceOffsetSettings('group', defaultProps);
+      const result = getBarChartTraceOffsetGroup('group', 'y3', 2);
 
-      expect(result).toEqual({
-        offsetgroup: 2,
-        width: 0.25,
-        offset: 0.125,
-      });
+      expect(result).toEqual(2);
     });
 
     it('return correct offset for barmode, mode group, timeline', () => {
-      const result = getBarChartTraceOffsetSettings('group', {
-        ...defaultProps,
-        isTimeline: true,
-      });
+      const result = getBarChartTraceOffsetGroup('group', 'y3', 2);
 
-      expect(result).toEqual({
-        offsetgroup: 2,
-        width: 2167500,
-        offset: 1083750,
-      });
+      expect(result).toEqual(2);
     });
 
     it('return correct offset for barmode, mode stack, non timeline', () => {
-      const result = getBarChartTraceOffsetSettings('stack', {
-        ...defaultProps,
-        yaxis: 'y2',
-        totalAxis: 2,
-        axisNumber: 2,
-        traceIndex: 1,
-        totalTraces: 2,
-      });
+      const result = getBarChartTraceOffsetGroup('stack', 'y2', 1);
 
-      expect(result).toEqual({
-        offsetgroup: 'y2',
-        width: 0.5,
-        offset: 0.25,
-      });
+      expect(result).toEqual('y2');
     });
 
     it('return correct offset for barmode, mode stack, timeline', () => {
-      const result = getBarChartTraceOffsetSettings('stack', {
-        ...defaultProps,
-        isTimeline: true,
-        yaxis: 'y2',
-        totalAxis: 2,
-        axisNumber: 2,
-        traceIndex: 1,
-        totalTraces: 2,
-      });
+      const result = getBarChartTraceOffsetGroup('stack', 'y2', 1);
 
-      expect(result).toEqual({
-        offsetgroup: 'y2',
-        width: 4335000,
-        offset: 2167500,
-      });
+      expect(result).toEqual('y2');
     });
   });
 
