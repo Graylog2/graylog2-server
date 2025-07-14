@@ -44,7 +44,6 @@ export type EntitySharedAction<T, M> = {
 };
 
 declare module 'graylog-web-plugin/plugin' {
-
   export interface PluginExports {
     'components.shared.entityActions'?: Array<EntitySharedAction<unknown, unknown>>;
   }
