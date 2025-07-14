@@ -163,7 +163,7 @@
         <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.51.0</opentelemetry.version>
+        <opentelemetry.version>1.52.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.17.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
