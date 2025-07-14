@@ -135,6 +135,7 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
   },
   notifications: [
     {
+      type: null,
       notification_id: 'email_notification_id',
       notification_parameters: null,
     },
@@ -145,6 +146,22 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
       streams: ['0002'],
     },
   ],
+  state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
+  matched_at: '',
+  scheduler: {
+    data: {
+      type: '',
+      timerange_from: 0,
+      timerange_to: 0,
+    },
+    next_time: '',
+    triggered_at: '',
+    queued_notifications: 0,
+    is_scheduled: false,
+    status: 'runnable',
+  },
 };
 
 export const mockEventDefinitionOneAggregation = {

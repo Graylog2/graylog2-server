@@ -37,7 +37,6 @@ const Container = styled.button<ContainerProps>(
     width: 100%;
     height: 40px;
     font-size: ${fonts.size.h3};
-    z-index: 4; /* to render over SidebarNav::before */
     cursor: ${$disabled ? 'not-allowed' : 'pointer'};
     color: ${colors.variant.darkest.default};
     background: transparent;
@@ -141,7 +140,6 @@ const Title = styled.div(
     border: 1px solid ${colors.variant.light.info};
     border-left: none;
     box-shadow: 3px 3px 3px ${colors.global.navigationBoxShadow};
-    z-index: 4;
     border-radius: 0 3px 3px 0;
     align-items: center;
     white-space: nowrap;
