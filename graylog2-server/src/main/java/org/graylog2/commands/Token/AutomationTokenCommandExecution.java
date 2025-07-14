@@ -36,7 +36,7 @@ import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 
 public class AutomationTokenCommandExecution {
-    public static final String TOKEN_NAME = "Automation Automation";
+    public static final String TOKEN_NAME = "Automation";
     public static final String TOKEN_ID = "000000000000000000000001";
 
     private final AccessTokenService accessTokenService;
