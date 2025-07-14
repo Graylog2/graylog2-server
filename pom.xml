@@ -119,7 +119,7 @@
         <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.19.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.39.0</error-prone.version>
+        <error-prone.version>2.40.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.53.2</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -172,7 +172,7 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.0.4</shiro.version>
+        <shiro.version>2.0.5</shiro.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
         <oshi.version>6.8.2</oshi.version>
