@@ -35,7 +35,8 @@ type Props = {
 const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(
   ({ $bsStyle, theme }) => css`
   margin: ${theme.spacings.md} 0;
-  border: 1px solid ${theme.colors.variant.lighter[$bsStyle]};
+  background-color: ${theme.colors.alerts[$bsStyle].background};
+  border: 1px solid ${theme.colors.alerts[$bsStyle].border};
 
   .mantine-Alert-message {
     color: ${theme.colors.text.primary};
