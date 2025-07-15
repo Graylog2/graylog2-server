@@ -14,24 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled, { css } from 'styled-components';
+import * as React from 'react';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-const Title = styled.h3(
-  ({ theme }) => css`
-    a {
-      color: ${theme.colors.text.primary};
-    }
+import Timestamp from 'components/common/Timestamp';
 
-    .label {
-      font-size: ${theme.fonts.size.tiny};
-      line-height: 200%;
-      margin-left: 5px;
-      vertical-align: bottom;
-    }
-  `,
-);
+const pluginExports: PluginExports = {
+  'markdown.augment.components': [
+    {
+      id: 'ts',
+      component: ({ value }) => (
+        <strong>
+          <Timestamp dateTime={value} />
+        </strong>
+      ),
+    },
+  ],
+};
 
-const MessageDetailsTitle = (props) => <Title {...props} />;
-
-export default MessageDetailsTitle;
+export default pluginExports;
