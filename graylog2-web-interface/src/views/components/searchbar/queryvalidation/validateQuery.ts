@@ -38,7 +38,7 @@ export const validateQuery = (
   { queryString, timeRange, streams, streamCategories, filter, ...rest }: ValidationQuery,
   userTimezone: string,
 ): Promise<QueryValidationState> => {
-  if (!queryExists(queryString) && !queryExists(filter) && !timeRange && streams?.length === 0) {
+  if (!queryExists(queryString) && !queryExists(filter) && !timeRange && (streams ? streams.length === 0 : true)) {
     return Promise.resolve({ status: 'OK', explanations: [], context: { searched_index_ranges: [] } });
   }
 
