@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.pagination;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.security.Capability;
 import org.graylog.security.GrantDTO;
@@ -33,9 +34,17 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class EntityPaginationHelper {
     private static final Logger LOG = LoggerFactory.getLogger(EntityPaginationHelper.class);
+    private static final Pattern KEY_VALUE_PATTERN = Pattern.compile("^(.*):(.*)");
 
-    public static final Pattern KEY_VALUE_PATTERN = Pattern.compile("^(.*):(.*)");
+    private EntityPaginationHelper() {
+    } // Utility class, no instantiation
 
+    /**
+     * Parses a capability filter string and returns an Optional containing the Capability if valid, or empty if invalid.
+     *
+     * @param capabilityFilterString the capability filter string to parse
+     * @return an Optional containing the Capability or empty if the string is invalid
+     */
     public static Optional<Capability> parseCapabilityFilter(String capabilityFilterString) {
         if (isNullOrEmpty(capabilityFilterString)) {
             return Optional.empty();
@@ -50,7 +59,25 @@ public class EntityPaginationHelper {
         }
     }
 
-    public static Predicate<GrantDTO> entityFilterGrantPredicate(List<String> filters) {
+    /**
+     * Creates a predicate that filters GRNDescriptor objects based on the provided pagination query.
+     *
+     * @param paginationQuery the pagination query string
+     * @return a Predicate that filters GRNDescriptor objects
+     */
+    public static Predicate<GRNDescriptor> queryPredicate(String paginationQuery) {
+        return buildPredicate(paginationQuery,
+                descriptor -> descriptor.grn().grnType().type(),
+                GRNDescriptor::title);
+    }
+
+    /**
+     * Creates a predicate that filters GrantDTO objects based on the provided list of entity filters.
+     *
+     * @param filters the list of entity filters
+     * @return a Predicate that filters GrantDTO objects
+     */
+    public static Predicate<GrantDTO> entityFiltersGrantPredicate(List<String> filters) {
         if (filters == null || filters.isEmpty()) {
             return descriptor -> true;
         }
@@ -59,7 +86,13 @@ public class EntityPaginationHelper {
                 .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
     }
 
-    public static Predicate<GRNDescriptor> entityFilterPredicate(List<String> filters) {
+    /**
+     * Creates a predicate that filters GRNDescriptor objects based on the provided list of entity filters.
+     *
+     * @param filters the list of entity filters
+     * @return a Predicate that filters GRNDescriptor objects
+     */
+    public static Predicate<GRNDescriptor> entityFiltersDescriptorPredicate(List<String> filters) {
         if (filters == null || filters.isEmpty()) {
             return descriptor -> true;
         }
@@ -68,70 +101,47 @@ public class EntityPaginationHelper {
                 .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
     }
 
-    private static Predicate<GrantDTO> entityFilterGrantPredicate(String entityFilter) {
-        if (isNullOrEmpty(entityFilter)) {
-            return grantDTO -> true;
+    @VisibleForTesting
+    public static <T> Predicate<T> buildPredicate(String filter, java.util.function.Function<T, String> typeExtractor, java.util.function.Function<T, String> titleExtractor) {
+        if (isNullOrEmpty(filter)) {
+            return t -> true;
         }
-        final String filter = entityFilter.trim().toLowerCase(Locale.US);
+        final String trimmedFilter = filter.trim().toLowerCase(Locale.US);
 
-        Matcher m = KEY_VALUE_PATTERN.matcher(filter);
-        if (m.find()) {
-            final String key = m.group(1);
-            final String value = m.group(2);
-            if (key.equals("type")) {
-                return grantDTO -> grantDTO.target().grnType().type().toLowerCase(Locale.US).contains(value);
-            } else {
-                return grantDTO -> false; // Unsupported key, return false
-            }
-        }
-
-        // If filter is not qualified, we query by type
-        return grantDTO -> grantDTO.target().grnType().type().equals(filter);
-    }
-
-    private static Predicate<GRNDescriptor> entityFilterDescriptorPredicate(String entityFilter) {
-        if (isNullOrEmpty(entityFilter)) {
-            return descriptor -> true;
-        }
-        final String filter = entityFilter.trim().toLowerCase(Locale.US);
-
-        Matcher m = KEY_VALUE_PATTERN.matcher(filter);
-        if (m.find()) {
-            final String key = m.group(1);
-            final String value = m.group(2);
-            if (key.equals("type")) {
-                return descriptor -> descriptor.grn().grnType().type().toLowerCase(Locale.US).contains(value);
-            } else {
-                return descriptor -> false; // Unsupported key, return false
-            }
-        }
-
-        // If filter is not qualified, we query by type
-        return descriptor -> descriptor.grn().type().equals(filter);
-    }
-
-    public static Predicate<GRNDescriptor> queryPredicate(String paginationQuery) {
-        if (isNullOrEmpty(paginationQuery)) {
-            return descriptor -> true;
-        }
-        final String query = paginationQuery.trim().toLowerCase(Locale.US);
-
-        Matcher m = KEY_VALUE_PATTERN.matcher(query);
+        Matcher m = KEY_VALUE_PATTERN.matcher(trimmedFilter);
         if (m.find()) {
             final String key = m.group(1);
             final String value = m.group(2);
             switch (key) {
                 case "type":
-                    return descriptor -> descriptor.grn().grnType().type().toLowerCase(Locale.US).contains(value);
+                    return t -> typeExtractor.apply(t).toLowerCase(Locale.US).contains(value);
                 case "title":
-                    return descriptor -> descriptor.title().toLowerCase(Locale.US).contains(value);
+                    if (titleExtractor != null) {
+                        return t -> titleExtractor.apply(t).toLowerCase(Locale.US).contains(value);
+                    }
+                    return t -> false;
                 default:
-                    return descriptor -> false;
+                    return t -> false;
             }
         }
 
-        // If query is not qualified, we query by title
-        return descriptor -> descriptor.title().toLowerCase(Locale.US).contains(query);
+        // If filter is not qualified, use type or title
+        if (titleExtractor != null) {
+            return t -> titleExtractor.apply(t).toLowerCase(Locale.US).contains(trimmedFilter);
+        } else {
+            return t -> typeExtractor.apply(t).equals(trimmedFilter);
+        }
     }
 
+    private static Predicate<GrantDTO> entityFilterGrantPredicate(String entityFilter) {
+        return buildPredicate(entityFilter,
+                grantDTO -> grantDTO.target().grnType().type(),
+                null);
+    }
+
+    private static Predicate<GRNDescriptor> entityFilterDescriptorPredicate(String entityFilter) {
+        return buildPredicate(entityFilter,
+                descriptor -> descriptor.grn().grnType().type(),
+                null);
+    }
 }
