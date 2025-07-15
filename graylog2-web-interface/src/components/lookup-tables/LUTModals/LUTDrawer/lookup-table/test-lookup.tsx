@@ -61,7 +61,7 @@ function TestLookup({ table }: Props) {
   const [previewSize, setPreviewSize] = React.useState<number>(5);
   const productName = useProductName();
   const {
-    lookupPreview: { results, total },
+    lookupPreview: { results, total, supported },
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
   const onChange = (event: React.BaseSyntheticEvent) => {
@@ -113,59 +113,62 @@ function TestLookup({ table }: Props) {
           {productName}.
         </Description>
       </Col>
-      <Col $gap="xs">
-        <form onSubmit={handleLookupKey} style={{ width: '100%' }}>
-          <fieldset>
-            <Input
-              type="text"
-              id="key"
-              name="lookupkey"
-              placeholder="Insert key that should be looked up"
-              label="Key"
-              required
-              onKeyDown={onKeyDown}
-              onChange={onChange}
-              help="Key to look up a value for."
-              value={lookupKey.value}
-            />
-            <Row $justify="flex-end">
-              <Button name="reset" disabled={!lookupResult} onClick={onReset}>
-                Reset
-              </Button>
-              <Button type="submit" name="lookupbutton" bsStyle="primary" disabled={!lookupKey.valid}>
-                Look up
-              </Button>
-            </Row>
-          </fieldset>
-        </form>
-        <Col $gap="xs" style={{ marginTop: 20 }}>
-          <h4 style={{ width: '100%' }}>
-            <Row $align="center" $justify="space-between">
-              <span>Lookup result</span>
-              <Row $width="auto" $align="center">
-                <NoMarginInput>
-                  <Input
-                    type="number"
-                    bsSize="xs"
-                    onChange={onPreviewSizeChange}
-                    value={previewSize > total ? total : previewSize}
-                    style={{ marginLeft: 'auto' }}
-                    min={1}
-                    max={total}
-                  />
-                </NoMarginInput>
-                <Description>of</Description>
-                <Description>{total}</Description>
+      {lutError && <StyledAlert bsStyle="danger">{lutError}</StyledAlert>}
+      {!supported && !lutError && (
+        <StyledAlert bsStyle="warning">This lookup table doesn&apos;t support keys preview</StyledAlert>
+      )}
+      {supported && !lutError && total < 1 && <StyledAlert>No result to show</StyledAlert>}
+      {supported && !lutError && total > 0 && (
+        <Col $gap="xs">
+          <form onSubmit={handleLookupKey} style={{ width: '100%' }}>
+            <fieldset>
+              <Input
+                type="text"
+                id="key"
+                name="lookupkey"
+                placeholder="Insert key that should be looked up"
+                label="Key"
+                required
+                onKeyDown={onKeyDown}
+                onChange={onChange}
+                help="Key to look up a value for."
+                value={lookupKey.value}
+              />
+              <Row $justify="flex-end">
+                <Button name="reset" disabled={!lookupResult} onClick={onReset}>
+                  Reset
+                </Button>
+                <Button type="submit" name="lookupbutton" bsStyle="primary" disabled={!lookupKey.valid}>
+                  Look up
+                </Button>
               </Row>
-            </Row>
-          </h4>
-          {lutError && <StyledAlert bsStyle="danger">{lutError}</StyledAlert>}
-          {!lutError && total < 1 && <StyledAlert>No result to show</StyledAlert>}
-          {!lutError && total > 0 && (
+            </fieldset>
+          </form>
+          <Col $gap="xs" style={{ marginTop: 20 }}>
+            <h4 style={{ width: '100%' }}>
+              <Row $align="center" $justify="space-between">
+                <span>Lookup result</span>
+                <Row $width="auto" $align="center">
+                  <NoMarginInput>
+                    <Input
+                      type="number"
+                      bsSize="xs"
+                      onChange={onPreviewSizeChange}
+                      value={previewSize > total ? total : previewSize}
+                      style={{ marginLeft: 'auto' }}
+                      min={1}
+                      max={total}
+                    />
+                  </NoMarginInput>
+                  <Description>of</Description>
+                  <Description>{total}</Description>
+                </Row>
+              </Row>
+            </h4>
             <StyledDataWell>{lookupResult ?? JSON.stringify(results, null, 2)}</StyledDataWell>
-          )}
+          </Col>
         </Col>
-      </Col>
+      )}
     </Col>
   );
 }

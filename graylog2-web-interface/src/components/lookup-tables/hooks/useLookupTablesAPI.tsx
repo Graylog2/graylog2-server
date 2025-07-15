@@ -114,7 +114,7 @@ export function useFetchLookupPreview(idOrName: string, enabled: boolean = false
   });
 
   return {
-    lookupPreview: data ?? { results: [], total: 0 },
+    lookupPreview: data ?? { results: [], total: 0, supported: true },
     loadingLookupPreview: isLoading,
   };
 }

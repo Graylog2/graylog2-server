@@ -27,6 +27,7 @@ export type AdaptersMap = { [key: string]: LookupTableAdapter };
 export type LookupPreviewType = {
   total: number;
   results: Array<{ [key: string]: string }>;
+  supported: boolean;
 };
 
 export interface CachePluginType {
