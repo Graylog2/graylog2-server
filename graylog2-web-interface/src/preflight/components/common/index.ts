@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as Badge } from './Badge';
-export { default as Button } from './Button';
 export { default as Col } from './Col';
 export { default as FormikInput } from './FormikTextInput';
 export { default as Grid } from './Grid';

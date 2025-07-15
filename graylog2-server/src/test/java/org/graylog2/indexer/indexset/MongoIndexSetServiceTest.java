@@ -380,8 +380,6 @@ public class MongoIndexSetServiceTest {
         final FakeStream stream1 = new FakeStream("Test stream 1");
 
         final String streamId = "57f3d721a43c2d59cb750001";
-        stream1.setIndexSetId(streamId);
-
         when(streamService.loadAllWithIndexSet(streamId)).thenReturn(Collections.singletonList(stream1));
 
         final int deletedEntries = indexSetService.delete(streamId);

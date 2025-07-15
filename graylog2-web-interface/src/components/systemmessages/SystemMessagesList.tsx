@@ -25,7 +25,7 @@ const SystemMessagesTable = styled(Table)(
     font-size: ${theme.fonts.size.body};
 
     a {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
   `,
 );

@@ -117,14 +117,16 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         // no s3 repo configuration properties given by the user
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
+
+        final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 datanodeConfiguration(Map.of(
-                        "path_repo", "/mnt/data/snapshots",
+                        "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -141,7 +143,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .isEmpty();
 
         Assertions.assertThat(configurationPart.properties())
-                .containsEntry("path.repo", "/mnt/data/snapshots")
+                .containsEntry("path.repo", snapshotsPath)
                 .containsEntry("node.search.cache.size", "10gb");
     }
 
@@ -197,14 +199,16 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
+
+        final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 datanodeConfiguration(Map.of(
                         "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
-                        "path_repo", "/mnt/data/snapshots",
+                        "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -218,7 +222,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .isEmpty(); // no search role should be provided, we have to use only those that are given in the configuration
 
         Assertions.assertThat(configurationPart.properties())
-                .containsEntry("path.repo", "/mnt/data/snapshots")
+                .containsEntry("path.repo", snapshotsPath)
                 .doesNotContainEntry("node.search.cache.size", "10gb");
     }
 

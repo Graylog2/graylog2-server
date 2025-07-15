@@ -24,10 +24,9 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
+import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.DBGrantService;
-import org.graylog.security.DefaultBuiltinCapabilities;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDependencyPermissionChecker;
 import org.graylog.security.entities.EntityDependencyResolver;
@@ -40,6 +39,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,6 +77,9 @@ class EntitySharesServiceTest {
     @Mock
     private GranteeService granteeService;
 
+    @Mock
+    private EntityCreationRequestService entityCreationRequestService;
+
     private GRNRegistry grnRegistry;
     private DBGrantService dbGrantService;
 
@@ -95,7 +98,8 @@ class EntitySharesServiceTest {
         final EventBus serverEventBus = mock(EventBus.class);
         this.entitySharesService = new EntitySharesService(
                 dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
-                grnRegistry, granteeService, serverEventBus, new HashSet<>(), new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
+                grnRegistry, granteeService, entityCreationRequestService, serverEventBus,
+                new HashSet<>(), new CapabilityRegistry(grnRegistry, Set.of(new RestPermissions(), new RestPermissions())));
     }
 
     @DisplayName("Validates we cannot remove the last owner")

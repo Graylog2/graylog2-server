@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security;
+package org.graylog2.plugin.lookup;
 
-import java.util.Set;
+import java.util.Map;
 
-public interface CapabilityPermissions {
-    default Set<String> readPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> editPermissions() {
-        return Set.of();
-    }
-
-    default Set<String> deletePermissions() {
-        return Set.of();
+public record LookupPreview(long total, Map<Object, Object> results) {
+    public static LookupPreview empty() {
+        return new LookupPreview(0, Map.of());
     }
 }

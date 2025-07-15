@@ -61,7 +61,7 @@ const SourceCodeContainer = styled.div<ContainerProps>(
       }
 
       .ace_cursor {
-        border-color: ${theme.colors.global.textDefault};
+        border-color: ${theme.colors.text.primary};
       }
     }
   `,

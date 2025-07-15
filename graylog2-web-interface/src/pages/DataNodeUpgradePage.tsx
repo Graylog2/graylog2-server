@@ -295,7 +295,10 @@ const DataNodeUpgradePage = () => {
               </dd>
               <dt>Number of Shards:</dt>
               <dd>
-                {data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)
+                {data?.cluster_state?.active_shards || 0} active,&nbsp;
+                {data?.cluster_state?.initializing_shards || 0} initializing,&nbsp;
+                {data?.cluster_state?.relocating_shards || 0} relocating,&nbsp;
+                {data?.cluster_state?.unassigned_shards || 0} unassigned
               </dd>
             </StyledHorizontalDl>
             <br />

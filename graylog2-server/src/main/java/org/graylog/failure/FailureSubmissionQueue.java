@@ -77,7 +77,7 @@ class FailureSubmissionQueue {
         queue.put(batch);
 
         if (queueSize() == configuration.getFailureHandlingQueueCapacity()) {
-            logger.debug("The queue is full! Current capacity: {}", configuration.getFailureHandlingQueueCapacity());
+            logger.warn("The queue is full! Current capacity: {}", configuration.getFailureHandlingQueueCapacity());
         }
 
         submittedFailureBatches.mark();
