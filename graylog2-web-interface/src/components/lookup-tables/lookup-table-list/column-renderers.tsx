@@ -21,7 +21,6 @@ import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContex
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-// import LookupTableView from 'components/lookup-tables/LookupTableView';
 import LookupTableDetails from 'components/lookup-tables/LUTModals/LUTDrawer/lookup-table';
 import Cache from 'components/lookup-tables/Cache';
 import DataAdapter from 'components/lookup-tables/DataAdapter';

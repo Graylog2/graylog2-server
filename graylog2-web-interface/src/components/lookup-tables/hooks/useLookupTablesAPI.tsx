@@ -105,11 +105,12 @@ export function useFetchErrors() {
   return { fetchErrors };
 }
 
-export function useFetchLookupPreview(idOrName: string, size: number = 5) {
+export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
   const { data, isLoading } = useQuery({
-    queryKey: ['lookup-preview', idOrName, size],
+    queryKey: ['lookup-preview', idOrName, size, enabled],
     queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), 'Failed to fetch lookup preview'),
     retry: false,
+    enabled,
   });
 
   return {

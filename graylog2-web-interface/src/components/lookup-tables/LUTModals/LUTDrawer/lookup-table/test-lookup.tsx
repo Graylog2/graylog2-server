@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
+import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
 import { Button, Input, Alert } from 'components/bootstrap';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
@@ -53,13 +54,15 @@ type Props = {
 };
 
 function TestLookup({ table }: Props) {
+  const { errors } = useErrorsContext();
+  const lutError = errors?.lutErrors[table.name];
   const [lookupKey, setLookupKey] = React.useState<{ value: string; valid: boolean }>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
   const [previewSize, setPreviewSize] = React.useState<number>(5);
   const productName = useProductName();
   const {
     lookupPreview: { results, total },
-  } = useFetchLookupPreview(table.id, previewSize);
+  } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
   const onChange = (event: React.BaseSyntheticEvent) => {
     const newValue = { ...lookupKey };
@@ -156,10 +159,10 @@ function TestLookup({ table }: Props) {
               </Row>
             </Row>
           </h4>
-          {total > 0 ? (
+          {lutError && <StyledAlert bsStyle="danger">{lutError}</StyledAlert>}
+          {!lutError && total < 1 && <StyledAlert>No result to show</StyledAlert>}
+          {!lutError && total > 0 && (
             <StyledDataWell>{lookupResult ?? JSON.stringify(results, null, 2)}</StyledDataWell>
-          ) : (
-            <StyledAlert>No result to show</StyledAlert>
           )}
         </Col>
       </Col>
