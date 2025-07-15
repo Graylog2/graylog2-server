@@ -22,9 +22,9 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { FormikFormGroup, FormSubmit, TimeUnitInput } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { LookupTableAdapter, validationErrorsType } from 'src/logic/lookup-tables/types';
 import { useCreateAdapter, useUpdateAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { LookupTableAdapter, validationErrorsType } from 'logic/lookup-tables/types';
 
 type TitleProps = {
   title: string;
@@ -183,19 +183,19 @@ const DataAdapterForm = ({
         onSubmit={handleSubmit}
         enableReinitialize>
         {({ errors, values, setValues, setFieldValue, isSubmitting }) => {
-          const configFieldSet = React.useMemo(() => plugin && React.createElement(plugin.formComponent, {
+          const configFieldSet = plugin && React.createElement(plugin.formComponent, {
             config: values.config,
             validationMessage,
             validationState,
             updateConfig: (newConfig) => setFieldValue('config', newConfig),
             handleFormEvent: (event) => {
-              const { name, value, type, checked } = event.target;
-              const updatedValue = type === 'checkbox' ? checked : value;
+              const { name, value, type: typeFromTarget, checked } = event.target;
+              const updatedValue = typeFromTarget === 'checkbox' ? checked : value;
 
               setFieldValue(`config.${name}`, updatedValue);
             },
             ref: configRef,
-          }), [plugin, values.config]);
+          });
 
           return (
             <Form className="form form-horizontal">

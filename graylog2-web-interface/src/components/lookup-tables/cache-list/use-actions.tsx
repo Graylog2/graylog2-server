@@ -41,7 +41,7 @@ function Actions({ cache }: ActionsProps) {
     setModal('CACHE-EDIT');
     setTitle(cache.name);
     setEntity(cache);
-  }, [cache]);
+  }, [cache, setModal, setTitle, setEntity]);
 
   const handleDelete = React.useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {

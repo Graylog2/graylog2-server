@@ -41,7 +41,7 @@ function Actions({ adapter }: ActionsProps) {
     setModal('DATA-ADAPTER-EDIT');
     setTitle(adapter.name);
     setEntity(adapter);
-  }, [adapter]);
+  }, [adapter, setModal, setTitle, setEntity]);
 
   const handleDelete = React.useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
