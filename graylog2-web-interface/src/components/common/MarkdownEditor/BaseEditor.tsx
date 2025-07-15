@@ -22,7 +22,6 @@ import { SourceCodeEditor } from 'components/common';
 
 const EditorStyles = styled.div<{ $width: string }>`
   & .ace_editor {
-    border: 1px solid ${({ theme }) => theme.colors.input.border} !important;
     width: ${({ $width }) => $width};
   }
 

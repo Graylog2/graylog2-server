@@ -45,34 +45,15 @@ const SourceCodeContainer = styled.div<ContainerProps>(
     }
 
     ${theme.components.aceEditor}
-    .ace-graylog {
-      .ace_marker-layer {
-        .ace_active-line {
-          background: ${theme.colors.variant.lightest.default};
-        }
-      }
-
-      .ace_gutter-active-line {
-        background-color: ${theme.colors.variant.lightest.default};
-      }
-
-      .ace_gutter {
-        background: ${theme.colors.variant.lighter.default};
-      }
-
-      .ace_cursor {
-        border-color: ${theme.colors.text.primary};
-      }
-    }
   `,
 );
 
 const Toolbar = styled.div(
   ({ theme }) => css`
     background: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.gray[80]};
+    border: 1px solid ${theme.colors.input.border};
     border-bottom: 0;
-    border-radius: 5px 5px 0 0;
+    border-radius: 0;
 
     .btn-link {
       color: ${theme.colors.variant.dark.info};
@@ -89,13 +70,6 @@ const Toolbar = styled.div(
         &:hover {
           color: ${theme.colors.variant.light.default};
         }
-      }
-    }
-
-    & + ${SourceCodeContainer} {
-      /* Do not add border radius if code editor comes after toolbar */
-      .ace_editor {
-        border-radius: 0 0 5px 5px;
       }
     }
   `,

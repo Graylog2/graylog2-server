@@ -2035,10 +2035,10 @@
   resolved "https://registry.yarnpkg.com/@graylog/prettier-config/-/prettier-config-1.0.3.tgz#4b0efe44b3e88ff9c956899cb367804da55227db"
   integrity sha512-aEQIJd/2jR98uZ6TwN0lc4CmrhYuagXJRqWNUNFDclqhr2yu+TH6hn8J7mNl63V+S0DF0CIZYmu71z3Di1N77Q==
 
-"@graylog/sawmill@2.0.24":
-  version "2.0.24"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.24.tgz#07d16ac3cdf24f9b142dc7e1df38847046b7dee0"
-  integrity sha512-hjZ+ODtDiT07yNtvRryZyX8Clo0FFKCaXIbeTq0fAlPtRfIR1huc3uWcR1EOb6NpWgt4W9TuQqiRNaMwra0Pbw==
+"@graylog/sawmill@2.0.26":
+  version "2.0.26"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.26.tgz#be46a9404ba79a0cb3f13239709f2f9286ebddd4"
+  integrity sha512-DUWEHOm3YsIv7/kuhJrBTlglwqizIbf8jcEO0wK0KmYpEz5a8/owLBPam/lWox4xZ03pMj/RdfSeYVu6IGCTmQ==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
@@ -8829,7 +8829,7 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "7.0.0-SNAPSHOT"
   dependencies:
-    "@graylog/sawmill" "2.0.24"
+    "@graylog/sawmill" "2.0.26"
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.83.0"
     "@types/jquery" "3.5.32"
