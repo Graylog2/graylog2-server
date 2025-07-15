@@ -59,7 +59,6 @@ export type TableElement<T extends EntityBase> = {
 }
 
 declare module 'graylog-web-plugin/plugin' {
-
   export interface PluginExports {
     'components.shared.entityActions'?: Array<EntitySharedAction<unknown, unknown>>;
     'components.shared.entityTableElements'?: Array<TableElement<EntityBase>>;
