@@ -25,19 +25,17 @@ type Props = {
   onClose: () => void,
 }
 
-const DataAdapterCreateModal = ({ onClose }: Props) => {
-  return (
-    <Modal show fullScreen onHide={onClose}>
-      <Modal.Header>
-        <Modal.Title>Create Data Adapter</Modal.Title>
-      </Modal.Header>
-      <DataAdapterCreate
-        saved={onClose}
-        onCancel={onClose}
-      />
-    </Modal>
-  );
-}
+const DataAdapterCreateModal = ({ onClose }: Props) => (
+  <Modal show fullScreen onHide={onClose}>
+    <Modal.Header>
+      <Modal.Title>Create Data Adapter</Modal.Title>
+    </Modal.Header>
+    <DataAdapterCreate
+      saved={onClose}
+      onCancel={onClose}
+    />
+  </Modal>
+);
 
 export default connect(
   DataAdapterCreateModal,

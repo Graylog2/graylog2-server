@@ -33,6 +33,9 @@ import {
   createCache,
   updateCache,
   validateCache,
+  createDataAdapter,
+  updateDataAdapter,
+  validateDataAdapter,
 } from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
@@ -147,6 +150,51 @@ export function useFetchDataAdapterTypes() {
   });
 
   return { fetchingDataAdapterTypes: isLoading, types: data };
+}
+
+export function useCreateAdapter() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: createDataAdapter,
+    onSuccess: () => {
+      UserNotification.success('Data Adapter created successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    createAdapter: mutateAsync,
+    creatingAdapter: isLoading,
+  };
+}
+
+export function useUpdateAdapter() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: updateDataAdapter,
+    onSuccess: () => {
+      UserNotification.success('Data Adapter updated successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateAdapter: mutateAsync,
+    updatingAdapter: isLoading,
+  };
+}
+
+export function useValidateDataAdapter() {
+  const { mutateAsync } = useMutation({
+    mutationFn: validateDataAdapter,
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return { validateDataAdapter: mutateAsync };
 }
 
 export function useDeleteDataAdapter() {

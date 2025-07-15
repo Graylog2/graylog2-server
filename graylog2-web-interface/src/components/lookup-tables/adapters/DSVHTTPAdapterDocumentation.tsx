@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Accordion } from '@mantine/core';
 
 import { Alert } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
@@ -29,6 +30,50 @@ const csvFile2 = `'127.0.0.1';'e4:b2:11:d1:38:14'
 
 const DSVHTTPAdapterDocumentation = () => {
   const productName = useProductName();
+
+  const accordionItems = [
+    {
+      value: 'example_1',
+      label: 'Example 1',
+      content:
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>,</code>
+            <br />
+            Quote character: <code>&#34;</code>
+            <br />
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>DSV File</h5>
+          <pre>{csvFile1}</pre>
+        </div>,
+    },
+    {
+      value: 'example_2',
+      label: 'Example 2',
+      content:
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>;</code>
+            <br />
+            Quote character: <code>&#39;</code>
+            <br />
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>DSV File</h5>
+          <pre>{csvFile2}</pre>
+        </div>
+    },
+  ];
+
+  const items = accordionItems.map((item) => (
+    <Accordion.Item key={item.value} value={item.value}>
+      <Accordion.Control>{item.label}</Accordion.Control>
+      <Accordion.Panel>{item.content}</Accordion.Panel>
+    </Accordion.Item>
+  ));
 
   return (
     <div>
@@ -48,31 +93,7 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Example 1</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code>
-        <br />
-        Quote character: <code>&#34;</code>
-        <br />
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>DSV File</h5>
-      <pre>{csvFile1}</pre>
-
-      <h3 style={{ marginBottom: 10 }}>Example 2</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code>
-        <br />
-        Quote character: <code>&#39;</code>
-        <br />
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>DSV File</h5>
-      <pre>{csvFile2}</pre>
+      <Accordion chevronPosition="left" defaultValue='example_1'>{items}</Accordion>
     </div>
   );
 };

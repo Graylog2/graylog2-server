@@ -16,6 +16,7 @@
  */
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
+import { Accordion } from '@mantine/core';
 
 import useProductName from 'brand-customization/useProductName';
 import { Alert } from 'components/bootstrap';
@@ -38,6 +39,89 @@ const csvFile3 = `"cidr","subnet"
 const CSVFileAdapterDocumentation = () => {
   const productName = useProductName();
 
+  const accordionItems = [
+    {
+      value: 'example_1',
+      label: 'Example 1',
+      content:
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>,</code>
+            <br />
+            Quote character: <code>"</code>
+            <br />
+            Key column: <code>ipaddr</code>
+            <br />
+            Value column: <code>hostname</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{csvFile1}</pre>
+        </div>,
+    },
+    {
+      value: 'example_2',
+      label: 'Example 2',
+      content:
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>;</code>
+            <br />
+            Quote character: <code>'</code>
+            <br />
+            Key column: <code>ipaddr</code>
+            <br />
+            Value column: <code>hostname</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{csvFile2}</pre>
+        </div>
+    },
+    {
+      value: 'cidr_lookups',
+      label: 'CIDR Lookups',
+      content:
+        <div>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            If this data adapter will be used to lookup IP address keys against CIDR addresses
+            <br />
+            then it should be marked as a CIDR lookup. For example:
+            <br />
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>,</code>
+            <br />
+            Quote character: <code>"</code>
+            <br />
+            Key column: <code>cidr</code>
+            <br />
+            Value column: <code>subnet</code>
+            <br />
+            CIDR lookup: <code>true</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{csvFile3}</pre>
+
+          <p>
+            Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.
+          </p>
+        </div>
+    }
+  ];
+
+  const items = accordionItems.map((item) => (
+    <Accordion.Item key={item.value} value={item.value}>
+      <Accordion.Control>{item.label}</Accordion.Control>
+      <Accordion.Panel>{item.content}</Accordion.Panel>
+    </Accordion.Item>
+  ));
+
   return (
     <div>
       <p>The CSV data adapter can read key value pairs from a CSV file.</p>
@@ -57,65 +141,7 @@ const CSVFileAdapterDocumentation = () => {
 
       <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Example 1</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code>
-        <br />
-        Quote character: <code>"</code>
-        <br />
-        Key column: <code>ipaddr</code>
-        <br />
-        Value column: <code>hostname</code>
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile1}</pre>
-
-      <h3 style={{ marginBottom: 10 }}>Example 2</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code>
-        <br />
-        Quote character: <code>'</code>
-        <br />
-        Key column: <code>ipaddr</code>
-        <br />
-        Value column: <code>hostname</code>
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile2}</pre>
-
-      <h3 style={{ marginBottom: 10 }}>CIDR Lookups</h3>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        If this data adapter will be used to lookup IP address keys against CIDR addresses
-        <br />
-        then it should be marked as a CIDR lookup. For example:
-        <br />
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code>
-        <br />
-        Quote character: <code>"</code>
-        <br />
-        Key column: <code>cidr</code>
-        <br />
-        Value column: <code>subnet</code>
-        <br />
-        CIDR lookup: <code>true</code>
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile3}</pre>
-
-      <p>
-        Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.
-      </p>
+      <Accordion chevronPosition="left" defaultValue='example_1'>{items}</Accordion>
     </div>
   );
 };

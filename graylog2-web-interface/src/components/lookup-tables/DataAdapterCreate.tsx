@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -22,30 +23,36 @@ import { Select } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import { DataAdapterForm } from 'components/lookup-tables';
 import ObjectUtils from 'util/ObjectUtils';
-import { useFetchDataAdapterTypes } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { useFetchDataAdapterTypes, useValidateDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
 type DataAdapterCreateProps = {
   saved: (...args: any[]) => void;
   onCancel: () => void;
-  validate?: (...args: any[]) => void;
   validationErrors?: any;
 };
+
+const StyledRow = styled(Row)`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
 
 const DataAdapterCreate = ({
   saved,
   onCancel,
-  validate = null,
   validationErrors = {},
 }: DataAdapterCreateProps) => {
   const [type, setType] = React.useState<string | undefined>(undefined);
   const [dataAdapter, setDataAdapter] = React.useState<any>(undefined);
   const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
+  const { validateDataAdapter } = useValidateDataAdapter();
 
   const adapterPlugins = React.useMemo(() => {
     const plugins = {};
     PluginStore.exports('lookupTableAdapters').forEach((p) => {
       plugins[p.type] = p;
     });
+
     return plugins;
   }, []);
 
@@ -90,34 +97,33 @@ const DataAdapterCreate = ({
     });
   }, [types]);
 
+  const validate = (adapter) => {
+    validateDataAdapter(adapter);
+  };
+
   return (
     <div>
-      <Row className="content">
-        <Col lg={8}>
-          <form className="form form-horizontal" onSubmit={(e) => e.preventDefault()}>
-            <Input
-              id="data-adapter-type-select"
-              label="Data Adapter Type"
-              required
-              autoFocus
-              help="The type of data adapter to configure."
-              labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9">
-              <Select
-                placeholder="Select Data Adapter Type"
-                clearable={false}
-                options={sortedAdapters}
-                onChange={handleTypeSelect}
-                value={null}
-              />
-            </Input>
-          </form>
+      <StyledRow>
+        <Col lg={9}>
+          <Input
+            id="data-adapter-type-select"
+            label="Data Adapter Type"
+            required
+            autoFocus
+            help="The type of data adapter to configure.">
+            <Select
+              placeholder="Select Data Adapter Type"
+              clearable={false}
+              options={sortedAdapters}
+              onChange={handleTypeSelect}
+              value={null}
+            />
+          </Input>
         </Col>
-      </Row>
-
+      </StyledRow>
       {dataAdapter && (
-        <Row className="content">
-          <Col lg={12}>
+        <StyledRow>
+          <Col lg={9}>
             <DataAdapterForm
               dataAdapter={dataAdapter}
               type={type}
@@ -126,9 +132,10 @@ const DataAdapterCreate = ({
               validate={validate}
               validationErrors={validationErrors}
               saved={saved}
+              onCancel={onCancel}
             />
           </Col>
-        </Row>
+        </StyledRow>
       )}
     </div>
   );

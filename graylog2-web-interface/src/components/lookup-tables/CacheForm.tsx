@@ -144,85 +144,84 @@ const CacheForm = ({
   return (
     <>
       <Title title={title} typeName={pluginName} create={create} />
-        <Formik
-          initialValues={{ ...INIT_CACHE, ...cache }}
-          validate={handleValidation}
-          validateOnBlur
-          validateOnChange={false}
-          validateOnMount={!create}
-          onSubmit={handleSubmit}
-          enableReinitialize>
-          {({ errors, values, setValues, isSubmitting }) => (
-            <Form className="form form-horizontal">
-              <Row>
-                <Col lg={6} style={{ marginTop: 10 }}>
-                    <fieldset>
-                      <FormikFormGroup
-                        type="text"
-                        name="title"
-                        label="* Title"
-                        required
-                        help={errors.title ? null : 'A short title for this cache.'}
-                        onChange={handleTitleChange(values, setValues)}
-                        autoFocus
-                        labelClassName="col-sm-3"
-                        wrapperClassName="col-sm-9"
-                      />
-                      <FormikFormGroup
-                        type="text"
-                        name="description"
-                        label="Description"
-                        help="Cache description."
-                        labelClassName="col-sm-3"
-                        wrapperClassName="col-sm-9"
-                      />
-                      <FormikFormGroup
-                        type="text"
-                        name="name"
-                        label="* Name"
-                        required
-                        error={validationErrors.name ? validationErrors.name[0] : null}
-                        onChange={() => setGenerateName(false)}
-                        help={
-                          errors.name || validationErrors.name
-                            ? null
-                            : 'The name that is being used to refer to this cache. Must be unique.'
-                        }
-                        labelClassName="col-sm-3"
-                        wrapperClassName="col-sm-9"
-                      />
-                    </fieldset>
-                    {configFieldSet}
-                </Col>
-                <Col lg={6} style={{ marginTop: 10 }}>
-                  {DocComponent ? <DocComponent /> : null}
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col md={3} mdOffset={9}>
-                  {create && (
-                    <FormSubmit
-                      submitButtonText="Create cache"
-                      submitLoadingText="Creating cache..."
-                      isSubmitting={isSubmitting || creatingCache}
-                      isAsyncSubmit
-                      onCancel={onCancel}
-                    />
-                  )}
-                  {updatable && (
-                    <FormSubmit
-                      submitButtonText="Update cache"
-                      submitLoadingText="Updating cache..."
-                      isAsyncSubmit
-                      isSubmitting={isSubmitting || updatingCache}
-                      onCancel={onCancel}
-                    />
-                  )}
-                </Col>
-              </Row>
-            </Form>
-          )}
-        </Formik>
+      <Formik
+        initialValues={{ ...INIT_CACHE, ...cache }}
+        validate={handleValidation}
+        validateOnChange
+        validateOnMount={!create}
+        onSubmit={handleSubmit}
+        enableReinitialize>
+        {({ errors, values, setValues, isSubmitting }) => (
+          <Form className="form form-horizontal">
+            <Row>
+              <Col lg={6} style={{ marginTop: 10 }}>
+                <fieldset>
+                  <FormikFormGroup
+                    type="text"
+                    name="title"
+                    label="* Title"
+                    required
+                    help={errors.title ? null : 'A short title for this cache.'}
+                    onChange={handleTitleChange(values, setValues)}
+                    autoFocus
+                    labelClassName="col-sm-3"
+                    wrapperClassName="col-sm-9"
+                  />
+                  <FormikFormGroup
+                    type="text"
+                    name="description"
+                    label="Description"
+                    help="Cache description."
+                    labelClassName="col-sm-3"
+                    wrapperClassName="col-sm-9"
+                  />
+                  <FormikFormGroup
+                    type="text"
+                    name="name"
+                    label="* Name"
+                    required
+                    error={validationErrors.name ? validationErrors.name[0] : null}
+                    onChange={() => setGenerateName(false)}
+                    help={
+                      errors.name || validationErrors.name
+                        ? null
+                        : 'The name that is being used to refer to this cache. Must be unique.'
+                    }
+                    labelClassName="col-sm-3"
+                    wrapperClassName="col-sm-9"
+                  />
+                </fieldset>
+                {configFieldSet}
+              </Col>
+              <Col lg={6} style={{ marginTop: 10 }}>
+                {DocComponent ? <DocComponent /> : null}
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 20 }}>
+              <Col md={3} mdOffset={9}>
+                {create && (
+                  <FormSubmit
+                    submitButtonText="Create cache"
+                    submitLoadingText="Creating cache..."
+                    isSubmitting={isSubmitting || creatingCache}
+                    isAsyncSubmit
+                    onCancel={onCancel}
+                  />
+                )}
+                {updatable && (
+                  <FormSubmit
+                    submitButtonText="Update cache"
+                    submitLoadingText="Updating cache..."
+                    isAsyncSubmit
+                    isSubmitting={isSubmitting || updatingCache}
+                    onCancel={onCancel}
+                  />
+                )}
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
     </>
   );
 };

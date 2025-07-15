@@ -96,8 +96,8 @@ const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
     setType(selectedType);
   };
 
-  const validate = (adapter) => {
-    validateCache(adapter);
+  const validate = (cacheObj: LookupTableCache) => {
+    validateCache(cacheObj);
   };
 
   return (

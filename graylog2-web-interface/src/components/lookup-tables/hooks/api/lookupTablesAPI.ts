@@ -80,6 +80,10 @@ export const fetchDataAdapterTypes = async () => {
   return state.types;
 };
 
+export const createDataAdapter = async (payload: LookupTableCache) => LookupTableDataAdaptersActions.create(payload);
+
+export const updateDataAdapter = async (payload: LookupTableCache) => LookupTableDataAdaptersActions.update(payload);
+
 export const validateDataAdapter = async (adapter) => LookupTableDataAdaptersActions.validate(adapter);
 
 export const deleteDataAdapter = async (adapterId: string) => LookupTableDataAdaptersActions.delete(adapterId);
