@@ -30,7 +30,7 @@ const GlobalThemeStyles = createGlobalStyle(
 
     body {
       background-color: ${theme.colors.global.background};
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
       font-family: ${theme.fonts.family.body};
       height: 100vh;
     }
@@ -65,7 +65,7 @@ const GlobalThemeStyles = createGlobalStyle(
       font-weight: normal;
       padding: 0;
       margin: 0;
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
 
     h1 {
