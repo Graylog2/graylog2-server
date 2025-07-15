@@ -126,6 +126,7 @@ class DataAdapterCreate extends React.Component<
                 validate={validate}
                 validationErrors={validationErrors}
                 saved={saved}
+                onCancel={() => {}}
               />
             </Col>
           </Row>

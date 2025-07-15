@@ -137,7 +137,6 @@ class LUTCachesPage extends React.Component<
         content = (
           <CacheCreate
             saved={() => _saved(history)}
-            validate={_validateCache}
             onCancel={() => {}}
           />
         );
