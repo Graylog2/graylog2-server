@@ -17,6 +17,7 @@
 package org.graylog2.database.pagination;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.security.Capability;
 import org.graylog.security.GrantDTO;
@@ -69,6 +70,21 @@ public class EntityPaginationHelper {
         return buildPredicate(paginationQuery,
                 descriptor -> descriptor.grn().grnType().type(),
                 GRNDescriptor::title);
+    }
+
+    /**
+     * Creates a predicate that filters GRN objects based on the provided list of entity filters.
+     *
+     * @param filters the list of entity filters
+     * @return a Predicate that filters GRN objects
+     */
+    public static Predicate<GRN> entityFiltersGRNPredicate(List<String> filters) {
+        if (filters == null || filters.isEmpty()) {
+            return grn -> true;
+        }
+        return filters.stream()
+                .map(EntityPaginationHelper::entityFilterGRNPredicate)
+                .reduce(grn -> false, Predicate::or); // Combine all predicates with OR
     }
 
     /**
@@ -131,6 +147,12 @@ public class EntityPaginationHelper {
         } else {
             return t -> typeExtractor.apply(t).equals(trimmedFilter);
         }
+    }
+
+    private static Predicate<GRN> entityFilterGRNPredicate(String entityFilter) {
+        return buildPredicate(entityFilter,
+                GRN::type,
+                null);
     }
 
     private static Predicate<GrantDTO> entityFilterGrantPredicate(String entityFilter) {
