@@ -24,6 +24,10 @@ const EditorStyles = styled.div<{ $width: string }>`
   & .ace_editor {
     width: ${({ $width }) => $width};
   }
+
+  & .ace_cursor {
+    border-color: ${({ theme }) => theme.colors.text.primary};
+  }
 `;
 
 type Props = {
