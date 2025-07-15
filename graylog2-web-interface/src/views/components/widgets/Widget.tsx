@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -46,6 +46,7 @@ import {
   useSendWidgetEditCancelTelemetry,
   useSendWidgetConfigUpdateTelemetry,
 } from 'views/components/widgets/telemety';
+import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -86,11 +87,16 @@ const useQueryFieldTypes = () => {
   return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
 };
 
-const WidgetFooter = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
+const WidgetFooter = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.tiny};
+    color: ${theme.colors.gray[30]};
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  `,
+);
 
 type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
   queryId: string;
@@ -223,6 +229,8 @@ const updateDescription = (widget: WidgetType, newDescription: string) => async 
   return dispatch(updateWidget(widget.id, updatedWidget));
 };
 
+const WidgetDescription = ({ text }: { text: string }) => <TextOverflowEllipsis>{text}</TextOverflowEllipsis>;
+
 const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
@@ -234,6 +242,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const sendWidgetEditTelemetry = useSendWidgetEditTelemetry();
   const sendWidgetEditCancelTelemetry = useSendWidgetEditCancelTelemetry();
   const sendWidgetConfigUpdateTelemetry = useSendWidgetConfigUpdateTelemetry();
+  const interactive = useContext(InteractiveContext);
 
   const isDashboard = viewType === View.Type.Dashboard;
 
@@ -282,29 +291,25 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        <InteractiveContext.Consumer>
-          {(interactive) => (
-            <WidgetHeader
-              description={widget.description}
+        <WidgetHeader
+          description={widget.description}
+          title={title}
+          titleIcon={titleIcon}
+          hideDragHandle={!interactive || isFocused}
+          loading={loading}
+          editing={editing}
+          onRename={onRenameWidget}
+          onUpdateDescription={onUpdateDescription}>
+          {!editing ? (
+            <WidgetActionsMenu
+              isFocused={isFocused}
+              toggleEdit={onToggleEdit}
               title={title}
-              titleIcon={titleIcon}
-              hideDragHandle={!interactive || isFocused}
-              loading={loading}
-              editing={editing}
-              onRename={onRenameWidget}
-              onUpdateDescription={onUpdateDescription}>
-              {!editing ? (
-                <WidgetActionsMenu
-                  isFocused={isFocused}
-                  toggleEdit={onToggleEdit}
-                  title={title}
-                  position={position}
-                  onPositionsChange={onPositionsChange}
-                />
-              ) : null}
-            </WidgetHeader>
-          )}
-        </InteractiveContext.Consumer>
+              position={position}
+              onPositionsChange={onPositionsChange}
+            />
+          ) : null}
+        </WidgetHeader>
         <EditWrapper
           onToggleEdit={onToggleEdit}
           onCancelEdit={onCancelEdit}
@@ -330,6 +335,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
           </WidgetErrorBoundary>
         </EditWrapper>
         <WidgetFooter>
+          {interactive ? <span /> : <WidgetDescription text={widget.description} />}
           {(widget.returnsAllRecords || isDashboard) && !editing && (
             <TimerangeInfo
               widget={widget}

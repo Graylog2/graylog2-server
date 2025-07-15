@@ -39,17 +39,17 @@ const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(
   border: 1px solid ${theme.colors.alerts[$bsStyle].border};
 
   .mantine-Alert-message {
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     font-size: ${theme.fonts.size.body};
   }
 
   .mantine-Alert-title {
     font-size: ${theme.fonts.size.body};
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   }
 
   .mantine-Alert-closeButton {
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   },
 `,
 );
