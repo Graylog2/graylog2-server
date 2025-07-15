@@ -118,7 +118,7 @@ public class SearchDbService {
      * @param id A Search ID.
      */
     void delete(String id) {
-        mongoUtils.getById(id);
+        mongoUtils.deleteById(id);
     }
 
     public Collection<Search> findByIds(Set<String> idSet) {

@@ -24,5 +24,6 @@ const zIndices = {
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
   notifications: modalBase + 11,
+  dropdownMenu: modalBase + 11,
 } as const;
 export default zIndices;

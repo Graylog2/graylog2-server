@@ -18,12 +18,18 @@
 package org.graylog.plugins.map.geoip;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.util.stream.Collectors.toMap;
 
 @AutoValue
 @JsonDeserialize(builder = GeoLocationInformation.Builder.class)
@@ -35,6 +41,7 @@ public abstract class GeoLocationInformation {
     private static final String FIELD_CITY_NAME = "city_name";
     private static final String FIELD_REGION = "region";
     private static final String FIELD_TIME_ZONE = "time_zone";
+    private static final String GEO_INDEXED_FIELD_PREFIX = "geo_";
 
     @Nullable
     @JsonProperty(FIELD_LATITUDE)
@@ -107,5 +114,21 @@ public abstract class GeoLocationInformation {
         }
 
         public abstract GeoLocationInformation build();
+    }
+
+    @JsonIgnore
+    public Map<String, Object> toIndexable() {
+        return java.util.stream.Stream.of(
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_LATITUDE, latitude()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_LONGITUDE, longitude()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_ISO_CODE, countryIsoCode()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_NAME, countryName()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_CITY_NAME, cityName()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_REGION, region()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_TIME_ZONE, timeZone())
+                )
+                .filter(e -> e.getValue() != null)
+                .collect(toMap(Entry::getKey, Entry::getValue
+                ));
     }
 }

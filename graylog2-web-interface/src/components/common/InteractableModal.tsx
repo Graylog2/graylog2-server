@@ -74,7 +74,7 @@ const Header = styled.header(
 
 const Title = styled.h3(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     flex: 1;
   `,
 );

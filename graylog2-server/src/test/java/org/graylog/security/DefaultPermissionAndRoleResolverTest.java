@@ -42,7 +42,7 @@ class DefaultPermissionAndRoleResolverTest {
     @BeforeEach
     void setUp(MongoCollections mongoCollections, GRNRegistry grnRegistry) {
         final var dbService = new DBGrantService(mongoCollections);
-        final var capabilities = new BuiltinCapabilities(grnRegistry, Set.of(
+        final var capabilities = new CapabilityRegistry(grnRegistry, Set.of(
                 new RestPermissions(),
                 new ViewsRestPermissions()
         ));

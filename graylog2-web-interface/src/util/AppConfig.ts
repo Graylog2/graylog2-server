@@ -38,6 +38,7 @@ export type Branding = {
   };
   login?: {
     background?: string;
+    show_logo?: boolean;
   };
   welcome?: {
     news?: { enabled: boolean; feed?: string };

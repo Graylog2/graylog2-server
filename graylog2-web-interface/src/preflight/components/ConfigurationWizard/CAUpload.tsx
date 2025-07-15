@@ -23,7 +23,8 @@ import { Formik, Form, Field } from 'formik';
 import Icon from 'components/common/Icon';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { Input, FormikInput, Button, Space } from 'preflight/components/common';
+import { Input, FormikInput, Space } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
@@ -173,7 +174,7 @@ const CAUpload = () => {
 
           <FormikInput placeholder="Password" name="password" type="password" label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
-          <Button disabled={!isValid} type="submit">
+          <Button disabled={!isValid} type="submit" bsStyle="info">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
         </Form>
