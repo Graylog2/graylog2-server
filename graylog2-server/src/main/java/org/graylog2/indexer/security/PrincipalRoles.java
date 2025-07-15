@@ -16,19 +16,7 @@
  */
 package org.graylog2.indexer.security;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
-public interface SecurityAdapter {
-    record MappingResponse(String status, String message) {}
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record Mapping(@JsonProperty List<String> backendRoles, @JsonProperty List<String> hosts, @JsonProperty List<String> users) {}
-
-    Mapping getMappingForRole(final String role);
-    MappingResponse addUserToRoleMapping(final String role, final String user);
-    MappingResponse removeUserFromRoleMapping(final String role, final String user);
-    List<SecurityRole> getRoles();
-    List<PrincipalRoles> getPrincipals();
+public record PrincipalRoles(String principal, List<String> roles) {
 }
