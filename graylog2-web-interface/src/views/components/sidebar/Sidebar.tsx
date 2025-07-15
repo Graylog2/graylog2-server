@@ -26,6 +26,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import zIndices from 'theme/z-indices';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -56,7 +57,7 @@ const ContentOverlay = styled.div(
     position: fixed;
     inset: 0 0 0 50px;
     background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-    z-index: 5;
+    z-index: ${zIndices.sidebarOverlay};
   `,
 );
 
