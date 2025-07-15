@@ -66,6 +66,10 @@ export type LookupTableDataAdapterConfig = {
   check_interval?: number;
   case_insensitive_lookup?: boolean;
   cidr_lookup?: boolean;
+  user_passwd?: {
+    is_set?: boolean;
+    keep_value?: boolean;
+  };
 };
 
 export type LookupTableAdapter = GenericEntityType & {

@@ -170,10 +170,16 @@ const DataAdapterForm = ({
     <>
       <Title title={title} typeName={pluginDisplayName} create={create} />
       <Formik
-        initialValues={{ ...INIT_ADAPTER, ...dataAdapter }}
+        initialValues={{
+          ...INIT_ADAPTER,
+          ...dataAdapter,
+          config: {
+            ...dataAdapter.config,
+            user_passwd: dataAdapter.config?.user_passwd ?? { keep_value: true },
+          },
+        }}
         validate={handleValidation}
         validateOnChange
-        validateOnMount={!create}
         onSubmit={handleSubmit}
         enableReinitialize>
         {({ errors, values, setValues, setFieldValue, isSubmitting }) => {

@@ -58,6 +58,7 @@ type StoreState = {
     count: number;
     query: string | null;
   };
+  validationErrors: any;
 };
 export const LookupTableDataAdaptersStore = singletonStore('core.LookupTableDataAdapters', () =>
   Reflux.createStore<StoreState>({
