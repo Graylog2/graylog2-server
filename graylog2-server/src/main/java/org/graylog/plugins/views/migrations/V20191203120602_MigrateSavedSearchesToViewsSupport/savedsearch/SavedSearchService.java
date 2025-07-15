@@ -16,8 +16,9 @@
  */
 package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch;
 
-import org.graylog2.database.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -36,6 +37,7 @@ public class SavedSearchService {
         this.db = mongoCollections.collection(COLLECTION_NAME, SavedSearch.class);
     }
 
+    @MustBeClosed
     public Stream<SavedSearch> streamAll() {
         return MongoUtils.stream(db.find());
     }

@@ -25,6 +25,21 @@ type ErrorMessageProps = {
   niceMessage?: string | React.ReactNode;
 };
 
+type FormWrapProps = {
+  buttonContent?: string | React.ReactNode;
+  children: any;
+  disabled?: boolean;
+  error?: {
+    full_message: string;
+    nice_message?: string | React.ReactNode;
+  };
+  description?: string | React.ReactNode;
+  loading?: boolean;
+  onSubmit?: (...args: any[]) => void;
+  title?: string | React.ReactNode;
+  className?: string;
+};
+
 const ErrorOutputStyle = createGlobalStyle`
   /* NOTE: This is to remove Bootstrap styles from the anchor element I can't override in Panel.Header */
   form {
@@ -46,19 +61,21 @@ const ErrorOutput = styled.span`
   display: block;
 `;
 
-const ErrorToggleInfo = styled.button`
-  border: 0;
-  background: none;
-  color: #1f1f1f;
-  font-size: 11px;
-  text-transform: uppercase;
-  margin: 12px 0 0;
-  padding: 0;
-`;
+const ErrorToggleInfo = styled.button(
+  ({ theme }) => css`
+    border: 0;
+    background: none;
+    color: ${theme.colors.text.primary};
+    font-size: 11px;
+    text-transform: uppercase;
+    margin: 12px 0 0;
+    padding: 0;
+  `,
+);
 
-const MoreIcon = styled(Icon)<{ expanded: boolean }>(
-  ({ expanded }) => css`
-    transform: rotate(${expanded ? '90deg' : '0deg'});
+const MoreIcon = styled(Icon)<{ $expanded: boolean }>(
+  ({ $expanded }) => css`
+    transform: rotate(${$expanded ? '90deg' : '0deg'});
     transition: 150ms transform ease-in-out;
   `,
 );
@@ -72,7 +89,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
       {niceMessage && (
         <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
-          More Info <MoreIcon name="chevron_right" expanded={expanded} />
+          More Info <MoreIcon name="chevron_right" $expanded={expanded} />
         </ErrorToggleInfo>
       )}
     </>
@@ -88,21 +105,6 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       {fullMessage}
     </Panel>
   );
-};
-
-type FormWrapProps = {
-  buttonContent?: string | React.ReactNode;
-  children: any;
-  disabled?: boolean;
-  error?: {
-    full_message: string;
-    nice_message?: string | React.ReactNode;
-  };
-  description?: string | React.ReactNode;
-  loading?: boolean;
-  onSubmit?: (...args: any[]) => void;
-  title?: string | React.ReactNode;
-  className?: string;
 };
 
 const FormWrap = ({

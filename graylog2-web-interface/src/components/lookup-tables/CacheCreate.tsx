@@ -98,7 +98,6 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
               placeholder="Select Cache Type"
               clearable={false}
               options={cacheTypes}
-              matchProp="label"
               onChange={handleSelect}
               value={type}
             />

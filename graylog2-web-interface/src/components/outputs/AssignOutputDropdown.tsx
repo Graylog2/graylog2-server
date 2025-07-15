@@ -18,28 +18,20 @@ import React from 'react';
 
 import { Button } from 'components/bootstrap';
 
-type AssignOutputDropdownProps = {
+type Props = {
   outputs: any[];
   onSubmit: (...args: any[]) => void;
 };
 
-class AssignOutputDropdown extends React.Component<
-  AssignOutputDropdownProps,
-  {
-    [key: string]: any;
-  }
-> {
+class AssignOutputDropdown extends React.Component<Props, { selectedOutput: string }> {
   PLACEHOLDER = 'placeholder';
 
-  state = {
-    selectedOutput: this.PLACEHOLDER,
-  };
-
-  _formatOutput = (output) => (
-    <option key={output.id} value={output.id}>
-      {output.title}
-    </option>
-  );
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      selectedOutput: this.PLACEHOLDER,
+    };
+  }
 
   _handleUpdate = (evt) => {
     this.setState({ selectedOutput: evt.target.value });
@@ -56,8 +48,6 @@ class AssignOutputDropdown extends React.Component<
   render() {
     const { outputs } = this.props;
     const { selectedOutput } = this.state;
-    const outputList =
-      outputs.length > 0 ? outputs.map(this._formatOutput) : <option disabled>No outputs available</option>;
 
     return (
       <div className="output-add">
@@ -66,7 +56,15 @@ class AssignOutputDropdown extends React.Component<
             <option value={this.PLACEHOLDER} disabled>
               Select existing output
             </option>
-            {outputList}
+            {outputs.length > 0 ? (
+              outputs.map((output) => (
+                <option key={output.id} value={output.id}>
+                  {output.title}
+                </option>
+              ))
+            ) : (
+              <option disabled>No outputs available</option>
+            )}
           </select>
           &nbsp;
           <Button

@@ -17,11 +17,12 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import NumberUtils from 'util/NumberUtils';
 import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBorder?: boolean }>`
+const Container = styled.div<{ $height?: number | string; $noBackground?: boolean; $noBorder?: boolean }>`
   position: relative;
   padding: 8px 0;
   background-color: ${({ theme, $noBackground }) =>
@@ -35,7 +36,9 @@ const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBor
   flex-grow: 1;
   overflow: hidden;
 
-  height: ${({ $height }) => ($height ? `${$height}px` : 'auto')};
+  height: ${({ $height }) =>
+    // eslint-disable-next-line no-nested-ternary
+    $height ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
   min-height: 100px;
   width: 100%;
 `;
@@ -49,10 +52,10 @@ const ExpandIconButton = styled(IconButton)`
   z-index: 10;
 `;
 
-const MarkdownStyles = styled.div`
+const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
   overflow: hidden auto;
   height: 100%;
-  padding: 0 8px;
+  padding: 0 ${({ $noPadding }) => ($noPadding ? '0' : '8px')};
 
   container-type: inline-size;
 
@@ -108,23 +111,34 @@ const MarkdownStyles = styled.div`
 
 type Props = {
   value: string;
-  height?: number;
+  height?: number | string;
   show: boolean;
   withFullView?: boolean;
   noBackground?: boolean;
   noBorder?: boolean;
+  noPadding?: boolean;
 };
 
-function Preview({ value, height = 100, show, withFullView = false, noBackground = false, noBorder = false }: Props) {
+function Preview({
+  value,
+  height = 100,
+  show,
+  withFullView = false,
+  noBackground = false,
+  noBorder = false,
+  noPadding = false,
+}: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
   return (
     show && (
       <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
-        <MarkdownStyles>
+        <MarkdownStyles $noPadding={noPadding}>
           <Markdown text={value} />
         </MarkdownStyles>
-        {withFullView && <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />}
+        {withFullView && (
+          <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />
+        )}
         <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
       </Container>
     )

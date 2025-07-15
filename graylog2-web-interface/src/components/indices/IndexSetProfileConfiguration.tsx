@@ -55,7 +55,7 @@ const IndexSetProfileConfiguration = ({
       </StyledAlert>
       <Row>
         <Col md={12}>
-          <Input id={name} label="Index field type mapping profile">
+          <Input id={name} label="Index field type mapping profile (optional)">
             <StyledSelect
               placeholder="Select index field type profile"
               inputId={name}

@@ -51,7 +51,6 @@ public class EntityDependencyResolver {
             .put(GRNTypes.SEARCH, ImmutableSet.of(ModelTypes.OUTPUT_V1))
             .put(GRNTypes.STREAM, ImmutableSet.of(ModelTypes.OUTPUT_V1))
             .put(GRNTypes.DASHBOARD, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .put(GRNTypes.EVENT_DEFINITION, ImmutableSet.of(ModelTypes.EVENT_PROCEDURE_V1))
             .build();
 
     @Inject
@@ -116,7 +115,7 @@ public class EntityDependencyResolver {
         // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
         return contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
-                .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(),
+                .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name()).newGRNBuilder().entity(e.id().id()).build(),
                         v -> Optional.ofNullable(v.title())));
     }
 

@@ -63,6 +63,7 @@ import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
+import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -110,13 +111,13 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   width: number;
 }
 
-export interface WidgetExport {
+export interface WidgetExport<T extends WidgetConfig = WidgetConfig> {
   type: string;
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
-  editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps<T, any>>;
+  editComponent: React.ComponentType<EditWidgetComponentProps<T>>;
   hasEditSubmitButton?: boolean;
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
@@ -326,6 +327,7 @@ type EventProcedureFormProps = {
 type EventProcedureSummaryProps = {
   eventDefinitionEventProcedure: string | undefined;
   eventId?: string;
+  event?: Event;
 };
 
 type SearchAction = {
@@ -537,7 +539,7 @@ type LICENSE_SUBJECTS = {
   anomaly: '/license/anomaly';
 };
 
-type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
+export type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
 
 export type LicenseCheck = (subject: LicenseSubject) => {
   data: {
@@ -547,6 +549,11 @@ export type LicenseCheck = (subject: LicenseSubject) => {
   };
   isInitialLoading: boolean;
   refetch: () => void;
+};
+
+type MarkdownAugmentation = {
+  id: string;
+  component: React.ComponentType<{ value: string }>;
 };
 
 declare module 'graylog-web-plugin/plugin' {
@@ -592,6 +599,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
+    'views.elements.aside'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
     'views.export.formats'?: Array<ExportFormat>;
@@ -615,6 +623,8 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
-    'licenseCheck'?: LicenseCheck;
+    'licenseCheck'?: Array<LicenseCheck>;
+    entityPermissionsMapper?: EntityPermissionsMapper;
+    'markdown.augment.components'?: Array<MarkdownAugmentation>;
   }
 }

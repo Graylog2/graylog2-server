@@ -66,7 +66,7 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 
 const DashboardSearchBar = () => (
   <TestStoreProvider>
-    <OriginalDashboardSearchBar />
+    <OriginalDashboardSearchBar scrollContainer={{ current: null }} />
   </TestStoreProvider>
 );
 

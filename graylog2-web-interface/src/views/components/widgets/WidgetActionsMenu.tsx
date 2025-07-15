@@ -50,6 +50,7 @@ import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
+import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -64,6 +65,8 @@ import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
+  line-height: 0;
+
   > *:not(:last-child) {
     margin-right: 2px;
   }
@@ -176,6 +179,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
+
   const onCopyToDashboard = useCallback(
     (widgetId: string, dashboardId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
@@ -231,7 +235,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className="widget-actions-menu">
+    <Container className={widgetActionsMenuClass}>
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton

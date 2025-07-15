@@ -257,6 +257,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       {showCloneModal && (
         <StreamModal
           title="Cloning Stream"
+          initialValues={stream}
           onSubmit={onCloneSubmit}
           onClose={toggleCloneModal}
           submitButtonText="Clone stream"
