@@ -25,7 +25,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.util.stream.Collectors.toMap;
 
 @AutoValue
 @JsonDeserialize(builder = GeoLocationInformation.Builder.class)
@@ -114,14 +118,17 @@ public abstract class GeoLocationInformation {
 
     @JsonIgnore
     public Map<String, Object> toIndexable() {
-        return Map.of(
-                GEO_INDEXED_FIELD_PREFIX + FIELD_LATITUDE, latitude(),
-                GEO_INDEXED_FIELD_PREFIX + FIELD_LONGITUDE, longitude(),
-                GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_ISO_CODE, countryIsoCode(),
-                GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_NAME, countryName(),
-                GEO_INDEXED_FIELD_PREFIX + FIELD_CITY_NAME, cityName(),
-                GEO_INDEXED_FIELD_PREFIX + FIELD_REGION, region(),
-                GEO_INDEXED_FIELD_PREFIX + FIELD_TIME_ZONE, timeZone()
-        );
+        return java.util.stream.Stream.of(
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_LATITUDE, latitude()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_LONGITUDE, longitude()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_ISO_CODE, countryIsoCode()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_COUNTRY_NAME, countryName()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_CITY_NAME, cityName()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_REGION, region()),
+                        new SimpleEntry<>(GEO_INDEXED_FIELD_PREFIX + FIELD_TIME_ZONE, timeZone())
+                )
+                .filter(e -> e.getValue() != null)
+                .collect(toMap(Entry::getKey, Entry::getValue
+                ));
     }
 }
