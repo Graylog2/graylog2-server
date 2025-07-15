@@ -71,7 +71,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
           next: 'maybeRegex',
         }, {
           token: 'term',
-          regex: /[\w\\/]+/,
+          regex: /[\w\\/.]+/,
         }, {
           token: 'text',
           regex: /\s+/,
