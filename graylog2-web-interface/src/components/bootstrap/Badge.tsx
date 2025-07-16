@@ -19,6 +19,8 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
+const mapStyle = (style: ColorVariant) => (style === 'default' ? 'gray' : style);
+
 const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
   ({ theme, color }) => css`
     text-transform: none;
@@ -49,17 +51,21 @@ const Badge = (
     title = undefined,
   }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
-) => (
-  <StyledBadge
-    color={bsStyle}
-    className={className}
-    title={title}
-    data-testid={dataTestid}
-    ref={ref}
-    variant="filled"
-    onClick={onClick}>
-    {children}
-  </StyledBadge>
-);
+) => {
+  const color = mapStyle(bsStyle);
+
+  return (
+    <StyledBadge
+      color={color}
+      className={className}
+      title={title}
+      data-testid={dataTestid}
+      ref={ref}
+      variant="filled"
+      onClick={onClick}>
+      {children}
+    </StyledBadge>
+  );
+};
 
 export default React.forwardRef(Badge);
