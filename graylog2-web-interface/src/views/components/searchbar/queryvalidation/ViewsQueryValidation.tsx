@@ -14,24 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled, { css } from 'styled-components';
 
-const Title = styled.h3(
-  ({ theme }) => css`
-    a {
-      color: ${theme.colors.text.primary};
-    }
+import * as React from 'react';
 
-    .label {
-      font-size: ${theme.fonts.size.tiny};
-      line-height: 200%;
-      margin-left: 5px;
-      vertical-align: bottom;
-    }
-  `,
-);
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const MessageDetailsTitle = (props) => <Title {...props} />;
+import QueryValidation from './QueryValidation';
 
-export default MessageDetailsTitle;
+const ViewsQueryValidation = () => {
+  const viewsValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
+
+  return <QueryValidation validationExplanations={viewsValidationExplanation} />;
+};
+
+export default ViewsQueryValidation;
