@@ -98,7 +98,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = merge({}, defaultLayout, plotLayout);
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(

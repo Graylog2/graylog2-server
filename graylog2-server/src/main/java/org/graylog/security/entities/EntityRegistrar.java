@@ -17,6 +17,7 @@
 package org.graylog.security.entities;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -25,28 +26,23 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog2.plugin.database.users.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
 
 @Singleton
 public class EntityRegistrar {
-    private static final Logger LOG = LoggerFactory.getLogger(EntityRegistrar.class);
-
     // TODO: get rid of this dependency
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
-    private final Set<EntityRegistrationHandler> registrationHandlers;
-
+    private final Provider<Set<EntityRegistrationHandler>> registrationHandlersProvider;
 
     @Inject
     public EntityRegistrar(DBGrantService dbGrantService, GRNRegistry grnRegistry,
-                           Set<EntityRegistrationHandler> registrationHandlers) {
+                           Provider<Set<EntityRegistrationHandler>> registrationHandlersProvider) {
         this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
-        this.registrationHandlers = registrationHandlers;
+        this.registrationHandlersProvider = registrationHandlersProvider;
     }
 
     public void registerNewEventDefinition(String id, User user) {
@@ -74,12 +70,15 @@ public class EntityRegistrar {
     }
 
     public void registerNewEntity(GRN entityGRN, User user) {
-        registrationHandlers.forEach(handler -> handler.handleRegistration(entityGRN, user));
+        registrationHandlersProvider.get().forEach(handler -> handler.handleRegistration(entityGRN, user));
+    }
+
+    public void unregisterEntity(GRN entityGRN) {
+        registrationHandlersProvider.get().forEach(handler -> handler.handleUnregistration(entityGRN));
     }
 
     public void unregisterEntity(final String id, final GRNType grnType) {
-        GRN target = grnRegistry.newGRN(grnType, id);
-        registrationHandlers.forEach(handler -> handler.handleUnregistration(target));
+        unregisterEntity(grnRegistry.newGRN(grnType, id));
     }
 
     // TODO: move this method to a more appropriate place
