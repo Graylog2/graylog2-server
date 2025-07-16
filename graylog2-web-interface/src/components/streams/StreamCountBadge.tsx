@@ -16,6 +16,7 @@
  */
 import styled, { css } from 'styled-components';
 import * as React from 'react';
+import { forwardRef } from 'react';
 
 import { Badge } from 'components/bootstrap';
 
@@ -25,10 +26,20 @@ const StyledBadge = styled(Badge)<{ onClick: () => void }>(
   `,
 );
 
-const StreamCountBadge = ({ disabled, children, onClick }) => (
-  <StyledBadge bsStyle={disabled ? 'gray' : 'info'} onClick={onClick}>
+type Props = {
+  disabled?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+  title: string;
+};
+
+const StreamCountBadge = (
+  { disabled = false, children, onClick = undefined, title }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <StyledBadge bsStyle={disabled ? 'gray' : 'info'} onClick={onClick} title={title} ref={ref}>
     {children}
   </StyledBadge>
 );
 
-export default StreamCountBadge;
+export default forwardRef(StreamCountBadge);
