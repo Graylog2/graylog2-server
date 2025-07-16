@@ -18,7 +18,7 @@
 import React from 'react';
 import { Accordion } from '@mantine/core';
 
-import { Alert, Col, Row } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
 
 const exampleJSON = `{
   "user": {
@@ -131,11 +131,11 @@ const HTTPJSONPathAdapterDocumentation = () => {
         configured JSONPath expressions.
       </p>
 
-      <Alert style={{ marginBottom: 10 }} bsStyle="info">
+      <p>
         Every lookup table result has two values. A <em>single value</em> and a <em>multi value</em>. The single value
         will be used when the lookup result is expected to be a string, number or boolean. The multi value will be used
         when the lookup result is expected to be a map or list.
-      </Alert>
+      </p>
 
       <h3 style={{ marginBottom: 10 }}>Configuration</h3>
 

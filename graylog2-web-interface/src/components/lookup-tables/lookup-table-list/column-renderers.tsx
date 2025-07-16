@@ -116,7 +116,7 @@ const columnRenderers: ColumnRenderers<LookupTableEntity> = {
     title: {
       width: 0.1,
       renderCell: (title: string, lut: LookupTableEntity, _c: any, meta: { caches: CachesMap, adapters: AdaptersMap; }) =>
-        <TitleCol lut={lut} caches={meta.caches} adapters={meta.adapters} title={title}>{title}</TitleCol>,
+        <TitleCol lut={lut} caches={meta?.caches} adapters={meta?.adapters} title={title}>{title}</TitleCol>,
     },
     description: {
       width: 0.2,

@@ -18,7 +18,6 @@
 import React from 'react';
 import { Accordion } from '@mantine/core';
 
-import { Alert } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 
 const CaffeineCacheDocumentation = () => {
@@ -68,10 +67,8 @@ const CaffeineCacheDocumentation = () => {
         cache efficiency.
       </p>
 
-      <Alert style={{ marginBottom: 10 }} bsStyle="info" title="Implementation details">
-        <p>The cache is local to each {productName} server, they do not share the entries.</p>
-        <p>For example, if you have two servers, they will maintain a completely independent cache from each other.</p>
-      </Alert>
+      <p>The cache is local to each {productName} server, they do not share the entries.</p>
+      <p>For example, if you have two servers, they will maintain a completely independent cache from each other.</p>
 
       <hr />
 

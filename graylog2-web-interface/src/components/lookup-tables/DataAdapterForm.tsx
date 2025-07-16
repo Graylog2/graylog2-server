@@ -255,7 +255,7 @@ const DataAdapterForm = ({
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
-                <Col mdOffset={3} md={9}>
+                <Col mdOffset={9} md={3}>
                   <FormSubmit
                     submitButtonText={create ? 'Create adapter' : 'Update adapter'}
                     disabledSubmit={isSubmitting || creatingAdapter || updatingAdapter}

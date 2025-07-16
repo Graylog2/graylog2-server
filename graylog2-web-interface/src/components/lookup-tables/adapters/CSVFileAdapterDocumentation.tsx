@@ -19,7 +19,6 @@ import React from 'react';
 import { Accordion } from '@mantine/core';
 
 import useProductName from 'brand-customization/useProductName';
-import { Alert } from 'components/bootstrap';
 
 const csvFile1 = `"ipaddr","hostname"
 "127.0.0.1","localhost"
@@ -127,17 +126,14 @@ const CSVFileAdapterDocumentation = () => {
       <p>The CSV data adapter can read key value pairs from a CSV file.</p>
       <p>Please make sure your CSV file is formatted according to your configuration settings.</p>
 
-      <Alert style={{ marginBottom: 10 }} bsStyle="info" title="CSV file requirements">
-        <ul className="no-padding">
-          <li>The first line in the CSV file needs to be a list of field/column names</li>
-          <li>
-            The file uses <strong>utf-8</strong> encoding
-          </li>
-          <li>
-            The file is readable by <strong>every</strong> {productName} server node
-          </li>
-        </ul>
-      </Alert>
+      <h4>CSV file requirements</h4>
+      <p>The first line in the CSV file needs to be a list of field/column names</p>
+      <p>
+        The file uses <strong>utf-8</strong> encoding
+      </p>
+      <p>
+        The file is readable by <strong>every</strong> {productName} server node
+      </p>
 
       <hr />
 
