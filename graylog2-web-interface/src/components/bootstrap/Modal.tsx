@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import type { BsSize } from 'components/bootstrap/types';
 import zIndices from 'theme/z-indices';
 
-export type ModalSize = 'lg' | 'large' | 'sm' | 'small' | 'fullscreen';
+export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
 
 const ModalOverlay = styled(MantineModal.Overlay)`
   z-index: ${zIndices.modalOverlay};
