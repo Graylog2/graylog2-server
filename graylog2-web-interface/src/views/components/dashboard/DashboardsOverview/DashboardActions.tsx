@@ -51,7 +51,7 @@ type Props = {
 const usePluggableDashboardActions = (dashboard: View) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.dashboardActions');
-  
+
   const availableActions = pluggableActions.filter((perspective) =>
     perspective.useCondition ? !!perspective.useCondition() : true,
   );
