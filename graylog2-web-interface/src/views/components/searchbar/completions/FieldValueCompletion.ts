@@ -267,7 +267,7 @@ class FieldValueCompletion implements Completer {
     });
   };
 
-  public identifierRegexps = [/[a-zA-Z_0-9$\\/\-\u00A2-\u2000\u2070-\uFFFF]/];
+  public identifierRegexps = [/[a-zA-Z_0-9$\\/.\-\u00A2-\u2000\u2070-\uFFFF]/];
 }
 
 export default FieldValueCompletion;

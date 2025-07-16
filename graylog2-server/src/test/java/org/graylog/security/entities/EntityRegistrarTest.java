@@ -46,7 +46,7 @@ class EntityRegistrarTest {
         this.registrationHandlers = Set.of(handler1, handler2);
 
         this.dbGrantService = mock(DBGrantService.class);
-        this.entityRegistrar = new EntityRegistrar(dbGrantService, grnRegistry, registrationHandlers);
+        this.entityRegistrar = new EntityRegistrar(dbGrantService, grnRegistry, () -> registrationHandlers);
     }
 
     @Test
