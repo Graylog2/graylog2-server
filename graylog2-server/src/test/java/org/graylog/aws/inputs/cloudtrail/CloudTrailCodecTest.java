@@ -123,7 +123,17 @@ public class CloudTrailCodecTest {
 
         Message message = codec.decode(getRawMessageFromFile(STATIC_CREDENTIALS_FILE));
         String userName = message.getField("user_name").toString();
+        assertTrue(message.getMessage().contains("Alice"));
         assertEquals("Alice", userName);
+        assertEquals("IAMUser", message.getField("user_type"));
+        assertEquals("AIDAJ45Q7YFFAREXAMPLE", message.getField("user_principal_id"));
+        assertEquals("arn:aws:iam::123456789012:user/Alice", message.getField("user_principal_arn"));
+        assertEquals("123456789012", message.getField("user_account_id"));
+
+        assertNull(message.getField("session_issuer_user_type"));
+        assertNull(message.getField("session_issuer_user_principal_id"));
+        assertNull(message.getField("session_issuer_user_principal_arn"));
+        assertNull(message.getField("session_issuer_user_account_id"));
     }
 
     @Test
@@ -133,10 +143,17 @@ public class CloudTrailCodecTest {
 
         Message message = codec.decode(getRawMessageFromFile(TEMPORARY_CREDENTIALS_FILE));
         String userName = message.getField("user_name").toString();
-
+        assertTrue(message.getMessage().contains("someTestUser"));
         assertEquals("someTestUser", userName);
-        assertEquals("AROAIDPPEZS35WEXAMPLE", message.getField("user_principal_id"));
-        assertEquals("arn:aws:iam::123456789012:role/someTestUser", message.getField("user_principal_arn"));
+        assertEquals("AssumedRole", message.getField("user_type"));
+        assertEquals("AROAIDPPEZS35WEXAMPLE:AssumedRoleSessionName", message.getField("user_principal_id"));
+        assertEquals("arn:aws:sts::123456789012:assumed-role/someTestUser/MySessionName", message.getField("user_principal_arn"));
+        assertEquals("123456789015", message.getField("user_account_id"));
+
+        assertEquals("Role", message.getField("session_issuer_user_type"));
+        assertEquals("AROAIDPPEZS35WEXAMPLE", message.getField("session_issuer_user_principal_id"));
+        assertEquals("arn:aws:iam::123456789012:role/someTestUser", message.getField("session_issuer_user_principal_arn"));
+        assertEquals("123456789012", message.getField("session_issuer_user_account_id"));
     }
 
     private RawMessage getRawMessageFromFile(String fileName) throws IOException, URISyntaxException {
