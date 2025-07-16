@@ -16,21 +16,15 @@
  */
 package org.graylog2.commands.Token;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mongodb.MongoException;
 import jakarta.inject.Inject;
-import java.util.Collections;
 import java.util.Map;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
-import org.graylog2.audit.AuditActor;
-import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
@@ -41,16 +35,11 @@ public class AutomationTokenCommandExecution {
 
     private final AccessTokenService accessTokenService;
     private final String rootUsername;
-    private final AuditEventSender auditEventSender;
-    private final NodeId nodeId;
 
     @Inject
-    public AutomationTokenCommandExecution(AccessTokenService accessTokenService, Configuration configuration,
-                                           AuditEventSender auditEventSender, NodeId nodeId) {
+    public AutomationTokenCommandExecution(AccessTokenService accessTokenService, Configuration configuration) {
         this.accessTokenService = accessTokenService;
         this.rootUsername = configuration.getRootUsername();
-        this.auditEventSender = auditEventSender;
-        this.nodeId = nodeId;
     }
 
     public void run(String tokenValue) {
@@ -64,7 +53,6 @@ public class AutomationTokenCommandExecution {
         AccessToken token = createToken(tokenValue);
         try {
             accessTokenService.save(token);
-            logAuditEvent(token);
             System.out.println(
                     "Created/updated token with name '" + token.getName() + "' for user '" + rootUsername + "'.");
         } catch (MongoException e) {
@@ -77,18 +65,6 @@ public class AutomationTokenCommandExecution {
         } catch (ValidationException e) {
             throw new RuntimeException("ERROR: Unable to create a valid API token with the provided token value.", e);
         }
-    }
-
-    private void logAuditEvent(AccessToken token) {
-        final Map<String, Object> context = ImmutableMap.of(
-                "path_params", ImmutableMap.of(
-                        "name", Collections.singletonList(token.getName()),
-                        "username", Collections.singletonList(token.getUserName())
-                )
-        );
-
-        auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.USER_ACCESS_TOKEN_CREATE,
-                context);
     }
 
     private AccessToken createToken(String tokenValue) {
