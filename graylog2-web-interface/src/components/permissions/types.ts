@@ -46,6 +46,7 @@ export type EntitySharedAction<T, M> = {
   modal?: React.ComponentType<EntityActionModalProps<T, M>>;
   useCondition?: () => boolean;
 };
+
 export type TableElement<T extends EntityBase> = {
   attributeName: string;
   attributes: Array<Attribute>;

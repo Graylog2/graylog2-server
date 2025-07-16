@@ -28,6 +28,7 @@ function usePluggableEntitySharedActions<T>(entity: T, entityType: string) {
   const availableActions = pluginActions.filter((action) =>
     action.useCondition ? !!action.useCondition() : true
   );
+
   const actions = availableActions.map((action: EntitySharedAction<T, ModalHandler>) => {
     const { key, component: PluggableEntityAction } = action;
 
