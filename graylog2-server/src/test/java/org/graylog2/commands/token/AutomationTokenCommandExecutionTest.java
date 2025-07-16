@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.commands.Token;
+package org.graylog2.commands.token;
 
 import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
@@ -37,7 +37,7 @@ import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.graylog2.commands.Token.AutomationTokenCommandExecution.TOKEN_ID;
+import static org.graylog2.commands.token.AutomationTokenCommandExecution.TOKEN_ID;
 import static org.mockito.Mockito.doReturn;
 
 public class AutomationTokenCommandExecutionTest {
@@ -72,17 +72,6 @@ public class AutomationTokenCommandExecutionTest {
     public void createToken() {
         assertThat(accessTokenService.loadById(TOKEN_ID)).isNull();
 
-        tokenCommandExecution.run("token");
-
-        assertThat(accessTokenService.loadById(TOKEN_ID)).satisfies(token -> {
-            assertThat(token).isNotNull();
-            assertThat(token.getToken()).isEqualTo("token");
-        });
-    }
-
-    @Test
-    public void tokenAlreadyCreatedByPreviousCommand() {
-        tokenCommandExecution.run("token");
         tokenCommandExecution.run("token");
 
         assertThat(accessTokenService.loadById(TOKEN_ID)).satisfies(token -> {

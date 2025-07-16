@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.commands.Token;
+package org.graylog2.commands.token;
 
 import com.google.common.collect.Maps;
 import com.mongodb.MongoException;

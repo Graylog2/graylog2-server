@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.commands.Token;
+package org.graylog2.commands.token;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.google.inject.Module;
@@ -28,7 +28,7 @@ import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 public abstract class AbstractAutomationTokenCommand extends AbstractNodeCommand {
-    public AbstractAutomationTokenCommand(String commandName) {
+    protected AbstractAutomationTokenCommand(String commandName) {
         super(commandName, new TokenCommandConfiguration());
     }
 

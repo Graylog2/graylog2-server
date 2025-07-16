@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.commands.Token;
+package org.graylog2.commands.token;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -33,7 +33,7 @@ import org.graylog2.security.AccessTokenServiceImpl;
 @Command(name = "automation-token", description = "Adds an automation API token for the local admin user.")
 public class AutomationTokenCommand extends AbstractAutomationTokenCommand {
 
-    @Arguments(description = "Value of the automation token to be created (if it doesn't exist yet).")
+    @Arguments(description = "Value of the automation token to be created (or to replace existing value).")
     @Required
     private String value;
 
