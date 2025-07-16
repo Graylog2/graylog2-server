@@ -31,13 +31,13 @@ import org.graylog2.security.AccessTokenServiceImpl;
  * This command will insert/update an automation API token with a fixed ID for the admin user
  */
 @Command(name = "automation-token", description = "Adds an automation API token for the local admin user.")
-public class AutomationAutomationTokenCommand extends AbstractAutomationTokenCommand {
+public class AutomationTokenCommand extends AbstractAutomationTokenCommand {
 
     @Arguments(description = "Value of the automation token to be created (if it doesn't exist yet).")
     @Required
     private String value;
 
-    public AutomationAutomationTokenCommand() {
+    public AutomationTokenCommand() {
         super("automation-token");
     }
 
