@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 import $ from 'jquery';
-import isString from 'lodash/isString';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
@@ -24,7 +23,7 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop?: boolean | 'static' | undefined;
+  backdrop?: boolean;
   submitButtonDisabled?: boolean;
   formProps?: object;
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
@@ -34,7 +33,6 @@ type Props = {
   onCancel: () => void;
   title: string | React.ReactNode;
   children: React.ReactNode;
-  modalTitle?: string | undefined;
 };
 
 /**
@@ -42,17 +40,16 @@ type Props = {
  * has, and providing form validation using HTML5 and our custom validation.
  */
 const BootstrapModalForm = ({
-  backdrop,
+  backdrop = undefined,
   submitButtonDisabled = false,
   formProps = {},
-  bsSize,
+  bsSize = undefined,
   show,
   submitButtonText = 'Submit',
-  onSubmitForm,
+  onSubmitForm = undefined,
   onCancel,
   title,
   children,
-  modalTitle,
   ...restProps
 }: Props) => {
   const form = useRef(null);
@@ -78,17 +75,9 @@ const BootstrapModalForm = ({
 
   const body = <div className="container-fluid">{children}</div>;
 
-  const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
-
   return (
-    <BootstrapModalWrapper
-      bsSize={bsSize}
-      showModal={show}
-      backdrop={backdrop}
-      onHide={onCancel}
-      title={_title}
-      {...restProps}>
-      <Modal.Header closeButton>
+    <BootstrapModalWrapper bsSize={bsSize} showModal={show} backdrop={backdrop} onHide={onCancel} {...restProps}>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <form ref={form} onSubmit={submit} {...formProps} data-testid="modal-form">

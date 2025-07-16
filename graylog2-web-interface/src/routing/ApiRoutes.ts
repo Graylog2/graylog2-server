@@ -134,6 +134,7 @@ const ApiRoutes = {
   },
   EntityShareController: {
     prepare: (entityGRN: string) => ({ url: `/authz/shares/entities/${entityGRN}/prepare` }),
+    prepareEntityCreate: () => ({ url: `/authz/shares/entities/prepare` }),
     update: (entityGRN: string) => ({ url: `/authz/shares/entities/${entityGRN}` }),
     userSharesPaginated: (username: string) => ({ url: `/authz/shares/user/${username}` }),
     entityScopes: () => ({ url: '/entity_scopes' }),
@@ -182,7 +183,9 @@ const ApiRoutes = {
     rebuildSingle: (index: string) => ({ url: `/system/indices/ranges/${index}/rebuild` }),
   },
   IndexSetsApiController: {
-    list: (stats) => ({ url: `/system/indices/index_sets?stats=${stats}` }),
+    list: (stats: boolean, only_open: boolean = false) => ({
+      url: `/system/indices/index_sets?stats=${stats}&only_open=${only_open}`,
+    }),
     listPaginated: (skip, limit, stats) => ({
       url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}`,
     }),

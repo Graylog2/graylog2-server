@@ -72,6 +72,14 @@ public interface AccessTokenService extends PersistedService {
     List<ExpiredToken> findExpiredTokens(DateTime expiredBefore);
 
     /**
+     * Returns all tokens not having a valid user.
+     * The items contain all information required to delete them via the {@link org.graylog2.periodical.OrphanedTokenCleaner}.
+     *
+     * @return List of orphaned tokens.
+     */
+    List<ExpiredToken> findOrphanedTokens();
+
+    /**
      * Deletes a token by its ID.
      *
      * @param id The ID of the token to delete.
@@ -86,7 +94,8 @@ public interface AccessTokenService extends PersistedService {
      * @param id        ID of the token.
      * @param tokenName Name of the token.
      * @param expiresAt Expiration date/time of the token.
-     * @param userId    ID of the owning user.
+     * @param userId    ID of the owning user. Can be null, in case the token belongs to a user which doesn't exist in the database.
+     * @param username  The username of the owner.
      */
-    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId) {}
+    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId, String username) {}
 }

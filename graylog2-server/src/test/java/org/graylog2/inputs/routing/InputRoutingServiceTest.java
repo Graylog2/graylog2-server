@@ -38,6 +38,8 @@ import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamDeletedEvent;
+import org.graylog2.streams.events.StreamRenamedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -75,6 +77,7 @@ class InputRoutingServiceTest {
     static final String INPUT_NEW_NAME = "inputNewName";
     static final String STREAM_ID = "streamId";
     static final String STREAM_NAME = "streamName";
+    static final String STREAM_NEW_NAME = "streamNewName";
 
     @BeforeEach
     void setUp() {
@@ -115,6 +118,15 @@ class InputRoutingServiceTest {
     }
 
     @Test
+    void handleStreamDeleted() throws IOException {
+        final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
+        when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
+
+        inputRoutingService.handleStreamDeleted(new StreamDeletedEvent(STREAM_ID, STREAM_NAME));
+        verify(ruleService).delete(ruleDao);
+    }
+
+    @Test
     void deleteFromDefaultPipeline() throws IOException, NotFoundException {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
         when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
@@ -147,13 +159,27 @@ class InputRoutingServiceTest {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
         when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
 
-        String pipelineSource = "pipeline \"All Messages Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName_to_streamName\"\nend";
+        String pipelineSource = "pipeline \"Default Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName_to_streamName\"\nend";
         when(pipelineService.loadByName(anyString())).thenReturn(PipelineDao.builder().id("pipelineId1").title("pipelineDao").source(pipelineSource).build());
 
         inputRoutingService.handleInputRenamed(new InputRenamedEvent(INPUT_ID, INPUT_NAME, INPUT_NEW_NAME));
 
         verify(ruleService).save(argThat(ruleDao1 -> ruleDao1.source().contains(INPUT_NEW_NAME)), anyBoolean());
-        verify(ruleService, times(1)).save(any(), anyBoolean());
+        verify(ruleService).save(any(), anyBoolean());
+    }
+
+    @Test
+    void handleStreamRenamed() throws IOException, NotFoundException {
+        final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
+        when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
+
+        String pipelineSource = "pipeline \"Default Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName_to_streamName\"\nend";
+        when(pipelineService.loadByName(anyString())).thenReturn(PipelineDao.builder().id("pipelineId1").title("pipelineDao").source(pipelineSource).build());
+
+        inputRoutingService.handleStreamRenamed(new StreamRenamedEvent(STREAM_ID, STREAM_NAME, STREAM_NEW_NAME));
+
+        verify(ruleService).save(argThat(ruleDao1 -> ruleDao1.source().contains(STREAM_NEW_NAME)), anyBoolean());
+        verify(ruleService).save(any(), anyBoolean());
     }
 
     @Test

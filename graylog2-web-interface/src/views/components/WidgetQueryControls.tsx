@@ -33,7 +33,7 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
@@ -201,7 +201,9 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
-  const isValidatingQuery = !!useIsFetching(['validateSearchQuery']);
+  const isValidatingQuery = !!useIsFetching({
+    queryKey: ['validateSearchQuery'],
+  });
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
@@ -333,7 +335,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     )}
                   </Field>
 
-                  <QueryValidation />
+                  <ViewsQueryValidation />
                   <QueryHistoryButton editorRef={editorRef} />
                 </SearchInputAndValidation>
 

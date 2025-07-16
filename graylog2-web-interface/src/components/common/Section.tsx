@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 import { Collapse } from '@mantine/core';
+
+import useDisclosure from 'util/hooks/useDisclosure';
 
 import Icon from './Icon';
 
@@ -62,6 +63,7 @@ type Props = React.PropsWithChildren<{
   title: string;
   header?: React.ReactNode;
   actions?: React.ReactNode;
+  preHeaderSection?: React.ReactNode;
   headerLeftSection?: React.ReactNode;
   collapsible?: boolean;
   onCollapse?: (opened?: boolean) => void;
@@ -76,6 +78,7 @@ const Section = ({
   title,
   header = null,
   actions = null,
+  preHeaderSection = null,
   headerLeftSection = null,
   collapsible = false,
   defaultClosed = false,
@@ -96,6 +99,14 @@ const Section = ({
     <Container $opened={opened} $collapsible={collapsible}>
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
+          {preHeaderSection && (
+            <FlexWrapper
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              {preHeaderSection}
+            </FlexWrapper>
+          )}
           <h2>{header ?? title}</h2>
           {headerLeftSection && (
             <FlexWrapper

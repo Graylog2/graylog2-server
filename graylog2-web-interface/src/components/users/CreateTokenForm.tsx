@@ -17,8 +17,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Spinner, ISODurationInput } from 'components/common';
+
+import useTokenTTL from './useTokenTTL';
 
 const StyledForm = styled.form`
   margin-top: 10px;
@@ -30,23 +32,35 @@ const StyledForm = styled.form`
       width: 300px;
     }
   }
+
+  .input-group {
+    width: 300px;
+  }
 `;
 
 type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
+  forceDefaultTtl?: string;
+  disableTtl?: boolean;
 };
 
-const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
+const CreateTokenForm = ({
+  creatingToken = false,
+  disableForm = false,
+  forceDefaultTtl = undefined,
+  disableTtl = false,
+  onCreate,
+}: Props) => {
   const [tokenName, setTokenName] = useState('');
-  const [tokenTtl, setTokenTtl] = useState('P7D');
+  const { tokenTtl, setTokenTtl, resetTokenTtl } = useTokenTTL(forceDefaultTtl);
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
     onCreate({ tokenName, tokenTtl });
     setTokenName('');
-    setTokenTtl('');
+    resetTokenTtl();
   };
 
   const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
@@ -61,7 +75,9 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           placeholder="What is this token for?"
           value={tokenName}
           onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
-        />{' '}
+        />
+      </FormGroup>
+      {!disableTtl && (
         <ISODurationInput
           id="token_creation_ttl"
           duration={tokenTtl}
@@ -73,7 +89,7 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           disabled={disableForm}
           required
         />
-      </FormGroup>
+      )}
       <Button
         id="create-token"
         disabled={disableForm || tokenName === '' || creatingToken}
@@ -81,6 +97,9 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
         bsStyle="primary">
         {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
+      <HelpBlock>
+        TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D
+      </HelpBlock>
     </StyledForm>
   );
 };

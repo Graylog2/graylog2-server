@@ -52,10 +52,11 @@ const useCreateDataNodeClientCert = (): {
 } => {
   const {
     mutateAsync: onTriggerNextState,
-    isLoading,
+    isPending: isLoading,
     error,
     isError,
-  } = useMutation(createClientCa, {
+  } = useMutation({
+    mutationFn: createClientCa,
     onError: (err: Error) => UserNotification.error(err.message),
   });
 

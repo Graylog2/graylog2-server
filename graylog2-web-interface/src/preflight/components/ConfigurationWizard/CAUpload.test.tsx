@@ -21,24 +21,16 @@ import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
 import CAUpload from './CAUpload';
 
 jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
-
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 
 describe('CAUpload', () => {
   beforeEach(() => {
@@ -79,7 +71,7 @@ describe('CAUpload', () => {
     asMock(fetchMultiPartFormData).mockRejectedValue(new Error('Something bad happened'));
 
     renderPreflight(
-      <DefaultQueryClientProvider options={{ logger }}>
+      <DefaultQueryClientProvider>
         <CAUpload />
       </DefaultQueryClientProvider>,
     );

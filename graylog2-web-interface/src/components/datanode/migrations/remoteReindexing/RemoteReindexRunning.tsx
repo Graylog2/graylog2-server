@@ -24,12 +24,14 @@ import { ConfirmDialog } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useProductName from 'brand-customization/useProductName';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 import { MIGRATION_ACTIONS } from '../../Constants';
 import RemoteReindexTasksProgress from '../common/RemoteReindexProgressBar';
+import MigrationError from '../common/MigrationError';
 
 const IndicesContainer = styled.div`
   max-height: 100px;
@@ -75,6 +77,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
   const [showRetryMigrationConfirmDialog, setShowRetryMigrationConfirmDialog] = useState<boolean>(false);
   const [showLogsQuery, setShowLogsQuery] = useQueryParam('show_logs', StringParam);
   const sendTelemetry = useSendTelemetry();
+  const productName = useProductName();
 
   const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
 
@@ -123,11 +126,12 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
 
   return (
     <>
-      We are currently migrating your existing data asynchronically (Graylog can be used while the reindexing is
+      We are currently migrating your existing data asynchronically ({productName} can be used while the reindexing is
       running), once the data migration is finished you will be automatically transitioned to the next step.
       <br />
       <br />
       <RemoteReindexTasksProgress migrationStatus={migrationStatus} />
+      <MigrationError errorMessage={currentStep.error_message} />
       {indicesWithErrors.length > 0 && (
         <Alert title="Migration failed" bsStyle="danger">
           <IndicesContainer>
@@ -163,7 +167,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
       )}
       {showLogView && (
         <BootstrapModalWrapper showModal={showLogView} onHide={handleCloseLogView} bsSize="large" backdrop>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
           </Modal.Header>
           <Modal.Body>

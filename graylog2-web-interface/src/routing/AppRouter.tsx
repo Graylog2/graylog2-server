@@ -36,7 +36,6 @@ import {
   DataNodePage,
   DataNodeUpgradePage,
   DataNodesClusterManagementPage,
-  DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
@@ -113,6 +112,7 @@ import {
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
+  ClusterCertificateManagementPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -218,7 +218,7 @@ const AppRouter = () => {
             },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
+            { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
@@ -298,8 +298,8 @@ const AppRouter = () => {
               element: <DataNodesClusterManagementPage />,
             },
             !isCloud && {
-              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
-              element: <DataNodesClusterConfigurationPage />,
+              path: RoutePaths.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
+              element: <ClusterCertificateManagementPage />,
             },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&

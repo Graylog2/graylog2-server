@@ -37,6 +37,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import UserNotification from 'util/UserNotification';
 import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';
 import StreamModal from 'components/streams/StreamModal';
+import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default stream</HoverForHelp>
@@ -56,6 +57,10 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
     () => StartpageStore.set(currentUser.id, 'stream', stream.id),
     [stream.id, currentUser.id],
   );
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<Stream>(stream, 'stream');
+  const moreActions = [
+    pluggableActions.length ? pluggableActions : null,
+  ].filter(Boolean);
 
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
@@ -222,7 +227,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem href={Routes.stream_alerts(stream.id)}>Manage Alerts</MenuItem>
         </IfPermitted>
-
+        {moreActions}
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem divider />
         </IfPermitted>
@@ -257,6 +262,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       {showCloneModal && (
         <StreamModal
           title="Cloning Stream"
+          initialValues={stream}
           onSubmit={onCloneSubmit}
           onClose={toggleCloneModal}
           submitButtonText="Clone stream"
@@ -290,6 +296,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           onDelete={onDelete}
         />
       )}
+      {pluggableActionModals}
     </ButtonToolbar>
   );
 };

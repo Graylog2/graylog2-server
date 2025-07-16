@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import useUserSearchFilterMutation, { urlPrefix } from 'hooks/useFavoriteItemMutation';
 import { qualifyUrl } from 'util/URLUtils';
-
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
@@ -47,7 +39,7 @@ describe('useFavoriteItemMutation', () => {
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
-      const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useUserSearchFilterMutation());
 
       act(() => {
         result.current.putItem('111');
@@ -59,7 +51,7 @@ describe('useFavoriteItemMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useUserSearchFilterMutation());
 
       act(() => {
         result.current.putItem('111').catch(() => {});
@@ -79,7 +71,7 @@ describe('useFavoriteItemMutation', () => {
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve());
-      const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useUserSearchFilterMutation());
 
       act(() => {
         result.current.deleteItem('111');
@@ -91,7 +83,7 @@ describe('useFavoriteItemMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useUserSearchFilterMutation());
 
       act(() => {
         result.current.deleteItem('111').catch(() => {});

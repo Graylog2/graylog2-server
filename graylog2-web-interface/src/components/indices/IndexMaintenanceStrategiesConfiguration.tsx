@@ -195,14 +195,16 @@ const getConfigurationComponent = (
 const IndexMaintenanceStrategiesConfiguration = ({
   title,
   name,
-  description,
+  description = undefined,
   selectPlaceholder,
   label,
   pluginExports,
   strategies,
+
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod } = {
     max_index_retention_period: undefined,
   },
+
   activeConfig: { strategy, config },
   getState,
 }: Props) => {
@@ -350,7 +352,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
             <StyledSelect
               placeholder={selectPlaceholder}
               options={getAvailableSelectOptions()}
-              matchProp="label"
               value={getActiveSelection()}
               onChange={_onSelect}
               clearable={false}

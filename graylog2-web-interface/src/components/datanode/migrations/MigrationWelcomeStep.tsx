@@ -25,6 +25,7 @@ import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/co
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 import AppConfig from 'util/AppConfig';
+import useProductName from 'brand-customization/useProductName';
 
 import useIsElasticsearch from '../hooks/useIsElasticsearch';
 
@@ -52,6 +53,7 @@ const StyledHelpPanel = styled(StyledPanel)`
 const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const isElasticsearch = useIsElasticsearch();
   const isRemoteReindexingEnabled = AppConfig.isFeatureEnabled('remote_reindex_migration');
+  const productName = useProductName();
 
   return (
     <Row>
@@ -64,8 +66,8 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: Migra
         <MigrationError errorMessage={currentStep.error_message} />
         <Headline>Data Nodes Migration</Headline>
         <p>
-          The Graylog Data Node is a management component designed to configure and optimize OpenSearch for use with
-          Graylog, reducing administrative overhead and simplifying future updates.
+          The {productName} Data Node is a management component designed to configure and optimize OpenSearch for use
+          with {productName}, reducing administrative overhead and simplifying future updates.
         </p>
         <p>
           Deployments earlier than v5.2 or that opted to not install with a Data Node will need to migrate the message
@@ -115,12 +117,12 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: Migra
                 OpenSearch. This is the recommended method if you want to quickly migrate to data node.
               </p>
               <p>
-                If you want to selectively migrate data (e.g. if you use your search backend non-exclusively for
-                Graylog), you should choose the <code>remote reindexing migration</code>. In this scenario, all data
-                will be copied from your existing search backend to data node’s OpenSearch. Depending on your setup,
-                this can take some time and imposes additional disk space for the copied data to be available. During
-                the remote reindexing, Graylog is ingesting data into data node and can be used, but will only serve the
-                data from the old search backend as it becomes available.
+                If you want to selectively migrate data (e.g. if you use your search backend non-exclusively for{' '}
+                {productName}), you should choose the <code>remote reindexing migration</code>. In this scenario, all
+                data will be copied from your existing search backend to data node’s OpenSearch. Depending on your
+                setup, this can take some time and imposes additional disk space for the copied data to be available.
+                During the remote reindexing, {productName} is ingesting data into data node and can be used, but will
+                only serve the data from the old search backend as it becomes available.
               </p>
               <p>
                 If you are running <code>ElasticSearch</code> as your search backend{' '}

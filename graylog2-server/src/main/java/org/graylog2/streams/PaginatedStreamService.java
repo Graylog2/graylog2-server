@@ -17,13 +17,13 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Variable;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
@@ -48,8 +48,8 @@ public class PaginatedStreamService {
         return collection.countDocuments();
     }
 
-    public PaginatedList<StreamDTO> findPaginated(Bson dbQuery, //query executed on DB level
-                                                  Predicate<StreamDTO> predicate, //predicate executed on code level, AFTER data is fetched
+    public PaginatedList<StreamImpl> findPaginated(Bson dbQuery, //query executed on DB level
+                                                   Predicate<StreamImpl> predicate, //predicate executed on code level, AFTER data is fetched
                                                   int page,
                                                   int perPage,
                                                   String sortField,
@@ -81,17 +81,17 @@ public class PaginatedStreamService {
             pipelineBuilder.add(Aggregates.unset("index_set_title"));
         }
 
-        final List<StreamDTO> streamsList;
-        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()))) {
+        final List<StreamImpl> streamsList;
+        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build())).map(StreamImpl::fromDTO)) {
             streamsList = results.filter(predicate).toList();
         }
 
         final long grandTotal;
-        try (final var stream = MongoUtils.stream(collection.find())) {
+        try (final var stream = MongoUtils.stream(collection.find()).map(StreamImpl::fromDTO)) {
             grandTotal = stream.filter(predicate).count();
         }
 
-        final List<StreamDTO> paginatedStreams = perPage > 0
+        final List<StreamImpl> paginatedStreams = perPage > 0
                 ? streamsList.stream()
                 .skip((long) perPage * Math.max(0, page - 1))
                 .limit(perPage)

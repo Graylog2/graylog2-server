@@ -19,6 +19,9 @@ package org.graylog.plugins.views.search.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
@@ -42,6 +45,8 @@ import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -53,10 +58,6 @@ import org.graylog2.shared.security.Permissions;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -130,7 +131,7 @@ public class ViewsResourceTest {
         );
 
 
-        viewsResource.create(TEST_DASHBOARD_VIEW, mockUserContext(), SEARCH_USER);
+        viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mockUserContext(), SEARCH_USER);
 
         final ArgumentCaptor<ViewDTO> viewCaptor = ArgumentCaptor.forClass(ViewDTO.class);
         final ArgumentCaptor<User> ownerCaptor = ArgumentCaptor.forClass(User.class);
@@ -154,7 +155,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -172,7 +173,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -190,7 +191,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -212,7 +213,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        viewsResource.update(VIEW_ID, TEST_SEARCH_VIEW, SEARCH_USER);
+        viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_SEARCH_VIEW, null), SEARCH_USER);
         verify(viewService).update(TEST_SEARCH_VIEW);
     }
 
@@ -229,7 +230,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -250,7 +251,7 @@ public class ViewsResourceTest {
                 EMPTY_VIEW_RESOLVERS,
                 SEARCH
         );
-        viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER);
+        viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER);
         verify(viewService).update(TEST_DASHBOARD_VIEW);
     }
 
@@ -351,7 +352,7 @@ public class ViewsResourceTest {
                 .canCreateDashboards(false)
                 .build();
 
-        assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), user))
+        assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), user))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -444,7 +445,9 @@ public class ViewsResourceTest {
             when(searchDomain.getForUser(eq(search.id()), eq(SEARCH_USER))).thenReturn(Optional.of(search));
         }
 
-        return new ViewsResource(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper, mock(AuditEventSender.class), mock(ObjectMapper.class)) {
+        return new ViewsResource(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain,
+                viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper,
+                mock(AuditEventSender.class), mock(ObjectMapper.class), mock(EntitySharesService.class)) {
             @Override
             protected Subject getSubject() {
                 return mock(Subject.class);

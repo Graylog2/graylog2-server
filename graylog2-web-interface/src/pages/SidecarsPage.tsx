@@ -50,14 +50,14 @@ const SidecarsPage = () => {
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
         <span>
-          The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
+          Sidecars can reliably forward contents of log files or Windows EventLog from your servers.
           {canCreateSidecarUserTokens &&
             (sidecarUser ? (
               <span>
                 <br />
                 Do you need an API token for a sidecar?&ensp;
                 <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                  Create or reuse a token for the <em>graylog-sidecar</em> user
+                  Create or reuse a token for the <em>{sidecarUser.username}</em> user
                 </Link>
               </span>
             ) : (

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
@@ -52,8 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
-import jakarta.inject.Inject;
-
 import java.net.URL;
 import java.util.Locale;
 import java.util.Objects;
@@ -61,7 +60,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import static org.graylog.integrations.aws.inputs.AWSInput.getKinesisStreamARNDefinition;
+
 public class KinesisTransport extends ThrottleableTransport2 {
+
     private static final Logger LOG = LoggerFactory.getLogger(KinesisTransport.class);
     public static final String NAME = "aws-kinesis-transport";
 
@@ -69,6 +71,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     private static final String CK_ACCESS_KEY = "aws_access_key";
     private static final String CK_SECRET_KEY = "aws_secret_key";
     public static final String CK_KINESIS_STREAM_NAME = "kinesis_stream_name";
+    public static final String CK_KINESIS_STREAM_ARN = "kinesis_stream_arn";
     public static final String CK_KINESIS_RECORD_BATCH_SIZE = "kinesis_record_batch_size";
 
     public static final int DEFAULT_BATCH_SIZE = 10000;
@@ -242,6 +245,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "The name of the Kinesis stream that receives your messages. See README for instructions on how to connect messages to a Kinesis Stream.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
+            r.addField(getKinesisStreamARNDefinition());
 
             r.addField(new NumberField(
                     CK_KINESIS_RECORD_BATCH_SIZE,

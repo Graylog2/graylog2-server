@@ -52,7 +52,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
 
   return (
     <>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Create client certificate</Modal.Title>
       </Modal.Header>
       {!clientCerts && (

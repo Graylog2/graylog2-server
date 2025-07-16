@@ -24,11 +24,12 @@ import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
-import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
 import { RulesActions } from 'stores/rules/RulesStore';
+import usePipeline from 'hooks/usePipeline';
+import usePipelineMutations from 'hooks/usePipelineMutations';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -36,17 +37,15 @@ const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 
 const PipelineDetailsPage = () => {
   const params = useParams<{ pipelineId: string }>();
-  const pipeline = useStore(PipelinesStore, (state) => state.pipelines?.filter((p) => p.id === params.pipelineId)?.[0]);
+  const { data: pipeline } = usePipeline(params?.pipelineId, {
+    enabled: !_isNewPipeline(params.pipelineId) && !!params?.pipelineId,
+  });
+
+  const { createPipeline, updatePipeline } = usePipelineMutations();
   const connections = useStore(PipelineConnectionsStore, (state) =>
     state.connections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId)),
   );
   const [streams, setStreams] = useState();
-
-  useEffect(() => {
-    if (!_isNewPipeline(params.pipelineId)) {
-      PipelinesActions.get(params.pipelineId);
-    }
-  }, [params.pipelineId]);
 
   useEffect(() => {
     RulesActions.list();
@@ -75,7 +74,7 @@ const PipelineDetailsPage = () => {
       source: SourceGenerator.generatePipeline(pipelineWithNewStages),
     };
 
-    PipelinesActions.update(newPipeline);
+    updatePipeline({ pipelineSource: newPipeline, pipelineId: newPipeline.id });
 
     if (typeof callback === 'function') {
       callback();
@@ -88,11 +87,11 @@ const PipelineDetailsPage = () => {
       source: SourceGenerator.generatePipeline(_pipeline),
     };
 
-    const promise = requestPipeline.id
-      ? PipelinesActions.update(requestPipeline)
-      : PipelinesActions.save(requestPipeline);
-
-    promise.then((p) => callback(p));
+    if (requestPipeline.id) {
+      updatePipeline({ pipelineSource: requestPipeline, pipelineId: requestPipeline.id }).then((p) => callback(p));
+    } else {
+      createPipeline({ pipelineSource: requestPipeline }).then((p) => callback(p));
+    }
   };
 
   const _isLoading = !_isNewPipeline(params.pipelineId) && (!pipeline || !connections || !streams);

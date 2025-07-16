@@ -23,11 +23,14 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -36,7 +39,8 @@ import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
-import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
+import org.graylog.integrations.aws.resources.requests.KinesisRequest;
+import org.graylog.integrations.aws.resources.responses.CreateLogSubscriptionResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
 import org.graylog.integrations.aws.resources.responses.RegionsResponse;
@@ -51,6 +55,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.resources.system.inputs.AbstractInputsResource;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.utilities.ExceptionUtils;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -106,6 +111,23 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
 
     @POST
     @Timed
+    @Path("/kinesis/stream_arn")
+    @ApiOperation(value = "Get stream ARN for the specified stream and region.")
+    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @NoAuditEvent("This does not change any data")
+    public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest request) {
+        String response;
+        try {
+            response = kinesisService.getStreamArn(request);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(ExceptionUtils.formatMessageCause(e));
+        }
+        final CreateLogSubscriptionResponse createLogSubscriptionResponse = CreateLogSubscriptionResponse.create(response);
+        return Response.ok().entity(createLogSubscriptionResponse).build();
+    }
+
+    @POST
+    @Timed
     @Path("/kinesis/health_check")
     @ApiOperation(
             value = "Attempt to retrieve logs from the indicated AWS log group with the specified credentials.",
@@ -113,7 +135,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     )
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisHealthCheckRequest heathCheckRequest) throws ExecutionException, IOException {
+    public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest heathCheckRequest) throws ExecutionException, IOException {
 
         KinesisHealthCheckResponse response = kinesisService.healthCheck(heathCheckRequest);
         return Response.accepted().entity(response).build();
@@ -123,12 +145,12 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Timed
     @Path("/inputs")
     @ApiOperation(value = "Create a new AWS input.")
-    @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true)
+    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":org.graylog.integrations.aws.inputs.AWSInput"})
+    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
-
-        Input input = awsService.saveInput(saveRequest, getCurrentUser());
+        Input input = awsService.saveInput(saveRequest, getCurrentUser(), isSetupWizard);
         return Response.ok().entity(getInputSummary(input)).build();
     }
 }

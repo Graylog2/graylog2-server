@@ -56,42 +56,31 @@ const _loadTokens = (loadedUser, currentUser, setTokens) => {
   }
 };
 
-const _deleteToken = (tokenId, tokenName, userId, loadTokens, setDeletingTokenId) => {
-  const promise = UsersDomain.deleteToken(userId, tokenId, tokenName);
-
-  setDeletingTokenId(tokenId);
-
-  promise.then(() => {
-    loadTokens();
-    setDeletingTokenId(undefined);
-  });
-};
-
 const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl) => {
   const promise = UsersDomain.createToken(userId, tokenName, tokenTtl);
 
   setCreatingToken(true);
 
-  return promise.then((token) => {
-    loadTokens();
-    setCreatingToken(false);
+  return promise
+    .then((token) => {
+      loadTokens();
 
-    return token;
-  });
+      return token;
+    })
+    .finally(() => {
+      setCreatingToken(false);
+    });
 };
 
 const UserEditPage = ({ params }: Props) => {
   const currentUser = useCurrentUser();
   const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const [tokens, setTokens] = useState([]);
-  const [deletingTokenId, setDeletingTokenId] = useState();
   const [creatingToken, setCreatingToken] = useState(false);
 
   const userId = params?.userId;
 
   const loadTokens = useCallback(() => _loadTokens(loadedUser, currentUser, setTokens), [currentUser, loadedUser]);
-  const _handleTokenDelete = (tokenId, tokenName) =>
-    _deleteToken(tokenId, tokenName, userId, loadTokens, setDeletingTokenId);
   const _handleTokenCreate = ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) =>
     _createToken(tokenName, userId, loadTokens, setCreatingToken, tokenTtl);
 
@@ -116,14 +105,14 @@ const UserEditPage = ({ params }: Props) => {
       </PageHeader>
 
       <Row className="content">
-        <Col lg={8}>
+        <Col lg={12}>
           {loadedUser ? (
             <TokenList
               tokens={tokens}
-              onDelete={_handleTokenDelete}
+              user={loadedUser}
               onCreate={_handleTokenCreate}
               creatingToken={creatingToken}
-              deletingToken={deletingTokenId}
+              onDelete={loadTokens}
             />
           ) : (
             <Row>

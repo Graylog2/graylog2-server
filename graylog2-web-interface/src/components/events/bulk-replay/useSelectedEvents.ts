@@ -32,7 +32,13 @@ type State = {
 const pickNextId = (eventIds: Array<ResolutionState>) => eventIds.find((event) => event.status === 'OPEN')?.id;
 
 const createInitialState = (_eventIds: Array<string>) => {
-  const eventIds = _eventIds.map((id) => ({ id, status: 'OPEN' }) as const);
+  const eventIds = _eventIds.map(
+    (id) =>
+      ({
+        id,
+        status: 'OPEN',
+      }) as const,
+  );
   const selectedId = pickNextId(eventIds);
 
   return {

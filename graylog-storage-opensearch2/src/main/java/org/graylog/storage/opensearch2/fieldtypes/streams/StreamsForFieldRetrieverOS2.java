@@ -56,6 +56,10 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
                 "Unable to retrieve fields types aggregations");
 
         final var response = multiSearchResponse.get(0);
+        if (response.isFailure()) {
+            throw OpenSearchClient.exceptionFrom(response.getFailure(), "Error while retrieving field types");
+        }
+
         final ParsedFilters aggregation = response.getResponse().getAggregations().get(AGG_NAME);
 
         return fieldNames.stream()

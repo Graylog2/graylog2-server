@@ -69,6 +69,7 @@ const ReplaySearch = ({
       ({
         alertId,
         definitionId,
+
         // eslint-disable-next-line no-nested-ternary
         type: replayEventDefinition ? 'event_definition' : eventData?.alert ? 'alert' : 'event',
       }) as const,

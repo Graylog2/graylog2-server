@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -25,7 +25,7 @@ type Options = {
   enabled: boolean;
 };
 
-export const fetchEventDefinitions = (searchParams: SearchParams) =>
+export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> =>
   EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
@@ -33,6 +33,13 @@ export const fetchEventDefinitions = (searchParams: SearchParams) =>
     list: elements,
     pagination,
     attributes,
+  }));
+
+export const fetchEventDefinition = (eventDefinitionId: string): Promise<any> =>
+  EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
+    eventDefinition: event_definition,
+    context: context,
+    is_mutable: is_mutable,
   }));
 
 export const keyFn = (searchParams: SearchParams) => ['eventDefinition', 'overview', searchParams];
@@ -43,27 +50,37 @@ type EventDefinitionResult = {
   attributes: Array<{ id: string; title: string; sortable: boolean }>;
 };
 
-const useEventDefinitions = (
-  searchParams: SearchParams,
-  { enabled }: Options = { enabled: true },
-): {
-  data: EventDefinitionResult | undefined;
-  refetch: () => void;
-  isInitialLoading: boolean;
-} => {
-  const { data, refetch, isInitialLoading } = useQuery<EventDefinitionResult>(
-    keyFn(searchParams),
-    () =>
+export const useGetEventDefinition = (eventDefinitionId: string) => {
+  const { data, isFetching } = useQuery({
+    queryKey: ['get-event-definition', eventDefinitionId],
+
+    queryFn: () =>
+      defaultOnError(
+        fetchEventDefinition(eventDefinitionId),
+        'Loading Event Definition failed with status',
+        'Could not load Event definition',
+      ),
+  });
+
+  return {
+    data: isFetching ? null : data,
+    isFetching,
+  };
+};
+
+const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }) => {
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
+
+    queryFn: () =>
       defaultOnError(
         fetchEventDefinitions(searchParams),
         'Loading Event Definitions failed with status',
         'Could not load Event definition',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data,

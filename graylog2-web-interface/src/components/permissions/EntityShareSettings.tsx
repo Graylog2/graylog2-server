@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
 
 import type { GRN } from 'logic/permissions/types';
@@ -29,17 +28,16 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import GranteesSelector from './GranteesSelector';
 import GranteesList from './GranteesList';
-import DependenciesWarning from './DependenciesWarning';
-import ValidationError from './ValidationError';
 import ShareableEntityURL from './ShareableEntityURL';
+import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
 type Props = {
   entityGRN: GRN;
   description: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityType: SharedEntity['type'];
+  entityTitle: SharedEntity['title'];
   entityShareState: EntityShareState;
-  setDisableSubmit: (boolean) => void;
+  setDisableSubmit: (disabled: boolean) => void;
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>;
   showShareableEntityURL?: boolean;
   entityTypeTitle?: string | null | undefined;
@@ -80,7 +78,7 @@ const EntityShareSettings = ({
   setDisableSubmit,
   granteesSelectFormRef,
   showShareableEntityURL = true,
-  entityTypeTitle,
+  entityTypeTitle = null,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
@@ -136,16 +134,11 @@ const EntityShareSettings = ({
           title="Collaborators"
         />
       </Section>
-      {validationResults?.failed && (
-        <Section>
-          <ValidationError validationResult={validationResults} availableGrantees={availableGrantees} />
-        </Section>
-      )}
-      {missingDependencies?.size > 0 && (
-        <Section>
-          <DependenciesWarning missingDependencies={missingDependencies} availableGrantees={availableGrantees} />
-        </Section>
-      )}
+      <EntityShareValidationsDependencies
+        missingDependencies={missingDependencies}
+        validationResults={validationResults}
+        availableGrantees={availableGrantees}
+      />
       {showShareableEntityURL && (
         <Section>
           <ShareableEntityURL entityGRN={entityGRN} />

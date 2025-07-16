@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+
+import selectEvent from 'helpers/selectEvent';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 

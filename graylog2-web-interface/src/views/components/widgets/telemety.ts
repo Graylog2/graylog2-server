@@ -16,6 +16,7 @@
  */
 
 // This file contains telemetry functions which are used in multiple components
+import { useCallback } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -26,34 +27,43 @@ export const useSendWidgetEditTelemetry = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
-  return () =>
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-button',
-    });
+  return useCallback(
+    () =>
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'search-widget',
+        app_action_value: 'widget-edit-button',
+      }),
+    [pathname, sendTelemetry],
+  );
 };
 
 export const useSendWidgetEditCancelTelemetry = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
-  return () =>
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-cancel-button',
-    });
+  return useCallback(
+    () =>
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'search-widget',
+        app_action_value: 'widget-edit-cancel-button',
+      }),
+    [pathname, sendTelemetry],
+  );
 };
 
 export const useSendWidgetConfigUpdateTelemetry = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
-  return () =>
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-update-button',
-    });
+  return useCallback(
+    () =>
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'search-widget',
+        app_action_value: 'widget-edit-update-button',
+      }),
+    [pathname, sendTelemetry],
+  );
 };

@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -29,6 +28,7 @@ import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;

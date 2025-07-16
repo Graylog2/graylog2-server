@@ -176,6 +176,14 @@ export const _getPrettifiedValue = (
   return result;
 };
 
+export const roundValue = (value) => {
+  if (value < 10) {
+    return Math.ceil(value);
+  }
+
+  return Math.ceil(value / 5) * 5;
+};
+
 export type ConvertValueToUnit = (
   value: number,
   fromParams: ConversionParams,

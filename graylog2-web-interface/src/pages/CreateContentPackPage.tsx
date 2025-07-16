@@ -28,8 +28,11 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
+import useProductName from 'brand-customization/useProductName';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const CreateContentPackPage = () => {
+  const productName = useProductName();
   const history = useHistory();
   const { entityIndex } = useStore(CatalogStore);
   const [contentPackState, setContentPackState] = useState({
@@ -67,7 +70,7 @@ const CreateContentPackPage = () => {
       (response) => {
         const message =
           'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-          'Graylog logs for more information.';
+          `${productName} server logs for more information.`;
         const title = 'Could not import content pack';
         let smallMessage = '';
 
@@ -109,11 +112,7 @@ const CreateContentPackPage = () => {
             Content packs accelerate the set up process for a specific data source. A content pack can include
             inputs/extractors, streams, and dashboards.
             <br />
-            Find more content packs in{' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">
-              the Graylog Marketplace
-            </a>
-            .
+            <MarketplaceLink prefix="Find more content packs in" />
           </span>
         </PageHeader>
         <ContentPackEdit

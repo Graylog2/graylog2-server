@@ -26,9 +26,8 @@ import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStor
 import AppConfig from 'util/AppConfig';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
-const TelemetrySettingsConfig = () => {
+const TelemetrySettingsConfigComponent = () => {
   const [settings, setSettings] = useState<UserTelemetrySettings | undefined>(undefined);
-  const { enabled: isTelemetryEnabled } = AppConfig.telemetry() || {};
   const posthog = usePostHog();
 
   useEffect(() => {
@@ -38,17 +37,17 @@ const TelemetrySettingsConfig = () => {
   }, []);
 
   useEffect(() => {
-    if (isTelemetryEnabled && settings?.telemetry_enabled && posthog?.has_opted_out_capturing()) {
+    if (settings?.telemetry_enabled && posthog?.has_opted_out_capturing()) {
       posthog.opt_in_capturing();
     }
-  }, [isTelemetryEnabled, posthog, settings?.telemetry_enabled]);
+  }, [posthog, settings?.telemetry_enabled]);
 
   if (!settings) {
     return <Spinner />;
   }
 
   const updateTelemetryOpt = (data: UserTelemetrySettings) => {
-    if (posthog && isTelemetryEnabled && !data.telemetry_enabled) {
+    if (posthog && !data.telemetry_enabled) {
       posthog.capture('$opt_out');
       posthog.opt_out_capturing();
     }
@@ -73,7 +72,6 @@ const TelemetrySettingsConfig = () => {
               <FormikFormGroup
                 label="enabled"
                 name="telemetry_enabled"
-                disabled={!isTelemetryEnabled}
                 formGroupClassName="form-group no-bm"
                 type="checkbox"
               />
@@ -84,7 +82,7 @@ const TelemetrySettingsConfig = () => {
                 <div className="pull-right">
                   <Button
                     bsStyle="success"
-                    disabled={isSubmitting || !isValid || !isTelemetryEnabled}
+                    disabled={isSubmitting || !isValid}
                     title="Update Preferences"
                     type="submit">
                     Update telemetry
@@ -97,6 +95,14 @@ const TelemetrySettingsConfig = () => {
       </Formik>
     </SectionComponent>
   );
+};
+
+const TelemetrySettingsConfig = () => {
+  const { enabled: isTelemetryEnabled } = AppConfig.telemetry() || {};
+
+  if (!isTelemetryEnabled) return null;
+
+  return <TelemetrySettingsConfigComponent />;
 };
 
 export default TelemetrySettingsConfig;

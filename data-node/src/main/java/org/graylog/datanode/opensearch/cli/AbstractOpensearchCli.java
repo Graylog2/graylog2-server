@@ -20,6 +20,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.graylog.datanode.process.Environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,25 +33,18 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractOpensearchCli {
 
-    private final Path configPath;
+    private final Environment env;
     private final Path binPath;
 
     /**
-     * @param configPath Opensearch CLI tools adapt configuration stored under OPENSEARCH_PATH_CONF env property.
-     *                   This is why wealways want to set this configPath for each CLI tool.
-     * @param bin        location of the actual executable binary that this wrapper handles
+     * @param bin location of the actual executable binary that this wrapper handles
      */
-    private AbstractOpensearchCli(Path configPath, Path bin) {
-        this.configPath = configPath;
-        this.binPath = bin;
-    }
-
-    protected AbstractOpensearchCli(Path configDir, Path binDir, String binName) {
-        this(configDir, checkExecutable(binDir.resolve(binName)));
+    protected AbstractOpensearchCli(Path bin, Environment env) {
+        this.env = env;
+        this.binPath = checkExecutable(bin);
     }
 
     private static Path checkExecutable(Path path) {
@@ -93,8 +87,7 @@ public abstract class AbstractOpensearchCli {
 
         try {
             final DefaultExecuteResultHandler executeResultHandler = new DefaultExecuteResultHandler();
-            final Map<String, String> env = Collections.singletonMap("OPENSEARCH_PATH_CONF", configPath.toAbsolutePath().toString());
-            executor.execute(cmd, env, executeResultHandler);
+            executor.execute(cmd, env.env(), executeResultHandler);
             executeResultHandler.waitFor();
             final int exitValue = executeResultHandler.getExitValue();
             if (exitValue != 0) {

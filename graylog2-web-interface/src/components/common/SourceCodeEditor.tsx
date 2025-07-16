@@ -45,34 +45,15 @@ const SourceCodeContainer = styled.div<ContainerProps>(
     }
 
     ${theme.components.aceEditor}
-    .ace-graylog {
-      .ace_marker-layer {
-        .ace_active-line {
-          background: ${theme.colors.variant.lightest.default};
-        }
-      }
-
-      .ace_gutter-active-line {
-        background-color: ${theme.colors.variant.lightest.default};
-      }
-
-      .ace_gutter {
-        background: ${theme.colors.variant.lighter.default};
-      }
-
-      .ace_cursor {
-        border-color: ${theme.colors.global.textDefault};
-      }
-    }
   `,
 );
 
 const Toolbar = styled.div(
   ({ theme }) => css`
     background: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.gray[80]};
+    border: 1px solid ${theme.colors.input.border};
     border-bottom: 0;
-    border-radius: 5px 5px 0 0;
+    border-radius: 0;
 
     .btn-link {
       color: ${theme.colors.variant.dark.info};
@@ -91,17 +72,10 @@ const Toolbar = styled.div(
         }
       }
     }
-
-    & + ${SourceCodeContainer} {
-      /* Do not add border radius if code editor comes after toolbar */
-      .ace_editor {
-        border-radius: 0 0 5px 5px;
-      }
-    }
   `,
 );
 
-const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] as const;
+type AvailableModes = 'json' | 'lua' | 'markdown' | 'text' | 'yaml' | 'pipeline';
 
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector
@@ -111,17 +85,17 @@ const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] a
  * Letting the component handle its own internal state may lead to weird errors while typing.
  */
 type Props = {
-  annotations: Array<IAnnotation>;
+  annotations?: Array<IAnnotation>;
   focus?: boolean;
   fontSize?: number;
   height?: number;
   width?: number;
   id: string;
   innerRef?: React.MutableRefObject<AceEditor>;
-  mode: (typeof availableModes)[number];
-  onLoad: () => void;
-  onChange: () => void;
-  onBlur: () => void;
+  mode?: AvailableModes;
+  onLoad?: () => void;
+  onChange?: () => void;
+  onBlur?: () => void;
   readOnly?: boolean;
   resizable?: boolean;
   toolbar?: boolean;

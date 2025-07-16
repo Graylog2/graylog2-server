@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import DOMPurify from 'dompurify';
 
-import { SourceCodeEditor, Icon } from 'components/common';
+import { IconButton } from 'components/common';
 
+import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
 import EditorModal from './EditorModal';
 
@@ -41,7 +41,7 @@ const Tab = styled.div<{ $active?: boolean }>`
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   background-color: ${({ theme }) => theme.colors.global.contentBackground};
-  color: ${({ theme, $active }) => ($active ? theme.colors.global.textDefault : theme.colors.input.placeholder)};
+  color: ${({ theme, $active }) => ($active ? theme.colors.text.primary : theme.colors.input.placeholder)};
   cursor: pointer;
 
   ${({ $active }) =>
@@ -52,28 +52,13 @@ const Tab = styled.div<{ $active?: boolean }>`
     `}
 `;
 
-const EditorStyles = styled.div`
-  & .ace_editor {
-    border-color: ${({ theme }) => theme.colors.input.border} !important;
-  }
-
-  & .ace_cursor {
-    border-color: ${({ theme }) => theme.colors.global.textDefault};
-  }
-`;
-
-const ExpandIcon = styled(Icon)`
+const ExpandIconButton = styled(IconButton)`
   position: absolute;
   bottom: 0;
   right: 0;
   padding: 8px;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.input.placeholder};
   z-index: 10;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.global.textDefault};
-  }
 `;
 
 type Props = {
@@ -99,9 +84,8 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
 
   const handleOnChange = React.useCallback(
     (newValue: string) => {
-      const sanitizedValue = DOMPurify.sanitize(newValue);
-      setLocalValue(sanitizedValue);
-      onChange(sanitizedValue);
+      setLocalValue(newValue);
+      onChange(newValue);
     },
     [onChange],
   );
@@ -118,22 +102,24 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
           </Tab>
         </TabsRow>
         {!showPreview && (
-          <EditorStyles>
-            <SourceCodeEditor
-              id={id ?? 'md-editor'}
-              mode="markdown"
-              theme="light"
-              toolbar={false}
-              resizable={false}
-              readOnly={readOnly}
-              height={height}
-              value={localValue}
-              onChange={handleOnChange}
-            />
-          </EditorStyles>
+          <MDBaseEditor
+            id={id}
+            onChange={handleOnChange}
+            value={localValue}
+            readOnly={readOnly}
+            height={height}
+            onBlur={handleOnChange}
+          />
         )}
         <Preview value={localValue} height={height} show={showPreview} />
-        <ExpandIcon data-testid="expand-icon" name="expand_content" size="sm" onClick={() => handleOnFullMode(true)} />
+        <ExpandIconButton
+          data-testid="expand-icon"
+          name="expand_content"
+          title="Expand Preview"
+          onClick={() => handleOnFullMode(true)}
+          size="sm"
+          aria-label="Expand preview"
+        />
       </div>
       {fullView && (
         <EditorModal

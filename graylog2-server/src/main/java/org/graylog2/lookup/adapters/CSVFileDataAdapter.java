@@ -41,6 +41,7 @@ import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
 import org.graylog2.utilities.CIDRPatriciaTrie;
@@ -60,6 +61,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -291,7 +293,29 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         return LookupResult.single(value);
     }
 
-    public LookupResult getResultForCIDRRange(Object ip) {
+    @Override
+    public boolean supportsPreview() {
+        return true;
+    }
+
+    @Override
+    public LookupPreview getPreview(int size) {
+        if (config.isCidrLookup()) {
+            return cidrLookupRef.get().getPreview(size);
+        } else {
+            final Map<Object, Object> result = new HashMap<>();
+            final Map<String, String> lookup = lookupRef.get();
+            for (Map.Entry<String, String> entries : lookup.entrySet()) {
+                if (result.size() == size) {
+                    break;
+                }
+                result.put(entries.getKey(), entries.getValue());
+            }
+            return new LookupPreview(lookup.size(), result);
+        }
+    }
+
+    private LookupResult getResultForCIDRRange(Object ip) {
         LookupResult result = getEmptyResult();
         try {
             final String resultValue = cidrLookupRef.get().longestPrefixRangeLookup(String.valueOf(ip));
@@ -330,7 +354,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         public Config defaultConfiguration() {
             return Config.builder()
                     .type(NAME)
-                    .path("/etc/graylog/lookup-table.csv")
+                    .path("/tmp/lookup-table.csv")
                     .separator(",")
                     .quotechar("\"")
                     .keyColumn("key")

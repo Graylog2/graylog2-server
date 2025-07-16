@@ -291,7 +291,8 @@ const RuleBuilder = () => {
         },
       );
 
-      await updateRule(rule);
+      const { _scope, ...updatedRule } = rule;
+      await updateRule(updatedRule);
       if (closeAfter) handleCancel();
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_RULE_CLICKED, {

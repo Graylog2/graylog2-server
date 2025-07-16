@@ -31,7 +31,7 @@ type Props = {
   help: React.ReactNode;
   addButtonTitle?: string;
   update: (options: Array<Option>) => void;
-  validator: (milliseconds: number, duration: string) => boolean;
+  validator?: (milliseconds: number, duration: string) => boolean;
 };
 
 class TimeRangeOptionsForm extends React.Component<Props> {

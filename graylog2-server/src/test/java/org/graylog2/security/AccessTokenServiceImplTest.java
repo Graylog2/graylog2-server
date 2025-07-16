@@ -24,6 +24,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.Configuration;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -67,6 +68,9 @@ public class AccessTokenServiceImplTest {
     @Mock
     private ClusterConfigService configService;
 
+    @Mock
+    private Configuration configuration;
+
     private AccessTokenService accessTokenService;
 
     @Before
@@ -76,7 +80,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService);
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
     }
 
     @After
@@ -304,12 +308,54 @@ public class AccessTokenServiceImplTest {
         final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findExpiredTokens(Tools.nowUTC());
         final List<AccessTokenService.ExpiredToken> expected =
                 List.of(
-                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf"),
-                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf")
+                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf", "user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
                 );
 
         assertThat(expiredTokens).isNotEmpty();
         assertEquals(expected, expiredTokens);
+
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_allAssigned.json")
+    public void findOrphanedTokensAllAssigned() {
+        final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findOrphanedTokens();
+
+        assertThat(expiredTokens).isEmpty();
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_twoOrphaned.json")
+    public void findOrphanedTokensReturnsOnlyTokensWithoutUsers() {
+        final List<AccessTokenService.ExpiredToken> orphanedTokens = accessTokenService.findOrphanedTokens();
+        final List<AccessTokenService.ExpiredToken> expected =
+                List.of(
+                        new AccessTokenService.ExpiredToken("44f9deadbeefdeadbeefaffe", "test", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "other_user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
+                );
+
+        assertThat(orphanedTokens).isNotEmpty()
+                .containsExactlyInAnyOrderElementsOf(expected);
+
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_twoOrphanedWithAdmin.json")
+    public void findOrphanedTokensReturnsOnlyTokensWithoutUsersAndNoAdmin() {
+        when(configuration.getRootUsername()).thenReturn("custom_admin_username");
+        final List<AccessTokenService.ExpiredToken> orphanedTokens = accessTokenService.findOrphanedTokens();
+        final List<AccessTokenService.ExpiredToken> expected =
+                List.of(
+                        new AccessTokenService.ExpiredToken("44f9deadbeefdeadbeefaffe", "test", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "other_user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
+                );
+
+        assertThat(orphanedTokens).isNotEmpty()
+                .containsExactlyInAnyOrderElementsOf(expected);
 
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }

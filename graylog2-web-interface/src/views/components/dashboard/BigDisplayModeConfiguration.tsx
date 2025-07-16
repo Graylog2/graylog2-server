@@ -43,7 +43,7 @@ type Configuration = {
 
 type ConfigurationModalProps = {
   onClose: () => void;
-  onSave: (Configuration) => void;
+  onSave: (configuration: Configuration) => void;
   show: boolean;
   view: View;
 };
@@ -146,7 +146,7 @@ const redirectToBigDisplayMode = (
 };
 
 const createQueryFromConfiguration = (
-  { queryCycleInterval, queryTabs, refreshInterval }: Configuration,
+  { queryCycleInterval = undefined, queryTabs = undefined, refreshInterval }: Configuration,
   view: View,
 ): UntypedBigDisplayModeQuery => {
   const basicConfiguration = {

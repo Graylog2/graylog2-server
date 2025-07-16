@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import useStreamsByIndexSet from 'components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet';
@@ -24,6 +25,11 @@ type Props = {
   selectedIndexSetId?: string;
   indexSets: Array<IndexSet>;
 };
+
+const StyledAlert = styled(Alert)`
+  margin-top: 0;
+  margin-bottom: 0;
+`;
 
 const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Props) => {
   const { data: streamsByIndexSetIdData } = useStreamsByIndexSet(selectedIndexSetId, !!selectedIndexSetId);
@@ -46,13 +52,13 @@ const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Pr
     return (
       <Row>
         <Col md={12}>
-          <Alert title="Default Index Set selected" bsStyle="info">
+          <StyledAlert title="Default Index Set selected" bsStyle="info">
             You have selected the Default Index Set.
             <br />
             We recommend against this: as the potential recipient of messages of many different formats (any message
             with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum
             per-Index field limit of the search backend if used extensively.
-          </Alert>
+          </StyledAlert>
         </Col>
       </Row>
     );
