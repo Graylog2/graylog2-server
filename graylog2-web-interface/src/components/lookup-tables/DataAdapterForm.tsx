@@ -90,8 +90,6 @@ const DataAdapterForm = ({
     return null;
   };
 
-  console.log(plugin)
-
   const validationMessage = (fieldName, defaultText) => {
     if (validationErrors[fieldName]) {
       return (
