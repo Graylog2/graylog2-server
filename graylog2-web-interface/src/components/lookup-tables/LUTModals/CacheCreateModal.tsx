@@ -26,7 +26,7 @@ type Props = {
 }
 
 const CacheCreateModal = ({ onClose, validationErrors }: Props & { validationErrors: any }) => (
-  <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
+  <Modal show fullScreen onHide={onClose}>
     <Modal.Header>
       <Modal.Title>Create Cache</Modal.Title>
     </Modal.Header>

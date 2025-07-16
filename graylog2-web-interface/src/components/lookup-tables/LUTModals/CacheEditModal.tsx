@@ -44,7 +44,7 @@ const CacheEditModal = ({ onClose, title, cache, validationErrors }: Props & { v
   }
 
   return (
-    <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
+    <Modal show fullScreen onHide={onClose}>
       <Modal.Header>
         <Modal.Title>{`Edit ${title}`}</Modal.Title>
       </Modal.Header>

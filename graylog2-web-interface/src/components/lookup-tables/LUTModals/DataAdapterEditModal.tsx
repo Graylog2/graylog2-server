@@ -44,7 +44,7 @@ const DataAdapterEditModal = ({ onClose, title, dataAdapter, validationErrors }:
   };
 
   return (
-    <Modal show fullScreen onHide={onClose} transitionProps={{ transition: 'fade', duration: 500 }}>
+    <Modal show fullScreen onHide={onClose}>
       <Modal.Header>
         <Modal.Title>{`Edit ${title}`}</Modal.Title>
       </Modal.Header>
