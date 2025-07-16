@@ -46,7 +46,7 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -552,6 +552,11 @@ export type LicenseCheck = (subject: LicenseSubject) => {
   refetch: () => void;
 };
 
+type MarkdownAugmentation = {
+  id: string;
+  component: React.ComponentType<{ value: string }>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -597,7 +602,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.aside'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
-    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
+    'views.elements.validationErrorExplanation'?: ValidationExplanations;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>;
     'views.hooks.confirmDeletingDashboardPage'?: Array<
@@ -621,5 +626,6 @@ declare module 'graylog-web-plugin/plugin' {
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: Array<LicenseCheck>;
     entityPermissionsMapper?: EntityPermissionsMapper;
+    'markdown.augment.components'?: Array<MarkdownAugmentation>;
   }
 }
