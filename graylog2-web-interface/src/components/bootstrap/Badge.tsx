@@ -21,8 +21,9 @@ import styled, { css } from 'styled-components';
 
 const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
   ({ theme, color }) => css`
-    color: ${theme.colors.contrast[color]};
     text-transform: none;
+    background: ${theme.colors.button[color].background};
+    color: ${theme.colors.button[color].color};
 
     .mantine-Badge-label {
       font-size: ${theme.fonts.size.small};
