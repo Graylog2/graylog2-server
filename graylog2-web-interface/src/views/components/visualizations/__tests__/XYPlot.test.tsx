@@ -171,15 +171,11 @@ describe('XYPlot', () => {
       },
     };
 
-    render(<SimpleXYPlot plotLayout={plotLayout} axisType="logarithmic" />);
+    const wrapper = mount(<SimpleXYPlot plotLayout={plotLayout} axisType="logarithmic" />);
+    const genericPlot = wrapper.find('GenericPlot');
 
-    expect(GenericPlot).toHaveBeenCalledWith(
-      expect.objectContaining({
-        'layout': expect.objectContaining({
-          yaxis: expect.objectContaining({ type: 'log', side: 'left' }), // ensure plotLayout is merged correctly
-        }),
-      }),
-      {},
-    );
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
+      yaxis: expect.objectContaining({ type: 'log', side: 'left' }), // ensure plotLayout is merged correctly
+    }));
   });
 });
