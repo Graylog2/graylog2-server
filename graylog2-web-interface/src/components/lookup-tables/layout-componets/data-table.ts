@@ -34,7 +34,7 @@ const TableRow = styled.tr`
 `;
 
 const TableItem = styled.td<{ $label?: boolean; $paragraph?: boolean; $width?: string; $alignText?: string }>`
-  color: ${({ $label, theme }) => ($label ? theme.colors.gray[40] : theme.colors.global.textDefault)};
+  color: ${({ $label, theme }) => ($label ? theme.colors.gray[40] : theme.colors.text.primary)};
   white-space: ${({ $paragraph }) => ($paragraph ? 'pre-wrap' : 'nowrap')};
   overflow: hidden;
   text-overflow: ellipsis;

@@ -20,8 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
-
-import { CACHES } from './fixtures';
+import { CACHES } from 'components/lookup-tables/fixtures';
 
 import { attributes } from '../constants';
 import CacheList from '../index';

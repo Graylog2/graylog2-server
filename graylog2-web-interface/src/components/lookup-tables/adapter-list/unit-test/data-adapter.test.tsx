@@ -20,8 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
-
-import { DATA_ADAPTERS, ERROR_STATE } from './fixtures';
+import { DATA_ADAPTERS, ERROR_STATE } from 'components/lookup-tables/fixtures';
 
 import { attributes } from '../constants';
 import DataAdapterList from '../index';
