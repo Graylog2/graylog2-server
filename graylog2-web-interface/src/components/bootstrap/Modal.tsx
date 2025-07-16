@@ -62,8 +62,8 @@ type Props = {
   transitionProps?: any;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false, transitionProps = { transition: 'fade', duration: 500 } }: Props) => (
-  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable} fullScreen={fullScreen} transitionProps={transitionProps}>
+const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false}: Props) => (
+  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable} fullScreen={fullScreen}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </ModalRoot>
