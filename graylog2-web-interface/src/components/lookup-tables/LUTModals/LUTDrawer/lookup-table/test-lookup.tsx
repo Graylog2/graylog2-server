@@ -21,8 +21,7 @@ import useProductName from 'brand-customization/useProductName';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
 import { Button, Input, Alert } from 'components/bootstrap';
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-import { useFetchLookupPreview } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { useFetchLookupPreview, useTestLookupTableKey } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { LookupTable } from 'logic/lookup-tables/types';
 
 import { Description } from '.';
@@ -63,6 +62,7 @@ function TestLookup({ table }: Props) {
   const {
     lookupPreview: { results, total, supported },
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
+  const { testLookupTableKey } = useTestLookupTableKey();
 
   const onChange = (event: React.BaseSyntheticEvent) => {
     const newValue = { ...lookupKey };
@@ -86,7 +86,7 @@ function TestLookup({ table }: Props) {
     event.preventDefault();
 
     if (lookupKey.valid) {
-      LookupTablesActions.lookup(table.name, lookupKey.value).then((resp: any) => {
+      testLookupTableKey({ tableName: table.name, key: lookupKey.value }).then((resp: any) => {
         setLookupResult(JSON.stringify(resp, null, 2));
         setLookupKey({ value: '', valid: false });
       });

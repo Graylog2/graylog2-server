@@ -20,26 +20,31 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
-import { CACHES } from 'components/lookup-tables/fixtures';
+import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
+import { attributes } from 'components/lookup-tables/lookup-table-list/constants';
 
-import { attributes } from '../constants';
-import CacheList from '../index';
+import LookupTableDetails from './index';
 
-const mockFetchPaginatedCaches = jest.fn(async () =>
+const mockFetchPaginatedLookupTables = jest.fn(async () =>
   Promise.resolve({
     attributes,
-    list: [...CACHES],
+    list: [...LOOKUP_TABLES],
     pagination: {
       page: 1,
-      total: CACHES.length,
+      total: LOOKUP_TABLES.length,
       per_page: 20,
       count: 10,
       query: null,
     },
+    meta: {
+      caches: { ...CACHES_MAP },
+      adapters: { ...ADAPTERS_MAP },
+    },
   }),
 );
 
-const mockDeleteCache = jest.fn(async () => Promise.resolve());
+const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
+const mockDeleteLookupTable = jest.fn(async () => Promise.resolve());
 
 jest.mock('hooks/useScopePermissions', () => ({
   __esModule: true,
@@ -66,46 +71,15 @@ jest.mock('routing/QueryParams', () => ({
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
-  useFetchCaches: () => ({
-    fetchPaginatedCaches: mockFetchPaginatedCaches,
-    cachesKeyFn: (searchParams: SearchParams) => ['caches', 'search', searchParams],
+  useFetchLookupTables: () => ({
+    fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
+    lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
   }),
-  useDeleteCache: () => ({
-    deleteCache: mockDeleteCache,
-    deletingCache: false,
+  useDeleteLookupTable: () => ({
+    deleteLookupTable: mockDeleteLookupTable,
+    deletingLookupTable: false,
+  }),
+  useFetchErrors: () => ({
+    fetchErrors: mockFetchErrors,
   }),
 }));
-
-describe('Cache List', () => {
-  it('should render a list of caches', async () => {
-    render(<CacheList />);
-
-    await screen.findByText(/0 cache title/i);
-    screen.getByText(/0 cache description/i);
-    screen.getByText(/0 cache name/i);
-  });
-
-  it('should show an actions menu', async () => {
-    render(<CacheList />);
-
-    await screen.findByRole('button', { name: CACHES[0].id });
-  });
-
-  it('should be able to edit a cache', async () => {
-    render(<CacheList />);
-
-    userEvent.click(await screen.findByRole('button', { name: CACHES[0].id }));
-
-    await screen.findByRole('menuitem', { name: /edit/i });
-  });
-
-  it('should be able to delete a cache', async () => {
-    render(<CacheList />);
-
-    userEvent.click(await screen.findByRole('button', { name: CACHES[0].id }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
-
-    expect(mockDeleteCache).toHaveBeenLastCalledWith(CACHES[0].id);
-  });
-});

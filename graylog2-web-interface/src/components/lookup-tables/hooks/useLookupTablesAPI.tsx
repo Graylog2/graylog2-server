@@ -24,6 +24,9 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
+  purgeLookupTableKey,
+  purgeAllLookupTableKey,
+  testLookupTableKey,
   deleteLookupTable,
   fetchPaginatedCaches,
   deleteCache,
@@ -35,6 +38,64 @@ import {
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function usePurgeLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: purgeLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table key purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    purgeLookupTableKey: mutateAsync,
+    purgingLookupTableKey: isPending,
+  };
+}
+
+export function usePurgeAllLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: purgeAllLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    purgeAllLookupTableKey: mutateAsync,
+    purgingAllLookupTableKey: isPending,
+  };
+}
+
+export function useTestLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: testLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    testLookupTableKey: mutateAsync,
+    testingLookupTableKey: isPending,
+  };
+}
+export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['lookup-preview', idOrName, size, enabled],
+    queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), 'Failed to fetch lookup preview'),
+    retry: false,
+    enabled,
+  });
+
+  return {
+    lookupPreview: data ?? { results: [], total: 0, supported: true },
+    loadingLookupPreview: isLoading,
+  };
 }
 
 export function useDeleteLookupTable() {
@@ -103,18 +164,4 @@ export function useDeleteDataAdapter() {
 
 export function useFetchErrors() {
   return { fetchErrors };
-}
-
-export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
-  const { data, isLoading } = useQuery({
-    queryKey: ['lookup-preview', idOrName, size, enabled],
-    queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), 'Failed to fetch lookup preview'),
-    retry: false,
-    enabled,
-  });
-
-  return {
-    lookupPreview: data ?? { results: [], total: 0, supported: true },
-    loadingLookupPreview: isLoading,
-  };
 }

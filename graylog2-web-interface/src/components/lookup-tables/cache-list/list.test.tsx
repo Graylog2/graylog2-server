@@ -20,18 +20,18 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
-import { DATA_ADAPTERS, ERROR_STATE } from 'components/lookup-tables/fixtures';
+import { CACHES } from 'components/lookup-tables/fixtures';
 
-import { attributes } from '../constants';
-import DataAdapterList from '../index';
+import { attributes } from './constants';
+import CacheList from './index';
 
 const mockFetchPaginatedCaches = jest.fn(async () =>
   Promise.resolve({
     attributes,
-    list: [...DATA_ADAPTERS],
+    list: [...CACHES],
     pagination: {
       page: 1,
-      total: DATA_ADAPTERS.length,
+      total: CACHES.length,
       per_page: 20,
       count: 10,
       query: null,
@@ -39,8 +39,7 @@ const mockFetchPaginatedCaches = jest.fn(async () =>
   }),
 );
 
-const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
-const mockDeleteDataAdapter = jest.fn(async () => Promise.resolve());
+const mockDeleteCache = jest.fn(async () => Promise.resolve());
 
 jest.mock('hooks/useScopePermissions', () => ({
   __esModule: true,
@@ -63,59 +62,50 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => { }],
+  useQueryParam: () => [undefined, () => {}],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
-  useFetchDataAdapters: () => ({
-    fetchPaginatedDataAdapters: mockFetchPaginatedCaches,
-    dataAdaptersKeyFn: (searchParams: SearchParams) => ['data-adapters', 'search', searchParams],
+  useFetchCaches: () => ({
+    fetchPaginatedCaches: mockFetchPaginatedCaches,
+    cachesKeyFn: (searchParams: SearchParams) => ['caches', 'search', searchParams],
   }),
-  useDeleteDataAdapter: () => ({
-    deleteDataAdapter: mockDeleteDataAdapter,
-    deletingDataAdapter: false,
-  }),
-  useFetchErrors: () => ({
-    fetchErrors: mockFetchErrors,
+  useDeleteCache: () => ({
+    deleteCache: mockDeleteCache,
+    deletingCache: false,
   }),
 }));
 
-describe('Data Adapter List', () => {
-  it('should render a list of data adapters', async () => {
-    render(<DataAdapterList />);
+describe('Cache List', () => {
+  it('should render a list of caches', async () => {
+    render(<CacheList />);
 
-    await screen.findByText(/0 adapter title/i);
-    screen.getByText(/0 adapter description/i);
-    screen.getByText(/0 adapter name/i);
-  });
-
-  it('should show a warning icon on tables with errors', async () => {
-    render(<DataAdapterList />);
-
-    await screen.findByTestId('data-adapter-problem', { exact: true }, { timeout: 1500 });
+    await screen.findByText(/0 cache title/i);
+    screen.getByText(/0 cache description/i);
+    screen.getByText(/0 cache name/i);
   });
 
   it('should show an actions menu', async () => {
-    render(<DataAdapterList />);
+    render(<CacheList />);
 
-    await screen.findByRole('button', { name: DATA_ADAPTERS[0].id });
+    await screen.findByRole('button', { name: CACHES[0].id });
   });
 
-  it('should be able to edit a data adapter', async () => {
-    render(<DataAdapterList />);
+  it('should be able to edit a cache', async () => {
+    render(<CacheList />);
 
-    userEvent.click(await screen.findByRole('button', { name: DATA_ADAPTERS[0].id }));
+    userEvent.click(await screen.findByRole('button', { name: CACHES[0].id }));
 
     await screen.findByRole('menuitem', { name: /edit/i });
   });
 
-  it('should be able to delete a data adapter', async () => {
-    render(<DataAdapterList />);
+  it('should be able to delete a cache', async () => {
+    render(<CacheList />);
 
-    userEvent.click(await screen.findByRole('button', { name: DATA_ADAPTERS[0].id }));
+    userEvent.click(await screen.findByRole('button', { name: CACHES[0].id }));
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
     userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 
-    expect(mockDeleteDataAdapter).toHaveBeenLastCalledWith(DATA_ADAPTERS[0].id);
+    expect(mockDeleteCache).toHaveBeenLastCalledWith(CACHES[0].id);
   });
 });

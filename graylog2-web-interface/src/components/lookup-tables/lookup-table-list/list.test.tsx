@@ -22,8 +22,8 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
 
-import { attributes } from '../constants';
-import LookupTableList from '../index';
+import { attributes } from './constants';
+import LookupTableList from './index';
 
 const mockFetchPaginatedLookupTables = jest.fn(async () =>
   Promise.resolve({
@@ -67,7 +67,7 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => { }],
+  useQueryParam: () => [undefined, () => {}],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({

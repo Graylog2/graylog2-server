@@ -18,8 +18,8 @@ import * as React from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import { Col, Row } from 'components/lookup-tables/layout-componets';
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import type { LookupTable } from 'logic/lookup-tables/types';
+import { usePurgeAllLookupTableKey, usePurgeLookupTableKey } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
 import { Description } from '.';
 
@@ -31,12 +31,14 @@ type Props = {
 
 function PurgeCache({ table }: Props) {
   const [purgeKey, setPurgeKey] = React.useState<{ value: string; valid: boolean }>(INIT_INPUT);
+  const { purgeLookupTableKey } = usePurgeLookupTableKey();
+  const { purgeAllLookupTableKey } = usePurgeAllLookupTableKey();
 
   const handlePurgeKey = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
     if (purgeKey.valid) {
-      LookupTablesActions.purgeKey(table, purgeKey.value).then(() => {
+      purgeLookupTableKey({ table, key: purgeKey.value }).then(() => {
         setPurgeKey(INIT_INPUT);
       });
     }
@@ -51,7 +53,7 @@ function PurgeCache({ table }: Props) {
 
   const hadlePurgeAll = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    LookupTablesActions.purgeAll(table);
+    purgeAllLookupTableKey(table);
   };
 
   return (
