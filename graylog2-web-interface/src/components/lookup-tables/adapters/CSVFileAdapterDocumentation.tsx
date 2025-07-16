@@ -16,8 +16,8 @@
  */
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
-import { Accordion } from '@mantine/core';
 
+import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 
 const csvFile1 = `"ipaddr","hostname"
@@ -114,13 +114,6 @@ const CSVFileAdapterDocumentation = () => {
     }
   ];
 
-  const items = accordionItems.map((item) => (
-    <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control>{item.label}</Accordion.Control>
-      <Accordion.Panel>{item.content}</Accordion.Panel>
-    </Accordion.Item>
-  ));
-
   return (
     <div>
       <p>The CSV data adapter can read key value pairs from a CSV file.</p>
@@ -137,7 +130,7 @@ const CSVFileAdapterDocumentation = () => {
 
       <hr />
 
-      <Accordion chevronPosition="left" defaultValue='example_1'>{items}</Accordion>
+      <MantineAccordion defaultValue='example_1' accordionItems={accordionItems} />
     </div>
   );
 };

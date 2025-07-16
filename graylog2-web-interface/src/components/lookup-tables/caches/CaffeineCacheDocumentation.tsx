@@ -16,8 +16,8 @@
  */
 
 import React from 'react';
-import { Accordion } from '@mantine/core';
 
+import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 
 const CaffeineCacheDocumentation = () => {
@@ -52,13 +52,6 @@ const CaffeineCacheDocumentation = () => {
     }
   ];
 
-  const items = accordionItems.map((item) => (
-    <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control>{item.label}</Accordion.Control>
-      <Accordion.Panel>{item.content}</Accordion.Panel>
-    </Accordion.Item>
-  ));
-
   return (
     <div>
       <p>The in-memory cache maintains recently used values from data adapters.</p>
@@ -72,7 +65,7 @@ const CaffeineCacheDocumentation = () => {
 
       <hr />
 
-      <Accordion chevronPosition="left" defaultValue='cache_size'>{items}</Accordion>
+      <MantineAccordion accordionItems={accordionItems} defaultValue='cache_size' />
     </div>
   );
 };

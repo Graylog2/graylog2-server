@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Accordion } from '@mantine/core';
+
+import { MantineAccordion } from 'components/bootstrap';
 
 const StyledPre = styled.pre(
   ({ theme }) => css`
@@ -174,20 +175,13 @@ const DnsAdapterDocumentation = () => {
     },
   ];
 
-  const items = accordionItems.map((item) => (
-    <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control>{item.label}</Accordion.Control>
-      <Accordion.Panel>{item.content}</Accordion.Panel>
-    </Accordion.Item>
-  ));
-
   return (
     <div>
       <h3 style={styleMarginBottom}>Configuration</h3>
 
       <h5 style={styleMarginBottom}>DNS Lookup Type</h5>
 
-      <Accordion chevronPosition="left" defaultValue='ipv4'>{items}</Accordion>
+      <MantineAccordion accordionItems={accordionItems} defaultValue='ipv4' />
 
       <hr />
       <h5 style={styleMarginBottom}>DNS Server IP Addresses</h5>

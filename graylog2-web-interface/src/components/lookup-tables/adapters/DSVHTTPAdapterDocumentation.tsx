@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { Accordion } from '@mantine/core';
 
+import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 
 const csvFile1 = `"127.0.0.1","localhost"
@@ -67,13 +67,6 @@ const DSVHTTPAdapterDocumentation = () => {
     },
   ];
 
-  const items = accordionItems.map((item) => (
-    <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control>{item.label}</Accordion.Control>
-      <Accordion.Panel>{item.content}</Accordion.Panel>
-    </Accordion.Item>
-  ));
-
   return (
     <div>
       <p>The DSV data adapter can read key value pairs (or check for the presence of a key) from a DSV file.</p>
@@ -89,7 +82,7 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <hr />
 
-      <Accordion chevronPosition="left" defaultValue='example_1'>{items}</Accordion>
+      <MantineAccordion accordionItems={accordionItems} defaultValue='example_1' />
     </div>
   );
 };

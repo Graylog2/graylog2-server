@@ -16,9 +16,8 @@
  */
 /* eslint-disable no-template-curly-in-string */
 import React from 'react';
-import { Accordion } from '@mantine/core';
 
-import { Col, Row } from 'components/bootstrap';
+import { Col, Row, MantineAccordion } from 'components/bootstrap';
 
 const exampleJSON = `{
   "user": {
@@ -117,13 +116,6 @@ const HTTPJSONPathAdapterDocumentation = () => {
     },
   ];
 
-  const items = accordionItems.map((item) => (
-    <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control>{item.label}</Accordion.Control>
-      <Accordion.Panel>{item.content}</Accordion.Panel>
-    </Accordion.Item>
-  ));
-
   return (
     <div>
       <p>
@@ -139,7 +131,7 @@ const HTTPJSONPathAdapterDocumentation = () => {
 
       <h3 style={{ marginBottom: 10 }}>Configuration</h3>
 
-      <Accordion chevronPosition="left" defaultValue='lookup_url'>{items}</Accordion>
+      <MantineAccordion accordionItems={accordionItems} defaultValue='lookup_url' />
 
       <hr />
 
