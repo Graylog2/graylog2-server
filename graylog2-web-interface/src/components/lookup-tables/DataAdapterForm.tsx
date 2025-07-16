@@ -90,6 +90,8 @@ const DataAdapterForm = ({
     return null;
   };
 
+  console.log(plugin)
+
   const validationMessage = (fieldName, defaultText) => {
     if (validationErrors[fieldName]) {
       return (
@@ -166,6 +168,12 @@ const DataAdapterForm = ({
     });
   };
 
+  const isLDAP = dataAdapter.config.type === 'LDAP' && dataAdapter.config?.user_passwd;
+  const configWithOptionalPassword = {
+    ...dataAdapter.config,
+    ...(isLDAP ? { user_passwd: { is_set: true, keep_value: true } } : {}),
+  };
+
   return (
     <>
       <Title title={title} typeName={pluginDisplayName} create={create} />
@@ -173,10 +181,7 @@ const DataAdapterForm = ({
         initialValues={{
           ...INIT_ADAPTER,
           ...dataAdapter,
-          config: {
-            ...dataAdapter.config,
-            user_passwd: dataAdapter.config?.user_passwd ?? { keep_value: true },
-          },
+          config: configWithOptionalPassword,
         }}
         validate={handleValidation}
         validateOnChange

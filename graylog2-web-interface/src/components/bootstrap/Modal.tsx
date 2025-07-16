@@ -59,7 +59,6 @@ type Props = {
   backdrop?: boolean;
   closable?: boolean;
   fullScreen?: boolean;
-  transitionProps?: any;
 };
 
 const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false}: Props) => (
