@@ -16,7 +16,6 @@
  */
 const iterable = Object.keys([...new Array(10)]);
 
-// eslint-disable-next-line import/prefer-default-export
 export const DATA_ADAPTERS = iterable.map((item: string) => ({
   id: `${item}-data-adapter-id`,
   _scope: 'DEFAULT',

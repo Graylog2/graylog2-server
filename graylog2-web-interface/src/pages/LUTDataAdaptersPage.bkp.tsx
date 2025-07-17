@@ -160,6 +160,7 @@ class LUTDataAdaptersPage extends React.Component<
                 saved={() => _saved(history)}
                 validate={_validateAdapter}
                 validationErrors={validationErrors}
+                onCancel={() => {}}
               />
             </Col>
           </Row>
@@ -173,10 +174,9 @@ class LUTDataAdaptersPage extends React.Component<
       } else {
         content = (
           <DataAdapterCreate
-            types={types}
             saved={() => _saved(history)}
-            validate={_validateAdapter}
             validationErrors={validationErrors}
+            onCancel={() => {}}
           />
         );
       }

@@ -16,22 +16,30 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LUTLayout, DataAdaptersOverview } from 'components/lookup-tables';
+import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTDataAdaptersPage() {
+  const { setModal } = useModalContext();
+
+  const showCreateModal = () => {
+    setModal('DATA-ADAPTER-CREATE');
+  }
+
   return (
     <LUTLayout
       documentTitle="Lookup Tables - Data Adapters"
       pageTitle="Data Adapters for Lookup Tables"
       pageDescription="Data adapters provide the actual values for lookup tables."
       actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
+        <Button bsStyle="primary" onClick={showCreateModal}>
           Create data adapter
         </Button>
       }>
       <DataAdaptersOverview />
+      <LUTModals />
     </LUTLayout>
   );
 }

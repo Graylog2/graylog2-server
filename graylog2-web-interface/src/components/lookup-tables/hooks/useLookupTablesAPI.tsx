@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -25,9 +25,17 @@ import {
   fetchPaginatedLookupTables,
   deleteLookupTable,
   fetchPaginatedCaches,
+  fetchCacheTypes,
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
+  fetchDataAdapterTypes,
+  createCache,
+  updateCache,
+  validateCache,
+  createDataAdapter,
+  updateDataAdapter,
+  validateDataAdapter,
 } from './api/lookupTablesAPI';
 
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
@@ -58,6 +66,60 @@ export function useFetchCaches() {
   return { fetchPaginatedCaches, cachesKeyFn };
 }
 
+export function useFetchCacheTypes() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['cache-types'],
+    queryFn: fetchCacheTypes,
+  });
+
+  return { fetchingCacheTypes: isLoading, types: data };
+}
+
+export function useValidateCache() {
+  const { mutateAsync } = useMutation({
+    mutationFn: validateCache,
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return { validateCache: mutateAsync };
+}
+
+export function useCreateCache() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: createCache,
+    onSuccess: () => {
+      UserNotification.success('Cache created successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    createCache: mutateAsync,
+    creatingCache: isLoading,
+  };
+}
+
+export function useUpdateCache() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: updateCache,
+    onSuccess: () => {
+      UserNotification.success('Cache updated successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateCache: mutateAsync,
+    updatingCache: isLoading,
+  };
+}
+
 export function useDeleteCache() {
   const { refetch } = useTableFetchContext();
 
@@ -79,6 +141,60 @@ export function useDeleteCache() {
 export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
+}
+
+export function useFetchDataAdapterTypes() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['data-adapter-types'],
+    queryFn: fetchDataAdapterTypes,
+  });
+
+  return { fetchingDataAdapterTypes: isLoading, types: data };
+}
+
+export function useCreateAdapter() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: createDataAdapter,
+    onSuccess: () => {
+      UserNotification.success('Data Adapter created successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    createAdapter: mutateAsync,
+    creatingAdapter: isLoading,
+  };
+}
+
+export function useUpdateAdapter() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: updateDataAdapter,
+    onSuccess: () => {
+      UserNotification.success('Data Adapter updated successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateAdapter: mutateAsync,
+    updatingAdapter: isLoading,
+  };
+}
+
+export function useValidateDataAdapter() {
+  const { mutateAsync } = useMutation({
+    mutationFn: validateDataAdapter,
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return { validateDataAdapter: mutateAsync };
 }
 
 export function useDeleteDataAdapter() {

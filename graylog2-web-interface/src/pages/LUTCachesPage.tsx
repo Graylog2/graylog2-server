@@ -16,22 +16,30 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LUTLayout, CachesOverview } from 'components/lookup-tables';
+import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTCachesPage() {
+  const { setModal } = useModalContext();
+
+  const showCreateModal = () => {
+    setModal('CACHE-CREATE');
+  }
+
   return (
     <LUTLayout
       documentTitle="Lookup Tables - Caches"
       pageTitle="Caches for Lookup Tables"
       pageDescription="Caches provide the actual values for lookup tables."
       actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+        <Button bsStyle="primary" onClick={showCreateModal}>
           Create cache
         </Button>
       }>
       <CachesOverview />
+      <LUTModals />
     </LUTLayout>
   );
 }
