@@ -105,7 +105,7 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
                 .map(fieldName -> new FiltersAggregator.KeyedFilter(fieldName, QueryBuilders.existsQuery(fieldName)))
                 .toList();
 
-        final var filtersAggregation = AggregationBuilders.filters(AGG_NAME, filters.toArray(new FiltersAggregator.KeyedFilter[]{})).otherBucket(false)
+        final var filtersAggregation = AggregationBuilders.filters(AGG_NAME, filters.toArray(FiltersAggregator.KeyedFilter[]::new)).otherBucket(false)
                 .subAggregation(AggregationBuilders
                         .terms(Message.FIELD_STREAMS)
                         .field(Message.FIELD_STREAMS)
