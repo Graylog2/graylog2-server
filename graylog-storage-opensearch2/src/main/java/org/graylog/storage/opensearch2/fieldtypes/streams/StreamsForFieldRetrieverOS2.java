@@ -47,7 +47,7 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
         this.client = client;
     }
 
-    private record FieldBucket<T>(String fieldName, T value) {}
+    private record FieldBucket(String fieldName, Set<String> value) {}
 
     @Override
     public Map<String, Set<String>> getStreams(final List<String> fieldNames, final String indexName) {
@@ -57,7 +57,7 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
         final ParsedFilters aggregation = response.getAggregations().get(AGG_NAME);
 
         return fieldNames.stream()
-                .map(fieldName -> new FieldBucket<>(fieldName, retrieveStreamsFromAggregationInResponse(aggregation.getBucketByKey(fieldName))))
+                .map(fieldName -> new FieldBucket(fieldName, retrieveStreamsFromAggregationInResponse(aggregation.getBucketByKey(fieldName))))
                 .collect(Collectors.toMap(FieldBucket::fieldName, FieldBucket::value));
     }
 
