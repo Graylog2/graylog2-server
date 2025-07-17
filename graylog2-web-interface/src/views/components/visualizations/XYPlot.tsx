@@ -93,8 +93,9 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = merge({}, defaultLayout, plotLayout);
   const dispatch = useAppDispatch();
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
     ? (from: string, to: string) => (onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone)))
