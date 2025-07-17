@@ -51,7 +51,7 @@ const StyledButton = styled(Button)(
   }
 
   &.active {
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
 
     ${activeIndicatorStyles(theme)}
 

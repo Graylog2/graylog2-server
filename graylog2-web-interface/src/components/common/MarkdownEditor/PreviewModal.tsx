@@ -54,7 +54,7 @@ const CloseIcon = styled(Icon)`
   color: ${({ theme }) => theme.colors.input.placeholder};
 
   &:hover {
-    color: ${({ theme }) => theme.colors.global.textDefault};
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 

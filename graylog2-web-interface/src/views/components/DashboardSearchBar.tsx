@@ -27,7 +27,7 @@ import SearchButton from 'views/components/searchbar/SearchButton';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
@@ -241,7 +241,7 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
                           )}
                         </Field>
 
-                        <QueryValidation />
+                        <ViewsQueryValidation />
                         <QueryHistoryButton editorRef={editorRef} />
                       </SearchInputAndValidationContainer>
                     </SearchButtonAndQuery>
