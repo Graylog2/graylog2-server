@@ -57,10 +57,11 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
     () => StartpageStore.set(currentUser.id, 'stream', stream.id),
     [stream.id, currentUser.id],
   );
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<Stream>(stream, 'stream');
-  const moreActions = [
-    pluggableActions.length ? pluggableActions : null,
-  ].filter(Boolean);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<Stream>(
+    stream,
+    'stream',
+  );
+  const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;

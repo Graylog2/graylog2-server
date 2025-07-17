@@ -47,10 +47,9 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
   const [showShareNotification, setShowShareNotification] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<EventNotification>(notification, 'notification');
-  const moreActions = [
-    pluggableActions.length ? pluggableActions : null,
-  ].filter(Boolean);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } =
+    usePluggableEntitySharedActions<EventNotification>(notification, 'notification');
+  const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const onDelete = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_DELETE_CLICKED, {
