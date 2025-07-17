@@ -37,8 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.utilities.Entry.createEntry;
-
 public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
     private static final String AGG_NAME = "fields";
     private static final int SEARCH_MAX_BUCKETS_ES = 10_000;
@@ -48,6 +46,12 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
     @Inject
     public StreamsForFieldRetrieverES7(final ElasticsearchClient client) {
         this.client = client;
+    }
+
+    private record FieldBucket<T>(String fieldName, T value) {
+        <R> FieldBucket<R> withValue(R newValue) {
+            return new FieldBucket<R>(fieldName, newValue);
+        }
     }
 
     @Override
@@ -63,9 +67,9 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
         final ParsedFilters aggregation = response.getResponse().getAggregations().get(AGG_NAME);
 
         return fieldNames.stream()
-                .map(fieldName -> createEntry(fieldName, aggregation.getBucketByKey(fieldName)))
-                .map(entry -> entry.withValue(retrieveStreamsFromAggregationInResponse(entry.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .map(fieldName -> new FieldBucket<>(fieldName, aggregation.getBucketByKey(fieldName)))
+                .map(entry -> entry.withValue(retrieveStreamsFromAggregationInResponse(entry.value())))
+                .collect(Collectors.toMap(FieldBucket::fieldName, FieldBucket::value));
     }
 
     @Override
