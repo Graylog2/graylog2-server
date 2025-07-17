@@ -18,33 +18,18 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { SearchParams } from 'stores/PaginationTypes';
-import type { GenericEntityType } from 'logic/lookup-tables/types';
-import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
-import { attributes } from 'components/lookup-tables/lookup-table-list/constants';
+import type { GenericEntityType, LookupTable } from 'logic/lookup-tables/types';
+import {
+  LOOKUP_TABLES,
+  CACHES,
+  DATA_ADAPTERS,
+  ERRORS_CONTEXT_VALUE,
+  UNSUPPORTED_PREVIEW,
+  SUPPORTED_PREVIEW,
+  TEST_KEY_RESULT,
+} from 'components/lookup-tables/fixtures';
 
 import LookupTableDetails from './index';
-
-const mockFetchPaginatedLookupTables = jest.fn(async () =>
-  Promise.resolve({
-    attributes,
-    list: [...LOOKUP_TABLES],
-    pagination: {
-      page: 1,
-      total: LOOKUP_TABLES.length,
-      per_page: 20,
-      count: 10,
-      query: null,
-    },
-    meta: {
-      caches: { ...CACHES_MAP },
-      adapters: { ...ADAPTERS_MAP },
-    },
-  }),
-);
-
-const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
-const mockDeleteLookupTable = jest.fn(async () => Promise.resolve());
 
 jest.mock('hooks/useScopePermissions', () => ({
   __esModule: true,
@@ -67,19 +52,110 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => { }],
+  useQueryParam: () => [undefined, () => {}],
 }));
 
+const mockPurgeLookupTableKey = jest.fn(async () => Promise.resolve());
+const mockPurgeAllLookupTableKey = jest.fn(async () => Promise.resolve());
+const mockUseFetchLookupPreview = jest.fn(() => ({
+  lookupPreview: UNSUPPORTED_PREVIEW,
+}));
+const mockTestLookupTableKey = jest.fn(async () => Promise.resolve(null));
+const mockUseErrorsContext = jest.fn(() => ERRORS_CONTEXT_VALUE);
+
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
-  useFetchLookupTables: () => ({
-    fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
-    lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
+  usePurgeLookupTableKey: () => ({
+    purgeLookupTableKey: mockPurgeLookupTableKey,
   }),
-  useDeleteLookupTable: () => ({
-    deleteLookupTable: mockDeleteLookupTable,
-    deletingLookupTable: false,
+  usePurgeAllLookupTableKey: () => ({
+    purgeAllLookupTableKey: mockPurgeAllLookupTableKey,
   }),
-  useFetchErrors: () => ({
-    fetchErrors: mockFetchErrors,
+  useFetchLookupPreview: () => mockUseFetchLookupPreview(),
+  useTestLookupTableKey: () => ({
+    testLookupTableKey: mockTestLookupTableKey,
   }),
 }));
+
+jest.mock('components/lookup-tables/contexts/ErrorsContext', () => ({
+  useErrorsContext: () => mockUseErrorsContext(),
+}));
+
+describe('Lookup Table Details', () => {
+  it('should render lookup table details', async () => {
+    const table: LookupTable = {
+      ...LOOKUP_TABLES[0],
+      default_single_value: '0',
+      default_single_value_type: 'NUMBER',
+      default_multi_value: '{}',
+      default_multi_value_type: 'OBJECT',
+    };
+    const cache = CACHES[0];
+    const dataAdapter = DATA_ADAPTERS[0];
+
+    render(<LookupTableDetails table={table} cache={cache} dataAdapter={dataAdapter} />);
+
+    await screen.findByText(table.description);
+    screen.getByText(cache.title);
+    screen.getByText(dataAdapter.title);
+    screen.getByText(/default single value/i);
+    screen.getByText('(number)');
+    screen.getByText(/default multi value/i);
+    screen.getByText('(object)');
+  });
+
+  it('should purge all keys', async () => {
+    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+
+    userEvent.click(await screen.findByRole('button', { name: /Purge all/i }));
+
+    expect(mockPurgeAllLookupTableKey).toHaveBeenCalledWith(LOOKUP_TABLES[0]);
+  });
+
+  it('shuld purge a key', async () => {
+    const testKeyValue = 'test_key';
+    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+
+    userEvent.type(await screen.findByRole('textbox', { name: /key/i }), testKeyValue);
+    userEvent.click(await screen.findByRole('button', { name: /Purge key/i }));
+
+    expect(mockPurgeLookupTableKey).toHaveBeenCalledWith({ table: LOOKUP_TABLES[0], key: testKeyValue });
+  });
+
+  it("should show a message when preview isn't supported", async () => {
+    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+
+    await screen.findByText(/This lookup table doesn't support keys preview/i);
+  });
+
+  it('should show the validation error message', async () => {
+    mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
+    render(<LookupTableDetails table={LOOKUP_TABLES[1]} cache={CACHES[1]} dataAdapter={DATA_ADAPTERS[1]} />);
+
+    await screen.findByText(/Lookup table test error/i);
+  });
+
+  it('should preview the lookup table', async () => {
+    mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
+    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+
+    await screen.findByText(/"100": "Continue"/i);
+    screen.getByText(/"101": "Switching Protocols"/i);
+    screen.getByText(/"203": "Non-Authoritative Information"/i);
+  });
+
+  it('should test one table key', async () => {
+    mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
+    mockTestLookupTableKey.mockImplementation(() => Promise.resolve(TEST_KEY_RESULT));
+    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+
+    const testKeyInputs = await screen.findAllByRole('textbox', { name: /key/i });
+
+    userEvent.type(testKeyInputs[1], '203{tab}');
+    userEvent.click(await screen.findByRole('button', { name: /Look up/i }));
+
+    await screen.findByText(/"single_value": "Non-Authoritative Information"/i);
+    screen.getByText(/"string_list_value": null/i);
+    screen.getByText(/"has_error": false/i);
+    screen.getByText(/"ttl": 9/i);
+  });
+});

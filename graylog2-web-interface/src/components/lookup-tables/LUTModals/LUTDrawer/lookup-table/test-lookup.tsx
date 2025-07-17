@@ -152,7 +152,7 @@ function TestLookup({ table }: Props) {
                   <NoMarginInput>
                     <Input
                       type="number"
-                      bsSize="xs"
+                      bsSize="sm"
                       onChange={onPreviewSizeChange}
                       value={previewSize > total ? total : previewSize}
                       style={{ marginLeft: 'auto' }}
