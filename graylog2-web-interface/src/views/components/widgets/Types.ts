@@ -30,8 +30,6 @@ export type WidgetAction = (
   contexts: Contexts,
 ) => (dispatch: ViewsDispatch, getState: GetState) => Promise<unknown>;
 
-type WidgetActionPositionType = 'menu' | 'dropdown';
-
 type WidgetBaseActionType = {
   type: string;
   isHidden?: (w: Widget) => boolean;
@@ -41,21 +39,29 @@ type WidgetBaseActionType = {
 type WidgetDropdownActionType = {
   title: (w: Widget) => React.ReactNode;
   action: WidgetAction;
-  position?: WidgetActionPositionType;
   component?: never;
 };
+
+type WidgetDropdownComponentType = {
+  title: (w: Widget) => React.ReactNode;
+  action?: never;
+  component: React.ComponentType<WidgetMenuActionComponentProps>;
+};
+
+type WidgetDropdownType = { position: 'dropdown' } & (WidgetDropdownActionType | WidgetDropdownComponentType);
 
 export type WidgetMenuActionComponentProps = {
   disabled?: boolean;
   widget: Widget;
   contexts?: Contexts;
+  onClose: () => void;
 };
 
 export type WidgetMenuActionType = {
   component: React.ComponentType<WidgetMenuActionComponentProps>;
-  position: WidgetActionPositionType;
+  position: 'menu';
   title?: never;
   action?: never;
 };
 
-export type WidgetActionType = (WidgetDropdownActionType | WidgetMenuActionType) & WidgetBaseActionType;
+export type WidgetActionType = (WidgetDropdownType | WidgetMenuActionType) & WidgetBaseActionType;
