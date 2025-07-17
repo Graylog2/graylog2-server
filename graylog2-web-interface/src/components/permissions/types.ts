@@ -34,7 +34,6 @@ export type EntityActionModalProps<T, M> = React.PropsWithRef<{
   ref: React.LegacyRef<M>;
 };
 
-
 export type EntityActionComponentProps<T, M> = {
   entity: T;
   modalRef: () => M;
