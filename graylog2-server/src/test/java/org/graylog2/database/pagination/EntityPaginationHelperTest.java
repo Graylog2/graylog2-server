@@ -24,17 +24,18 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.mockito.Mockito.mock;
 
 class EntityPaginationHelperTest {
 
     static Stream<org.junit.jupiter.params.provider.Arguments> filterProvider() {
         return Stream.of(
-                org.junit.jupiter.params.provider.Arguments.of("type:example", true),
-                org.junit.jupiter.params.provider.Arguments.of("title:example", true),
-                org.junit.jupiter.params.provider.Arguments.of("example", true),
-                org.junit.jupiter.params.provider.Arguments.of("invalid:filter", false),
-                org.junit.jupiter.params.provider.Arguments.of(null, true)
+                of("type:example", true),
+                of("title:example", true),
+                of("example", true),
+                of("invalid:filter", false),
+                of(null, true)
         );
     }
 

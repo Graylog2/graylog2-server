@@ -20,13 +20,13 @@ import com.google.common.annotations.VisibleForTesting;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.security.Capability;
-import org.graylog.security.GrantDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,21 +88,6 @@ public class EntityPaginationHelper {
     }
 
     /**
-     * Creates a predicate that filters GrantDTO objects based on the provided list of entity filters.
-     *
-     * @param filters the list of entity filters
-     * @return a Predicate that filters GrantDTO objects
-     */
-    public static Predicate<GrantDTO> entityFiltersGrantPredicate(List<String> filters) {
-        if (filters == null || filters.isEmpty()) {
-            return descriptor -> true;
-        }
-        return filters.stream()
-                .map(EntityPaginationHelper::entityFilterGrantPredicate)
-                .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
-    }
-
-    /**
      * Creates a predicate that filters GRNDescriptor objects based on the provided list of entity filters.
      *
      * @param filters the list of entity filters
@@ -118,7 +103,7 @@ public class EntityPaginationHelper {
     }
 
     @VisibleForTesting
-    public static <T> Predicate<T> buildPredicate(String filter, java.util.function.Function<T, String> typeExtractor, java.util.function.Function<T, String> titleExtractor) {
+    public static <T> Predicate<T> buildPredicate(String filter, Function<T, String> typeExtractor, Function<T, String> titleExtractor) {
         if (isNullOrEmpty(filter)) {
             return t -> true;
         }
@@ -152,12 +137,6 @@ public class EntityPaginationHelper {
     private static Predicate<GRN> entityFilterGRNPredicate(String entityFilter) {
         return buildPredicate(entityFilter,
                 GRN::type,
-                null);
-    }
-
-    private static Predicate<GrantDTO> entityFilterGrantPredicate(String entityFilter) {
-        return buildPredicate(entityFilter,
-                grantDTO -> grantDTO.target().grnType().type(),
                 null);
     }
 
