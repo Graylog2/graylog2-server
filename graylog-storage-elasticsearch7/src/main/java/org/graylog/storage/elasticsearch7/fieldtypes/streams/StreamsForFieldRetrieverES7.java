@@ -17,7 +17,6 @@
 package org.graylog.storage.elasticsearch7.fieldtypes.streams;
 
 import jakarta.inject.Inject;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
@@ -48,28 +47,18 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
         this.client = client;
     }
 
-    private record FieldBucket<T>(String fieldName, T value) {
-        <R> FieldBucket<R> withValue(R newValue) {
-            return new FieldBucket<R>(fieldName, newValue);
-        }
-    }
+    private record FieldStreams(String fieldName, Set<String> streams) {}
 
     @Override
     public Map<String, Set<String>> getStreams(final List<String> fieldNames, final String indexName) {
-        final List<MultiSearchResponse.Item> multiSearchResponse = client.msearch(List.of(createSearchRequest(fieldNames, indexName)),
+        final var response = client.search(createSearchRequest(fieldNames, indexName),
                 "Unable to retrieve fields types aggregations");
 
-        final var response = multiSearchResponse.get(0);
-        if (response.isFailure()) {
-            throw ElasticsearchClient.exceptionFrom(response.getFailure(), "Error while retrieving field types");
-        }
-
-        final ParsedFilters aggregation = response.getResponse().getAggregations().get(AGG_NAME);
+        final ParsedFilters aggregation = response.getAggregations().get(AGG_NAME);
 
         return fieldNames.stream()
-                .map(fieldName -> new FieldBucket<>(fieldName, aggregation.getBucketByKey(fieldName)))
-                .map(entry -> entry.withValue(retrieveStreamsFromAggregationInResponse(entry.value())))
-                .collect(Collectors.toMap(FieldBucket::fieldName, FieldBucket::value));
+                .map(fieldName -> new FieldStreams(fieldName, retrieveStreamsFromAggregationInResponse(aggregation.getBucketByKey(fieldName))))
+                .collect(Collectors.toMap(FieldStreams::fieldName, FieldStreams::streams));
     }
 
     @Override
