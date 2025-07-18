@@ -17,6 +17,7 @@
 package org.graylog.security.certutil.csr;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.openssl.PKCS8Generator;
@@ -56,7 +57,7 @@ public class ClientCertGenerator {
 
     public ClientCert generateClientCert(final String principal,
                                          final String role,
-                                         final char[] privateKeyPassword,
+                                         @Nullable final String privateKeyPassword,
                                          Duration certificateLifetime) throws ClientCertGenerationException {
 
         try {
@@ -87,26 +88,26 @@ public class ClientCertGenerator {
     }
 
     @Nonnull
-    private ClientCert toClientCert(String principal, String role, CertificateChain certChain, KeyPair keyPair, char[] privateKeyPassword) throws IOException, OperatorCreationException {
+    private ClientCert toClientCert(String principal, String role, CertificateChain certChain, KeyPair keyPair, @Nullable String privateKeyPassword) throws IOException, OperatorCreationException {
         final String caCertificate = serializeAsPEM(certChain.caCertificates().iterator().next());
         final String privateKey = serializePrivateKey(keyPair.privateKey(), privateKeyPassword);
         final String certificate = serializeAsPEM(certChain.signedCertificate());
         return new ClientCert(principal, role, caCertificate, privateKey, certificate);
     }
 
-    private String serializePrivateKey(PrivateKey privateKey, char[] privateKeyPassword) throws IOException, OperatorCreationException {
-        if (privateKeyPassword == null || privateKeyPassword.length == 0) {
+    private String serializePrivateKey(PrivateKey privateKey, @Nullable String privateKeyPassword) throws IOException, OperatorCreationException {
+        if (privateKeyPassword == null || privateKeyPassword.isEmpty()) {
             return serializeAsPEM(privateKey);
         } else {
             return encryptPrivateKey(privateKey, privateKeyPassword);
         }
     }
 
-    private String encryptPrivateKey(PrivateKey privateKey, char[] privateKeyPassword) throws OperatorCreationException, IOException {
+    private String encryptPrivateKey(PrivateKey privateKey, @Nonnull String privateKeyPassword) throws OperatorCreationException, IOException {
         OutputEncryptor encryptor =
                 new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
                         .setRandom(new SecureRandom())
-                        .setPassword(privateKeyPassword)
+                        .setPassword(privateKeyPassword.toCharArray())
                         .build();
         PemObject pemObj = new JcaPKCS8Generator(privateKey, encryptor).generate();
         return serializeAsPEM(pemObj);
