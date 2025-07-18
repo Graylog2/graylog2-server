@@ -18,8 +18,18 @@ import * as React from 'react';
 
 import Icon from 'components/common/Icon';
 
-const StatusIcon = ({ active }: { active: boolean }) => (
-  <Icon name={active ? 'check_circle' : 'cancel'} bsStyle={active ? 'success' : undefined} />
+type Props = {
+  active: boolean;
+  className?: string;
+};
+
+const StatusIcon = ({ active, className = undefined }: Props) => (
+  <Icon
+    name={active ? 'check_circle' : 'cancel'}
+    bsStyle={active ? 'success' : undefined}
+    className={className}
+    title={active ? 'Yes' : 'No'}
+  />
 );
 
 export default StatusIcon;
