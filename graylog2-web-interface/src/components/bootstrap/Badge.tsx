@@ -19,9 +19,10 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
-  color: ${theme.colors.contrast[color]};
+const mapStyle = (style: ColorVariant) => (style === 'default' ? 'gray' : style); const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
   text-transform: none;
+    background: ${theme.colors.button[color].background};
+  color: ${theme.colors.button[color].color};
 
   .mantine-Badge-label {
     font-size: ${theme.fonts.size.small};
@@ -43,17 +44,21 @@ const Badge = React.forwardRef<HTMLDivElement, Props>(({
   'data-testid': dataTestid,
   onClick,
   title,
-}, ref) => (
-  <StyledBadge color={bsStyle}
-               className={className}
-               title={title}
-               data-testid={dataTestid}
-               ref={ref}
-               variant="filled"
-               onClick={onClick}>
-    {children}
-  </StyledBadge>
-));
+}, ref) => {
+  const color = mapStyle(bsStyle);
+
+  return (
+    <StyledBadge color={color}
+                 className={className}
+                 title={title}
+                 data-testid={dataTestid}
+                 ref={ref}
+                 variant="filled"
+                 onClick={onClick}>
+      {children}
+    </StyledBadge>
+  );
+});
 
 Badge.defaultProps = {
   bsStyle: 'default',
