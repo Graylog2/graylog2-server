@@ -99,7 +99,7 @@ type Props = {
  * Have a look at the `BrandIcon` component for brand icons.
  */
 const Icon = ({
-  bsStyle,
+  bsStyle = undefined,
   name,
   type = 'solid',
   size = undefined,
