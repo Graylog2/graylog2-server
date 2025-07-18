@@ -73,6 +73,7 @@ exports[`copyPageToDashboard should copy a page to a dashboard 1`] = `
             "visualization": "bar",
             "visualization_config": null,
           },
+          "context": undefined,
           "description": undefined,
           "filter": undefined,
           "filters": Immutable.List [],

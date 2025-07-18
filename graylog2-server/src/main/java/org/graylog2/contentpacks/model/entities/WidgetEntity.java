@@ -80,6 +80,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CONTEXT = "context";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -112,6 +113,10 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     @JsonProperty(FIELD_DESCRIPTION)
     @Nullable
     public abstract String description();
+
+    @JsonProperty(FIELD_CONTEXT)
+    @Nullable
+    public abstract String context();
 
     public static Builder builder() {
         return Builder.builder();
@@ -154,6 +159,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(@Nullable String description);
 
+        @JsonProperty(FIELD_CONTEXT)
+        public abstract Builder context(@Nullable String context);
+
         public abstract WidgetEntity build();
 
         @JsonCreator
@@ -169,6 +177,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public WidgetDTO toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
                 .description(this.description())
+                .context(this.context())
                 .config(this.config())
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
