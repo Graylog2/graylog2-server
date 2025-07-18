@@ -22,6 +22,7 @@ import { createLookupTableAdapter } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
 
 import CSVFileAdapterSummary from './adapters/CSVFileAdapterSummary';
 import DataAdapter from './DataAdapter';
@@ -46,7 +47,7 @@ PluginStore.register(
 const renderedDataAdapter = (scope: string) => {
   const dataAdapter = createLookupTableAdapter(1, { _scope: scope });
 
-  return render(<DataAdapter dataAdapter={dataAdapter} />);
+  return render(<ModalProvider><DataAdapter dataAdapter={dataAdapter} /></ModalProvider>);
 };
 
 describe('DataAdapter', () => {

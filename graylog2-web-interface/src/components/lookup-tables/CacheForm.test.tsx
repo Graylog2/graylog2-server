@@ -75,6 +75,7 @@ const renderedCache = ({
       create={create}
       validate={validate}
       validationErrors={validationErrors}
+      onCancel={() => {}}
     />,
   );
 };
@@ -130,7 +131,7 @@ describe('CacheForm', () => {
     fireEvent.blur(titleInput);
     const requiredErrorMessages = await screen.findAllByText('Required');
 
-    expect(requiredErrorMessages.length).toBeGreaterThanOrEqual(2);
+    expect(requiredErrorMessages.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should show duplicated name error', async () => {

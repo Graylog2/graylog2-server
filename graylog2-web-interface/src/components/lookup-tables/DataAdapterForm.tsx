@@ -15,240 +15,74 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import isEqual from 'lodash/isEqual';
+import { Formik, Form } from 'formik';
+import isEmpty from 'lodash/isEmpty';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { TimeUnitInput, FormSubmit } from 'components/common';
-import { Col, Row, Input } from 'components/bootstrap';
-import ObjectUtils from 'util/ObjectUtils';
-import { getValueFromInput } from 'util/FormsUtils';
-import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-import Routes from 'routing/Routes';
-import withHistory from 'routing/withHistory';
-import withTelemetry from 'logic/telemetry/withTelemetry';
+import { FormikFormGroup, FormSubmit, TimeUnitInput } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { useCreateAdapter, useUpdateAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { LookupTableAdapter, validationErrorsType } from 'logic/lookup-tables/types';
 
-type DataAdapterFormProps = {
+type TitleProps = {
+  title: string;
+  typeName: string;
+  create: boolean;
+};
+
+const Title = ({ title, typeName, create }: TitleProps) => {
+  const TagName = create ? 'h3' : 'h2';
+
+  return (
+    <TagName style={{ marginBottom: '12px' }}>
+      {title} <small>({typeName})</small>
+    </TagName>
+  );
+};
+
+type Props = {
   type: string;
   title: string;
   saved: (...args: any[]) => void;
+  onCancel: () => void;
   create?: boolean;
-  dataAdapter?: any;
-  validate?: (...args: any[]) => void;
-  validationErrors?: any;
-  sendTelemetry?: (...args: any[]) => void;
-  history: any;
+  dataAdapter?: LookupTableAdapter;
+  validate?: (arg: LookupTableAdapter) => void;
+  validationErrors?: validationErrorsType;
 };
 
-class DataAdapterForm extends React.Component<
-  DataAdapterFormProps,
-  {
-    [key: string]: any;
-  }
-> {
-  validationCheckTimer = undefined;
+const INIT_ADAPTER = {
+  id: undefined,
+  title: '',
+  description: '',
+  name: '',
+  custom_error_ttl_enabled: false,
+  custom_error_ttl: null,
+  custom_error_ttl_unit: null,
+  config: {},
+}
 
-  _input = undefined;
+const DataAdapterForm = ({
+  type,
+  title,
+  saved,
+  onCancel,
+  create = true,
+  dataAdapter = INIT_ADAPTER,
+  validate = null,
+  validationErrors = {},
+}: Props) => {
+  const sendTelemetry = useSendTelemetry();
+  const configRef = React.useRef(null);
+  const [generateName, setGenerateName] = React.useState<boolean>(create);
+  const { createAdapter, creatingAdapter } = useCreateAdapter();
+  const { updateAdapter, updatingAdapter } = useUpdateAdapter();
 
-  static defaultProps = {
-    create: true,
-    dataAdapter: {
-      id: undefined,
-      title: '',
-      description: '',
-      name: '',
-      custom_error_ttl_enabled: false,
-      custom_error_ttl: null,
-      custom_error_ttl_unit: null,
-      config: {},
-    },
-    validate: null,
-    validationErrors: {},
-    sendTelemetry: () => {},
-  };
+  const plugin = React.useMemo(() => PluginStore.exports('lookupTableAdapters').find((p) => p.type === type), [type]);
 
-  constructor(props) {
-    super(props);
-
-    this.state = this._initialState(props.dataAdapter);
-  }
-
-  componentDidMount() {
-    this._input.getInputDOMNode().focus();
-    const { create, dataAdapter } = this.props;
-
-    if (!create) {
-      // Validate when mounted to immediately show errors for invalid objects
-      this._validate(dataAdapter);
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const { type: currentType } = this.props;
-
-    if (prevProps.type !== currentType) {
-      this._input.getInputDOMNode().focus();
-    }
-
-    const { dataAdapter } = this.props;
-
-    if (isEqual(dataAdapter, prevProps.dataAdapter)) {
-      // props haven't changed, don't update our state from them
-      return;
-    }
-
-    this.updateState(dataAdapter);
-  }
-
-  componentWillUnmount() {
-    this._clearTimer();
-  }
-
-  updateState = (dataAdapter) => {
-    this.setState(this._initialState(dataAdapter));
-  };
-
-  _initialState = (dataAdapter) => {
-    const adapter = ObjectUtils.clone(dataAdapter);
-    const { create } = this.props;
-
-    return {
-      // when creating always initially auto-generate the adapter name,
-      // this will be false if the user changed the adapter name manually
-      generateAdapterName: create,
-      isFormDisabled: false,
-      dataAdapter: {
-        id: adapter.id,
-        title: adapter.title,
-        description: adapter.description,
-        name: adapter.name,
-        custom_error_ttl_enabled: adapter.custom_error_ttl_enabled,
-        custom_error_ttl: adapter.custom_error_ttl,
-        custom_error_ttl_unit: adapter.custom_error_ttl_unit,
-        config: adapter.config,
-      },
-    };
-  };
-
-  _clearTimer = () => {
-    if (this.validationCheckTimer !== undefined) {
-      clearTimeout(this.validationCheckTimer);
-      this.validationCheckTimer = undefined;
-    }
-  };
-
-  _setIsFormDisabled = (isDisabled) => {
-    this.setState({ isFormDisabled: isDisabled });
-  };
-
-  _validate = (adapter) => {
-    const { validate } = this.props;
-
-    // first cancel outstanding validation timer, we have new data
-    this._clearTimer();
-
-    if (validate) {
-      this.validationCheckTimer = setTimeout(() => validate(adapter), 500);
-    }
-  };
-
-  _onChange = (event) => {
-    const { dataAdapter: dataAdapterState } = this.state;
-    const dataAdapter = ObjectUtils.clone(dataAdapterState);
-
-    dataAdapter[event.target.name] = getValueFromInput(event.target);
-    let { generateAdapterName } = this.state;
-
-    if (generateAdapterName && event.target.name === 'title') {
-      // generate the name
-      dataAdapter.name = this._sanitizeTitle(dataAdapter.title);
-    }
-
-    if (event.target.name === 'name') {
-      // the adapter name has been changed manually, no longer automatically change it
-      generateAdapterName = false;
-    }
-
-    this._validate(dataAdapter);
-    this.setState({ dataAdapter: dataAdapter, generateAdapterName: generateAdapterName });
-  };
-
-  _onConfigChange = (event) => {
-    const { dataAdapter: dataAdapterState } = this.state;
-    const dataAdapter = ObjectUtils.clone(dataAdapterState);
-
-    dataAdapter.config[event.target.name] = getValueFromInput(event.target);
-    this._validate(dataAdapter);
-    this.setState({ dataAdapter: dataAdapter });
-  };
-
-  _updateConfig = (newConfig) => {
-    const { dataAdapter: dataAdapterState } = this.state;
-    const dataAdapter = ObjectUtils.clone(dataAdapterState);
-
-    dataAdapter.config = newConfig;
-    this._validate(dataAdapter);
-    this.setState({ dataAdapter: dataAdapter });
-  };
-
-  updateCustomErrorTTL = (value, unit, enabled) => {
-    this._updateCustomErrorTTL(value, unit, enabled, 'custom_error_ttl');
-  };
-
-  _updateCustomErrorTTL = (value, unit, enabled, fieldPrefix) => {
-    const { dataAdapter: dataAdapterState } = this.state;
-    const dataAdapter = ObjectUtils.clone(dataAdapterState);
-
-    if (enabled && value) {
-      dataAdapter[fieldPrefix] = enabled && value ? value : null;
-      dataAdapter[`${fieldPrefix}_enabled`] = enabled;
-    } else {
-      dataAdapter[fieldPrefix] = null;
-      dataAdapter[`${fieldPrefix}_enabled`] = false;
-    }
-
-    dataAdapter[`${fieldPrefix}_unit`] = enabled ? unit : null;
-    this._validate(dataAdapter);
-    this.setState({ dataAdapter: dataAdapter });
-  };
-
-  _save = (event) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    const { dataAdapter } = this.state;
-    const { create, saved, sendTelemetry } = this.props;
-
-    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
-      app_pathname: 'lut',
-      app_section: 'lut_data_adapter',
-      event_details: {
-        type: dataAdapter?.config?.type,
-      },
-    });
-
-    let promise;
-
-    if (create) {
-      promise = LookupTableDataAdaptersActions.create(dataAdapter);
-    } else {
-      promise = LookupTableDataAdaptersActions.update(dataAdapter);
-    }
-
-    promise.then(() => {
-      saved();
-    });
-  };
-
-  // eslint-disable-next-line
-  _sanitizeTitle = (title) => {
-    return title.trim().replace(/\W+/g, '-').toLocaleLowerCase();
-  };
-
-  _validationState = (fieldName) => {
-    const { validationErrors } = this.props;
-
+  const validationState = (fieldName) => {
     if (validationErrors[fieldName]) {
       return 'error' as const;
     }
@@ -256,9 +90,7 @@ class DataAdapterForm extends React.Component<
     return null;
   };
 
-  _validationMessage = (fieldName, defaultText) => {
-    const { validationErrors } = this.props;
-
+  const validationMessage = (fieldName, defaultText) => {
     if (validationErrors[fieldName]) {
       return (
         <div>
@@ -274,143 +106,172 @@ class DataAdapterForm extends React.Component<
     return <span>{defaultText}</span>;
   };
 
-  // eslint-disable-next-line
-  _renderTitle = (title, typeName, create) => {
-    const TagName = create ? 'h3' : 'h2';
+  const DocComponent = React.useMemo(() => plugin.documentationComponent, [plugin]);
+  const pluginDisplayName = React.useMemo(() => plugin.displayName || type, [plugin, type]);
 
-    return (
-      <TagName>
-        {title} <small>({typeName})</small>
-      </TagName>
-    );
+  const sanitizeName = (inName: string) => inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
+
+  const handleTitleChange = (values: LookupTableAdapter, setValues: any) => (event: React.BaseSyntheticEvent) => {
+    if (!generateName) return;
+    const safeName = sanitizeName(event.target.value);
+
+    setValues({
+      ...values,
+      title: event.target.value,
+      name: safeName,
+    });
   };
 
-  render() {
-    const { dataAdapter, isFormDisabled } = this.state;
-    const { create, type, title, history } = this.props;
-    const adapterPlugins = PluginStore.exports('lookupTableAdapters');
+  const updateCustomErrorTTL = (value: number, enabled: boolean, unit: string, values: LookupTableAdapter, setValues: any) => {
+    setValues({
+      ...values,
+      custom_error_ttl: value,
+      custom_error_ttl_enabled: enabled,
+      custom_error_ttl_unit: unit,
+    });
+  }
 
-    const plugin = adapterPlugins.filter((p) => p.type === type);
-    const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
-    let configFieldSet = null;
-    let documentationComponent = null;
-    let pluginDisplayName = dataAdapter.config.type;
+  const handleValidation = (values: LookupTableAdapter) => {
+    const errors: any = {};
 
-    if (plugin && plugin.length > 0) {
-      const p = plugin[0];
+    if (!values.title) errors.title = 'Required';
 
-      pluginDisplayName = p.displayName;
+    if (!values.name) {
+      errors.name = 'Required';
+    } else {
+      validate(values);
+    }
 
-      configFieldSet = React.createElement(p.formComponent, {
-        config: dataAdapter.config,
-        handleFormEvent: this._onConfigChange,
-        updateConfig: this._updateConfig,
-        validationMessage: this._validationMessage,
-        validationState: this._validationState,
-        setDisableFormSubmission: this._setIsFormDisabled,
+    if (values.config.type !== 'none') {
+      const confErrors = configRef.current?.validate() || {};
+      if (!isEmpty(confErrors)) errors.config = confErrors;
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = (values: LookupTableAdapter) => {
+    const promise = create ? createAdapter(values) : updateAdapter(values);
+
+    return promise.then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
+        app_pathname: 'lut',
+        app_section: 'lut_data_adapter',
+        event_details: {
+          type: dataAdapter?.config?.type,
+        },
       });
 
-      if (p.documentationComponent) {
-        documentationComponent = React.createElement(p.documentationComponent, {
-          dataAdapterId: dataAdapter.id,
-        });
-      }
-    }
+      saved();
+    });
+  };
 
-    let documentationColumn = null;
-    let formRowWidth = 8; // If there is no documentation component, we don't use the complete page
+  const isLDAP = dataAdapter.config.type === 'LDAP' && dataAdapter.config?.user_passwd;
+  const configWithOptionalPassword = {
+    ...dataAdapter.config,
+    ...(isLDAP ? { user_passwd: { is_set: true, keep_value: true } } : {}),
+  };
 
-    // width
-    if (documentationComponent) {
-      formRowWidth = 6;
+  return (
+    <>
+      <Title title={title} typeName={pluginDisplayName} create={create} />
+      <Formik
+        initialValues={{
+          ...INIT_ADAPTER,
+          ...dataAdapter,
+          config: configWithOptionalPassword,
+        }}
+        validate={handleValidation}
+        validateOnChange
+        onSubmit={handleSubmit}
+        enableReinitialize>
+        {({ errors, values, setValues, setFieldValue, isSubmitting }) => {
+          const configFieldSet = plugin && React.createElement(plugin.formComponent, {
+            config: values.config,
+            validationMessage,
+            validationState,
+            updateConfig: (newConfig) => setFieldValue('config', newConfig),
+            handleFormEvent: (event) => {
+              const { name, value, type: typeFromTarget, checked } = event.target;
+              const updatedValue = typeFromTarget === 'checkbox' ? checked : value;
 
-      documentationColumn = <Col lg={formRowWidth}>{documentationComponent}</Col>;
-    }
+              setFieldValue(`config.${name}`, updatedValue);
+            },
+            ref: configRef,
+          });
 
-    return (
-      <>
-        <p>{this._renderTitle(title, pluginDisplayName, create)}</p>
-        <Row>
-          <Col lg={formRowWidth}>
-            <form className="form form-horizontal" onSubmit={this._save}>
-              <fieldset>
-                <Input
-                  type="text"
-                  id="title"
-                  name="title"
-                  label="Title"
-                  autoFocus
-                  required
-                  onChange={this._onChange}
-                  help="A short title for this data adapter."
-                  value={dataAdapter.title}
-                  labelClassName="col-sm-3"
-                  ref={(ref) => {
-                    this._input = ref;
-                  }}
-                  wrapperClassName="col-sm-9"
-                />
-
-                <Input
-                  type="text"
-                  id="description"
-                  name="description"
-                  label="Description"
-                  onChange={this._onChange}
-                  help="Data adapter description."
-                  value={dataAdapter.description}
-                  labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                />
-
-                <Input
-                  type="text"
-                  id="name"
-                  name="name"
-                  label="Name"
-                  required
-                  onChange={this._onChange}
-                  help={this._validationMessage(
-                    'name',
-                    'The name that is being used to refer to this data adapter. Must be unique.',
-                  )}
-                  value={dataAdapter.name}
-                  labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                  bsStyle={this._validationState('name')}
-                />
-
-                <TimeUnitInput
-                  label="Custom Error TTL"
-                  help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
-                  update={this.updateCustomErrorTTL}
-                  value={dataAdapter.custom_error_ttl}
-                  unit={dataAdapter.custom_error_ttl_unit || 'MINUTES'}
-                  units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
-                  enabled={dataAdapter.custom_error_ttl_enabled}
-                  labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                />
-              </fieldset>
-              {configFieldSet}
-              <fieldset>
-                <Row>
-                  <Col mdOffset={3} md={9}>
-                    <FormSubmit
-                      submitButtonText={create ? 'Create adapter' : 'Update adapter'}
-                      disabledSubmit={isFormDisabled}
-                      onCancel={onCancel}
+          return (
+            <Form className="form form-horizontal">
+              <Row>
+                <Col lg={6} style={{ marginTop: 10 }}>
+                  <fieldset>
+                    <FormikFormGroup
+                      type="text"
+                      name="title"
+                      label="* Title"
+                      required
+                      help={errors.title ? null : 'A short title for this data adapter.'}
+                      onChange={handleTitleChange(values, setValues)}
+                      autoFocus
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
                     />
-                  </Col>
-                </Row>
-              </fieldset>
-            </form>
-          </Col>
-          {documentationColumn}
-        </Row>
-      </>
-    );
-  }
-}
+                    <FormikFormGroup
+                      type="text"
+                      name="description"
+                      label="Description"
+                      help="Data adapter description."
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
+                    />
+                    <FormikFormGroup
+                      type="text"
+                      name="name"
+                      label="* Name"
+                      required
+                      error={validationErrors.name ? validationErrors.name[0] : null}
+                      onChange={() => setGenerateName(false)}
+                      help={
+                        errors.name || validationErrors.name
+                          ? null
+                          : 'The name that is being used to refer to this data adapter. Must be unique.'
+                      }
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
+                    />
+                    <TimeUnitInput
+                      label="Custom Error TTL"
+                      help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
+                      update={(value, unit, enabled) => updateCustomErrorTTL(value, enabled, unit, values, setValues)}
+                      value={values.custom_error_ttl}
+                      unit={values.custom_error_ttl_unit || 'MINUTES'}
+                      units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
+                      enabled={values.custom_error_ttl_enabled}
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
+                    />
+                    {configFieldSet}
+                  </fieldset>
+                </Col>
+                <Col lg={6} style={{ marginTop: 10 }}>
+                  {DocComponent ? <DocComponent /> : null}
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 20 }}>
+                <Col mdOffset={9} md={3}>
+                  <FormSubmit
+                    submitButtonText={create ? 'Create adapter' : 'Update adapter'}
+                    disabledSubmit={isSubmitting || creatingAdapter || updatingAdapter}
+                    onCancel={onCancel}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          );
+        }}
+      </Formik>
+    </>
+  );
+};
 
-export default withTelemetry(withHistory(DataAdapterForm));
+export default DataAdapterForm;

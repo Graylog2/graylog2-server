@@ -29,6 +29,7 @@ const ModalOverlay = styled(MantineModal.Overlay)`
 
 const ModalContent = styled(MantineModal.Content)`
   z-index: ${zIndices.modalBody};
+  border-radius: 10px;
 `;
 
 const ModalRoot = styled(MantineModal.Root)(
@@ -57,10 +58,11 @@ type Props = {
   bsSize?: ModalSize;
   backdrop?: boolean;
   closable?: boolean;
+  fullScreen?: boolean;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true }: Props) => (
-  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable}>
+const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false}: Props) => (
+  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable} fullScreen={fullScreen}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </ModalRoot>
