@@ -52,9 +52,9 @@ const ClientCertForm = ({ onCancel }: Props) => {
   };
 
   const onToggleUnencrypted = (setFieldValue: (field: string, value: any) => void) => {
-    setIsUnencrypted(!isUnencrypted)
+    setIsUnencrypted(!isUnencrypted);
     setFieldValue('password', null);
-  }
+  };
 
   return (
     <>
@@ -90,8 +90,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
                   id="client_certificate_unencrypted"
                   name="client_certificate_unencrypted"
                   checked={isUnencrypted}
-                  onChange={() => onToggleUnencrypted(setFieldValue)}
-                >
+                  onChange={() => onToggleUnencrypted(setFieldValue)}>
                   Unencrypted
                 </Checkbox>
                 <FormikInput
