@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import CSVFileAdapterSummary from 'components/lookup-tables/adapters/CSVFileAdapterSummary';
+import NullCacheSummary from 'components/lookup-tables/caches/NullCacheSummary';
 
 const iterable = Object.keys([...new Array(10)]);
 
@@ -35,7 +37,16 @@ export const LOOKUP_TABLES: Array<LookupTable> = iterable.map((item: string) => 
 
 export const CACHES: Array<LookupTableCache> = iterable.map((item: string) => ({
   config: {
-    type: 'none',
+    type: 'illuminate_cache',
+    max_size: 1000,
+    expire_after_access: 60,
+    expire_after_access_unit: 'MINUTES',
+    expire_after_write: 4,
+    expire_after_write_unit: 'HOURS',
+    ignore_null: null,
+    ttl_empty: null,
+    ttl_empty_unit: null,
+    adapter_id: '683e110b94c61994d4150c32',
   },
   id: `${item}-cache-id`,
   _scope: 'DEFAULT',
@@ -56,7 +67,16 @@ export const DATA_ADAPTERS: Array<LookupTableAdapter> = iterable.map((item: stri
   custom_error_ttl_unit: null,
   content_pack: null,
   config: {
-    type: 'torexitnode',
+    type: 'illuminate_csv',
+    path: 'core/data/http_response.csv',
+    override_type: 'mongo',
+    separator: ',',
+    quotechar: '"',
+    key_column: 'http_response_code',
+    value_column: 'http_response',
+    check_interval: 3600,
+    case_insensitive_lookup: false,
+    cidr_lookup: false,
   },
 }));
 
@@ -118,4 +138,20 @@ export const TEST_KEY_RESULT = {
   string_list_value: null,
   has_error: false,
   ttl: 9,
+};
+
+export const CACHE_PLUGIN = {
+  type: 'illuminate_cache',
+  displayName: 'Do not cache values',
+  formComponent: null,
+  summaryComponent: NullCacheSummary,
+  documentationComponent: null,
+};
+
+export const DATA_ADAPTER_PLUGIN = {
+  type: 'illuminate_csv',
+  displayName: 'Illuminate Customizable',
+  formComponent: null,
+  summaryComponent: CSVFileAdapterSummary,
+  documentationComponent: null,
 };

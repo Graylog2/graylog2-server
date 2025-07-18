@@ -23,7 +23,7 @@ import LUTdrawer from './LUTDrawer';
 export type ModalTypes = 'LUT' | 'CACHE' | 'DATA-ADAPTER';
 
 function LUTModals() {
-  const { modal, setModal, entity, setEntity, title, setTitle } = useModalContext();
+  const { modal, setModal, entity, setEntity, title, setTitle, double } = useModalContext();
 
   const onClose = () => {
     setModal(null);
@@ -33,20 +33,10 @@ function LUTModals() {
 
   switch (modal) {
     case 'LUT':
-      return (
-        <LUTdrawer title={title} onClose={onClose}>
-          {entity}
-        </LUTdrawer>
-      );
     case 'CACHE':
-      return (
-        <LUTdrawer title={title} onClose={onClose}>
-          {entity}
-        </LUTdrawer>
-      );
     case 'DATA-ADAPTER':
       return (
-        <LUTdrawer title={title} onClose={onClose}>
+        <LUTdrawer title={title} onClose={onClose} double={double}>
           {entity}
         </LUTdrawer>
       );

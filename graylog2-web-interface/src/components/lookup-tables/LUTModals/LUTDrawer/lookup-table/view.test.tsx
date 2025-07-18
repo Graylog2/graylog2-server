@@ -18,7 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { GenericEntityType, LookupTable } from 'logic/lookup-tables/types';
+import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
+import type { GenericEntityType, LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import {
   LOOKUP_TABLES,
   CACHES,
@@ -27,6 +28,8 @@ import {
   UNSUPPORTED_PREVIEW,
   SUPPORTED_PREVIEW,
   TEST_KEY_RESULT,
+  CACHE_PLUGIN as MOCK_CACHE_PLUGIN,
+  DATA_ADAPTER_PLUGIN as MOCK_DATA_ADAPTER_PLUGIN,
 } from 'components/lookup-tables/fixtures';
 
 import LookupTableDetails from './index';
@@ -48,6 +51,16 @@ jest.mock('hooks/useScopePermissions', () => ({
         return scopes[entityScope].is_mutable;
       },
     };
+  }),
+}));
+
+jest.mock('hooks/usePluginEntities', () => ({
+  __esModule: true,
+  default: jest.fn((pluginType: string) => {
+    if (pluginType === 'lookupTableCaches') return [MOCK_CACHE_PLUGIN];
+    if (pluginType === 'lookupTableAdapters') return [MOCK_DATA_ADAPTER_PLUGIN];
+
+    return [];
   }),
 }));
 
@@ -80,6 +93,14 @@ jest.mock('components/lookup-tables/contexts/ErrorsContext', () => ({
   useErrorsContext: () => mockUseErrorsContext(),
 }));
 
+function renderView(table: LookupTable, cache: LookupTableCache, dataAdapter: LookupTableAdapter) {
+  return render(
+    <ModalProvider>
+      <LookupTableDetails table={table} cache={cache} dataAdapter={dataAdapter} />
+    </ModalProvider>,
+  );
+}
+
 describe('Lookup Table Details', () => {
   it('should render lookup table details', async () => {
     const table: LookupTable = {
@@ -92,7 +113,7 @@ describe('Lookup Table Details', () => {
     const cache = CACHES[0];
     const dataAdapter = DATA_ADAPTERS[0];
 
-    render(<LookupTableDetails table={table} cache={cache} dataAdapter={dataAdapter} />);
+    renderView(table, cache, dataAdapter);
 
     await screen.findByText(table.description);
     screen.getByText(cache.title);
@@ -104,7 +125,7 @@ describe('Lookup Table Details', () => {
   });
 
   it('should purge all keys', async () => {
-    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
     userEvent.click(await screen.findByRole('button', { name: /Purge all/i }));
 
@@ -113,7 +134,7 @@ describe('Lookup Table Details', () => {
 
   it('shuld purge a key', async () => {
     const testKeyValue = 'test_key';
-    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
     userEvent.type(await screen.findByRole('textbox', { name: /key/i }), testKeyValue);
     userEvent.click(await screen.findByRole('button', { name: /Purge key/i }));
@@ -122,21 +143,21 @@ describe('Lookup Table Details', () => {
   });
 
   it("should show a message when preview isn't supported", async () => {
-    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
     await screen.findByText(/This lookup table doesn't support keys preview/i);
   });
 
   it('should show the validation error message', async () => {
     mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
-    render(<LookupTableDetails table={LOOKUP_TABLES[1]} cache={CACHES[1]} dataAdapter={DATA_ADAPTERS[1]} />);
+    renderView(LOOKUP_TABLES[1], CACHES[1], DATA_ADAPTERS[1]);
 
     await screen.findByText(/Lookup table test error/i);
   });
 
   it('should preview the lookup table', async () => {
     mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
-    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
     await screen.findByText(/"100": "Continue"/i);
     screen.getByText(/"101": "Switching Protocols"/i);
@@ -146,7 +167,7 @@ describe('Lookup Table Details', () => {
   it('should test one table key', async () => {
     mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
     mockTestLookupTableKey.mockImplementation(() => Promise.resolve(TEST_KEY_RESULT));
-    render(<LookupTableDetails table={LOOKUP_TABLES[0]} cache={CACHES[0]} dataAdapter={DATA_ADAPTERS[0]} />);
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
     const testKeyInputs = await screen.findAllByRole('textbox', { name: /key/i });
 
@@ -157,5 +178,23 @@ describe('Lookup Table Details', () => {
     screen.getByText(/"string_list_value": null/i);
     screen.getByText(/"has_error": false/i);
     screen.getByText(/"ttl": 9/i);
+  });
+
+  it('should show cache details side by side', async () => {
+    mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
+
+    userEvent.click(await screen.findByRole('link', { name: /cache details/i }));
+
+    await screen.findByText(CACHES[0].description);
+  });
+
+  it('should show data adapter details side by side', async () => {
+    mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
+    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
+
+    userEvent.click(await screen.findByRole('link', { name: /adapter details/i }));
+
+    await screen.findByText(DATA_ADAPTERS[0].description);
   });
 });

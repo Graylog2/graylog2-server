@@ -19,9 +19,12 @@ import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import { Link } from 'components/common/router';
+import { Icon } from 'components/common';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import useScopePermissions from 'hooks/useScopePermissions';
+import Cache from 'components/lookup-tables/Cache';
+import DataAdapter from 'components/lookup-tables/DataAdapter';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 
 import PurgeCache from './purge-cache';
@@ -34,6 +37,18 @@ export const Description = styled.span`
   overflow-wrap: break-word;
 `;
 
+const LinkSpan = styled.span`
+  color: ${({ theme }) => theme.colors.link.default};
+  cursor: pointer;
+  max-width: 390px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.link.hover};
+  }
+`;
+
 type Props = {
   table: LookupTable;
   cache: LookupTableCache;
@@ -42,66 +57,101 @@ type Props = {
 
 function LookupTableDetails({ table, cache, dataAdapter }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
+  const { double, setDouble } = useModalContext();
+  const [showAttached, setShowAttached] = React.useState<string>();
+
+  const handleShowAttached = (type: string) => () => {
+    setDouble(showAttached === type ? !double : true);
+    setShowAttached(showAttached === type ? undefined : type);
+  };
+
+  React.useEffect(() => () => setDouble(false), [setDouble]);
 
   return (
-    <Col $gap="lg">
-      <Col $gap="xs">
-        <Row $align="flex-end" $justify="space-between">
-          <h2>Description</h2>
-          {!loadingScopePermissions && scopePermissions?.is_mutable && (
-            <Button bsStyle="primary" bsSize="sm" href={Routes.SYSTEM.LOOKUPTABLES.edit(table.name)} name="edit_square">
-              Edit
-            </Button>
-          )}
-        </Row>
-        <Description>{table.description}</Description>
+    <Row $align="stretch" $gap="lg">
+      <Col $gap="lg" $width={double ? '50%' : '100%'} style={{ flexShrink: 0 }}>
+        <Col $gap="xs">
+          <Row $align="flex-end" $justify="space-between">
+            <h2>Description</h2>
+            {!loadingScopePermissions && scopePermissions?.is_mutable && (
+              <Button
+                bsStyle="primary"
+                bsSize="sm"
+                href={Routes.SYSTEM.LOOKUPTABLES.edit(table.name)}
+                name="edit_square">
+                Edit
+              </Button>
+            )}
+          </Row>
+          <Description>{table.description}</Description>
+        </Col>
+        {(table.default_single_value || table.default_multi_value) && (
+          <DataWell style={{ overflow: 'auto' }}>
+            <Col $gap="xs">
+              {table.default_single_value && (
+                <Row>
+                  <span style={{ width: 208 }}>Default single value</span>
+                  <Row $gap="md">
+                    <code>{table.default_single_value}</code>
+                    <span>
+                      <Description>({table.default_single_value_type.toLowerCase()})</Description>
+                    </span>
+                  </Row>
+                </Row>
+              )}
+              {table.default_multi_value && (
+                <Row>
+                  <span style={{ width: 208 }}>Default multi value</span>
+                  <Row $gap="md">
+                    <code>{table.default_multi_value}</code>
+                    <span>
+                      <Description>({table.default_multi_value_type.toLowerCase()})</Description>
+                    </span>
+                  </Row>
+                </Row>
+              )}
+            </Col>
+          </DataWell>
+        )}
+        <Col $gap="xs">
+          <h2>Attached</h2>
+          <DataWell style={{ overflow: 'auto' }}>
+            <Col $gap="xs">
+              <Row>
+                <span style={{ width: 100, flexShrink: 0 }}>Cache</span>
+                <Row $justify="space-between" $align="center">
+                  <LinkSpan role="link" aria-label="cache details" onClick={handleShowAttached('cache-details')}>
+                    {cache.title}
+                  </LinkSpan>
+                  <Description>
+                    <Icon name="chevron_right" rotation={showAttached === 'cache-details' ? 180 : 0} size="sm" />
+                  </Description>
+                </Row>
+              </Row>
+              <Row>
+                <span style={{ width: 100, flexShrink: 0 }}>Data Adapter</span>
+                <Row $justify="space-between" $align="center">
+                  <LinkSpan role="link" aria-label="adapter details" onClick={handleShowAttached('adapter-details')}>
+                    {dataAdapter.title}
+                  </LinkSpan>
+                  <Description>
+                    <Icon name="chevron_right" rotation={showAttached === 'adapter-details' ? 180 : 0} size="sm" />
+                  </Description>
+                </Row>
+              </Row>
+            </Col>
+          </DataWell>
+        </Col>
+        <PurgeCache table={table} />
+        <TestLookup table={table} />
       </Col>
-      {(table.default_single_value || table.default_multi_value) && (
-        <DataWell>
-          <Col $gap="xs">
-            {table.default_single_value && (
-              <Row>
-                <span style={{ width: 208 }}>Default single value</span>
-                <Row $gap="md">
-                  <code>{table.default_single_value}</code>
-                  <span>
-                    <Description>({table.default_single_value_type.toLowerCase()})</Description>
-                  </span>
-                </Row>
-              </Row>
-            )}
-            {table.default_multi_value && (
-              <Row>
-                <span style={{ width: 208 }}>Default multi value</span>
-                <Row $gap="md">
-                  <code>{table.default_multi_value}</code>
-                  <span>
-                    <Description>({table.default_multi_value_type.toLowerCase()})</Description>
-                  </span>
-                </Row>
-              </Row>
-            )}
-          </Col>
-        </DataWell>
+      {double && (
+        <Col $gap="lg" $width="50%">
+          {showAttached === 'cache-details' && <Cache cache={cache} />}
+          {showAttached === 'adapter-details' && <DataAdapter dataAdapter={dataAdapter} />}
+        </Col>
       )}
-      <Col $gap="xs">
-        <h2>Attached</h2>
-        <DataWell>
-          <Col $gap="xs">
-            <Row>
-              <span style={{ width: 100 }}>Cache</span>
-              <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
-            </Row>
-            <Row>
-              <span style={{ width: 100 }}>Data Adapter</span>
-              <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
-            </Row>
-          </Col>
-        </DataWell>
-      </Col>
-      <PurgeCache table={table} />
-      <TestLookup table={table} />
-    </Col>
+    </Row>
   );
 }
 
