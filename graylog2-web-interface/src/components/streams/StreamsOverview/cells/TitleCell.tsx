@@ -34,7 +34,7 @@ const DefaultLabel = styled(Label)`
 
 const StyledText = styled(Text)(
   ({ theme }) => css`
-    color: ${theme.colors.gray[50]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
