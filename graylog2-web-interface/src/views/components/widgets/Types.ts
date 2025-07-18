@@ -45,23 +45,32 @@ type WidgetDropdownActionType = {
 type WidgetDropdownComponentType = {
   title: (w: Widget) => React.ReactNode;
   action?: never;
-  component: React.ComponentType<WidgetMenuActionComponentProps>;
+  component: React.ComponentType<WidgetDropdownActionComponentProps>;
 };
 
-type WidgetDropdownType = { position: 'dropdown' } & (WidgetDropdownActionType | WidgetDropdownComponentType);
+export type WidgetDropdownType = WidgetBaseActionType & { position: 'dropdown' } & (
+    | WidgetDropdownActionType
+    | WidgetDropdownComponentType
+  );
 
 export type WidgetMenuActionComponentProps = {
   disabled?: boolean;
   widget: Widget;
   contexts?: Contexts;
+};
+
+type WidgetDropdownActionComponentProps = WidgetMenuActionComponentProps & {
   onClose: () => void;
 };
 
-export type WidgetMenuActionType = {
+export type WidgetMenuActionType = WidgetBaseActionType & {
   component: React.ComponentType<WidgetMenuActionComponentProps>;
   position: 'menu';
   title?: never;
   action?: never;
 };
 
-export type WidgetActionType = (WidgetDropdownType | WidgetMenuActionType) & WidgetBaseActionType;
+export type WidgetActionType = WidgetDropdownType | WidgetMenuActionType;
+
+export const isWidgetMenuAction = (action: WidgetActionType): action is WidgetMenuActionType =>
+  action.position === 'menu';
