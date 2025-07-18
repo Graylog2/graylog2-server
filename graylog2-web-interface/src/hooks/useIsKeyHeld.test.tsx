@@ -25,15 +25,11 @@ describe('useIsKeyHeld custom hook', () => {
     const { container } = render(<input />);
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
 
-    act(() => {
-      fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
-    });
+    fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
 
     expect(result.current).toEqual(true);
 
-    act(() => {
-      fireEvent.keyUp(container, { key: 'Enter', code: 13, charCode: 13 });
-    });
+    fireEvent.keyUp(container, { key: 'Enter', code: 13, charCode: 13 });
 
     expect(result.current).toEqual(false);
   });
@@ -42,15 +38,11 @@ describe('useIsKeyHeld custom hook', () => {
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
     const { container } = render(<input />);
 
-    act(() => {
-      fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
-    });
+    fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
 
     expect(result.current).toEqual(true);
 
-    act(() => {
-      fireEvent.keyDown(container, { key: 'Shift', code: 16, charCode: 16 });
-    });
+    fireEvent.keyDown(container, { key: 'Shift', code: 16, charCode: 16 });
 
     expect(result.current).toEqual(true);
   });
