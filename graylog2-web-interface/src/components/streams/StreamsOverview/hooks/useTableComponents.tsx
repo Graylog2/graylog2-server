@@ -35,7 +35,6 @@ const useTableElements = ({ indexSets, pluggableExpandedSections }: {
 
   const renderExpandedRules = useCallback((stream: Stream) => <ExpandedRulesSection stream={stream} />, []);
   const renderExpandedRulesActions = useCallback((stream: Stream) => <ExpandedRulesActions stream={stream} />, []);
-  
   const expandedSections = useMemo(
     () => ({
       rules: {

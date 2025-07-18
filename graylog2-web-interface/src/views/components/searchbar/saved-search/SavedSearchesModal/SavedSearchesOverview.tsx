@@ -58,7 +58,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
     refetch,
   } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
 
-  const { pluggableAttributes } = usePluggableEntityTableElements<View>(null, 'search');
+  const { pluggableAttributes, pluggableExpandedSections } = usePluggableEntityTableElements<View>(null, 'search');
 
   const renderSavedSearchActions = useCallback(
     (search: View) => (
@@ -119,6 +119,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
           pageSize={searchParams.pageSize}
           onPageSizeChange={onPageSizeChange}
           actionsCellWidth={120}
+          expandedSectionsRenderer={pluggableExpandedSections}
           entityActions={renderSavedSearchActions}
           columnRenderers={customColumnRenderers}
           columnDefinitions={columnDefinitions}
