@@ -45,7 +45,7 @@ const Title = ({ title, typeName, create }: TitleProps) => {
 type Props = {
   type: string;
   title: string;
-  saved: (...args: any[]) => void;
+  saved: (response: LookupTableAdapter) => void;
   onCancel: () => void;
   create?: boolean;
   dataAdapter?: LookupTableAdapter;
@@ -153,7 +153,7 @@ const DataAdapterForm = ({
   const handleSubmit = (values: LookupTableAdapter) => {
     const promise = create ? createAdapter(values) : updateAdapter(values);
 
-    return promise.then(() => {
+    return promise.then((response) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
         app_pathname: 'lut',
         app_section: 'lut_data_adapter',
@@ -162,11 +162,11 @@ const DataAdapterForm = ({
         },
       });
 
-      saved();
+      saved(response);
     });
   };
 
-  const isLDAP = dataAdapter.config.type === 'LDAP' && dataAdapter.config?.user_passwd;
+  const isLDAP = dataAdapter.config.type === 'LDAP' && dataAdapter.config?.user_passwd?.is_set;
   const configWithOptionalPassword = {
     ...dataAdapter.config,
     ...(isLDAP ? { user_passwd: { is_set: true, keep_value: true } } : {}),

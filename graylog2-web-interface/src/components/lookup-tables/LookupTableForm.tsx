@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-import { Col, Row, Input } from 'components/bootstrap';
+import { Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput, FormSubmit } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 import useScopePermissions from 'hooks/useScopePermissions';
@@ -52,11 +53,37 @@ const INIT_TABLE_VALUES: LookupTableType = {
 
 type Props = {
   saved: () => void;
+  onCacheCreateClick: () => void;
+  onDataAdapterCreateClick: () => void;
   create?: boolean;
   table?: LookupTableType;
+  dataAdapter?: string;
+  cache?: string;
 };
 
-const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Props) => {
+const StyledJSONValueInput = styled(JSONValueInput)`
+  margin: 0;
+  padding: 0 10px;
+`;
+
+const StyledDefaultValueSection = styled.div(
+  ({ theme }) => css`
+    border: 1px solid ${theme.colors.border};
+    border-radius: 10px;
+    margin-bottom: ${theme.spacings.xxs};
+    padding: 10px;
+    margin-top: ${theme.spacings.md};
+  `,
+);
+
+const StyledFormSubmitWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+`;
+
+const LookupTableForm = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, create = true, table = INIT_TABLE_VALUES, dataAdapter = '', cache = '' }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
@@ -135,10 +162,11 @@ const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Pr
             <FormikFormGroup
               type="text"
               name="title"
-              label="Title"
+              label="Title *"
               help={touched.title && errors.title ? undefined : 'A short title for this lookup table.'}
-              labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
+              labelClassName="d-block mb-1"
+              wrapperClassName="d-block"
+              formGroupClassName="mb-3"
             />
 
             <FormikFormGroup
@@ -146,137 +174,141 @@ const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Pr
               name="description"
               label="Description"
               help="Description of the lookup table."
-              labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
+              labelClassName="d-block mb-1"
+              wrapperClassName="d-block"
+              formGroupClassName="mb-3"
             />
 
             <FormikFormGroup
               type="text"
               name="name"
-              label="Name"
+              label="Name *"
               help={
                 touched.name && errors.name
                   ? undefined
                   : 'The name that is being used to refer to this lookup table. Must be unique.'
               }
-              labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
+              labelClassName="d-block mb-1"
+              wrapperClassName="d-block"
+              formGroupClassName="mb-3"
             />
 
-            <Input
-              id="enable_single_value"
-              name="enable_single_value"
-              type="checkbox"
-              label="Enable single default value"
-              help="Enable if the lookup table should provide a default for the single value."
-              wrapperClassName="col-md-offset-3 col-md-9"
-              checked={values.enable_single_value}
-              onChange={() => {
-                setFieldValue('enable_single_value', !values.enable_single_value);
+            <StyledDefaultValueSection>
+              <Input
+                id="enable_single_value"
+                name="enable_single_value"
+                type="checkbox"
+                label="Enable single default value"
+                help="Enable if the lookup table should provide a default for the single value."
+                labelClassName="d-block mb-1"
+                wrapperClassName="d-block"
+                formGroupClassName="mb-3"
+                checked={values.enable_single_value}
+                onChange={() => {
+                  setFieldValue('enable_single_value', !values.enable_single_value);
 
-                if (values.enable_single_value) {
-                  setFieldValue('default_single_value', '');
-                  setFieldValue('default_single_value_type', 'NULL');
-                }
-              }}
-            />
-            {values.enable_single_value && (
-              <JSONValueInput
-                label="Default single value"
-                help={
-                  (touched.default_single_value && errors.default_single_value) ||
-                  'The single value that is being used as lookup result if the data adapter or cache does not find a value.'
-                }
-                validationState={touched.default_single_value && errors.default_single_value ? 'error' : undefined}
-                onBlur={() => setFieldTouched('default_single_value', true)}
-                update={(value, valueType) => {
-                  setValues({
-                    ...values,
-                    default_single_value: value,
-                    default_single_value_type: valueType,
-                  });
+                  if (values.enable_single_value) {
+                    setFieldValue('default_single_value', '');
+                    setFieldValue('default_single_value_type', 'NULL');
+                  }
                 }}
-                value={values.default_single_value}
-                valueType={values.default_single_value_type || 'NULL'}
-                allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
-                labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
               />
-            )}
+              {values.enable_single_value && (
+                <StyledJSONValueInput
+                  label="Default single value *"
+                  help={
+                    (touched.default_single_value && errors.default_single_value) ||
+                    'The single value that is being used as lookup result if the data adapter or cache does not find a value.'
+                  }
+                  validationState={touched.default_single_value && errors.default_single_value ? 'error' : undefined}
+                  onBlur={() => setFieldTouched('default_single_value', true)}
+                  update={(value, valueType) => {
+                    setValues({
+                      ...values,
+                      default_single_value: value,
+                      default_single_value_type: valueType,
+                    });
+                  }}
+                  value={values.default_single_value}
+                  valueType={values.default_single_value_type || 'NULL'}
+                  allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
+                />
+              )}
+            </StyledDefaultValueSection>
 
-            <Input
-              id="enable_multi_value"
-              name="enable_multi_value"
-              type="checkbox"
-              label="Enable multi default value"
-              help="Enable if the lookup table should provide a default for the multi value."
-              wrapperClassName="col-md-offset-3 col-md-9"
-              checked={values.enable_multi_value}
-              onChange={() => {
-                setFieldValue('enable_multi_value', !values.enable_multi_value);
+            <StyledDefaultValueSection>
+              <Input
+                id="enable_multi_value"
+                name="enable_multi_value"
+                type="checkbox"
+                label="Enable multi default value"
+                help="Enable if the lookup table should provide a default for the multi value."
+                labelClassName="d-block mb-1"
+                wrapperClassName="d-block"
+                formGroupClassName="mb-3"
+                checked={values.enable_multi_value}
+                onChange={() => {
+                  setFieldValue('enable_multi_value', !values.enable_multi_value);
 
-                if (values.enable_multi_value) {
-                  setFieldValue('default_multi_value', '');
-                  setFieldValue('default_multi_value_type', 'NULL');
-                }
-              }}
-            />
-            {values.enable_multi_value && (
-              <JSONValueInput
-                label="Default multi value"
-                help={
-                  (touched.default_multi_value && errors.default_multi_value) ||
-                  'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'
-                }
-                validationState={touched.default_multi_value && errors.default_multi_value ? 'error' : undefined}
-                onBlur={() => setFieldTouched('default_multi_value', true)}
-                update={(value, valueType) => {
-                  setValues({
-                    ...values,
-                    default_multi_value: value,
-                    default_multi_value_type: valueType,
-                  });
+                  if (values.enable_multi_value) {
+                    setFieldValue('default_multi_value', '');
+                    setFieldValue('default_multi_value_type', 'NULL');
+                  }
                 }}
-                value={values.default_multi_value}
-                valueType={values.default_multi_value_type || 'NULL'}
-                allowedTypes={['OBJECT', 'NULL']}
-                labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
               />
-            )}
+              {values.enable_multi_value && (
+                <StyledJSONValueInput
+                  label="Default multi value *"
+                  help={
+                    (touched.default_multi_value && errors.default_multi_value) ||
+                    'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'
+                  }
+                  validationState={touched.default_multi_value && errors.default_multi_value ? 'error' : undefined}
+                  onBlur={() => setFieldTouched('default_multi_value', true)}
+                  update={(value, valueType) => {
+                    setValues({
+                      ...values,
+                      default_multi_value: value,
+                      default_multi_value_type: valueType,
+                    });
+                  }}
+                  value={values.default_multi_value}
+                  valueType={values.default_multi_value_type || 'NULL'}
+                  allowedTypes={['OBJECT', 'NULL']}
+                />
+              )}
+            </StyledDefaultValueSection>
           </fieldset>
 
           <DataAdaptersContainer>
-            <DataAdapterPicker />
+            <DataAdapterPicker onCreateClick={onDataAdapterCreateClick} dataAdapter={dataAdapter} />
           </DataAdaptersContainer>
 
           <CachesContainer>
-            <CachePicker />
+            <CachePicker onCreateClick={onCacheCreateClick} cache={cache} />
           </CachesContainer>
 
           <fieldset>
-            <Row>
-              <Col mdOffset={3} md={9}>
-                {create && (
-                  <FormSubmit
-                    submitButtonText="Create lookup table"
-                    submitLoadingText="Creating lookup table..."
-                    isSubmitting={isSubmitting}
-                    isAsyncSubmit
-                    onCancel={onCancel}
-                  />
-                )}
-                {updatable && (
-                  <FormSubmit
-                    submitButtonText="Update lookup table"
-                    submitLoadingText="Updating lookup table..."
-                    isSubmitting={isSubmitting}
-                    isAsyncSubmit
-                    onCancel={onCancel}
-                  />
-                )}
-              </Col>
-            </Row>
+            <StyledFormSubmitWrapper>
+              {create && (
+                <FormSubmit
+                  submitButtonText="Create lookup table"
+                  submitLoadingText="Creating lookup table..."
+                  isSubmitting={isSubmitting}
+                  isAsyncSubmit
+                  onCancel={onCancel}
+                />
+              )}
+              {updatable && (
+                <FormSubmit
+                  submitButtonText="Update lookup table"
+                  submitLoadingText="Updating lookup table..."
+                  isSubmitting={isSubmitting}
+                  isAsyncSubmit
+                  onCancel={onCancel}
+                />
+              )}
+            </StyledFormSubmitWrapper>
           </fieldset>
         </Form>
       )}

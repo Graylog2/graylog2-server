@@ -23,11 +23,14 @@ import CacheCreateModal from './CacheCreateModal';
 import DataAdapterCreateModal from './DataAdapterCreateModal';
 import CacheEditModal from './CacheEditModal';
 import DataAdapterEditModal from './DataAdapterEditModal';
+import LUTCreateModal from './LUTCreateModal';
 
 export type ModalTypes =
   | 'LUT'
   | 'CACHE'
   | 'DATA-ADAPTER'
+  | 'LUT-CREATE'
+  | 'LUT-EDIT'
   | 'CACHE-CREATE'
   | 'DATA-ADAPTER-CREATE'
   | 'CACHE-EDIT'
@@ -49,6 +52,8 @@ function LUTModals() {
       return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>;
     case 'DATA-ADAPTER':
       return <LUTdrawer title={title} onClose={onClose}>{entity}</LUTdrawer>;
+    case 'LUT-CREATE':
+      return <LUTCreateModal onClose={onClose} />;
     case 'CACHE-CREATE':
       return <CacheCreateModal onClose={onClose} />;
     case 'DATA-ADAPTER-CREATE':

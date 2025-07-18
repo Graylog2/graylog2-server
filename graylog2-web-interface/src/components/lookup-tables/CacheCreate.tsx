@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
@@ -24,6 +23,7 @@ import { Select } from 'components/common';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { useFetchCacheTypes, useValidateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import CacheForm from 'components/lookup-tables/CacheForm';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 import type { CachePluginType } from './types';
 
@@ -39,7 +39,7 @@ type TypesType = { type?: string; lable?: string };
 type cacheTypeOptionsType = { value: string; label: string };
 
 type Props = {
-  saved: () => void;
+  saved: (cacheObj: LookupTableCache) => void;
   onCancel: () => void;
   validationErrors?: any;
 };
@@ -103,7 +103,7 @@ const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
   return (
     <>
       <StyledRow>
-        <Col lg={9}>
+        <Col lg={6}>
           <Input
             id="cache-type-select"
             label="Cache Type"

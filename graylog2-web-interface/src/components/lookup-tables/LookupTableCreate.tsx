@@ -15,22 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { LookupTableForm } from 'components/lookup-tables';
 
 type Props = {
   saved: (...args: any[]) => void;
+  onCacheCreateClick: () => void;
+  onDataAdapterCreateClick: () => void;
+  dataAdapter?: string;
+  cache?: string;
 };
 
-const LookupTableCreate = ({ saved }: Props) => (
-  <div>
-    <Row className="content">
-      <Col lg={8}>
-        <LookupTableForm saved={saved} create />
+const StyledRow = styled(Row)`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
+
+const LookupTableCreate = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '' }: Props) => (
+  <>
+    <StyledRow>
+      <Col lg={6}>
+        <LookupTableForm saved={saved} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create dataAdapter={dataAdapter} cache={cache} />
       </Col>
-    </Row>
-  </div>
+    </StyledRow>
+  </>
 );
 
 export default LookupTableCreate;

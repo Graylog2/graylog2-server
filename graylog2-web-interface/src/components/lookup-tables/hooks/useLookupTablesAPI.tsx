@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -85,6 +85,8 @@ export function useValidateCache() {
 }
 
 export function useCreateCache() {
+  const queryClient = useQueryClient();
+
   const {
     mutateAsync,
     isPending: isLoading,
@@ -92,6 +94,10 @@ export function useCreateCache() {
     mutationFn: createCache,
     onSuccess: () => {
       UserNotification.success('Cache created successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['caches'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -138,7 +144,7 @@ export function useDeleteCache() {
   };
 }
 
-export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['adapters', 'search', searchParams];
 export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
 }
@@ -153,6 +159,8 @@ export function useFetchDataAdapterTypes() {
 }
 
 export function useCreateAdapter() {
+  const queryClient = useQueryClient();
+
   const {
     mutateAsync,
     isPending: isLoading,
@@ -160,6 +168,10 @@ export function useCreateAdapter() {
     mutationFn: createDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter created successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['adapters'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
