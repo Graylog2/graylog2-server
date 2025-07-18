@@ -42,7 +42,9 @@ const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
           {!authServiceEnabled ? ' (authentication service is disabled)' : ''}
         </>
       }>
-      <StatusIcon active={accountStatus === 'enabled'} />
+      <div>
+        <StatusIcon active={accountStatus === 'enabled'} />
+      </div>
     </Tooltip>
   </Td>
 );
