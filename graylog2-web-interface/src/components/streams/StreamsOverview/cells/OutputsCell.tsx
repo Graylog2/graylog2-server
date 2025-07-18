@@ -35,7 +35,7 @@ const OutputsCell = ({ stream }: Props) => {
   const outputCount = stream.outputs?.length || 0;
 
   return (
-    <StreamCountBadge $disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
+    <StreamCountBadge disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
       {outputCount}
     </StreamCountBadge>
   );

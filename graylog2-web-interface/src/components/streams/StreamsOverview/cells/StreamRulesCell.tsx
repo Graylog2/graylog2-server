@@ -40,7 +40,7 @@ const StreamRulesCell = ({ stream }: Props) => {
 
   return (
     <StreamCountBadge
-      $disabled={stream.rules.length === 0}
+      disabled={stream.rules.length === 0}
       onClick={toggleRulesSection}
       ref={buttonRef}
       title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
