@@ -14,18 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 
 type Props = {
-  builtIn: boolean;
+  active: boolean;
+  className?: string;
 };
 
-const BuiltInCell = ({ builtIn }: Props) => {
-  if (!builtIn) return null;
+const StatusIcon = ({ active, className = undefined }: Props) => (
+  <Icon
+    name={active ? 'check_circle' : 'cancel'}
+    bsStyle={active ? 'success' : undefined}
+    className={className}
+    title={active ? 'Yes' : 'No'}
+  />
+);
 
-  return <Icon name="check_circle" />;
-};
-
-export default BuiltInCell;
+export default StatusIcon;

@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Alert, Table } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { StatusIcon } from 'components/common';
 import { IndexerFailure } from 'components/indexers';
 
 type Props = {
@@ -28,7 +28,7 @@ const IndexerFailuresList = ({ failures }: Props) => {
   if (failures.length === 0) {
     return (
       <Alert bsStyle="success">
-        <Icon name="check_circle" /> Hurray! There are not any indexer failures.
+        <StatusIcon active /> Hurray! There are not any indexer failures.
       </Alert>
     );
   }

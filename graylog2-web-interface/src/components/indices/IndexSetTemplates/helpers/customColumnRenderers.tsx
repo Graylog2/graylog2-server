@@ -17,9 +17,9 @@
 import React from 'react';
 
 import TitleCell from 'components/indices/IndexSetTemplates/cells/TitleCell';
-import BuiltInCell from 'components/indices/IndexSetTemplates/cells/BuiltInCell';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { StatusIcon } from 'components/common';
 
 const customColumnRenderers: ColumnRenderers<IndexSetTemplate> = {
   attributes: {
@@ -29,7 +29,7 @@ const customColumnRenderers: ColumnRenderers<IndexSetTemplate> = {
       ),
     },
     built_in: {
-      renderCell: (built_in: boolean, _template) => <BuiltInCell builtIn={built_in} />,
+      renderCell: (built_in: boolean, _template) => <StatusIcon active={built_in} />,
     },
   },
 };

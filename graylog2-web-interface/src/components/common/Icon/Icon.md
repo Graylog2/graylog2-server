@@ -27,9 +27,9 @@ Examples:
 </p>
 
 <p>
-  <strong>Filled:</strong>{' '}
-  <Icon name="edit_square" flip="horizontal" />
-  <Icon name="edit_square" flip="vertical" />
-  <Icon name="edit_square" flip="both" />
+  <strong>Color variants:</strong>{' '}
+  <Icon name="house" />
+  <Icon name="house" bsStyle="success" />
+  <Icon name="house" bsStyle="warning" />
 </p>
 ```

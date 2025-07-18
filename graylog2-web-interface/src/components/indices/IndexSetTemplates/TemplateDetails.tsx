@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row } from 'components/bootstrap';
-import { Section, Icon } from 'components/common';
+import { Section, StatusIcon } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import {
   DataTieringSummary,
@@ -139,7 +139,7 @@ const TemplateDetails = ({ template, showDescription = false }: Props) => {
                   <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
                   <dt>Index Optimization after Rotation:</dt>
                   <dd>
-                    <Icon name={template.index_set_config.index_optimization_disabled ? 'cancel' : 'check_circle'} />
+                    <StatusIcon active={!template.index_set_config.index_optimization_disabled} />
                   </dd>
                   <dt>Field Type Refresh Interval:</dt>
                   <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>

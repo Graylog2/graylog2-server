@@ -18,8 +18,7 @@ import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
-import { Timestamp } from 'components/common';
-import IsExternalUserCell from 'components/users/UsersTokenManagement/cells/IsExternalUserCell';
+import { Timestamp, StatusIcon } from 'components/common';
 import UsernameCell from 'components/users/UsersTokenManagement/cells/UsernameCell';
 
 const customColumnRenderers = (): ColumnRenderers<Token> => ({
@@ -50,7 +49,7 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
       width: 0.2,
     },
     external_user: {
-      renderCell: (_external_user: boolean, token) => <IsExternalUserCell token={token} />,
+      renderCell: (_external_user: boolean, token) => <StatusIcon active={token.external_user} />,
       width: 0.2,
     },
     title: {
