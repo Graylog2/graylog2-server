@@ -15,30 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef } from 'react';
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamCountBadge from 'components/streams/StreamCountBadge';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-type Props = {
-  stream: Stream;
+import QueryValidation from './QueryValidation';
+
+const ViewsQueryValidation = () => {
+  const viewsValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
+
+  return <QueryValidation validationExplanations={viewsValidationExplanation} />;
 };
 
-const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
-
-  const outputCount = stream.outputs?.length || 0;
-
-  return (
-    <StreamCountBadge disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
-      {outputCount}
-    </StreamCountBadge>
-  );
-};
-
-export default OutputsCell;
+export default ViewsQueryValidation;
