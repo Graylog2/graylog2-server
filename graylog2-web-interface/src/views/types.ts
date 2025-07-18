@@ -217,6 +217,7 @@ export interface SystemConfiguration {
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
   useCondition?: () => boolean;
+  readPermission?: string; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
 }
 
 export type GenericResult = {
