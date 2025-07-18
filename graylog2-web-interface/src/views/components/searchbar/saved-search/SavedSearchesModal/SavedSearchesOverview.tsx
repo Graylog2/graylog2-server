@@ -24,11 +24,13 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
 import useSavedSearchPaginationAndTableLayout from 'views/components/searchbar/saved-search/useSavedSearchPaginationAndTableLayout';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 import SearchActions from './SearchActions';
 
 import BulkActions from '../BulkActions';
 import { DEFAULT_LAYOUT } from '../Constants';
+
 
 type Props = {
   activeSavedSearchId: string;
@@ -56,6 +58,8 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
     refetch,
   } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
 
+  const { pluggableAttributes, pluggableExpandedSections } = usePluggableEntityTableElements<View>(null, 'search');
+
   const renderSavedSearchActions = useCallback(
     (search: View) => (
       <SearchActions
@@ -75,6 +79,9 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
   }
 
   const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
+  const columnDefinitions = [...attributes, ...pluggableAttributes.attributes];
+  const visibleColumns = [...layoutConfig.displayedAttributes, ...pluggableAttributes.attributeNames];
+  const columnsOrder = [...DEFAULT_LAYOUT.columnsOrder, ...pluggableAttributes.attributeNames];
 
   return (
     <PaginatedList
@@ -102,8 +109,8 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       {!!savedSearches?.length && (
         <EntityDataTable<View>
           entities={savedSearches}
-          visibleColumns={layoutConfig.displayedAttributes}
-          columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+          visibleColumns={visibleColumns}
+          columnsOrder={columnsOrder}
           onColumnsChange={onColumnsChange}
           bulkSelection={{ actions: <BulkActions /> }}
           onSortChange={onSortChange}
@@ -112,9 +119,10 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
           pageSize={searchParams.pageSize}
           onPageSizeChange={onPageSizeChange}
           actionsCellWidth={120}
+          expandedSectionsRenderer={pluggableExpandedSections}
           entityActions={renderSavedSearchActions}
           columnRenderers={customColumnRenderers}
-          columnDefinitions={attributes}
+          columnDefinitions={columnDefinitions}
         />
       )}
     </PaginatedList>

@@ -28,9 +28,11 @@ import getStreamTableElements from 'components/streams/StreamsOverview/Constants
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
+
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -47,24 +49,26 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
 type Props = {
   indexSets: Array<IndexSet>;
 };
+const entityName = 'stream';
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
   const { isPipelineColumnPermitted } = usePipelineColumn();
   const currentUser = useCurrentUser();
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } = usePluggableEntityTableElements<Stream>(null, entityName);
 
-  const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
+  const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets, pluggableExpandedSections });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));
 
   const columnRenderers = useMemo(
-    () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions),
-    [indexSets, isPipelineColumnPermitted, currentUser.permissions],
+    () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
+    [indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers],
   );
   const { columnOrder, additionalAttributes, defaultLayout } = useMemo(
-    () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted),
-    [currentUser.permissions, isPipelineColumnPermitted],
+    () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes),
+    [currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes],
   );
-
+  
   return (
     <PaginatedEntityTable<Stream>
       humanName="streams"
