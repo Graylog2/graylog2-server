@@ -18,10 +18,16 @@ import * as React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import asMock from 'helpers/mocking/AsMock';
+import { currentPathname } from 'util/URLUtils';
 
 import useSendTelemetry from './useSendTelemetry';
 
 jest.mock('util/AppConfig');
+jest.mock('util/URLUtils', () => ({
+  ...jest.requireActual('util/URLUtils'),
+  currentPathname: jest.fn(),
+}));
 
 const contextValue = {
   sendTelemetry: jest.fn(),
@@ -31,21 +37,11 @@ const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren
   <TelemetryContext.Provider value={contextValue}>{children}</TelemetryContext.Provider>
 );
 
+const setLocation = (pathname: string) => {
+  asMock(currentPathname).mockReturnValue(pathname);
+};
+
 describe('useSendTelemetry', () => {
-  const setLocation = (pathname: string) =>
-    Object.defineProperty(window, 'location', {
-      value: {
-        pathname,
-      },
-      writable: true,
-    });
-
-  const oldLocation = window.location.pathname;
-
-  afterEach(() => {
-    window.location.pathname = oldLocation;
-  });
-
   it('should return `sendTelemetry` that retrieves current route', () => {
     setLocation('/welcome');
     const { result } = renderHook(() => useSendTelemetry(), { wrapper: DummyTelemetryContext });

@@ -156,6 +156,7 @@ describe('AdaptableQueryTabs', () => {
 
       await screen.findByRole(mainTabRole, {
         name: /Tab 4/i,
+        hidden: true,
       });
 
       await openMoreTabsDropdown();
@@ -188,15 +189,14 @@ describe('AdaptableQueryTabs', () => {
 
       const mainTabs = [1, 2, 3, 4];
 
-      await screen.findByRole(mainTabRole, {
-        name: /tab 4/i,
-      });
+      await screen.findByRole(mainTabRole, { name: /tab 4/i, hidden: true });
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
         expect(
           screen.getByRole(mainTabRole, {
             name: new RegExp(`tab ${tabNr}`, 'i'),
+            hidden: true,
           }),
         ).toBeInTheDocument();
       });
@@ -209,9 +209,7 @@ describe('AdaptableQueryTabs', () => {
       asMock(useCurrentQueryId).mockReturnValue('query-id-4');
       rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
-      const newActiveTab = await screen.findByRole(mainTabRole, {
-        name: /tab 4/i,
-      });
+      const newActiveTab = await screen.findByRole(mainTabRole, { name: /tab 4/i, hidden: true });
 
       // eslint-disable-next-line testing-library/no-node-access
       expect(newActiveTab.parentNode).toHaveClass('active');
