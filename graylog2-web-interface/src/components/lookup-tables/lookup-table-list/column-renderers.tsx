@@ -134,7 +134,7 @@ const columnRenderers: ColumnRenderers<LookupTableEntity> = {
         _c: any,
         meta: { caches: CachesMap; adapters: AdaptersMap },
       ) => (
-        <TitleCol lut={lut} caches={meta.caches} adapters={meta.adapters} title={title}>
+        <TitleCol lut={lut} caches={meta?.caches} adapters={meta?.adapters} title={title}>
           {title}
         </TitleCol>
       ),

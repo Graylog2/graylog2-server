@@ -122,6 +122,7 @@ class LUTCachesPage extends React.Component<
                 saved={() => _saved(history)}
                 validate={_validateCache}
                 validationErrors={validationErrors}
+                onCancel={() => {}}
               />
             </Col>
           </Row>
@@ -135,10 +136,8 @@ class LUTCachesPage extends React.Component<
       } else {
         content = (
           <CacheCreate
-            types={types}
             saved={() => _saved(history)}
-            validate={_validateCache}
-            validationErrors={validationErrors}
+            onCancel={() => {}}
           />
         );
       }

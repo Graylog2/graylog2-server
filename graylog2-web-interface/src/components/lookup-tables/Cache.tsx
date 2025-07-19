@@ -15,51 +15,55 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import Routes from 'routing/Routes';
 import { Row, Col, Button, Label } from 'components/bootstrap';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
+import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
 
 import type { CachePluginType } from './types';
-import { SummaryContainer, SummaryRow, Title, Value } from './caches/SummaryComponents.styled';
+import { SummaryRow, Title, Value } from './caches/SummaryComponents.styled';
 
 type Props = {
   cache: LookupTableCache;
 };
 
 const Cache = ({ cache }: Props) => {
-  const navigate = useNavigate();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const plugin = usePluginEntities('lookupTableCaches').find((p: CachePluginType) => p.type === cache.config?.type);
+  const { setModal, setTitle, setEntity } = useModalContext();
 
   if (!plugin) {
     return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
   }
 
-  const handleEdit = (cacheName: string) => () => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
+  const handleEdit = () => {
+    setModal('CACHE-EDIT');
+    setTitle(cache.name);
+    setEntity(cache);
   };
 
   return (
     <Row className="content">
       <Col md={12}>
-        <Label>{plugin.displayName}</Label>
-        <SummaryContainer>
-          <SummaryRow>
-            <Title>Description:</Title>
-            <Value>{cache.description || <em>No description.</em>}</Value>
-          </SummaryRow>
-        </SummaryContainer>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Label>{plugin.displayName}</Label>
+          {!loadingScopePermissions && scopePermissions?.is_mutable && (
+            <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
+              Edit
+            </Button>
+          )}
+        </div>
+
+        <SummaryRow>
+          <Title>Description:</Title>
+          <Value>{cache.description || <em>No description.</em>}</Value>
+        </SummaryRow>
+
         <h4>Configuration</h4>
         <div>{React.createElement(plugin.summaryComponent, { cache: cache })}</div>
-        {!loadingScopePermissions && scopePermissions?.is_mutable && (
-          <Button bsStyle="success" onClick={handleEdit(cache.name)} role="button" name="edit_square">
-            Edit
-          </Button>
-        )}
+
       </Col>
     </Row>
   );
