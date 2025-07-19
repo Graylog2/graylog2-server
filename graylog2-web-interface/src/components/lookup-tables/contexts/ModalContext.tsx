@@ -27,6 +27,12 @@ export function ModalProvider<ModalTypes, EntityType = unknown>({ children }: { 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }
 
+export const withLUTModalProvider = (Component: React.ElementType, props = {}) => (
+  <ModalProvider>
+    <Component {...props} />
+  </ModalProvider>
+);
+
 export function useModalContext() {
   const context = React.useContext(ModalContext);
 
