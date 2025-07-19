@@ -23,8 +23,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
 import { useDeleteCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-
-import type { CacheEntity } from './types';
+import type { CacheEntity } from 'components/lookup-tables/types';
 
 type ActionsProps = {
   cache: CacheEntity;

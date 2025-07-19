@@ -22,14 +22,14 @@ import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import ErrorsConsumer from 'components/lookup-tables/lookup-table-list/errors-consumer';
 import { useFetchDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
+import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 import LUTModals from 'components/lookup-tables/LUTModals';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
 import { adapterListElements } from './constants';
 import columnRenderers from './column-renderers';
 import useActions from './use-actions';
-import type { DataAdapterEntity } from './types';
 
 const queryHelpComponent = (
   <QueryHelper

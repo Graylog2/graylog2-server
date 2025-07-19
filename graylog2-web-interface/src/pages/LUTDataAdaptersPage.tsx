@@ -17,8 +17,9 @@
 import * as React from 'react';
 
 import { Button } from 'components/bootstrap';
-import { LUTLayout, DataAdaptersOverview } from 'components/lookup-tables';
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import { DataAdaptersOverview } from 'components/lookup-tables';
+import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTDataAdaptersPage() {
@@ -26,10 +27,10 @@ function LUTDataAdaptersPage() {
 
   const showCreateModal = () => {
     setModal('DATA-ADAPTER-CREATE');
-  }
+  };
 
   return (
-    <LUTLayout
+    <LUTPageLayout
       documentTitle="Lookup Tables - Data Adapters"
       pageTitle="Data Adapters for Lookup Tables"
       pageDescription="Data adapters provide the actual values for lookup tables."
@@ -40,7 +41,7 @@ function LUTDataAdaptersPage() {
       }>
       <DataAdaptersOverview />
       <LUTModals />
-    </LUTLayout>
+    </LUTPageLayout>
   );
 }
 

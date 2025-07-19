@@ -14,17 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const iterable = Object.keys([...new Array(10)]);
-
-// eslint-disable-next-line import/prefer-default-export
-export const CACHES = iterable.map((item: string) => ({
-  config: {
-    type: 'none',
-  },
-  id: `${item}-cache-id`,
-  _scope: 'DEFAULT',
-  title: `${item} cache title`,
-  description: `${item} cache description`,
-  name: `${item} cache name`,
-  content_pack: null,
-}));
+export { default as LUTPageLayout } from './lut-page-layout';
+export { default as DataWell } from './data-well';
+export { default as DataTable } from './data-table';
+export * from './flex-box';

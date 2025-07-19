@@ -20,11 +20,10 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
 
-import { LOOKUP_TABLES, CACHES, ADAPTERS, ERROR_STATE } from './fixtures';
-
-import { attributes } from '../constants';
-import LookupTableList from '../index';
+import { attributes } from './constants';
+import LookupTableList from './index';
 
 const mockFetchPaginatedLookupTables = jest.fn(async () =>
   Promise.resolve({
@@ -38,8 +37,8 @@ const mockFetchPaginatedLookupTables = jest.fn(async () =>
       query: null,
     },
     meta: {
-      caches: { ...CACHES },
-      adapters: { ...ADAPTERS },
+      caches: { ...CACHES_MAP },
+      adapters: { ...ADAPTERS_MAP },
     },
   }),
 );
@@ -68,7 +67,7 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => { }],
+  useQueryParam: () => [undefined, () => {}],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({

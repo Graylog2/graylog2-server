@@ -21,16 +21,16 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchLookupTables } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
+import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 import LUTModals from 'components/lookup-tables/LUTModals';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import type { LookupTableEntity } from 'components/lookup-tables/types';
 
 import { lutListElements } from './constants';
 import columnRenderers from './column-renderers';
 import ErrorsConsumer from './errors-consumer';
 import useActions from './use-actions';
-import type { LookupTableEntity } from './types';
 
 const queryHelpComponent = (
   <QueryHelper

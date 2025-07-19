@@ -14,6 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { EntityBase } from 'components/common/EntityDataTable/types';
+import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+
+export type LookupTableEntity = EntityBase & LookupTable;
+export type CacheEntity = EntityBase & LookupTableCache;
+export type DataAdapterEntity = EntityBase & LookupTableAdapter;
+
+export type CachesMap = { [key: string]: LookupTableCache };
+export type AdaptersMap = { [key: string]: LookupTableAdapter };
+
+export type LookupPreviewType = {
+  total: number;
+  results: Array<{ [key: string]: string }>;
+  supported: boolean;
+};
+
 export interface CachePluginType {
   type: string;
   displayName: string;
