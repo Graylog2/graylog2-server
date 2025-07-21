@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const Wrapper = styled.div<{ $active: boolean }>(
-  ({ theme, $active }) => css`
-    color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-  `,
-);
+import QueryValidation from './QueryValidation';
 
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check_circle' : 'cancel'} />
-  </Wrapper>
-);
+const ViewsQueryValidation = () => {
+  const viewsValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
 
-export default LoggedInIcon;
+  return <QueryValidation validationExplanations={viewsValidationExplanation} />;
+};
+
+export default ViewsQueryValidation;

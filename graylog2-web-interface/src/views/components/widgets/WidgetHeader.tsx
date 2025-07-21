@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon, OverlayTrigger } from 'components/common';
@@ -22,6 +23,7 @@ import EditableTitle, { Title } from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
 import IconButton from 'components/common/IconButton';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -192,20 +194,26 @@ const WidgetHeader = ({
   titleIcon = undefined,
   onRename = undefined,
   onUpdateDescription = undefined,
-}: Props) => (
-  <Container>
-    <Col>
-      {hideDragHandle || (
-        <DragHandleContainer className={widgetDragHandleClass} title={`Drag handle for ${title}`}>
-          <WidgetDragHandle name="drag_indicator" />
-        </DragHandleContainer>
-      )}
-      <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
-      <WidgetDescription editing={editing} description={description} onChange={onUpdateDescription} />
-      {loading && <LoadingSpinner text="" delay={0} />}
-    </Col>
-    {children}
-  </Container>
-);
+}: Props) => {
+  const interactive = useContext(InteractiveContext);
+
+  return (
+    <Container>
+      <Col>
+        {hideDragHandle || (
+          <DragHandleContainer className={widgetDragHandleClass} title={`Drag handle for ${title}`}>
+            <WidgetDragHandle name="drag_indicator" />
+          </DragHandleContainer>
+        )}
+        <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
+        {interactive && (
+          <WidgetDescription editing={editing} description={description} onChange={onUpdateDescription} />
+        )}
+        {loading && <LoadingSpinner text="" delay={0} />}
+      </Col>
+      {children}
+    </Container>
+  );
+};
 
 export default WidgetHeader;
