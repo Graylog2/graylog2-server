@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { PluginExports } from 'graylog-web-plugin/plugin';
+import type {PluginExports} from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
-import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMenuItems';
+import filterMenuItems, {filterCloudMenuItems} from 'util/conditional/filterMenuItems';
 import AppConfig from 'util/AppConfig';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
@@ -55,7 +55,11 @@ const navigationBindings: PluginExports = {
               description: 'Configurations',
               permissions: ['clusterconfigentry:read'],
             },
-            { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration', permissions: ['datanode:read'] },
+            {
+              path: Routes.SYSTEM.CLUSTER.NODES,
+              description: 'Cluster Configuration',
+              permissions: ['clusterconfiguration:read'],
+            },
             { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
