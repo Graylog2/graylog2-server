@@ -20,9 +20,9 @@ import styled, { css } from 'styled-components';
 import type { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 import { Button } from 'components/bootstrap';
 import { Select } from 'components/common';
+import GranteeIcon from 'components/permissions/Grantee/GranteeIcon';
 
 import CapabilitySelect from './CapabilitySelect';
-import GranteeIcon from './GranteeIcon';
 import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
 
 export const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeState) => {

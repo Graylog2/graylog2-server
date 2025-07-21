@@ -24,10 +24,13 @@ import type EntityShareState from 'logic/permissions/EntityShareState';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type {
+  SelectionRequest,
+  FormValues as GranteesSelectFormValues,
+} from 'components/permissions/Grantee/GranteesSelector';
+import GranteesSelector from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
 
-import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
-import GranteesSelector from './GranteesSelector';
-import GranteesList from './GranteesList';
 import ShareableEntityURL from './ShareableEntityURL';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 

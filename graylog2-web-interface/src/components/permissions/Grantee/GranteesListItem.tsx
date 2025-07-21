@@ -29,7 +29,8 @@ import type { CurrentState as CurrentGranteeState } from 'logic/permissions/Sele
 import type SelectedGrantee from 'logic/permissions/SelectedGrantee';
 
 import GranteeIcon from './GranteeIcon';
-import CapabilitySelect from './CapabilitySelect';
+
+import CapabilitySelect from '../CapabilitySelect';
 
 const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeState) => {
   switch (currentState) {
