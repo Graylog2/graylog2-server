@@ -18,8 +18,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Set } from 'immutable';
 
-import { DataTable, Icon } from 'components/common';
-import { Badge } from 'components/bootstrap';
+import { DataTable, StatusIcon } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 
 type ContentPackConstraintsProps = {
@@ -59,9 +58,7 @@ const ContentPackConstraints = ({ constraints = Set(), isFulfilled = false }: Co
         <td>{constraint.type}</td>
         <td>{constraint.version}</td>
         <td>
-          <Badge bsStyle={constraint.fulfilled ? 'success' : 'danger'}>
-            <Icon name={constraint.fulfilled ? 'check_circle' : 'cancel'} />
-          </Badge>
+          <StatusIcon active={constraint.fulfilled} />
         </td>
       </tr>
     );
