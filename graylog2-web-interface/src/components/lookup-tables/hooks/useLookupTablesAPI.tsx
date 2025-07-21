@@ -23,6 +23,8 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
+  createLookupTable,
+  updateLookupTable,
   deleteLookupTable,
   fetchPaginatedCaches,
   fetchCacheTypes,
@@ -41,6 +43,48 @@ import {
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function useCreateLookupTable() {
+  const queryClient = useQueryClient();
+
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: createLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Lookup Table created successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-tables'],
+        refetchType: 'active',
+      });
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    createLookupTable: mutateAsync,
+    creatingLookupTable: isLoading,
+  };
+}
+
+export function useUpdateLookupTable() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: updateLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Lookup Table updated successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateLookupTable: mutateAsync,
+    updatingLookupTable: isLoading,
+  };
 }
 
 export function useDeleteLookupTable() {

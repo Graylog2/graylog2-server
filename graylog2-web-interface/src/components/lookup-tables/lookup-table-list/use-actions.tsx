@@ -24,6 +24,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
 
 import type { LookupTableEntity } from './types';
 
@@ -37,10 +38,11 @@ function Actions({ lut }: ActionsProps) {
   const sendTelemetry = useSendTelemetry();
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
+  const { setModal, setTitle, setEntity } = useModalContext();
 
   const handleEdit = React.useCallback(() => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
-  }, [history, lut.name]);
+  }, [lut, setModal, setTitle, setEntity]);
 
   const handleDelete = React.useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {

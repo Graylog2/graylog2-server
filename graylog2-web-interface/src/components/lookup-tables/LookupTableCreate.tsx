@@ -21,7 +21,7 @@ import { Row, Col } from 'components/bootstrap';
 import { LookupTableForm } from 'components/lookup-tables';
 
 type Props = {
-  saved: (...args: any[]) => void;
+  onClose: () => void;
   onCacheCreateClick: () => void;
   onDataAdapterCreateClick: () => void;
   dataAdapter?: string;
@@ -34,11 +34,11 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const LookupTableCreate = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '' }: Props) => (
+const LookupTableCreate = ({ onClose, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '' }: Props) => (
   <>
     <StyledRow>
       <Col lg={6}>
-        <LookupTableForm saved={saved} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create dataAdapter={dataAdapter} cache={cache} />
+        <LookupTableForm onClose={onClose} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create dataAdapter={dataAdapter} cache={cache} />
       </Col>
     </StyledRow>
   </>

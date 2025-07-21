@@ -26,16 +26,17 @@ import { useFetchDataAdapters } from 'components/lookup-tables/hooks/useLookupTa
 
 type Props = {
   children: React.ReactElement;
+  dataAdapter?: string;
 };
 
-const DataAdaptersContainer = ({ children }: Props) => {
+const DataAdaptersContainer = ({ children, dataAdapter = '' }: Props) => {
   const { dataAdapters, pagination } = useStore(LookupTableDataAdaptersStore);
   const { fetchPaginatedDataAdapters } = useFetchDataAdapters();
 
   useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
     fetchPaginatedDataAdapters({page: 1, pageSize: 10000, query: null, sort: { attributeId: 'name', direction: 'asc' }});
-  }, []);
+  }, [dataAdapter]);
 
   if (!dataAdapters) {
     return <Spinner />;

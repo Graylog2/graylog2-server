@@ -48,8 +48,6 @@ const DataAdapterPicker = ({ onCreateClick, dataAdapters = [], dataAdapter = '' 
 
   const errorMessage = touched ? error : '';
 
-  console.log(dataAdapters.find((adapter) => adapter.id === dataAdapter), dataAdapter)
-
   return (
     <fieldset>
       <Input

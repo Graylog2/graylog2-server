@@ -26,6 +26,7 @@ import { Select } from 'components/common';
 type Props = {
   onCreateClick: () => void;
   caches?: LookupTableCache[];
+  cache?: string;
 };
 
 const StyledSelect = styled(Select)`
@@ -39,7 +40,7 @@ const StyledButton = styled(Button)`
   white-space: nowrap;
 `;
 
-const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
+const CachePicker = ({ onCreateClick, caches = [], cache = '' }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const sortedCaches = caches
     .map((cache) => ({ value: cache.id, label: `${cache.title} (${cache.name})` }))

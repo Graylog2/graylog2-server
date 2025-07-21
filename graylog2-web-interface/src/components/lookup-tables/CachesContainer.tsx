@@ -24,16 +24,17 @@ import { useFetchCaches } from 'components/lookup-tables/hooks/useLookupTablesAP
 
 type Props = {
   children: React.ReactElement;
+  cache?: string;
 };
 
-const CachesContainer = ({ children }: Props) => {
+const CachesContainer = ({ children, cache = '' }: Props) => {
   const { caches, pagination } = useStore(LookupTableCachesStore);
   const { fetchPaginatedCaches } = useFetchCaches();
 
   useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
     fetchPaginatedCaches({ page: 1, pageSize: 10000, query: null, sort: { attributeId: 'name', direction: 'asc' } });
-  }, []);
+  }, [cache]);
 
   if (!caches) {
     return <Spinner />;

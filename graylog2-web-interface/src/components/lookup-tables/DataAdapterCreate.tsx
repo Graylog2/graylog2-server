@@ -105,7 +105,7 @@ const DataAdapterCreate = ({
   return (
     <div>
       <StyledRow>
-        <Col lg={9}>
+        <Col lg={6}>
           <Input
             id="data-adapter-type-select"
             label="Data Adapter Type"

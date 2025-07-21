@@ -20,13 +20,11 @@ import { Formik, Form } from 'formik';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput, FormSubmit } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 import useScopePermissions from 'hooks/useScopePermissions';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
+import { useCreateLookupTable, useUpdateLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -52,7 +50,7 @@ const INIT_TABLE_VALUES: LookupTableType = {
 };
 
 type Props = {
-  saved: () => void;
+  onClose: () => void;
   onCacheCreateClick: () => void;
   onDataAdapterCreateClick: () => void;
   create?: boolean;
@@ -83,9 +81,10 @@ const StyledFormSubmitWrapper = styled.div`
   margin-top: 20px;
 `;
 
-const LookupTableForm = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, create = true, table = INIT_TABLE_VALUES, dataAdapter = '', cache = '' }: Props) => {
+const LookupTableForm = ({ onClose, onCacheCreateClick, onDataAdapterCreateClick, create = true, table = INIT_TABLE_VALUES, dataAdapter = '', cache = '' }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
-  const history = useHistory();
+  const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
+  const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
   const sendTelemetry = useSendTelemetry();
 
   const validate = (values: LookupTableType) => {
@@ -112,34 +111,29 @@ const LookupTableForm = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, 
   };
 
   const handleSubmit = (values: LookupTableType) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CREATED' : 'UPDATED'], {
-      app_pathname: 'lut',
-      app_section: 'lut',
-    });
-
-    let promise: Promise<any>;
-
     const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
 
-    if (create) {
-      promise = LookupTablesActions.create(valuesToSave);
-    } else {
-      promise = LookupTablesActions.update(valuesToSave);
-    }
+    const promise = create ? createLookupTable(valuesToSave) : updateLookupTable(valuesToSave);
 
     return promise.then(() => {
-      saved();
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CREATED' : 'UPDATED'], {
+        app_pathname: 'lut',
+        app_section: 'lut',
+      });
+
+      onClose();
     });
   };
 
   const initialValues: LookupTableType = {
     ...INIT_TABLE_VALUES,
     ...table,
+    data_adapter_id: (table?.data_adapter_id || dataAdapter) || undefined,
+    cache_id: (table?.cache_id || cache) || undefined,
     enable_single_value: table.default_single_value !== '',
     enable_multi_value: table.default_multi_value !== '',
   };
 
-  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
@@ -280,11 +274,11 @@ const LookupTableForm = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, 
             </StyledDefaultValueSection>
           </fieldset>
 
-          <DataAdaptersContainer>
+          <DataAdaptersContainer dataAdapter={dataAdapter}>
             <DataAdapterPicker onCreateClick={onDataAdapterCreateClick} dataAdapter={dataAdapter} />
           </DataAdaptersContainer>
 
-          <CachesContainer>
+          <CachesContainer cache={cache}>
             <CachePicker onCreateClick={onCacheCreateClick} cache={cache} />
           </CachesContainer>
 
@@ -294,18 +288,18 @@ const LookupTableForm = ({ saved, onCacheCreateClick, onDataAdapterCreateClick, 
                 <FormSubmit
                   submitButtonText="Create lookup table"
                   submitLoadingText="Creating lookup table..."
-                  isSubmitting={isSubmitting}
+                  isSubmitting={isSubmitting || creatingLookupTable}
                   isAsyncSubmit
-                  onCancel={onCancel}
+                  onCancel={onClose}
                 />
               )}
               {updatable && (
                 <FormSubmit
                   submitButtonText="Update lookup table"
                   submitLoadingText="Updating lookup table..."
-                  isSubmitting={isSubmitting}
+                  isSubmitting={isSubmitting || updatingLookupTable}
                   isAsyncSubmit
-                  onCancel={onCancel}
+                  onCancel={onClose}
                 />
               )}
             </StyledFormSubmitWrapper>

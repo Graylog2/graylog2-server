@@ -82,7 +82,7 @@ const LUTCreateModal = ({ onClose }: Props) => {
     title: string;
     section: Section;
   }) => (
-    <Box onClick={() => handleSectionClick(section)} style={{ cursor: 'pointer' }}>
+    <Box onClick={() => handleSectionClick(section)} style={{ cursor: 'pointer', padding: '0 15px' }}>
       <Group position="apart" py="xs">
         <Title order={6}>{title}</Title>
         <Icon
@@ -108,7 +108,7 @@ const LUTCreateModal = ({ onClose }: Props) => {
           <Header title="Lookup Table" section="lookup" />
           <Collapse in={activeSection === 'lookup'}>
             <LookupTableCreate
-              saved={() => onClose()}
+              onClose={() => onClose()}
               onCacheCreateClick={handleCacheCreateClick}
               onDataAdapterCreateClick={handleDataAdapterClick}
               dataAdapter={createdAdapterId}
