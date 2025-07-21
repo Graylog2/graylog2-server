@@ -14,27 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import styled from 'styled-components';
 
-import Drawer from 'components/common/Drawer';
+const DataWell = styled.div<{ $color?: 'background' | 'content' }>`
+  width: 100%;
+  border: 1px solid ${({ theme }) => theme.colors.cards.border};
+  border-radius: 8px;
+  padding: ${({ theme }) => theme.spacings.md};
+  background-color: ${({ theme, $color }) => theme.colors.global[$color || 'background']};
+`;
 
-type Props = {
-  onClose: () => void,
-  title: string,
-  children: React.ReactNode,
-}
-
-const LUTDrawer = ({ onClose, title, children }: Props) => (
-  <Drawer
-    opened
-    onClose={onClose}
-    size="lg"
-    position="right"
-    overlayProps={{ zIndex: '1030' }}
-    title={title}
-    >
-    {children}
-  </Drawer>
-);
-
-export default LUTDrawer;
+export default DataWell;

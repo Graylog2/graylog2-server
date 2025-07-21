@@ -26,7 +26,7 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import useProductName from 'brand-customization/useProductName';
 
-const DataWell = styled.div<{ $color?: 'background' | 'content'; }>`
+const DataWell = styled.div<{ $color?: 'background' | 'content' }>`
   width: 100%;
   border: 1px solid ${({ theme }) => theme.colors.cards.border};
   border-radius: 8px;
@@ -44,6 +44,13 @@ const StyledRow = styled.div`
 const StyledLink = styled(Link)`
   display: flex;
   flex: 3;
+`;
+
+const Description = styled.p`
+  color: ${({ theme }) => theme.colors.text.secondary};
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 `;
 
 type Props = {
@@ -115,9 +122,9 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
 
   return (
     <Row className="content">
-      <Col md={12}>
+      <Col md={12} className="gap-3">
         <h2>Description</h2>
-        <span>{table.description}</span>
+        <Description>{table.description}</Description>
         {!loadingScopePermissions && scopePermissions?.is_mutable && (
           <Button bsStyle="success" onClick={handleEdit(table.name)} role="button" name="edit_square">
             Edit
@@ -144,12 +151,16 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
           </StyledRow>
           <StyledRow>
             <span style={{ display: 'flex', flex: 1 }}>Data adapter</span>
-            <StyledLink to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</StyledLink>
+            <StyledLink to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>
+              {dataAdapter.title}
+            </StyledLink>
           </StyledRow>
         </DataWell>
         <hr />
         <h2>Purge Cache</h2>
-        <p>You can purge the complete cache for this lookup table or only the cache entry for a single key.</p>
+        <Description>
+          You can purge the complete cache for this lookup table or only the cache entry for a single key.
+        </Description>
         <form onSubmit={handlePurgeKey}>
           <fieldset>
             <Input
@@ -175,10 +186,10 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
         </form>
         <hr />
         <h2>Test lookup</h2>
-        <p>
+        <Description>
           You can manually query the lookup table using this form. The data will be cached as configured by{' '}
           {productName}.
-        </p>
+        </Description>
         <form onSubmit={handleLookupKey}>
           <fieldset>
             <Input

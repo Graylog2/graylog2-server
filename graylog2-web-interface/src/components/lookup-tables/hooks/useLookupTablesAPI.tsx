@@ -16,6 +16,7 @@
  */
 import { useQuery, useMutation } from '@tanstack/react-query';
 
+import { defaultOnError } from 'util/conditional/onError';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import UserNotification from 'util/UserNotification';
@@ -23,12 +24,16 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
+  purgeLookupTableKey,
+  purgeAllLookupTableKey,
+  testLookupTableKey,
   deleteLookupTable,
   fetchPaginatedCaches,
   fetchCacheTypes,
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
+  fetchLookupPreview,
   fetchDataAdapterTypes,
   createCache,
   updateCache,
@@ -41,6 +46,64 @@ import {
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function usePurgeLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: purgeLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table key purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    purgeLookupTableKey: mutateAsync,
+    purgingLookupTableKey: isPending,
+  };
+}
+
+export function usePurgeAllLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: purgeAllLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    purgeAllLookupTableKey: mutateAsync,
+    purgingAllLookupTableKey: isPending,
+  };
+}
+
+export function useTestLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: testLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    testLookupTableKey: mutateAsync,
+    testingLookupTableKey: isPending,
+  };
+}
+export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['lookup-preview', idOrName, size, enabled],
+    queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), 'Failed to fetch lookup preview'),
+    retry: false,
+    enabled,
+  });
+
+  return {
+    lookupPreview: data ?? { results: [], total: 0, supported: true },
+    loadingLookupPreview: isLoading,
+  };
 }
 
 export function useDeleteLookupTable() {
@@ -85,10 +148,7 @@ export function useValidateCache() {
 }
 
 export function useCreateCache() {
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createCache,
     onSuccess: () => {
       UserNotification.success('Cache created successfully');
@@ -103,10 +163,7 @@ export function useCreateCache() {
 }
 
 export function useUpdateCache() {
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateCache,
     onSuccess: () => {
       UserNotification.success('Cache updated successfully');
@@ -153,10 +210,7 @@ export function useFetchDataAdapterTypes() {
 }
 
 export function useCreateAdapter() {
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter created successfully');
@@ -171,10 +225,7 @@ export function useCreateAdapter() {
 }
 
 export function useUpdateAdapter() {
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter updated successfully');

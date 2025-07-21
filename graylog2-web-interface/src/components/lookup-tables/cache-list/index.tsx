@@ -21,13 +21,13 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/LUTModals/ModalContext';
+import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 import LUTModals from 'components/lookup-tables/LUTModals';
+import type { CacheEntity } from 'components/lookup-tables/types';
 
 import { cacheListElements } from './constants';
 import columnRenderers from './column-renderers';
 import useActions from './use-actions';
-import type { CacheEntity } from './types';
 
 const queryHelpComponent = (
   <QueryHelper

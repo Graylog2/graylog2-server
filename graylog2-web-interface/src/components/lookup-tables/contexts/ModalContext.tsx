@@ -18,7 +18,7 @@ import * as React from 'react';
 
 const ModalContext = React.createContext(null);
 
-export function ModalProvider<ModalTypes, EntityType = unknown>({ children }: { children: React.ReactNode; }) {
+export function ModalProvider<ModalTypes, EntityType = unknown>({ children }: { children: React.ReactNode }) {
   const [modal, setModal] = React.useState<ModalTypes>(null);
   const [entity, setEntity] = React.useState<EntityType>();
   const [title, setTitle] = React.useState<string>(null);
@@ -26,6 +26,12 @@ export function ModalProvider<ModalTypes, EntityType = unknown>({ children }: { 
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }
+
+export const withLUTModalProvider = (Component: React.ElementType, props = {}) => (
+  <ModalProvider>
+    <Component {...props} />
+  </ModalProvider>
+);
 
 export function useModalContext() {
   const context = React.useContext(ModalContext);

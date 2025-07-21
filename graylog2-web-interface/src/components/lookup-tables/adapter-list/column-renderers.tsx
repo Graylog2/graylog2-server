@@ -18,13 +18,12 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
-
-import type { DataAdapterEntity } from './types';
+import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
 const TitleRow = styled.div`
   display: flex;

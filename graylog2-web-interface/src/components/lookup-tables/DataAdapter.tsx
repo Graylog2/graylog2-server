@@ -22,7 +22,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import type { DataAdapterPluginType } from './types';
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
@@ -53,7 +53,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     setModal('DATA-ADAPTER-EDIT');
     setTitle(dataAdapter.name);
     setEntity(dataAdapter);
-  }
+  };
 
   const plugin = usePluginEntities('lookupTableAdapters').find(
     (p: DataAdapterPluginType) => p.type === dataAdapter.config?.type,
