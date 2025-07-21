@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
@@ -27,53 +26,17 @@ import { Spinner, IconButton } from 'components/common';
 import type Capability from 'logic/permissions/Capability';
 import type { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 import type SelectedGrantee from 'logic/permissions/SelectedGrantee';
-
-import GranteeIcon from './GranteeIcon';
+import {
+  GranteeListItemTitle,
+  GranteeInfo,
+  StyledGranteeIcon,
+  GranteeListItemContainer,
+} from 'components/permissions/CommonStyledComponents';
 
 import CapabilitySelect from '../CapabilitySelect';
 
-const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeState) => {
-  switch (currentState) {
-    case 'new':
-      return theme.colors.variant.lighter.success;
-    case 'changed':
-      return theme.colors.variant.lighter.warning;
-    default:
-      return 'transparent';
-  }
-};
-
-const Container = styled.li<{ $currentState: CurrentGranteeState }>(
-  ({ theme, $currentState }) => css`
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 5px;
-    border-left: 5px solid ${currentStateColor(theme, $currentState)};
-  `,
-);
-
-const GranteeInfo = styled.div`
-  display: flex;
-  align-items: center;
-  flex: 1;
-  overflow: hidden;
-  margin-right: 10px;
-`;
-
-const Title = styled.div`
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
 const StyledCapabilitySelect = styled(CapabilitySelect)`
   flex: 0.5;
-`;
-
-const StyledGranteeIcon = styled(GranteeIcon)`
-  margin-right: 5px;
 `;
 
 const Actions = styled.div`
@@ -113,10 +76,10 @@ const GranteesListItem = ({
   return (
     <Formik initialValues={{ capabilityId }} onSubmit={() => {}}>
       <Form>
-        <Container $currentState={currentGranteeState}>
+        <GranteeListItemContainer $currentState={currentGranteeState}>
           <GranteeInfo title={title}>
             <StyledGranteeIcon type={type} />
-            <Title>{title}</Title>
+            <GranteeListItemTitle>{title}</GranteeListItemTitle>
           </GranteeInfo>
           <StyledCapabilitySelect
             onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
@@ -130,7 +93,7 @@ const GranteesListItem = ({
               <IconButton name="delete" onClick={handleDelete} title={`Remove sharing for ${title}`} />
             )}
           </Actions>
-        </Container>
+        </GranteeListItemContainer>
       </Form>
     </Formik>
   );

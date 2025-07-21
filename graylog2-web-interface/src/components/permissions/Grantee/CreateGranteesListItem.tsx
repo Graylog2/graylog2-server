@@ -24,7 +24,6 @@ import { Spinner, IconButton } from 'components/common';
 import type Capability from 'logic/permissions/Capability';
 import type { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 import type SelectedGrantee from 'logic/permissions/SelectedGrantee';
-
 import {
   GranteeInfo,
   GranteeListItemActions,
@@ -32,7 +31,7 @@ import {
   GranteeListItemTitle,
   StyledEntityCreateCapabilitySelect,
   StyledGranteeIcon,
-} from '../CommonStyledComponents';
+} from 'components/permissions/CommonStyledComponents';
 
 type Props = {
   availableCapabilities: CapabilitiesList;

@@ -30,6 +30,7 @@ import type {
 } from 'components/permissions/Grantee/GranteesSelector';
 import GranteesSelector from 'components/permissions/Grantee/GranteesSelector';
 import GranteesList from 'components/permissions/Grantee/GranteesList';
+import CollectionGranteesList from 'components/permissions/Grantee/CollectionGranteesList';
 
 import ShareableEntityURL from './ShareableEntityURL';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
@@ -134,7 +135,16 @@ const EntityShareSettings = ({
           onDelete={_handleDeletion}
           onCapabilityChange={_handleSelection}
           selectedGrantees={selectedGrantees}
-          title="Collaborators"
+          title="Direct Collaborators"
+        />
+      </Section>
+      <Section>
+        <CollectionGranteesList
+          activeShares={activeShares}
+          entityType={entityType}
+          entityTypeTitle={entityTypeTitle}
+          selectedGrantees={selectedGrantees}
+          title="Collection Collaborators"
         />
       </Section>
       <EntityShareValidationsDependencies

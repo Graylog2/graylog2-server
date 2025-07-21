@@ -19,36 +19,24 @@ import { useState } from 'react';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
-import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
-import type EntityShareState from 'logic/permissions/EntityShareState';
-import type Grantee from 'logic/permissions/Grantee';
-import type Capability from 'logic/permissions/Capability';
+import type { ActiveShares, SelectedGrantees } from 'logic/permissions/EntityShareState';
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
+import CollectionGranteesListItem from 'components/permissions/Grantee/CollectionGranteesListItem';
 import {
-  GranteeListHeader,
-  GranteeListStyledPageSizeSelect,
-  GranteeListStyledPagination,
-  GranteeListPaginationWrapper,
   StyledGranteeList,
+  GranteeListHeader,
+  GranteeListPaginationWrapper,
+  GranteeListStyledPagination,
+  GranteeListStyledPageSizeSelect,
 } from 'components/permissions/CommonStyledComponents';
-
-import GranteesListItem from './GranteesListItem';
-import CreateGranteesListItem from './CreateGranteesListItem';
 
 type Props = {
   activeShares: ActiveShares;
-  availableCapabilities: CapabilitiesList;
   className?: string;
   entityType: SharedEntity['type'];
-  onDelete: (GRN) => Promise<EntityShareState | undefined | null>;
-  onCapabilityChange: (payload: {
-    granteeId: Grantee['id'];
-    capabilityId: Capability['id'];
-  }) => Promise<EntityShareState | undefined | null>;
   selectedGrantees: SelectedGrantees;
   title: string;
   entityTypeTitle?: string | null | undefined;
-  isCreating?: boolean;
 };
 
 const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number, currentPage: number) => {
@@ -58,17 +46,13 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
   return selectedGrantees.slice(begin, end);
 };
 
-const GranteesList = ({
+const CollectionGranteesList = ({
   activeShares,
-  onDelete,
-  onCapabilityChange,
   entityType,
   entityTypeTitle = null,
-  availableCapabilities,
   selectedGrantees,
   className = null,
   title,
-  isCreating = false,
 }: Props) => {
   const initialPageSize = DEFAULT_PAGE_SIZES[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
@@ -77,7 +61,6 @@ const GranteesList = ({
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
   const showPageSizeSelect = totalGrantees > initialPageSize;
-  const ItemComponent = isCreating ? CreateGranteesListItem : GranteesListItem;
 
   return (
     <div className={className}>
@@ -93,16 +76,7 @@ const GranteesList = ({
             .map((grantee) => {
               const currentGranteeState = grantee.currentState(activeShares);
 
-              return (
-                <ItemComponent
-                  availableCapabilities={availableCapabilities}
-                  currentGranteeState={currentGranteeState}
-                  grantee={grantee}
-                  key={grantee.id}
-                  onDelete={onDelete}
-                  onCapabilityChange={onCapabilityChange}
-                />
-              );
+              return <CollectionGranteesListItem currentGranteeState={currentGranteeState} grantee={grantee} />;
             })
             .toArray()}
         </StyledGranteeList>
@@ -116,4 +90,4 @@ const GranteesList = ({
   );
 };
 
-export default GranteesList;
+export default CollectionGranteesList;
