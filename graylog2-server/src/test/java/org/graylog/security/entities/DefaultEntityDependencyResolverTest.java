@@ -50,8 +50,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(MockitoExtension.class)
-@MongoDBFixtures("EntityDependencyResolverTest.json")
-class EntityDependencyResolverTest {
+@MongoDBFixtures("DefaultEntityDependencyResolverTest.json")
+class DefaultEntityDependencyResolverTest {
 
     private EntityDependencyResolver entityDependencyResolver;
     private GRNRegistry grnRegistry;
@@ -69,7 +69,7 @@ class EntityDependencyResolverTest {
         DBGrantService dbGrantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
         this.contentPackService = contentPackService;
         this.grnDescriptorService = grnDescriptorService;
-        entityDependencyResolver = new EntityDependencyResolver(contentPackService, grnRegistry, grnDescriptorService, dbGrantService);
+        entityDependencyResolver = new DefaultEntityDependencyResolver(contentPackService, grnRegistry, grnDescriptorService, dbGrantService);
     }
 
     @Test
