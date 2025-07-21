@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { fireEvent, render } from 'wrappedTestingLibrary';
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 
