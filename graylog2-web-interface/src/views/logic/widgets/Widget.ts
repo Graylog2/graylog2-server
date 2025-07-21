@@ -35,6 +35,7 @@ export type WidgetState = {
   streams: Array<string>;
   stream_categories: Array<string>;
   description?: string;
+  context?: string;
 };
 
 interface DeserializesWidgets {
@@ -59,6 +60,7 @@ class Widget {
     streamCategories?: Array<string>,
     filters?: FiltersType | Array<SearchFilter>,
     description?: string,
+    context?: string,
   ) {
     this._value = {
       id,
@@ -71,6 +73,7 @@ class Widget {
       streams,
       stream_categories: streamCategories,
       description,
+      context,
     };
   }
 
@@ -118,6 +121,10 @@ class Widget {
     return this.toBuilder().description(description).build();
   }
 
+  get context(): string | undefined {
+    return this._value.context;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   get isExportable() {
     return false;
@@ -145,7 +152,9 @@ class Widget {
       isDeepEqual(this.timerange, other.timerange) &&
       isDeepEqual(this.query, other.query) &&
       isDeepEqual(this.streams, other.streams) &&
-      isDeepEqual(this.streamCategories, other.streamCategories)
+      isDeepEqual(this.streamCategories, other.streamCategories) &&
+      isDeepEqual(this.description, other.description) &&
+      isDeepEqual(this.context, other.context)
     );
   }
 
@@ -154,17 +163,17 @@ class Widget {
   }
 
   toBuilder(): Builder {
-    const { id, type, config, filter, filters, timerange, query, streams, stream_categories, description } =
+    const { id, type, config, filter, filters, timerange, query, streams, stream_categories, description, context } =
       this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
-      Map({ id, type, config, filter, filters, timerange, query, streams, stream_categories, description }),
+      Map({ id, type, config, filter, filters, timerange, query, streams, stream_categories, description, context }),
     );
   }
 
   toJSON() {
-    const { id, type, config, filter, filters, timerange, query, streams, stream_categories, description } =
+    const { id, type, config, filter, filters, timerange, query, streams, stream_categories, description, context } =
       this._value;
 
     return {
@@ -178,18 +187,32 @@ class Widget {
       streams,
       stream_categories,
       description,
+      context,
     };
   }
 
   static fromJSON(value: WidgetState): Widget {
-    const { id, type, config, filter, filters, timerange, query, streams, stream_categories, description } = value;
+    const { id, type, config, filter, filters, timerange, query, streams, stream_categories, description, context } =
+      value;
     const implementingClass = Widget.__registrations[type.toLowerCase()];
 
     if (implementingClass) {
       return implementingClass.fromJSON(value);
     }
 
-    return new Widget(id, type, config, filter, timerange, query, streams, stream_categories, filters, description);
+    return new Widget(
+      id,
+      type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 
   static empty() {
@@ -281,6 +304,12 @@ class Builder {
     return this;
   }
 
+  context(value: string) {
+    this.value = this.value.set('context', value);
+
+    return this;
+  }
+
   build(): Widget {
     const {
       id,
@@ -293,9 +322,22 @@ class Builder {
       streams,
       stream_categories: streamCategories,
       description,
+      context,
     } = this.value.toObject();
 
-    return new Widget(id, type, config, filter, timerange, query, streams, streamCategories, filters, description);
+    return new Widget(
+      id,
+      type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      streamCategories,
+      filters,
+      description,
+      context,
+    );
   }
 }
 
