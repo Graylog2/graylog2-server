@@ -5,8 +5,8 @@ import { PreferencesStore } from 'stores/users/PreferencesStore';
 import Store from 'logic/local-storage/Store';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-const usePersistedSetting = (settingKey: string) => {
-  const currentUser = useCurrentUser();
+const usePersistedSetting = <T = string>(settingKey: string): [T, (newValue: T) => void] => {
+  const currentUser = useCurrentUser(false);
   const { userIsReadOnly, username } = useMemo(
     () => ({ username: currentUser?.username, userIsReadOnly: currentUser?.readOnly ?? true }),
     [currentUser],
@@ -16,7 +16,7 @@ const usePersistedSetting = (settingKey: string) => {
   const setting = userIsReadOnly ? Store.get(settingKey) : userPreferences[settingKey];
 
   const setSetting = useCallback(
-    (newSetting: string) => {
+    (newSetting: T) => {
       if (userIsReadOnly) {
         Store.set(settingKey, newSetting);
 
