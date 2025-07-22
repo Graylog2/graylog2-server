@@ -29,6 +29,7 @@ import RolesSection from './RolesSection';
 import SettingsSection from './SettingsSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
 import TeamsSection from './TeamsSection';
+import CollectionsSection from './CollectionsSection';
 
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 
@@ -66,6 +67,11 @@ const UserDetails = ({ user }: Props) => {
             {currentUser.id === user.id && !isLocalAdmin && (
               <IfPermitted permissions={`users:edit:${user.username}`}>
                 <TelemetrySettingsDetails />
+              </IfPermitted>
+            )}
+            {currentUser.id === user.id && (
+              <IfPermitted permissions={`users:edit:${user.username}`}>
+                <CollectionsSection user={user} />
               </IfPermitted>
             )}
             {currentUser.id === user.id && isLocalAdmin && (
