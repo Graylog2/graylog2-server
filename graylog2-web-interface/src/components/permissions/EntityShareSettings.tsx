@@ -141,7 +141,13 @@ const EntityShareSettings = ({
         />
       </Section>
       <Section>
-        <CollectionGranteeList />
+        <CollectionGranteeList
+          title="Collection Collaborators"
+          activeShares={activeShares}
+          entityType={entityType}
+          entityTypeTitle={entityTypeTitle}
+          selectedGrantees={selectedGrantees}
+        />
       </Section>
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}
