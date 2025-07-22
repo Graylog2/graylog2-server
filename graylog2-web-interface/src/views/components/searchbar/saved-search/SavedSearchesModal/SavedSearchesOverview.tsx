@@ -31,7 +31,6 @@ import SearchActions from './SearchActions';
 import BulkActions from '../BulkActions';
 import { DEFAULT_LAYOUT } from '../Constants';
 
-
 type Props = {
   activeSavedSearchId: string;
   deleteSavedSearch: (view: View) => Promise<void>;

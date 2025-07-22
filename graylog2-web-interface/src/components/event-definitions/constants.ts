@@ -18,11 +18,10 @@ import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
 
-const getEventDefinitionTableElements = (
-  pluggableAttributes?: {
-    attributeNames?: Array<string>;
-    attributes?: Array<Attribute>;
-  }) => {
+const getEventDefinitionTableElements = (pluggableAttributes?: {
+  attributeNames?: Array<string>;
+  attributes?: Array<Attribute>;
+}) => {
   const defaultLayout = {
     entityTableId: 'event_definitions',
     defaultPageSize: 20,
@@ -58,6 +57,6 @@ const getEventDefinitionTableElements = (
     columnOrder,
     additionalAttributes,
   };
-}
+};
 
 export default getEventDefinitionTableElements;
