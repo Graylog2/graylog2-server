@@ -30,7 +30,7 @@ const fetchStream = (streamId: string) => {
 
 const useStream = (
   streamId: string,
-  { enabled, refetchInterval }: { enabled: boolean, refetchInterval: false|number } = { enabled: true, refetchInterval: false },
+  { enabled, refetchInterval }: { enabled: boolean|undefined, refetchInterval: false|number|undefined }|undefined = { enabled: true, refetchInterval: false },
 ): {
   data: Stream;
   refetch: () => void;
