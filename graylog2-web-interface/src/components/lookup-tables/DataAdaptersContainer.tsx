@@ -36,7 +36,7 @@ const DataAdaptersContainer = ({ children, dataAdapter = '' }: Props) => {
   useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
     fetchPaginatedDataAdapters({page: 1, pageSize: 10000, query: null, sort: { attributeId: 'name', direction: 'asc' }});
-  }, [dataAdapter]);
+  }, [dataAdapter, fetchPaginatedDataAdapters]);
 
   if (!dataAdapters) {
     return <Spinner />;

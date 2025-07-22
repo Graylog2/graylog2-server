@@ -26,7 +26,6 @@ import { Select } from 'components/common';
 type Props = {
   onCreateClick: () => void;
   dataAdapters?: LookupTableAdapter[];
-  dataAdapter?: string;
 };
 
 const StyledSelect = styled(Select)`
@@ -40,7 +39,7 @@ const StyledButton = styled(Button)`
   white-space: nowrap;
 `;
 
-const DataAdapterPicker = ({ onCreateClick, dataAdapters = [], dataAdapter = '' }: Props) => {
+const DataAdapterPicker = ({ onCreateClick, dataAdapters = [] }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
   const sortedAdapters = dataAdapters
     .map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` }))

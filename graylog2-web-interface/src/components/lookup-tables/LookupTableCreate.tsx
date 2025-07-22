@@ -43,13 +43,11 @@ const StyledRow = styled(Row)`
 `;
 
 const LookupTableCreate = ({ create, onClose, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '', table = undefined }: Props) => (
-  <>
-    <StyledRow>
-      <Col lg={6}>
-        <LookupTableForm onClose={onClose} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create={create} dataAdapter={dataAdapter} cache={cache} table={table} />
-      </Col>
-    </StyledRow>
-  </>
+  <StyledRow>
+    <Col lg={6}>
+      <LookupTableForm onClose={onClose} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create={create} dataAdapter={dataAdapter} cache={cache} table={table} />
+    </Col>
+  </StyledRow>
 );
 
 export default LookupTableCreate;

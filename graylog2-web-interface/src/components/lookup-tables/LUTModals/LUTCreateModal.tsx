@@ -20,8 +20,7 @@ import { Collapse, Stack, Box, Group, Title, Transition, Divider } from '@mantin
 import { Icon } from 'components/common';
 import { Modal } from 'components/bootstrap';
 import { LookupTableCreate, CacheCreate, DataAdapterCreate } from 'components/lookup-tables';
-import { LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
-import type { LookupTable } from 'logic/lookup-tables/types';
+import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 
 type LookupTableType = LookupTable & {
   enable_single_value: boolean;
@@ -35,6 +34,32 @@ type Props = {
 }
 
 type Section = 'lookup' | 'cache' | 'adapter';
+
+const Header = ({
+  title,
+  section,
+  activeSection,
+  handleSectionClick,
+}: {
+  title: string;
+  section: Section;
+  activeSection: string;
+  handleSectionClick: (section: string) => void;
+}) => (
+  <Box onClick={() => handleSectionClick(section)} style={{ cursor: 'pointer', padding: '0 15px' }}>
+    <Group position="apart" py="xs">
+      <Title order={6}>{title}</Title>
+      <Icon
+        name="keyboard_arrow_down"
+        style={{
+          transition: 'transform 0.3s ease',
+          transform: activeSection === section ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}
+      />
+    </Group>
+    <Divider />
+  </Box>
+);
 
 const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
   const [activeSection, setActiveSection] = React.useState<Section>('lookup');
@@ -83,28 +108,6 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
     setActiveSection('lookup');
   };
 
-  const Header = ({
-    title,
-    section,
-  }: {
-    title: string;
-    section: Section;
-  }) => (
-    <Box onClick={() => handleSectionClick(section)} style={{ cursor: 'pointer', padding: '0 15px' }}>
-      <Group position="apart" py="xs">
-        <Title order={6}>{title}</Title>
-        <Icon
-          name="keyboard_arrow_down"
-          style={{
-            transition: 'transform 0.3s ease',
-            transform: activeSection === section ? 'rotate(180deg)' : 'rotate(0deg)',
-          }}
-        />
-      </Group>
-      <Divider />
-    </Box>
-  );
-
   return (
     <Modal show fullScreen onHide={onClose}>
       <Modal.Header>
@@ -113,12 +116,12 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
       </Modal.Header>
       <Stack>
         <div>
-          {(showCache || showAdapter) && <Header title="Lookup Table" section="lookup" />}
+          {(showCache || showAdapter) && <Header title="Lookup Table" section="lookup" activeSection={activeSection} handleSectionClick={handleSectionClick} />}
           <Collapse in={activeSection === 'lookup'}>
             <LookupTableCreate
-              create={lut ? false : true}
+              create={!lut}
               table={lut}
-              onClose={() => onClose()}
+              onClose={onClose}
               onCacheCreateClick={handleCacheCreateClick}
               onDataAdapterCreateClick={handleDataAdapterClick}
               dataAdapter={createdAdapterId}
@@ -129,7 +132,7 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
         <Transition mounted={showCache} transition="slide-down" duration={300} timingFunction="ease">
           {(styles) => (
             <div style={styles}>
-              <Header title="Cache" section="cache" />
+              <Header title="Cache" section="cache" activeSection={activeSection} handleSectionClick={handleSectionClick} />
             </div>
           )}
         </Transition>
@@ -142,7 +145,7 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
         <Transition mounted={showAdapter} transition="slide-down" duration={300} timingFunction="ease">
           {(styles) => (
             <div style={styles}>
-              <Header title="Data Adapter" section="adapter" />
+              <Header title="Data Adapter" section="adapter" activeSection={activeSection} handleSectionClick={handleSectionClick} />
             </div>
           )}
         </Transition>

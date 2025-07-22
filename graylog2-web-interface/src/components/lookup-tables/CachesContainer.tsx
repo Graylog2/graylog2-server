@@ -34,7 +34,7 @@ const CachesContainer = ({ children, cache = '' }: Props) => {
   useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
     fetchPaginatedCaches({ page: 1, pageSize: 10000, query: null, sort: { attributeId: 'name', direction: 'asc' } });
-  }, [cache]);
+  }, [cache, fetchPaginatedCaches]);
 
   if (!caches) {
     return <Spinner />;
