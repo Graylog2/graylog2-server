@@ -20,11 +20,11 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -46,7 +46,7 @@ public class DatanodeTestUtils {
     }
 
     public static KeyPair generateKeyPair(Duration validity) throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(RandomStringUtils.randomAlphabetic(10))
+        final CertRequest certRequest = CertRequest.selfSigned(RandomStringUtils.secure().nextAlphanumeric(10))
                 .isCA(false)
                 .validity(validity);
         return CertificateGenerator.generate(certRequest);
