@@ -24,6 +24,7 @@ import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 
 const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; dashboardId: string }) => {
   const queryClient = useQueryClient();
@@ -52,24 +53,25 @@ const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; d
   );
 };
 
-export const useColumnRenderers = () => {
+export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAttribute<View>) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(
     () => ({
       attributes: {
         title: {
-          renderCell: (_title: string, dashboard) => (
+          renderCell: (_title: string, dashboard: View) => (
             <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />
           ),
         },
         favorite: {
-          renderCell: (favorite: boolean, dashboard) => (
+          renderCell: (favorite: boolean, dashboard: View) => (
             <DashboardFavoriteItem dashboardId={dashboard.id} favorite={favorite} />
           ),
         },
+        ...(pluggableColumnRenderers || {}),
       },
     }),
-    [requirementsProvided],
+    [requirementsProvided, pluggableColumnRenderers],
   );
 
   return customColumnRenderers;

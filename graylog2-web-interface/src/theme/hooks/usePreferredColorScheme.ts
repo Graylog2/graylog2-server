@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { ColorScheme } from '@graylog/sawmill';
 
-import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { PreferencesStore } from 'stores/users/PreferencesStore';
 import type { UserPreferences } from 'contexts/UserPreferencesContext';
-import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import usePersistedSetting from 'hooks/usePersistedSetting';
 
 import useBrowserColorSchemePreference from './useBrowserColorSchemePreference';
 
@@ -77,16 +74,11 @@ const usePreferredColorScheme = (
   userIsLoggedIn: boolean,
 ): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
   const browserThemePreference = useBrowserColorSchemePreference();
+  const [themeMode, setThemeMode] = usePersistedSetting(PREFERENCES_THEME_MODE);
 
-  const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
-    username: userStore.currentUser?.username,
-    userIsReadOnly: userStore.currentUser?.read_only ?? true,
-  }));
-
-  const userPreferences = useContext(UserPreferencesContext);
   const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(() =>
     getInitialThemeMode({
-      userPreferencesThemeMode: userPreferences[PREFERENCES_THEME_MODE],
+      userPreferencesThemeMode: themeMode,
       browserThemePreference,
       initialThemeModeOverride,
       userIsLoggedIn,
@@ -98,16 +90,10 @@ const usePreferredColorScheme = (
       setCurrentThemeMode(newThemeMode);
 
       if (userIsLoggedIn) {
-        Store.set(PREFERENCES_THEME_MODE, newThemeMode);
-
-        if (!userIsReadOnly) {
-          const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
-
-          PreferencesStore.saveUserPreferences(username, nextPreferences);
-        }
+        setThemeMode(newThemeMode);
       }
     },
-    [userIsLoggedIn, userIsReadOnly, userPreferences, username],
+    [setThemeMode, userIsLoggedIn],
   );
 
   return [currentThemeMode, changeCurrentThemeMode];
