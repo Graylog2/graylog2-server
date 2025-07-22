@@ -47,7 +47,7 @@ const Header = ({
   handleSectionClick: (section: string) => void;
 }) => (
   <Box onClick={() => handleSectionClick(section)} style={{ cursor: 'pointer', padding: '0 15px' }}>
-    <Group position="apart" py="xs">
+    <Group py="xs">
       <Title order={6}>{title}</Title>
       <Icon
         name="keyboard_arrow_down"

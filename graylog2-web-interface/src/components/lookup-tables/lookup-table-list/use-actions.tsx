@@ -22,13 +22,8 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-<<<<<<< HEAD
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
-
-import type { LookupTableEntity } from './types';
-=======
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import type { LookupTableEntity } from 'components/lookup-tables/types';
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 
 type ActionsProps = {
   lut: LookupTableEntity;

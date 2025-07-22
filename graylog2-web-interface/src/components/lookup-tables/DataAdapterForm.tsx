@@ -45,7 +45,7 @@ const Title = ({ title, typeName, create }: TitleProps) => {
 type Props = {
   type: string;
   title: string;
-  saved: (response: LookupTableAdapter) => void;
+  saved: (response: any) => void;
   onCancel: () => void;
   create?: boolean;
   dataAdapter?: LookupTableAdapter;

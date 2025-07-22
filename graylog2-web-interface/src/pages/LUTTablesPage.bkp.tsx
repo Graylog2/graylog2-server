@@ -23,7 +23,7 @@ import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import type { PaginationProps } from 'components/common/withPaginationQueryParameter';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { LookupTableView, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
+import { LookupTableView, LookupTablesOverview } from 'components/lookup-tables';
 import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import type { LocationContext } from 'routing/withLocation';
@@ -33,10 +33,10 @@ import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
 
-const _saved = (history) => {
-  // reset detail state
-  history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
-};
+// const _saved = (history) => {
+//   // reset detail state
+//   history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+// };
 
 const _isCreating = ({ action }: LUTTablesPageProps) => action === 'create';
 
@@ -164,12 +164,12 @@ class LUTTablesPage extends React.Component<
       // dataAdapters,
       // pagination,
       // errorStates,
-      history,
+      // history,
     } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
-    const saved = () => _saved(history);
+    // const saved = () => _saved(history);
 
     if (isShowing || isEditing) {
       if (!table) {
@@ -179,7 +179,7 @@ class LUTTablesPage extends React.Component<
           <Row className="content">
             <Col lg={8}>
               <h2>Lookup Table</h2>
-              <LookupTableForm table={table} create={false} saved={saved} />
+              {/* <LookupTableForm table={table} create={false} saved={saved} /> */}
             </Col>
           </Row>
         );
@@ -187,7 +187,7 @@ class LUTTablesPage extends React.Component<
         content = <LookupTableView dataAdapter={dataAdapter} cache={cache} table={table} />;
       }
     } else if (_isCreating(this.props)) {
-      content = <LookupTableCreate saved={saved} />;
+      // content = <LookupTableCreate saved={saved} />;
     } else if (!tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {

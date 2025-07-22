@@ -53,7 +53,7 @@ const INIT_CACHE: LookupTableCache = {
 
 type Props = {
   type: string;
-  saved: (response: LookupTableCache) => void;
+  saved: (response: any) => void;
   title: string;
   onCancel: () => void;
   create?: boolean;

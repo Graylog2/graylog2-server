@@ -128,10 +128,6 @@ const columnRenderers: ColumnRenderers<LookupTableEntity> = {
   attributes: {
     title: {
       width: 0.1,
-<<<<<<< HEAD
-      renderCell: (title: string, lut: LookupTableEntity, _c: any, meta: { caches: CachesMap, adapters: AdaptersMap; }) =>
-        <TitleCol lut={lut} caches={meta?.caches} adapters={meta?.adapters} title={title}>{title}</TitleCol>,
-=======
       renderCell: (
         title: string,
         lut: LookupTableEntity,
@@ -142,7 +138,6 @@ const columnRenderers: ColumnRenderers<LookupTableEntity> = {
           {title}
         </TitleCol>
       ),
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     },
     description: {
       width: 0.2,

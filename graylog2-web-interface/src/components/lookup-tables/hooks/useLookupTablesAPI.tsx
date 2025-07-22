@@ -14,11 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-<<<<<<< HEAD
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-=======
-import { useQuery, useMutation } from '@tanstack/react-query';
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 
 import { defaultOnError } from 'util/conditional/onError';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -28,24 +24,18 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
-<<<<<<< HEAD
   createLookupTable,
   updateLookupTable,
-=======
   purgeLookupTableKey,
   purgeAllLookupTableKey,
   testLookupTableKey,
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
   deleteLookupTable,
   fetchPaginatedCaches,
   fetchCacheTypes,
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
-<<<<<<< HEAD
-=======
   fetchLookupPreview,
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
   fetchDataAdapterTypes,
   createCache,
   updateCache,
@@ -60,7 +50,6 @@ export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
 }
 
-<<<<<<< HEAD
 export function useCreateLookupTable() {
   const queryClient = useQueryClient();
 
@@ -75,19 +64,11 @@ export function useCreateLookupTable() {
         queryKey: ['lookup-tables'],
         refetchType: 'active',
       });
-=======
-export function usePurgeLookupTableKey() {
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: purgeLookupTableKey,
-    onSuccess: () => {
-      UserNotification.success('Lookup table key purged successfully');
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
 
   return {
-<<<<<<< HEAD
     createLookupTable: mutateAsync,
     creatingLookupTable: isLoading,
   };
@@ -101,7 +82,26 @@ export function useUpdateLookupTable() {
     mutationFn: updateLookupTable,
     onSuccess: () => {
       UserNotification.success('Lookup Table updated successfully');
-=======
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateLookupTable: mutateAsync,
+    updatingLookupTable: isLoading,
+  };
+}
+
+export function usePurgeLookupTableKey() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: purgeLookupTableKey,
+    onSuccess: () => {
+      UserNotification.success('Lookup table key purged successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
     purgeLookupTableKey: mutateAsync,
     purgingLookupTableKey: isPending,
   };
@@ -112,16 +112,11 @@ export function usePurgeAllLookupTableKey() {
     mutationFn: purgeAllLookupTableKey,
     onSuccess: () => {
       UserNotification.success('Lookup table purged successfully');
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
 
   return {
-<<<<<<< HEAD
-    updateLookupTable: mutateAsync,
-    updatingLookupTable: isLoading,
-=======
     purgeAllLookupTableKey: mutateAsync,
     purgingAllLookupTableKey: isPending,
   };
@@ -141,6 +136,7 @@ export function useTestLookupTableKey() {
     testingLookupTableKey: isPending,
   };
 }
+
 export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
   const { data, isLoading } = useQuery({
     queryKey: ['lookup-preview', idOrName, size, enabled],
@@ -152,7 +148,6 @@ export function useFetchLookupPreview(idOrName: string, enabled: boolean = false
   return {
     lookupPreview: data ?? { results: [], total: 0, supported: true },
     loadingLookupPreview: isLoading,
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
   };
 }
 
@@ -198,7 +193,6 @@ export function useValidateCache() {
 }
 
 export function useCreateCache() {
-<<<<<<< HEAD
   const queryClient = useQueryClient();
 
   const {
@@ -212,12 +206,6 @@ export function useCreateCache() {
         queryKey: ['caches'],
         refetchType: 'active',
       });
-=======
-  const { mutateAsync, isPending: isLoading } = useMutation({
-    mutationFn: createCache,
-    onSuccess: () => {
-      UserNotification.success('Cache created successfully');
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -229,14 +217,7 @@ export function useCreateCache() {
 }
 
 export function useUpdateCache() {
-<<<<<<< HEAD
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
-=======
   const { mutateAsync, isPending: isLoading } = useMutation({
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     mutationFn: updateCache,
     onSuccess: () => {
       UserNotification.success('Cache updated successfully');
@@ -283,7 +264,6 @@ export function useFetchDataAdapterTypes() {
 }
 
 export function useCreateAdapter() {
-<<<<<<< HEAD
   const queryClient = useQueryClient();
 
   const {
@@ -297,12 +277,6 @@ export function useCreateAdapter() {
         queryKey: ['adapters'],
         refetchType: 'active',
       });
-=======
-  const { mutateAsync, isPending: isLoading } = useMutation({
-    mutationFn: createDataAdapter,
-    onSuccess: () => {
-      UserNotification.success('Data Adapter created successfully');
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -314,14 +288,7 @@ export function useCreateAdapter() {
 }
 
 export function useUpdateAdapter() {
-<<<<<<< HEAD
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
-=======
   const { mutateAsync, isPending: isLoading } = useMutation({
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     mutationFn: updateDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter updated successfully');

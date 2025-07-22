@@ -17,25 +17,17 @@
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
-<<<<<<< HEAD
-import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-=======
 import {
   LookupTableDataAdaptersActions,
   LookupTableDataAdaptersStore,
 } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 import type { SearchParams } from 'stores/PaginationTypes';
-<<<<<<< HEAD
-import type { LookupTableCache } from 'logic/lookup-tables/types';
-=======
 import type { LookupPreviewType } from 'components/lookup-tables/types';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 
 export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
 
@@ -55,11 +47,10 @@ export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => 
   return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
 };
 
-<<<<<<< HEAD
 export const createLookupTable = async (payload: LookupTableCache) => LookupTablesActions.create(payload);
 
 export const updateLookupTable = async (payload: LookupTableCache) => LookupTablesActions.update(payload);
-=======
+
 export const purgeLookupTableKey = async ({ table, key }: { table: LookupTable; key: string }) =>
   LookupTablesActions.purgeKey(table, key);
 
@@ -70,7 +61,6 @@ export const testLookupTableKey = async ({ tableName, key }: { tableName: string
 
 export const fetchLookupPreview = async (idOrName: string, size: number): Promise<LookupPreviewType> =>
   fetch('GET', qualifyUrl(`/system/lookup/tables/preview/${idOrName}?size=${size}`));
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 
 export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
   const { page, pageSize, query } = searchParams;
@@ -85,11 +75,7 @@ export const fetchCacheTypes = async () => {
   return state.types;
 };
 
-<<<<<<< HEAD
-export const validateCache = async (cache) => {
-=======
 export const validateCache = async (cache: LookupTableCache) => {
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
   await LookupTableCachesActions.validate(cache);
   const state = LookupTableCachesStore.getInitialState();
 
@@ -119,11 +105,7 @@ export const createDataAdapter = async (payload: LookupTableCache) => LookupTabl
 
 export const updateDataAdapter = async (payload: LookupTableCache) => LookupTableDataAdaptersActions.update(payload);
 
-<<<<<<< HEAD
-export const validateDataAdapter = async (adapter) => LookupTableDataAdaptersActions.validate(adapter);
-=======
 export const validateDataAdapter = async (adapter: LookupTableAdapter) =>
   LookupTableDataAdaptersActions.validate(adapter);
->>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 
 export const deleteDataAdapter = async (adapterId: string) => LookupTableDataAdaptersActions.delete(adapterId);

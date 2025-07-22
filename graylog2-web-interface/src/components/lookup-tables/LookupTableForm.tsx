@@ -66,7 +66,7 @@ const StyledJSONValueInput = styled(JSONValueInput)`
 
 const StyledDefaultValueSection = styled.div(
   ({ theme }) => css`
-    border: 1px solid ${theme.colors.border};
+    border: 1px solid ${theme.colors.variant.lighter.default};
     border-radius: 10px;
     margin-bottom: ${theme.spacings.xxs};
     padding: 10px;
