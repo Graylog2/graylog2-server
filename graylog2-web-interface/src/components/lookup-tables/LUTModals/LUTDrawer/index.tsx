@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import Drawer from 'components/common/Drawer';
 
-const Wrapper = styled.div<{ $active: boolean }>(
-  ({ theme, $active }) => css`
-    color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-  `,
+type Props = {
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+};
+
+const LUTDrawer = ({ onClose, title, children }: Props) => (
+  <Drawer opened onClose={onClose} size="lg" position="right" overlayProps={{ zIndex: '1030' }} title={title}>
+    {children}
+  </Drawer>
 );
 
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check_circle' : 'cancel'} />
-  </Wrapper>
-);
-
-export default LoggedInIcon;
+export default LUTDrawer;

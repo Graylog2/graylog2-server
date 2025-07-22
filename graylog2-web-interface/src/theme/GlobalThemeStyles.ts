@@ -148,7 +148,7 @@ const GlobalThemeStyles = createGlobalStyle(
     }
 
     legend small {
-      color: ${theme.colors.gray[60]};
+      color: ${theme.colors.text.secondary};
       margin-left: 5px;
     }
 
@@ -168,7 +168,7 @@ const GlobalThemeStyles = createGlobalStyle(
 
       p.description {
         margin-top: 3px;
-        color: ${theme.colors.gray[50]};
+        color: ${theme.colors.text.secondary};
       }
     }
 

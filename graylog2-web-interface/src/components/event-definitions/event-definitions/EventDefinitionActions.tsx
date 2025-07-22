@@ -89,10 +89,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
-  const moreActions = [
-    pluggableActions.length ? pluggableActions : null,
-  ].filter(Boolean);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } =
+    usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
+  const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
 

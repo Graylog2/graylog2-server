@@ -275,11 +275,11 @@ const LookupTableForm = ({ onClose, onCacheCreateClick, onDataAdapterCreateClick
           </fieldset>
 
           <DataAdaptersContainer dataAdapter={dataAdapter}>
-            <DataAdapterPicker onCreateClick={onDataAdapterCreateClick} dataAdapter={dataAdapter} />
+            <DataAdapterPicker onCreateClick={onDataAdapterCreateClick} />
           </DataAdaptersContainer>
 
           <CachesContainer cache={cache}>
-            <CachePicker onCreateClick={onCacheCreateClick} cache={cache} />
+            <CachePicker onCreateClick={onCacheCreateClick} />
           </CachesContainer>
 
           <fieldset>

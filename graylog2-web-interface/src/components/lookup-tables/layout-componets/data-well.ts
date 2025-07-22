@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import styled from 'styled-components';
 
-import { Icon } from 'components/common';
+const DataWell = styled.div<{ $color?: 'background' | 'content' }>`
+  width: 100%;
+  border: 1px solid ${({ theme }) => theme.colors.cards.border};
+  border-radius: 8px;
+  padding: ${({ theme }) => theme.spacings.md};
+  background-color: ${({ theme, $color }) => theme.colors.global[$color || 'background']};
+`;
 
-type Props = {
-  builtIn: boolean;
-};
-
-const BuiltInCell = ({ builtIn }: Props) => {
-  if (!builtIn) return null;
-
-  return <Icon name="check_circle" />;
-};
-
-export default BuiltInCell;
+export default DataWell;

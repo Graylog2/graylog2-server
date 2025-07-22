@@ -16,25 +16,20 @@
  */
 import * as React from 'react';
 
-import Drawer from 'components/common/Drawer';
+import Icon from 'components/common/Icon';
 
 type Props = {
-  onClose: () => void,
-  title: string,
-  children: React.ReactNode,
-}
+  active: boolean;
+  className?: string;
+};
 
-const LUTDrawer = ({ onClose, title, children }: Props) => (
-  <Drawer
-    opened
-    onClose={onClose}
-    size="lg"
-    position="right"
-    overlayProps={{ zIndex: '1030' }}
-    title={title}
-    >
-    {children}
-  </Drawer>
+const StatusIcon = ({ active, className = undefined }: Props) => (
+  <Icon
+    name={active ? 'check_circle' : 'cancel'}
+    bsStyle={active ? 'success' : undefined}
+    className={className}
+    title={active ? 'Yes' : 'No'}
+  />
 );
 
-export default LUTDrawer;
+export default StatusIcon;

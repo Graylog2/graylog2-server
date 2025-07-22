@@ -20,7 +20,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Button, Label } from 'components/bootstrap';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import type { CachePluginType } from './types';
 import { SummaryRow, Title, Value } from './caches/SummaryComponents.styled';
@@ -63,7 +63,6 @@ const Cache = ({ cache }: Props) => {
 
         <h4>Configuration</h4>
         <div>{React.createElement(plugin.summaryComponent, { cache: cache })}</div>
-
       </Col>
     </Row>
   );

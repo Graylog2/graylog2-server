@@ -20,12 +20,11 @@ import styled from 'styled-components';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
-import LookupTableView from 'components/lookup-tables/LookupTableView';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
+import LookupTableDetails from 'components/lookup-tables/LUTModals/LUTDrawer/lookup-table';
 import Cache from 'components/lookup-tables/Cache';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
-
-import type { LookupTableEntity, CachesMap, AdaptersMap } from './types';
+import type { LookupTableEntity, CachesMap, AdaptersMap } from 'components/lookup-tables/types';
 
 const TitleRow = styled.div`
   display: flex;
@@ -46,7 +45,19 @@ const Title = styled.div`
   }
 `;
 
-const TitleCol = ({ lut, caches, adapters, title, children }: { lut: LookupTableEntity; caches: CachesMap; adapters: AdaptersMap; title: string; children: string }) => {
+const TitleCol = ({
+  lut,
+  caches,
+  adapters,
+  title,
+  children,
+}: {
+  lut: LookupTableEntity;
+  caches: CachesMap;
+  adapters: AdaptersMap;
+  title: string;
+  children: string;
+}) => {
   const { errors } = useErrorsContext();
   const tableErrorText = errors?.lutErrors[lut.name];
   const { setModal, setTitle, setEntity } = useModalContext();
@@ -54,7 +65,9 @@ const TitleCol = ({ lut, caches, adapters, title, children }: { lut: LookupTable
   const onClick = React.useCallback(() => {
     setModal('LUT');
     setTitle(title);
-    setEntity(<LookupTableView table={lut} cache={caches[lut.cache_id]} dataAdapter={adapters[lut.data_adapter_id]} />);
+    setEntity(
+      <LookupTableDetails table={lut} cache={caches[lut.cache_id]} dataAdapter={adapters[lut.data_adapter_id]} />,
+    );
   }, [lut, caches, adapters, title, setModal, setTitle, setEntity]);
 
   return (
@@ -115,8 +128,21 @@ const columnRenderers: ColumnRenderers<LookupTableEntity> = {
   attributes: {
     title: {
       width: 0.1,
+<<<<<<< HEAD
       renderCell: (title: string, lut: LookupTableEntity, _c: any, meta: { caches: CachesMap, adapters: AdaptersMap; }) =>
         <TitleCol lut={lut} caches={meta?.caches} adapters={meta?.adapters} title={title}>{title}</TitleCol>,
+=======
+      renderCell: (
+        title: string,
+        lut: LookupTableEntity,
+        _c: any,
+        meta: { caches: CachesMap; adapters: AdaptersMap },
+      ) => (
+        <TitleCol lut={lut} caches={meta?.caches} adapters={meta?.adapters} title={title}>
+          {title}
+        </TitleCol>
+      ),
+>>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
     },
     description: {
       width: 0.2,

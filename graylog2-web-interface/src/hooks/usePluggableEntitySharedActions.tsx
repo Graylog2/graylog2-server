@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -25,19 +24,13 @@ function usePluggableEntitySharedActions<T>(entity: T, entityType: string) {
   const modalRefs = useRef({});
   const pluginActions = usePluginEntities('components.shared.entityActions');
 
-  const availableActions = pluginActions.filter((action) =>
-    action.useCondition ? !!action.useCondition() : true
-  );
+  const availableActions = pluginActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
 
   const actions = availableActions.map((action: EntitySharedAction<T, ModalHandler>) => {
     const { key, component: PluggableEntityAction } = action;
 
     return (
-      <PluggableEntityAction
-        key={`entity-action-${key}`}
-        entity={entity}
-        modalRef={() => modalRefs.current[key]}
-      />
+      <PluggableEntityAction key={`entity-action-${key}`} entity={entity} modalRef={() => modalRefs.current[key]} />
     );
   });
 

@@ -19,11 +19,10 @@ import styled from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
-import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import Cache from 'components/lookup-tables/Cache';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-
-import type { CacheEntity } from './types';
+import type { CacheEntity } from 'components/lookup-tables/types';
 
 const TitleRow = styled.div`
   display: flex;

@@ -21,10 +21,13 @@ import { Icon, Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+<<<<<<< HEAD
 import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
+=======
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
+>>>>>>> df677229f18938b0a79a99ee48e0183d5c1268cf
 import { useDeleteDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-
-import type { DataAdapterEntity } from './types';
+import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
 type ActionsProps = {
   adapter: DataAdapterEntity;
