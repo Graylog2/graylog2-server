@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import QueryHelper from 'components/common/QueryHelper';
 import type View from 'views/logic/views/View';
 import { fetchDashboards, keyFn } from 'views/components/dashboard/hooks/useDashboards';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/useColumnRenderers';
-import { DEFAULT_LAYOUT, COLUMNS_ORDER } from 'views/components/dashboard/DashboardsOverview/Constants';
+import getDashboardTableElements from 'views/components/dashboard/DashboardsOverview/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 import BulkActions from './BulkActions';
 
@@ -31,23 +32,37 @@ type Props = {
 };
 
 const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
-  const customColumnRenderers = useColumnRenderers();
+  const {
+    pluggableColumnRenderers,
+    pluggableAttributes,
+    pluggableExpandedSections
+  } = usePluggableEntityTableElements<View>(null, 'dashboard');
+  const { getDefaultLayout, columnOrder, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
+  const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
 
   const renderDashboardActions = useCallback(
     (dashboard: View) => <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />,
     [isEvidenceModal],
   );
+  const expandedSections = useMemo(
+    () => ({
+      ...pluggableExpandedSections,
+    }),
+    [pluggableExpandedSections],
+  );
 
   return (
     <PaginatedEntityTable<View>
       humanName="dashboards"
-      columnsOrder={COLUMNS_ORDER}
+      columnsOrder={columnOrder}
       queryHelpComponent={
         <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
       }
       entityActions={renderDashboardActions}
-      tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
+      tableLayout={getDefaultLayout(isEvidenceModal)}
       fetchEntities={fetchDashboards}
+      additionalAttributes={additionalAttributes}
+      expandedSectionsRenderer={expandedSections}
       keyFn={keyFn}
       entityAttributesAreCamelCase
       bulkSelection={{ actions: <BulkActions /> }}

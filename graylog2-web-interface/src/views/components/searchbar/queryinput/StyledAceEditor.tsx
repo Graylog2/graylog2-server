@@ -97,7 +97,7 @@ const StyledAceEditor = styled(AceEditor)<Props>(
       }
 
       .ace_keyword.ace_operator {
-        color: ${$scTheme.colors.global.textDefault};
+        color: ${$scTheme.colors.text.primary};
       }
 
       .ace_constant.ace_character,

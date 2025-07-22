@@ -203,4 +203,23 @@ describe('XYPlot', () => {
 
     expect(onClick).toHaveBeenCalledWith({ x: 'Foo', y: '23' });
   });
+
+  it('maps axis type correctly', async () => {
+    const plotLayout = {
+      yaxis: {
+        side: 'left' as const,
+      },
+    };
+
+    render(<SimpleXYPlot plotLayout={plotLayout} axisType="logarithmic" />);
+
+    expect(GenericPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'layout': expect.objectContaining({
+          yaxis: expect.objectContaining({ type: 'log', side: 'left' }), // ensure plotLayout is merged correctly
+        }),
+      }),
+      {},
+    );
+  });
 });
