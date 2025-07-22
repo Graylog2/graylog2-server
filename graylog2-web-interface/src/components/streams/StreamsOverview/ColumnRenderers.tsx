@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
+import type { ColumnRenderersByAttribute } from 'src/components/common/EntityDataTable/types';
 
 import type { Output } from 'stores/outputs/OutputsStore';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
@@ -32,6 +33,7 @@ import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
 
+
 const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 const pipelineRenderer = {
   pipelines: {
@@ -43,6 +45,7 @@ const customColumnRenderers = (
   indexSets: Array<IndexSet>,
   isPipelineColumnPermitted: boolean,
   permissions: Immutable.List<string>,
+  pluggableColumnRenderers?: ColumnRenderersByAttribute<Stream>,
 ): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
@@ -75,6 +78,7 @@ const customColumnRenderers = (
       staticWidth: 100,
     },
     ...(getStreamDataLakeTableElements?.(permissions)?.columnRenderer || {}),
+    ...(pluggableColumnRenderers || {}),
   },
 });
 
