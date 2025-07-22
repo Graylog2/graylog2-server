@@ -19,9 +19,7 @@ import * as React from 'react';
 import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
-import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { useModalContext } from 'components/lookup-tables/LUTModals/ModalContext';
@@ -34,14 +32,15 @@ type ActionsProps = {
 
 function Actions({ lut }: ActionsProps) {
   const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
-  const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
   const { setModal, setTitle, setEntity } = useModalContext();
 
   const handleEdit = React.useCallback(() => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
+    setModal('LUT-EDIT');
+    setTitle(lut.name);
+    setEntity(lut);
   }, [lut, setModal, setTitle, setEntity]);
 
   const handleDelete = React.useCallback(() => {

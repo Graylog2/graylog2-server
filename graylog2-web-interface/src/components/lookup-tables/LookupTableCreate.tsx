@@ -19,13 +19,21 @@ import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { LookupTableForm } from 'components/lookup-tables';
+import type { LookupTable } from 'logic/lookup-tables/types';
+
+type LookupTableType = LookupTable & {
+  enable_single_value: boolean;
+  enable_multi_value: boolean;
+};
 
 type Props = {
+  create: boolean;
   onClose: () => void;
   onCacheCreateClick: () => void;
   onDataAdapterCreateClick: () => void;
   dataAdapter?: string;
   cache?: string;
+  table?: LookupTableType;
 };
 
 const StyledRow = styled(Row)`
@@ -34,11 +42,11 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const LookupTableCreate = ({ onClose, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '' }: Props) => (
+const LookupTableCreate = ({ create, onClose, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '', table = undefined }: Props) => (
   <>
     <StyledRow>
       <Col lg={6}>
-        <LookupTableForm onClose={onClose} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create dataAdapter={dataAdapter} cache={cache} />
+        <LookupTableForm onClose={onClose} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create={create} dataAdapter={dataAdapter} cache={cache} table={table} />
       </Col>
     </StyledRow>
   </>

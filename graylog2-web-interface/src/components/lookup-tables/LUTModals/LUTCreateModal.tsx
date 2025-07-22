@@ -21,14 +21,22 @@ import { Icon } from 'components/common';
 import { Modal } from 'components/bootstrap';
 import { LookupTableCreate, CacheCreate, DataAdapterCreate } from 'components/lookup-tables';
 import { LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
+import type { LookupTable } from 'logic/lookup-tables/types';
+
+type LookupTableType = LookupTable & {
+  enable_single_value: boolean;
+  enable_multi_value: boolean;
+};
 
 type Props = {
   onClose: () => void;
+  title?: string;
+  lut?: LookupTableType;
 }
 
 type Section = 'lookup' | 'cache' | 'adapter';
 
-const LUTCreateModal = ({ onClose }: Props) => {
+const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
   const [activeSection, setActiveSection] = React.useState<Section>('lookup');
   const [showCache, setShowCache] = React.useState(false);
   const [showAdapter, setShowAdapter] = React.useState(false);
@@ -100,14 +108,16 @@ const LUTCreateModal = ({ onClose }: Props) => {
   return (
     <Modal show fullScreen onHide={onClose}>
       <Modal.Header>
-        <Modal.Title>Create Lookup Table</Modal.Title>
+        <Modal.Title>{title || "Create Lookup Table"}</Modal.Title>
         <Divider />
       </Modal.Header>
       <Stack>
         <div>
-          <Header title="Lookup Table" section="lookup" />
+          {(showCache || showAdapter) && <Header title="Lookup Table" section="lookup" />}
           <Collapse in={activeSection === 'lookup'}>
             <LookupTableCreate
+              create={lut ? false : true}
+              table={lut}
               onClose={() => onClose()}
               onCacheCreateClick={handleCacheCreateClick}
               onDataAdapterCreateClick={handleDataAdapterClick}
