@@ -50,13 +50,13 @@ export type TableElement<T extends EntityBase> = {
   attributeName: string;
   attributes: Array<Attribute>;
   getColumnRenderer: (entityType: string) => ColumnRenderer<T, unknown>;
-  expandedSection: (entityType: string) => {[sectionName: string]: ExpandedSectionRenderer<T>};
+  expandedSection: (entityType: string) => { [sectionName: string]: ExpandedSectionRenderer<T> };
   tableCellComponent: React.ComponentType<{
     entityId: string;
     entityType: string;
   }>;
   useCondition: () => true;
-}
+};
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -23,26 +22,36 @@ import type { EntityBase } from 'components/common/EntityDataTable/types';
 const usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, entityType: string) => {
   const pluginTableElements = usePluginEntities('components.shared.entityTableElements');
 
-  const tableElements = pluginTableElements.filter((action) =>
-    (action.useCondition ? !!action.useCondition() : true));
-  const pluggableColumnRenderers = tableElements.reduce((acc, curr) =>
-    ({ ...acc, ...curr.getColumnRenderer(entityType) }), {});
-  const pluggableAttributes = tableElements.reduce((acc, curr) =>
-    ([...acc, ...curr.attributes]), []);
-  const pluggableAttributeNames = tableElements.reduce((acc, curr) =>
-    ([...acc, curr.attributeName]), []);
-  const pluggableExpandedSections = tableElements.reduce((acc, curr) =>
-    ({ ...acc, ...curr.expandedSection(entityType) }), {});
+  const tableElements = pluginTableElements.filter((action) => (action.useCondition ? !!action.useCondition() : true));
+  const pluggableColumnRenderers = tableElements.reduce(
+    (acc, curr) => ({ ...acc, ...curr.getColumnRenderer(entityType) }),
+    {},
+  );
+  const pluggableAttributes = tableElements.reduce((acc, curr) => [...acc, ...curr.attributes], []);
+  const pluggableAttributeNames = tableElements.reduce((acc, curr) => [...acc, curr.attributeName], []);
+  const pluggableExpandedSections = tableElements.reduce(
+    (acc, curr) => ({ ...acc, ...curr.expandedSection(entityType) }),
+    {},
+  );
 
-  const getPluggableTableCells = (entityId: string) => tableElements.reduce((acc, curr) =>
-    ([...acc, {
-      component: curr.tableCellComponent,
-    }]), []).map(({ component: PluggableTableCell }) => (
-      <PluggableTableCell key={entityId} entityId={entityId} entityType={entityType} />
-    ));
+  const getPluggableTableCells = (entityId: string) =>
+    tableElements
+      .reduce(
+        (acc, curr) => [
+          ...acc,
+          {
+            component: curr.tableCellComponent,
+          },
+        ],
+        [],
+      )
+      .map(({ component: PluggableTableCell }) => (
+        <PluggableTableCell key={entityId} entityId={entityId} entityType={entityType} />
+      ));
 
-  const pluggableTableHeaders = tableElements.reduce((acc, curr) =>
-    ([...acc, ...curr.attributes]), []).map((attribute) => (
+  const pluggableTableHeaders = tableElements
+    .reduce((acc, curr) => [...acc, ...curr.attributes], [])
+    .map((attribute) => (
       <th key={attribute.id} className={`entity-table-header-${attribute.id}`}>
         {attribute.title}
       </th>
@@ -58,6 +67,6 @@ const usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, entit
     getPluggableTableCells,
     pluggableTableHeaders,
   };
-}
+};
 
 export default usePluggableEntityTableElements;
