@@ -20,7 +20,7 @@ import { useState } from 'react';
 import moment from 'moment';
 
 import { FormikInput, TimeUnitInput } from 'components/common';
-import { Button, ButtonToolbar, Modal } from 'components/bootstrap';
+import { Button, ButtonToolbar, Checkbox, Modal } from 'components/bootstrap';
 import type { ClientCertFormValues } from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import useCreateDataNodeClientCert from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import ClientCertificateView from 'components/datanode/client-certificate/ClientCertificateView';
@@ -34,6 +34,7 @@ type Props = {
 
 const ClientCertForm = ({ onCancel }: Props) => {
   const [clientCerts, setClientCerts] = useState(null);
+  const [isUnencrypted, setIsUnencrypted] = useState(false);
   const { onCreateClientCert } = useCreateDataNodeClientCert();
 
   const onSubmit = (formValues: ClientCertFormValues) => {
@@ -50,6 +51,11 @@ const ClientCertForm = ({ onCancel }: Props) => {
       .catch(() => {});
   };
 
+  const onToggleUnencrypted = (setFieldValue: (field: string, value: any) => void) => {
+    setIsUnencrypted(!isUnencrypted);
+    setFieldValue('password', null);
+  };
+
   return (
     <>
       <Modal.Header>
@@ -61,7 +67,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
             {
               principal: '',
               role: 'all_access',
-              password: '',
+              password: null,
               lifetimeValue: 30,
               lifetimeUnit: 'days',
             } as ClientCertFormValues
@@ -79,13 +85,22 @@ const ClientCertForm = ({ onCancel }: Props) => {
                   label="Role"
                   required
                 />
+                <Checkbox
+                  type="checkbox"
+                  id="client_certificate_unencrypted"
+                  name="client_certificate_unencrypted"
+                  checked={isUnencrypted}
+                  onChange={() => onToggleUnencrypted(setFieldValue)}>
+                  Unencrypted
+                </Checkbox>
                 <FormikInput
                   id="password"
                   placeholder="*******"
                   name="password"
                   type="password"
                   label="Password"
-                  required
+                  disabled={isUnencrypted}
+                  required={!isUnencrypted}
                 />
                 <TimeUnitInput
                   label="Certificate Lifetime"

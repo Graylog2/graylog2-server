@@ -34,19 +34,20 @@ public class EventNotifications implements GraylogRestApi {
 
     public String createHttpNotification(URI uri) {
         final String body = """
-                {
-                  "title": "my http notification",
-                  "description": "",
-                  "config": {
-                    "url": "%s",
-                    "api_key_as_header": false,
-                    "api_key": "",
-                    "api_secret": null,
-                    "basic_auth": null,
-                    "skip_tls_verification": false,
-                    "type": "http-notification-v1"
-                  }
-                }
+                { "entity":
+                    {
+                      "title": "my http notification",
+                      "description": "",
+                      "config": {
+                        "url": "%s",
+                        "api_key_as_header": false,
+                        "api_key": "",
+                        "api_secret": null,
+                        "basic_auth": null,
+                        "skip_tls_verification": false,
+                        "type": "http-notification-v1"
+                      }
+                }}
                 """;
         final ValidatableResponse res = api.post("/events/notifications", String.format(Locale.ROOT, body, uri), 200);
         return res.extract().body().jsonPath().getString("id");

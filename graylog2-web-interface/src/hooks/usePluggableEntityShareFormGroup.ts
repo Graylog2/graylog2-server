@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-import { Icon } from 'components/common';
+const usePluggableEntityShareFormGroup = () => {
+  const pluggableCollection = usePluginEntities('components.collection');
 
-type Props = {
-  builtIn: boolean;
+  return pluggableCollection?.[0]?.AddCollectionFormGroup ?? null;
 };
 
-const BuiltInCell = ({ builtIn }: Props) => {
-  if (!builtIn) return null;
-
-  return <Icon name="check_circle" />;
-};
-
-export default BuiltInCell;
+export default usePluggableEntityShareFormGroup;

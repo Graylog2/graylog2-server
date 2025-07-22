@@ -18,10 +18,10 @@ import * as React from 'react';
 import { Space } from '@mantine/core';
 import styled from 'styled-components';
 
+import { Badge, List } from 'preflight/components/common';
 import Spinner from 'components/common/Spinner';
 import Alert from 'components/bootstrap/Alert';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Badge, List } from 'preflight/components/common';
 import DataNodeBadge from 'components/datanode/DataNodeList/DataNodeBadge';
 
 const P = styled.p`
@@ -54,7 +54,6 @@ const DataNodesOverview = () => {
         These are the data nodes which are currently registered. The list is constantly updated.{' '}
         {isFetchingDataNodes && <Spinner text="" />}
       </P>
-
       {!!dataNodes.length && (
         <>
           <Space h="sm" />
