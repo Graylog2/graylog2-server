@@ -28,7 +28,8 @@ const getStreamTableElements = (
   pluggableAttributes?: {
     attributeNames?: Array<string>;
     attributes?: Array<Attribute>;
-  }) => {
+  },
+) => {
   const streamDataLakeTableElements = getStreamDataLakeTableElements?.(permissions);
 
   const defaultLayout = {

@@ -16,29 +16,32 @@
  */
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
-const getEventNotificationTableElements = (
-  pluggableAttributes?: {
-    attributeNames?: Array<string>;
-    attributes?: Array<Attribute>;
-  }) => {
+const getEventNotificationTableElements = (pluggableAttributes?: {
+  attributeNames?: Array<string>;
+  attributes?: Array<Attribute>;
+}) => {
   const DEFAULT_LAYOUT = {
     entityTableId: 'event_notifications',
     defaultPageSize: 20,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-    defaultDisplayedAttributes: ['title', 'description', 'type', 'created_at', ...(pluggableAttributes?.attributeNames || [])],
+    defaultDisplayedAttributes: [
+      'title',
+      'description',
+      'type',
+      'created_at',
+      ...(pluggableAttributes?.attributeNames || []),
+    ],
   };
 
   const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at', ...(pluggableAttributes?.attributeNames || [])];
 
-  const additionalAttributes = [
-    ...(pluggableAttributes?.attributes || []),
-  ];
+  const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
 
   return {
     defaultLayout: DEFAULT_LAYOUT,
     columnOrder: COLUMNS_ORDER,
     additionalAttributes,
   };
-}
+};
 
 export default getEventNotificationTableElements;
