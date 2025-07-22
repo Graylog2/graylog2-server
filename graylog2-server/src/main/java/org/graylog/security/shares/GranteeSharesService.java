@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,13 +51,22 @@ public class GranteeSharesService {
     private final DBGrantService grantService;
     private final GRNDescriptorService descriptorService;
     private final GranteeService granteeService;
+    private final Set<CollectionRequestHandler> collectionRequestHandlers;
 
     @Inject
     public GranteeSharesService(DBGrantService grantService,
-                                GRNDescriptorService descriptorService, GranteeService granteeService) {
+                                GRNDescriptorService descriptorService,
+                                GranteeService granteeService,
+                                Set<CollectionRequestHandler> collectionRequestHandlers) {
         this.grantService = grantService;
         this.descriptorService = descriptorService;
         this.granteeService = granteeService;
+        this.collectionRequestHandlers = collectionRequestHandlers;
+    }
+
+    private Predicate<GRN> excludeCollectionTypesFilter() {
+        return entityDescriptor -> collectionRequestHandlers.stream()
+                .noneMatch(handler -> handler.collectionEntitiesFilter().test(entityDescriptor));
     }
 
     public SharesResponse getPaginatedSharesFor(GRN grantee,
@@ -70,7 +80,10 @@ public class GranteeSharesService {
                 .map(c -> grantService.getForGranteesOrGlobalWithCapability(granteeAliases, c))
                 .orElseGet(() -> grantService.getForGranteesOrGlobal(granteeAliases));
 
-        final Set<GRN> targets = grants.stream().map(GrantDTO::target).collect(Collectors.toSet());
+        final Set<GRN> targets = grants.stream()
+                .map(GrantDTO::target)
+                .filter(excludeCollectionTypesFilter())
+                .collect(Collectors.toSet());
 
         final Map<GRN, Set<Grantee>> targetOwners = getTargetOwners(targets);
 
