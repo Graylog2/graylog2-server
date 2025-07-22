@@ -74,7 +74,7 @@ const usePreferredColorScheme = (
   userIsLoggedIn: boolean,
 ): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
   const browserThemePreference = useBrowserColorSchemePreference();
-  const [themeMode, setThemeMode] = usePersistedSetting<ColorScheme>(PREFERENCES_THEME_MODE);
+  const [themeMode, setThemeMode] = usePersistedSetting(PREFERENCES_THEME_MODE);
 
   const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(() =>
     getInitialThemeMode({

@@ -31,7 +31,7 @@ const findPerspective = (perspectives: Array<Perspective>, perspectiveId: string
 
 const useActivePerspectiveState = (availablePerspectives: Array<Perspective>) => {
   const [persistedPerspective, setPersistedPerspective] = usePersistedSetting('perspective');
-  const [activePerspective, setActivePerspective] = useState<string>(
+  const [activePerspective, setActivePerspective] = useState(
     findPerspective(availablePerspectives, persistedPerspective) ? persistedPerspective : DEFAULT_PERSPECTIVE,
   );
   const setActivePerspectiveWithPersistence = useCallback(

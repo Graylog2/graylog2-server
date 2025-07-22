@@ -16,12 +16,15 @@
  */
 import { useCallback, useContext, useMemo } from 'react';
 
+import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 import Store from 'logic/local-storage/Store';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-const usePersistedSetting = <T = string>(settingKey: string): [T, (newValue: T) => void] => {
+const usePersistedSetting = <T extends keyof UserPreferences>(
+  settingKey: T,
+): [UserPreferences[T], (newValue: UserPreferences[T]) => void] => {
   const currentUser = useCurrentUser(false);
   const { userIsReadOnly, username } = useMemo(
     () => ({ username: currentUser?.username, userIsReadOnly: currentUser?.readOnly ?? true }),
@@ -29,10 +32,10 @@ const usePersistedSetting = <T = string>(settingKey: string): [T, (newValue: T) 
   );
 
   const userPreferences = useContext(UserPreferencesContext);
-  const setting = userIsReadOnly ? Store.get(settingKey) : userPreferences[settingKey];
+  const setting: UserPreferences[T] = userIsReadOnly ? Store.get(settingKey) : userPreferences[settingKey];
 
   const setSetting = useCallback(
-    (newSetting: T) => {
+    (newSetting: UserPreferences[T]) => {
       if (userIsReadOnly) {
         Store.set(settingKey, newSetting);
 
