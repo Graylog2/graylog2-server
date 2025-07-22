@@ -30,7 +30,7 @@ import type {
 } from 'components/permissions/Grantee/GranteesSelector';
 import GranteesSelector from 'components/permissions/Grantee/GranteesSelector';
 import GranteesList from 'components/permissions/Grantee/GranteesList';
-import CollectionGranteesList from 'components/permissions/Grantee/CollectionGranteesList';
+import usePluggableEntityCollectionGranteeList from 'hooks/usePluggableEntityCollectionGranteeList';
 
 import ShareableEntityURL from './ShareableEntityURL';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
@@ -86,6 +86,8 @@ const EntityShareSettings = ({
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
+  const CollectionGranteeList = usePluggableEntityCollectionGranteeList();
+
   useEffect(() => {
     setDisableSubmit(validationResults?.failed);
   }, [validationResults, setDisableSubmit]);
@@ -139,13 +141,7 @@ const EntityShareSettings = ({
         />
       </Section>
       <Section>
-        <CollectionGranteesList
-          activeShares={activeShares}
-          entityType={entityType}
-          entityTypeTitle={entityTypeTitle}
-          selectedGrantees={selectedGrantees}
-          title="Collection Collaborators"
-        />
+        <CollectionGranteeList />
       </Section>
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}

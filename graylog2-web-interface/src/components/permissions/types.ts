@@ -71,6 +71,12 @@ declare module 'graylog-web-plugin/plugin' {
         value?: Array<string>;
         onChange: (values: Pick<EntitySharePayload, 'selected_collections'>) => void;
       }>;
+      CollectionGranteeList: React.ComponentType<{
+        entityType?: string;
+        name?: string;
+        error?: any;
+        value?: Array<string>;
+      }>;
     };
   }
 }
