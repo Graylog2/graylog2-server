@@ -68,7 +68,7 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
             <DashboardFavoriteItem dashboardId={dashboard.id} favorite={favorite} />
           ),
         },
-         ...(pluggableColumnRenderers || {}),
+        ...(pluggableColumnRenderers || {}),
       },
     }),
     [requirementsProvided, pluggableColumnRenderers],
