@@ -14,18 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+package org.graylog.events.processor;
 
-import CurrentUserContext from 'contexts/CurrentUserContext';
-
-const useCurrentUser = (failWithoutContext: boolean = true) => {
-  const currentUser = useContext(CurrentUserContext);
-
-  if (!currentUser && failWithoutContext) {
-    throw new Error('useCurrentUser hook needs to be used inside CurrentUserContext.Provider');
-  }
-
-  return currentUser;
-};
-
-export default useCurrentUser;
+public record EventDefinitionDeleted(String eventDefinitionId) {
+}

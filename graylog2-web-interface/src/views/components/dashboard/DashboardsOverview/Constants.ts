@@ -17,11 +17,10 @@
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
-const getDashboardTableElements = (
-  pluggableAttributes?: {
-    attributeNames?: Array<string>;
-    attributes?: Array<Attribute>;
-  }) => {
+const getDashboardTableElements = (pluggableAttributes?: {
+  attributeNames?: Array<string>;
+  attributes?: Array<Attribute>;
+}) => {
   const getDefaultLayout = (isEvidenceModal: boolean) => ({
     entityTableId: 'dashboards',
     defaultPageSize: 20,
@@ -31,11 +30,18 @@ const getDashboardTableElements = (
       : ['title', 'description', 'summary', 'favorite', ...(pluggableAttributes?.attributeNames || [])],
   });
 
-  const columnOrder = ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite', ...(pluggableAttributes?.attributeNames || [])];
-
-  const additionalAttributes = [
-    ...(pluggableAttributes?.attributes || []),
+  const columnOrder = [
+    'title',
+    'summary',
+    'description',
+    'owner',
+    'created_at',
+    'last_updated_at',
+    'favorite',
+    ...(pluggableAttributes?.attributeNames || []),
   ];
+
+  const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
 
   return {
     getDefaultLayout,
