@@ -61,8 +61,22 @@ type Props = {
   fullScreen?: boolean;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined, backdrop = true, closable = true, fullScreen = false}: Props) => (
-  <ModalRoot opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus closeOnEscape={closable} fullScreen={fullScreen}>
+const Modal = ({
+  onHide,
+  show = false,
+  children,
+  bsSize = undefined,
+  backdrop = true,
+  closable = true,
+  fullScreen = false,
+}: Props) => (
+  <ModalRoot
+    opened={show}
+    onClose={onHide}
+    size={sizeForMantine(bsSize)}
+    trapFocus
+    closeOnEscape={closable}
+    fullScreen={fullScreen}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </ModalRoot>
