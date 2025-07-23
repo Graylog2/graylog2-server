@@ -77,7 +77,7 @@ public class GranteeSharesService {
         final Supplier<Stream<EntityDescriptor>> filteredStream = () -> targets.stream()
                 .map(descriptorService::getDescriptor)
                 .filter(EntityPaginationHelper.queryPredicate(paginationParameters.getQuery()))
-                .filter(EntityPaginationHelper.entityFilterPredicate(entityTypeFilterString))
+                .filter(EntityPaginationHelper.entityFiltersDescriptorPredicate(List.of(entityTypeFilterString)))
                 .map(toEntityDescriptor(targetOwners))
                 .sorted(Comparator.comparing(EntityDescriptor::title, (t1, t2) -> {
                     if (paginationParameters.getOrder().toLowerCase(Locale.US).equals("desc")) {

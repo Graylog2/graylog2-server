@@ -17,13 +17,12 @@
 import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, Input, Label } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import Routes from 'routing/Routes';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import type { DataAdapterPluginType } from './types';
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
@@ -36,6 +35,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   const [lookupKey, setLookupKey] = React.useState('');
   const [lookupResult, setLookupResult] = React.useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
+  const { setModal, setTitle, setEntity } = useModalContext();
 
   const _onChange = (event: React.SyntheticEvent) => {
     setLookupKey(getValueFromInput(event.target));
@@ -49,6 +49,12 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     });
   };
 
+  const handleEdit = () => {
+    setModal('DATA-ADAPTER-EDIT');
+    setTitle(dataAdapter.name);
+    setEntity(dataAdapter);
+  };
+
   const plugin = usePluginEntities('lookupTableAdapters').find(
     (p: DataAdapterPluginType) => p.type === dataAdapter.config?.type,
   );
@@ -57,13 +63,20 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
   }
 
-  const { description: adapterDescription, name: adapterName } = dataAdapter;
+  const { description: adapterDescription } = dataAdapter;
   const summary = plugin.summaryComponent;
 
   return (
     <Row className="content">
       <Col md={12}>
-        <Label>{plugin.displayName}</Label>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Label>{plugin.displayName}</Label>
+          {!loadingScopePermissions && scopePermissions?.is_mutable && (
+            <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
+              Edit
+            </Button>
+          )}
+        </div>
         <ConfigSummaryDefinitionListWrapper>
           <dl>
             <dt>Description</dt>
@@ -75,13 +88,6 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { dataAdapter: dataAdapter })}
         </ConfigSummaryDefinitionListWrapper>
-        {!loadingScopePermissions && scopePermissions?.is_mutable && (
-          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-            <Button bsStyle="success" role="button" name="edit_square">
-              Edit
-            </Button>
-          </LinkContainer>
-        )}
         <hr />
         <h3>Test lookup</h3>
         <p>You can manually trigger the data adapter using this form. The data will be not cached.</p>

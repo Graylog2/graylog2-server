@@ -1,5 +1,13 @@
 type = "a"
 message = "Lookup table page UI revamp"
 
-issues = ["Graylog2/graylog-plugin-enterprise#11108", "Graylog2/graylog-plugin-enterprise#11107", "Graylog2/graylog-plugin-enterprise#11115"]
-pulls = ["23056"]
+issues = [
+  "Graylog2/graylog-plugin-enterprise#11108",
+  "Graylog2/graylog-plugin-enterprise#11107",
+  "Graylog2/graylog-plugin-enterprise#11115",
+  "Graylog2/graylog-plugin-enterprise#11110",
+  "Graylog2/graylog-plugin-enterprise#11111",
+  "Graylog2/graylog-plugin-enterprise#11109",
+]
+
+pulls = ["23056", "23203", "23222"]

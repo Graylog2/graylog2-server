@@ -15,20 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 
-const Wrapper = styled.div<{ $active: boolean }>(
-  ({ theme, $active }) => css`
-    color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-  `,
+type Props = {
+  active: boolean;
+  className?: string;
+};
+
+const StatusIcon = ({ active, className = undefined }: Props) => (
+  <Icon
+    name={active ? 'check_circle' : 'cancel'}
+    bsStyle={active ? 'success' : undefined}
+    className={className}
+    title={active ? 'Yes' : 'No'}
+  />
 );
 
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check_circle' : 'cancel'} />
-  </Wrapper>
-);
-
-export default LoggedInIcon;
+export default StatusIcon;

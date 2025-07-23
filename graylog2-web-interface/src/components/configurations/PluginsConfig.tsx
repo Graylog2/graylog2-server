@@ -30,6 +30,7 @@ import Spinner from 'components/common/Spinner';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
 import type { SelectCallback } from 'components/bootstrap/types';
+import usePermissions from 'hooks/usePermissions';
 
 type PluginSectionLinkProps = {
   configType: string;
@@ -53,15 +54,16 @@ const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) 
 };
 
 const PluginsConfig = () => {
+  const { isPermitted } = usePermissions();
   const [activeSectionKey, setActiveSectionKey] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
   const originalPluginSystemConfigs = usePluginEntities('systemConfigurations');
   const pluginSystemConfigs = useMemo(
     () =>
-      originalPluginSystemConfigs.filter(
-        (config) => typeof config?.useCondition !== 'function' || config.useCondition(),
-      ),
-    [originalPluginSystemConfigs],
+      originalPluginSystemConfigs
+        .filter((config) => typeof config?.useCondition !== 'function' || config.useCondition())
+        .filter((config) => (config.readPermission ? isPermitted(config.readPermission) : true)), // defaults to true for backwards compatibility. should be removed once all plugins have a permission added
+    [originalPluginSystemConfigs, isPermitted],
   );
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 

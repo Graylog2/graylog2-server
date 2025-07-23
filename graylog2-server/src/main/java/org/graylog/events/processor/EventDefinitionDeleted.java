@@ -14,19 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+<<<<<<<< HEAD:graylog2-web-interface/src/components/lookup-tables/layout-componets/index.ts
+export { default as LUTPageLayout } from './lut-page-layout';
+export { default as DataWell } from './data-well';
+export { default as DataTable } from './data-table';
+export * from './flex-box';
+========
+package org.graylog.events.processor;
 
-declare module 'graylog-web-plugin/plugin' {
-  export interface PluginExports {
-    'components.collection'?: {
-      AddCollectionFormGroup: React.ComponentType<{
-        entityType?: string;
-        label?: React.ReactElement | string;
-        name?: string;
-        error?: any;
-        value?: Array<string>;
-        onChange: (values: Pick<EntitySharePayload, 'selected_collections'>) => void;
-      }>;
-    };
-  }
+public record EventDefinitionDeleted(String eventDefinitionId) {
 }
+>>>>>>>> 3ed32a24794e6500ad6a8ad06810f9c8657b1b1a:graylog2-server/src/main/java/org/graylog/events/processor/EventDefinitionDeleted.java
