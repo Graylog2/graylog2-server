@@ -20,6 +20,7 @@ import { Button } from 'components/bootstrap';
 import { LookupTablesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
+import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTTablesPage() {
   const { setModal } = useModalContext();
@@ -39,6 +40,7 @@ function LUTTablesPage() {
         </Button>
       }>
       <LookupTablesOverview />
+      <LUTModals />
     </LUTPageLayout>
   );
 }
