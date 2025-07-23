@@ -29,7 +29,7 @@ public interface CollectionRequestHandler {
         // Intentionally left empty - ignore this in the community edition.
     }
 
-    default Predicate<GRN> collectionEntitiesFilter() {
+    default Predicate<GRN> collectionFilter() {
         // Ignore this in the community edition
         return grn -> false;
     }

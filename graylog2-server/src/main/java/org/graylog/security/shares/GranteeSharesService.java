@@ -66,7 +66,7 @@ public class GranteeSharesService {
 
     private Predicate<GRN> excludeCollectionTypesFilter() {
         return entityDescriptor -> collectionRequestHandlers.stream()
-                .noneMatch(handler -> handler.collectionEntitiesFilter().test(entityDescriptor));
+                .noneMatch(handler -> handler.collectionFilter().test(entityDescriptor));
     }
 
     public SharesResponse getPaginatedSharesFor(GRN grantee,
