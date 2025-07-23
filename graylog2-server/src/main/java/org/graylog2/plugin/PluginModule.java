@@ -35,6 +35,7 @@ import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypeProvider;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -44,12 +45,16 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
+import org.graylog.security.shares.CollectionRequestHandler;
+import org.graylog.security.entities.EntityRegistrationHandler;
+import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -80,14 +85,11 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public abstract class PluginModule extends Graylog2Module {
     public Set<? extends PluginConfigBean> getConfigBeans() {
         return Collections.emptySet();
-    }
-
-    @Override
-    protected Set<Object> getConfigurationBeans() {
-        return Collections.singleton(getConfigBeans());
     }
 
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
@@ -365,6 +367,26 @@ public abstract class PluginModule extends Graylog2Module {
         mapBinder.addBinding(type).to(descriptorProvider);
     }
 
+    protected void addGRNTypeProvider(Class<? extends GRNTypeProvider> grnTypeProvider) {
+        final Multibinder<GRNTypeProvider> grnTypeProviderBinder = Multibinder.newSetBinder(binder(), GRNTypeProvider.class);
+        grnTypeProviderBinder.addBinding().to(grnTypeProvider);
+    }
+
+    protected void addEntityRegistrationHandler(Class<? extends EntityRegistrationHandler> entityRegistrationHandlerClass) {
+        final var handlerBinder = Multibinder.newSetBinder(binder(), EntityRegistrationHandler.class);
+        handlerBinder.addBinding().to(entityRegistrationHandlerClass);
+    }
+
+    protected void addSyncedEntitiesResolver(Class<? extends SyncedEntitiesResolver> resolverClass) {
+        final Multibinder<SyncedEntitiesResolver> syncedEntitiesResolverBinder = Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
+        syncedEntitiesResolverBinder.addBinding().to(resolverClass);
+    }
+
+    protected void addCollectionRequestHandler(Class<? extends CollectionRequestHandler> handlerClass) {
+        final Multibinder<CollectionRequestHandler> binder = Multibinder.newSetBinder(binder(), CollectionRequestHandler.class);
+        binder.addBinding().to(handlerClass);
+    }
+
     protected MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {
         return MapBinder.newMapBinder(
                 binder(),
@@ -466,5 +488,17 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addStreamDeletionGuard(Class<? extends StreamDeletionGuard> streamDeletionGuard) {
         streamDeletionGuardBinder().addBinding().to(streamDeletionGuard);
+    }
+
+    protected void addDbEntities(Class<?>... entitiesClasses) {
+        for (final Class<?> entitiesClass : entitiesClasses) {
+            if (!entitiesClass.isAnnotationPresent(DbEntity.class)) {
+                throw new IllegalArgumentException(f(
+                        "Trying to bind entities class %s but found no @DbEntity annotation",
+                        entitiesClass.getCanonicalName()));
+            }
+
+            dbEntitiesBinder().addBinding().toInstance(entitiesClass);
+        }
     }
 }

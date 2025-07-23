@@ -71,8 +71,6 @@ const SortConfiguration = ({
               id="sort-configuration-column-select"
               placeholder="Select a column"
               options={columnOptions}
-              matchProp="label"
-              menuPortalTarget={document.body}
               clearable={false}
               size="small"
               onChange={(newColumn) => onChange({ target: { value: newColumn, name } })}
@@ -93,8 +91,6 @@ const SortConfiguration = ({
               id="sort-configuration-direction-select"
               placeholder="Select a direction"
               options={directionOptions}
-              menuPortalTarget={document.body}
-              matchProp="label"
               clearable={false}
               size="small"
               onChange={(newDirection) => onChange({ target: { value: newDirection, name } })}

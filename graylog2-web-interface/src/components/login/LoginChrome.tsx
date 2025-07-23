@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
+import AppConfig from 'util/AppConfig';
+import useThemes from 'theme/hooks/useThemes';
+import useCustomLogo from 'brand-customization/useCustomLogo';
+import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
@@ -41,20 +47,22 @@ const Background = styled.div`
   width: 100%;
 `;
 
-const BackgroundText = styled.div`
-  z-index: -1;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  vertical-align: middle;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  padding: 0 30px;
-  background-image: url(${backgroundImage});
-  background-position: center;
-  background-size: cover;
-`;
+const BackgroundText = styled.div<{ $backgroundImage: string }>(
+  ({ $backgroundImage }) => css`
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    vertical-align: middle;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 0 30px;
+    background-image: url(${$backgroundImage});
+    background-position: center;
+    background-size: cover;
+  `,
+);
 
 const NotificationsContainer = styled.div`
   position: absolute;
@@ -103,32 +111,75 @@ const Highlight = styled.span(
   `,
 );
 
+const CustomLogo = styled.div`
+  svg {
+    width: 100%;
+    height: 200px;
+  }
+`;
+
+const CustomizableLogo = () => {
+  const { colorScheme } = useThemes('dark', false);
+  const customLogo = useCustomLogo(colorScheme);
+
+  return customLogo ? (
+    <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
+  ) : (
+    <>
+      <LogoContainer>
+        <Logo color="#ffffff" />
+      </LogoContainer>
+      <Claim>
+        Data. Insights. <Highlight>Answers.</Highlight>
+      </Claim>
+    </>
+  );
+};
+
+const sanitize = (content: string) =>
+  DOMPurify.sanitize(content, { USE_PROFILES: { svg: true }, ADD_TAGS: ['use'], ADD_ATTR: ['xlink:href'] });
+
 type Props = {
   children: React.ReactNode;
 };
 
-const LoginChrome = ({ children }: Props) => (
-  <LoginContainer>
-    <LoginBox>
-      <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
-      {children}
-    </LoginBox>
-    <Background>
-      <NotificationsContainer>
-        <PublicNotifications readFromConfig />
-      </NotificationsContainer>
-      <BackgroundText>
-        <TextContainer>
-          <LogoContainer>
-            <Logo color="#ffffff" />
-          </LogoContainer>
-          <Claim>
-            Data. Insights. <Highlight>Answers.</Highlight>
-          </Claim>
-        </TextContainer>
-      </BackgroundText>
-    </Background>
-  </LoginContainer>
-);
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${Buffer.from(content).toString('base64')}`;
+const useLoginBackground = () =>
+  useMemo(
+    () =>
+      AppConfig.branding()?.login?.background
+        ? svgDataUrl(sanitize(AppConfig.branding()?.login?.background))
+        : backgroundImage,
+    [],
+  );
+
+const useShowLogo = () => useMemo(() => AppConfig.branding()?.login?.show_logo ?? true, []);
+
+const LoginChrome = ({ children }: Props) => {
+  const productName = useProductName();
+  const loginBackground = useLoginBackground();
+  const showLogo = useShowLogo();
+
+  return (
+    <LoginContainer>
+      <LoginBox>
+        <WelcomeMessage>Welcome to {productName}</WelcomeMessage>
+        {children}
+      </LoginBox>
+      <Background>
+        <NotificationsContainer>
+          <PublicNotifications login />
+        </NotificationsContainer>
+        <BackgroundText $backgroundImage={loginBackground}>
+          {showLogo && (
+            <TextContainer>
+              <CustomizableLogo />
+            </TextContainer>
+          )}
+        </BackgroundText>
+      </Background>
+    </LoginContainer>
+  );
+};
 
 export default LoginChrome;

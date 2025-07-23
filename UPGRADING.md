@@ -1,14 +1,13 @@
-Upgrading to Graylog 6.2.x
+Upgrading to Graylog 7.0.x
 ==========================
 
 ## Breaking Changes
 
-### Plugins
-* This release includes Java API changes which might require plugin authors to adjust their code. Please check
-  [Java API Changes](#java-api-changes) for details.
-* Adjustment of `enterpriseWidgets` web interface plugin. The `editComponent` attribute now no longer has a `onSubmit` prop.
-  Before this change the prop had to be called to close the widget edit mode. Now it is enough to call `applyAllWidgetChanges` from the `WidgetEditApplyAllChangesContext`.
-  Alternatively the `SaveOrCancelButtons` component can be used in the edit component for custom widgets. It renders a cancel and submit button and calls `applyAllWidgetChanges` on submit.
+### Kafka Inputs
+
+The `kafka-clients` library was updated to 4.x which removes support for Kafka
+brokers with version 2.0 and earlier. That means all Graylog 7.0 Kafka inputs
+can only talk to Kafka brokers with version 2.1 or newer.
 
 ## Configuration File Changes
 
@@ -18,35 +17,51 @@ Upgrading to Graylog 6.2.x
 
 ## Default Configuration Changes
 
-- tbd
+- The permission to view the "Cluster Configuration" page was removed from the `Reader` role. This permission is now
+  available with the `Cluster Configuration Reader` role. There is an automatic one-time migration to add this role to
+  all existing users with the `Reader` role to ensure backwards compatibility. New users that will be created in the
+  future need to be explicitly assigned to the `Cluster Configuration Reader` role if they should be able to access the
+  page.
 
 ## Java API Changes
 
-Upgraded [MongoJack](https://github.com/mongojack/mongojack) to version 5.x. This impacts the Java API for accessing
-documents in MongoDB. Some previously deprecated MongoJack classes (like `org.mongojack.DBQuery`) have been removed.
-Plugin authors will have to replace usages of removed classes to corresponding classes from the MongoDB driver
-packages, most prominently `com.mongodb.client.model.Filters`.
+- tbd
 
-Additionally, the following Java Code API changes are included in this release:
+## General REST API Changes
 
-| File/method                                                                       | Description                              |
-|-----------------------------------------------------------------------------------|------------------------------------------|
-| `org.graylog.scheduler.JobSchedule#toDBUpdate`                                    | removed                                  |
-| `org.graylog.scheduler.DBJobTriggerService#all`                                   | replaced by streamAll                    |
-| `org.graylog.scheduler.DBJobTriggerService#getAllForJob`                          | replaced by streamAllForJob              |
-| `org.graylog.scheduler.DBJobTriggerService#findByQuery`                           | replaced by streamByQuery                |
-| `org.graylog.events.processor.DBEventDefinitionService#getByNotificationId`       | replaced by streamByNotificationId       |
-| `org.graylog.events.processor.DBEventDefinitionService#getSystemEventDefinitions` | replaced by streamSystemEventDefinitions |
-| `org.graylog.events.processor.DBEventDefinitionService#getByArrayValue`           | replaced by streamByArrayValue           |
-| `org.graylog2.lookup.db.DBCacheService#findByIds`                                 | replaced by streamByIds                  |
-| `org.graylog2.lookup.db.DBCacheService#findAll`                                   | replaced by streamAll                    |
-| `org.graylog2.lookup.db.DBDataAdapterService#findByIds`                           | replaced by streamByIds                  |
-| `org.graylog2.lookup.db.DBDataAdapterService#findAll`                             | replaced by streamAll                    |
-| `org.graylog2.lookup.db.DBLookupTableService#findByCacheIds`                      | replaced by streamByCacheIds             |
-| `org.graylog2.lookup.db.DBLookupTableService#findByDataAdapterIds`                | replaced by streamByDataAdapterIds       |
-| `org.graylog2.lookup.db.DBLookupTableService#findAll`                             | replaced by streamAll                    |
+- In Graylog 7.0, an issue was fixed that previously allowed additional unknown JSON properties to be accepted 
+  (and ignored) in API requests on the Graylog leader node. Now that the issue has been fixed, API requests on the 
+  leader node will once again only accept JSON payloads that contain explicitly mapped/supported properties.
+- APIs for entity creation now use a parameter `CreateEntityRequest` to keep entity fields separated from sharing 
+  information. This is a breaking change for all API requests that create entities, such as streams, dashboards, etc.
+  <br> Affected entities: 
+  - Search / Dashboard 
+  - Search Filter 
+  - Report
+  - Event Definition
+  - Stream
+  - Notifications
+  - Sigma rules
+  - Event procedure
+  - Event step
+  
+  <br> For example, the request payload to create a stream might now look like this:
 
-DBService classes' new streaming methods require streams to be closed after using - recommend using try-with-resource statements.
+```json
+{
+    "entity":{
+        "index_set_id":"65b7ba138cdb8c534a953fef",
+        "description":"An example stream",
+        "title":"My Stream",
+        "remove_matches_from_default_stream":false
+    },
+    "share_request":{
+        "selected_grantee_capabilities":{
+            "grn::::search:684158906442150b2eefb78c":"own"
+        }
+    }
+}
+```
 
 ## REST API Endpoint Changes
 
@@ -54,6 +69,5 @@ The following REST API changes have been made.
 
 | Endpoint                                                              | Description                                                                             |
 |-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| `GET /plugins/org.graylog.integrations/aws/inputs/available_services` | Remove unused endpoint.                                                                 |
-| `GET /plugins/org.graylog.integrations/aws/inputs/permissions`        | Removed permissions endpoint in favor of maintaining permissions in official docs site. |
-| `/plugins/org.graylog.plugins.files/*`                                | Removed (Graylog Enterprise plugin).                                                    |
+| `GET /<endpoint>`                                                     | description                                                                             |
+| `GET /<endpoint>`                                                     | description                                                                             |

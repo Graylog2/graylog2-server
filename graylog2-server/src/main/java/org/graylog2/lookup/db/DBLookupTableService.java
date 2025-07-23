@@ -17,12 +17,12 @@
 package org.graylog2.lookup.db;
 
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
@@ -134,6 +134,6 @@ public class DBLookupTableService {
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {
-        stream(collection.find()).forEach(action);
+        collection.find().forEach(action);
     }
 }

@@ -29,7 +29,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 jest.mock('hooks/useSearchConfiguration', () => () => ({
-  config: { ...mockSearchClusterConfig, query_time_range_limit: undefined },
+  config: mockSearchClusterConfig,
   refresh: () => {},
 }));
 
@@ -52,6 +52,7 @@ describe('TimeRangeFilterButtons', () => {
   const SUTTimeRangeFilterButtons = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
       <TimeRangeFilterButtons
+        limitDuration={0}
         toggleShow={() => {}}
         onPresetSelectOpen={() => {}}
         setCurrentTimeRange={() => {}}

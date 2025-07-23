@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.graph.Graph;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
@@ -74,6 +73,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -228,8 +228,8 @@ public class PipelineFacadeTest {
 
         final FakeStream fakeDefaultStream = new FakeStream("All message Fake") {
             @Override
-            protected ObjectId getObjectId() {
-                return new ObjectId(Stream.DEFAULT_STREAM_ID);
+            public String getId() {
+                return Stream.DEFAULT_STREAM_ID;
             }
         };
         when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(fakeDefaultStream);
@@ -335,7 +335,7 @@ public class PipelineFacadeTest {
         final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
                 .id(ModelId.of("5a85c4854b900afd5d662be4"))
                 .type(ModelTypes.PIPELINE_V1)
-                .title("All Messages Routing")
+                .title(GL_INPUT_ROUTING_PIPELINE)
                 .build();
         final Set<EntityExcerpt> expected = Set.of(expectedEntityExcerpt1, expectedEntityExcerpt2);
 

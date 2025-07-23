@@ -38,7 +38,7 @@ public interface MoreSearchAdapter {
                                   int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                   Map<String, Set<String>> extraFilters);
 
-    MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+    MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                         Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                         ZoneId timeZone, Map<String, Set<String>> extraFilters);
 

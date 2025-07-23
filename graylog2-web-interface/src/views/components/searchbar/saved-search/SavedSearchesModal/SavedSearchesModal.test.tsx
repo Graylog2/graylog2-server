@@ -23,8 +23,6 @@ import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import useSavedSearches from 'views/hooks/useSavedSearches';
-import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
-import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -85,7 +83,6 @@ describe('SavedSearchesModal', () => {
       isInitialLoading: false,
     });
 
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
@@ -221,14 +218,12 @@ describe('SavedSearchesModal', () => {
 
       const pageSizeDropdown = await screen.findByRole('button', {
         name: /configure page size/i,
-        hidden: true,
       });
 
       userEvent.click(pageSizeDropdown);
 
       const pageSizeOption = await screen.findByRole('menuitem', {
         name: /100/i,
-        hidden: true,
       });
 
       userEvent.click(pageSizeOption);

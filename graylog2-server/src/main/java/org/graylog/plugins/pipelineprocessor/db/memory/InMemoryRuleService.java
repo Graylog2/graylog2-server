@@ -27,6 +27,7 @@ import org.graylog2.events.ClusterEventBus;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -94,6 +95,20 @@ public class InMemoryRuleService implements RuleService {
     @Override
     public Collection<RuleDao> loadAll() {
         return ImmutableSet.copyOf(store.values());
+    }
+
+    @Override
+    public Collection<RuleDao> loadAllByTitle(String regex) {
+        return store.values().stream()
+                .filter(rule -> rule.title().matches(regex))
+                .toList();
+    }
+
+    @Override
+    public Collection<RuleDao> loadAllByScope(String scope) {
+        return store.values().stream()
+                .filter(rule -> Objects.equals(rule.scope(), scope))
+                .toList();
     }
 
     @Override

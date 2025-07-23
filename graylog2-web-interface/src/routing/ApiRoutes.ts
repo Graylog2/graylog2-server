@@ -134,6 +134,7 @@ const ApiRoutes = {
   },
   EntityShareController: {
     prepare: (entityGRN: string) => ({ url: `/authz/shares/entities/${entityGRN}/prepare` }),
+    prepareEntityCreate: () => ({ url: `/authz/shares/entities/prepare` }),
     update: (entityGRN: string) => ({ url: `/authz/shares/entities/${entityGRN}` }),
     userSharesPaginated: (username: string) => ({ url: `/authz/shares/user/${username}` }),
     entityScopes: () => ({ url: '/entity_scopes' }),
@@ -182,7 +183,9 @@ const ApiRoutes = {
     rebuildSingle: (index: string) => ({ url: `/system/indices/ranges/${index}/rebuild` }),
   },
   IndexSetsApiController: {
-    list: (stats) => ({ url: `/system/indices/index_sets?stats=${stats}` }),
+    list: (stats: boolean, only_open: boolean = false) => ({
+      url: `/system/indices/index_sets?stats=${stats}&only_open=${only_open}`,
+    }),
     listPaginated: (skip, limit, stats) => ({
       url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}`,
     }),
@@ -211,6 +214,7 @@ const ApiRoutes = {
     list: () => ({ url: '/system/inputs' }),
     get: (id: string) => ({ url: `/system/inputs/${id}` }),
     globalRecentMessage: (inputId: string) => ({ url: `/${inputId}` }),
+    references: (inputId: string) => ({ url: `/system/inputs/references/${inputId}` }),
   },
   InputStatesController: {
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
@@ -276,6 +280,7 @@ const ApiRoutes = {
   StreamsApiController: {
     index: () => ({ url: '/streams' }),
     paginated: () => ({ url: '/streams/paginated' }),
+    withoutSecurityDefaults: () => ({ url: '/streams/no_security' }),
     get: (streamId: string) => ({ url: `/streams/${streamId}` }),
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
     bulk_resume: () => ({ url: '/streams/bulk_resume' }),
@@ -441,6 +446,9 @@ const ApiRoutes = {
     delete_token: (userId: string, tokenName: string) => ({ url: `/users/${userId}/tokens/${tokenName}` }),
     list_tokens: (userId: string) => ({ url: `/users/${userId}/tokens` }),
     setStatus: (userId: string, accountStatus) => ({ url: `/users/${userId}/status/${accountStatus}` }),
+  },
+  TokenManagementController: {
+    paginated: () => ({ url: '/token_usage/paginated' }),
   },
   DashboardsController: {
     show: (id) => ({ url: `/dashboards/${id}` }),

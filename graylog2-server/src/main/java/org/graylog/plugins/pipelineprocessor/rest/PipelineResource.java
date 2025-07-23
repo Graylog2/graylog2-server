@@ -56,6 +56,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -76,8 +77,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -87,14 +88,14 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineResource extends RestResource implements PluginRestResource {
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineResource.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(PipelineDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
-    public static final String GL_INPUT_ROUTING_PIPELINE = "All Messages Routing";
+    public static final String GL_INPUT_ROUTING_PIPELINE = "Default Routing";
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
@@ -126,10 +127,11 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CREATE)
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         checkReservedName(pipelineSource);
-        return forceCreateFromParser(pipelineSource);
+        checkSystemRuleUsed(pipelineSource);
+        return forceCreateFromParser(pipelineSource, DefaultEntityScope.NAME);
     }
 
-    private PipelineSource forceCreateFromParser(PipelineSource pipelineSource) {
+    private PipelineSource forceCreateFromParser(PipelineSource pipelineSource, String scope) {
         final Pipeline pipeline;
         try {
             pipeline = pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
@@ -139,7 +141,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final PipelineDao pipelineDao = PipelineDao.builder()
                 .title(pipeline.name())
-                .scope(pipelineSource.scope() == null ? DefaultEntityScope.NAME : pipelineSource.scope())
+                .scope(scope)
                 .description(pipelineSource.description())
                 .source(pipelineSource.source())
                 .createdAt(now)
@@ -252,6 +254,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
         checkReservedName(update);
+        checkSystemRuleUsed(update);
         return PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, id, update, true);
     }
 
@@ -304,12 +307,11 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
         final PipelineSource pipelineSource = PipelineSource.builder()
                 .title(GL_INPUT_ROUTING_PIPELINE)
-                .scope(ImmutableSystemScope.NAME)
-                .description("GL generated pipeline")
+                .description("System generated pipeline")
                 .source("pipeline \"" + GL_INPUT_ROUTING_PIPELINE + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
                 .stages(stages)
                 .build();
-        final PipelineSource parsedSource = forceCreateFromParser(pipelineSource);
+        final PipelineSource parsedSource = forceCreateFromParser(pipelineSource, ImmutableSystemScope.NAME);
         ensurePipelineConnection(parsedSource.id(), DEFAULT_STREAM_ID);
         return parsedSource;
     }
@@ -343,5 +345,16 @@ public class PipelineResource extends RestResource implements PluginRestResource
         if (GL_INPUT_ROUTING_PIPELINE.equals(update.title())) {
             throw new BadRequestException("Pipeline name is reserved and cannot be used.");
         }
+    }
+
+    private void checkSystemRuleUsed(@NotNull PipelineSource pipelineSource) {
+        List<String> usedSystemRules = ruleService.loadAllByScope(DeletableSystemScope.NAME).stream()
+                .map(RuleDao::title)
+                .filter(title -> pipelineSource.source().contains(title))
+                .toList();
+        if (!usedSystemRules.isEmpty()) {
+            throw new BadRequestException("Pipeline cannot use system rules: " + usedSystemRules);
+        }
+
     }
 }

@@ -33,6 +33,8 @@ type Props = {
   setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void;
   toggleShow: () => void;
   showPresetDropdown?: boolean;
+  submitOnPresetChange?: boolean;
+  limitDuration: number;
 };
 
 const StyledRangePresetDropdown = styled(RangePresetDropdown)`
@@ -52,6 +54,8 @@ const TimeRangeFilterButtons = ({
   setCurrentTimeRange,
   showPresetDropdown = true,
   toggleShow,
+  limitDuration,
+  submitOnPresetChange = true,
 }: Props) => {
   const { submitForm, isValid } = useFormikContext();
 
@@ -62,8 +66,7 @@ const TimeRangeFilterButtons = ({
 
   const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
-
-    if (isValid) {
+    if (isValid && submitOnPresetChange) {
       submitForm();
     }
   };
@@ -79,6 +82,7 @@ const TimeRangeFilterButtons = ({
       <TimeRangePickerButton hasError={hasErrorOnMount} disabled={disabled} onClick={_onClick} />
       {showPresetDropdown && (
         <StyledRangePresetDropdown
+          limitDuration={limitDuration}
           disabled={disabled}
           displayTitle={false}
           onChange={selectRelativeTimeRangePreset}

@@ -17,16 +17,15 @@
 package org.junit.jupiter.engine.descriptor;
 
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
-import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.support.hierarchical.Node;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 public class ContainerMatrixExtensionContext extends AbstractExtensionContext<ContainerMatrixEngineDescriptor> {
@@ -46,6 +45,11 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     @Override
     public Optional<Class<?>> getTestClass() {
         return Optional.empty();
+    }
+
+    @Override
+    public List<Class<?>> getEnclosingTestClasses() {
+        return List.of();
     }
 
     @Override

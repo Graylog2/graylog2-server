@@ -62,7 +62,7 @@ type Props = {
   title?: string;
 };
 
-const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title }: Props) => {
+const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = undefined }: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
   const { pathname } = useLocation();

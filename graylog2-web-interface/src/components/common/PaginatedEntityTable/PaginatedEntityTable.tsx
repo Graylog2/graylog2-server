@@ -32,6 +32,7 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -130,6 +131,8 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
     fetchOptions: reactQueryOptions,
   });
 
+  useOnRefresh(refetch);
+
   const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
       paginationQueryParameter.resetPage();
@@ -164,7 +167,11 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions} attributes={attributes}>
+    <TableFetchContextProvider
+      refetch={refetch}
+      searchParams={fetchOptions}
+      attributes={attributes}
+      entityTableId={tableLayout.entityTableId}>
       <PaginatedList pageSize={layoutConfig.pageSize} showPageSizeSelect={false} totalItems={total}>
         <SearchRow>
           <SearchForm

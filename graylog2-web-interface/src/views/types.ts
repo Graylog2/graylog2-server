@@ -46,7 +46,7 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -62,6 +62,8 @@ import type { FilterComponents, Attributes } from 'views/components/widgets/over
 import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
+import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
+import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -109,24 +111,19 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   width: number;
 }
 
-export interface WidgetExport {
+export interface WidgetExport<T extends WidgetConfig = WidgetConfig> {
   type: string;
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
-  editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps<T, any>>;
+  editComponent: React.ComponentType<EditWidgetComponentProps<T>>;
   hasEditSubmitButton?: boolean;
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
   exportComponent?: React.ComponentType<{ widget: Widget }>;
-}
-
-export interface VisualizationConfigProps {
-  config: WidgetConfig;
-  onChange: (newConfig: WidgetConfig) => void;
 }
 
 type BaseField = {
@@ -210,7 +207,7 @@ export interface ExportFormat {
 }
 
 export interface SystemConfigurationComponentProps<T = unknown> {
-  config: T;
+  config?: T;
   updateConfig: (newConfig: T) => any;
 }
 
@@ -219,6 +216,8 @@ export interface SystemConfiguration {
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
+  useCondition?: () => boolean;
+  readPermission?: string; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
 }
 
 export type GenericResult = {
@@ -314,8 +313,22 @@ type SearchActionModalProps = React.PropsWithRef<{
 };
 
 type AssetInformationComponentProps = {
-  identifiers: unknown;
-  addToQuery: (id: string) => void;
+  assetIds: unknown;
+  direction?: 'col' | 'row';
+  addToQuery?: (id: string) => void;
+};
+
+type EventProcedureFormProps = {
+  eventProcedureID: string | undefined;
+  remediationSteps: string;
+  onClose: () => void;
+  onSave: (eventProcedureId: string) => void;
+};
+
+type EventProcedureSummaryProps = {
+  eventDefinitionEventProcedure: string | undefined;
+  eventId?: string;
+  event?: Event;
 };
 
 type SearchAction = {
@@ -349,6 +362,16 @@ type EventWidgetAction<T> = {
 
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>;
+  key: string;
+};
+
+type EventProcedureForm = {
+  component: React.ComponentType<EventProcedureFormProps>;
+  key: string;
+};
+
+type EventProcedureSummary = {
+  component: React.ComponentType<EventProcedureSummaryProps>;
   key: string;
 };
 
@@ -503,18 +526,55 @@ export type SearchDataSource = {
   useCondition: () => boolean;
 };
 
+type LICENSE_SUBJECTS = {
+  enterprise: '/license/enterprise';
+  archive: '/license/enterprise/archive';
+  auditlog: '/license/enterprise/auditlog';
+  illuminate: '/license/enterprise/illuminate';
+  searchFilter: '/license/enterprise/search-filter';
+  customization: '/license/enterprise/customization';
+  views: '/license/enterprise/views';
+  forwarder: '/license/enterprise/forwarder';
+  report: '/license/enterprise/report';
+  security: '/license/security';
+  anomaly: '/license/anomaly';
+};
+
+export type LicenseSubject = LICENSE_SUBJECTS[keyof LICENSE_SUBJECTS];
+
+export type LicenseCheck = (subject: LicenseSubject) => {
+  data: {
+    valid: boolean;
+    expired: boolean;
+    violated: boolean;
+  };
+  isInitialLoading: boolean;
+  refetch: () => void;
+};
+
+type MarkdownAugmentation = {
+  id: string;
+  component: React.ComponentType<{ value: string }>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
     fieldActions?: Array<ActionDefinition>;
+    fieldTypeValueRenderer?: Array<{
+      type: string;
+      render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
+    }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
+    'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
+    'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
@@ -540,8 +600,9 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
+    'views.elements.aside'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
-    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
+    'views.elements.validationErrorExplanation'?: ValidationExplanations;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>;
     'views.hooks.confirmDeletingDashboardPage'?: Array<
@@ -563,5 +624,8 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
+    'licenseCheck'?: Array<LicenseCheck>;
+    entityPermissionsMapper?: EntityPermissionsMapper;
+    'markdown.augment.components'?: Array<MarkdownAugmentation>;
   }
 }

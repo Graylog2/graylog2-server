@@ -40,7 +40,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchMetadata;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
+import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -83,7 +83,7 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
             throw new IllegalArgumentException("Search must not be null.");
         }
         final Search search = searchDTO.toSearch();
-        if (DataWarehouseSearchValidator.containsDataWarehouseSearchElements(search)) {
+        if (DataLakeSearchValidator.containsDataLakeSearchElements(search)) {
             //When parsing the query, ElasticsearchQueryString backend is expected... for DataLake just return empty metadata
             return SearchMetadata.create(Map.of(), ImmutableMap.of());
         } else {

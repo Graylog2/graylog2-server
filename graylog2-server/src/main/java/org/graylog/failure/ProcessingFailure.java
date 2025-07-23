@@ -22,12 +22,13 @@ import com.google.common.base.Objects;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 
 import java.util.Map;
 
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_NODE;
 import static org.graylog2.plugin.Message.FIELD_SOURCE;
 import static org.graylog2.plugin.Message.FIELD_STREAMS;
 
@@ -106,7 +107,7 @@ public class ProcessingFailure implements Failure {
     @Nonnull
     @Override
     public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper,
-                                                     @NonNull Meter invalidTimestampMeter,
+                                                     @Nonnull Meter invalidTimestampMeter,
                                                      boolean includeFailedMessage) {
         Map<String, Object> fields = failedMessage.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         fields.put(Message.FIELD_ID, failedMessage.getId());
@@ -114,7 +115,9 @@ public class ProcessingFailure implements Failure {
 
         FailureObjectBuilder builder = new FailureObjectBuilder(this)
                 .put(FIELD_FAILED_MESSAGE_STREAMS, fields.get(FIELD_STREAMS))
-                .put(FIELD_SOURCE, fields.get(FIELD_SOURCE));
+                .put(FIELD_SOURCE, fields.get(FIELD_SOURCE))
+                .put(FIELD_GL2_SOURCE_INPUT, fields.get(FIELD_GL2_SOURCE_INPUT))
+                .put(FIELD_GL2_SOURCE_NODE, fields.get(FIELD_GL2_SOURCE_NODE));
 
         if (includeFailedMessage) {
             builder.put(FIELD_FAILED_MESSAGE, fields);

@@ -25,7 +25,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-const ProductLink = ({ href = '', clusterId, children }: Props) => {
+const ProductLink = ({ href = '', clusterId = undefined, children = undefined }: Props) => {
   let hrefWithParam = href;
 
   if (clusterId) {

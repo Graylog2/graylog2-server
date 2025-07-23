@@ -1,5 +1,0 @@
-type = "fixed"
-message = "Set datanode remote reindex status to error if any log entry is of error type"
-
-issues = ["20461"]
-pulls = ["20622"]

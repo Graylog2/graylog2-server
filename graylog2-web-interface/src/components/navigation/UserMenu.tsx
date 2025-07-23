@@ -24,6 +24,7 @@ import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Menu from 'components/bootstrap/Menu';
 import useLogout from 'hooks/useLogout';
+import NavIcon from 'components/navigation/NavIcon';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -40,7 +41,7 @@ const UserMenu = () => {
   const onLogoutClicked = useLogout();
 
   return (
-    <NavDropdown title={<Icon name="person" size="lg" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
+    <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
       <Menu.Label>
         <FullName>{fullName}</FullName>
       </Menu.Label>

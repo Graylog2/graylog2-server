@@ -81,9 +81,9 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
       <Row className="no-bm">
         <Col xs={12}>
           <Alert bsStyle="info" title="Changing the session timeout">
-            Changing the timeout setting for sessions will log the user out of Graylog and will invalidate all their
-            current sessions. If you are changing the setting for your own user, you will be logged out at the moment of
-            saving the setting. In that case, make sure to save any pending changes before changing the timeout.
+            Changing the timeout setting for sessions will log the user out and will invalidate all their current
+            sessions. If you are changing the setting for your own user, you will be logged out at the moment of saving
+            the setting. In that case, make sure to save any pending changes before changing the timeout.
           </Alert>
         </Col>
       </Row>

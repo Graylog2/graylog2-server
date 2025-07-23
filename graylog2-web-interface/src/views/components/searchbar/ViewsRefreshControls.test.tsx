@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import Button from 'preflight/components/common/Button';
+import Button from 'components/bootstrap/Button';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -47,7 +47,13 @@ const autoRefreshOptions = {
 describe('RefreshControls', () => {
   useViewsPlugin();
 
-  const SUT = ({ onSubmit = () => {}, children }: { onSubmit?: () => void; children?: React.ReactNode }) => (
+  const SUT = ({
+    onSubmit = () => {},
+    children = undefined,
+  }: {
+    onSubmit?: () => void;
+    children?: React.ReactNode;
+  }) => (
     <TestStoreProvider>
       <Formik initialValues={{}} onSubmit={onSubmit}>
         <Form>

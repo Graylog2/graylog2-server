@@ -42,11 +42,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 @Singleton
 public class ConfigurationStateUpdater {
-    private static final RateLimitedLog log = getRateLimitedLog(ConfigurationStateUpdater.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(ConfigurationStateUpdater.class);
 
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ScheduledExecutorService scheduler;

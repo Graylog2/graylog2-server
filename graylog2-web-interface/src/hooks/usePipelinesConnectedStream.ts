@@ -20,7 +20,7 @@ import { create, windowScheduler, indexedResolver } from '@yornaath/batshit';
 import { Streams } from '@graylog/server-api';
 
 import type FetchError from 'logic/errors/FetchError';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 
 export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>;
 
@@ -40,14 +40,12 @@ const usePipelinesConnectedStream = (
   error: FetchError;
   isError: boolean;
 } => {
-  const { data, refetch, isInitialLoading, error, isError } = useQuery<StreamConnectedPipelines, FetchError>(
-    ['stream', 'pipelines', streamId],
-    () => pipelines.fetch(streamId),
-    {
-      notifyOnChangeProps: ['data', 'error'],
-      enabled: enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading, error, isError } = useQuery<StreamConnectedPipelines, FetchError>({
+    queryKey: ['stream', 'pipelines', streamId],
+    queryFn: () => pipelines.fetch(streamId),
+    notifyOnChangeProps: ['data', 'error'],
+    enabled: enabled,
+  });
 
   return {
     data: data ?? [],

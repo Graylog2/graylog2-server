@@ -256,7 +256,6 @@ export const TELEMETRY_EVENT_TYPE = {
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
     INPUT_CREATED: 'Inputs Input Created',
-    FIND_MORE_CLICKED: 'Inputs Find More Inputs Clicked',
     INPUT_DELETED: 'Inputs Input Deleted',
     INPUT_EDIT_CLICKED: 'Inputs Input Edit Clicked',
     INPUT_UPDATED: 'Inputs Input Updated',

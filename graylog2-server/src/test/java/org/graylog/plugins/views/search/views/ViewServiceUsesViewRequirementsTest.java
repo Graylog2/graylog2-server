@@ -19,7 +19,7 @@ package org.graylog.plugins.views.search.views;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -76,7 +76,7 @@ public class ViewServiceUsesViewRequirementsTest {
         this.viewService = new ViewService(
                 clusterConfigService,
                 viewRequirementsFactory,
-                mock(EntityOwnershipService.class),
+                mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
                 mongoCollections);
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
@@ -174,6 +174,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Test
     @MongoDBFixtures("views.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamAllReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamAll().collect(Collectors.toList());
 
@@ -185,6 +186,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Test
     @MongoDBFixtures("views.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamByIdsReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamByIds(
                 ImmutableSet.of("5ced4df1d6e8104c16f50e00", "5ced4a4485b52a86b96a0a63")

@@ -76,7 +76,7 @@ class LinkToNode extends React.PureComponent<
         return content;
       }
 
-      return <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>{content}</Link>;
+      return <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(this.props.nodeId)}>{content}</Link>;
     }
 
     return <i>Unknown Node</i>;

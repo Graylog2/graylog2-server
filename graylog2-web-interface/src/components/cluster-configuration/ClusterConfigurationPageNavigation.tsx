@@ -22,16 +22,23 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 
-
 const ClusterConfigurationPageNavigation = () => {
   const { showDatanodeMigration, isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
 
   const NAV_ITEMS = [
-    { title: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
-    isDatanodeConfiguredAndUsed && { title: 'Data Node Dashboard', path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD },
-    isDatanodeConfiguredAndUsed && { title: 'Data Node Certificate Management', path: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION },
-    showDatanodeMigration && enableDataNodeMigration && { title: 'Data Node Migration', path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION },
+    { description: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+    isDatanodeConfiguredAndUsed && {
+      description: 'Certificate Management',
+      path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
+    },
+    isDatanodeConfiguredAndUsed && {
+      description: 'Data Node Dashboard',
+      path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
+    },
+    isDatanodeConfiguredAndUsed && { description: 'Data Node Upgrade', path: Routes.SYSTEM.CLUSTER.DATANODE_UPGRADE },
+    showDatanodeMigration &&
+      enableDataNodeMigration && { description: 'Data Node Migration', path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION },
   ];
 
   return (

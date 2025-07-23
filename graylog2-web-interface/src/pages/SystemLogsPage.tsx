@@ -61,7 +61,7 @@ const SystemLogsPage = () => {
   }, [fetchLogs]);
 
   const onCancel = () => {
-    history.push(Routes.SYSTEM.NODES.LIST);
+    history.push(Routes.SYSTEM.CLUSTER.NODES);
   };
 
   const _isLoading = () => !node;

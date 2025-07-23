@@ -49,12 +49,14 @@ export const buildSearchExecutionState = (
   return executionStateBuilder.build();
 };
 
-export const startJob = async (
+export type StartJobType = (
   search: Search,
   searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
-  keepQueries: string[] = [],
-): Promise<JobIds> => {
+  keepQueries: string[],
+) => Promise<JobIds>;
+
+export const startJob: StartJobType = async (search, searchTypesToSearch, executionStateParam, keepQueries = []) => {
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
@@ -67,24 +69,61 @@ const getDelayTime = (depth: number = 1): number => {
   return Math.ceil(curDepth / 10) * 250;
 };
 
-export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> =>
+export const pollJob = ({
+  jobIds,
+  result,
+  depth = 1,
+  page,
+  perPage,
+  stopPolling,
+}: {
+  jobIds: JobIds;
+  result: SearchJobType | null;
+  depth?: number;
+  page?: number;
+  perPage?: number;
+  stopPolling?: (progress: number) => boolean;
+}): Promise<SearchJobType> =>
   new Promise((resolve) => {
-    if (result?.execution?.done || result?.execution?.cancelled) {
+    if (stopPolling?.(result?.progress ?? 0) || result?.execution?.done || result?.execution?.cancelled) {
       resolve(result);
     } else {
       delay(getDelayTime(depth)).then(() => {
-        resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, depth + 1)));
+        resolve(
+          runPollJob({ jobIds, page, perPage }).then((res) =>
+            pollJob({ jobIds, result: res, depth: depth + 1, page, perPage, stopPolling }),
+          ),
+        );
       });
     }
   });
 
-export const executeJobResult = async (
-  { asyncSearchId, nodeId }: JobIds,
-  widgetMapping?: WidgetMapping,
-): Promise<SearchExecutionResult> =>
-  pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
+export type ExecuteJobResultType = (param: {
+  jobIds: JobIds;
+  widgetMapping?: WidgetMapping;
+  page?: number;
+  perPage?: number;
+  stopPolling?: (progress: number) => boolean;
+}) => Promise<SearchExecutionResult>;
+
+export const executeJobResult: ExecuteJobResultType = async ({
+  jobIds: { asyncSearchId, nodeId },
+  widgetMapping,
+  page,
+  perPage,
+  stopPolling,
+}) =>
+  pollJob({
+    jobIds: { asyncSearchId, nodeId },
+    result: null,
+    depth: 1,
+    page,
+    perPage,
+    stopPolling,
+  }).then((result) => ({
     result: new SearchResult(result),
     widgetMapping,
+    jobIds: { asyncSearchId, nodeId },
   }));
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);

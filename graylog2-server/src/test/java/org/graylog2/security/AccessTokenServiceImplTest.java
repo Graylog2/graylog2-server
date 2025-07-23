@@ -24,6 +24,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.Configuration;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.util.List;
@@ -66,6 +68,9 @@ public class AccessTokenServiceImplTest {
     @Mock
     private ClusterConfigService configService;
 
+    @Mock
+    private Configuration configuration;
+
     private AccessTokenService accessTokenService;
 
     @Before
@@ -75,7 +80,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService);
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
     }
 
     @After
@@ -142,7 +147,7 @@ public class AccessTokenServiceImplTest {
         final int ttlInDays = 30;
 
         assertEquals(0, accessTokenService.loadAll(username).size());
-        final AccessToken token = accessTokenService.create(username, tokenname, Duration.ofDays(ttlInDays));
+        final AccessToken token = accessTokenService.create(username, tokenname, PeriodDuration.of(Duration.ofDays(ttlInDays)));
 
         assertEquals(1, accessTokenService.loadAll(username).size());
         assertNotNull("Should have returned token", token);
@@ -152,6 +157,34 @@ public class AccessTokenServiceImplTest {
         assertNotNull("\"CreatedAt\" should not be null", token.getCreatedAt());
         assertNotNull("\"ExpiresAt\" should not be null", token.getExpiresAt());
         assertEquals("Expiration-timestamp should be " + ttlInDays + " days after creation-timestamp", token.getCreatedAt().plusDays(ttlInDays), token.getExpiresAt());
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    public void testCreateWithOddTTL() {
+        final String username = "admin";
+        final String tokenname = "web";
+
+        assertEquals(0, accessTokenService.loadAll(username).size());
+        final AccessToken token = accessTokenService.create(username, tokenname, PeriodDuration.parse("P1Y1M1DT1H1M1S"));
+
+        final List<AccessToken> accessTokens = accessTokenService.loadAll(username);
+        assertEquals(1, accessTokens.size());
+        assertNotNull("Should have returned token", token);
+        assertEquals("Username before and after saving should be equal", username, token.getUserName());
+        assertEquals("Token before and after saving should be equal", tokenname, token.getName());
+        assertNotNull("Token should not be null", token.getToken());
+        assertNotNull("\"CreatedAt\" should not be null", token.getCreatedAt());
+        assertNotNull("\"ExpiresAt\" should not be null", token.getExpiresAt());
+        //Comparing the period between the creation and expiration of the token: It should be 1 year, 1 month, 1 day, 1 hour, 1 minute and 1 second, as defined above:
+        org.joda.time.Period validDuring = new org.joda.time.Period(token.getCreatedAt(), token.getExpiresAt());
+        assertEquals(1, validDuring.getYears());
+        assertEquals(1, validDuring.getMonths());
+        assertEquals(1, validDuring.getDays());
+        assertEquals(1, validDuring.getHours());
+        assertEquals(1, validDuring.getMinutes());
+        assertEquals(1, validDuring.getSeconds());
+        assertEquals(0, validDuring.getMillis());
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
@@ -182,7 +215,7 @@ public class AccessTokenServiceImplTest {
 
         assertThat(accessTokenService.loadAll(username)).isEmpty();
 
-        final AccessToken token = accessTokenService.create(username, tokenName, Duration.ofDays(30));
+        final AccessToken token = accessTokenService.create(username, tokenName, PeriodDuration.of(Duration.ofDays(30)));
 
         assertThat(accessTokenService.loadAll(username)).hasSize(1);
 
@@ -232,7 +265,7 @@ public class AccessTokenServiceImplTest {
         assertNull(accessTokenService.load(tokenString));
         assertEquals(0, accessTokenService.loadAll(username).size());
 
-        final AccessToken token = accessTokenService.create(username, tokenname, Duration.ofDays(30));
+        final AccessToken token = accessTokenService.create(username, tokenname, PeriodDuration.of(Duration.ofDays(30)));
         token.setToken(tokenString);
 
         accessTokenService.save(token);
@@ -251,7 +284,7 @@ public class AccessTokenServiceImplTest {
     @MongoDBFixtures("accessTokensSingleToken.json")
     public void testExceptionForMultipleTokens() {
         final AccessToken existingToken = accessTokenService.load("foobar");
-        final AccessToken newToken = accessTokenService.create("user", "foobar", Duration.ofDays(30));
+        final AccessToken newToken = accessTokenService.create("user", "foobar", PeriodDuration.of(Duration.ofDays(30)));
         newToken.setToken(existingToken.getToken());
         assertThatThrownBy(() -> accessTokenService.save(newToken))
                 .isInstanceOfSatisfying(MongoException.class, e ->
@@ -275,12 +308,54 @@ public class AccessTokenServiceImplTest {
         final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findExpiredTokens(Tools.nowUTC());
         final List<AccessTokenService.ExpiredToken> expected =
                 List.of(
-                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf"),
-                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf")
+                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf", "user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
                 );
 
         assertThat(expiredTokens).isNotEmpty();
         assertEquals(expected, expiredTokens);
+
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_allAssigned.json")
+    public void findOrphanedTokensAllAssigned() {
+        final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findOrphanedTokens();
+
+        assertThat(expiredTokens).isEmpty();
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_twoOrphaned.json")
+    public void findOrphanedTokensReturnsOnlyTokensWithoutUsers() {
+        final List<AccessTokenService.ExpiredToken> orphanedTokens = accessTokenService.findOrphanedTokens();
+        final List<AccessTokenService.ExpiredToken> expected =
+                List.of(
+                        new AccessTokenService.ExpiredToken("44f9deadbeefdeadbeefaffe", "test", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "other_user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
+                );
+
+        assertThat(orphanedTokens).isNotEmpty()
+                .containsExactlyInAnyOrderElementsOf(expected);
+
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_twoOrphanedWithAdmin.json")
+    public void findOrphanedTokensReturnsOnlyTokensWithoutUsersAndNoAdmin() {
+        when(configuration.getRootUsername()).thenReturn("custom_admin_username");
+        final List<AccessTokenService.ExpiredToken> orphanedTokens = accessTokenService.findOrphanedTokens();
+        final List<AccessTokenService.ExpiredToken> expected =
+                List.of(
+                        new AccessTokenService.ExpiredToken("44f9deadbeefdeadbeefaffe", "test", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "other_user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
+                );
+
+        assertThat(orphanedTokens).isNotEmpty()
+                .containsExactlyInAnyOrderElementsOf(expected);
 
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }

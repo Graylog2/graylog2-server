@@ -22,18 +22,20 @@ import com.google.common.collect.Ordering;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresGuest;
-import org.graylog2.rest.models.system.responses.ReaderPermissionResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.Permissions;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresGuest;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.system.responses.ReaderPermissionResponse;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserConfiguration;
 
 import java.util.Collection;
 import java.util.Map;
@@ -47,10 +49,14 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(APPLICATION_JSON)
 public class PermissionsResource extends RestResource {
     private final Permissions permissions;
+    private final UserService userService;
+    private final ClusterConfigService configService;
 
     @Inject
-    public PermissionsResource(final Permissions permissions) {
+    public PermissionsResource(final Permissions permissions, UserService userService, ClusterConfigService configService) {
         this.permissions = permissions;
+        this.userService = userService;
+        this.configService = configService;
     }
 
     @GET
@@ -70,7 +76,12 @@ public class PermissionsResource extends RestResource {
     public ReaderPermissionResponse readerPermissions(
             @ApiParam(name = "username", required = true)
             @PathParam("username") String username) {
+        final User user = userService.load(username);
+        final boolean isExternal = user == null || user.isExternalUser();
+        final UserConfiguration config = this.configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+        final boolean isAllowedToCreateToken = this.permissions.isAllowedToCreateTokens(isExternal, config);
+
         return ReaderPermissionResponse.create(
-                Ordering.natural().sortedCopy(permissions.userSelfEditPermissions(username)));
+                Ordering.natural().sortedCopy(permissions.userSelfEditPermissions(username, isAllowedToCreateToken)));
     }
 }

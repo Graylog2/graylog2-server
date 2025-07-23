@@ -21,7 +21,6 @@ import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog2.shared.messageq.Acknowledgeable;
 import org.joda.time.DateTime;
 
@@ -97,7 +96,7 @@ public interface Failure extends Acknowledgeable {
 
     @Nonnull
     FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper,
-                                              @NonNull Meter invalidTimestampMeter,
+                                              @Nonnull Meter invalidTimestampMeter,
                                               boolean includeFailedMessage);
 
 }

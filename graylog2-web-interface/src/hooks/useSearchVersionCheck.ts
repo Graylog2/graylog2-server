@@ -17,34 +17,31 @@
 import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import { defaultOnError } from 'util/conditional/onError';
 
 type VersionCheckType = {
   satisfied: boolean;
   errorMessage?: string;
 };
 
-export const fetchSearchVersionCheck = async ({ queryKey }) => {
+export const fetchSearchVersionCheck = ({ queryKey }): Promise<VersionCheckType> => {
   const [, /* queryName */ { distribution, version }] = queryKey;
 
-  try {
-    const data = await fetch(
-      'GET',
-      qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url),
-    );
-
-    return data;
-  } catch (e) {
-    return UserNotification.error('Could not fetch override data.');
-  }
+  return defaultOnError(
+    fetch('GET', qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url)),
+    'Could not fetch override data',
+  );
 };
 
 const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch' | 'datanode', version?: string) => {
   const MAIN_KEY = 'SearchVersionQuery';
-  const queryKey = version ? [MAIN_KEY, { distribution, version }] : [MAIN_KEY, { distribution, version: null }];
-  const { data, isLoading, error } = useQuery<VersionCheckType, Error>(queryKey, fetchSearchVersionCheck);
+  const queryKey = [MAIN_KEY, { distribution, version: version ?? null }];
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: (args) => defaultOnError(fetchSearchVersionCheck(args), 'Could not fetch override data'),
+  });
 
   return {
     data,

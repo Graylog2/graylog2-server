@@ -16,7 +16,7 @@
  */
 import type * as React from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export type EntityBase = {
   id: string;
@@ -24,17 +24,17 @@ export type EntityBase = {
 
 export type Column = {
   anyPermissions?: boolean;
-  hidden?: boolean;
-  id: string;
-  permissions?: Array<string>;
-  sortable?: boolean;
-  title: string;
-  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID';
-};
+} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
-  renderCell?: (value: unknown, entity: Entity, column: Column, meta: Meta) => React.ReactNode;
+  renderCell?: (
+    value: unknown,
+    entity: Entity,
+    column: Column,
+    meta: Meta,
+    additionalInfo?: unknown,
+  ) => React.ReactNode;
   renderHeader?: (column: Column) => React.ReactNode;
   textAlign?: string;
   minWidth?: number; // px
@@ -51,19 +51,21 @@ export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
   types?: { [type: string]: ColumnRenderer<Entity, Meta> };
 };
 
-export type TableLayoutPreferences = {
+export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   displayedAttributes?: Array<string>;
   sort?: Sort;
   perPage?: number;
+  customPreferences?: T;
 };
 
-export type TableLayoutPreferencesJSON = {
+export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
   displayed_attributes?: Array<string>;
   sort?: {
     field: string;
     order: 'asc' | 'desc';
   };
   per_page?: number;
+  custom_preferences?: T;
 };
 
 export type ExpandedSectionRenderer<Entity> = {

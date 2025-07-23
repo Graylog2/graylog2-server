@@ -74,5 +74,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20250304102900_ScopeMigration.class);
         addMigration(V20250206105400_TokenManagementConfiguration.class);
         addMigration(V20250219134200_DefaultTTLForNewTokens.class);
+        addMigration(V20250506090000_AddInputTypesPermissions.class);
+        addMigration(V20250721090000_AddClusterConfigurationPermission.class);
     }
 }

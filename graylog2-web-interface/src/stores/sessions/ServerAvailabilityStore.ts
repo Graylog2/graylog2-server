@@ -38,44 +38,61 @@ export type ServerError = {
 };
 export type ServerAvailabilityStoreState = {
   server: { up: true } | { up: false; error: ServerError };
+  version: string;
 };
 
 const ping = (url: string) =>
-  window.fetch(url, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'X-Graylog-No-Session-Extension': 'true',
-    },
-  });
+  window
+    .fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'X-Graylog-No-Session-Extension': 'true',
+      },
+    })
+    .then<StatusResponse>((response) => response.json());
 
+type StatusResponse = {
+  version: string;
+};
 export const ServerAvailabilityStore = singletonStore('core.ServerAvailability', () =>
   Reflux.createStore<ServerAvailabilityStoreState>({
     listenables: [ServerAvailabilityActions],
     server: { up: true },
+    version: undefined,
     init() {
       this.ping();
     },
     getInitialState() {
-      return { server: this.server };
+      return { server: this.server, version: this.version };
     },
     ping() {
       return ping(URLUtils.qualifyUrl(ApiRoutes.ping().url)).then(
-        () => ServerAvailabilityActions.reportSuccess(),
+        (response: StatusResponse) => {
+          if (response?.version !== this.version) {
+            this.version = response?.version;
+            this._trigger();
+          }
+
+          return ServerAvailabilityActions.reportSuccess();
+        },
         (error) => ServerAvailabilityActions.reportError(error),
       );
     },
     reportError(error) {
       if (this.server.up) {
         this.server = { up: false, error: error };
-        this.trigger({ server: this.server });
+        this._trigger();
       }
     },
     reportSuccess() {
       if (!this.server.up) {
         this.server = { up: true };
-        this.trigger({ server: this.server });
+        this._trigger();
       }
+    },
+    _trigger() {
+      this.trigger({ server: this.server, version: this.version });
     },
   }),
 );

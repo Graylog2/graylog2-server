@@ -27,7 +27,7 @@ const useHasEntityPermissionByGRN = (grn: string, permissionType: string = 'read
   const { permissions } = useCurrentUser();
 
   return useMemo(
-    () => isPermitted(permissions, `${getPermissionPrefixByType(type)}${permissionType}:${id}`),
+    () => isPermitted(permissions, `${getPermissionPrefixByType(type, id)}${permissionType}:${id}`),
     [id, permissionType, permissions, type],
   );
 };

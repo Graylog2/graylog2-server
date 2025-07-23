@@ -64,9 +64,9 @@ public class Debug extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(valueParam))
-                .description("Print the passed value as string in the graylog-server log." +
+                .description("Print the passed value as string in the server log." +
                         " You can also pass $message to print the current Message object." +
-                        " Note that this will only appear in the log of the graylog-server node" +
+                        " Note that this will only appear in the log of the server node" +
                         " that is processing the message you are trying to debug.")
                 .build();
     }

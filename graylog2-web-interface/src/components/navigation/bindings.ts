@@ -50,8 +50,16 @@ const navigationBindings: PluginExports = {
         filterMenuItems(
           [
             { path: Routes.SYSTEM.OVERVIEW, description: 'Overview' },
-            { path: Routes.SYSTEM.CONFIGURATIONS, description: 'Configurations', permissions: ['clusterconfigentry:read'] },
-            { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration' },
+            {
+              path: Routes.SYSTEM.CONFIGURATIONS,
+              description: 'Configurations',
+              permissions: ['clusterconfigentry:read'],
+            },
+            {
+              path: Routes.SYSTEM.CLUSTER.NODES,
+              description: 'Cluster Configuration',
+              permissions: ['clusterconfiguration:read'],
+            },
             { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
@@ -80,8 +88,7 @@ const navigationBindings: PluginExports = {
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),
         [
-          Routes.SYSTEM.NODES.LIST,
-          Routes.SYSTEM.DATANODES.LIST,
+          Routes.SYSTEM.CLUSTER.NODES,
           Routes.SYSTEM.OUTPUTS,
           Routes.SYSTEM.LOGGING,
           Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,

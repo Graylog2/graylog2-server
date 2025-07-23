@@ -57,15 +57,6 @@ public class InMemorySearchJobServiceTest {
     }
 
     @Test
-    public void testAdminCanLoadJobOfDifferentUser() {
-        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
-        final Optional<SearchJobDTO> retrievedJob = toTest.load(jannettesJob.getId(), adminUser("Clara"));
-        Assertions.assertThat(retrievedJob)
-                .isPresent()
-                .hasValue(SearchJobDTO.fromSearchJob(jannettesJob));
-    }
-
-    @Test
     public void testReturnsEmptyOptionalWhenTryingToLoadNonExistingJob() {
         final Optional<SearchJobDTO> retrievedJob = toTest.load("Guadalajara!", null);
         Assertions.assertThat(retrievedJob)
@@ -78,9 +69,4 @@ public class InMemorySearchJobServiceTest {
                 .build();
     }
 
-    private SearchUser adminUser(final String username) {
-        return TestSearchUser.builder()
-                .withUser(u -> u.withUsername(username).isLocalAdmin(true))
-                .build();
-    }
 }

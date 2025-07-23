@@ -20,13 +20,66 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, StatusIcon } from 'components/common';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
 import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
+
+const Container = styled.div`
+  border: 1px solid #a6afbd;
+  margin: 25px 0;
+  padding: 15px;
+  border-radius: 4px;
+`;
+
+const Subheader = styled.h3`
+  margin: 0 0 10px;
+`;
+
+const ReviewItems = styled.ul`
+  list-style: none;
+  margin: 0 0 25px 10px;
+  padding: 0;
+
+  li {
+    padding: 5px;
+
+    &:nth-of-type(odd) {
+      background-color: rgb(220 225 229 / 40%);
+    }
+  }
+
+  strong::after {
+    content: ':';
+    margin-right: 5px;
+  }
+`;
+
+const EditAnchor = styled.a`
+  font-size: 12px;
+  margin-left: 5px;
+  font-style: italic;
+  cursor: pointer;
+
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+`;
+
+const ArnErrorMessage = styled.span`
+  color: #856404;
+  background-color: #fff3cd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+`;
 
 type DefaultProps = {
   value: string;
@@ -63,10 +116,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     awsEndpointDynamoDB = { value: undefined },
     awsEndpointIAM = { value: undefined },
     awsEndpointKinesis = { value: undefined },
+    overrideSource = { value: undefined },
   } = formData;
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
@@ -82,6 +137,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
+      override_source: overrideSource?.value ?? '',
     },
   );
 
@@ -186,9 +243,23 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
         </Subheader>
         <ReviewItems>
           <li>
-            <strong>Stream</strong>
+            <strong>Kinesis Stream</strong>
             <span>{awsCloudWatchKinesisStream.value}</span>
           </li>
+          <li>
+            <strong>Kinesis Stream ARN</strong>
+            <span>
+              {!awsCloudwatchKinesisStreamArn ? (
+                <ArnErrorMessage>
+                  Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream
+                  permission.
+                </ArnErrorMessage>
+              ) : (
+                awsCloudwatchKinesisStreamArn
+              )}
+            </span>
+          </li>
+
           <li>
             <strong>Global Input</strong>
             <span>
@@ -208,15 +279,21 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
           <li>
             <strong>Enable Throttling</strong>
             <span>
-              <Icon name={throttleEnabled ? 'check_circle' : 'cancel'} />
+              <StatusIcon active={throttleEnabled} />
             </span>
           </li>
           <li>
             <strong>Add Flow Log prefix to field names</strong>
             <span>
-              <Icon name={addPrefix ? 'check_circle' : 'cancel'} />
+              <StatusIcon active={addPrefix} />
             </span>
           </li>
+          {overrideSource.value && (
+            <li>
+              <strong>Override Source</strong>
+              <span>{overrideSource.value}</span>
+            </li>
+          )}
         </ReviewItems>
 
         <Subheader>Formatting</Subheader>
@@ -243,50 +320,5 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     </FormWrap>
   );
 };
-
-const Container = styled.div`
-  border: 1px solid #a6afbd;
-  margin: 25px 0;
-  padding: 15px;
-  border-radius: 4px;
-`;
-
-const Subheader = styled.h3`
-  margin: 0 0 10px;
-`;
-
-const ReviewItems = styled.ul`
-  list-style: none;
-  margin: 0 0 25px 10px;
-  padding: 0;
-
-  li {
-    padding: 5px;
-
-    &:nth-of-type(odd) {
-      background-color: rgb(220 225 229 / 40%);
-    }
-  }
-
-  strong::after {
-    content: ':';
-    margin-right: 5px;
-  }
-`;
-
-const EditAnchor = styled.a`
-  font-size: 12px;
-  margin-left: 5px;
-  font-style: italic;
-  cursor: pointer;
-
-  &::before {
-    content: '(';
-  }
-
-  &::after {
-    content: ')';
-  }
-`;
 
 export default StepReview;

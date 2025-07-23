@@ -23,7 +23,7 @@ import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'comp
 import { getValueFromInput } from 'util/FormsUtils';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import { RulesStore } from 'stores/rules/RulesStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -95,8 +95,11 @@ const StageForm = ({
 
   const _getFormattedOptions = useCallback(() => {
     const chosenRules = nextStage.rules;
+    const defaultScopeRules = rules?.filter((rule) => rule._scope === 'DEFAULT');
 
-    return rules ? rules.filter((rule) => _filterChosenRules(rule, chosenRules)).map(_formatRuleOption) : [];
+    return defaultScopeRules
+      ? defaultScopeRules.filter((rule) => _filterChosenRules(rule, chosenRules)).map(_formatRuleOption)
+      : [];
   }, [nextStage.rules, rules]);
 
   const rulesHelp = (

@@ -40,6 +40,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
 import { setIsDirty } from 'views/logic/slices/viewSlice';
+import { widgetDragHandleClass } from 'views/components/widgets/Constants';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -57,7 +58,7 @@ const COLUMNS = {
 
 const DashboardWrap = styled(ElementDimensions)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     margin: 0;
     width: 100%;
     height: 100%;
@@ -141,7 +142,7 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout = undefined, p
       onPositionsChange={onPositionsChange}
       onSyncLayout={onSyncLayout}
       width={width}
-      draggableHandle=".widget-drag-handle">
+      draggableHandle={`.${widgetDragHandleClass}`}>
       {children}
     </StyledReactGridContainer>
   );

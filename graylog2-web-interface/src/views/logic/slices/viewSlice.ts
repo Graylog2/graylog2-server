@@ -107,7 +107,7 @@ export const executeActiveQuery = () => (dispatch: ViewsDispatch, getState: () =
   const search = selectSearch(getState());
   const activeQuery = selectActiveQuery(getState());
 
-  return dispatch(execute(search, activeQuery, view.widgetMapping));
+  return dispatch(execute({ search, activeQuery, widgetMapping: view.widgetMapping }));
 };
 
 export const selectQuery = (activeQuery: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {

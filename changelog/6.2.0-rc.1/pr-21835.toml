@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding an interface to tag inputs for enterprise functionality, extracting scripting API methods into a service for reuse"
+
+pulls = ["21835", "graylog-plugin-enterprise#9869"]

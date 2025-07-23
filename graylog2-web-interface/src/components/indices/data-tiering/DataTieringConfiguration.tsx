@@ -104,7 +104,7 @@ type FormValues<T extends string | undefined> = T extends undefined
     : never;
 
 const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
-  valuesPrefix,
+  valuesPrefix = undefined,
 }: {
   valuesPrefix?: ValuesPrefix;
 }) => {
@@ -178,7 +178,7 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
         min={0}
         max={formValue('index_lifetime_max')}
         validate={validateMinDaysInStorage}
-        help="How many days at minumum your data should be stored."
+        help="How many days at minimum your data should be stored."
         required
       />
 

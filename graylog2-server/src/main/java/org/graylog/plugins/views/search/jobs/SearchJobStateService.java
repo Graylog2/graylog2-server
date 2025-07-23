@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.jobs;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
@@ -27,6 +26,7 @@ import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.graylog.plugins.views.search.QueryResult;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
@@ -202,5 +202,23 @@ public class SearchJobStateService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public Optional<SearchJobExecutionState> getExecutionStateForLatestUserJob(final String user) {
+        final Document doc = collection.find(Filters.eq(OWNER_FIELD, user), Document.class)
+                .projection(include(STATUS_FIELD, PROGRESS_FIELD))
+                .sort(Sorts.descending(CREATED_AT_FIELD))
+                .first();
+        if (doc != null) {
+            return Optional.of(
+                    new SearchJobExecutionState(
+                            SearchJobStatus.valueOf(doc.get(STATUS_FIELD, String.class)),
+                            doc.getInteger(PROGRESS_FIELD, 0)
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+
     }
 }

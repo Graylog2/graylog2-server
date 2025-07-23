@@ -43,6 +43,6 @@ public interface SearchJobService {
     boolean isInCache(final String jobId);
 
     default boolean hasPermissionToAccessJob(final SearchUser searchUser, final String jobOwner) {
-        return jobOwner.equals(searchUser.username()) || searchUser.isAdmin();
+        return jobOwner.equals(searchUser.username());
     }
 }

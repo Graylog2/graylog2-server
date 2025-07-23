@@ -138,7 +138,18 @@ public class CIDRPatriciaTrieTest {
         assertThat(cidrBinary).isEqualTo("00100000000000010000110110110111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
         cidrBinary = CIDRPatriciaTrie.toBinaryString("192.168.102.0", 24);
         assertThat(cidrBinary).isEqualTo("110000001010100001100110");
+    }
 
+    @Test
+    public void testFromBinaryIP() {
+        String cidr = CIDRPatriciaTrie.fromBinaryString("0010000000000010000000000000000000000000000000000001001000110100", true);
+        assertThat(cidr).isEqualTo("2002:0:0:1234::/64");
+        cidr = CIDRPatriciaTrie.fromBinaryString("11000000101010000110011100010000", false);
+        assertThat(cidr).isEqualTo("192.168.103.16");
+        cidr = CIDRPatriciaTrie.fromBinaryString("00100000000000010000110110110111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", true);
+        assertThat(cidr).isEqualTo("2001:db7::");
+        cidr = CIDRPatriciaTrie.fromBinaryString("110000001010100001100110", false);
+        assertThat(cidr).isEqualTo("192.168.102.0/24");
     }
 
     private static CIDRPatriciaTrie buildTrie() {

@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
@@ -38,10 +38,10 @@ import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class MongoDbPipelineStreamConnectionsService implements PipelineStreamConnectionsService {
-    private static final RateLimitedLog log = getRateLimitedLog(MongoDbPipelineStreamConnectionsService.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbPipelineStreamConnectionsService.class);
 
     private static final String COLLECTION = "pipeline_processor_pipelines_streams";
 

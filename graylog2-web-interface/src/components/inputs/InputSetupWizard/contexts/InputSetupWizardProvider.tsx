@@ -20,10 +20,13 @@ import { useCallback, useMemo, useState } from 'react';
 
 import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
 import type { InputSetupWizardStep, WizardData } from 'components/inputs/InputSetupWizard/types';
+import { INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
 import { getNextStep, checkHasPreviousStep } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DEFAULT_ACTIVE_STEP = undefined;
-const DEFAULT_WIZARD_DATA = {};
+const DEFAULT_WIZARD_DATA = {
+  flow: INPUT_WIZARD_FLOWS.NON_ILLUMINATE,
+};
 
 const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);

@@ -87,6 +87,9 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
   };
 };
 
+const getUnitOptions = (units: Array<string>) =>
+  unitValues.filter((value) => units.includes(value)).map((value) => ({ value: value, label: value.toLowerCase() }));
+
 /**
  * Component that renders a form field for a time unit value. The field has
  * a checkbox that enables/disables the input, a input for the time value,
@@ -149,6 +152,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     value: undefined,
     unit: 'SECONDS',
     units: defaultUnits,
+    id: undefined,
     label: '',
     help: '',
     name: null,
@@ -161,6 +165,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     hideCheckbox: false,
     pullRight: false,
     clearable: false,
+    type: undefined,
   };
 
   constructor(props) {
@@ -170,7 +175,7 @@ class TimeUnitInput extends React.Component<Props, State> {
 
     this.state = {
       enabled: defaultTo(enabled, defaultEnabled),
-      unitOptions: this._getUnitOptions(units),
+      unitOptions: getUnitOptions(units),
     };
   }
 
@@ -178,7 +183,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     const { units } = this.props;
 
     if (!isEqual(units, nextProps.units)) {
-      this.setState({ unitOptions: this._getUnitOptions(nextProps.units) });
+      this.setState({ unitOptions: getUnitOptions(nextProps.units) });
     }
   }
 
@@ -187,9 +192,6 @@ class TimeUnitInput extends React.Component<Props, State> {
 
     return clearable ? value : defaultTo(value, defaultValue);
   };
-
-  _getUnitOptions = (units) =>
-    unitValues.filter((value) => units.includes(value)).map((value) => ({ value: value, label: value.toLowerCase() }));
 
   _isChecked = () => {
     const { required, enabled } = this.props;

@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.annotations.VisibleForTesting;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -101,10 +101,10 @@ import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -372,7 +372,7 @@ public class UsersResource extends RestResource {
             user.setStartpage(startpage.type(), startpage.id());
         }
 
-        final String id = userManagementService.create(user);
+        final String id = userManagementService.create(user, getCurrentUser());
         LOG.debug("Saved user {} with id {}", user.getName(), id);
 
         final URI userUri = getUriBuilderToSelf().path(UsersResource.class)
@@ -388,6 +388,7 @@ public class UsersResource extends RestResource {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
                 List<String> unknownRoles = new ArrayList<>();
                 roles.forEach(roleName -> {
+                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
                     if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
                         unknownRoles.add(roleName);
                     }
@@ -705,14 +706,14 @@ public class UsersResource extends RestResource {
 
         final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess()));
+            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess(), token.getCreatedAt(), token.getExpiresAt()));
         }
 
         return TokenList.create(tokenList.build());
     }
 
-    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
-        public Duration getTTL(Supplier<Duration> defaultSupplier) {
+    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
+        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
             return this.tokenTTL.orElseGet(defaultSupplier);
         }
     }
@@ -725,16 +726,16 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
-        final User user = loadUserById(userId);
-        final String username = user.getName();
+        final User futureOwner = loadUserById(userId);
 
-        if (!isTokenCreationAllowed(user)) {
-            throw new ForbiddenException("Not allowed to create tokens for user " + username);
+        if (!isPermitted(USERS_TOKENCREATE, futureOwner.getName())) {
+            throw new ForbiddenException("You are not allowed to create a token for user " + futureOwner.getName() + ".");
         }
+
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
         }
-        final AccessToken accessToken = accessTokenService.create(user.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
+        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
@@ -766,42 +767,12 @@ public class UsersResource extends RestResource {
         }
     }
 
-    @VisibleForTesting
-    boolean isTokenCreationAllowed(User user) {
-        final boolean allowed = isPermitted(USERS_TOKENCREATE, user.getName());
-        final boolean isAdmin = isAdmin(user);
-        if (isAdmin) {
-            return allowed;
-        }
-        final boolean externalAllowed = isExternalUserAllowed(user);
-        final boolean adminAllowed = isAllowedAsNoAdmin(user);
-
-        return allowed && externalAllowed && adminAllowed;
-    }
-
-    private boolean isAdmin(User user) {
-        final String adminRoleId = roleService.getAdminRoleObjectId();
-        return user.getRoleIds().contains(adminRoleId);
-    }
-
-    private boolean isAllowedAsNoAdmin(User user) {
-        return isAdmin(user) || !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).restrictAccessTokenToAdmins();
-    }
-
-    private boolean isExternalUserAllowed(User user) {
-        return !user.isExternalUser() || clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
-    }
-
     private User loadUserById(String userId) {
         final User user = userManagementService.loadById(userId);
         if (user == null) {
             throw new NotFoundException("Couldn't find user with ID <" + userId + ">");
         }
         return user;
-    }
-
-    private UserSummary toUserResponse(User user, AllUserSessions sessions) {
-        return toUserResponse(user, true, Optional.of(sessions));
     }
 
     private UserSummary toUserResponse(User user, boolean includePermissions, Optional<AllUserSessions> optSessions) {

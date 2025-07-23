@@ -38,7 +38,7 @@ const UsersOverviewPage = () => (
         title: 'Permissions documentation',
         path: DocsHelper.PAGES.USERS_ROLES,
       }}>
-      <span>Overview of Graylog&apos;s registered users.</span>
+      <span>Overview of all registered users.</span>
     </PageHeader>
 
     <UsersOverview />

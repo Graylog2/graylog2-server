@@ -237,6 +237,14 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
         return resultWithError;
     }
 
+    public boolean supportsPreview() {
+        return false;
+    }
+
+    public LookupPreview getPreview(int size) {
+        return LookupPreview.empty();
+    }
+
     public LookupDataAdapterConfiguration getConfig() {
         return config;
     }

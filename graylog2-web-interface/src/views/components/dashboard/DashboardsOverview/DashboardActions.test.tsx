@@ -51,7 +51,12 @@ const mockSearchParams = {
   },
 } as const;
 
-const mockContextValue = { searchParams: mockSearchParams, refetch: jest.fn(), attributes: [] };
+const mockContextValue = {
+  searchParams: mockSearchParams,
+  refetch: jest.fn(),
+  attributes: [],
+  entityTableId: 'entity-table',
+};
 
 const DashboardActions = ({
   contextValue = undefined,

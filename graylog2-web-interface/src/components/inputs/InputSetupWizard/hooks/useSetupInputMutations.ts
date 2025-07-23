@@ -16,11 +16,12 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
-import { PipelinesPipelines, Streams, PipelinesRules } from '@graylog/server-api';
+import { PipelinesPipelines, Streams, PipelinesRules, PipelinesConnections } from '@graylog/server-api';
 
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { Stream } from 'logic/streams/types';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { NewPipelineType, PipelineType } from 'components/pipelines/types';
+import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 
 export type RoutingParams = {
   stream_id?: string;
@@ -31,28 +32,23 @@ export type RoutingParams = {
 export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remove_matches_from_default_stream'> &
   Partial<Pick<Stream, 'description'>>;
 
-type PipelineConfiguration = Pick<PipelineType, 'title' | 'description'> &
-  Partial<Pick<PipelineType, 'source' | 'stages'>>;
-
 const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> =>
   Streams.create({
-    matching_type: undefined,
-    rules: undefined,
-    content_pack: undefined,
-    description: undefined,
-    ...stream,
+    entity: {
+      matching_type: undefined,
+      rules: undefined,
+      content_pack: undefined,
+      description: undefined,
+      ...stream,
+    },
+    share_request: undefined,
   });
 
 const startStream = async (streamId) => Streams.resume(streamId);
 
-const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> => {
+const createPipeline = (pipeline: NewPipelineType): Promise<PipelineType> => {
   const requestPipeline = {
-    id: undefined,
-    errors: undefined,
-    created_at: undefined,
-    modified_at: undefined,
-    stages: [{ stage: 0, rules: [], match: 'EITHER' } as StageType],
-    _scope: undefined,
+    ...DEFAULT_PIPELINE,
     ...pipeline,
   };
 
@@ -70,15 +66,34 @@ const deleteStream = async (streamId: string) => Streams.remove(streamId);
 const deletePipeline = async (pipelineId: string) => PipelinesPipelines.remove(pipelineId);
 
 const deleteRoutingRule = async (ruleId: string) => PipelinesRules.remove(ruleId);
+const connectPipeline = async ({ pipelineId, streamId }: { pipelineId: string; streamId: string }) =>
+  PipelinesConnections.connectStreams({ stream_ids: [streamId], pipeline_id: pipelineId });
 
-const usePipelineRoutingMutation = () => {
-  const createStreamMutation = useMutation(createStream);
-  const startStreamMutation = useMutation(startStream);
-  const createPipelineMutation = useMutation(createPipeline);
-  const updateRoutingMutation = useMutation(updateRouting);
-  const deleteStreamMutation = useMutation(deleteStream);
-  const deletePipelineMutation = useMutation(deletePipeline);
-  const deleteRoutingRuleMutation = useMutation(deleteRoutingRule);
+const useSetupInputMutations = () => {
+  const createStreamMutation = useMutation({
+    mutationFn: createStream,
+  });
+  const startStreamMutation = useMutation({
+    mutationFn: startStream,
+  });
+  const createPipelineMutation = useMutation({
+    mutationFn: createPipeline,
+  });
+  const updateRoutingMutation = useMutation({
+    mutationFn: updateRouting,
+  });
+  const deleteStreamMutation = useMutation({
+    mutationFn: deleteStream,
+  });
+  const deletePipelineMutation = useMutation({
+    mutationFn: deletePipeline,
+  });
+  const deleteRoutingRuleMutation = useMutation({
+    mutationFn: deleteRoutingRule,
+  });
+  const connectPipelineMutation = useMutation({
+    mutationFn: connectPipeline,
+  });
 
   return {
     createStreamMutation,
@@ -88,7 +103,8 @@ const usePipelineRoutingMutation = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
+    connectPipelineMutation,
   };
 };
 
-export default usePipelineRoutingMutation;
+export default useSetupInputMutations;

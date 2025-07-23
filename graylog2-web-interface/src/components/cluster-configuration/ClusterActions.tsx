@@ -33,7 +33,9 @@ type Props = {
 
 const ClusterActions = ({ node }: Props) => {
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
-  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE'|'DEAD'|undefined>(undefined);
+  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE' | 'DEAD' | undefined>(
+    undefined,
+  );
 
   const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
   const nodeName = `${node.short_node_id} / ${node.hostname}`;
@@ -47,7 +49,7 @@ const ClusterActions = ({ node }: Props) => {
     setShowMessageProcessingModal(false);
   };
 
-  const updateLoadBalancerStatus = (status: 'ALIVE'|'DEAD') => {
+  const updateLoadBalancerStatus = (status: 'ALIVE' | 'DEAD') => {
     SystemLoadBalancerStore.override(node.node_id, status);
     setLoadBalancerStatusToConfirm(undefined);
   };
@@ -62,9 +64,13 @@ const ClusterActions = ({ node }: Props) => {
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
           {node.lb_status === 'alive' ? (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>Override load Balancer status to DEAD</MenuItem>
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>
+              Override load Balancer status to DEAD
+            </MenuItem>
           ) : (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>Override load Balancer status to ALIVE</MenuItem>
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>
+              Override load Balancer status to ALIVE
+            </MenuItem>
           )}
         </IfPermitted>
         <IfPermitted permissions={['processing:changestate', 'lbstatus:change', 'node:shutdown']} anyPermissions>
@@ -107,7 +113,10 @@ const ClusterActions = ({ node }: Props) => {
           onConfirm={toggleMessageProcessing}
           onCancel={() => setShowMessageProcessingModal(false)}
           title="Message Processing">
-          <>You are about to <b>{node.is_processing ? 'pause' : 'resume'}</b> message processing in <b>{nodeName}</b> node. Are you sure?</>
+          <>
+            You are about to <b>{node.is_processing ? 'pause' : 'resume'}</b> message processing in <b>{nodeName}</b>{' '}
+            node. Are you sure?
+          </>
         </ConfirmDialog>
       )}
       {loadBalancerStatusToConfirm && (
@@ -116,11 +125,14 @@ const ClusterActions = ({ node }: Props) => {
           onConfirm={() => updateLoadBalancerStatus(loadBalancerStatusToConfirm)}
           onCancel={() => setLoadBalancerStatusToConfirm(undefined)}
           title="Load Balancer">
-          <>You are about to change the load balancer status for <b>{nodeName}</b> node to <b>{loadBalancerStatusToConfirm}</b>. Are you sure?</>
+          <>
+            You are about to change the load balancer status for <b>{nodeName}</b> node to{' '}
+            <b>{loadBalancerStatusToConfirm}</b>. Are you sure?
+          </>
         </ConfirmDialog>
       )}
     </>
   );
-}
+};
 
 export default ClusterActions;

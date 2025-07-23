@@ -25,7 +25,7 @@ const PanelHeading = styled(BootstrapPanel.Heading)(
   ({ theme }) => css`
     .panel-title {
       > a {
-        color: ${theme.colors.global.textDefault};
+        color: ${theme.colors.text.primary};
         display: block;
       }
     }
@@ -40,24 +40,18 @@ const PanelFooter = styled(BootstrapPanel.Footer)(
 );
 
 const panelVariantStyles = css<{ bsStyle?: string }>(({ bsStyle = 'default', theme }) => {
-  const backgroundColor = theme.colors.variant.lighter[bsStyle];
-  const borderColor = theme.colors.variant.dark[bsStyle];
+  const backgroundColor = theme.colors.alerts[bsStyle].background;
+  const borderColor = theme.colors.alerts[bsStyle].border;
 
   return css`
     border-color: ${borderColor};
 
     > ${PanelHeading} {
-      color: ${theme.utils.readableColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
       + .panel-collapse > .panel-body {
         border-top-color: ${borderColor};
-      }
-
-      .badge {
-        color: ${backgroundColor};
-        background-color: ${theme.colors.variant[bsStyle]};
       }
     }
 
@@ -71,13 +65,16 @@ const panelVariantStyles = css<{ bsStyle?: string }>(({ bsStyle = 'default', the
 
 const StyledPanel = styled(BootstrapPanel)(
   ({ theme }) => css`
-    background-color: ${theme.utils.colorLevel(theme.colors.global.background, -4)};
+    background-color: transparent;
 
-    > ${PanelHeading} {
-      .panel-title,
-      .panel-title h3 {
-        font-size: ${theme.fonts.size.large};
-      }
+    .panel-heading,
+    .panel-heading h3 {
+      color: ${theme.colors.text.primary};
+      font-size: ${theme.fonts.size.large};
+    }
+
+    .panel-body {
+      background: ${theme.colors.global.contentBackground};
     }
 
     .panel-group {
@@ -198,13 +195,13 @@ type PanelProps = React.ComponentProps<typeof DeprecatedStyledPanel> &
   }>;
 
 const Panel = ({
-  title,
-  children,
+  title = undefined,
+  children = undefined,
   collapsible = false,
   defaultExpanded = null,
   expanded = null,
-  footer,
-  header,
+  footer = undefined,
+  header = undefined,
   onToggle = () => {},
   ...props
 }: PanelProps) => {

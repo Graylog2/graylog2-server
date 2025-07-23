@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import * as Immutable from 'immutable';
 import trim from 'lodash/trim';
 
@@ -41,25 +41,28 @@ import {
   selectParameterBindings,
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
-import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import type Parameter from 'views/logic/parameters/Parameter';
-import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import type { ParameterMap } from 'views/logic/parameters/Parameter';
+import type Parameter from 'views/logic/parameters/Parameter';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import type { WidgetMapping } from 'views/logic/views/types';
 
+const initialState = {
+  searchTypesToSearch: undefined,
+  executionState: SearchExecutionState.empty(),
+  isLoading: false,
+  result: undefined,
+  jobIds: null,
+};
+
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
-  initialState: {
-    searchTypesToSearch: undefined,
-    executionState: SearchExecutionState.empty(),
-    isLoading: false,
-    result: undefined,
-    jobIds: null,
-  } as SearchExecution,
+  initialState,
   reducers: {
+    resetState: () => initialState,
     loading: (state) => ({
       ...state,
       isLoading: true,
@@ -125,6 +128,7 @@ export const {
   stopLoading,
   finishedLoading,
   updateGlobalOverride,
+  resetState,
   setSearchTypesToSearch,
   setParameterValues,
   setParameterBindings,
@@ -142,7 +146,13 @@ export type SearchExecutors = {
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
   ) => Promise<JobIds>;
-  executeJobResult: (jobIds: JobIds, widgetMapping?: WidgetMapping) => Promise<SearchExecutionResult>;
+  executeJobResult: (params: {
+    jobIds: JobIds;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+    stopPolling?: (progress: number) => boolean;
+  }) => Promise<SearchExecutionResult>;
   cancelJob: (jobIds: JobIds) => Promise<null>;
 };
 
@@ -161,15 +171,60 @@ export const cancelExecutedJob =
     return Promise.resolve();
   };
 
+export const executeSearchJob =
+  ({
+    jobIds,
+    widgetMapping,
+    page,
+    perPage,
+    searchExecutors,
+    stopPolling,
+  }: {
+    jobIds: JobIds;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+    searchExecutors: SearchExecutors;
+    stopPolling?: (progress: number) => boolean;
+  }) =>
+  (dispatch: ViewsDispatch, _getState) => {
+    dispatch(setJobIds(jobIds));
+    dispatch(loading());
+
+    return searchExecutors
+      .executeJobResult({ jobIds, widgetMapping, page, perPage, stopPolling })
+      .then(searchExecutors.resultMapper)
+      .then((result) => {
+        dispatch(setJobIds(null));
+        const isCanceled = result?.result?.result?.execution?.cancelled;
+        if (isCanceled) return dispatch(stopLoading());
+
+        return dispatch(finishedLoading(result));
+      });
+  };
+
 export const executeWithExecutionState =
-  (
-    search: Search,
-    activeQuery: string,
-    searchTypesToSearch: Array<string>,
-    executionState: SearchExecutionState,
-    searchExecutors: SearchExecutors,
-    widgetMapping?: WidgetMapping,
-  ) =>
+  ({
+    search,
+    activeQuery,
+    searchTypesToSearch,
+    executionState,
+    searchExecutors,
+    widgetMapping,
+    page,
+    perPage,
+    stopPolling,
+  }: {
+    search: Search;
+    activeQuery: string;
+    searchTypesToSearch: Array<string>;
+    executionState: SearchExecutionState;
+    searchExecutors: SearchExecutors;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+    stopPolling?: (progress: number) => boolean;
+  }) =>
   (dispatch: ViewsDispatch) =>
     dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
@@ -178,37 +233,49 @@ export const executeWithExecutionState =
 
         return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
-      .then((jobIds: JobIds) => {
-        dispatch(setJobIds(jobIds));
+      .then((jobIds: JobIds) =>
+        dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
+      )
+      .catch((error) => {
+        dispatch(cancelExecutedJob());
+        dispatch(stopLoading());
 
-        return searchExecutors
-          .executeJobResult(jobIds, widgetMapping)
-          .then(searchExecutors.resultMapper)
-          .then((result) => {
-            dispatch(setJobIds(null));
-            const isCanceled = result?.result?.result?.execution?.cancelled;
-            if (isCanceled) return dispatch(stopLoading());
-
-            return dispatch(finishedLoading(result));
-          });
+        throw error;
       });
 
 export const execute =
-  (search: Search, activeQuery: string, widgetMapping?: WidgetMapping) =>
+  ({
+    search,
+    activeQuery,
+    widgetMapping,
+    page,
+    perPage,
+    stopPolling,
+  }: {
+    search: Search;
+    activeQuery: string;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+    stopPolling?: (progress: number) => boolean;
+  }) =>
   (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
     const state = getState();
     const executionState = selectSearchExecutionState(state);
     const searchTypesToSearch = selectSearchTypesToSearch(state);
 
     return dispatch(
-      executeWithExecutionState(
+      executeWithExecutionState({
         search,
         activeQuery,
         searchTypesToSearch,
         executionState,
         searchExecutors,
         widgetMapping,
-      ),
+        page,
+        perPage,
+        stopPolling,
+      }),
     );
   };
 

@@ -51,6 +51,10 @@ public interface RuleService {
 
     Collection<RuleDao> loadAll();
 
+    Collection<RuleDao> loadAllByTitle(String regex);
+
+    Collection<RuleDao> loadAllByScope(String scope);
+
     void delete(String id);
 
     default void delete(RuleDao rule) {

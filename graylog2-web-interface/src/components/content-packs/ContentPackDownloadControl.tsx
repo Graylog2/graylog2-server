@@ -45,7 +45,7 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onH
 
   return (
     <BootstrapModalWrapper showModal={showDownloadModal} onHide={closeModal} bsSize="large">
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>

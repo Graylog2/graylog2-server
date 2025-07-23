@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Table, Label } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -22,26 +23,57 @@ import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusC
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
+import JournalState from 'components/nodes/JournalState';
 
 import type { ClusterNodes } from './useClusterNodes';
 import ClusterStatusLabel from './ClusterStatusLabel';
 import ClusterActions from './ClusterActions';
+import JvmHeapUsageText from './JvmHeapUsageText';
+
+const SecondaryText = styled.div`
+  span {
+    font-size: small;
+  }
+`;
+
+const NodeInfoTH = styled.th`
+  width: 51%;
+`;
+
+const StyledTable = styled(Table)`
+  table-layout: fixed;
+  width: 100%;
+
+  th,
+  td {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+`;
+
+const RoleLabel = styled(Label)`
+  display: inline-flex;
+  justify-content: center;
+  gap: 4px;
+`;
 
 type Props = {
-  clusterNodes: ClusterNodes,
-}
+  clusterNodes: ClusterNodes;
+};
 
-const getRoleLabels = (roles: string) => roles.split(',').map((role) => (
-  <span key={role}>
-    <Label bsSize="xs">{role}</Label>&nbsp;
-  </span>
-));
+const getRoleLabels = (roles: string) =>
+  roles.split(',').map((role) => (
+    <span key={role}>
+      <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
+    </span>
+  ));
 
 const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
-  <Table>
+  <StyledTable>
     <thead>
       <tr>
-        <th>Node</th>
+        <NodeInfoTH>Node</NodeInfoTH>
         <th>Type</th>
         <th>Role</th>
         <th>State</th>
@@ -51,25 +83,45 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
     <tbody>
       {clusterNodes.graylogNodes.map((graylogNode) => (
         <tr key={graylogNode.nodeName}>
-          <td><Link to={Routes.SYSTEM.NODES.SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link></td>
+          <td>
+            <div>
+              <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
+            </div>
+            <SecondaryText>
+              <JournalState nodeId={graylogNode.nodeInfo.node_id} />
+            </SecondaryText>
+            <SecondaryText>
+              <JvmHeapUsageText nodeId={graylogNode.nodeInfo.node_id} />
+            </SecondaryText>
+          </td>
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
-          <td><ClusterStatusLabel node={graylogNode.nodeInfo} /></td>
-          <td align='right'><ClusterActions node={graylogNode.nodeInfo} /></td>
+          <td>
+            <ClusterStatusLabel node={graylogNode.nodeInfo} />
+          </td>
+          <td align="right">
+            <ClusterActions node={graylogNode.nodeInfo} />
+          </td>
         </tr>
       ))}
       {clusterNodes.dataNodes.map((dataNode) => (
         <tr key={dataNode.nodeName}>
-          <td><Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link></td>
+          <td>
+            <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link>
+          </td>
           <td>{dataNode.type}</td>
           <td>{getRoleLabels(dataNode.role)}</td>
-          <td><DataNodeStatusCell dataNode={dataNode.nodeInfo} /></td>
-          <td align='right'><DataNodeActions dataNode={dataNode.nodeInfo} /></td>
+          <td>
+            <DataNodeStatusCell dataNode={dataNode.nodeInfo} />
+          </td>
+          <td align="right">
+            <DataNodeActions dataNode={dataNode.nodeInfo} />
+          </td>
         </tr>
       ))}
     </tbody>
     {clusterNodes.isLoading && <Spinner />}
-  </Table>
+  </StyledTable>
 );
 
 export default ClusterConfigurationListView;

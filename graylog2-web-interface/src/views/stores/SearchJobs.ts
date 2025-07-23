@@ -28,8 +28,10 @@ const startJobUrl = (id: string) => URLUtils.qualifyUrl(`/views/search/${id}/exe
 const cancelJobUrl = (nodeId: string, jobId: string) =>
   URLUtils.qualifyUrl(`/views/searchjobs/${nodeId}/${jobId}/cancel`);
 
-const pollJobUrl = (nodeId: string, jobId: string) =>
-  URLUtils.qualifyUrl(`/views/searchjobs/${nodeId}/${jobId}/status`);
+const pollJobUrl = (nodeId: string, jobId: string, page?: number, perPage?: number) =>
+  URLUtils.qualifyUrl(
+    `/views/searchjobs/${nodeId}/${jobId}/status${page && perPage ? `?page=${page}&per_page=${perPage}` : ''}`,
+  );
 
 type ExecutionInfoType = {
   done: boolean;
@@ -41,6 +43,7 @@ export type SearchJobType = {
   id: SearchJobId;
   search: Search;
   search_id: SearchId;
+  progress: number;
   results: { [id: string]: any };
   execution: ExecutionInfoType;
   owner: string;
@@ -61,8 +64,16 @@ export function runStartJob(search: Search, executionState: SearchExecutionState
   return fetch('POST', startJobUrl(search.id), JSON.stringify(executionState));
 }
 
-export function runPollJob({ nodeId, asyncSearchId }: JobIds): Promise<SearchJobType | null> {
-  return fetch('GET', pollJobUrl(nodeId, asyncSearchId));
+export function runPollJob({
+  jobIds: { nodeId, asyncSearchId },
+  page,
+  perPage,
+}: {
+  jobIds: JobIds;
+  page?: number;
+  perPage?: number;
+}): Promise<SearchJobType | null> {
+  return fetch('GET', pollJobUrl(nodeId, asyncSearchId, page, perPage));
 }
 
 export function runCancelJob({ nodeId, asyncSearchId }: JobIds): Promise<null> {

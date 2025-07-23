@@ -19,23 +19,22 @@ import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useProductName from 'brand-customization/useProductName';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const SystemOutputsPage = () => {
   const currentUser = useCurrentUser();
+  const productName = useProductName();
 
   return (
     <DocumentTitle title="Outputs">
       <span>
         <PageHeader title="Outputs in Cluster">
           <span>
-            Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here{' '}
+            {productName} nodes can forward messages via outputs. Launch or terminate as many outputs as you want here{' '}
             <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
             <br />
-            You can find output plugins in{' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noreferrer">
-              the Graylog Marketplace
-            </a>
-            .
+            <MarketplaceLink prefix="You can find output plugins in" />
           </span>
         </PageHeader>
 
