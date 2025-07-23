@@ -59,6 +59,11 @@ public class GranteeSharesService {
         this.granteeService = granteeService;
     }
 
+    public Set<GrantDTO> grantsByGrantee(GRN grantee){
+        final Set<GRN> granteeAliases = granteeService.getGranteeAliases(grantee);
+        return grantService.getForGranteesOrGlobal(granteeAliases);
+    }
+
     public SharesResponse getPaginatedSharesFor(GRN grantee,
                                                 PaginationParameters paginationParameters,
                                                 String capabilityFilterString,

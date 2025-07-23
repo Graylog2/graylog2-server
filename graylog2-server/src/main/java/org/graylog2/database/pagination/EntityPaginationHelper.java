@@ -18,6 +18,7 @@ package org.graylog2.database.pagination;
 
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.security.Capability;
+import org.graylog.security.GrantDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,32 @@ public class EntityPaginationHelper {
     private static final Logger LOG = LoggerFactory.getLogger(EntityPaginationHelper.class);
 
     public static final Pattern KEY_VALUE_PATTERN = Pattern.compile("^(.*):(.*)");
+
+    public static Predicate<GrantDTO> entityCapabilityPredicate(List<String> filters) {
+        if (filters == null || filters.isEmpty()) {
+            return descriptor -> true;
+        }
+        return filters.stream()
+                .map(EntityPaginationHelper::entityCapabilityPredicate)
+                .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
+    }
+
+    public static Predicate<GrantDTO> entityCapabilityPredicate(String entityFilter) {
+        if (isNullOrEmpty(entityFilter)) {
+            return grantDTO -> true;
+        }
+        final String filter = entityFilter.trim().toLowerCase(Locale.US);
+
+        Matcher m = KEY_VALUE_PATTERN.matcher(filter);
+        if (m.find()) {
+            final String key = m.group(1);
+            final String value = m.group(2);
+            if (key.equals("capability")) {
+                return grant -> grant.capability().toId().equals(value);
+            }
+        }
+        return grantDTO -> true;
+    }
 
     public static Optional<Capability> parseCapabilityFilter(String capabilityFilterString) {
         if (isNullOrEmpty(capabilityFilterString)) {
