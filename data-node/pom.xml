@@ -673,6 +673,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
                                 <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
                                 and need to be removed in correct order-->
+                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-alerting</argument>
                                 <argument>opensearch-custom-codecs</argument>
                                 <argument>opensearch-geospatial</argument>
@@ -682,10 +683,9 @@
                                 <argument>opensearch-notifications-core</argument>
                                 <argument>opensearch-performance-analyzer</argument>
                                 <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-sql</argument>
                                 <argument>opensearch-observability</argument>
-                                <argument>opensearch-query-insights</argument>
+                                <argument>query-insights</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -701,6 +701,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
                                 <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
                                 and need to be removed in correct order-->
+                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-alerting</argument>
                                 <argument>opensearch-custom-codecs</argument>
                                 <argument>opensearch-geospatial</argument>
@@ -710,10 +711,9 @@
                                 <argument>opensearch-notifications-core</argument>
                                 <argument>opensearch-performance-analyzer</argument>
                                 <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-sql</argument>
                                 <argument>opensearch-observability</argument>
-                                <argument>opensearch-query-insights</argument>
+                                <argument>query-insights</argument>
                             </arguments>
                         </configuration>
                     </execution>
