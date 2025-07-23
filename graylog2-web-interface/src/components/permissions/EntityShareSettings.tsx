@@ -140,15 +140,17 @@ const EntityShareSettings = ({
           title="Direct Collaborators"
         />
       </Section>
-      <Section>
-        <CollectionGranteeList
-          title="Collection Collaborators"
-          activeShares={activeShares}
-          entityType={entityType}
-          entityTypeTitle={entityTypeTitle}
-          selectedGrantees={selectedGrantees}
-        />
-      </Section>
+      {CollectionGranteeList && (
+        <Section>
+          <CollectionGranteeList
+            title="Collection Collaborators"
+            activeShares={activeShares}
+            entityType={entityType}
+            entityTypeTitle={entityTypeTitle}
+            selectedGrantees={selectedGrantees}
+          />
+        </Section>
+      )}
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}
         validationResults={validationResults}
