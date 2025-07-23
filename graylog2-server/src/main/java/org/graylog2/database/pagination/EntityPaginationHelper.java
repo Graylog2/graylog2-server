@@ -41,6 +41,13 @@ public class EntityPaginationHelper {
     private EntityPaginationHelper() {
     } // Utility class, no instantiation
 
+
+    /**
+     * Creates a predicate that filters GrantDTO objects based on the provided list of entity capability filters.
+     *
+     * @param filters the list of entity filters
+     * @return a Predicate that filters GrantDTO objects
+     */
     public static Predicate<GrantDTO> entityCapabilityPredicate(List<String> filters) {
         if (filters == null || filters.isEmpty()) {
             return descriptor -> true;
@@ -50,7 +57,7 @@ public class EntityPaginationHelper {
                 .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
     }
 
-    public static Predicate<GrantDTO> entityCapabilityPredicate(String entityFilter) {
+    private static Predicate<GrantDTO> entityCapabilityPredicate(String entityFilter) {
         if (isNullOrEmpty(entityFilter)) {
             return grantDTO -> true;
         }
