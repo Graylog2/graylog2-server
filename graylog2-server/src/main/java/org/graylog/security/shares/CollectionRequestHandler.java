@@ -30,7 +30,7 @@ public interface CollectionRequestHandler {
     }
 
     default Predicate<GRN> collectionEntitiesFilter() {
-        // Intentionally left empty - ignore this in the community edition.
-        return entityDescriptor -> true;
+        // Ignore this in the community edition
+        return grn -> false;
     }
 }
