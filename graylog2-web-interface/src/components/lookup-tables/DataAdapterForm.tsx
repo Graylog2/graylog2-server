@@ -77,8 +77,13 @@ const DataAdapterForm = ({
   const sendTelemetry = useSendTelemetry();
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
+  const [configReady, setConfigReady] = React.useState(false);
   const { createAdapter, creatingAdapter } = useCreateAdapter();
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
+
+  React.useEffect(() => {
+    setConfigReady(false);
+  }, [type]);
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableAdapters').find((p) => p.type === type), [type]);
 
@@ -142,8 +147,8 @@ const DataAdapterForm = ({
       validate(values);
     }
 
-    if (values.config.type !== 'none') {
-      const confErrors = configRef.current?.validate() || {};
+    if (values.config?.type !== 'none' && configReady) {
+      const confErrors = configRef.current?.validate?.() || {};
       if (!isEmpty(confErrors)) errors.config = confErrors;
     }
 
@@ -197,7 +202,10 @@ const DataAdapterForm = ({
 
               setFieldValue(`config.${name}`, updatedValue);
             },
-            ref: configRef,
+            ref: (ref) => {
+              configRef.current = ref;
+              setConfigReady(true);
+            },
           });
 
           return (
