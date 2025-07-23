@@ -32,11 +32,8 @@ type Props = {
 };
 
 const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
-  const {
-    pluggableColumnRenderers,
-    pluggableAttributes,
-    pluggableExpandedSections
-  } = usePluggableEntityTableElements<View>(null, 'dashboard');
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<View>(null, 'dashboard');
   const { getDefaultLayout, columnOrder, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
   const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
 

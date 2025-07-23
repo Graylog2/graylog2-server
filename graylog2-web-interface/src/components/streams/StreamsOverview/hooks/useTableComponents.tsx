@@ -24,9 +24,12 @@ import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRul
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
-const useTableElements = ({ indexSets, pluggableExpandedSections }: {
-  indexSets: Array<IndexSet>,
-  pluggableExpandedSections: { [sectionName: string]: ExpandedSectionRenderer<Stream> },
+const useTableElements = ({
+  indexSets,
+  pluggableExpandedSections,
+}: {
+  indexSets: Array<IndexSet>;
+  pluggableExpandedSections: { [sectionName: string]: ExpandedSectionRenderer<Stream> };
 }) => {
   const entityActions = useCallback(
     (listItem: Stream) => <StreamActions stream={listItem} indexSets={indexSets} />,

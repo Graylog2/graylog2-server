@@ -45,10 +45,14 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
         eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
     },
     scheduling: {
-      renderCell: (_scheduling: string, eventDefinition: EventDefinition) => <SchedulingCell definition={eventDefinition} />,
+      renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
+        <SchedulingCell definition={eventDefinition} />
+      ),
     },
     status: {
-      renderCell: (_status: string, eventDefinition: EventDefinition) => <StatusCell eventDefinition={eventDefinition} />,
+      renderCell: (_status: string, eventDefinition: EventDefinition) => (
+        <StatusCell eventDefinition={eventDefinition} />
+      ),
       staticWidth: 100,
     },
     priority: {
@@ -66,11 +70,8 @@ const renderEventDefinitionActions = (listItem: EventDefinition) => (
 );
 
 const EventDefinitionsContainer = () => {
-  const {
-    pluggableColumnRenderers,
-    pluggableAttributes,
-    pluggableExpandedSections
-  } = usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
   const { defaultLayout, columnOrder, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
   const expandedSections = useMemo(
     () => ({
