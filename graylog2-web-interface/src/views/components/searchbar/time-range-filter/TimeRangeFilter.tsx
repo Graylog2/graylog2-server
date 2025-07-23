@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
@@ -28,6 +28,7 @@ import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import MoveRange from 'views/components/searchbar/time-range-filter/MoveRange';
 
 import TimeRangeFilterButtons from './TimeRangeFilterButtons';
 import TimeRangeDisplay from './TimeRangeDisplay';
@@ -40,6 +41,11 @@ const FlexContainer = styled.div`
   min-width: 430px;
   gap: ${SEARCH_BAR_GAP};
   position: relative;
+`;
+
+const RightCol = styled.div`
+  display: flex;
+  width: 100%;
 `;
 
 type Props = {
@@ -55,6 +61,11 @@ type Props = {
   value?: TimeRange | NoTimeRangeOverride;
   withinPortal?: boolean;
   submitOnPresetChange?: boolean;
+  moveRangeProps?: {
+    effectiveTimerange: AbsoluteTimeRange;
+    initialTimerange: TimeRange | NoTimeRangeOverride;
+    initialTimerangeFormat: 'internal' | 'internalIndexer';
+  };
 };
 
 const TimeRangeFilter = ({
@@ -70,6 +81,7 @@ const TimeRangeFilter = ({
   limitDuration,
   withinPortal = true,
   submitOnPresetChange = true,
+  moveRangeProps = undefined,
 }: Props) => {
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
@@ -120,7 +132,17 @@ const TimeRangeFilter = ({
             submitOnPresetChange={submitOnPresetChange}
           />
         )}
-        <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
+        <RightCol>
+          <MoveRange
+            displayMoveRangeButtons={!!moveRangeProps}
+            setCurrentTimeRange={onChange}
+            initialTimerangeFormat={moveRangeProps?.initialTimerangeFormat}
+            effectiveTimerange={moveRangeProps?.effectiveTimerange}
+            initialTimerange={moveRangeProps?.initialTimerange}
+            currentTimerange={value}>
+            <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
+          </MoveRange>
+        </RightCol>
       </FlexContainer>
     </TimeRangePicker>
   );

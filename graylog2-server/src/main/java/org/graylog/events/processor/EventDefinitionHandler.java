@@ -32,6 +32,7 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -59,6 +60,7 @@ public class EventDefinitionHandler {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
+    private final ClusterEventBus clusterEventBus;
 
     // Provider to avoid circular dependency
     private final Provider<EntitySharesService> entitySharesServiceProvider;
@@ -70,12 +72,14 @@ public class EventDefinitionHandler {
                                   DBJobDefinitionService jobDefinitionService,
                                   DBJobTriggerService jobTriggerService,
                                   Provider<EntitySharesService> entitySharesServiceProvider,
-                                  JobSchedulerClock clock) {
+                                  JobSchedulerClock clock,
+                                  ClusterEventBus clusterEventBus) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
         this.entitySharesServiceProvider = entitySharesServiceProvider;
         this.clock = clock;
+        this.clusterEventBus = clusterEventBus;
     }
 
     /**
@@ -167,6 +171,7 @@ public class EventDefinitionHandler {
             throw e;
         }
 
+        clusterEventBus.post(new EventDefinitionUpdated(updatedEventDefinition.id()));
         return eventDefinition;
     }
 
@@ -227,6 +232,7 @@ public class EventDefinitionHandler {
         getJobDefinition(eventDefinition)
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
 
+        clusterEventBus.post(new EventDefinitionDeleted(eventDefinitionId));
         LOG.debug("Deleting event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
         return deleteSupplier.get();
     }

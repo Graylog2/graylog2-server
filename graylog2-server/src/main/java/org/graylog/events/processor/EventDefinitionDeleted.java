@@ -14,19 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+package org.graylog.events.processor;
 
-declare module 'graylog-web-plugin/plugin' {
-  export interface PluginExports {
-    'components.collection'?: {
-      AddCollectionFormGroup: React.ComponentType<{
-        entityType?: string;
-        label?: React.ReactElement | string;
-        name?: string;
-        error?: any;
-        value?: Array<string>;
-        onChange: (values: Pick<EntitySharePayload, 'selected_collections'>) => void;
-      }>;
-    };
-  }
+public record EventDefinitionDeleted(String eventDefinitionId) {
 }

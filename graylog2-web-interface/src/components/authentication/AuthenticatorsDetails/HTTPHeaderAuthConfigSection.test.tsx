@@ -53,7 +53,7 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
 
     await screen.findByText('Enabled');
 
-    expect(screen.getByText('yes')).toBeInTheDocument();
-    expect(screen.getByText('Remote-User')).toBeInTheDocument();
+    await screen.findByTitle('Yes');
+    await screen.findByText('Remote-User');
   });
 });

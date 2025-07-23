@@ -14,18 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.events.processor;
 
-import { Icon } from 'components/common';
-
-type Props = {
-  builtIn: boolean;
-};
-
-const BuiltInCell = ({ builtIn }: Props) => {
-  if (!builtIn) return null;
-
-  return <Icon name="check_circle" />;
-};
-
-export default BuiltInCell;
+public record EventDefinitionUpdated(String eventDefinitionId) {
+}
