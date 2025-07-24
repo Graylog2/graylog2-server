@@ -25,12 +25,7 @@ public interface CollectionRequestHandler {
     /**
      * Pluggable handler for actions related to collections.
      */
-    default void addToCollection(GRN entity, Set<GRN> collections) {
-        // Intentionally left empty - ignore this in the community edition.
-    }
+    void addToCollection(GRN entity, Set<GRN> collections);
 
-    default Predicate<GRN> collectionFilter() {
-        // Ignore this in the community edition
-        return grn -> false;
-    }
+    Predicate<GRN> collectionFilter();
 }
