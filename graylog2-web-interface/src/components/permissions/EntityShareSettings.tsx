@@ -144,10 +144,8 @@ const EntityShareSettings = ({
         <Section>
           <CollectionGranteeList
             title="Collection Collaborators"
-            activeShares={activeShares}
             entityType={entityType}
             entityTypeTitle={entityTypeTitle}
-            selectedGrantees={selectedGrantees}
             entityGRN={entityGRN}
           />
         </Section>
