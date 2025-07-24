@@ -22,7 +22,11 @@ export function ModalProvider<ModalTypes, EntityType = unknown>({ children }: { 
   const [modal, setModal] = React.useState<ModalTypes>(null);
   const [entity, setEntity] = React.useState<EntityType>();
   const [title, setTitle] = React.useState<string>(null);
-  const value = React.useMemo(() => ({ modal, setModal, entity, setEntity, title, setTitle }), [modal, entity, title]);
+  const [double, setDouble] = React.useState<boolean>(false);
+  const value = React.useMemo(
+    () => ({ modal, setModal, entity, setEntity, title, setTitle, double, setDouble }),
+    [modal, entity, title, double],
+  );
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }

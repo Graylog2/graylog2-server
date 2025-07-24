@@ -17,17 +17,27 @@
 import * as React from 'react';
 
 import Drawer from 'components/common/Drawer';
+import { Row } from 'components/lookup-tables/layout-componets';
 
 type Props = {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  double?: boolean;
 };
 
-const LUTDrawer = ({ onClose, title, children }: Props) => (
-  <Drawer opened onClose={onClose} size="lg" position="right" overlayProps={{ zIndex: '1030' }} title={title}>
-    {children}
-  </Drawer>
+const LUTDrawer = ({ onClose, title, double = false, children }: Props) => (
+  <Row $align="stretch">
+    <Drawer
+      opened
+      onClose={onClose}
+      position="right"
+      size={double ? 1260 : 'lg'}
+      overlayProps={{ zIndex: '1030' }}
+      title={title}>
+      {children}
+    </Drawer>
+  </Row>
 );
 
 export default LUTDrawer;

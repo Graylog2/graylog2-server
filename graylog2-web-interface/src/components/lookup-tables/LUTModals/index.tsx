@@ -37,7 +37,7 @@ export type ModalTypes =
   | 'DATA-ADAPTER-EDIT';
 
 function LUTModals() {
-  const { modal, setModal, entity, setEntity, title, setTitle } = useModalContext();
+  const { modal, setModal, entity, setEntity, title, setTitle, double } = useModalContext();
 
   const onClose = () => {
     setModal(null);
@@ -50,7 +50,7 @@ function LUTModals() {
     case 'CACHE':
     case 'DATA-ADAPTER':
       return (
-        <LUTdrawer title={title} onClose={onClose}>
+        <LUTdrawer title={title} onClose={onClose} double={double}>
           {entity}
         </LUTdrawer>
       );
