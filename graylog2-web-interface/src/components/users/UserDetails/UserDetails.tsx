@@ -69,7 +69,7 @@ const UserDetails = ({ user }: Props) => {
                 <TelemetrySettingsDetails />
               </IfPermitted>
             )}
-            {currentUser.id === user.id && isLocalAdmin && (
+            {(currentUser.id === user.id || isLocalAdmin) && (
               <IfPermitted permissions={`users:edit:${user.username}`}>
                 <CollectionsSection user={user} />
               </IfPermitted>
