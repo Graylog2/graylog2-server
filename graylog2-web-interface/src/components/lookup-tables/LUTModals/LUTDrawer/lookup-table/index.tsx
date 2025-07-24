@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import Routes from 'routing/Routes';
 import { Button, Col as BSCol } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
@@ -59,6 +58,13 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const { double, setDouble } = useModalContext();
   const [showAttached, setShowAttached] = React.useState<string>();
+  const { setModal, setTitle, setEntity } = useModalContext();
+
+  const handleEdit = () => {
+    setModal('LUT-EDIT');
+    setTitle(table.name);
+    setEntity(table);
+  };
 
   const handleShowAttached = (type: string) => () => {
     setDouble(showAttached === type ? !double : true);
@@ -74,11 +80,7 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
           <Row $align="flex-end" $justify="space-between">
             <h2>Description</h2>
             {!loadingScopePermissions && scopePermissions?.is_mutable && (
-              <Button
-                bsStyle="primary"
-                bsSize="sm"
-                href={Routes.SYSTEM.LOOKUPTABLES.edit(table.name)}
-                name="edit_square">
+              <Button bsStyle="primary" bsSize="sm" onClick={handleEdit} name="edit_square">
                 Edit
               </Button>
             )}

@@ -16,23 +16,31 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LookupTablesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
+import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTTablesPage() {
+  const { setModal } = useModalContext();
+
+  const showCreateModal = () => {
+    setModal('LUT-CREATE');
+  }
+
   return (
     <LUTPageLayout
       documentTitle="Lookup Tables"
       pageTitle="Lookup Tables"
       pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
       actions={
-        <Button bsStyle="primary" href={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+        <Button bsStyle="primary" onClick={showCreateModal}>
           Create lookup table
         </Button>
       }>
       <LookupTablesOverview />
+      <LUTModals />
     </LUTPageLayout>
   );
 }

@@ -47,6 +47,10 @@ export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => 
   return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
 };
 
+export const createLookupTable = async (payload: LookupTableCache) => LookupTablesActions.create(payload);
+
+export const updateLookupTable = async (payload: LookupTableCache) => LookupTablesActions.update(payload);
+
 export const purgeLookupTableKey = async ({ table, key }: { table: LookupTable; key: string }) =>
   LookupTablesActions.purgeKey(table, key);
 

@@ -45,7 +45,7 @@ const Title = ({ title, typeName, create }: TitleProps) => {
 type Props = {
   type: string;
   title: string;
-  saved: (...args: any[]) => void;
+  saved: (response: any) => void;
   onCancel: () => void;
   create?: boolean;
   dataAdapter?: LookupTableAdapter;
@@ -77,8 +77,13 @@ const DataAdapterForm = ({
   const sendTelemetry = useSendTelemetry();
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
+  const [configReady, setConfigReady] = React.useState(false);
   const { createAdapter, creatingAdapter } = useCreateAdapter();
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
+
+  React.useEffect(() => {
+    setConfigReady(false);
+  }, [type]);
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableAdapters').find((p) => p.type === type), [type]);
 
@@ -142,8 +147,8 @@ const DataAdapterForm = ({
       validate(values);
     }
 
-    if (values.config.type !== 'none') {
-      const confErrors = configRef.current?.validate() || {};
+    if (values.config?.type !== 'none' && configReady) {
+      const confErrors = configRef.current?.validate?.() || {};
       if (!isEmpty(confErrors)) errors.config = confErrors;
     }
 
@@ -153,7 +158,7 @@ const DataAdapterForm = ({
   const handleSubmit = (values: LookupTableAdapter) => {
     const promise = create ? createAdapter(values) : updateAdapter(values);
 
-    return promise.then(() => {
+    return promise.then((response) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
         app_pathname: 'lut',
         app_section: 'lut_data_adapter',
@@ -162,11 +167,11 @@ const DataAdapterForm = ({
         },
       });
 
-      saved();
+      saved(response);
     });
   };
 
-  const isLDAP = dataAdapter.config.type === 'LDAP' && dataAdapter.config?.user_passwd;
+  const isLDAP = dataAdapter.config.type === 'LDAP' && dataAdapter.config?.user_passwd?.is_set;
   const configWithOptionalPassword = {
     ...dataAdapter.config,
     ...(isLDAP ? { user_passwd: { is_set: true, keep_value: true } } : {}),
@@ -197,7 +202,10 @@ const DataAdapterForm = ({
 
               setFieldValue(`config.${name}`, updatedValue);
             },
-            ref: configRef,
+            ref: (ref) => {
+              configRef.current = ref;
+              setConfigReady(true);
+            },
           });
 
           return (
