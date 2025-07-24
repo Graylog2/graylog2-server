@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.19.2</opensearch.version>
+        <opensearch.version>2.19.3</opensearch.version>
         <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
         <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
 
@@ -558,7 +558,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                a580e22906d65a1e65c6c0a6728c5bdb44b66943ad8fb72ab643c410401c24c7ffac3ba335a301c853f5799a626e811d9e5010c029728b29354b4218fb911525
+                                13c1df3bf6e8a46bff1e43d6ac664b82c3e839283b9a10c9fd549d1b44f9f039e24de91f51063d7d0a9945d6d6136e9d8a47588a7d9867405501274d4c943df3
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -582,7 +582,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                f092213c83402739ba2ee5774b14ee7a4483c6db2a01e2e802d4391564ed0c5ef357cd0b0659db8f64f5154fbff58d7647940b4342c05d75af180ae68a7a1f2d
+                                64929d121359ca8fc4291a3398914b6212998f1be678a516056b72b614656c604e50ded47273d5f376265d15c43b2d0b1883e40faeebb84b04205d623c065a6b
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -608,7 +608,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                61bc170bf9c5b14dc60bfdbebeeda4bdfa048c5c6ff68bf0fb5a03b8a1f9547409c3c2a9a14f7f84c49198f30a64ca0ced23b1dc7990d6b7728a03911903fe17
+                                098a94a0a959caa70ed286d232f8d4d9a064aa70f85c6a1198f1fd030196721c232b9084efcad9aa27188ad10827b7f6a8f89f54573ad12098dc7053e965990d
                             </sha512>
                         </configuration>
                     </execution>
@@ -625,7 +625,7 @@
                             <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                27b4f44d382dcde8a4ed494885de49c74e0c98a9df39a75dbe7f1674d8ea50614207a2dba0a1e0cfdbb7bcc9a69083f891fff2c17c4470b97f72b408cccef1f8
+                                70a574d41f0269f7e91e1558960270a7dc98cc233653babd454d66f990ec4d8ee49f6fb6860a61c6760118c1ddc821c8f64ecb42b016ab4d57e89af7f6df00e1
                             </sha512>
                         </configuration>
                     </execution>
