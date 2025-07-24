@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { defaultOnError } from 'util/conditional/onError';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -24,6 +24,8 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
+  createLookupTable,
+  updateLookupTable,
   purgeLookupTableKey,
   purgeAllLookupTableKey,
   testLookupTableKey,
@@ -46,6 +48,48 @@ import {
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function useCreateLookupTable() {
+  const queryClient = useQueryClient();
+
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: createLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Lookup Table created successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-tables'],
+        refetchType: 'active',
+      });
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    createLookupTable: mutateAsync,
+    creatingLookupTable: isLoading,
+  };
+}
+
+export function useUpdateLookupTable() {
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
+    mutationFn: updateLookupTable,
+    onSuccess: () => {
+      UserNotification.success('Lookup Table updated successfully');
+    },
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return {
+    updateLookupTable: mutateAsync,
+    updatingLookupTable: isLoading,
+  };
 }
 
 export function usePurgeLookupTableKey() {
@@ -92,6 +136,7 @@ export function useTestLookupTableKey() {
     testingLookupTableKey: isPending,
   };
 }
+
 export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
   const { data, isLoading } = useQuery({
     queryKey: ['lookup-preview', idOrName, size, enabled],
@@ -148,10 +193,19 @@ export function useValidateCache() {
 }
 
 export function useCreateCache() {
-  const { mutateAsync, isPending: isLoading } = useMutation({
+  const queryClient = useQueryClient();
+
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
     mutationFn: createCache,
     onSuccess: () => {
       UserNotification.success('Cache created successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['caches'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -195,7 +249,7 @@ export function useDeleteCache() {
   };
 }
 
-export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+export const dataAdaptersKeyFn = (searchParams: SearchParams) => ['adapters', 'search', searchParams];
 export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
 }
@@ -210,10 +264,19 @@ export function useFetchDataAdapterTypes() {
 }
 
 export function useCreateAdapter() {
-  const { mutateAsync, isPending: isLoading } = useMutation({
+  const queryClient = useQueryClient();
+
+  const {
+    mutateAsync,
+    isPending: isLoading,
+  } = useMutation({
     mutationFn: createDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter created successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['adapters'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });

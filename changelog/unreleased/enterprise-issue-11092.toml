@@ -8,6 +8,7 @@ issues = [
   "Graylog2/graylog-plugin-enterprise#11110",
   "Graylog2/graylog-plugin-enterprise#11111",
   "Graylog2/graylog-plugin-enterprise#11109",
+  "Graylog2/graylog-plugin-enterprise#11113",
 ]
 
-pulls = ["23056", "23203", "23222"]
+pulls = ["23056", "23203", "23222", "23262"]

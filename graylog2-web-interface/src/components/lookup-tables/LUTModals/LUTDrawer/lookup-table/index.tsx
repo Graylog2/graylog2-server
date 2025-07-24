@@ -23,6 +23,7 @@ import { Link } from 'components/common/router';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
+import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import PurgeCache from './purge-cache';
 import TestLookup from './test-lookup';
@@ -42,6 +43,13 @@ type Props = {
 
 function LookupTableDetails({ table, cache, dataAdapter }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
+  const { setModal, setTitle, setEntity } = useModalContext();
+
+  const handleEdit = () => {
+    setModal('LUT-EDIT');
+    setTitle(table.name);
+    setEntity(table);
+  }
 
   return (
     <Col $gap="lg">
@@ -49,7 +57,7 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
         <Row $align="flex-end" $justify="space-between">
           <h2>Description</h2>
           {!loadingScopePermissions && scopePermissions?.is_mutable && (
-            <Button bsStyle="primary" bsSize="sm" href={Routes.SYSTEM.LOOKUPTABLES.edit(table.name)} name="edit_square">
+            <Button bsStyle="primary" bsSize="sm" onClick={handleEdit} name="edit_square">
               Edit
             </Button>
           )}

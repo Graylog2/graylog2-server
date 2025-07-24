@@ -24,9 +24,10 @@ import { Row, Col, Input } from 'components/bootstrap';
 import { DataAdapterForm } from 'components/lookup-tables';
 import ObjectUtils from 'util/ObjectUtils';
 import { useFetchDataAdapterTypes, useValidateDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type DataAdapterCreateProps = {
-  saved: (...args: any[]) => void;
+  saved: (adapterObj: LookupTableAdapter) => void;
   onCancel: () => void;
   validationErrors?: any;
 };
@@ -104,7 +105,7 @@ const DataAdapterCreate = ({
   return (
     <div>
       <StyledRow>
-        <Col lg={9}>
+        <Col lg={6}>
           <Input
             id="data-adapter-type-select"
             label="Data Adapter Type"

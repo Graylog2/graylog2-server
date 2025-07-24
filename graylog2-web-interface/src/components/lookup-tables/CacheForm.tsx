@@ -53,7 +53,7 @@ const INIT_CACHE: LookupTableCache = {
 
 type Props = {
   type: string;
-  saved: () => void;
+  saved: (response: any) => void;
   title: string;
   onCancel: () => void;
   create?: boolean;
@@ -126,7 +126,7 @@ const CacheForm = ({
   const handleSubmit = (values: LookupTableCache) => {
     const promise = create ? createCache(values) : updateCache(values);
 
-    return promise.then(() => {
+    return promise.then((response) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
         app_pathname: 'lut',
         app_section: 'lut_cache',
@@ -135,7 +135,7 @@ const CacheForm = ({
         },
       });
 
-      saved();
+      saved(response);
     });
   };
 
