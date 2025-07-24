@@ -48,8 +48,23 @@ public class NoopJournal extends AbstractIdleService implements Journal {
     }
 
     @Override
+    public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
+        return List.of();
+    }
+
+    @Override
     public void markJournalOffsetCommitted(long offset) {
         // nothing to do
+    }
+
+    @Override
+    public long getCommittedOffset() {
+        return Long.MIN_VALUE;
+    }
+
+    @Override
+    public long getNextReadOffset() {
+        return Long.MIN_VALUE;
     }
 
     @Override

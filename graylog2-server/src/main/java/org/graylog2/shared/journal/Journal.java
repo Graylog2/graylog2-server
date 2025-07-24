@@ -28,7 +28,43 @@ public interface Journal {
 
     List<JournalReadEntry> read(long maximumCount);
 
+    /**
+     * Read from the journal, starting at the given offset. If the underlying journal implementation returns an empty
+     * list of entries, it will be returned even if we know there are more entries in the journal.
+     *
+     * @param readOffset            Offset to start reading at
+     * @param requestedMaximumCount Maximum number of entries to return.
+     * @return A list of entries
+     */
+    List<JournalReadEntry> read(long readOffset, long requestedMaximumCount);
+
     void markJournalOffsetCommitted(long offset);
+
+    /**
+     * Returns the highest journal offset that has been written to persistent storage by Graylog.
+     * <p>
+     * Every message at an offset prior to this one can be considered as processed and does not need to be held in
+     * the journal any longer. By default, Graylog will try to aggressively flush the journal to consume a smaller
+     * amount of disk space.
+     * </p>
+     *
+     * @return the offset of the last message which has been successfully processed.
+     */
+    long getCommittedOffset();
+
+    /**
+     * Returns the next offset the client should read.
+     * <p>
+     * This offset is *not* the committed offset (see {@link #getCommittedOffset()} for that), it just keeps track
+     * of the message this client has already processed without telling the journal that all the read messages have
+     * been processed successfully.
+     * </p><p>
+     * Caution: Do not use the {@code nextReadOffset} with more than one consumer!
+     * </p>
+     *
+     * @return The offset of the next message to consume.
+     */
+    long getNextReadOffset();
 
     void flush();
 
