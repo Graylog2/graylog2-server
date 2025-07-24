@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import { Button, Col as BSCol } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
 import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
@@ -147,8 +147,10 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
       </Col>
       {double && (
         <Col $gap="lg" $width="50%">
-          {showAttached === 'cache-details' && <Cache cache={cache} />}
-          {showAttached === 'adapter-details' && <DataAdapter dataAdapter={dataAdapter} />}
+          <BSCol style={{ width: '100%' }}>
+            {showAttached === 'cache-details' && <Cache cache={cache} />}
+            {showAttached === 'adapter-details' && <DataAdapter dataAdapter={dataAdapter} />}
+          </BSCol>
         </Col>
       )}
     </Row>
