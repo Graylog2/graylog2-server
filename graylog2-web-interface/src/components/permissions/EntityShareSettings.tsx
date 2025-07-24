@@ -148,6 +148,7 @@ const EntityShareSettings = ({
             entityType={entityType}
             entityTypeTitle={entityTypeTitle}
             selectedGrantees={selectedGrantees}
+            entityGRN={entityGRN}
           />
         </Section>
       )}
