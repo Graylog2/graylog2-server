@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.shares;
+package org.graylog.datanode;
 
-import org.graylog.grn.GRN;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 
-import java.util.Set;
-import java.util.function.Predicate;
+public class JavaHeapSizeValidator implements Validator<String> {
 
-public interface CollectionRequestHandler {
-    /**
-     * Pluggable handler for actions related to collections.
-     */
-    void addToCollection(GRN entity, Set<GRN> collections);
-
-    Predicate<GRN> collectionFilter();
+    @Override
+    public void validate(String name, String value) throws ValidationException {
+        if (value == null || !value.matches("\\d+[gGmMkK]")) {
+            throw new ValidationException("Invalid heap size configuration: " + value + ". Set " + name + " to <size>[g|G|m|M|k|K]. For example 4g or 512m.");
+        }
+    }
 }

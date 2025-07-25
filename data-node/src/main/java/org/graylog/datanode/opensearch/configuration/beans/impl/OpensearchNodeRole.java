@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.shares;
+package org.graylog.datanode.opensearch.configuration.beans.impl;
 
-import org.graylog.grn.GRN;
-
-import java.util.Set;
-import java.util.function.Predicate;
-
-public interface CollectionRequestHandler {
-    /**
-     * Pluggable handler for actions related to collections.
-     */
-    void addToCollection(GRN entity, Set<GRN> collections);
-
-    Predicate<GRN> collectionFilter();
+public interface OpensearchNodeRole {
+    String CLUSTER_MANAGER = "cluster_manager";
+    String DATA = "data";
+    String INGEST = "ingest";
+    String REMOTE_CLUSTER_CLIENT = "remote_cluster_client";
+    String SEARCH = "search";
 }

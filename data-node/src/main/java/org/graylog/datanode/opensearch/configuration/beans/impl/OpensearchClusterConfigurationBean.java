@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -67,8 +68,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
             properties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
         } else {
-            final var nodeList = String.join(",", nodeService.allActive().values().stream().map(Node::getHostname).collect(Collectors.toSet()));
-            properties.put("cluster.initial_cluster_manager_nodes", nodeList);
+            properties.put("cluster.initial_cluster_manager_nodes", buildInitialManagerNodesList());
         }
 
         final List<String> discoverySeedHosts = localConfiguration.getOpensearchDiscoverySeedHosts();
@@ -85,6 +85,19 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
                 .properties(properties.build())
                 .withConfigFile(seedHostFile())
                 .build();
+    }
+
+    @Nonnull
+    private String buildInitialManagerNodesList() {
+        return nodeService.allActive().values().stream()
+                .filter(this::isManager)
+                .map(Node::getHostname)
+                .collect(Collectors.joining(","));
+    }
+
+    private boolean isManager(DataNodeDto n) {
+        final List<String> roles = n.getOpensearchRoles();
+        return roles != null && roles.contains(OpensearchNodeRole.CLUSTER_MANAGER);
     }
 
     private TextConfigFile seedHostFile() {
