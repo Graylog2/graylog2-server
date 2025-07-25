@@ -20,17 +20,19 @@ import com.google.common.annotations.VisibleForTesting;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.security.Capability;
-import org.graylog.security.GrantDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -40,39 +42,6 @@ public class EntityPaginationHelper {
 
     private EntityPaginationHelper() {
     } // Utility class, no instantiation
-
-
-    /**
-     * Creates a predicate that filters GrantDTO objects based on the provided list of entity capability filters.
-     *
-     * @param filters the list of entity filters
-     * @return a Predicate that filters GrantDTO objects
-     */
-    public static Predicate<GrantDTO> entityCapabilityPredicate(List<String> filters) {
-        if (filters == null || filters.isEmpty()) {
-            return descriptor -> true;
-        }
-        return filters.stream()
-                .map(EntityPaginationHelper::entityCapabilityPredicate)
-                .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
-    }
-
-    private static Predicate<GrantDTO> entityCapabilityPredicate(String entityFilter) {
-        if (isNullOrEmpty(entityFilter)) {
-            return grantDTO -> true;
-        }
-        final String filter = entityFilter.trim().toLowerCase(Locale.US);
-
-        Matcher m = KEY_VALUE_PATTERN.matcher(filter);
-        if (m.find()) {
-            final String key = m.group(1);
-            final String value = m.group(2);
-            if (key.equals("capability")) {
-                return grant -> grant.capability().toId().equals(value);
-            }
-        }
-        return grantDTO -> true;
-    }
 
     /**
      * Parses a capability filter string and returns an Optional containing the Capability if valid, or empty if invalid.
@@ -101,9 +70,10 @@ public class EntityPaginationHelper {
      * @return a Predicate that filters GRNDescriptor objects
      */
     public static Predicate<GRNDescriptor> queryPredicate(String paginationQuery) {
-        return buildPredicate(paginationQuery,
-                descriptor -> descriptor.grn().grnType().type(),
-                GRNDescriptor::title);
+        return buildPredicate(paginationQuery, Map.of(
+                "type", descriptor -> descriptor.grn().grnType().type(),
+                "title", GRNDescriptor::title
+        ));
     }
 
     /**
@@ -137,8 +107,8 @@ public class EntityPaginationHelper {
     }
 
     @VisibleForTesting
-    public static <T> Predicate<T> buildPredicate(String filter, Function<T, String> typeExtractor, Function<T, String> titleExtractor) {
-        if (isNullOrEmpty(filter)) {
+    public static <T> Predicate<T> buildPredicate(String filter, Map<String, Function<T, String>> fieldExtractors) {
+        if (isNullOrEmpty(filter) || fieldExtractors.isEmpty()) {
             return t -> true;
         }
         final String trimmedFilter = filter.trim().toLowerCase(Locale.US);
@@ -147,36 +117,29 @@ public class EntityPaginationHelper {
         if (m.find()) {
             final String key = m.group(1);
             final String value = m.group(2);
-            switch (key) {
-                case "type":
-                    return t -> typeExtractor.apply(t).toLowerCase(Locale.US).contains(value);
-                case "title":
-                    if (titleExtractor != null) {
-                        return t -> titleExtractor.apply(t).toLowerCase(Locale.US).contains(value);
+            Function<T, String> extractor = fieldExtractors.get(key);
+            if (extractor != null) {
+                return o -> {
+                    String fieldValue = extractor.apply(o);
+                    if (fieldValue != null) {
+                        return fieldValue.toLowerCase(Locale.US).contains(value);
                     }
-                    return t -> false;
-                default:
-                    return t -> false;
+                    return false;
+                };
             }
         }
 
-        // If filter is not qualified, use type or title
-        if (titleExtractor != null) {
-            return t -> titleExtractor.apply(t).toLowerCase(Locale.US).contains(trimmedFilter);
-        } else {
-            return t -> typeExtractor.apply(t).equals(trimmedFilter);
-        }
+        Set<Predicate<T>> predicates = fieldExtractors.values().stream().map(e ->
+                (Predicate<T>) t -> e.apply(t).toLowerCase(Locale.US).contains(trimmedFilter)).collect(Collectors.toSet());
+
+        return t -> predicates.stream().anyMatch(p -> p.test(t));
     }
 
     private static Predicate<GRN> entityFilterGRNPredicate(String entityFilter) {
-        return buildPredicate(entityFilter,
-                GRN::type,
-                null);
+        return buildPredicate(entityFilter, Map.of("type", GRN::type));
     }
 
     private static Predicate<GRNDescriptor> entityFilterDescriptorPredicate(String entityFilter) {
-        return buildPredicate(entityFilter,
-                descriptor -> descriptor.grn().grnType().type(),
-                null);
+        return buildPredicate(entityFilter, Map.of("type", descriptor -> descriptor.grn().grnType().type()));
     }
 }
