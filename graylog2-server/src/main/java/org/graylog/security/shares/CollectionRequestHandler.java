@@ -19,12 +19,13 @@ package org.graylog.security.shares;
 import org.graylog.grn.GRN;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 public interface CollectionRequestHandler {
     /**
-     * Pluggable handler to add given entity to the specified collections.
+     * Pluggable handler for actions related to collections.
      */
-    default void addToCollection(GRN entity, Set<GRN> collections) {
-        // Intentionally left empty - ignore this in the community edition.
-    }
+    void addToCollection(GRN entity, Set<GRN> collections);
+
+    Predicate<GRN> collectionFilter();
 }
