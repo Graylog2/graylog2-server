@@ -62,7 +62,6 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
-    static final String SEARCH_NODE_ROLE = "search";
     private final Configuration localConfiguration;
     private final DatanodeDirectories datanodeDirectories;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
@@ -88,7 +87,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             if (searchRoleEnabled) {
                 LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
                 validateUsableSpace();
-                builder.addNodeRole(SEARCH_NODE_ROLE);
+                builder.addNodeRole(OpensearchNodeRole.SEARCH);
             }
             return builder
                     .properties(properties(searchRoleEnabled))
@@ -104,12 +103,12 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private boolean searchRoleExplicitlyConfigured() {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(SEARCH_NODE_ROLE);
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
     }
 
     private boolean searchRoleEnabled() {
         final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(SEARCH_NODE_ROLE);
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {

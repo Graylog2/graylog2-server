@@ -63,7 +63,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .map(OpensearchKeystoreItem::key)
@@ -101,7 +101,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .hasSize(1)
@@ -137,7 +137,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .isEmpty();
