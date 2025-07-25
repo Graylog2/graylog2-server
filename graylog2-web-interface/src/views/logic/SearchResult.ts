@@ -43,7 +43,7 @@ export type SearchJobResult = {
   owner: string;
   results: { [id: string]: any };
   search_id: SearchId;
-  errors: Array<SearchErrorResponse>;
+  errors: Array<SearchErrorResponse | ResultWindowLimitErrorResponse>;
 };
 
 class SearchResult {
