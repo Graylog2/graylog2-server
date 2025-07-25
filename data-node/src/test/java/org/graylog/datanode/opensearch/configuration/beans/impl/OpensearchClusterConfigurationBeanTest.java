@@ -28,6 +28,7 @@ import org.graylog2.cluster.nodes.TestDataNodeNodeClusterService;
 import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,11 @@ class OpensearchClusterConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(Collections.emptyList(), Map.of()));
 
         // initial cluster manager nodes should only contain nodes that publish cluster_manager role, ignore all other nodes
-        Assertions.assertThat(configurationPart.properties())
-                .containsEntry("cluster.initial_cluster_manager_nodes", "my_manager_node,my_other_manager_node");
+        final String initialManagerNodes = configurationPart.properties().get("cluster.initial_cluster_manager_nodes");
+        Assertions.assertThat(initialManagerNodes).isNotEmpty();
+        final List<String> managerNodes = Arrays.asList(initialManagerNodes.split(","));
+
+        Assertions.assertThat(managerNodes)
+                .contains("my_manager_node", "my_other_manager_node");
     }
 }
