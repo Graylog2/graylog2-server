@@ -17,7 +17,11 @@ can only talk to Kafka brokers with version 2.1 or newer.
 
 ## Default Configuration Changes
 
-- tbd
+- The permission to view the "Cluster Configuration" page was removed from the `Reader` role. This permission is now
+  available with the `Cluster Configuration Reader` role. There is an automatic one-time migration to add this role to
+  all existing users with the `Reader` role to ensure backwards compatibility. New users that will be created in the
+  future need to be explicitly assigned to the `Cluster Configuration Reader` role if they should be able to access the
+  page.
 
 ## Java API Changes
 

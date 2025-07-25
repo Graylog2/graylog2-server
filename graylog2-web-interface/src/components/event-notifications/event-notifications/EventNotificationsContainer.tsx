@@ -37,7 +37,10 @@ import getEventNotificationTableElements from './Constants';
 import { keyFn, fetchEventNotifications } from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
 
-const customColumnRenderers = (testResults: TestResults, pluggableColumnRenderers?: ColumnRenderersByAttribute<EventNotification>): ColumnRenderers<EventNotification> => ({
+const customColumnRenderers = (
+  testResults: TestResults,
+  pluggableColumnRenderers?: ColumnRenderersByAttribute<EventNotification>,
+): ColumnRenderers<EventNotification> => ({
   attributes: {
     title: {
       renderCell: (_title: string, notification) => (
@@ -55,14 +58,14 @@ const EventNotificationsContainer = () => {
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const {
-    pluggableColumnRenderers,
-    pluggableAttributes,
-    pluggableExpandedSections
-  } = usePluggableEntityTableElements<EventNotification>(null, 'notification');
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<EventNotification>(null, 'notification');
 
   const { defaultLayout, columnOrder, additionalAttributes } = getEventNotificationTableElements(pluggableAttributes);
-  const columnRenderers = useMemo(() => customColumnRenderers(testResults, pluggableColumnRenderers), [testResults, pluggableColumnRenderers]);
+  const columnRenderers = useMemo(
+    () => customColumnRenderers(testResults, pluggableColumnRenderers),
+    [testResults, pluggableColumnRenderers],
+  );
   const queryClient = useQueryClient();
 
   const handleTest = useCallback(

@@ -33,7 +33,6 @@ import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElemen
 import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
 
-
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -55,20 +54,22 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
   const { isPipelineColumnPermitted } = usePipelineColumn();
   const currentUser = useCurrentUser();
-  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } = usePluggableEntityTableElements<Stream>(null, entityName);
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<Stream>(null, entityName);
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets, pluggableExpandedSections });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));
 
   const columnRenderers = useMemo(
-    () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
+    () =>
+      CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
     [indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers],
   );
   const { columnOrder, additionalAttributes, defaultLayout } = useMemo(
     () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes),
     [currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes],
   );
-  
+
   return (
     <PaginatedEntityTable<Stream>
       humanName="streams"
