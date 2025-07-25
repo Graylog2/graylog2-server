@@ -16,11 +16,7 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
@@ -29,17 +25,12 @@ import jakarta.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
 public class CSPDynamicFeature implements DynamicFeature {
-    private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
     public static final String CSP_NONCE_PROPERTY = "cspNonce";
     private final CSPService cspService;
 
     @Inject
     public CSPDynamicFeature(@Context CSPService cspService) {
         this.cspService = cspService;
-    }
-
-    public String cspDefault() {
-        return cspService.cspString(CSP.DEFAULT);
     }
 
     @Override
