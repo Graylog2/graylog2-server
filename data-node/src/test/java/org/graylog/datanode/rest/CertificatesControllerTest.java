@@ -17,11 +17,10 @@
 package org.graylog.datanode.rest;
 
 import com.google.common.eventbus.EventBus;
-import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.OpensearchKeystoreProvider;
 import org.graylog.security.certutil.CertRequest;
@@ -80,8 +79,8 @@ public class CertificatesControllerTest {
 
     private DatanodeKeystore testKeyStore(Path tempDir) throws Exception {
         final String keystorePass = RandomStringUtils.secure().next(96);
-        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), keystorePass, new EventBus());
-        datanodeKeystore.create(generateKeyPair());
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), keystorePass, new EventBus());
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(31)));
 
 
         final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
@@ -104,13 +103,5 @@ public class CertificatesControllerTest {
 
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
         return datanodeKeystore;
-    }
-
-    @Nonnull
-    private static KeyPair generateKeyPair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS)
-                .isCA(false)
-                .validity(Duration.ofDays(31));
-        return CertificateGenerator.generate(certRequest);
     }
 }
