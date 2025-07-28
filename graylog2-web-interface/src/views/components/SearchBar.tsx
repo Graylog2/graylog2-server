@@ -32,7 +32,7 @@ import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import {
@@ -75,6 +75,8 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useViewsSelector from 'views/stores/useViewsSelector';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -196,6 +198,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const { parameters } = useParameters();
   const currentQuery = useCurrentQuery();
   const queryFilters = useQueryFilters();
+  const results = useViewsSelector(selectCurrentQueryResults);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useViewsDispatch();
@@ -254,6 +257,11 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                         value={values?.timerange}
                         hasErrorOnMount={!!errors.timerange}
+                        moveRangeProps={{
+                          effectiveTimerange: results?.effectiveTimerange,
+                          initialTimerange: currentQuery.timerange,
+                          initialTimerangeFormat: 'internalIndexer',
+                        }}
                       />
                       <StreamsAndRefresh>
                         <Field name="streams">
@@ -330,7 +338,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                             )}
                           </Field>
 
-                          <QueryValidation />
+                          <ViewsQueryValidation />
                           <QueryHistoryButton editorRef={editorRef} />
                         </SearchInputAndValidationContainer>
                       </SearchButtonAndQuery>

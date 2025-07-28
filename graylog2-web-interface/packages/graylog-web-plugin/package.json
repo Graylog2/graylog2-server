@@ -30,9 +30,9 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@graylog/sawmill": "2.0.24",
+    "@graylog/sawmill": "2.0.28",
     "@reduxjs/toolkit": "^2.5.1",
-    "@tanstack/react-query": "5.81.5",
+    "@tanstack/react-query": "5.83.0",
     "@types/jquery": "3.5.32",
     "@types/react": "18.3.13",
     "babel-preset-graylog": "file:../babel-preset-graylog",
@@ -54,7 +54,7 @@
     "styled-components": "6.1.1",
     "typescript": "5.8.3",
     "use-query-params": "^2.2.0",
-    "webpack": "5.99.9",
+    "webpack": "5.100.2",
     "webpack-cli": "6.0.1",
     "webpack-merge": "4.2.2"
   }

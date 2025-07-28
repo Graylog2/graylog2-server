@@ -48,7 +48,7 @@ type InternalState = {
   units: UnitsConfig;
 };
 
-type AggregationWidgetConfigJson = {
+export type AggregationWidgetConfigJson = {
   column_pivots: Array<PivotJson>;
   formatting_settings: WidgetFormattingSettingsJSON;
   rollup: boolean;

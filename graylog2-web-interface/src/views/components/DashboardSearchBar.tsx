@@ -27,7 +27,7 @@ import SearchButton from 'views/components/searchbar/SearchButton';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
@@ -63,6 +63,9 @@ import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useViewsSelector from 'views/stores/useViewsSelector';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -128,6 +131,7 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
   const view = useView();
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
+  const results = useViewsSelector(selectCurrentQueryResults);
   const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const dispatch = useViewsDispatch();
@@ -189,6 +193,11 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
                       value={values?.timerange}
                       limitDuration={limitDuration}
                       hasErrorOnMount={!!errors.timerange}
+                      moveRangeProps={{
+                        effectiveTimerange: results?.effectiveTimerange,
+                        initialTimerange: timerange ?? NO_TIMERANGE_OVERRIDE,
+                        initialTimerangeFormat: 'internal',
+                      }}
                       noOverride
                     />
                     <ViewsRefreshControls disable={!isValid} />
@@ -232,7 +241,7 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
                           )}
                         </Field>
 
-                        <QueryValidation />
+                        <ViewsQueryValidation />
                         <QueryHistoryButton editorRef={editorRef} />
                       </SearchInputAndValidationContainer>
                     </SearchButtonAndQuery>

@@ -55,6 +55,22 @@ const eventDefinition: EventDefinition = {
   notifications: [],
   storage: [],
   updated_at: null,
+  state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
+  matched_at: '',
+  scheduler: {
+    data: {
+      type: '',
+      timerange_from: 0,
+      timerange_to: 0,
+    },
+    next_time: '',
+    triggered_at: '',
+    queued_notifications: 0,
+    is_scheduled: false,
+    status: 'runnable',
+  },
 };
 
 const SUT = ({ streams = [] }: { streams?: Array<Stream> }) => (

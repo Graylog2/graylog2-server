@@ -51,6 +51,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
 import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
+import type { ActionComponents } from 'views/components/actions/ActionHandler';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -169,6 +170,8 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
+  const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
+  const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
@@ -271,7 +274,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>Move to Page</MenuItem>
           </IfDashboard>
-          <ExtraDropdownWidgetActions widget={widget} />
+          <ExtraDropdownWidgetActions widget={widget} setComponents={setOverflowingComponents} />
           <MenuItem divider />
           <DeleteMenuItem onSelect={onDelete} />
         </WidgetActionDropdown>
@@ -299,6 +302,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
           />
         )}
       </IfInteractive>
+      {overflowingComponentsValues}
     </Container>
   );
 };

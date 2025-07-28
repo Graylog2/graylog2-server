@@ -19,10 +19,10 @@ import styled, { css } from 'styled-components';
 
 import type { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 import { Button } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Select, Pagination, PageSizeSelect } from 'components/common';
+import GranteeIcon from 'components/permissions/Grantee/GranteeIcon';
 
 import CapabilitySelect from './CapabilitySelect';
-import GranteeIcon from './GranteeIcon';
 import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
 
 export const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeState) => {
@@ -123,3 +123,45 @@ export const GranteesSelectOption = styled.div`
   display: flex;
   align-items: center;
 `;
+
+export const GranteeListHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+export const StyledGranteeList = styled.div(
+  ({ theme }) => `
+  >:nth-child(even) {
+    background: ${theme.colors.table.row.backgroundStriped};
+  };
+
+  >:nth-child(odd) {
+    background: ${theme.colors.table.row.background};
+  };
+`,
+);
+
+export const GranteeListPaginationWrapper = styled.ul`
+  display: flex;
+  justify-content: center;
+
+  .pagination {
+    margin: 10px 0;
+  }
+`;
+
+export const GranteeListStyledPagination = styled(Pagination)`
+  margin-top: 10px;
+  margin-bottom: 0;
+`;
+
+export const GranteeListStyledPageSizeSelect = styled(PageSizeSelect)(
+  ({ theme }) => css`
+    label {
+      font-weight: normal;
+      font-size: ${theme.fonts.size.body};
+    }
+  `,
+);
