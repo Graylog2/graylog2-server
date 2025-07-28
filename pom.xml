@@ -92,7 +92,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
         <airline.version>3.1.0</airline.version>
-        <amqp-client.version>5.25.0</amqp-client.version>
+        <amqp-client.version>5.26.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -110,7 +110,7 @@
         <caffeine.version>3.2.2</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.181</classgraph.version>
-        <commons-codec.version>1.18.0</commons-codec.version>
+        <commons-codec.version>1.19.0</commons-codec.version>
         <commons-csv.version>1.14.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.5.0</commons-exec.version>
@@ -119,7 +119,7 @@
         <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.20.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.40.0</error-prone.version>
+        <error-prone.version>2.41.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.53.3</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
