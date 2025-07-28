@@ -87,22 +87,20 @@ const HitRateCol = ({ cache }: { cache: CacheEntity }) => {
   };
 
   const computeCountMetrics = (metrics: any) => {
-    const totalHits = Object.keys(metrics).reduce(
-      (acc: number, nodeId: string) =>
-        acc + (Number.isNaN(metrics[nodeId].hits.metric.rate.total) ? 0 : metrics[nodeId].hits.metric.rate.total),
-      0,
-    );
+    const totalHits = Object.keys(metrics).reduce((acc: number, nodeId: string) => {
+      const total = metrics[nodeId]?.hits?.metric?.rate?.total;
+      return acc + (Number.isFinite(total) ? total : 0);
+    }, 0);
 
-    const totalMisses = Object.keys(metrics).reduce(
-      (acc: number, nodeId: string) =>
-        acc + (Number.isNaN(metrics[nodeId].misses.metric.rate.total) ? 0 : metrics[nodeId].misses.metric.rate.total),
-      0,
-    );
+    const totalMisses = Object.keys(metrics).reduce((acc: number, nodeId: string) => {
+      const total = metrics[nodeId]?.misses?.metric?.rate?.total;
+      return acc + (Number.isFinite(total) ? total : 0);
+    }, 0);
 
     const total = totalHits + totalMisses;
     if (total < 1) return 'N/A';
-    const hitRate = (totalHits * 100.0) / total;
 
+    const hitRate = (totalHits * 100.0) / total;
     return `${NumberUtils.formatNumber(hitRate)}%`;
   };
 
