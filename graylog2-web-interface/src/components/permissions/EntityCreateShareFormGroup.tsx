@@ -29,9 +29,9 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import { createGRN } from 'logic/permissions/GRN';
 import { Section, Spinner } from 'components/common';
 import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
+import type { SelectionRequest } from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
 
-import type { SelectionRequest } from './GranteesSelector';
-import GranteesList from './GranteesList';
 import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
 import {
   GranteesSelect,
