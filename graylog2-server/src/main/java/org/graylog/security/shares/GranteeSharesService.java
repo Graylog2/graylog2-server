@@ -69,6 +69,11 @@ public class GranteeSharesService {
                 .noneMatch(handler -> handler.collectionFilter().test(entityDescriptor));
     }
 
+    public Set<GrantDTO> grantsByGrantee(GRN grantee){
+        final Set<GRN> granteeAliases = granteeService.getGranteeAliases(grantee);
+        return grantService.getForGranteesOrGlobal(granteeAliases);
+    }
+
     public SharesResponse getPaginatedSharesFor(GRN grantee,
                                                 PaginationParameters paginationParameters,
                                                 String capabilityFilterString,
