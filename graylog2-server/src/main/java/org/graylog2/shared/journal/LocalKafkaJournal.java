@@ -801,6 +801,12 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         return nextReadOffset;
     }
 
+    @Override
+    public void setNextReadOffset(long nextReadOffset) {
+        LOG.info("Setting next read offset from {} to {}", this.nextReadOffset, nextReadOffset);
+        this.nextReadOffset = nextReadOffset;
+    }
+
     /**
      * Returns the current utilization of the journal as a percentage of the maximum retention size.
      * This method calculates how much of the maximum retention size is currently being utilized

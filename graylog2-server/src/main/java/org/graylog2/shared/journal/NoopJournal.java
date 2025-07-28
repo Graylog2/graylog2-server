@@ -68,6 +68,11 @@ public class NoopJournal extends AbstractIdleService implements Journal {
     }
 
     @Override
+    public void setNextReadOffset(long nextReadOffset) {
+        // nothing to do
+    }
+
+    @Override
     protected void startUp() throws Exception {
         // nothing to do
     }
