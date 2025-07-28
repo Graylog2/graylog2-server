@@ -16,61 +16,24 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
-import { Pagination, PageSizeSelect } from 'components/common';
 import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
 import type EntityShareState from 'logic/permissions/EntityShareState';
 import type Grantee from 'logic/permissions/Grantee';
 import type Capability from 'logic/permissions/Capability';
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
+import {
+  GranteeListHeader,
+  GranteeListStyledPageSizeSelect,
+  GranteeListStyledPagination,
+  GranteeListPaginationWrapper,
+  StyledGranteeList,
+} from 'components/permissions/CommonStyledComponents';
 
 import GranteesListItem from './GranteesListItem';
 import CreateGranteesListItem from './CreateGranteesListItem';
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-`;
-
-const List = styled.div(
-  ({ theme }) => `
-  >:nth-child(even) {
-    background: ${theme.colors.table.row.backgroundStriped};
-  };
-
-  >:nth-child(odd) {
-    background: ${theme.colors.table.row.background};
-  };
-`,
-);
-
-const PaginationWrapper = styled.ul`
-  display: flex;
-  justify-content: center;
-
-  .pagination {
-    margin: 10px 0;
-  }
-`;
-
-const StyledPagination = styled(Pagination)`
-  margin-top: 10px;
-  margin-bottom: 0;
-`;
-
-const StyledPageSizeSelect = styled(PageSizeSelect)(
-  ({ theme }) => css`
-    label {
-      font-weight: normal;
-      font-size: ${theme.fonts.size.body};
-    }
-  `,
-);
 
 type Props = {
   activeShares: ActiveShares;
@@ -118,14 +81,14 @@ const GranteesList = ({
 
   return (
     <div className={className}>
-      <Header>
+      <GranteeListHeader>
         <h5>{title}</h5>
         {showPageSizeSelect && (
-          <StyledPageSizeSelect onChange={(newPageSize) => setPageSize(newPageSize)} pageSize={pageSize} />
+          <GranteeListStyledPageSizeSelect onChange={(newPageSize) => setPageSize(newPageSize)} pageSize={pageSize} />
         )}
-      </Header>
+      </GranteeListHeader>
       {paginatedGrantees.size > 0 ? (
-        <List>
+        <StyledGranteeList>
           {paginatedGrantees
             .map((grantee) => {
               const currentGranteeState = grantee.currentState(activeShares);
@@ -142,13 +105,13 @@ const GranteesList = ({
               );
             })
             .toArray()}
-        </List>
+        </StyledGranteeList>
       ) : (
         <Alert>This {entityTypeTitle || entityType} has no collaborators.</Alert>
       )}
-      <PaginationWrapper>
-        <StyledPagination totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />
-      </PaginationWrapper>
+      <GranteeListPaginationWrapper>
+        <GranteeListStyledPagination totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />
+      </GranteeListPaginationWrapper>
     </div>
   );
 };
