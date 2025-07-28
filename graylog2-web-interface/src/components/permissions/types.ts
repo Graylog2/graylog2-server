@@ -20,6 +20,7 @@ import type React from 'react';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { ColumnRenderer, EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 
 export type ModalHandler = {
   toggle?: () => void;
@@ -70,6 +71,12 @@ declare module 'graylog-web-plugin/plugin' {
         error?: any;
         value?: Array<string>;
         onChange: (values: Pick<EntitySharePayload, 'selected_collections'>) => void;
+      }>;
+      CollectionGranteeList: React.ComponentType<{
+        entityType: SharedEntity['type'];
+        title: string;
+        entityGRN: string;
+        entityTypeTitle?: string | null | undefined;
       }>;
     };
   }
