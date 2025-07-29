@@ -23,4 +23,5 @@ const useSubsystems = () =>
     queryKey: ['loggers', 'subsystems'],
     queryFn: () => ClusterSystemLoggers.subsystems(),
   });
+
 export default useSubsystems;

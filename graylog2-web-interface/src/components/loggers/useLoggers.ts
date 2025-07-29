@@ -23,4 +23,5 @@ const useLoggers = () =>
     queryKey: ['loggers', 'loggers'],
     queryFn: () => ClusterSystemLoggers.loggers(),
   });
+
 export default useLoggers;
