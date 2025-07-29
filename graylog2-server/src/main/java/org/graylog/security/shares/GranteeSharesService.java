@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,22 +50,17 @@ public class GranteeSharesService {
     private final DBGrantService grantService;
     private final GRNDescriptorService descriptorService;
     private final GranteeService granteeService;
-    private final Set<CollectionRequestHandler> collectionRequestHandlers;
+    private final PluggableEntityService pluggableEntityService;
 
     @Inject
     public GranteeSharesService(DBGrantService grantService,
                                 GRNDescriptorService descriptorService,
                                 GranteeService granteeService,
-                                Set<CollectionRequestHandler> collectionRequestHandlers) {
+                                PluggableEntityService pluggableEntityService) {
         this.grantService = grantService;
         this.descriptorService = descriptorService;
         this.granteeService = granteeService;
-        this.collectionRequestHandlers = collectionRequestHandlers;
-    }
-
-    private Predicate<GRN> excludeCollectionTypesFilter() {
-        return entityDescriptor -> collectionRequestHandlers.stream()
-                .noneMatch(handler -> handler.collectionFilter().test(entityDescriptor));
+        this.pluggableEntityService = pluggableEntityService;
     }
 
     public Set<GrantDTO> grantsByGrantee(GRN grantee){
@@ -81,13 +75,16 @@ public class GranteeSharesService {
         final Optional<Capability> capability = EntityPaginationHelper.parseCapabilityFilter(capabilityFilterString);
         // Get all aliases for the grantee to make sure we find all entities the grantee has access to
         final Set<GRN> granteeAliases = granteeService.getGranteeAliases(grantee);
+
         final ImmutableSet<GrantDTO> grants = capability
                 .map(c -> grantService.getForGranteesOrGlobalWithCapability(granteeAliases, c))
                 .orElseGet(() -> grantService.getForGranteesOrGlobal(granteeAliases));
 
         final Set<GRN> targets = grants.stream()
                 .map(GrantDTO::target)
-                .filter(excludeCollectionTypesFilter())
+                .flatMap(pluggableEntityService::expand)
+                .filter(pluggableEntityService.excludeTypesFilter())
+                .distinct()
                 .collect(Collectors.toSet());
 
         final Map<GRN, Set<Grantee>> targetOwners = getTargetOwners(targets);
@@ -167,7 +164,7 @@ public class GranteeSharesService {
     }
 
     @AutoValue
-    public static abstract class SharesResponse {
+    public abstract static class SharesResponse {
         public abstract PaginatedList<EntityDescriptor> paginatedEntities();
 
         public abstract Map<GRN, Capability> capabilities();
