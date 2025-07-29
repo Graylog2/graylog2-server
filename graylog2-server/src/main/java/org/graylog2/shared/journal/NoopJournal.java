@@ -68,7 +68,7 @@ public class NoopJournal extends AbstractIdleService implements Journal {
     }
 
     @Override
-    public void setNextReadOffset(long nextReadOffset) {
+    public void resetNextReadOffset() {
         // nothing to do
     }
 

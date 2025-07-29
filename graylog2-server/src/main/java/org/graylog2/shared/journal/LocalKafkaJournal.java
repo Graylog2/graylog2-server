@@ -802,9 +802,10 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     }
 
     @Override
-    public void setNextReadOffset(long nextReadOffset) {
-        LOG.info("Setting next read offset from {} to {}", this.nextReadOffset, nextReadOffset);
-        this.nextReadOffset = nextReadOffset;
+    public void resetNextReadOffset() {
+        final long newValue = committedOffset.get() + 1;
+        LOG.info("Resetting next read offset to the last committed offset ({} -> {})", this.nextReadOffset, newValue);
+        this.nextReadOffset = newValue;
     }
 
     /**

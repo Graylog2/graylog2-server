@@ -67,13 +67,12 @@ public interface Journal {
     long getNextReadOffset();
 
     /**
-     * Sets the next read offset the client should start reading from.
-     * To allow the client to simply continue reading, it can set this method in case of an error to
-     * {@code getCommittedOffset + 1} and just do its thing.
+     * Resets the next read offset the client should start reading from to {@code getCommittedOffset() + 1}.
      *
-     * @param nextReadOffset The next offset to continue reading from.
+     * This method should be used in case of an error while consuming the messages. The next time the consumer asks
+     * for messages, the next ones after the last successful commit will be returned.
      */
-    void setNextReadOffset(long nextReadOffset);
+    void resetNextReadOffset();
 
     void flush();
 
