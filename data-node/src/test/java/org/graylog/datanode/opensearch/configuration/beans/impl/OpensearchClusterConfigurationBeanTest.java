@@ -26,6 +26,7 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.TestDataNodeNodeClusterService;
 import org.graylog2.plugin.Tools;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -35,10 +36,10 @@ import java.util.Map;
 
 class OpensearchClusterConfigurationBeanTest {
 
-    @Test
-    void testManagerNodes() throws ValidationException, RepositoryException {
-        final TestDataNodeNodeClusterService testNodeService = new TestDataNodeNodeClusterService();
+    final TestDataNodeNodeClusterService testNodeService = new TestDataNodeNodeClusterService();
 
+    @BeforeEach
+    void setUp() {
         testNodeService.registerServer(DataNodeDto.builder()
                 .setId(Tools.generateServerId())
                 .setTransportAddress("https://my_manager_node:9200")
@@ -62,8 +63,12 @@ class OpensearchClusterConfigurationBeanTest {
                 .setDataNodeStatus(DataNodeStatus.AVAILABLE)
                 .setOpensearchRoles(List.of(OpensearchNodeRole.SEARCH))
                 .build());
+    }
 
-        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(Collections.emptyMap()), testNodeService);
+    @Test
+    void testManagerNodes() throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node_can_be_manager", "node_roles", OpensearchNodeRole.CLUSTER_MANAGER)), testNodeService);
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(Collections.emptyList(), Map.of()));
 
@@ -73,6 +78,23 @@ class OpensearchClusterConfigurationBeanTest {
         final List<String> managerNodes = Arrays.asList(initialManagerNodes.split(","));
 
         Assertions.assertThat(managerNodes)
-                .contains("my_manager_node", "my_other_manager_node");
+                .containsOnly("my_manager_node", "my_other_manager_node", "this_node_can_be_manager");
     }
+
+    @Test
+    void testManagerNodesWithSelfNoManager() throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", OpensearchNodeRole.SEARCH)), testNodeService);
+
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(Collections.emptyList(), Map.of()));
+
+        // initial cluster manager nodes should only contain nodes that publish cluster_manager role, ignore all other nodes
+        final String initialManagerNodes = configurationPart.properties().get("cluster.initial_cluster_manager_nodes");
+        Assertions.assertThat(initialManagerNodes).isNotEmpty();
+        final List<String> managerNodes = Arrays.asList(initialManagerNodes.split(","));
+
+        Assertions.assertThat(managerNodes)
+                .containsOnly("my_manager_node", "my_other_manager_node");
+    }
+
 }
