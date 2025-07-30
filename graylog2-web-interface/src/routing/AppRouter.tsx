@@ -18,6 +18,7 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import {
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
@@ -123,6 +124,15 @@ import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import TokenManagementPage from 'pages/TokenManagementPage';
+import useCurrentUser from 'hooks/useCurrentUser';
+
+type Permission = string;
+type Permissions = Array<Permission>;
+const useUserHasPermission = (requiredPermissions: Permissions | Permission) => {
+  const currentUser = useCurrentUser();
+
+  return isPermitted(currentUser.permissions, requiredPermissions);
+};
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -145,6 +155,7 @@ const renderPluginRoute = ({ path, component: Component, parentComponent, requir
 const routeHasAppParent = (route: PluginRoute) => route.parentComponent === App;
 
 const AppRouter = () => {
+
   const pluginRoutes = usePluginEntities('routes');
   const pluginRoutesWithNullParent = pluginRoutes
     .filter((route) => route.parentComponent === null)
@@ -344,7 +355,10 @@ const AppRouter = () => {
               element: <AuthenticatorsEditPage />,
             },
 
-            { path: RoutePaths.SYSTEM.USERS.OVERVIEW, element: <UsersOverviewPage /> },
+            useUserHasPermission('users:list') && {
+              path: RoutePaths.SYSTEM.USERS.OVERVIEW,
+              element: <UsersOverviewPage />,
+            },
             { path: RoutePaths.SYSTEM.USERS.CREATE, element: <UserCreatePage /> },
             { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
             { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
