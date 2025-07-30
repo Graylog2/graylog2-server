@@ -19,8 +19,6 @@ package org.graylog2.database.entities;
 
 import jakarta.inject.Inject;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,7 +38,7 @@ public final class EntityScopeService {
     }
 
     public List<EntityScope> getEntityScopes() {
-        return Collections.unmodifiableList(new ArrayList<>(entityScopes.values()));
+        return List.copyOf(entityScopes.values());
     }
 
     public boolean isMutable(ScopedEntity scopedEntity) {
