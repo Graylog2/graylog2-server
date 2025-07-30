@@ -16,7 +16,7 @@
  */
 package org.graylog.security.shares;
 
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -84,7 +84,6 @@ public class GranteeSharesService {
                 .map(GrantDTO::target)
                 .flatMap(pluggableEntityService::expand)
                 .filter(pluggableEntityService.excludeTypesFilter())
-                .distinct()
                 .collect(Collectors.toSet());
 
         final Map<GRN, Set<Grantee>> targetOwners = getTargetOwners(targets);
@@ -104,9 +103,9 @@ public class GranteeSharesService {
         final int filteredResultCount = Ints.saturatedCast(filteredStream.get().count());
 
         final List<EntityDescriptor> entityDescriptors = filteredStream.get()
-                .skip(paginationParameters.getPerPage() * (paginationParameters.getPage() - 1))
+                .skip((long) paginationParameters.getPerPage() * (paginationParameters.getPage() - 1))
                 .limit(paginationParameters.getPerPage())
-                .collect(Collectors.toList());
+                .toList();
 
         final Set<GRN> entityDescriptorsGRNs = entityDescriptors.stream()
                 .map(EntityDescriptor::id)
@@ -132,7 +131,7 @@ public class GranteeSharesService {
                 (long) targets.size()
         );
 
-        return SharesResponse.create(paginatedList, granteeCapabilities);
+        return new SharesResponse(paginatedList, granteeCapabilities);
     }
 
     private Function<GRNDescriptor, EntityDescriptor> toEntityDescriptor(Map<GRN, Set<Grantee>> targetOwners) {
@@ -163,14 +162,8 @@ public class GranteeSharesService {
                 .collect(Collectors.toSet());
     }
 
-    @AutoValue
-    public abstract static class SharesResponse {
-        public abstract PaginatedList<EntityDescriptor> paginatedEntities();
-
-        public abstract Map<GRN, Capability> capabilities();
-
-        public static SharesResponse create(PaginatedList<EntityDescriptor> paginatedEntities, Map<GRN, Capability> capabilities) {
-            return new AutoValue_GranteeSharesService_SharesResponse(paginatedEntities, capabilities);
-        }
+    public record SharesResponse(
+            @JsonProperty("entities") PaginatedList<EntityDescriptor> paginatedEntities,
+            @JsonProperty("grantee_capabilities") Map<GRN, Capability> capabilities) {
     }
 }
