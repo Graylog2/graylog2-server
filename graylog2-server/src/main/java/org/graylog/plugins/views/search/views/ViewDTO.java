@@ -155,6 +155,14 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     }
 
     @JsonIgnore
+    public Optional<WidgetPositionDTO> findPositionById(final String widgetId) {
+        return state().values()
+                .stream()
+                .map(q -> q.widgetPositions().get(widgetId))
+                .findFirst();
+    }
+
+    @JsonIgnore
     public Set<WidgetDTO> getAllWidgets() {
         return this.state()
                 .values()
