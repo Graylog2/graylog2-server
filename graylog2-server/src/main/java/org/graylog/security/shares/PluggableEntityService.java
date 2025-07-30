@@ -46,6 +46,9 @@ public class PluggableEntityService {
     }
 
     public Stream<GRN> expand(GRN grn) {
+        if (handlers.isEmpty()) {
+            return Stream.of(grn);
+        }
         return handlers.stream()
                 .flatMap(handler -> handler.expand(grn));
     }
