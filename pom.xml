@@ -121,11 +121,11 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.41.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.53.3</gcs.version>
+        <gcs.version>2.54.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.73.0</grpc.version>
+        <grpc.version>1.74.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -448,7 +448,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.27.1</version>
+                <version>1.28.0</version>
             </dependency>
 
             <dependency>
