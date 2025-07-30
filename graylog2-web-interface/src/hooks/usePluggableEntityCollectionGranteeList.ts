@@ -14,21 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled, { css } from 'styled-components';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-import { Icon } from 'components/common';
+const usePluggableEntityCollectionGranteeList = () => {
+  const pluggableCollectionGranteeList = usePluginEntities('components.collection');
 
-const Wrapper = styled.div<{ $active: boolean }>(
-  ({ theme, $active }) => css`
-    color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-  `,
-);
+  return pluggableCollectionGranteeList?.[0]?.CollectionGranteeList ?? null;
+};
 
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check_circle' : 'cancel'} />
-  </Wrapper>
-);
-
-export default LoggedInIcon;
+export default usePluggableEntityCollectionGranteeList;

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Display correct visualization for bar charts with logarithmic axis type"
+
+issues = ["23031"]
+pulls = ["23032"]

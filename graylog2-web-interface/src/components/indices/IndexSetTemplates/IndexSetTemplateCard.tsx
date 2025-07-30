@@ -38,7 +38,7 @@ const StyledCard = styled(Card)<{ $selected: boolean; $disabled: boolean }>(
   ({ $selected, $disabled, theme }) => css`
     display: flex;
     gap: ${theme.spacings.sm};
-    ${$disabled && `color: ${theme.colors.global.textSecondary};`}
+    ${$disabled && `color: ${theme.colors.text.secondary};`}
 
     ${$selected &&
     `
@@ -50,7 +50,7 @@ const StyledCard = styled(Card)<{ $selected: boolean; $disabled: boolean }>(
 
 const Title = styled.h3<{ $disabled: boolean }>(
   ({ $disabled, theme }) => css`
-    ${$disabled && `color: ${theme.colors.global.textSecondary};`}
+    ${$disabled && `color: ${theme.colors.text.secondary};`}
   `,
 );
 

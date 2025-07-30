@@ -28,6 +28,7 @@ const supportedTypes = new Set([
   'role',
   'output',
   'collection',
+  'collection_entities',
 ]);
 
 const typePrefixCornerCasesMap = {

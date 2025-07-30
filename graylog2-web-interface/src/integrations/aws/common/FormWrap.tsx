@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import { Button, Panel } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -61,35 +61,35 @@ const ErrorOutput = styled.span`
   display: block;
 `;
 
-const ErrorToggleInfo = styled.button<{ isDarkMode: boolean }>`
-  border: 0;
-  background: none;
-  color: ${({ isDarkMode }) => (isDarkMode ? 'white' : 'black')};
-  font-size: 11px;
-  text-transform: uppercase;
-  margin: 12px 0 0;
-  padding: 0;
-`;
+const ErrorToggleInfo = styled.button(
+  ({ theme }) => css`
+    border: 0;
+    background: none;
+    color: ${theme.colors.text.primary};
+    font-size: 11px;
+    text-transform: uppercase;
+    margin: 12px 0 0;
+    padding: 0;
+  `,
+);
 
-const MoreIcon = styled(Icon)<{ expanded: boolean }>(
-  ({ expanded }) => css`
-    transform: rotate(${expanded ? '90deg' : '0deg'});
+const MoreIcon = styled(Icon)<{ $expanded: boolean }>(
+  ({ $expanded }) => css`
+    transform: rotate(${$expanded ? '90deg' : '0deg'});
     transition: 150ms transform ease-in-out;
   `,
 );
 
 export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessageProps) => {
   const [expanded, toggleExpanded] = useState(false);
-  const theme = useTheme();
-  const isDarkMode = theme.mode === 'dark';
 
   const Header = (
     <>
       <ErrorOutputStyle />
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
       {niceMessage && (
-        <ErrorToggleInfo isDarkMode={isDarkMode} onClick={() => toggleExpanded(!expanded)}>
-          More Info <MoreIcon name="chevron_right" expanded={expanded} />
+        <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
+          More Info <MoreIcon name="chevron_right" $expanded={expanded} />
         </ErrorToggleInfo>
       )}
     </>

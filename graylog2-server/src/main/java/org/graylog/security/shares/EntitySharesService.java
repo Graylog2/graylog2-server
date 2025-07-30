@@ -65,6 +65,7 @@ public class EntitySharesService {
     private final EntityDependencyPermissionChecker entityDependencyPermissionChecker;
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
+    private final EntityCreationRequestService entityCreationService;
     private final EventBus serverEventBus;
     private final Set<SyncedEntitiesResolver> entitiesResolvers;
     private final CapabilityRegistry capabilityRegistry;
@@ -75,6 +76,7 @@ public class EntitySharesService {
                                final EntityDependencyPermissionChecker entityDependencyPermissionChecker,
                                final GRNRegistry grnRegistry,
                                final GranteeService granteeService,
+                               final EntityCreationRequestService entityCreationService,
                                final EventBus serverEventBus,
                                final Set<SyncedEntitiesResolver> entitiesResolvers,
                                final CapabilityRegistry capabilityRegistry) {
@@ -83,6 +85,7 @@ public class EntitySharesService {
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
+        this.entityCreationService = entityCreationService;
         this.serverEventBus = serverEventBus;
         this.entitiesResolvers = entitiesResolvers;
         this.capabilityRegistry = capabilityRegistry;
@@ -257,9 +260,10 @@ public class EntitySharesService {
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
 
+        request.selectedCollections().ifPresent(collections -> entityCreationService.handleCollections(ownedEntity, collections));
+
         final ImmutableMap<GRN, Capability> selectedGranteeCapabilities = request.selectedGranteeCapabilities()
                 .orElse(ImmutableMap.of());
-
         final String userName = sharingUser.getName();
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser, ownedEntity);
@@ -381,8 +385,7 @@ public class EntitySharesService {
         EntityShareRequest shareRequest = EntityShareRequest.create(
                 existingGrants.stream()
                         .filter(grant -> modifiableGranteeGRNs.contains(grant.grantee()))
-                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability))
-        );
+                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability)));
 
         return updateEntityShares(grnClone, shareRequest, sharingUser);
     }

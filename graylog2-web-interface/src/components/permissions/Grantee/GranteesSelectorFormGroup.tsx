@@ -23,8 +23,8 @@ import { Select } from 'components/common';
 import SelectGroup from 'components/common/SelectGroup';
 import type Grantee from 'logic/permissions/Grantee';
 
-import CapabilitySelect from './CapabilitySelect';
-import { StyledGranteeIcon } from './CommonStyledComponents';
+import CapabilitySelect from '../CapabilitySelect';
+import { StyledGranteeIcon } from '../CommonStyledComponents';
 
 type Props = {
   availableGrantees: GranteesList;

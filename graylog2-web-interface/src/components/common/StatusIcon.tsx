@@ -14,32 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
-import { Label } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 
 type Props = {
-  token: Token;
+  active: boolean;
+  className?: string;
 };
 
-const Wrapper = styled.div<{ $enabled: boolean }>(
-  ({ theme, $enabled }) => css`
-    color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-    width: fit-content;
-  `,
+const StatusIcon = ({ active, className = undefined }: Props) => (
+  <Icon
+    name={active ? 'check_circle' : 'cancel'}
+    bsStyle={active ? 'success' : undefined}
+    className={className}
+    title={active ? 'Yes' : 'No'}
+  />
 );
 
-const IsExternalUserCell = ({ token }: Props) => {
-  const isExternal = token?.external_user;
-
-  return (
-    <Wrapper $enabled={isExternal}>
-      <Label bsStyle={isExternal ? 'success' : 'default'}>{isExternal ? 'Yes' : 'No'}</Label>
-    </Wrapper>
-  );
-};
-
-export default IsExternalUserCell;
+export default StatusIcon;

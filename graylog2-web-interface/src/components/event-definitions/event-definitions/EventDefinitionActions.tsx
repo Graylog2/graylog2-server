@@ -34,6 +34,7 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import {
@@ -88,6 +89,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
+  const { actions: pluggableActions, actionModals: pluggableActionModals } =
+    usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
+  const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
 
@@ -280,7 +284,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               {isEnabled ? 'Disable' : 'Enable'}
             </MenuItem>
           </IfPermitted>
-
+          {moreActions}
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
@@ -339,6 +343,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           onConfirm={onSigmaModalClose}
         />
       )}
+      {pluggableActionModals}
     </>
   );
 };

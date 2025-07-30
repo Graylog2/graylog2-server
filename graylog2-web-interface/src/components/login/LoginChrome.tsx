@@ -153,9 +153,12 @@ const useLoginBackground = () =>
     [],
   );
 
+const useShowLogo = () => useMemo(() => AppConfig.branding()?.login?.show_logo ?? true, []);
+
 const LoginChrome = ({ children }: Props) => {
   const productName = useProductName();
   const loginBackground = useLoginBackground();
+  const showLogo = useShowLogo();
 
   return (
     <LoginContainer>
@@ -168,9 +171,11 @@ const LoginChrome = ({ children }: Props) => {
           <PublicNotifications login />
         </NotificationsContainer>
         <BackgroundText $backgroundImage={loginBackground}>
-          <TextContainer>
-            <CustomizableLogo />
-          </TextContainer>
+          {showLogo && (
+            <TextContainer>
+              <CustomizableLogo />
+            </TextContainer>
+          )}
         </BackgroundText>
       </Background>
     </LoginContainer>

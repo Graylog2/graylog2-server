@@ -56,8 +56,8 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -215,9 +215,9 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final UnwrappedCreateEntityRequest<CreateStreamRequest> unwrappedCreateEntityRequest,
+    public Response create(@ApiParam(name = "JSON body", required = true) final CreateEntityRequest<CreateStreamRequest> createEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
-        final CreateStreamRequest cr = unwrappedCreateEntityRequest.getEntity();
+        final CreateStreamRequest cr = createEntityRequest.entity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
 
@@ -235,7 +235,7 @@ public class StreamResource extends RestResource {
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
-        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest ->
+        createEntityRequest.shareRequest().ifPresent(shareRequest ->
                 entitySharesService.updateEntityShares(GRNTypes.STREAM, result.streamId(), shareRequest, userContext.getUser()));
 
         return Response.created(streamUri).entity(result).build();
