@@ -84,9 +84,9 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
 
+        // verify the stream exists and is editable
         checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
-        // verify the stream exists
-        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         streamService.load(streamId);
 
         // verify the pipelines exist
@@ -106,7 +106,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         final String pipelineId = connection.pipelineId();
         final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
 
-        // verify the pipeline exists and is editable
+        // verify the pipeline exists
         checkPermission(PipelineRestPermissions.PIPELINE_READ, pipelineId);
         checkScope(pipelineService.load(pipelineId));
 
@@ -115,9 +115,12 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
-        connection.streamIds().forEach(streamId ->
-                checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
+        // check for read-only system streams
+        connection.streamIds().forEach(streamId -> {
+                    checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
+                }
         );
+
         // remove deleted pipeline connections
         for (PipelineConnections pipelineConnection : pipelineConnections) {
             if (!connection.streamIds().contains(pipelineConnection.streamId())) {
@@ -132,8 +135,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
         // update pipeline connections
         for (String streamId : connection.streamIds()) {
-            // verify the stream exist
-            checkPermission(RestPermissions.STREAMS_READ, streamId);
+            // verify the stream exists and is editable
+            checkPermission(RestPermissions.STREAMS_EDIT, streamId);
             streamService.load(streamId);
 
             PipelineConnections updatedConnection;
