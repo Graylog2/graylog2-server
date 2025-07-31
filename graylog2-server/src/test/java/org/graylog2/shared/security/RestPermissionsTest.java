@@ -27,4 +27,17 @@ public class RestPermissionsTest {
         Assertions.assertThat(restPermissions.readerBasePermissions())
                 .hasSize(RestPermissions.READER_BASE_PERMISSION_SELECTION.size());
     }
+
+
+    @Test
+    public void testUserInspectorRoleContainsTeamsListPermission() throws Exception {
+        final RestPermissions restPermissions = new RestPermissions();
+
+        Assertions.assertThat(RestPermissions.BUILTIN_ROLES.stream()
+                        .filter(r -> r.name().equals("User Inspector"))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("User Inspector role not found"))
+                        .permissions())
+                .contains(RestPermissions.TEAMS_LIST);
+    }
 }

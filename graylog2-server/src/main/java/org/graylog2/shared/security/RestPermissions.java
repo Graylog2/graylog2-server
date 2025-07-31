@@ -171,6 +171,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
     public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
     public static final String TYPE_MAPPINGS_READ = "typemappings:read";
+    public static final String TEAMS_LIST = "teams:list";
     public static final String MAPPING_PROFILES_CREATE = "mappingprofiles:create";
     public static final String MAPPING_PROFILES_DELETE = "mappingprofiles:delete";
     public static final String MAPPING_PROFILES_EDIT = "mappingprofiles:edit";
@@ -379,7 +380,7 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE
             )),
             BuiltinRole.create("User Inspector", "Allows listing all user accounts (built-in)", ImmutableSet.of(
-                    RestPermissions.USERS_READ, RestPermissions.USERS_LIST
+                    RestPermissions.USERS_READ, RestPermissions.USERS_LIST, RestPermissions.TEAMS_LIST
             )),
             BuiltinRole.create("Cluster Configuration Reader", "Allows viewing the Cluster Configuration page", ImmutableSet.of(
                     RestPermissions.CLUSTER_CONFIGURATION_READ
