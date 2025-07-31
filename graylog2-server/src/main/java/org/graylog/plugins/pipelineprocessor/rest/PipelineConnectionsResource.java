@@ -115,10 +115,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
-        // check for read-only system streams
-        connection.streamIds().forEach(streamId -> {
-                    checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
-                }
+        connection.streamIds().forEach(streamId ->
+                checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
         );
 
         // remove deleted pipeline connections
