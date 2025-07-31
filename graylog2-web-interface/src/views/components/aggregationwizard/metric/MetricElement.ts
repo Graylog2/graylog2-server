@@ -69,7 +69,7 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
   return hasErrors(metricsErrors) ? { metrics: metricsErrors } : {};
 };
 
-const parameterForMetric = (metric: MetricFormValues) => {
+export const parameterForMetric = (metric: MetricFormValues) => {
   switch (metric.function) {
     case 'percentage':
       return metric.strategy;
@@ -82,13 +82,14 @@ const parameterForMetric = (metric: MetricFormValues) => {
 
 const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
 
-const metricsToSeries = (formMetrics: Array<MetricFormValues>) =>
-  formMetrics.map((metric) =>
-    Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
-      .toBuilder()
-      .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
-      .build(),
-  );
+// SeriesAlso has parameter it defines here
+export const metricToSeries = (metric: MetricFormValues) =>
+  Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
+    .toBuilder()
+    .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
+    .build();
+
+export const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics.map(metricToSeries);
 
 export const seriesToMetrics = (series: Array<Series>) =>
   series.map((s: Series) => {
