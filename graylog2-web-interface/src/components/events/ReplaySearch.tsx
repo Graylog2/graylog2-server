@@ -41,6 +41,7 @@ type ReplaySearchProps = {
   replayEventDefinition: boolean;
   searchPageLayout: Partial<LayoutState>;
   forceSidebarPinned: boolean;
+  ignoreInitialUrlQueries?: boolean;
 };
 
 const defaultSearchPageLayout = {};
@@ -54,6 +55,7 @@ const ReplaySearch = ({
   replayEventDefinition,
   searchPageLayout,
   forceSidebarPinned,
+  ignoreInitialUrlQueries = false,
 }: ReplaySearchProps) => {
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
@@ -79,7 +81,12 @@ const ReplaySearch = ({
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
       <SearchPageLayoutProvider value={_searchPageLayout}>
-        <SearchPage view={view} isNew forceSideBarPinned={forceSidebarPinned} />
+        <SearchPage
+          view={view}
+          isNew
+          forceSideBarPinned={forceSidebarPinned}
+          ignoreInitialUrlQueries={ignoreInitialUrlQueries}
+        />
       </SearchPageLayoutProvider>
     </ReplaySearchContext.Provider>
   );
@@ -91,6 +98,7 @@ type Props = {
   replayEventDefinition?: boolean;
   searchPageLayout?: Partial<LayoutState>;
   forceSidebarPinned?: boolean;
+  ignoreInitialUrlQueries?: boolean;
 };
 
 const canReplayEvent = (eventDefinition: EventDefinition) => {
@@ -109,6 +117,7 @@ const LoadingBarrier = ({
   replayEventDefinition = false,
   searchPageLayout = defaultSearchPageLayout,
   forceSidebarPinned = false,
+  ignoreInitialUrlQueries = false,
 }: Props) => {
   const { eventDefinition, aggregations, eventData, isLoading } = useAlertAndEventDefinitionData(alertId, definitionId);
 
@@ -128,6 +137,7 @@ const LoadingBarrier = ({
       searchPageLayout={searchPageLayout}
       replayEventDefinition={replayEventDefinition}
       forceSidebarPinned={forceSidebarPinned}
+      ignoreInitialUrlQueries={ignoreInitialUrlQueries}
     />
   ) : (
     <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>
