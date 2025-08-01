@@ -78,7 +78,7 @@ class EntitySharesServiceTest {
     private GranteeService granteeService;
 
     @Mock
-    private EntityCreationRequestService entityCreationRequestService;
+    private PluggableEntityService entityCreationRequestService;
 
     private GRNRegistry grnRegistry;
     private DBGrantService dbGrantService;
