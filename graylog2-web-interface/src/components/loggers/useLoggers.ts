@@ -21,6 +21,7 @@ import { ClusterSystemLoggers } from '@graylog/server-api';
 const useLoggers = () =>
   useQuery({
     queryKey: ['loggers', 'loggers'],
-    ...ClusterSystemLoggers.loggers,
+    queryFn: () => ClusterSystemLoggers.loggers(),
   });
+
 export default useLoggers;
