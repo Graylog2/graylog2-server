@@ -32,6 +32,7 @@ public class RestPermissions implements PluginPermissions {
      * These should all be in the form of "domain:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
+    public static final String API_BROWSER_READ = "api_browser:read";
     public static final String AUTH_HTTP_HEADER_CONFIG_EDIT = "authhttpheaderconfig:edit";
     public static final String AUTH_HTTP_HEADER_CONFIG_READ = "authhttpheaderconfig:read";
     public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
@@ -193,6 +194,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
+            .add(create(API_BROWSER_READ, ""))
             .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
             .add(create(AUTH_HTTP_HEADER_CONFIG_READ, ""))
             .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
@@ -383,6 +385,9 @@ public class RestPermissions implements PluginPermissions {
             )),
             BuiltinRole.create("Cluster Configuration Reader", "Allows viewing the Cluster Configuration page", ImmutableSet.of(
                     RestPermissions.CLUSTER_CONFIGURATION_READ
+            )),
+            BuiltinRole.create("API Browser Reader", "Allows viewing the API browser page", ImmutableSet.of(
+                    RestPermissions.API_BROWSER_READ
             ))
     ).build();
 

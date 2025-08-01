@@ -62,6 +62,8 @@ can only talk to Kafka brokers with version 2.1 or newer.
     }
 }
 ```
+- Access to the API browser now requires the `api_browser:read` permission. This permission can be granted by assigning 
+  the new “API Browser Reader” role to a user.
 
 ## REST API Endpoint Changes
 
