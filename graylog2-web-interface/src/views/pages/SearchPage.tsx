@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -44,6 +44,7 @@ type Props = React.PropsWithChildren<{
   searchResult?: SearchExecutionResult;
   forceSideBarPinned?: boolean;
   skipNoStreamsCheck?: boolean;
+  ignoreInitialUrlQueries?: boolean;
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -62,8 +63,10 @@ const SearchPage = ({
   searchResult = undefined,
   forceSideBarPinned = false,
   skipNoStreamsCheck = false,
+  ignoreInitialUrlQueries = false,
 }: Props) => {
-  const query = useQuery();
+  const urlQuery = useQuery();
+  const query = useMemo(() => (ignoreInitialUrlQueries ? {} : urlQuery), [ignoreInitialUrlQueries, urlQuery]);
   const initialQuery = query?.page as string;
   const history = useHistory();
   const loadNewView = useCallback(() => _loadNewView(history), [_loadNewView, history]);
