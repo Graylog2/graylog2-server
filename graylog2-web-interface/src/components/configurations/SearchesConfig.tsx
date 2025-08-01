@@ -485,7 +485,6 @@ const SearchesConfig = () => {
                 options={autoRefreshOptions(formConfig)}
                 displayKey="description"
                 valueKey="period"
-                matchProp="label"
                 onChange={onAutoRefreshDefaultOptionsUpdate}
                 value={defaultAutoRefreshOption(formConfig)}
               />

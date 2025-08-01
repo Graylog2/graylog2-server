@@ -152,7 +152,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Opensearch heap memory. Initial and maximum heap must be identical for OpenSearch, otherwise the boot fails.
             So it's only one config option.
             """)
-    @Parameter(value = "opensearch_heap")
+    @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
 
     @Documentation("HTTP port on which the embedded opensearch listens")
@@ -327,8 +327,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
      * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
      */
     @Documentation("Filesystem path where searchable snapshots should be stored")
-    @Parameter(value = "path_repo", converter = StringListConverter.class)
-    private List<String> pathRepo;
+    @Parameter(value = "path_repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
+    private List<Path> pathRepo;
 
     @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
@@ -704,7 +704,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return searchCacheSize;
     }
 
-    public List<String> getPathRepo() {
+    public List<Path> getPathRepo() {
         return pathRepo;
     }
 

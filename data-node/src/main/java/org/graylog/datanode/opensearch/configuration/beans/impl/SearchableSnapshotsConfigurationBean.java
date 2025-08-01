@@ -42,10 +42,12 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This opensearch configuration bean manages searchable snapshots and their S3 or local filesystem configuration.
@@ -60,7 +62,6 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
-    static final String SEARCH_NODE_ROLE = "search";
     private final Configuration localConfiguration;
     private final DatanodeDirectories datanodeDirectories;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
@@ -86,7 +87,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             if (searchRoleEnabled) {
                 LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
                 validateUsableSpace();
-                builder.addNodeRole(SEARCH_NODE_ROLE);
+                builder.addNodeRole(OpensearchNodeRole.SEARCH);
             }
             return builder
                     .properties(properties(searchRoleEnabled))
@@ -102,12 +103,12 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private boolean searchRoleExplicitlyConfigured() {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(SEARCH_NODE_ROLE);
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
     }
 
     private boolean searchRoleEnabled() {
         final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(SEARCH_NODE_ROLE);
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
@@ -170,7 +171,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         if (isSharedFileSystemRepo()) {
             // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
             if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-                builder.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+                builder.put("path.repo", serialize(localConfiguration.getPathRepo()));
             }
         }
 
@@ -178,6 +179,11 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             builder.putAll(s3RepositoryConfiguration.toOpensearchProperties());
         }
         return builder.build();
+    }
+
+    @Nonnull
+    private String serialize(List<Path> pathRepo) {
+        return pathRepo.stream().map(Path::toString).collect(Collectors.joining(","));
     }
 
     private Collection<OpensearchKeystoreItem> keystoreItems() {

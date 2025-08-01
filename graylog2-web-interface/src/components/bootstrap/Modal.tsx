@@ -55,9 +55,9 @@ type Props = {
   children: React.ReactNode;
   show?: boolean;
   bsSize?: ModalSize;
-  enforceFocus?: boolean;
   backdrop?: boolean;
   closable?: boolean;
+  fullScreen?: boolean;
 };
 
 const Modal = ({
@@ -65,16 +65,17 @@ const Modal = ({
   show = false,
   children,
   bsSize = undefined,
-  enforceFocus = false,
   backdrop = true,
   closable = true,
+  fullScreen = false,
 }: Props) => (
   <ModalRoot
     opened={show}
     onClose={onHide}
     size={sizeForMantine(bsSize)}
-    trapFocus={enforceFocus}
-    closeOnEscape={closable}>
+    trapFocus
+    closeOnEscape={closable}
+    fullScreen={fullScreen}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </ModalRoot>

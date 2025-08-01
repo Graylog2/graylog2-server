@@ -24,7 +24,8 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityOwnershipRegistrationHandler;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -44,6 +45,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -72,9 +74,10 @@ class ViewOwnershipToGrantsMigrationTest {
         this.userService = userService;
         this.grantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
 
-        final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
-        final TestViewService viewService = new TestViewService(clusterConfigService, entityOwnershipService, viewSummaryService, mongoCollections);
+        final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
+                () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
+        final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, viewSummaryService, mongoCollections);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -134,10 +137,10 @@ class ViewOwnershipToGrantsMigrationTest {
 
     public static class TestViewService extends ViewService {
         public TestViewService(ClusterConfigService clusterConfigService,
-                               EntityOwnershipService entityOwnerShipService,
+                               EntityRegistrar entityRegistrar,
                                ViewSummaryService viewSummaryService,
                                MongoCollections mongoCollections) {
-            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, mongoCollections);
+            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, mongoCollections);
         }
     }
 }

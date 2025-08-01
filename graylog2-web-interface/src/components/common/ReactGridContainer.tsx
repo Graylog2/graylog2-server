@@ -25,6 +25,7 @@ import 'react-resizable/css/styles.css';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normalizeWidgetPositions';
+import { widgetDragHandleClass } from 'views/components/widgets/Constants';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -37,7 +38,7 @@ const WidthProvidedGridLayout = ({
 const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(
   ({ theme }) => css`
     &.locked {
-      .widget-drag-handle {
+      .${widgetDragHandleClass} {
         display: none;
       }
     }

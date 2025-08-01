@@ -32,7 +32,7 @@ import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import {
@@ -75,6 +75,8 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useViewsSelector from 'views/stores/useViewsSelector';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -167,9 +169,10 @@ type Props = {
     query: Query,
     restartAutoRefresh: () => void,
   ) => Promise<any>;
+  scrollContainer: React.RefObject<HTMLDivElement>;
 };
 
-const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
+const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const availableStreams = useStore(StreamsStore, ({ streams }) =>
@@ -195,6 +198,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const { parameters } = useParameters();
   const currentQuery = useCurrentQuery();
   const queryFilters = useQueryFilters();
+  const results = useViewsSelector(selectCurrentQueryResults);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useViewsDispatch();
@@ -217,128 +221,136 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   return (
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
-        <ScrollToHint value={query.query_string}>
-          <FormWarningsProvider>
-            <SearchBarForm
-              initialValues={initialValues}
-              limitDuration={limitDuration}
-              onSubmit={_onSubmit}
-              validateQueryString={(values) =>
-                _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
-              }>
-              {({
-                dirty,
-                errors,
-                isSubmitting,
-                isValid,
-                isValidating,
-                handleSubmit,
-                values,
-                setFieldValue,
-                validateForm,
-              }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
+        <FormWarningsProvider>
+          <ScrollToHint
+            scrollContainer={scrollContainer}
+            ifValueChanges={query.query_string}
+            title="Scroll to search bar"
+          />
+          <SearchBarForm
+            initialValues={initialValues}
+            limitDuration={limitDuration}
+            onSubmit={_onSubmit}
+            validateQueryString={(values) =>
+              _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
+            }>
+            {({
+              dirty,
+              errors,
+              isSubmitting,
+              isValid,
+              isValidating,
+              handleSubmit,
+              values,
+              setFieldValue,
+              validateForm,
+            }) => {
+              const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
-                return (
-                  <>
-                    <ValidateOnParameterChange parameters={parameters} />
-                    <SearchBarContainer>
-                      <TimeRangeRow>
-                        <TimeRangeFilter
-                          limitDuration={limitDuration}
-                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                          value={values?.timerange}
-                          hasErrorOnMount={!!errors.timerange}
+              return (
+                <>
+                  <ValidateOnParameterChange parameters={parameters} />
+                  <SearchBarContainer>
+                    <TimeRangeRow>
+                      <TimeRangeFilter
+                        limitDuration={limitDuration}
+                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                        value={values?.timerange}
+                        hasErrorOnMount={!!errors.timerange}
+                        moveRangeProps={{
+                          effectiveTimerange: results?.effectiveTimerange,
+                          initialTimerange: currentQuery.timerange,
+                          initialTimerangeFormat: 'internalIndexer',
+                        }}
+                      />
+                      <StreamsAndRefresh>
+                        <Field name="streams">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamsFilter
+                              value={value}
+                              streams={availableStreams}
+                              onChange={(newStreams) =>
+                                onChange({
+                                  target: {
+                                    value: newStreams,
+                                    name,
+                                  },
+                                })
+                              }
+                            />
+                          )}
+                        </Field>
+                        <Field name="streamCategories">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamCategoryFilter
+                              value={value}
+                              streamCategories={availableStreamCategories}
+                              onChange={(newCategories) =>
+                                onChange({
+                                  target: {
+                                    value: newCategories,
+                                    name,
+                                  },
+                                })
+                              }
+                            />
+                          )}
+                        </Field>
+
+                        <ViewsRefreshControls disable={!isValid} />
+                      </StreamsAndRefresh>
+                    </TimeRangeRow>
+                    <SearchQueryRow>
+                      <SearchButtonAndQuery>
+                        <SearchButton
+                          disabled={disableSearchSubmit}
+                          dirty={dirty}
+                          displaySpinner={isSubmitting || isLoadingExecution}
                         />
-                        <StreamsAndRefresh>
-                          <Field name="streams">
-                            {({ field: { name, value, onChange } }) => (
-                              <StreamsFilter
-                                value={value}
-                                streams={availableStreams}
-                                onChange={(newStreams) =>
-                                  onChange({
-                                    target: {
-                                      value: newStreams,
-                                      name,
-                                    },
-                                  })
-                                }
-                              />
-                            )}
-                          </Field>
-                          <Field name="streamCategories">
-                            {({ field: { name, value, onChange } }) => (
-                              <StreamCategoryFilter
-                                value={value}
-                                streamCategories={availableStreamCategories}
-                                onChange={(newCategories) =>
-                                  onChange({
-                                    target: {
-                                      value: newCategories,
-                                      name,
-                                    },
-                                  })
-                                }
-                              />
+                        <SearchInputAndValidationContainer>
+                          <Field name="queryString">
+                            {({ field: { name, value, onChange }, meta: { error } }) => (
+                              <FormWarningsContext.Consumer>
+                                {({ warnings }) => (
+                                  <PluggableCommands usage="search_query">
+                                    {(customCommands) => (
+                                      <ViewsQueryInput
+                                        value={value}
+                                        ref={editorRef}
+                                        view={view}
+                                        timeRange={values.timerange}
+                                        streams={values.streams}
+                                        name={name}
+                                        onChange={onChange}
+                                        placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                        error={error}
+                                        isValidating={isValidating}
+                                        warning={warnings.queryString}
+                                        disableExecution={disableSearchSubmit}
+                                        validate={validateForm}
+                                        onExecute={handleSubmit as () => void}
+                                        commands={customCommands}
+                                      />
+                                    )}
+                                  </PluggableCommands>
+                                )}
+                              </FormWarningsContext.Consumer>
                             )}
                           </Field>
 
-                          <ViewsRefreshControls disable={!isValid} />
-                        </StreamsAndRefresh>
-                      </TimeRangeRow>
-                      <SearchQueryRow>
-                        <SearchButtonAndQuery>
-                          <SearchButton
-                            disabled={disableSearchSubmit}
-                            dirty={dirty}
-                            displaySpinner={isSubmitting || isLoadingExecution}
-                          />
-                          <SearchInputAndValidationContainer>
-                            <Field name="queryString">
-                              {({ field: { name, value, onChange }, meta: { error } }) => (
-                                <FormWarningsContext.Consumer>
-                                  {({ warnings }) => (
-                                    <PluggableCommands usage="search_query">
-                                      {(customCommands) => (
-                                        <ViewsQueryInput
-                                          value={value}
-                                          ref={editorRef}
-                                          view={view}
-                                          timeRange={values.timerange}
-                                          streams={values.streams}
-                                          name={name}
-                                          onChange={onChange}
-                                          placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                          error={error}
-                                          isValidating={isValidating}
-                                          warning={warnings.queryString}
-                                          disableExecution={disableSearchSubmit}
-                                          validate={validateForm}
-                                          onExecute={handleSubmit as () => void}
-                                          commands={customCommands}
-                                        />
-                                      )}
-                                    </PluggableCommands>
-                                  )}
-                                </FormWarningsContext.Consumer>
-                              )}
-                            </Field>
-
-                            <QueryValidation />
-                            <QueryHistoryButton editorRef={editorRef} />
-                          </SearchInputAndValidationContainer>
-                        </SearchButtonAndQuery>
-                        {!editing && <SearchActionsMenu />}
-                      </SearchQueryRow>
-                      <PluggableSearchBarControls />
-                    </SearchBarContainer>
-                  </>
-                );
-              }}
-            </SearchBarForm>
-          </FormWarningsProvider>
-        </ScrollToHint>
+                          <ViewsQueryValidation />
+                          <QueryHistoryButton editorRef={editorRef} />
+                        </SearchInputAndValidationContainer>
+                      </SearchButtonAndQuery>
+                      {!editing && <SearchActionsMenu />}
+                    </SearchQueryRow>
+                    <PluggableSearchBarControls />
+                  </SearchBarContainer>
+                </>
+              );
+            }}
+          </SearchBarForm>
+        </FormWarningsProvider>
       )}
     </WidgetFocusContext.Consumer>
   );
