@@ -29,6 +29,7 @@ const ModalOverlay = styled(MantineModal.Overlay)`
 
 const ModalContent = styled(MantineModal.Content)`
   z-index: ${zIndices.modalBody};
+  border-radius: 10px;
 `;
 
 const ModalRoot = styled(MantineModal.Root)(
