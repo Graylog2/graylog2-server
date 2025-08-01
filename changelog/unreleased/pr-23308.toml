@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Connecting a pipeline to a stream requires edit permissions on the stream."
+
+issues = ["Graylog/graylog2-enterprise#10654"]
+pulls = ["23308"]
