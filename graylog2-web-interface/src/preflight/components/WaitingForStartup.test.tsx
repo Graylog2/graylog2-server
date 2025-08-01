@@ -19,29 +19,21 @@ import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 
 import useServerAvailability from 'preflight/hooks/useServerAvailability';
 import { asMock } from 'helpers/mocking';
+import { fullPageReload } from 'util/URLUtils';
 
 import WaitingForStartup from './WaitingForStartup';
 
 jest.mock('preflight/hooks/useServerAvailability', () => jest.fn());
 
+jest.mock('util/navigation', () => ({
+  fullPageReload: jest.fn(),
+}));
+
 describe('WaitingForStartup', () => {
-  let windowLocation;
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { reload: jest.fn() },
-    });
-  });
-
   beforeEach(() => {
     asMock(useServerAvailability).mockReturnValue({
       data: false,
     });
-  });
-
-  afterAll(() => {
-    Object.defineProperty(window, 'location', { configurable: true, value: windowLocation });
   });
 
   it('should not reload page while server is starting', async () => {
@@ -49,7 +41,7 @@ describe('WaitingForStartup', () => {
 
     await screen.findByText(/The Graylog server is currently starting./);
 
-    expect(window.location.reload).not.toHaveBeenCalled();
+    expect(fullPageReload).not.toHaveBeenCalled();
   });
 
   it('should reload page after server started', async () => {
@@ -60,6 +52,6 @@ describe('WaitingForStartup', () => {
     renderPreflight(<WaitingForStartup />);
 
     await screen.findByText(/The Graylog server is currently starting./);
-    await waitFor(() => expect(window.location.reload).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(fullPageReload).toHaveBeenCalledTimes(1));
   });
 });

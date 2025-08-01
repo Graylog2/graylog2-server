@@ -132,6 +132,9 @@ const URLUtils = {
 
     return path.slice(pathPrefixLength);
   },
+  fullPageReload() {
+    window.location.reload();
+  },
 };
 
 export default URLUtils;
@@ -149,4 +152,5 @@ export const {
   currentPathname,
   currentPathnameWithoutPrefix,
   stripPrefixFromPathname,
+  fullPageReload,
 } = URLUtils;
