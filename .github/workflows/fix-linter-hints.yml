@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [ 17 ]
+        java-version: [ 21 ]
 
     steps:
       - name: Freeing up more disk space

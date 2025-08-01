@@ -38,5 +38,10 @@ public class KinesisTransportTest {
                 .isExactlyInstanceOf(MisfireException.class)
                 .hasMessageContaining("Override Endpoint")
                 .hasMessageContaining("is invalid");
+
+        assertThatThrownBy(() -> KinesisTransport.validateEndpoint("unknown-scheme://graylog.org", "Graylog"))
+                .isExactlyInstanceOf(MisfireException.class)
+                .hasMessageContaining("Override Endpoint")
+                .hasMessageContaining("is invalid");
     }
 }
