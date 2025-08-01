@@ -1,0 +1,5 @@
+type = "f"
+message = "Ensure retained ByteBuf is released in SyslogTCPFramingRouterHandler on decode failure."
+
+pulls = ["23317"]
+issues = ["23312"]
