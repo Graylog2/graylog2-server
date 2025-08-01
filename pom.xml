@@ -111,7 +111,7 @@
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.181</classgraph.version>
         <commons-codec.version>1.19.0</commons-codec.version>
-        <commons-csv.version>1.14.0</commons-csv.version>
+        <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.5.0</commons-exec.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
@@ -121,7 +121,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.41.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.53.3</gcs.version>
+        <gcs.version>2.54.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -198,7 +198,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.6</equalsverifier.version>
+        <equalsverifier.version>4.0.7</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
@@ -448,7 +448,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.27.1</version>
+                <version>1.28.0</version>
             </dependency>
 
             <dependency>
