@@ -554,6 +554,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
+                        <phase>test</phase>
                         <goals>
                             <!-- Required to get Mockito's JAR path for the surefire argLine. -->
                             <goal>properties</goal>
@@ -569,9 +570,7 @@
                     <reuseForks>true</reuseForks>
                     <!-- See: "Explicitly setting up instrumentation for inline mocking (Java 21+)" at
                          https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3 -->
-                    <argLine>-javaagent:${org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid
-                        -Djava.awt.headless=true
-                    </argLine>
+                    <argLine>-javaagent:${org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                         <exclude>**/*IT.java</exclude>
