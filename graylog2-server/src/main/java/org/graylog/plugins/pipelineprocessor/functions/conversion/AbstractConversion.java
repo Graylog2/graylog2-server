@@ -29,7 +29,7 @@ public abstract class AbstractConversion<T> extends AbstractFunction<T> {
     public final ParameterDescriptor<Boolean, Boolean> defaultToNullParam;
 
     public AbstractConversion() {
-        defaultToNullParam = bool("defaultToNull").optional().description("Returns null when 'value' is null and overrides the \"default\" parameter.").defaultValue(Optional.of(false)).build();
+        defaultToNullParam = bool("defaultToNull").optional().description("Returns null when the 'value' parameter is null, and overrides any default value.").defaultValue(Optional.of(false)).build();
     }
 
     protected Boolean defaultToNull(FunctionArgs args, EvaluationContext context) {
