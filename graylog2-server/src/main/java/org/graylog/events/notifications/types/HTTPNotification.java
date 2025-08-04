@@ -110,4 +110,9 @@ public class HTTPNotification {
                 url + "\"]";
         urlWhitelistNotificationService.publishWhitelistFailure(description);
     }
+
+    static String buildRetryMessage(int status) {
+        return "Received unsuccessful (but retryable) response [" + status + "]. " +
+                "This request will be retried again later.";
+    }
 }

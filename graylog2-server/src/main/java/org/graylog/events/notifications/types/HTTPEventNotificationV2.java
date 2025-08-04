@@ -128,7 +128,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
      * Depending on the configuration, either a default HTTP client will be returned or an instance
      * with {@link org.graylog2.shared.bindings.providers.TcpKeepAliveSocketFactory} configured.
      */
-    private OkHttpClient selectClient(HTTPEventNotificationConfigV2 notificationConfig) {
+    OkHttpClient selectClient(HTTPEventNotificationConfigV2 notificationConfig) {
         final boolean withKeepAlive = configurationProvider.get().notificationsKeepAliveProbe();
         return parameterizedHttpClientProvider.get(withKeepAlive, notificationConfig.skipTLSVerification());
     }
@@ -151,11 +151,11 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
             body = buildRequestBody(modelData, config);
         } catch (JsonProcessingException processingErr) {
             errorMessage = "Unable to serialize notification";
-            createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+            createSystemErrorNotification(errorMessage, ctx);
             throw new PermanentEventNotificationException(errorMessage, processingErr);
         } catch (UnsupportedEncodingException encodingErr) {
             errorMessage = "Unable to URL encode notification body";
-            createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+            createSystemErrorNotification(errorMessage, ctx);
             throw new PermanentEventNotificationException(errorMessage, encodingErr);
         }
 
@@ -171,23 +171,29 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         try (final Response r = httpClient.newCall(builder.build()).execute()) {
             if (!r.isSuccessful()) {
                 final String errorDetail = r.body() == null ? " URL: " + config.url() : " " + r.body().string();
-                errorMessage = "Expected successful HTTP response [2xx] but got [" + r.code() + "]." + errorDetail;
-                createSystemErrorNotification(errorMessage + " for notification [" + ctx.notificationId() + "]");
+                final int status = r.code();
+                if (HTTPUtils.isRetryableStatus(status)) {
+                    errorMessage = buildRetryMessage(status) + errorDetail;
+                    createSystemErrorNotification(errorMessage, ctx);
+                    throw new TemporaryEventNotificationException(errorMessage);
+                }
+                errorMessage = "Expected successful HTTP response [2xx] but got [" + status + "]." + errorDetail;
+                createSystemErrorNotification(errorMessage, ctx);
                 throw new PermanentEventNotificationException(errorMessage);
             }
         } catch (IOException e) {
-            createSystemErrorNotification("Error: " + e.getMessage() + " for notification [" + ctx.notificationId() + "]");
+            createSystemErrorNotification("Error: " + e.getMessage(), ctx);
             throw new PermanentEventNotificationException(e.getMessage());
         }
     }
 
-    private void createSystemErrorNotification(String message) {
+    private void createSystemErrorNotification(String message, EventNotificationContext ctx) {
         final Notification systemNotification = notificationService.buildNow()
                 .addNode(nodeId.getNodeId())
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.URGENT)
                 .addDetail("title", "Custom HTTP Notification Failed")
-                .addDetail("description", message);
+                .addDetail("description", message + " for notification [" + ctx.notificationId() + "]");
         notificationService.publishIfFirst(systemNotification);
     }
 

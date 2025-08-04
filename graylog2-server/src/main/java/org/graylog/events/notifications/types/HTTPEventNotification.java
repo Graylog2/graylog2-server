@@ -114,8 +114,12 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
         final OkHttpClient httpClient = selectClient(config);
         try (final Response r = httpClient.newCall(request).execute()) {
             if (!r.isSuccessful()) {
+                final int status = r.code();
+                if (HTTPUtils.isRetryableStatus(status)) {
+                    throw new TemporaryEventNotificationException(buildRetryMessage(status));
+                }
                 throw new PermanentEventNotificationException(
-                        "Expected successful HTTP response [2xx] but got [" + r.code() + "]. " + config.url());
+                        "Expected successful HTTP response [2xx] but got [" + status + "]. " + config.url());
             }
         } catch (IOException e) {
             throw new PermanentEventNotificationException(e.getMessage());
