@@ -30,7 +30,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@graylog/sawmill": "2.0.28",
+    "@graylog/sawmill": "4.0.0",
     "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/react-query": "5.83.0",
     "@types/jquery": "3.5.32",
