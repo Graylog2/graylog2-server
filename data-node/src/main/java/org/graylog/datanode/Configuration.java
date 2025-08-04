@@ -152,7 +152,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Opensearch heap memory. Initial and maximum heap must be identical for OpenSearch, otherwise the boot fails.
             So it's only one config option.
             """)
-    @Parameter(value = "opensearch_heap")
+    @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
 
     @Documentation("HTTP port on which the embedded opensearch listens")

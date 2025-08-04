@@ -22,10 +22,23 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import type { FiltersType } from 'views/types';
 import type { QueryString } from 'views/logic/queries/types';
 
+import type { AggregationWidgetConfigJson } from './AggregationWidgetConfig';
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
 import Widget, { widgetAttributesForComparison } from '../widgets/Widget';
 
+type AggregationWidgetJson = {
+  id: string;
+  config: AggregationWidgetConfigJson;
+  filter?: string;
+  timerange?: TimeRange;
+  query?: QueryString;
+  streams?: Array<string>;
+  stream_categories?: Array<string>;
+  filters?: FiltersType;
+  description?: string;
+  context?: string;
+};
 export default class AggregationWidget extends Widget {
   constructor(
     id: string,
@@ -37,6 +50,7 @@ export default class AggregationWidget extends Widget {
     streamCategories?: Array<string>,
     filters?: FiltersType,
     description?: string,
+    context?: string,
   ) {
     super(
       id,
@@ -49,6 +63,7 @@ export default class AggregationWidget extends Widget {
       streamCategories,
       filters,
       description,
+      context,
     );
   }
 
@@ -56,8 +71,8 @@ export default class AggregationWidget extends Widget {
 
   static defaultTitle = 'Untitled Aggregation';
 
-  static fromJSON(value) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters, description } = value;
+  static fromJSON(value: AggregationWidgetJson) {
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } = value;
 
     return new AggregationWidget(
       id,
@@ -69,14 +84,18 @@ export default class AggregationWidget extends Widget {
       stream_categories,
       filters,
       description,
+      context,
     );
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters, description } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description }));
+    return new Builder(
+      Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description, context }),
+    );
   }
 
   static builder() {
@@ -86,7 +105,9 @@ export default class AggregationWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof AggregationWidget) {
-      return widgetAttributesForComparison.every((key) => isDeepEqual(this[key], other[key]));
+      return [...widgetAttributesForComparison, 'description', 'context'].every((key) =>
+        isDeepEqual(this[key], other[key]),
+      );
     }
 
     return false;
@@ -103,7 +124,7 @@ export default class AggregationWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters, description } =
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
       this.value.toObject();
 
     return new AggregationWidget(
@@ -116,6 +137,7 @@ class Builder extends Widget.Builder {
       stream_categories,
       filters,
       description,
+      context,
     );
   }
 }

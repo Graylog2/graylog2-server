@@ -14,21 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled, { css } from 'styled-components';
+package org.graylog.datanode.opensearch.configuration.beans.impl;
 
-import { Icon } from 'components/common';
-
-const Wrapper = styled.div<{ $active: boolean }>(
-  ({ theme, $active }) => css`
-    color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-  `,
-);
-
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check_circle' : 'cancel'} />
-  </Wrapper>
-);
-
-export default LoggedInIcon;
+public interface OpensearchNodeRole {
+    String CLUSTER_MANAGER = "cluster_manager";
+    String DATA = "data";
+    String INGEST = "ingest";
+    String REMOTE_CLUSTER_CLIENT = "remote_cluster_client";
+    String SEARCH = "search";
+}

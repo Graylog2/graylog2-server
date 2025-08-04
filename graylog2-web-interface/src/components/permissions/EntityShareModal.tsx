@@ -29,8 +29,8 @@ import type SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { FormValues as GranteesSelectFormValues } from 'components/permissions/Grantee/GranteesSelector';
 
-import type { FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import EntityShareSettings from './EntityShareSettings';
 
 type Props = {

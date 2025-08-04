@@ -63,6 +63,7 @@
     "embla-carousel-react": "^8.0.0-rc11",
     "fast-xml-parser": "^5.0.1",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
+    "html-react-parser": "^5.2.5",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
     "leaflet": "^1.5.1",

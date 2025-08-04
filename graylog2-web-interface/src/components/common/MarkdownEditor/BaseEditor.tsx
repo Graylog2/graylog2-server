@@ -22,12 +22,11 @@ import { SourceCodeEditor } from 'components/common';
 
 const EditorStyles = styled.div<{ $width: string }>`
   & .ace_editor {
-    border: 1px solid ${({ theme }) => theme.colors.input.border} !important;
     width: ${({ $width }) => $width};
   }
 
   & .ace_cursor {
-    border-color: ${({ theme }) => theme.colors.global.textDefault};
+    border-color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
