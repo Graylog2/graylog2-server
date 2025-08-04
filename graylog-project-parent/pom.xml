@@ -554,7 +554,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>test</phase>
+                        <phase>test-compile</phase>
                         <goals>
                             <!-- Required to get Mockito's JAR path for the surefire argLine. -->
                             <goal>properties</goal>
