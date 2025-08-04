@@ -400,6 +400,10 @@ public class ContentPackService {
     }
 
     public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
+        return resolveEntityDependencyGraph(unresolvedEntities).nodes();
+    }
+
+    public Graph<EntityDescriptor> resolveEntityDependencyGraph(Collection<EntityDescriptor> unresolvedEntities) {
         final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
                 .allowsSelfLoops(false)
                 .nodeOrder(ElementOrder.insertion())
@@ -411,7 +415,7 @@ public class ContentPackService {
 
         LOG.debug("Final dependency graph: {}", finalDependencyGraph);
 
-        return finalDependencyGraph.nodes();
+        return finalDependencyGraph;
     }
 
     private MutableGraph<EntityDescriptor> resolveDependencyGraph(Graph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
