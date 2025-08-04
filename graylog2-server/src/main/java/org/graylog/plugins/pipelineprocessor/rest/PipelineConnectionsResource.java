@@ -76,7 +76,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         this.entityScopeService = entityScopeService;
     }
 
-    @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
+    @ApiOperation(value = "Connect processing pipelines to a stream")
     @POST
     @Path("/to_stream")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
@@ -97,7 +97,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         return connectionsService.save(connection);
     }
 
-    @ApiOperation(value = "Connect streams to a processing pipeline", notes = "")
+    @ApiOperation(value = "Connect streams to a processing pipeline")
     @POST
     @Path("/to_pipeline")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
@@ -178,7 +178,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @ApiOperation("Get all pipeline connections")
     @GET
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_READ)
-    public Set<PipelineConnections> getAll() throws NotFoundException {
+    public Set<PipelineConnections> getAll() {
         final Set<PipelineConnections> pipelineConnections = connectionsService.loadAll();
 
         final Set<PipelineConnections> filteredConnections = Sets.newHashSetWithExpectedSize(pipelineConnections.size());
