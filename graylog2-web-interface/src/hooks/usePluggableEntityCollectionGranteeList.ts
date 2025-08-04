@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.shares;
+import usePluginEntities from 'hooks/usePluginEntities';
 
-import org.graylog.grn.GRN;
+const usePluggableEntityCollectionGranteeList = () => {
+  const pluggableCollectionGranteeList = usePluginEntities('components.collection');
 
-import java.util.Set;
-import java.util.function.Predicate;
+  return pluggableCollectionGranteeList?.[0]?.CollectionGranteeList ?? null;
+};
 
-public interface CollectionRequestHandler {
-    /**
-     * Pluggable handler for actions related to collections.
-     */
-    void addToCollection(GRN entity, Set<GRN> collections);
-
-    Predicate<GRN> collectionFilter();
-}
+export default usePluggableEntityCollectionGranteeList;
