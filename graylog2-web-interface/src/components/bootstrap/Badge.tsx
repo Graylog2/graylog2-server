@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 const mapStyle = (style: ColorVariant) => (style === 'default' ? 'gray' : style); const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
   text-transform: none;
     background: ${theme.colors.button[color].background};
-  color: ${theme.colors.button[color].color};
+    color: ${theme.colors.button[color].color};
 
   .mantine-Badge-label {
     font-size: ${theme.fonts.size.small};
