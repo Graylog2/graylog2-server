@@ -85,7 +85,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         final String streamId = connection.streamId();
 
         // verify the stream exists
-        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         final Stream stream = streamService.load(streamId);
         checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
 
@@ -118,7 +118,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         // verify the streams exist and the user has permission to read them
         final Set<Stream> connectedStreams = streamService.loadByIds(connection.streamIds());
         connectedStreams.forEach(stream -> {
-            checkPermission(RestPermissions.STREAMS_READ, stream.getId());
+            checkPermission(RestPermissions.STREAMS_EDIT, stream.getId());
             checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
         });
 
