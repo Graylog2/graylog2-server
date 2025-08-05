@@ -54,3 +54,5 @@ export type QueryValidationState = {
     },
   }
 };
+
+export type ValidationExplanations = Array<React.ComponentType<{ validationState: QueryValidationState }>>;
