@@ -23,14 +23,14 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.mockito.Mockito.spy;
@@ -50,30 +50,27 @@ public class CommonNodeCommandTest {
     }
 
     @Test
-    public void startCommonNode() {
-        CommonNode node = spy(new CommonNode());
+    public void startCommonNode(@TempDir Path tmpDir) throws Exception {
+        final var configFile = tmpDir.resolve("common-node.conf");
+        Files.write(configFile, List.of(
+                "node_id_file = " + tmpDir.resolve("node-id").toAbsolutePath(),
+                "password_secret = 1234567890123456"
+        ));
+        CommonNode node = spy(new CommonNode(configFile));
         node.run();
         verify(node, times(1)).startCommand();
     }
 
     static class CommonNode extends AbstractNodeCommand {
 
-        public CommonNode() {
+        public CommonNode(Path configFile) {
             super(new CommonNodeConfiguration() {
                 @Parameter("password_secret")
                 String passwordSecret;
                 @Parameter("node_id_file")
                 String nodeIdFile;
             });
-            URL resource = this.getClass().getResource("common-node.conf");
-            if (resource == null) {
-                Assertions.fail("Cannot read configuration file");
-            }
-            try {
-                setConfigFile(resource.toURI().getPath());
-            } catch (URISyntaxException e) {
-                Assertions.fail("Cannot read configuration file");
-            }
+            setConfigFile(configFile.toString());
         }
 
         @Override
