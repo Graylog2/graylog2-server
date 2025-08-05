@@ -19,13 +19,14 @@ import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { exampleFormDataWithKeySecretAuth } from 'fixtures/aws/FormData.fixtures';
-import { FormDataProvider } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { StepsContext } from 'integrations/aws/context/Steps';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
 import Routes from 'routing/Routes';
 
 import CloudWatch from './CloudWatch';
+
+import FormDataProvider from '../../contexts/FormDataProvider';
 
 const mockNavigate = jest.fn();
 

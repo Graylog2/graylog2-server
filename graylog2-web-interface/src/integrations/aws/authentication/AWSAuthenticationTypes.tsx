@@ -18,7 +18,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 import AppConfig from 'util/AppConfig';
 

@@ -17,7 +17,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
