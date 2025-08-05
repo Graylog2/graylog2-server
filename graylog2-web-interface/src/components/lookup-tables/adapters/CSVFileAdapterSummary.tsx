@@ -43,6 +43,16 @@ const CSVFileAdapterSummary = ({ dataAdapter }: Props) => {
       <dd>{config.value_column}</dd>
       <dt>Check interval</dt>
       <dd>{config.check_interval} seconds</dd>
+      <dt>Multi-value lookup</dt>
+      <dd>{config.multi_value_lookup ? 'yes' : 'no'}</dd>
+      {config.multi_value_lookup && (
+        <>
+          <dt>Multi-value separator</dt>
+          <dd>
+            <code>{config.multi_value_separator}</code>
+          </dd>
+        </>
+      )}
       <dt>Case-insensitive lookup</dt>
       <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
       <dt>CIDR lookup</dt>

@@ -51,6 +51,7 @@ public class CSVFileDataAdapterTest {
 
     private final Path csvFile;
     private final Path cidrLookupFile;
+    private final Path multiValueLookupFile;
     private CSVFileDataAdapter csvFileDataAdapter;
 
     @Mock
@@ -70,6 +71,10 @@ public class CSVFileDataAdapterTest {
         final URL cidrResource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterCIDRLookupTest.csv");
         final Path cidrLookupFilePath = Paths.get(cidrResource.toURI());
         this.cidrLookupFile = cidrLookupFilePath;
+
+        final URL multiValueResource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterMultiValueTest.csv");
+        final Path multiValueFilePath = Paths.get(multiValueResource.toURI());
+        this.multiValueLookupFile = multiValueFilePath;
     }
 
     @Test
@@ -231,6 +236,46 @@ public class CSVFileDataAdapterTest {
         assertThat(csvFileDataAdapter.doGet("not.an.ip.address")).isEqualTo(LookupResult.withError());
     }
 
+    @Test
+    public void testMultiValueLookups() throws Exception {
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueConfig(), new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+
+        // Test for user_id "000001"
+        LookupResult result1 = csvFileDataAdapter.doGet("000001");
+        assertThat(result1.singleValue()).isEqualTo("Adam|Alpha|aalpha|123-4567|123 Sleepy Hollow Lane");
+        assertThat(result1.multiValue())
+                .containsEntry("0", "Adam")
+                .containsEntry("1", "Alpha")
+                .containsEntry("2", "aalpha")
+                .containsEntry("3", "123-4567")
+                .containsEntry("4", "123 Sleepy Hollow Lane");
+
+        // Test for user_id "000005"
+        LookupResult result5 = csvFileDataAdapter.doGet("000005");
+        assertThat(result5.singleValue()).isEqualTo("Mason|Johnson|mjohnson|880-1222|4000 2nd St");
+        assertThat(result5.multiValue())
+                .containsEntry("0", "Mason")
+                .containsEntry("1", "Johnson")
+                .containsEntry("2", "mjohnson")
+                .containsEntry("3", "880-1222")
+                .containsEntry("4", "4000 2nd St");
+
+        // Test for user_id "000010"
+        LookupResult result10 = csvFileDataAdapter.doGet("000010");
+        assertThat(result10.singleValue()).isEqualTo("Lucas|Davis|ldavis|366-1742|1616 Elm St");
+        assertThat(result10.multiValue())
+                .containsEntry("0", "Lucas")
+                .containsEntry("1", "Davis")
+                .containsEntry("2", "ldavis")
+                .containsEntry("3", "366-1742")
+                .containsEntry("4", "1616 Elm St");
+
+        // Non-existent user_id
+        assertThat(csvFileDataAdapter.doGet("999999")).isEqualTo(LookupResult.empty());
+    }
+
     private Config baseConfig() {
         return Config.builder()
                 .type(NAME)
@@ -241,6 +286,21 @@ public class CSVFileDataAdapterTest {
                 .valueColumn("value")
                 .checkInterval(60)
                 .caseInsensitiveLookup(false)
+                .build();
+    }
+
+    private Config multiValueConfig() {
+        return Config.builder()
+                .type(NAME)
+                .path(multiValueLookupFile.toString())
+                .separator(",")
+                .quotechar("\"")
+                .keyColumn("user_id")
+                .valueColumn("user_values")
+                .checkInterval(60)
+                .caseInsensitiveLookup(false)
+                .multiValueLookup(true)
+                .multiValueSeparator("|")
                 .build();
     }
 

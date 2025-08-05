@@ -104,6 +104,27 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
       wrapperClassName="col-sm-9"
     />
     <Input
+      type="text"
+      id="multi_value_separator"
+      name="multi_value_separator"
+      label="Multi-value separator"
+      onChange={handleFormEvent}
+      help="The delimiter to use for separating multiple values."
+      value={config.multi_value_separator}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+    />
+    <Input
+      type="checkbox"
+      id="multi_value_lookup"
+      name="multi_value_lookup"
+      label="Multi-value lookup"
+      checked={config.multi_value_lookup}
+      onChange={handleFormEvent}
+      help="Enable if the lookup value has multiple values."
+      wrapperClassName="col-md-offset-3 col-md-9"
+    />
+    <Input
       type="checkbox"
       id="case_insensitive_lookup"
       name="case_insensitive_lookup"

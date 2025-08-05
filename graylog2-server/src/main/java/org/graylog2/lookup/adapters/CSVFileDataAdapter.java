@@ -66,6 +66,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -290,6 +291,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return getEmptyResult();
         }
 
+        if (config.multiValueLookup().isPresent() && config.multiValueLookup().get()) {
+            return LookupResult.multi(value, getMultiValueResult(value));
+        }
+
         return LookupResult.single(value);
     }
 
@@ -320,7 +325,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         try {
             final String resultValue = cidrLookupRef.get().longestPrefixRangeLookup(String.valueOf(ip));
             if (resultValue != null) {
-                result = LookupResult.single(resultValue);
+                if (config.multiValueLookup().isPresent() && config.multiValueLookup().get()) {
+                    result = LookupResult.multi(resultValue, getMultiValueResult(resultValue));
+                } else {
+                    result = LookupResult.single(resultValue);
+                }
             }
         } catch (IllegalArgumentException e) {
             LOG.debug("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
@@ -328,6 +337,16 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         return result;
+    }
+
+    private Map<Object, Object> getMultiValueResult(String value) {
+        final String valueSeparator = Pattern.quote(config.multiValueSeparator().orElse("|"));
+        final String[] values = value.split(valueSeparator);
+        final Map<Object, Object> multiValueMap = new HashMap<>();
+        for (int i = 0; i < values.length; i++) {
+            multiValueMap.put(Integer.toString(i), values[i]);
+        }
+        return multiValueMap;
     }
 
     @Override
@@ -362,6 +381,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     .checkInterval(60)
                     .caseInsensitiveLookup(false)
                     .cidrLookup(false)
+                    .multiValueLookup(false)
+                    .multiValueSeparator("|")
                     .build();
         }
     }
@@ -421,6 +442,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         @JsonProperty("case_insensitive_lookup")
         public abstract Optional<Boolean> caseInsensitiveLookup();
 
+        @JsonProperty("multi_value_lookup")
+        public abstract Optional<Boolean> multiValueLookup();
+
+        @JsonProperty("multi_value_separator")
+        public abstract Optional<String> multiValueSeparator();
+
         @JsonProperty("cidr_lookup")
         public abstract Optional<Boolean> cidrLookup();
 
@@ -453,6 +480,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                 errors.put("path", "The file does not exist.");
             } else if (!Files.isReadable(path)) {
                 errors.put("path", "The file cannot be read.");
+            }
+
+            if (multiValueLookup().isPresent() && multiValueLookup().get() &&
+                    (multiValueSeparator().isEmpty() || multiValueSeparator().get().isEmpty())) {
+                errors.put("multi_value_separator", "The multi-value separator must be set when multi-value lookup is enabled.");
             }
 
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
@@ -488,6 +520,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("case_insensitive_lookup")
             public abstract Builder caseInsensitiveLookup(Boolean caseInsensitiveLookup);
+
+            @JsonProperty("multi_value_lookup")
+            public abstract Builder multiValueLookup(Boolean multiValueLookup);
+
+            @JsonProperty("multi_value_separator")
+            public abstract Builder multiValueSeparator(String multiValueSeparator);
 
             @JsonProperty("cidr_lookup")
             public abstract Builder cidrLookup(Boolean cidrLookup);

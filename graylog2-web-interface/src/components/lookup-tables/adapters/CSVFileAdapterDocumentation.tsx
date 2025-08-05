@@ -35,6 +35,11 @@ const csvFile3 = `"cidr","subnet"
 "192.168.101.0/24","IT Department subnet"
 "192.168.102.0/24","HR Department subnet"`;
 
+const multiValueCsvFile = `"user_id","user_info"
+"000001","User|One|user1|user.one@company.net"
+"000002","User|Two|user2|u2@company.net"
+"000003","Admin|One|admin1|admin@company.net"`;
+
 const CSVFileAdapterDocumentation = () => {
   const productName = useProductName();
 
@@ -88,6 +93,26 @@ const CSVFileAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>CSV File</h5>
       <pre>{csvFile2}</pre>
+
+      <h3 style={{ marginBottom: 10 }}>Multi-Value Example</h3>
+
+      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        Separator: <code>,</code>
+        <br />
+        Quote character: <code>"'"</code>
+        <br />
+        Key column: <code>user_id</code>
+        <br />
+        Value column: <code>user_info</code>
+        <br />
+        Multi-value lookup: <code>true</code>
+        <br />
+        Multi-value separator: <code>|</code>
+      </p>
+
+      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+      <pre>{multiValueCsvFile}</pre>
 
       <h3 style={{ marginBottom: 10 }}>CIDR Lookups</h3>
       <p style={{ marginBottom: 10, padding: 0 }}>
