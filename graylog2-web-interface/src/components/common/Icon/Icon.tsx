@@ -40,27 +40,34 @@ const spinAnimation = keyframes`
   }
 `;
 
+type ColorVariants = 'success' | 'warning';
+
 const StyledSpan = styled.span<{
+  $bsStyle: ColorVariants | undefined,
   $size: string,
   $spin: boolean,
   $rotation: RotateProp
   $flip: FlipProp,
   $fill: boolean
 }>(({
+  $bsStyle,
   $size,
   $spin,
   $rotation,
   $flip,
   $fill,
+  theme,
 }) => css`
   font-variation-settings: 'opsz' 48, 'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
   font-size: ${sizeMap[$size] ?? '1.15em'};
   transform: rotate(${$rotation}deg) scaleY(${$flip === 'horizontal' || $flip === 'both' ? -1 : 1}) scaleX(${$flip === 'vertical' || $flip === 'both' ? -1 : 1});
   animation: ${$spin ? css`${spinAnimation} 2s infinite linear` : 'none'};
   vertical-align: middle;
+  color: ${$bsStyle ? theme.colors.button[$bsStyle].background : 'inherit'};
 `);
 
 type Props = {
+  bsStyle?: ColorVariants; // if this prop is not defined, the inherited font color will be used.
   className?: string,
   'data-testid'?: string,
   /** Name of Material Symbol icon */
@@ -90,6 +97,7 @@ type Props = {
  * Have a look at the `BrandIcon` component for brand icons.
  */
 const Icon = ({
+  bsStyle,
   name,
   type,
   size,
@@ -115,6 +123,7 @@ const Icon = ({
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               tabIndex={tabIndex}
+              $bsStyle={bsStyle}
               $rotation={rotation}
               $flip={flip}
               $size={size}
