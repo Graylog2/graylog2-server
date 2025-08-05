@@ -18,6 +18,8 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useCallback } from 'react';
 
+import { isAnyPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
 import { StreamsStore } from 'stores/streams/StreamsStore';
@@ -52,7 +54,12 @@ type Props = {
 };
 
 const StatusCell = ({ stream }: Props) => {
-  const disableChange = stream.is_default || !stream.is_editable;
+  const currentUser = useCurrentUser();
+  const userHasPermissions = isAnyPermitted(currentUser.permissions, [
+    `streams:changestate:${stream.id}`,
+    `streams:edit:${stream.id}`,
+  ]);
+  const disableChange = stream.is_default || !stream.is_editable || !userHasPermissions;
   const description = stream.disabled ? 'Paused' : 'Running';
   const title = _title(stream.disabled, disableChange, description);
   const sendTelemetry = useSendTelemetry();
