@@ -202,6 +202,7 @@ const DataAdapterForm = ({
 
               setFieldValue(`config.${name}`, updatedValue);
             },
+            setFieldValue,
             ref: (ref) => {
               configRef.current = ref;
               setConfigReady(true);
