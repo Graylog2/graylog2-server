@@ -22,6 +22,8 @@ can only talk to Kafka brokers with version 2.1 or newer.
   all existing users with the `Reader` role to ensure backwards compatibility. New users that will be created in the
   future need to be explicitly assigned to the `Cluster Configuration Reader` role if they should be able to access the
   page.
+- Only admins are allowed to create a new API token. Existing tokens are not affected by this change. Also, new tokens
+  will expire after 30 days by default.
 
 ## Java API Changes
 
