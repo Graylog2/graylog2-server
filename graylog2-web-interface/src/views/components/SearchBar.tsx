@@ -75,6 +75,8 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useViewsSelector from 'views/stores/useViewsSelector';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -195,6 +197,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const { parameters } = useParameters();
   const currentQuery = useCurrentQuery();
   const queryFilters = useQueryFilters();
+  const results = useViewsSelector(selectCurrentQueryResults);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useViewsDispatch();
@@ -249,6 +252,11 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                           onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                           value={values?.timerange}
                           hasErrorOnMount={!!errors.timerange}
+                          moveRangeProps={{
+                            effectiveTimerange: results?.effectiveTimerange,
+                            initialTimerange: currentQuery.timerange,
+                            initialTimerangeFormat: 'internalIndexer',
+                          }}
                         />
                         <StreamsAndRefresh>
                           <Field name="streams">
