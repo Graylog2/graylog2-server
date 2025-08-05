@@ -15,12 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import styled, { css } from 'styled-components';
+import * as React from 'react';
+import { forwardRef } from 'react';
 
-import { CountBadge } from 'components/common';
+import { Badge } from 'components/bootstrap';
 
-const StreamCountBadge = styled(CountBadge)<{ $disabled: boolean }>(({ $disabled, theme }) => css`
-  cursor: pointer;
-  background-color: ${$disabled ? theme.colors.variant.default : theme.colors.variant.light.info};
+const StyledBadge = styled(Badge)<{ onClick:() => void }>(({ onClick }) => css`
+  cursor: ${onClick ? 'pointer' : 'default'};
 `);
 
-export default StreamCountBadge;
+type Props = {
+  disabled?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+  title: string;
+};
+
+const StreamCountBadge = (
+  { disabled = false, children, onClick = undefined, title }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <StyledBadge bsStyle={disabled ? 'gray' : 'info'} onClick={onClick} title={title} ref={ref}>
+    {children}
+  </StyledBadge>
+);
+
+export default forwardRef(StreamCountBadge);
