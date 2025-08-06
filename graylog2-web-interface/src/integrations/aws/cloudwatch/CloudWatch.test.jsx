@@ -54,7 +54,7 @@ const TestCommonProviders = ({ children }) => (
       <FormDataProvider initialFormData={exampleFormDataWithKeySecretAuth}>
         <SidebarContext.Provider
           value={{
-            sidebar: <></>,
+            sidebar: <div />,
             clearSidebar: jest.fn(),
           }}>
           {children}

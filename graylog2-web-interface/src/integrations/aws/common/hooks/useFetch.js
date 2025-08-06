@@ -110,6 +110,7 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
     return () => {
       isFetchable = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qualifiedURL]);
 
   return [{ loading, error, data }, setFetchUrl];

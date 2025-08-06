@@ -55,6 +55,7 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
 
   useEffect(() => {
     onChange({ target: { name: 'awsAuthenticationType', value: defaultAuthTypeValue } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isType = (type) => currentType === type;
