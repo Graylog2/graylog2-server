@@ -1,6 +1,8 @@
 package org.graylog2.server.search.services;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.InternalServerErrorException;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -32,12 +34,12 @@ import java.util.stream.Collectors;
  * Accepts a query string and pivot field name, builds and executes the search,
  * handles errors, and extracts pivot values.
  */
-@jakarta.inject.Singleton
+@Singleton
 public class PivotSearchService {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSearchService.class);
     private final SearchExecutor searchExecutor;
 
-    @jakarta.inject.Inject
+    @Inject
     public PivotSearchService(SearchExecutor searchExecutor) {
         this.searchExecutor = searchExecutor;
     }
