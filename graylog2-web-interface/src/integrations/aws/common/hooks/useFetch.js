@@ -18,8 +18,8 @@ import { useContext, useEffect, useState } from 'react';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 
-import { FormDataContext } from '../../context/FormData';
 import { toAWSRequest } from '../formDataAdapter';
 
 /* useFetch Custom Hook
@@ -110,6 +110,7 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
     return () => {
       isFetchable = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qualifiedURL]);
 
   return [{ loading, error, data }, setFetchUrl];

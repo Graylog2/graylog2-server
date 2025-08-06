@@ -14,14 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import * as React from 'react';
 
-import { ClusterSystemLoggers } from '@graylog/server-api';
+import { singleton } from 'logic/singleton';
+import type { FieldData, FormDataType } from 'integrations/types';
 
-const useLoggers = () =>
-  useQuery({
-    queryKey: ['loggers', 'loggers'],
-    queryFn: () => ClusterSystemLoggers.loggers(),
-  });
+type ContextValue = {
+  formData: FormDataType;
+  setFormData: (id: string, fieldData: FieldData) => void;
+  clearField: (id: string) => void;
+};
 
-export default useLoggers;
+const FormDataContext = React.createContext<ContextValue | undefined>(undefined);
+export default singleton('contexts.integrations.FormDataContext', () => FormDataContext);
