@@ -88,7 +88,11 @@ class EventDefinitionDescription extends React.Component<
         .duration(definition.config.search_within_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
-      schedulingInformation = `Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
+      const searchWithinMessage = definition.config.search_within_ms
+        ? `, searching within the last ${searchWithinFormatted}.`
+        : '.';
+
+      schedulingInformation = `Runs ${executeEveryFormatted}${searchWithinMessage}`;
     }
 
     return schedulingInformation;
