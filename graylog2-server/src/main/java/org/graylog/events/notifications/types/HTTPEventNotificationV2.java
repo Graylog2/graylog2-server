@@ -39,7 +39,6 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.jackson.TypeReferences;
-import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
@@ -113,7 +112,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                                    NotificationService notificationService,
                                    NodeId nodeId,
                                    final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
-        super(whitelistService, urlWhitelistNotificationService, encryptedValueService);
+        super(whitelistService, urlWhitelistNotificationService, encryptedValueService, notificationService, nodeId);
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = objectMapperProvider;
         this.configurationProvider = configurationProvider;
@@ -185,16 +184,6 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
             createSystemErrorNotification("Error: " + e.getMessage(), ctx);
             throw new PermanentEventNotificationException(e.getMessage());
         }
-    }
-
-    private void createSystemErrorNotification(String message, EventNotificationContext ctx) {
-        final Notification systemNotification = notificationService.buildNow()
-                .addNode(nodeId.getNodeId())
-                .addType(Notification.Type.GENERIC)
-                .addSeverity(Notification.Severity.URGENT)
-                .addDetail("title", "Custom HTTP Notification Failed")
-                .addDetail("description", message + " for notification [" + ctx.notificationId() + "]");
-        notificationService.publishIfFirst(systemNotification);
     }
 
     private MediaType getMediaType(HTTPEventNotificationConfigV2.ContentType contentType) {

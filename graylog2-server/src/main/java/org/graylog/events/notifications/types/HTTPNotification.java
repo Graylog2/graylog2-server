@@ -20,8 +20,12 @@ import com.google.common.base.Strings;
 import com.unboundid.util.Base64;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
+import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
@@ -33,13 +37,18 @@ public class HTTPNotification {
     private final UrlWhitelistService whitelistService;
     private final UrlWhitelistNotificationService urlWhitelistNotificationService;
     private final EncryptedValueService encryptedValueService;
+    private final NotificationService notificationService;
+    private final NodeId nodeId;
 
     public HTTPNotification(UrlWhitelistService whitelistService,
                             UrlWhitelistNotificationService urlWhitelistNotificationService,
-                            EncryptedValueService encryptedValueService) {
+                            EncryptedValueService encryptedValueService,
+                            NotificationService notificationService, NodeId nodeId) {
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
         this.encryptedValueService = encryptedValueService;
+        this.notificationService = notificationService;
+        this.nodeId = nodeId;
     }
 
 
@@ -109,6 +118,16 @@ public class HTTPNotification {
                 "\" is trying to access a URL which is not whitelisted. Please check your configuration. [url: \"" +
                 url + "\"]";
         urlWhitelistNotificationService.publishWhitelistFailure(description);
+    }
+
+    void createSystemErrorNotification(String message, EventNotificationContext ctx) {
+        final Notification systemNotification = notificationService.buildNow()
+                .addNode(nodeId.getNodeId())
+                .addType(Notification.Type.GENERIC)
+                .addSeverity(Notification.Severity.URGENT)
+                .addDetail("title", "Custom HTTP Notification Failed")
+                .addDetail("description", message + " for notification [" + ctx.notificationId() + "]");
+        notificationService.publishIfFirst(systemNotification);
     }
 
     static String buildRetryMessage(int status) {

@@ -32,7 +32,9 @@ import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
@@ -67,8 +69,10 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
                                  UrlWhitelistNotificationService urlWhitelistNotificationService,
                                  EncryptedValueService encryptedValueService,
                                  EventsConfigurationProvider configurationProvider,
+                                 NotificationService notificationService,
+                                 NodeId nodeId,
                                  final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
-        super(whitelistService, urlWhitelistNotificationService, encryptedValueService);
+        super(whitelistService, urlWhitelistNotificationService, encryptedValueService, notificationService, nodeId);
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.configurationProvider = configurationProvider;
@@ -100,7 +104,9 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
         try {
             body = objectMapper.writeValueAsBytes(model);
         } catch (JsonProcessingException e) {
-            throw new PermanentEventNotificationException("Unable to serialize notification", e);
+            final String errorMessage = "Unable to serialize notification";
+            createSystemErrorNotification(errorMessage, ctx);
+            throw new PermanentEventNotificationException(errorMessage, e);
         }
 
         final Request request = builder
@@ -116,13 +122,18 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
             if (!r.isSuccessful()) {
                 final int status = r.code();
                 if (HTTPUtils.isRetryableStatus(status)) {
-                    throw new TemporaryEventNotificationException(buildRetryMessage(status));
+                    final String retryMessage = buildRetryMessage(status);
+                    createSystemErrorNotification(retryMessage, ctx);
+                    throw new TemporaryEventNotificationException(retryMessage);
                 }
-                throw new PermanentEventNotificationException(
-                        "Expected successful HTTP response [2xx] but got [" + status + "]. " + config.url());
+                final String errorMessage = "Expected successful HTTP response [2xx] but got [" + status + "]. " + config.url();
+                createSystemErrorNotification(errorMessage, ctx);
+                throw new PermanentEventNotificationException(errorMessage);
             }
         } catch (IOException e) {
-            throw new PermanentEventNotificationException(e.getMessage());
+            final String errorMessage = e.getMessage();
+            createSystemErrorNotification("Error: " + errorMessage, ctx);
+            throw new PermanentEventNotificationException(errorMessage);
         }
     }
 }
