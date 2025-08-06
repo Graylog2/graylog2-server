@@ -22,6 +22,7 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBea
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.InputStreamConfigFile;
+import org.graylog.datanode.process.configuration.files.TextConfigFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,9 +45,15 @@ import java.util.List;
 public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     @Override
-    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
         return DatanodeConfigurationPart.builder()
-                .configFiles(collectConfigFiles())
+                .withConfigFiles(collectConfigFiles())
+                .withConfigFile(new TextConfigFile(Path.of("opensearch.policy"), """
+                        grant {
+                          permission java.lang.RuntimePermission "accessUserInformation";
+                        };
+                        """))
+                .systemProperty("java.security.policy", configurationParams.targetConfigDir().resolve("opensearch.policy").toAbsolutePath().toString())
                 .build();
     }
 
@@ -58,22 +65,22 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         // from previous runs.
         final Path sourceOfInitialConfiguration = Path.of("opensearch", "config");
         try {
-            return synchronizeConfig(sourceOfInitialConfiguration);
+            return readConfigFiles(sourceOfInitialConfiguration);
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<DatanodeConfigFile> synchronizeConfig(Path configRelativePath) throws URISyntaxException, IOException {
+    public List<DatanodeConfigFile> readConfigFiles(Path configRelativePath) throws URISyntaxException, IOException {
         final URI uriToConfig = OpensearchDefaultConfigFilesBean.class.getResource("/" + configRelativePath.toString()).toURI();
         if ("jar".equals(uriToConfig.getScheme())) {
-            return copyFromJar(configRelativePath, uriToConfig);
+            return readFromJar(configRelativePath, uriToConfig);
         } else {
-            return copyFromLocalFs(configRelativePath);
+            return readFromLocalFs(configRelativePath);
         }
     }
 
-    private static List<DatanodeConfigFile> copyFromJar(Path configRelativePath, URI uri) throws IOException {
+    private static List<DatanodeConfigFile> readFromJar(Path configRelativePath, URI uri) throws IOException {
         try (
                 final FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap());
         ) {
@@ -84,7 +91,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         }
     }
 
-    private static List<DatanodeConfigFile> copyFromLocalFs(Path configRelativePath) throws URISyntaxException, IOException {
+    private static List<DatanodeConfigFile> readFromLocalFs(Path configRelativePath) throws URISyntaxException, IOException {
         final Path source = Paths.get(OpensearchDefaultConfigFilesBean.class.getResource("/" + configRelativePath).toURI());
         return collectRecursively(source);
     }

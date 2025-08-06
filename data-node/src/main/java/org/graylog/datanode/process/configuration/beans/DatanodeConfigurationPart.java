@@ -89,7 +89,12 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+        abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+
+        public Builder withConfigFiles(Collection<DatanodeConfigFile> configFiles) {
+            configFilesBuilder().addAll(configFiles);
+            return this;
+        }
 
         abstract ImmutableList.Builder<DatanodeConfigFile> configFilesBuilder();
 
