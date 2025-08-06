@@ -1,15 +1,15 @@
 package org.graylog2.server.search.services;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import jakarta.ws.rs.InternalServerErrorException;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -19,84 +19,76 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * A utility service to simplify execution of basic pivot searches in the backend.
- * Accepts the variable parts (query, pivot field) and handles search building, execution, result parsing, and error handling.
+ * Utility service for executing basic pivot search queries.
+ * Accepts a query string and pivot field name, builds and executes the search,
+ * handles errors, and extracts pivot values.
  */
-@Singleton
+@jakarta.inject.Singleton
 public class PivotSearchService {
-
     private static final Logger LOG = LoggerFactory.getLogger(PivotSearchService.class);
-
     private final SearchExecutor searchExecutor;
 
-    @Inject
+    @jakarta.inject.Inject
     public PivotSearchService(SearchExecutor searchExecutor) {
         this.searchExecutor = searchExecutor;
     }
 
-    /**
-     * Executes a pivot search for the given query and field.
-     *
-     * @param query          Search query string (e.g., "status:500").
-     * @param pivotFieldName Field to pivot on (e.g., "host").
-     * @param searchUser     Search user (permissions).
-     * @return Map of pivot value -> count
-     */
     public Map<String, Long> findPivotValues(String query, String pivotFieldName, SearchUser searchUser) {
         final String searchTypeId = "pivot-" + pivotFieldName + "-" + UUID.randomUUID();
+        final String queryId = "pivot-query";
 
-        // 1. Build Pivot search type
-        final SearchType pivotSearchType = Pivot.builder()
-                .id(searchTypeId)
-                .rollup(true)
-                .rowGroups(Values.builder().fields(List.of(pivotFieldName)).build())
-                .series(Count.builder().build())
-                .build();
+        final Pivot pivotSearchType = Pivot.builder()
+            .id(searchTypeId)
+            .rollup(true)
+            .rowGroups(Values.builder().fields(List.of(pivotFieldName)).build())
+            .series(Count.builder().build())
+            .build();
 
-        // 2. Build Search object (using ElasticsearchQueryString instead of QueryString)
         final Search search = Search.builder()
-                .queries(ImmutableSet.of(
-                        Query.builder()
-                                .id("pivot-query")
-                                .query(ElasticsearchQueryString.of(query))
-                                .timerange(RelativeRange.create(900)) // 15 minutes
-                                .searchTypes(Collections.singleton(pivotSearchType))
-                                .build()
-                ))
-                .build();
+            .queries(ImmutableSet.of(
+                Query.builder()
+                    .id(queryId)
+                    .query(ElasticsearchQueryString.of(query))
+                    .timerange(RelativeRange.create(900))
+                    .searchTypes(Collections.singleton(pivotSearchType))
+                    .build()))
+            .build();
 
-        // 3. Execute search
-        final SearchJob searchJob = this.searchExecutor.executeSync(search, searchUser);
+        final SearchJob job = this.searchExecutor.executeSync(search, searchUser, null);
 
         // 4. Check for errors
-        final Set<String> errors = searchJob.errors().get("pivot-query");
+        final Set<SearchError> errors = job.getErrors();
         if (errors != null && !errors.isEmpty()) {
-            String errorMsg = String.format(
-                    "Error executing pivot search for field '%s': %s",
-                    pivotFieldName,
-                    String.join(", ", errors)
-            );
-            LOG.error(errorMsg);
-            throw new InternalServerErrorException(errorMsg);
+            final String err = "Error executing pivot search for field '" + pivotFieldName + "': " + errors.stream().map(SearchError::description).collect(Collectors.joining(", "));
+            LOG.error(err);
+            throw new InternalServerErrorException(err);
         }
 
         // 5. Extract Pivot results
-        final var aggregationResult = searchJob.results().get(searchTypeId);
-        if (aggregationResult instanceof PivotResult pivotResult) {
-            return pivotResult.rows().stream()
-                    .filter(row -> row.source().equals("leaf"))
+        final Optional<QueryResult> queryResult = Optional.ofNullable(job.results().get(queryId));
+        if (queryResult.isPresent()) {
+            final SearchType.Result result = queryResult.get().searchTypes().get(searchTypeId);
+            if (result instanceof PivotResult) {
+                final PivotResult pivotResult = (PivotResult) result;
+                return pivotResult.rows().stream()
+                    .filter(r -> "leaf".equals(r.source()))
                     .collect(Collectors.toMap(
-                            row -> (String) row.key().get("key"),
-                            PivotResult.Row::count,
-                            Long::sum
-                    ));
+                        r -> r.key().get(0),
+                        (row) -> (Long) row.values().get(0).value(),
+                        Long::sum));
+            }
         }
 
-        LOG.warn("Pivot search for field '{}' returned no results or a non-pivot result type.", pivotFieldName);
+        LOG.warn("Pivot result is not of expected type for field '{}'", pivotFieldName);
         return Collections.emptyMap();
     }
 }
