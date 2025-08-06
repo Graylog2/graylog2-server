@@ -57,7 +57,7 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const assignRoleButton = screen.getByRole('button', { name: 'Assign Role' });
-    await selectEvent.selectOption('Search for roles', notAssignedRole.name);
+    await selectEvent.chooseOption('Search for roles', notAssignedRole.name);
     fireEvent.click(assignRoleButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));

@@ -161,8 +161,8 @@ describe('EntityShareModal', () => {
       const addGrantee = async ({ newGrantee, capability }) => {
         render(<SimpleEntityShareModal />);
 
-        await selectEvent.selectOption('Search for users and teams', newGrantee.title);
-        await selectEvent.selectOption('Select a capability', capability.title);
+        await selectEvent.chooseOption('Search for users and teams', newGrantee.title);
+        await selectEvent.chooseOption('Select a capability', capability.title);
 
         // Submit form
         const submitButton = await screen.findByRole('button', {
@@ -197,7 +197,7 @@ describe('EntityShareModal', () => {
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
       render(<SimpleEntityShareModal />);
 
-      await selectEvent.selectOption('Search for users and teams', john.title);
+      await selectEvent.chooseOption('Search for users and teams', john.title);
 
       fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
@@ -221,7 +221,7 @@ describe('EntityShareModal', () => {
       const ownerTitle = jane.title;
       render(<SimpleEntityShareModal />);
 
-      await selectEvent.selectOption(`Change the capability for ${ownerTitle}`, viewer.title);
+      await selectEvent.chooseOption(`Change the capability for ${ownerTitle}`, viewer.title);
 
       await waitFor(() => {
         expect(screen.queryAllByText(viewer.title)).toHaveLength(2);

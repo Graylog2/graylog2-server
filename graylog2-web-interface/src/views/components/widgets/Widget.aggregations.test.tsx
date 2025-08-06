@@ -166,12 +166,12 @@ describe('Aggregation Widget', () => {
         const nameInput = await screen.findByLabelText(/Name/);
         await userEvent.type(nameInput, 'Metric name');
 
-        await selectEvent.selectOption('Select a function', 'Count');
+        await selectEvent.chooseOption('Select a function', 'Count');
 
         await findWidgetConfigSubmitButton();
 
         // Change widget search controls
-        await selectEvent.selectOption(
+        await selectEvent.chooseOption(
           'Select streams the search should include. Searches in all streams if empty.',
           'Stream 1',
         );
@@ -246,7 +246,7 @@ describe('Aggregation Widget', () => {
         const nameInput = await screen.findByLabelText(/Name/);
         await userEvent.type(nameInput, 'Metric name');
 
-        await selectEvent.selectOption('Select a function', 'Count');
+        await selectEvent.chooseOption('Select a function', 'Count');
 
         await findWidgetConfigSubmitButton();
 

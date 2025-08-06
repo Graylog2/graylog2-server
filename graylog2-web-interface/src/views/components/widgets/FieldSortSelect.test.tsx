@@ -46,7 +46,7 @@ describe('FieldSortSelect', () => {
     const onChangeStub = jest.fn();
     render(<FieldSortSelect fields={fields} onChange={onChangeStub} sort={sort} />);
 
-    await selectEvent.selectOption('Select field for sorting', 'date');
+    await selectEvent.chooseOption('Select field for sorting', 'date');
 
     const updateSort = [new SortConfig('pivot', 'date', Direction.Ascending)];
     await waitFor(() => expect(onChangeStub).toHaveBeenCalledTimes(1));

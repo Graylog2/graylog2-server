@@ -78,8 +78,8 @@ describe('EditProfile', () => {
 
     fireEvent.change(name, { target: { value: 'Profile 1 new name' } });
 
-    await selectEvent.selectOption('select customFieldMappings.0.field', 'date');
-    await selectEvent.selectOption('select customFieldMappings.0.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.0.field', 'date');
+    await selectEvent.chooseOption('select customFieldMappings.0.type', 'String type');
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);
 
@@ -107,8 +107,8 @@ describe('EditProfile', () => {
 
     const submitButton = await screen.findByTitle(/update profile/i);
 
-    await selectEvent.selectOption('select customFieldMappings.2.field', 'date');
-    await selectEvent.selectOption('select customFieldMappings.2.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.2.field', 'date');
+    await selectEvent.chooseOption('select customFieldMappings.2.type', 'String type');
 
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);

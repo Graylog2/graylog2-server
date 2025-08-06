@@ -89,10 +89,10 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT onSetEntityShare={mockOnSetEntityShare} />);
 
     // Select a grantee
-    await selectEvent.selectOption('Search for users and teams', everyone.title);
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
 
     // Select a capability
-    await selectEvent.selectOption('Select a capability', viewer.title);
+    await selectEvent.chooseOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,

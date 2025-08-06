@@ -190,7 +190,7 @@ describe('ChangeFieldTypeModal', () => {
   it('Shows type options', async () => {
     renderChangeFieldTypeModal({});
 
-    await selectEvent.findOption('select field type for field', 'Boolean');
+    await selectEvent.assertOptionExists('select field type for field', 'Boolean');
   });
 
   it('Shows index sets data', async () => {
@@ -207,7 +207,7 @@ describe('ChangeFieldTypeModal', () => {
   it('run putFieldTypeMutationMock with selected type and indexes', async () => {
     renderChangeFieldTypeModal({});
 
-    await selectEvent.selectOption('select field type for field', 'Number(int)');
+    await selectEvent.chooseOption('select field type for field', 'Number(int)');
 
     const submit = await screen.findByTitle(/change field type/i);
 
@@ -228,7 +228,7 @@ describe('ChangeFieldTypeModal', () => {
   it('run putFieldTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
     renderChangeFieldTypeModal({ initialSelectedIndexSets: ['id-2'] });
 
-    await selectEvent.selectOption('select field type for field', 'Number(int)');
+    await selectEvent.chooseOption('select field type for field', 'Number(int)');
 
     const submit = await screen.findByTitle(/change field type/i);
 

@@ -65,7 +65,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     await screen.findByRole('heading', { name: /assign index set to 2 streams/i });
 
-    await selectEvent.selectOption('Index Set', 'Example Index Set');
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
 
     const submitButton = await screen.findByRole('button', { name: /assign index set/i });
 

@@ -68,8 +68,8 @@ const submitWidgetConfigForm = async () => {
 
 const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
   const httpMethodSortContainer = await screen.findByTestId(sortElementContainerId);
-  await selectEvent.selectOption('Select field for sorting', option, { container: httpMethodSortContainer });
-  await selectEvent.selectOption('Select direction for sorting', 'Descending', { container: httpMethodSortContainer });
+  await selectEvent.chooseOption('Select field for sorting', option, { container: httpMethodSortContainer });
+  await selectEvent.chooseOption('Select direction for sorting', 'Descending', { container: httpMethodSortContainer });
 
   await within(httpMethodSortContainer).findByText('Descending');
 };

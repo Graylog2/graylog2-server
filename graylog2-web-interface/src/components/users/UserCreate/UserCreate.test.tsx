@@ -88,9 +88,9 @@ describe('<UserCreate />', () => {
       await userEvent.clear(timeoutAmountInput);
       await userEvent.type(timeoutAmountInput, '40');
 
-      await selectEvent.selectOption('Time Zone', 'Berlin');
+      await selectEvent.chooseOption('Time Zone', 'Berlin');
 
-      await selectEvent.selectOption('search for roles', 'Manager');
+      await selectEvent.chooseOption('search for roles', 'Manager');
 
       await userEvent.type(passwordInput, 'thepassword');
       await userEvent.type(passwordRepeatInput, 'thepassword');

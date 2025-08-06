@@ -69,7 +69,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run setIndexSetFieldTypeProfile on submit with rotation', async () => {
     renderModal();
-    await selectEvent.selectOption('Select index set profile', 'Profile-2');
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
     const submit = await screen.findByRole('button', { name: /Set Profile/i });
     fireEvent.click(submit);
 
@@ -82,7 +82,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run setIndexSetFieldTypeProfile on submit without rotation', async () => {
     renderModal();
-    await selectEvent.selectOption('Select index set profile', 'Profile-2');
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
     const submit = await screen.findByRole('button', { name: /Set Profile/i });
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,

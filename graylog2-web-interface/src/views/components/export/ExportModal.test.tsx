@@ -368,7 +368,7 @@ describe('ExportModal', () => {
 
       await screen.findByText(/Please select the message table you want to export the search results for./);
 
-      await selectEvent.findOption('Select message table', ['Widget 1', 'Widget 2']);
+      await selectEvent.assertOptionExists('Select message table', ['Widget 1', 'Widget 2']);
     });
 
     it('show widget selection with widgets from all dashboard pages', async () => {
@@ -389,7 +389,7 @@ describe('ExportModal', () => {
 
       render(<DashboardExportModal view={complexView} />);
 
-      await selectEvent.findOption('Select message table', ['Widget 1', 'Widget 2']);
+      await selectEvent.assertOptionExists('Select message table', ['Widget 1', 'Widget 2']);
     });
 
     it('preselect widget on direct widget export', () => {

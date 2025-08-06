@@ -60,7 +60,7 @@ describe('SelectExtractorType', () => {
       </AdditionalContext.Provider>,
     );
 
-    await selectEvent.selectOption('select extractor type', 'Grok pattern');
+    await selectEvent.chooseOption('select extractor type', 'Grok pattern');
 
     await userEvent.click(await screen.findByRole('button', { name: /submit/i }));
 

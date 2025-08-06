@@ -61,7 +61,7 @@ const addGrouping = async () => {
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
   const groupingContainer = await screen.findByTestId(`grouping-${groupingIndex}`);
 
-  await selectEvent.selectOption(fieldSelectLabel, fieldName, { container: groupingContainer });
+  await selectEvent.chooseOption(fieldSelectLabel, fieldName, { container: groupingContainer });
 };
 
 const submitWidgetConfigForm = async () => {

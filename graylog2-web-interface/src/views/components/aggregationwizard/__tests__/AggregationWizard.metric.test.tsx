@@ -66,8 +66,8 @@ const submitWidgetConfigForm = async () => {
 const selectMetric = async (functionName: string, fieldName: string, elementIndex = 0) => {
   const metricContainer = await screen.findByTestId(`metric-${elementIndex}`);
 
-  await selectEvent.selectOption('Select a function', functionName, { container: metricContainer });
-  await selectEvent.selectOption('Select a field', fieldName, { container: metricContainer });
+  await selectEvent.chooseOption('Select a function', functionName, { container: metricContainer });
+  await selectEvent.chooseOption('Select a field', fieldName, { container: metricContainer });
 };
 
 const extendedTimeout = applyTimeoutMultiplier(30000);
@@ -118,7 +118,7 @@ describe('AggregationWizard', () => {
 
       await addMetric();
 
-      await selectEvent.selectOption('Select a function', 'Minimum');
+      await selectEvent.chooseOption('Select a function', 'Minimum');
 
       await screen.findByText('Field is required for function min.');
     },
@@ -205,7 +205,7 @@ describe('AggregationWizard', () => {
 
       expect(screen.getByText('Percentile is required.')).toBeInTheDocument();
 
-      await selectEvent.selectOption('Select percentile', '50');
+      await selectEvent.chooseOption('Select percentile', '50');
 
       await submitWidgetConfigForm();
 

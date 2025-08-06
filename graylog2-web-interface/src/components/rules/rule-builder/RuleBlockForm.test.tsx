@@ -62,7 +62,7 @@ describe('RuleBlockForm', () => {
   it('renders a select with all functions as options', async () => {
     render(comp());
 
-    await selectEvent.findOption(
+    await selectEvent.assertOptionExists(
       'Add action',
       options.map(({ label }) => label),
     );
@@ -76,7 +76,7 @@ describe('RuleBlockForm', () => {
     await selectEvent.openMenu(select);
     await selectEvent.select(select, 'set_field');
 
-    await selectEvent.selectOption('Add action', 'set_field');
+    await selectEvent.chooseOption('Add action', 'set_field');
 
     expect(mockSelect).toHaveBeenCalledWith('set_field');
   });

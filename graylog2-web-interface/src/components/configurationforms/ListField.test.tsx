@@ -54,7 +54,7 @@ describe('<ListField>', () => {
     expect(screen.queryByText('uno')).not.toBeInTheDocument();
     expect(screen.queryByText('dos')).not.toBeInTheDocument();
 
-    await selectEvent.findOption(listField.human_name, 'uno');
+    await selectEvent.assertOptionExists(listField.human_name, 'uno');
 
     expect(screen.getByText('dos')).toBeInTheDocument();
   });
@@ -71,7 +71,7 @@ describe('<ListField>', () => {
 
     render(<SUT onChange={updateFunction} />);
 
-    await selectEvent.selectOption(listField.human_name, ['uno', 'dos']);
+    await selectEvent.chooseOption(listField.human_name, ['uno', 'dos']);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['one', 'two']));
   });
 

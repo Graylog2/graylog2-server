@@ -269,7 +269,7 @@ describe('InputSetupWizard Start Input', () => {
 
       fireEvent.click(selectStreamButton);
 
-      await selectEvent.selectOption('Default Stream', 'One Stream');
+      await selectEvent.chooseOption('Default Stream', 'One Stream');
 
       goToStartInputStep();
       startInput();
@@ -298,7 +298,7 @@ describe('InputSetupWizard Start Input', () => {
 
       fireEvent.click(selectStreamButton);
 
-      await selectEvent.selectOption('Default Stream', 'One Stream');
+      await selectEvent.chooseOption('Default Stream', 'One Stream');
 
       const removeFromDefaultCheckbox = await screen.findByRole('checkbox', {
         name: /remove matches from ‘default stream’/i,

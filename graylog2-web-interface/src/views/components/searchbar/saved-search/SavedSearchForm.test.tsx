@@ -39,8 +39,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 const shareWithCollaborator = async () => {
-  await selectEvent.selectOption('Search for users and teams', everyone.title);
-  await selectEvent.selectOption('Select a capability', viewer.title);
+  await selectEvent.chooseOption('Search for users and teams', everyone.title);
+  await selectEvent.chooseOption('Select a capability', viewer.title);
 
   const addCollaborator = await screen.findByRole('button', {
     name: /add collaborator/i,

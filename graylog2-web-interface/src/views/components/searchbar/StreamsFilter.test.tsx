@@ -31,7 +31,7 @@ describe('StreamsFilter', () => {
     ];
     render(<StreamsFilter streams={streams} onChange={() => {}} />);
 
-    await selectEvent.findOption('select streams', [
+    await selectEvent.assertOptionExists('select streams', [
       '101 Stream',
       'Second Stream',
       'First Stream',

@@ -43,7 +43,7 @@ describe('Select', () => {
 
     render(<SimpleSelect options={options} onChange={onChange} />);
 
-    await selectEvent.selectOption('Select value', 'foo');
+    await selectEvent.chooseOption('Select value', 'foo');
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith('foo'));
   });
@@ -55,7 +55,7 @@ describe('Select', () => {
 
     render(<SimpleSelect options={options} onChange={onChange} />);
 
-    await selectEvent.selectOption('Select value', '42');
+    await selectEvent.chooseOption('Select value', '42');
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
   });
@@ -83,7 +83,7 @@ describe('Select', () => {
       const onChange = jest.fn();
       const { container } = render(<SimpleSelect onChange={onChange} clearable />);
 
-      await selectEvent.selectOption('Select value', 'label1');
+      await selectEvent.chooseOption('Select value', 'label1');
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1'));
 
@@ -108,7 +108,7 @@ describe('Select', () => {
       const customOptions = [{ label: 'label1', customValue: 42 }];
       render(<SimpleSelect options={customOptions} onChange={onChange} valueKey="customValue" menuIsOpen />);
 
-      await selectEvent.selectOption('Select value', 'label1');
+      await selectEvent.chooseOption('Select value', 'label1');
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
     });

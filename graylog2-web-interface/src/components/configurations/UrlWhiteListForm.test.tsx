@@ -113,7 +113,7 @@ describe('UrlWhitelistForm', () => {
 
     const row = await screen.findByRole('row', { name: /3/i });
 
-    await selectEvent.selectOption('Select url type', 'Regex', { container: row });
+    await selectEvent.chooseOption('Select url type', 'Regex', { container: row });
 
     const numberCalls = 2; // First render + debounce
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));

@@ -76,7 +76,7 @@ describe('AggregationWizard/Core Visualizations', () => {
     async () => {
       render(<SimpleAggregationWizard />);
 
-      await selectEvent.findOption('Select visualization type', [
+      await selectEvent.assertOptionExists('Select visualization type', [
         'Area Chart',
         'Bar Chart',
         'Data Table',
@@ -102,8 +102,8 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={areaChartConfig} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Area Chart');
-      await selectEvent.selectOption('Select Interpolation', 'step-after');
+      await selectEvent.chooseOption('Select visualization type', 'Area Chart');
+      await selectEvent.chooseOption('Select Interpolation', 'step-after');
       await expectSubmitButtonNotToBeDisabled();
 
       userEvent.click(await submitButton());
@@ -133,8 +133,8 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={barChartConfig} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Bar Chart');
-      await selectEvent.selectOption('Select Mode', 'Stack');
+      await selectEvent.chooseOption('Select visualization type', 'Bar Chart');
+      await selectEvent.chooseOption('Select Mode', 'Stack');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -165,8 +165,8 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={lineChartConfig} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Line Chart');
-      await selectEvent.selectOption('Select Interpolation', 'spline');
+      await selectEvent.chooseOption('Select visualization type', 'Line Chart');
+      await selectEvent.chooseOption('Select Interpolation', 'spline');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -198,7 +198,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={timelineConfig} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Line Chart');
+      await selectEvent.chooseOption('Select visualization type', 'Line Chart');
 
       userEvent.click(await screen.findByRole('checkbox', { name: /show event annotations/i }));
 
@@ -229,7 +229,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} config={heatMapConfig} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Heatmap');
+      await selectEvent.chooseOption('Select visualization type', 'Heatmap');
 
       const useSmallestAsDefault = await screen.findByRole('checkbox', { name: 'Use smallest as default' });
       userEvent.click(useSmallestAsDefault);
@@ -262,7 +262,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard onChange={onChange} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Single Number');
+      await selectEvent.chooseOption('Select visualization type', 'Single Number');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -270,7 +270,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonToBeDisabled();
 
-      await selectEvent.selectOption('Select Trend Preference', 'Higher');
+      await selectEvent.chooseOption('Select Trend Preference', 'Higher');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -303,7 +303,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       render(<SimpleAggregationWizard config={areaChart} onChange={onChange} />);
 
-      await selectEvent.selectOption('Select visualization type', 'Data Table');
+      await selectEvent.chooseOption('Select visualization type', 'Data Table');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -335,7 +335,7 @@ describe('AggregationWizard/Core Visualizations', () => {
       async ({ visualization, error }: { visualization: string; error: string }) => {
         render(<SimpleAggregationWizard />);
 
-        await selectEvent.selectOption('Select visualization type', visualization);
+        await selectEvent.chooseOption('Select visualization type', visualization);
 
         await expectSubmitButtonToBeDisabled();
 

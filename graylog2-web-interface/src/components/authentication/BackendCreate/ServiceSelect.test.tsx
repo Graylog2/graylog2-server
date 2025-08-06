@@ -39,7 +39,7 @@ describe('ServiceSelect', () => {
   it('should redirect correctly after selecting LDAP', async () => {
     render(<ServiceSelect />);
 
-    await selectEvent.selectOption('Select a service', 'LDAP');
+    await selectEvent.chooseOption('Select a service', 'LDAP');
 
     const submitButton = await screen.findByRole('button', { name: 'Get started' });
     fireEvent.click(submitButton);
@@ -53,7 +53,7 @@ describe('ServiceSelect', () => {
   it('should redirect correctly after selecting active directory', async () => {
     render(<ServiceSelect />);
 
-    await selectEvent.selectOption('Select a service', 'Active Directory');
+    await selectEvent.chooseOption('Select a service', 'Active Directory');
 
     const submitButton = await screen.findByRole('button', { name: 'Get started' });
     fireEvent.click(submitButton);

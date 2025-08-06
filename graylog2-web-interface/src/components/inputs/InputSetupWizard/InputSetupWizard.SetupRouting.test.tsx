@@ -245,7 +245,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        await selectEvent.findOption('Default Stream', 'Aloho');
+        await selectEvent.assertOptionExists('Default Stream', 'Aloho');
 
         const moraOption = screen.queryByText(/Mora/i);
 
@@ -268,7 +268,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        await selectEvent.findOption('Default Stream', 'Mora');
+        await selectEvent.assertOptionExists('Default Stream', 'Mora');
 
         const alohoOption = screen.queryByText(/Aloho/i);
 
@@ -291,7 +291,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        await selectEvent.selectOption('Default Stream', 'Aloho');
+        await selectEvent.chooseOption('Default Stream', 'Aloho');
       });
 
       it('should show a warning if the selected stream has connected pipelines', async () => {
@@ -317,7 +317,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        await selectEvent.selectOption('Default Stream', 'Aloho');
+        await selectEvent.chooseOption('Default Stream', 'Aloho');
 
         const warning = await screen.findByText(/Pipelines connected to target Stream/i);
         const warningPipeline1 = await screen.findByText(/Pipeline1/i);
@@ -359,7 +359,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
-      await selectEvent.selectOption('Select an index set', 'Nox');
+      await selectEvent.chooseOption('Select an index set', 'Nox');
 
       fireEvent.click(removeMatchesCheckbox);
       fireEvent.click(newPipelineCheckbox);
@@ -387,7 +387,7 @@ describe('InputSetupWizard Setup Routing', () => {
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
-      await selectEvent.selectOption('Select an index set', 'Default');
+      await selectEvent.chooseOption('Select an index set', 'Default');
 
       expect(await screen.findByText(/You have selected the Default Index Set./i)).toBeInTheDocument();
     });
@@ -408,7 +408,7 @@ describe('InputSetupWizard Setup Routing', () => {
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
-      await selectEvent.selectOption('Select an index set', 'Nox');
+      await selectEvent.chooseOption('Select an index set', 'Nox');
 
       await screen.findByText(/Selected index set already associated with another stream/i);
     });

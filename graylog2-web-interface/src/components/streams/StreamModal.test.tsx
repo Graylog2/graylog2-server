@@ -95,7 +95,7 @@ describe('StreamModal', () => {
     await userEvent.type(title, ' and further title');
     await userEvent.type(description, ' and further description');
 
-    await selectEvent.selectOption('Index Set', 'Example Index Set');
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
 
     await screen.findByText('Example Index Set');
 
@@ -138,9 +138,9 @@ describe('StreamModal', () => {
     userEvent.type(title, 'New title');
     userEvent.type(description, 'New description');
 
-    await selectEvent.selectOption('Index Set', 'Example Index Set');
-    await selectEvent.selectOption('Search for users and teams', everyone.title);
-    await selectEvent.selectOption('Select a capability', viewer.title);
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
+    await selectEvent.chooseOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,

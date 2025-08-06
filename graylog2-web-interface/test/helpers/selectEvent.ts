@@ -40,7 +40,7 @@ const findSelectInput = (name: string, config?: { container: HTMLElement }) => {
 
   return queryRoot.findByRole('combobox', { name: new RegExp(name, 'i') });
 };
-const findOption = async (
+const assertOptionExists = async (
   selectName: string,
   optionName: (string | RegExp) | Array<string | RegExp>,
   config?: { container: HTMLElement },
@@ -53,7 +53,7 @@ const findOption = async (
 };
 
 // The select name should ideally be the HTML label. If there is no label, you can use the placeholder text.
-const selectOption = async (
+const chooseOption = async (
   selectName: string,
   optionName: (string | RegExp) | Array<string | RegExp>,
   config?: { container: HTMLElement },
@@ -71,7 +71,7 @@ export default {
   openMenu: selectEvent.openMenu,
   create: customCreate,
   select: customSelect,
-  selectOption,
+  chooseOption,
   findSelectInput,
-  findOption,
+  assertOptionExists,
 };

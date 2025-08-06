@@ -90,7 +90,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectEvent.selectOption('select customFieldMappings.1.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('String type')).toHaveLength(2);
@@ -115,8 +115,8 @@ describe('IndexSetFieldTypesList', () => {
 
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectEvent.selectOption('select customFieldMappings.1.type', 'String type');
-    await selectEvent.selectOption('select customFieldMappings.1.field', 'http_method');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.field', 'http_method');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('http_method')).toHaveLength(2);
