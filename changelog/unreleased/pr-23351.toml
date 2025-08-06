@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed errors on Event Definition create wizard 'Share' page for definition types that don't use streams."
+
+pulls = ["23351"]
