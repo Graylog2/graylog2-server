@@ -21,6 +21,8 @@ import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import MockComponent from 'helpers/mocking/MockComponent';
+import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
 
@@ -40,7 +42,7 @@ const mockEntity = {
   entityType: 'stream',
   entityId: null,
 };
-
+jest.mock('hooks/usePluggableEntityShareFormGroup');
 jest.setTimeout(10000);
 
 const SUT = ({ ...props }) => (
@@ -57,6 +59,7 @@ const SUT = ({ ...props }) => (
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(usePluggableEntityShareFormGroup).mockReturnValue(MockComponent('FormGroup'));
   });
 
   beforeAll(() => {

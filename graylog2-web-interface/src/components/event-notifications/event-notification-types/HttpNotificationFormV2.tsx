@@ -17,7 +17,6 @@
 import type { SyntheticEvent } from 'react';
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 import styled from 'styled-components';
 
 import { Select, SourceCodeEditor, TimezoneSelect, URLWhiteListInput } from 'components/common';
@@ -218,7 +217,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
           label="URL"
           onChange={this.handleUrlChange}
           validationState={validation.errors.url ? 'error' : null}
-          validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs')}
+          validationMessage={validation?.errors?.url?.[0] ?? 'The URL to POST to when an Event occurs'}
           onValidationChange={this.onValidationChange}
           url={config.url}
           autofocus={false}
@@ -285,7 +284,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
               type="text"
               onChange={this.handleChange}
               bsStyle={validation.errors.api_key ? 'error' : null}
-              help={get(validation, 'errors.api_key[0]', 'Must be set if an API secret is set')}
+              help={validation.errors.api_key?.[0] ?? 'Must be set if an API secret is set'}
               value={config.api_key}
             />
             <Checkbox
@@ -321,7 +320,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                 type="password"
                 onChange={this.handleSecretInputChange}
                 bsStyle={validation.errors.api_secret ? 'error' : null}
-                help={get(validation, 'errors.api_secret[0]', 'Must be set if an API key is set')}
+                help={validation.errors.api_secret?.[0] ?? 'Must be set if an API key is set'}
                 value={this.state.api_secret || ''}
                 buttonAfter={
                   reset.api_secret ? (
@@ -351,11 +350,9 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
               type="text"
               onChange={this.handleChange}
               bsStyle={validation.errors.headers ? 'error' : null}
-              help={get(
-                validation,
-                'errors.headers[0]',
-                'Semicolon delimited list of HTTP headers to add to the notification',
-              )}
+              help={
+                validation.errors.headers?.[0] ?? 'Semicolon delimited list of HTTP headers to add to the notification'
+              }
               value={config.headers}
             />
           </Col>
@@ -420,7 +417,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                   wrapEnabled
                   onChange={this.handleJsonBodyTemplateChange}
                 />
-                <HelpBlock>{get(validation, 'errors.body_template[0]', helpElement)}</HelpBlock>
+                <HelpBlock>{validation.errors.body_template?.[0] ?? helpElement}</HelpBlock>
               </FormGroup>
             )}
           </Col>

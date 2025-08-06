@@ -36,10 +36,10 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -47,6 +47,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 public class SecurityTestUtils {
 
@@ -116,8 +120,12 @@ public class SecurityTestUtils {
         try {
             VarHandle handle = MethodHandles.privateLookupIn(RestResource.class, MethodHandles.lookup())
                     .findVarHandle(RestResource.class, "securityContext", SecurityContext.class);
-            handle.set(resource, SecurityTestUtils.getSecurityContext());
-            return Mockito.mock(clazz, Mockito.withSettings()
+            handle.set(resource, securityContext);
+            VarHandle userServiceHandle = MethodHandles.privateLookupIn(RestResource.class, MethodHandles.lookup())
+                    .findVarHandle(RestResource.class, "userService", UserService.class);
+            UserService userService = mockUserService();
+            userServiceHandle.set(resource, userService);
+            return mock(clazz, withSettings()
                     .spiedInstance(resource)
                     .defaultAnswer(new PermissionInterceptor())
             );
@@ -125,6 +133,38 @@ public class SecurityTestUtils {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Mocks a UserService which returns a mocked User when loacById is called for the current userPrincipal
+     * The mocked user returns:
+     * <ul>
+     *     <li>getId(): same as username</li>
+     *     <li>getName(): username</li>
+     * </ul>
+     * no other methods are implemented
+     *
+     * @return mocked UserService
+     */
+    public static UserService mockUserService() {
+        UserService userService = mock(UserService.class);
+        User user = mock(User.class);
+        lenient().when(user.getId()).thenReturn(securityContext.getUsername());
+        lenient().when(user.getName()).thenReturn(securityContext.getUsername());
+        lenient().when(userService.loadById(securityContext.getSubject().getPrincipal().toString())).thenReturn(user);
+        lenient().when(userService.load(securityContext.getSubject().getPrincipal().toString())).thenReturn(user);
+        return userService;
+    }
+
+    /**
+     * Convenience method to obtain a Graylog UserContext, initialized with a mocked UserService.
+     *
+     * @return Graylog UserContext with mocked UserService
+     * @see SecurityTestUtils#mockUserService()
+     * @see SecurityTestUtils#getUserContext(UserService)
+     */
+    public static UserContext getUserContext() {
+        return getUserContext(mockUserService());
     }
 
     /**

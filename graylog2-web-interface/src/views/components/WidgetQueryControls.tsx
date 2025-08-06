@@ -33,7 +33,7 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import useParameters from 'views/hooks/useParameters';
@@ -57,7 +57,6 @@ import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
 import useView from 'views/hooks/useView';
-import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
@@ -146,9 +145,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 
         if (dirty && isValid) {
           const normalizedFormValues = {
-            timerange: isNoTimeRangeOverride(timerange)
-              ? undefined
-              : normalizeFromSearchBarForBackend(timerange, userTimezone),
+            timerange: normalizeFromSearchBarForBackend(timerange, userTimezone),
             ...rest,
           };
 
@@ -335,7 +332,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     )}
                   </Field>
 
-                  <QueryValidation />
+                  <ViewsQueryValidation />
                   <QueryHistoryButton editorRef={editorRef} />
                 </SearchInputAndValidation>
 

@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding permission check to show only plugin configuration pages, that the user is allowed to see."
+
+pulls = ["22979"]

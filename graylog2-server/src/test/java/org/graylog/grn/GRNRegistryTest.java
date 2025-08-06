@@ -36,7 +36,7 @@ class GRNRegistryTest {
     class WithBuiltins {
         @BeforeEach
         void setup() {
-            type = GRNType.create("test", "tests:");
+            type = GRNType.create("test");
             registry = GRNRegistry.createWithTypes(Collections.singleton(type));
         }
 
@@ -48,7 +48,6 @@ class GRNRegistryTest {
                 assertThat(grn.cluster()).isEmpty();
                 assertThat(grn.type()).isEqualTo("test");
                 assertThat(grn.entity()).isEqualTo("123");
-                assertThat(grn.grnType().permissionPrefix()).isEqualTo("tests:");
             });
         }
 
@@ -82,13 +81,13 @@ class GRNRegistryTest {
                     new GRNTypeProvider() {
                         @Override
                         public Set<GRNType> getTypes() {
-                            return Set.of(GRNType.create("provided1", "provided1:"));
+                            return Set.of(GRNType.create("provided1"));
                         }
                     },
                     new GRNTypeProvider() {
                         @Override
                         public Set<GRNType> getTypes() {
-                            return Set.of(GRNType.create("provided2", "provided2:"));
+                            return Set.of(GRNType.create("provided2"));
                         }
                     }
             ));

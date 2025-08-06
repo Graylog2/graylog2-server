@@ -26,6 +26,8 @@ export type UserPreferences = {
   updateUnfocussed: boolean;
   searchSidebarIsPinned?: boolean;
   dashboardSidebarIsPinned?: boolean;
+  'views.widgetSummary.doNotAskAgain'?: boolean;
+  perspective?: string;
   [PREFERENCES_THEME_MODE]?: ColorScheme;
 };
 

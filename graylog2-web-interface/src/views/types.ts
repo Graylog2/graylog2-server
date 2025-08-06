@@ -46,7 +46,7 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -111,13 +111,13 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   width: number;
 }
 
-export interface WidgetExport {
+export interface WidgetExport<T extends WidgetConfig = WidgetConfig> {
   type: string;
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
-  editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps<T, any>>;
+  editComponent: React.ComponentType<EditWidgetComponentProps<T>>;
   hasEditSubmitButton?: boolean;
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
@@ -217,6 +217,7 @@ export interface SystemConfiguration {
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
   useCondition?: () => boolean;
+  readPermission?: string; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
 }
 
 export type GenericResult = {
@@ -551,6 +552,11 @@ export type LicenseCheck = (subject: LicenseSubject) => {
   refetch: () => void;
 };
 
+type MarkdownAugmentation = {
+  id: string;
+  component: React.ComponentType<{ value: string }>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -594,8 +600,9 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
+    'views.elements.aside'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
-    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
+    'views.elements.validationErrorExplanation'?: ValidationExplanations;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>;
     'views.hooks.confirmDeletingDashboardPage'?: Array<
@@ -619,5 +626,6 @@ declare module 'graylog-web-plugin/plugin' {
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: Array<LicenseCheck>;
     entityPermissionsMapper?: EntityPermissionsMapper;
+    'markdown.augment.components'?: Array<MarkdownAugmentation>;
   }
 }
