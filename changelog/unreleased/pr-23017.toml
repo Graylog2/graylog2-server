@@ -1,5 +1,5 @@
 type = "c"
-message = "Lookup table page UI revamp"
+message = "Lookup table improved creation workflow and UI"
 
 issues = ["Graylog2/graylog-plugin-enterprise#11092"]
 
