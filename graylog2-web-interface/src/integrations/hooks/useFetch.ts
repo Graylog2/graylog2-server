@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import FormDataContext from 'integrations/contexts/FormDataContext';
-
-import { toAWSRequest } from '../formDataAdapter';
 
 /* useFetch Custom Hook
 
@@ -58,18 +55,38 @@ EXAMPLES:
 ```
 */
 
-const parseError = (error) => {
+interface ErrorType {
+  additional?: {
+    body?: {
+      message: string;
+    };
+  };
+  message?: string;
+}
+
+const parseError = (error: ErrorType) => {
   const fullError = error.additional && error.additional.body && error.additional.body.message;
 
   return fullError || error.message;
 };
 
-const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
-  const { formData } = useContext(FormDataContext);
-  const [fetchUrl, setFetchUrl] = useState(url);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
+type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
+
+export type Options = { [key: string]: unknown };
+
+const useFetch = (
+  url: string,
+  setHook: (data: any) => any = () => {},
+  method: Method = 'GET',
+  options: Options = {},
+  urlWithParams: (fetchUrl: string, options: Options) => string = (fetchUrl) => fetchUrl,
+): [config: { loading: boolean; error: any; data: any }, setFetchUrl: React.Dispatch<string>] => {
+  const [fetchUrl, setFetchUrl] = useState<string>(url);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any | null>(null);
+
+  const qualifiedGetURL = fetchUrl ? qualifyUrl(urlWithParams(fetchUrl, options)) : null;
   const qualifiedURL = fetchUrl ? qualifyUrl(fetchUrl) : null;
 
   useEffect(() => {
@@ -82,9 +99,11 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
         setLoading(true);
 
         if (method === 'GET') {
-          fetcher = fetch(method, qualifiedURL);
+          fetcher = fetch(method, qualifiedGetURL);
         } else {
-          fetcher = fetch(method, qualifiedURL, toAWSRequest(formData, options));
+          fetcher = fetch(method, qualifiedURL, {
+            ...options,
+          });
         }
 
         fetcher
@@ -111,7 +130,7 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
       isFetchable = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qualifiedURL]);
+  }, [qualifiedURL, qualifiedGetURL]);
 
   return [{ loading, error, data }, setFetchUrl];
 };

@@ -22,7 +22,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
+import useFetch from 'integrations/hooks/useFetch';
 import FormWrap from 'integrations/aws/common/FormWrap';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { ApiRoutes, DocsRoutes } from 'integrations/aws/common/Routes';
@@ -30,6 +30,7 @@ import { renderOptions } from 'integrations/aws/common/Options';
 import formValidation from 'integrations/aws/utils/formValidation';
 import Spinner from 'components/common/Spinner';
 import useProductName from 'brand-customization/useProductName';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
@@ -72,10 +73,10 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
       onSubmit();
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream ? formData.awsCloudWatchKinesisStream.value : '',
-    },
+    }),
   );
 
   useEffect(() => {
