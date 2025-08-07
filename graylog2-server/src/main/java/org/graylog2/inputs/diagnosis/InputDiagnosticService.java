@@ -1,9 +1,6 @@
 package org.graylog2.inputs.diagnosis;
 
-import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.InternalServerErrorException;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
@@ -12,11 +9,9 @@ import org.graylog2.server.search.services.PivotSearchService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 import static org.graylog2.rest.models.system.inputs.responses.InputDiagnostics.EMPTY_DIAGNOSTICS;
 import static org.graylog2.rest.models.system.inputs.responses.InputDiagnostics.StreamMessageCount;

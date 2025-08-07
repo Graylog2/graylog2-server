@@ -1,5 +1,6 @@
 package org.graylog2.server.search.services;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -38,14 +40,21 @@ import java.util.stream.Collectors;
 public class PivotSearchService {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSearchService.class);
     private final SearchExecutor searchExecutor;
+    private final Supplier<UUID> uuidSupplier;
 
     @Inject
     public PivotSearchService(SearchExecutor searchExecutor) {
+        this(searchExecutor, UUID::randomUUID);
+    }
+
+    @VisibleForTesting
+    PivotSearchService(SearchExecutor searchExecutor, Supplier<UUID> uuidSupplier) {
         this.searchExecutor = searchExecutor;
+        this.uuidSupplier = uuidSupplier;
     }
 
     public Map<String, Long> findPivotValues(String query, String pivotFieldName, SearchUser searchUser) {
-        final String searchTypeId = "pivot-" + pivotFieldName + "-" + UUID.randomUUID();
+        final String searchTypeId = "pivot-" + pivotFieldName + "-" + uuidSupplier.get();
         final String queryId = "pivot-query";
 
         final Pivot pivotSearchType = Pivot.builder()
