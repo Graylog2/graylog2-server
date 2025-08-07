@@ -65,10 +65,7 @@ describe('Select', () => {
       const onChange = jest.fn();
       render(<SimpleSelect onChange={onChange} multi />);
 
-      const select = await selectEvent.findSelectInput('Select value');
-
-      selectEvent.openMenu(select);
-      selectEvent.select(select, ['label1', 'label2']);
+      await selectEvent.chooseOption('Select value', ['label1', 'label2']);
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1,value2'));
     });
