@@ -44,7 +44,8 @@ class IndexerIndexerJwtAuthTokenProviderTest {
                 jwtSecret,
                 Duration.seconds(90),
                 Duration.seconds(60),
-                true,
+                Duration.seconds(30)
+                , true,
                 Clock.fixed(now, ZoneOffset.UTC)
         );
 
