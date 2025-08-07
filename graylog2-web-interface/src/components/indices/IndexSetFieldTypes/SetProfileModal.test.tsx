@@ -26,12 +26,6 @@ import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hook
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
-
 const renderModal = (currentProfile = 'profile-id-111') =>
   render(
     <DefaultQueryParamProvider>
@@ -75,8 +69,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run setIndexSetFieldTypeProfile on submit with rotation', async () => {
     renderModal();
-    const select = await screen.findByLabelText(/Select profile/i);
-    await selectItem(select, 'Profile-2');
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
     const submit = await screen.findByRole('button', { name: /Set Profile/i });
     fireEvent.click(submit);
 
@@ -89,8 +82,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run setIndexSetFieldTypeProfile on submit without rotation', async () => {
     renderModal();
-    const select = await screen.findByLabelText(/Select profile/i);
-    await selectItem(select, 'Profile-2');
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
     const submit = await screen.findByRole('button', { name: /Set Profile/i });
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,

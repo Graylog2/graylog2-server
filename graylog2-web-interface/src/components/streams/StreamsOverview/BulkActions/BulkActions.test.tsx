@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { Streams } from '@graylog/server-api';
@@ -65,13 +65,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     await screen.findByRole('heading', { name: /assign index set to 2 streams/i });
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await selectEvent.select(indexSetSelect, 'Example Index Set');
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
 
     const submitButton = await screen.findByRole('button', { name: /assign index set/i });
 

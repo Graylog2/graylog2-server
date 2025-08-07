@@ -99,15 +99,11 @@ describe('StreamRuleModal', () => {
       name: /update rule/i,
     });
 
-    const ruleTypeSelect = await screen.findByLabelText('Type');
-    selectEvent.openMenu(ruleTypeSelect);
-    await selectEvent.select(ruleTypeSelect, 'match input');
+    await selectEvent.chooseOption('Type', 'match input');
 
     expect(submitBtn).toBeDisabled();
 
-    const inputSelect = await screen.findByLabelText('Input');
-    selectEvent.openMenu(inputSelect);
-    await selectEvent.select(inputSelect, 'input title (name)');
+    await selectEvent.chooseOption('Input', 'input title (name)');
 
     await waitFor(() => expect(submitBtn).toBeEnabled());
     userEvent.click(submitBtn);
