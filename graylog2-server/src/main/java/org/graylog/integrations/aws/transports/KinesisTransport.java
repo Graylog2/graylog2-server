@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -166,7 +166,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     static void validateEndpoint(String endpoint, String endpointName) throws MisfireException {
         if (StringUtils.isNotEmpty(endpoint)) {
             try {
-                new URL(endpoint).toURI();
+                var ignored = new URI(endpoint).toURL();
             } catch (Exception e) {
                 // Re-throw the exception to fail the input start attempt
                 throw new MisfireException(String.format(Locale.ROOT, "The specified [%s] Override Endpoint [%s] is invalid.",
