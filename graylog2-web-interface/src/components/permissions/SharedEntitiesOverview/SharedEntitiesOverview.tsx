@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { Pagination } from 'stores/PaginationTypes';
@@ -73,7 +73,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
     () => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading),
     [pagination, searchPaginated, setLoading],
   );
-
+  const tableHeaders = useMemo(() => [ ...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames) ], [pluggableAttributes]);
   const _handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery });
   const _handleFilter = (param: string, value: string) =>
     setPagination({ ...pagination, query, additionalQueries: { ...additionalQueries, [param]: value } });
@@ -96,9 +96,9 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
           className="table-hover"
           customFilter={<SharedEntitiesFilter onSearch={_handleSearch} onFilter={_handleFilter} />}
           dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
-          filterKeys={[]}
+          filterKeys={tableHeaders}
           noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
-          headers={[...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames)]}
+          headers={tableHeaders}
           id="shared-entities"
           rowClassName="no-bm"
           rows={list.toJS()}
