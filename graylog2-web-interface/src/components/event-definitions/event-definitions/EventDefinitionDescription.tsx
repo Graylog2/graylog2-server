@@ -17,6 +17,7 @@
 import React from 'react';
 import moment from 'moment';
 import 'moment-duration-format';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
