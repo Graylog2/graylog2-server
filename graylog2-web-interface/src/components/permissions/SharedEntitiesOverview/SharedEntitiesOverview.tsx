@@ -22,6 +22,7 @@ import type { Pagination } from 'stores/PaginationTypes';
 import mockedPermissions from 'logic/permissions/mocked';
 import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
 import { DataTable, PaginatedList, Spinner, NoSearchResult } from 'components/common';
+import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntityTableElements';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
 import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
@@ -66,6 +67,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
   const { list, context, pagination: { total } = { total: 0 } } = paginatedEntityShares || {};
   const { page, query, additionalQueries } = pagination;
+  const { pluggableAttributes } = usePluggableSharedEntityTableElements();
 
   useEffect(
     () => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading),
@@ -96,7 +98,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
           dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
           filterKeys={[]}
           noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
-          headers={TABLE_HEADERS}
+          headers={[...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames)]}
           id="shared-entities"
           rowClassName="no-bm"
           rows={list.toJS()}
