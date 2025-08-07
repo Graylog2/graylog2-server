@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 
 import KinesisSetupStep from './KinesisSetupStep';
 
