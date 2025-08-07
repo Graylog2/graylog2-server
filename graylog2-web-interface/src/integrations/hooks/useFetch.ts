@@ -108,22 +108,16 @@ const useFetch = (
 
         fetcher
           .then((result) => {
-            if (isFetchable) {
-              setError(null);
-              setData(result);
-              setHook(result);
-            }
+            setError(null);
+            setData(result);
+            setHook(result);
           })
           .catch((err) => {
-            if (isFetchable) {
-              setData(null);
-              setError(parseError(err));
-            }
+            setData(null);
+            setError(parseError(err));
           })
           .finally(() => {
-            if (isFetchable) {
-              setLoading(false);
-            }
+            setLoading(false);
           });
       }
 
