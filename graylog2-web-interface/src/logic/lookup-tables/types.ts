@@ -64,7 +64,7 @@ export type LookupTableDataAdapterConfig = {
   key_column?: string;
   value_column?: string;
   check_interval?: number;
-  multi_value_separator?: string;
+  multi_value_columns?: string[];
   multi_value_lookup?: boolean;
   case_insensitive_lookup?: boolean;
   cidr_lookup?: boolean;

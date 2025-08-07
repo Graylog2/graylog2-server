@@ -31,6 +31,7 @@ import org.mockito.junit.MockitoRule;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +53,7 @@ public class CSVFileDataAdapterTest {
     private final Path csvFile;
     private final Path cidrLookupFile;
     private final Path multiValueLookupFile;
+    private final Path multiValueCidrFile;
     private CSVFileDataAdapter csvFileDataAdapter;
 
     @Mock
@@ -65,16 +67,16 @@ public class CSVFileDataAdapterTest {
 
     public CSVFileDataAdapterTest() throws Exception {
         final URL resource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterTest.csv");
-        final Path csvFilePath = Paths.get(resource.toURI());
-        this.csvFile = csvFilePath;
+        this.csvFile = Paths.get(resource.toURI());
 
         final URL cidrResource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterCIDRLookupTest.csv");
-        final Path cidrLookupFilePath = Paths.get(cidrResource.toURI());
-        this.cidrLookupFile = cidrLookupFilePath;
+        this.cidrLookupFile = Paths.get(cidrResource.toURI());
 
         final URL multiValueResource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterMultiValueTest.csv");
-        final Path multiValueFilePath = Paths.get(multiValueResource.toURI());
-        this.multiValueLookupFile = multiValueFilePath;
+        this.multiValueLookupFile = Paths.get(multiValueResource.toURI());
+
+        final URL multiValueCidrResource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterMultiCIDR.csv");
+        this.multiValueCidrFile = Paths.get(multiValueCidrResource.toURI());
     }
 
     @Test
@@ -214,6 +216,29 @@ public class CSVFileDataAdapterTest {
     }
 
     @Test
+    public void testConfigValidationFailsIfValueColumnMissingForNonMultiValueLookup() {
+        final Config config = Config.builder()
+                .type(NAME)
+                .path(csvFile.toString())
+                .separator(",")
+                .quotechar("\"")
+                .keyColumn("key")
+                .valueColumn("") // Not set
+                .checkInterval(60)
+                .caseInsensitiveLookup(false)
+                .multiValueLookup(false)
+                .multiValueColumns(List.of())
+                .build();
+        when(validationContext.getPathChecker()).thenReturn(pathChecker);
+        when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(true);
+
+        Optional<Multimap<String, String>> result = config.validate(validationContext);
+        assertTrue(result.isPresent());
+        assertThat(result.get().get("value_column"))
+                .contains("Value column must be set unless multi-value lookup is enabled.");
+    }
+
+    @Test
     public void testCIDRLookups() throws Exception {
         final Config config = cidrLookupConfig();
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
@@ -242,38 +267,64 @@ public class CSVFileDataAdapterTest {
         when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
         csvFileDataAdapter.doStart();
 
-        // Test for user_id "000001"
         LookupResult result1 = csvFileDataAdapter.doGet("000001");
-        assertThat(result1.singleValue()).isEqualTo("Adam|Alpha|aalpha|123-4567|123 Sleepy Hollow Lane");
         assertThat(result1.multiValue())
-                .containsEntry("0", "Adam")
-                .containsEntry("1", "Alpha")
-                .containsEntry("2", "aalpha")
-                .containsEntry("3", "123-4567")
-                .containsEntry("4", "123 Sleepy Hollow Lane");
+                .containsEntry("first_name", "Adam")
+                .containsEntry("last_name", "Alpha")
+                .containsEntry("username", "aalpha")
+                .containsEntry("phone", "123-4567")
+                .containsEntry("address", "123 Sleepy Hollow Lane");
 
-        // Test for user_id "000005"
         LookupResult result5 = csvFileDataAdapter.doGet("000005");
-        assertThat(result5.singleValue()).isEqualTo("Mason|Johnson|mjohnson|880-1222|4000 2nd St");
         assertThat(result5.multiValue())
-                .containsEntry("0", "Mason")
-                .containsEntry("1", "Johnson")
-                .containsEntry("2", "mjohnson")
-                .containsEntry("3", "880-1222")
-                .containsEntry("4", "4000 2nd St");
+                .containsEntry("first_name", "Mason")
+                .containsEntry("last_name", "Johnson")
+                .containsEntry("username", "mjohnson")
+                .containsEntry("phone", "880-1222")
+                .containsEntry("address", "4000 2nd St");
 
-        // Test for user_id "000010"
         LookupResult result10 = csvFileDataAdapter.doGet("000010");
-        assertThat(result10.singleValue()).isEqualTo("Lucas|Davis|ldavis|366-1742|1616 Elm St");
         assertThat(result10.multiValue())
-                .containsEntry("0", "Lucas")
-                .containsEntry("1", "Davis")
-                .containsEntry("2", "ldavis")
-                .containsEntry("3", "366-1742")
-                .containsEntry("4", "1616 Elm St");
+                .containsEntry("first_name", "Lucas")
+                .containsEntry("last_name", "Davis")
+                .containsEntry("username", "ldavis")
+                .containsEntry("phone", "366-1742")
+                .containsEntry("address", "1616 Elm St");
 
-        // Non-existent user_id
         assertThat(csvFileDataAdapter.doGet("999999")).isEqualTo(LookupResult.empty());
+    }
+
+    @Test
+    public void testMultiValueCIDRLookups() throws Exception {
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueCidrConfig(), new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+
+        LookupResult result1 = csvFileDataAdapter.doGet("192.168.1.10");
+        assertThat(result1.multiValue())
+                .containsEntry("network_name", "Office LAN")
+                .containsEntry("location", "New York")
+                .containsEntry("gateway_ip", "192.168.1.1")
+                .doesNotContainKey("admin_contact")
+                .doesNotContainKey("vlan_id");
+
+        LookupResult result2 = csvFileDataAdapter.doGet("10.0.0.5");
+        assertThat(result2.multiValue())
+                .containsEntry("network_name", "Data Center")
+                .containsEntry("location", "San Francisco")
+                .containsEntry("gateway_ip", "10.0.0.1")
+                .doesNotContainKey("admin_contact")
+                .doesNotContainKey("vlan_id");
+
+        LookupResult result3 = csvFileDataAdapter.doGet("172.16.10.50");
+        assertThat(result3.multiValue())
+                .containsEntry("network_name", "IoT Network")
+                .containsEntry("location", "Denver")
+                .containsEntry("gateway_ip", "172.16.10.1")
+                .doesNotContainKey("admin_contact")
+                .doesNotContainKey("vlan_id");
+
+        assertThat(csvFileDataAdapter.doGet("8.8.8.8")).isEqualTo(LookupResult.empty());
     }
 
     private Config baseConfig() {
@@ -300,7 +351,22 @@ public class CSVFileDataAdapterTest {
                 .checkInterval(60)
                 .caseInsensitiveLookup(false)
                 .multiValueLookup(true)
-                .multiValueSeparator("|")
+                .build();
+    }
+
+    private Config multiValueCidrConfig() {
+        return Config.builder()
+                .type(NAME)
+                .path(multiValueCidrFile.toString())
+                .separator(",")
+                .quotechar("\"")
+                .keyColumn("cidr_range")
+                .valueColumn("")
+                .checkInterval(60)
+                .caseInsensitiveLookup(false)
+                .cidrLookup(true)
+                .multiValueLookup(true)
+                .multiValueColumns(List.of("network_name", "location", "gateway_ip"))
                 .build();
     }
 

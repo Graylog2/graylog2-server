@@ -18,7 +18,10 @@ import type { SyntheticEvent } from 'react';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
+import { InputList } from 'components/common';
 import type { LookupTableDataAdapterConfig } from 'logic/lookup-tables/types';
+
+import InputWrapper from '../../bootstrap/InputWrapper';
 
 type Props = {
   config: LookupTableDataAdapterConfig;
@@ -91,29 +94,35 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
       labelClassName="col-sm-3"
       wrapperClassName="col-sm-9"
     />
-    <Input
-      type="text"
-      id="value_column"
-      name="value_column"
-      label="Value column"
-      required
-      onChange={handleFormEvent}
-      help="The column name that should be used as the value for a key."
-      value={config.value_column}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
-    <Input
-      type="text"
-      id="multi_value_separator"
-      name="multi_value_separator"
-      label="Multi-value separator"
-      onChange={handleFormEvent}
-      help="The delimiter to use for separating multiple values."
-      value={config.multi_value_separator}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
+    {!config.multi_value_lookup && (
+      <Input
+        type="text"
+        id="value_column"
+        name="value_column"
+        label="Value column"
+        required
+        onChange={handleFormEvent}
+        help="The column name that should be used as the value for a key."
+        value={config.value_column}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+    )}
+    {config.multi_value_lookup && (
+      <InputWrapper className="col-sm-9">
+        <InputList
+          id="multi_value_columns"
+          name="multi_value_columns"
+          label="Multi-value columns"
+          aria-label="Multi-value columns"
+          placeholder="Enter column names or leave blank for all columns except key"
+          onChange={handleFormEvent}
+          help="The columns to inlcude in the multi-value lookup. If blank, all columns except the key will be included."
+          values={config.multi_value_columns ?? []}
+          isClearable
+        />
+      </InputWrapper>
+    )}
     <Input
       type="checkbox"
       id="multi_value_lookup"
