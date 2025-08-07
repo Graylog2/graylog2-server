@@ -56,17 +56,14 @@ const parseError = (error: ErrorType) => {
 
 type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
-type Options = { [key: string]: unknown };
-
-const defaultUrlParams = (fetchUrl, options) =>
-  `${fetchUrl}?eventHubName=${options.eventHubName}&connectionString=${options.connectionString}&consumerGroup=${options.consumerGroup}`;
+export type Options = { [key: string]: unknown };
 
 const useFetch = (
   url: string,
   setHook: (data: any) => any = () => {},
   method: Method = 'GET',
   options: Options = {},
-  urlWithParams: (fetchUrl: string, options: Options) => string = defaultUrlParams,
+  urlWithParams: (fetchUrl: string, options: Options) => string = (fetchUrl) => fetchUrl,
 ): [config: { loading: boolean; error: any; data: any }, setFetchUrl: React.Dispatch<string>] => {
   const [fetchUrl, setFetchUrl] = useState<string>(url);
   const [loading, setLoading] = useState<boolean>(false);
