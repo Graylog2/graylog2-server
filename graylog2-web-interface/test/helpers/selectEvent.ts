@@ -62,7 +62,7 @@ const chooseOption = async (
   const optionNames = Array.isArray(optionName) ? optionName : [optionName];
 
   optionNames.forEach((name) => {
-    userEvent.type(input, `{meta>}{a}{/meta}{backspace}${name}{enter}`);
+    userEvent.type(input, `${name}{enter}`);
   });
 };
 
