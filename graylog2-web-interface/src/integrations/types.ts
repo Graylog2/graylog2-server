@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
 
-import { ClusterSystemLoggers } from '@graylog/server-api';
+export type FieldData = {
+  defaultValue?: any;
+  value?: any;
+  error?: string;
+  dirty?: boolean;
+  fileName?: string;
+  fileContent?: string;
+};
 
-const useLoggers = () =>
-  useQuery({
-    queryKey: ['loggers', 'loggers'],
-    queryFn: () => ClusterSystemLoggers.loggers(),
-  });
-
-export default useLoggers;
+// This type is called FormDataType, because FormData is a reserved type
+export type FormDataType = {
+  [key: string]: FieldData;
+};

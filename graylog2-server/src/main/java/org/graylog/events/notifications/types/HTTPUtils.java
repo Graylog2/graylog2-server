@@ -14,14 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+package org.graylog.events.notifications.types;
 
-import { ClusterSystemLoggers } from '@graylog/server-api';
+import java.util.Set;
 
-const useLoggers = () =>
-  useQuery({
-    queryKey: ['loggers', 'loggers'],
-    queryFn: () => ClusterSystemLoggers.loggers(),
-  });
+public class HTTPUtils {
+    private HTTPUtils() {
+    }
 
-export default useLoggers;
+    private static Set<Integer> RETRYABLE_STATUS_CODES = Set.of(
+            408,// Request Timeout
+            429 // Too Many Requests
+    );
+
+    public static boolean isRetryableStatus(int statusCode) {
+        if (RETRYABLE_STATUS_CODES.contains(statusCode)) {
+            return true;
+            // Any 5xx status code is considered retryable
+        } else return statusCode >= 500 && statusCode <= 599;
+    }
+}
