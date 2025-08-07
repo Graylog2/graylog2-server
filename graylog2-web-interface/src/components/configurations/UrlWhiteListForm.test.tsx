@@ -230,7 +230,7 @@ describe('UrlWhitelistForm', () => {
       render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
       const row = screen.getByRole('row', { name: /3/i });
-      await selectEvent.chooseOption('exact match', 'Regex', { container: row });
+      await selectEvent.chooseOption('Select url type', 'Regex', { container: row });
 
       await screen.findByText(/not a valid java regular expression/i);
 
