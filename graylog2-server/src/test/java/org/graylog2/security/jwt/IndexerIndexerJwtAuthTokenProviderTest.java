@@ -68,7 +68,10 @@ class IndexerIndexerJwtAuthTokenProviderTest {
                     // Let's give or take 5s, this won't change the validity of the test.
                     final long delta = Duration.seconds(5).toMilliseconds();
                     Assertions.assertThat(claims.getIssuedAt()).isCloseTo(now, delta);
-                    Assertions.assertThat(claims.getExpiration()).isCloseTo(now.plus(90, ChronoUnit.SECONDS), delta);
+                    Assertions.assertThat(claims.getExpiration()).isCloseTo(now
+                                    .plus(90, ChronoUnit.SECONDS) // add expected expiration
+                                    .plus(30, ChronoUnit.SECONDS),  // add clock skew workaround
+                            delta);
                 });
     }
 }
