@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Button, Modal, Panel } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
