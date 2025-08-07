@@ -16,7 +16,6 @@
  */
 package org.graylog.security.shares;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -163,7 +162,7 @@ public class GranteeSharesService {
     }
 
     public record SharesResponse(
-            @JsonProperty("entities") PaginatedList<EntityDescriptor> paginatedEntities,
-            @JsonProperty("grantee_capabilities") Map<GRN, Capability> capabilities) {
+            PaginatedList<EntityDescriptor> paginatedEntities,
+            Map<GRN, Capability> capabilities) {
     }
 }

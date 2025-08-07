@@ -382,7 +382,7 @@ public abstract class PluginModule extends Graylog2Module {
         syncedEntitiesResolverBinder.addBinding().to(resolverClass);
     }
 
-    protected void addCollectionRequestHandler(Class<? extends PluggableEntityHandler> handlerClass) {
+    protected void addPluggableEntityHandler(Class<? extends PluggableEntityHandler> handlerClass) {
         final Multibinder<PluggableEntityHandler> binder = Multibinder.newSetBinder(binder(), PluggableEntityHandler.class);
         binder.addBinding().to(handlerClass);
     }

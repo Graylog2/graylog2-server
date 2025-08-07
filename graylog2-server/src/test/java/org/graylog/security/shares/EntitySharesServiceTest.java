@@ -78,7 +78,7 @@ class EntitySharesServiceTest {
     private GranteeService granteeService;
 
     @Mock
-    private PluggableEntityService entityCreationRequestService;
+    private PluggableEntityService pluggableEntityService;
 
     private GRNRegistry grnRegistry;
     private DBGrantService dbGrantService;
@@ -98,7 +98,7 @@ class EntitySharesServiceTest {
         final EventBus serverEventBus = mock(EventBus.class);
         this.entitySharesService = new EntitySharesService(
                 dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
-                grnRegistry, granteeService, entityCreationRequestService, serverEventBus,
+                grnRegistry, granteeService, pluggableEntityService, serverEventBus,
                 new HashSet<>(), new CapabilityRegistry(grnRegistry, Set.of(new RestPermissions(), new RestPermissions())));
     }
 
