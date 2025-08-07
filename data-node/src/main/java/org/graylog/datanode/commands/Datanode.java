@@ -83,7 +83,7 @@ public class Datanode extends DatanodeBootstrap implements DocumentedBeansServic
 
     @Override
     public @Nonnull List<Object> getNodeCommandConfigurationBeans() {
-        return Arrays.asList(configuration,
+        return Arrays.asList(
                 tlsConfiguration,
                 s3RepositoryConfiguration,
                 gcsRepositoryConfiguration);
