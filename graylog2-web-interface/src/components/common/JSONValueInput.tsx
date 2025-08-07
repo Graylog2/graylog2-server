@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import {
   ControlLabel,
@@ -49,6 +50,10 @@ type JSONValueInputProps = {
   labelClassName?: string;
   wrapperClassName?: string;
 };
+
+const StyledFormGroup = styled(FormGroup)`
+  padding: 0 15px;
+`;
 
 class JSONValueInput extends React.Component<
   JSONValueInputProps,
@@ -105,7 +110,7 @@ class JSONValueInput extends React.Component<
     ));
 
     return (
-      <FormGroup validationState={this.props.validationState}>
+      <StyledFormGroup validationState={this.props.validationState}>
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
@@ -116,16 +121,18 @@ class JSONValueInput extends React.Component<
               value={this.state.value}
               required={this.props.required}
             />
-            <DropdownButton
-              id="input-dropdown-addon"
-              bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-              title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
-              {options}
-            </DropdownButton>
+            <InputGroup.Button>
+              <DropdownButton
+                id="input-dropdown-addon"
+                bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
+                title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
+                {options}
+              </DropdownButton>
+            </InputGroup.Button>
           </InputGroup>
           {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
         </InputWrapper>
-      </FormGroup>
+      </StyledFormGroup>
     );
   }
 }
