@@ -18,10 +18,7 @@ import type { SyntheticEvent } from 'react';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
-import { InputList } from 'components/common';
 import type { LookupTableDataAdapterConfig } from 'logic/lookup-tables/types';
-
-import InputWrapper from '../../bootstrap/InputWrapper';
 
 type Props = {
   config: LookupTableDataAdapterConfig;
@@ -30,130 +27,120 @@ type Props = {
   validationMessage: (field: string, message: string) => string;
 };
 
-const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, validationMessage }: Props) => (
-  <fieldset>
-    <Input
-      type="text"
-      id="path"
-      name="path"
-      label="File path"
-      autoFocus
-      required
-      onChange={handleFormEvent}
-      help={validationMessage('path', 'The path to the CSV file.')}
-      bsStyle={validationState('path')}
-      value={config.path}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
-    <Input
-      type="number"
-      id="check_interval"
-      name="check_interval"
-      label="Check interval"
-      required
-      onChange={handleFormEvent}
-      help="The interval to check if the CSV file needs a reload. (in seconds)"
-      value={config.check_interval}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
-    <Input
-      type="text"
-      id="separator"
-      name="separator"
-      label="Separator"
-      required
-      onChange={handleFormEvent}
-      help="The delimiter to use for separating entries."
-      value={config.separator}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
-    <Input
-      type="text"
-      id="quotechar"
-      name="quotechar"
-      label="Quote character"
-      required
-      onChange={handleFormEvent}
-      help="The character to use for quoted elements."
-      value={config.quotechar}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
-    <Input
-      type="text"
-      id="key_column"
-      name="key_column"
-      label="Key column"
-      required
-      onChange={handleFormEvent}
-      help="The column name that should be used for the key lookup."
-      value={config.key_column}
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
-    />
-    {!config.multi_value_lookup && (
+const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, validationMessage }: Props) => {
+  const valueLabel = config.multi_value_lookup ? 'Value columns' : 'Value column';
+  const valueHelp = config.multi_value_lookup
+    ? 'The column names that should be used as the values for a key, or leave empty for all columns except the key.'
+    : 'The column name that should be used as the value for a key.';
+
+  return (
+    <fieldset>
+      <Input
+        type="text"
+        id="path"
+        name="path"
+        label="File path"
+        autoFocus
+        required
+        onChange={handleFormEvent}
+        help={validationMessage('path', 'The path to the CSV file.')}
+        bsStyle={validationState('path')}
+        value={config.path}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <Input
+        type="number"
+        id="check_interval"
+        name="check_interval"
+        label="Check interval"
+        required
+        onChange={handleFormEvent}
+        help="The interval to check if the CSV file needs a reload. (in seconds)"
+        value={config.check_interval}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <Input
+        type="text"
+        id="separator"
+        name="separator"
+        label="Separator"
+        required
+        onChange={handleFormEvent}
+        help="The delimiter to use for separating entries."
+        value={config.separator}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <Input
+        type="text"
+        id="quotechar"
+        name="quotechar"
+        label="Quote character"
+        required
+        onChange={handleFormEvent}
+        help="The character to use for quoted elements."
+        value={config.quotechar}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <Input
+        type="text"
+        id="key_column"
+        name="key_column"
+        label="Key column"
+        required
+        onChange={handleFormEvent}
+        help="The column name that should be used for the key lookup."
+        value={config.key_column}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
       <Input
         type="text"
         id="value_column"
         name="value_column"
-        label="Value column"
-        required
+        label={valueLabel}
+        required={!config.multi_value_lookup}
         onChange={handleFormEvent}
-        help="The column name that should be used as the value for a key."
+        help={valueHelp}
         value={config.value_column}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
-    )}
-    {config.multi_value_lookup && (
-      <InputWrapper className="col-sm-9">
-        <InputList
-          id="multi_value_columns"
-          name="multi_value_columns"
-          label="Multi-value columns"
-          aria-label="Multi-value columns"
-          placeholder="Enter column names or leave blank for all columns except key"
-          onChange={handleFormEvent}
-          help="The columns to inlcude in the multi-value lookup. If blank, all columns except the key will be included."
-          values={config.multi_value_columns ?? []}
-          isClearable
-        />
-      </InputWrapper>
-    )}
-    <Input
-      type="checkbox"
-      id="multi_value_lookup"
-      name="multi_value_lookup"
-      label="Multi-value lookup"
-      checked={config.multi_value_lookup}
-      onChange={handleFormEvent}
-      help="Enable if the lookup value has multiple values."
-      wrapperClassName="col-md-offset-3 col-md-9"
-    />
-    <Input
-      type="checkbox"
-      id="case_insensitive_lookup"
-      name="case_insensitive_lookup"
-      label="Allow case-insensitive lookups"
-      checked={config.case_insensitive_lookup}
-      onChange={handleFormEvent}
-      help="Enable if the key lookup should be case-insensitive."
-      wrapperClassName="col-md-offset-3 col-md-9"
-    />
-    <Input
-      type="checkbox"
-      id="cidr_lookup"
-      name="cidr_lookup"
-      label="CIDR lookup"
-      checked={config.cidr_lookup}
-      onChange={handleFormEvent}
-      help="Enable if the keys in the lookup table are in CIDR notation and lookups will be done with IPs"
-      wrapperClassName="col-md-offset-3 col-md-9"
-    />
-  </fieldset>
-);
+      <Input
+        type="checkbox"
+        id="multi_value_lookup"
+        name="multi_value_lookup"
+        label="Multi-value lookup"
+        checked={config.multi_value_lookup}
+        onChange={handleFormEvent}
+        help="Enable for multiple value columns."
+        wrapperClassName="col-md-offset-3 col-md-9"
+      />
+      <Input
+        type="checkbox"
+        id="case_insensitive_lookup"
+        name="case_insensitive_lookup"
+        label="Allow case-insensitive lookups"
+        checked={config.case_insensitive_lookup}
+        onChange={handleFormEvent}
+        help="Enable if the key lookup should be case-insensitive."
+        wrapperClassName="col-md-offset-3 col-md-9"
+      />
+      <Input
+        type="checkbox"
+        id="cidr_lookup"
+        name="cidr_lookup"
+        label="CIDR lookup"
+        checked={config.cidr_lookup}
+        onChange={handleFormEvent}
+        help="Enable if the keys in the lookup table are in CIDR notation and lookups will be done with IPs"
+        wrapperClassName="col-md-offset-3 col-md-9"
+      />
+    </fieldset>
+  );
+};
 
 export default CSVFileAdapterFieldSet;

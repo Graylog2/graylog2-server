@@ -61,6 +61,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -260,6 +261,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         final Map<Integer, String> multiValueColumns = new HashMap<>();
         final ImmutableMap.Builder<String, Map<Object, Object>> multiValueLookupBuilder = ImmutableMap.builder();
         final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
+        final List<String> columns = Arrays.stream(config.valueColumn().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
 
         try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
@@ -281,8 +286,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         if (!isNullOrEmpty(column)) {
                             if (config.keyColumn().equals(column)) {
                                 keyColumn = col;
-                            } else if (!config.valueColumn().equals(column) &&
-                                    (config.useAllColumns() || config.multiValueColumns().get().contains(column))) {
+                            } else if (!config.valueColumn().equals(column) && (columns.isEmpty() || columns.contains(column))) {
                                 multiValueColumns.put(col, column);
                             }
                         }
@@ -339,8 +343,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                 multiValueLookupRef.set(multiValueLookupBuilder.build());
             }
         } catch (Exception e) {
-            LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> multi_value_columns=<{}>)", config.path(),
-                    config.separator(), config.quotechar(), config.keyColumn(), config.multiValueColumns(), e);
+            LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
+                    config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
             setError(e);
             throw new IllegalStateException(e);
         }
@@ -507,7 +511,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     .caseInsensitiveLookup(false)
                     .cidrLookup(false)
                     .multiValueLookup(false)
-                    .multiValueColumns(List.of())
                     .build();
         }
     }
@@ -569,9 +572,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         @JsonProperty("multi_value_lookup")
         public abstract Optional<Boolean> multiValueLookup();
 
-        @JsonProperty("multi_value_columns")
-        public abstract Optional<List<String>> multiValueColumns();
-
         @JsonProperty("cidr_lookup")
         public abstract Optional<Boolean> cidrLookup();
 
@@ -581,10 +581,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         public boolean isMultiValueLookup() {
             return multiValueLookup().isPresent() && multiValueLookup().get();
-        }
-
-        public boolean useAllColumns() {
-            return multiValueColumns().isEmpty() || multiValueColumns().get().isEmpty();
         }
 
         public boolean isCidrLookup() {
@@ -654,9 +650,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("multi_value_lookup")
             public abstract Builder multiValueLookup(Boolean multiValueLookup);
-
-            @JsonProperty("multi_value_columns")
-            public abstract Builder multiValueColumns(List<String> multiValueColumns);
 
             @JsonProperty("cidr_lookup")
             public abstract Builder cidrLookup(Boolean cidrLookup);

@@ -31,7 +31,6 @@ import org.mockito.junit.MockitoRule;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -227,7 +226,6 @@ public class CSVFileDataAdapterTest {
                 .checkInterval(60)
                 .caseInsensitiveLookup(false)
                 .multiValueLookup(false)
-                .multiValueColumns(List.of())
                 .build();
         when(validationContext.getPathChecker()).thenReturn(pathChecker);
         when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(true);
@@ -347,7 +345,7 @@ public class CSVFileDataAdapterTest {
                 .separator(",")
                 .quotechar("\"")
                 .keyColumn("user_id")
-                .valueColumn("user_values")
+                .valueColumn("")
                 .checkInterval(60)
                 .caseInsensitiveLookup(false)
                 .multiValueLookup(true)
@@ -361,12 +359,11 @@ public class CSVFileDataAdapterTest {
                 .separator(",")
                 .quotechar("\"")
                 .keyColumn("cidr_range")
-                .valueColumn("")
+                .valueColumn("network_name,location,gateway_ip")
                 .checkInterval(60)
                 .caseInsensitiveLookup(false)
                 .cidrLookup(true)
                 .multiValueLookup(true)
-                .multiValueColumns(List.of("network_name", "location", "gateway_ip"))
                 .build();
     }
 
