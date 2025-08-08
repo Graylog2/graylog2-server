@@ -65,7 +65,7 @@ public class EntitySharesService {
     private final EntityDependencyPermissionChecker entityDependencyPermissionChecker;
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
-    private final EntityCreationRequestService entityCreationService;
+    private final PluggableEntityService pluggableEntityService;
     private final EventBus serverEventBus;
     private final Set<SyncedEntitiesResolver> entitiesResolvers;
     private final CapabilityRegistry capabilityRegistry;
@@ -76,7 +76,7 @@ public class EntitySharesService {
                                final EntityDependencyPermissionChecker entityDependencyPermissionChecker,
                                final GRNRegistry grnRegistry,
                                final GranteeService granteeService,
-                               final EntityCreationRequestService entityCreationService,
+                               final PluggableEntityService pluggableEntityService,
                                final EventBus serverEventBus,
                                final Set<SyncedEntitiesResolver> entitiesResolvers,
                                final CapabilityRegistry capabilityRegistry) {
@@ -85,7 +85,7 @@ public class EntitySharesService {
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
-        this.entityCreationService = entityCreationService;
+        this.pluggableEntityService = pluggableEntityService;
         this.serverEventBus = serverEventBus;
         this.entitiesResolvers = entitiesResolvers;
         this.capabilityRegistry = capabilityRegistry;
@@ -260,7 +260,7 @@ public class EntitySharesService {
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
 
-        request.selectedCollections().ifPresent(collections -> entityCreationService.handleCollections(ownedEntity, collections));
+        request.selectedCollections().ifPresent(collections -> pluggableEntityService.onCreate(ownedEntity, collections));
 
         final ImmutableMap<GRN, Capability> selectedGranteeCapabilities = request.selectedGranteeCapabilities()
                 .orElse(ImmutableMap.of());
