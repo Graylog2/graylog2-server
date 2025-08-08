@@ -55,18 +55,6 @@ function DataAdapterList() {
   const { fetchPaginatedDataAdapters, dataAdaptersKeyFn } = useFetchDataAdapters();
   const { renderActions } = useActions();
 
-  // const handleFetchAdapters = React.useCallback(
-  //   async (searchParams: SearchParams) => {
-  //     const resp = await fetchPaginatedDataAdapters(searchParams);
-
-  //     setNames({
-  //       adapterNames: resp.list.map((adapter: DataAdapterEntity) => adapter.name),
-  //     });
-
-  //     return Promise.resolve(resp);
-  //   },
-  //   [fetchPaginatedDataAdapters, setNames],
-  // );
   const handleFetchAdapters = React.useCallback(async (searchParams: SearchParams) => {
     const resp = await fetchPaginatedDataAdapters(searchParams);
 
