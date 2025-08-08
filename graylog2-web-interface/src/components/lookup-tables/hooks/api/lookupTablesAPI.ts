@@ -16,7 +16,7 @@
  */
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import {
   LookupTableDataAdaptersActions,
   LookupTableDataAdaptersStore,
@@ -42,9 +42,16 @@ export const fetchErrors = async ({
 }) => LookupTablesActions.getErrors(lutNames, cacheNames, adapterNames);
 
 export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
-  const { page, pageSize, query } = searchParams;
+  const { page, pageSize, query, sort } = searchParams;
 
-  return LookupTablesActions.searchPaginated(page, pageSize, query).then(deserializeLookupTables);
+    const sortField = sort?.attributeId;
+    const sortOrder = sort?.direction;
+
+    const promise = LookupTablesStore.searchPaginated(page, pageSize, query, true, sortField, sortOrder);
+
+    LookupTablesActions.searchPaginated.promise(promise);
+
+    return promise.then(deserializeLookupTables);
 };
 
 export const createLookupTable = async (payload: LookupTableCache) => LookupTablesActions.create(payload);
