@@ -57,8 +57,7 @@ const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
         bsStyle={errorMessage ? 'error' : undefined}
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
-        formGroupClassName="mb-3"
-        >
+        formGroupClassName="mb-3">
         <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
           {errorMessage || 'Select an existing cache'}
         </div>
@@ -73,10 +72,7 @@ const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
             value={value}
           />
 
-          <StyledButton
-            type="button"
-            aria-label="Create Cache"
-            onClick={onCreateClick}>
+          <StyledButton type="button" aria-label="Create Cache" onClick={onCreateClick}>
             Create Cache
           </StyledButton>
         </div>

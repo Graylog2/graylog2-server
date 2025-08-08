@@ -25,9 +25,9 @@ import { useValidateDataAdapter } from 'components/lookup-tables/hooks/useLookup
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
-  onClose: () => void,
-  dataAdapter: LookupTableAdapter,
-  title: string,
+  onClose: () => void;
+  dataAdapter: LookupTableAdapter;
+  title: string;
 };
 
 const StyledRow = styled(Row)`
@@ -36,7 +36,7 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const DataAdapterEditModal = ({ onClose, title, dataAdapter, validationErrors }: Props & { validationErrors: any; }) => {
+const DataAdapterEditModal = ({ onClose, title, dataAdapter, validationErrors }: Props & { validationErrors: any }) => {
   const { validateDataAdapter } = useValidateDataAdapter();
 
   const validate = (dataAdapterObj: LookupTableAdapter) => {
