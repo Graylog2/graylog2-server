@@ -55,7 +55,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/ca/clientcert")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "Client Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
+@Api(value = "Client/Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
 public class ClientCertResource extends RestResource {
     private final SecurityAdapter securityAdapter;
     private final ClientCertGenerator clientCertGenerator;
