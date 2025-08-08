@@ -70,9 +70,16 @@ export const fetchLookupPreview = async (idOrName: string, size: number): Promis
   fetch('GET', qualifyUrl(`/system/lookup/tables/preview/${idOrName}?size=${size}`));
 
 export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
-  const { page, pageSize, query } = searchParams;
+  const { page, pageSize, query, sort } = searchParams;
 
-  return LookupTableCachesActions.searchPaginated(page, pageSize, query).then((resp: any) => deserializeCaches(resp));
+  const sortField = sort?.attributeId;
+  const sortOrder = sort?.direction;
+
+  const promise = LookupTableCachesStore.searchPaginated(page, pageSize, query, sortField, sortOrder);
+
+  LookupTableCachesActions.searchPaginated.promise(promise);
+
+  return promise.then(deserializeCaches);
 };
 
 export const fetchCacheTypes = async () => {
@@ -96,9 +103,16 @@ export const updateCache = async (payload: LookupTableCache) => LookupTableCache
 export const deleteCache = async (cacheId: string) => LookupTableCachesActions.delete(cacheId);
 
 export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => {
-  const { page, pageSize, query } = searchParams;
+  const { page, pageSize, query, sort } = searchParams;
 
-  return LookupTableDataAdaptersActions.searchPaginated(page, pageSize, query).then(deserializeDataAdapters);
+  const sortField = sort?.attributeId;
+  const sortOrder = sort?.direction;
+
+  const promise = LookupTableDataAdaptersStore.searchPaginated(page, pageSize, query, sortField, sortOrder);
+
+  LookupTableDataAdaptersActions.searchPaginated.promise(promise);
+
+  return promise.then(deserializeDataAdapters);
 };
 
 export const fetchDataAdapterTypes = async () => {

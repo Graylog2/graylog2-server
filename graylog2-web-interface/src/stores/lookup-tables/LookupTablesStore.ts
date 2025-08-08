@@ -172,8 +172,8 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
       perPage: number,
       query: string = null,
       resolve: boolean = true,
-      sort?: string,
-      order?: 'asc' | 'desc',
+      sort: string = 'title',
+      order: 'asc' | 'desc' = 'asc',
     ) {
       const url = this._url(PaginationURL('tables', page, perPage, query, { resolve, sort, order }));
       const promise = fetch('GET', url);
