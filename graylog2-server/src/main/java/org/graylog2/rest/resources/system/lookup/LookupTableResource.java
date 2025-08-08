@@ -429,7 +429,7 @@ public class LookupTableResource extends RestResource {
         checkPermission(RestPermissions.LOOKUP_TABLES_READ, tableDto.id());
         final var service = lookupTableService.newBuilder().lookupTable(tableDto.name()).build();
         if (!service.supportsPreview()) {
-            throw new UnsupportedOperationException("Backing data adapter does not support preview.");
+            return LookupPreview.unsupported();
         }
         return service.getPreview(size);
     }

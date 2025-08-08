@@ -22,6 +22,7 @@ import { asMock } from 'helpers/mocking';
 import { createLookupTableCache } from 'fixtures/lookupTables';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
 import Cache from './Cache';
@@ -46,7 +47,11 @@ PluginStore.register(
 const renderedCache = (scope: string) => {
   const cache = createLookupTableCache(1, { _scope: scope });
 
-  return render(<Cache cache={cache} />);
+  return render(
+    <ModalProvider>
+      <Cache cache={cache} />
+    </ModalProvider>,
+  );
 };
 
 describe('Cache', () => {

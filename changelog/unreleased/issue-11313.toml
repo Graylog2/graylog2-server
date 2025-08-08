@@ -1,0 +1,5 @@
+type = "a"
+message = "Add ability for HTTP notifications to retry requests for temporary HTTP failure codes."
+
+issues = ["11313"]
+pulls = ["23334"]

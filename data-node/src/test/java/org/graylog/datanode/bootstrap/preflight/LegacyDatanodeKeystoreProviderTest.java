@@ -23,6 +23,7 @@ import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bson.Document;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
@@ -117,7 +118,7 @@ class LegacyDatanodeKeystoreProviderTest {
 
     @Nonnull
     private static KeyStore createSignedKeystore(String passwordSecret) throws Exception {
-        final KeyPair keyPair = generateKeyPair();
+        final KeyPair keyPair = DatanodeTestUtils.generateKeyPair(Duration.ofDays(31));
         final KeyStore keystore = keyPair.toKeystore("datanode", passwordSecret.toCharArray());
         final CertificateChain signed = singCertChain(keystore, passwordSecret);
 
@@ -141,13 +142,6 @@ class LegacyDatanodeKeystoreProviderTest {
         return CsrGenerator.generateCSR(keystoreInformation, DATANODE_KEY_ALIAS, "my-hostname", Collections.emptyList());
     }
 
-    @Nonnull
-    private static KeyPair generateKeyPair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DATANODE_KEY_ALIAS)
-                .isCA(false)
-                .validity(Duration.ofDays(31));
-        return CertificateGenerator.generate(certRequest);
-    }
 
     private static String keystoreToBase64(final KeyStore keyStore, char[] keystorePassword) throws KeyStoreStorageException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

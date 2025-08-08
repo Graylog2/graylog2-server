@@ -86,7 +86,7 @@ const FormSubmit = ({ ...props }: Props) => {
   return (
     <ButtonToolbar className={className}>
       <Button
-        bsStyle="success"
+        bsStyle="primary"
         bsSize={bsSize}
         disabled={disabledSubmit || submittingAsync}
         form={formId}
