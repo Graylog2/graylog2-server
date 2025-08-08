@@ -16,24 +16,19 @@
  */
 package org.graylog.security.shares;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-@Singleton
-public class EntityCreationRequestService {
-    Set<CollectionRequestHandler> collectionRequestHandlers;
+public interface PluggableEntityHandler {
+    /**
+     * Pluggable handler for actions related to specific entity types.
+     */
+    void onCreate(GRN entity, Set<GRN> collections);
 
-    @Inject
-    public EntityCreationRequestService(Set<CollectionRequestHandler> collectionRequestHandlers) {
-        this.collectionRequestHandlers = collectionRequestHandlers;
-    }
+    Predicate<GRN> entityFilter();
 
-    public void handleCollections(GRN entity, Set<GRN> collections) {
-        for (CollectionRequestHandler handler : collectionRequestHandlers) {
-            handler.addToCollection(entity, collections);
-        }
-    }
+    Stream<GRN> expand(GRN grn);
 }
