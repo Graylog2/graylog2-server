@@ -47,7 +47,7 @@ export const LookupTableCachesActions = singletonActions('core.LookupTableCaches
 
 type StoreState = {
   caches: LookupTableCache[];
-  types: any,
+  types: any;
   pagination: {
     page: number;
     per_page: number;
@@ -55,7 +55,7 @@ type StoreState = {
     count: number;
     query: string | null;
   };
-  validationErrors: any,
+  validationErrors: any;
 };
 export const LookupTableCachesStore = singletonStore('core.LookupTableCaches', () =>
   Reflux.createStore<StoreState>({
