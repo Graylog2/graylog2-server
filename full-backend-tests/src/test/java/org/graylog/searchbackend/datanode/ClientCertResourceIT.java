@@ -98,7 +98,7 @@ public class ClientCertResourceIT {
         final ValidatableResponse clientCertResponse = api.post("/ca/clientcert", """
                 {
                     "principal": "admin",
-                    "role": "all_access",
+                    "roles": ["all_access"],
                     "password": "%s",
                     "certificate_lifetime": "P6M"
                 }
