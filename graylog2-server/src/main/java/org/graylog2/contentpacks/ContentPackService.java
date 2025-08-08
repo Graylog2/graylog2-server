@@ -30,10 +30,9 @@ import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
-import org.apache.shiro.authz.annotation.Logical;
+import org.graylog.security.GrantDTO;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
-import org.graylog.security.GrantDTO;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -397,6 +396,10 @@ public class ContentPackService {
     }
 
     public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
+        return resolveEntityDependencyGraph(unresolvedEntities).nodes();
+    }
+
+    public Graph<EntityDescriptor> resolveEntityDependencyGraph(Collection<EntityDescriptor> unresolvedEntities) {
         final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
                 .allowsSelfLoops(false)
                 .nodeOrder(ElementOrder.insertion())
@@ -408,7 +411,7 @@ public class ContentPackService {
 
         LOG.debug("Final dependency graph: {}", finalDependencyGraph);
 
-        return finalDependencyGraph.nodes();
+        return finalDependencyGraph;
     }
 
     private MutableGraph<EntityDescriptor> resolveDependencyGraph(Graph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
