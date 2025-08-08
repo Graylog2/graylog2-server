@@ -135,10 +135,13 @@ const SchedulingInfo = ({
   const searchWithinFormatted = moment
     .duration(searchWithinMs)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+  const searchWithinMessage = searchWithinMs
+    ? `, searching within the last ${searchWithinFormatted}.`
+    : '.';
 
   return (
     <>
-      {`Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
+      {`Runs ${executeEveryFormatted}${searchWithinMessage} `}
       <OverlayTrigger
         trigger="click"
         rootClose

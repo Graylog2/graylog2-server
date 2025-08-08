@@ -17,6 +17,7 @@
 import React from 'react';
 import moment from 'moment';
 import 'moment-duration-format';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
@@ -88,7 +89,11 @@ class EventDefinitionDescription extends React.Component<
         .duration(definition.config.search_within_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
-      schedulingInformation = `Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
+      const searchWithinMessage = definition.config.search_within_ms
+        ? `, searching within the last ${searchWithinFormatted}.`
+        : '.';
+
+      schedulingInformation = `Runs ${executeEveryFormatted}${searchWithinMessage}`;
     }
 
     return schedulingInformation;
