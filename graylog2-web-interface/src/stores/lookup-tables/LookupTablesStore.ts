@@ -253,6 +253,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
       return promise;
     },
 
+    // TODO: How to include the call to the get errors
     getErrors(
       tableNames: Array<string> | undefined,
       cacheNames: Array<string> | undefined,

@@ -197,5 +197,6 @@ module.exports = {
     'import/internal-regex':
       '^(actions|components|contexts|domainActions|fixtures|helpers|hooks|logic|routing|stores|util|theme|views)/',
     polyfills: ['fetch', 'IntersectionObserver', 'Promise'],
+    'testing-library/utils-module': 'wrappedTestingLibrary',
   },
 };

@@ -9,6 +9,12 @@ The `kafka-clients` library was updated to 4.x which removes support for Kafka
 brokers with version 2.0 and earlier. That means all Graylog 7.0 Kafka inputs
 can only talk to Kafka brokers with version 2.1 or newer.
 
+### Enterprise Theme Color Customization
+
+The logic for generating color shades based on custom-defined color variants (error, informative, etc.)
+has been slightly adjusted. This change ensures that the exact color specified in the customization settings
+is now used as the primary color for elements like buttons and badges in the UI.
+
 ## Configuration File Changes
 
 | Option        | Action     | Description                                    |
@@ -17,7 +23,11 @@ can only talk to Kafka brokers with version 2.1 or newer.
 
 ## Default Configuration Changes
 
-- tbd
+- The permission to view the "Cluster Configuration" page was removed from the `Reader` role. This permission is now
+  available with the `Cluster Configuration Reader` role. There is an automatic one-time migration to add this role to
+  all existing users with the `Reader` role to ensure backwards compatibility. New users that will be created in the
+  future need to be explicitly assigned to the `Cluster Configuration Reader` role if they should be able to access the
+  page.
 
 ## Java API Changes
 
@@ -58,6 +68,8 @@ can only talk to Kafka brokers with version 2.1 or newer.
     }
 }
 ```
+- Access to the API browser now requires the `api_browser:read` permission. This permission can be granted by assigning 
+  the new “API Browser Reader” role to a user.
 
 ## REST API Endpoint Changes
 

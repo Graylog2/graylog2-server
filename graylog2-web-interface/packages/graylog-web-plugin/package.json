@@ -30,7 +30,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@graylog/sawmill": "2.0.24",
+    "@graylog/sawmill": "4.0.0",
     "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/react-query": "5.83.0",
     "@types/jquery": "3.5.32",
@@ -54,7 +54,7 @@
     "styled-components": "6.1.1",
     "typescript": "5.8.3",
     "use-query-params": "^2.2.0",
-    "webpack": "5.100.1",
+    "webpack": "5.100.2",
     "webpack-cli": "6.0.1",
     "webpack-merge": "4.2.2"
   }

@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Col, Row, HelpBlock } from 'components/bootstrap';
-import Icon from 'components/common/Icon';
+import { StatusIcon } from 'components/common';
 
 const StyledRow = styled(Row)`
   &:not(:last-child) {
@@ -43,21 +43,9 @@ const LabelCol = styled(Col)(
   `,
 );
 
-const BooleanIcon = styled(Icon)<{ value: Props['value'] }>(
-  ({ theme, value }) => css`
-    color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
-  `,
-);
-
-const BooleanValue = ({ value }: { value: boolean }) => (
-  <>
-    <BooleanIcon name={value ? 'check_circle' : 'cancel'} value={value} /> {value ? 'yes' : 'no'}
-  </>
-);
-
 const readableValue = (value: Props['value']): React.ReactNode => {
   if (typeof value === 'boolean') {
-    return <BooleanValue value={value} />;
+    return <StatusIcon active={value} />;
   }
 
   if (value) {

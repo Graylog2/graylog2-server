@@ -20,8 +20,8 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
-import { Icon } from 'components/common';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import { Icon, StatusIcon } from 'components/common';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
 import FormWrap from 'integrations/aws/common/FormWrap';
@@ -279,13 +279,13 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
           <li>
             <strong>Enable Throttling</strong>
             <span>
-              <Icon name={throttleEnabled ? 'check_circle' : 'cancel'} />
+              <StatusIcon active={throttleEnabled} />
             </span>
           </li>
           <li>
             <strong>Add Flow Log prefix to field names</strong>
             <span>
-              <Icon name={addPrefix ? 'check_circle' : 'cancel'} />
+              <StatusIcon active={addPrefix} />
             </span>
           </li>
           {overrideSource.value && (

@@ -24,7 +24,7 @@ import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { renderOptions } from 'integrations/aws/common/Options';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
 import formValidation from 'integrations/aws/utils/formValidation';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 
 import SetupModal from './setup-steps/SetupModal';
