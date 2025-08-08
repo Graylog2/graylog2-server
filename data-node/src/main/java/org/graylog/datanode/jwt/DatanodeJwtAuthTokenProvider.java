@@ -30,6 +30,6 @@ public class DatanodeJwtAuthTokenProvider extends IndexerJwtAuthTokenProvider {
      */
     @Inject
     public DatanodeJwtAuthTokenProvider(JwtSecret jwtSecret, Configuration configuration) {
-        super(jwtSecret, configuration.getIndexerJwtAuthTokenExpirationDuration(), configuration.getIndexerJwtAuthTokenCachingDuration(), true, Clock.systemDefaultZone());
+        super(jwtSecret, configuration.getIndexerJwtAuthTokenExpirationDuration(), configuration.getIndexerJwtAuthTokenCachingDuration(), configuration.getIndexerJwtAuthTokenClockSkewTolerance(), true, Clock.systemDefaultZone());
     }
 }
