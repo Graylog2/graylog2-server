@@ -36,7 +36,7 @@ class OpensearchConfigurationTest {
         final DatanodeConfigurationPart cp2 = DatanodeConfigurationPart.builder().addNodeRole("search").build();
         final DatanodeConfigurationPart cp3 = DatanodeConfigurationPart.builder().nodeRoles(List.of("cluster_manager", "data", "ingest", "remote_cluster_client")).build();
 
-        final OpensearchConfiguration configuration = new OpensearchConfiguration(new OpensearchDistribution(tempDir, "2.15.0"), datanodeDirectories, "localhost", 9200, List.of(cp1, cp2, cp3));
+        final OpensearchConfiguration configuration = new OpensearchConfiguration(new OpensearchDistribution(tempDir, "2.15.0"), datanodeDirectories, datanodeDirectories.createUniqueOpensearchProcessConfigurationDir(), "localhost", 9200, List.of(cp1, cp2, cp3));
 
         Assertions.assertThat(configuration.opensearchRoles())
                 .hasSize(5)
