@@ -25,6 +25,7 @@ import type { UserTelemetrySettings } from 'stores/telemetry/TelemetrySettingsSt
 import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
 import AppConfig from 'util/AppConfig';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
+import { fullPageReload } from 'util/URLUtils';
 
 const TelemetrySettingsConfigComponent = () => {
   const [settings, setSettings] = useState<UserTelemetrySettings | undefined>(undefined);
@@ -58,7 +59,7 @@ const TelemetrySettingsConfigComponent = () => {
 
     TelemetrySettingsActions.update(data).then(() => {
       setSubmitting(false);
-      window.location.reload();
+      fullPageReload();
     });
   };
 
