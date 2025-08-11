@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.shares;
+import type { LookupTableCache } from 'logic/lookup-tables/types';
+import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
-import org.graylog.grn.GRN;
+import { attributes } from './constants';
 
-import java.util.Set;
-import java.util.function.Predicate;
+type DeserializeCachesArgs = PaginatedResponseType & {
+  caches: Array<LookupTableCache>;
+};
 
-public interface CollectionRequestHandler {
-    /**
-     * Pluggable handler for actions related to collections.
-     */
-    void addToCollection(GRN entity, Set<GRN> collections);
-
-    Predicate<GRN> collectionFilter();
+export default function deserializeCaches({ query, total, page, per_page, count, caches }: DeserializeCachesArgs) {
+  return {
+    attributes,
+    list: caches.map((cache: LookupTableCache) => ({ ...cache, id: cache.id })) ?? [],
+    pagination: { total, page, per_page, count, query },
+  };
 }
