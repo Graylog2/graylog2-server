@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface CSP {
-    static final String DEFAULT = "default";
-    static final String SWAGGER = "swagger";
+    String DEFAULT = "default";
+    String SWAGGER = "swagger";
 
     String group() default DEFAULT;
 }
