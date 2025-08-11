@@ -17,8 +17,6 @@
 import React from 'react';
 import moment from 'moment';
 import 'moment-duration-format';
-// eslint-disable-next-line no-restricted-imports
-import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
@@ -140,7 +138,7 @@ class EventDefinitionDescription extends React.Component<
       return null;
     }
 
-    const scheduleCtx = get(context, `scheduler.${definition.id}`, null);
+    const scheduleCtx = context?.scheduler?.[definition.id] ?? null;
 
     if (!scheduleCtx.is_scheduled) {
       return <p>Event definition is not scheduled, no details available.</p>;
@@ -148,7 +146,7 @@ class EventDefinitionDescription extends React.Component<
 
     let timerange = null;
 
-    if (get(scheduleCtx, 'data.type', null) === 'event-processor-execution-v1') {
+    if (scheduleCtx?.data?.type === 'event-processor-execution-v1') {
       const from = scheduleCtx.data.timerange_from;
       const to = scheduleCtx.data.timerange_to;
 
