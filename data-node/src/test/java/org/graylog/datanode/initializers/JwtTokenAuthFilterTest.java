@@ -95,7 +95,7 @@ class JwtTokenAuthFilterTest {
 
     @Nonnull
     private static String generateToken(String signingKey) {
-        final IndexerJwtAuthTokenProvider tokenProvider = new IndexerJwtAuthTokenProvider(new JwtSecret(signingKey), Duration.seconds(180), Duration.seconds(90), true, Clock.systemDefaultZone());
+        final IndexerJwtAuthTokenProvider tokenProvider = new IndexerJwtAuthTokenProvider(new JwtSecret(signingKey), Duration.seconds(180), Duration.seconds(90), Duration.seconds(30), true, Clock.systemDefaultZone());
         return tokenProvider.get().rawTokenValue().get();
     }
 }

@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
+import styled from 'styled-components';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import { useFetchCacheTypes, useValidateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import CacheForm from 'components/lookup-tables/CacheForm';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
-import CacheForm from './CacheForm';
 import type { CachePluginType } from './types';
 
 const INIT_CACHE: LookupTableCache = {
@@ -37,15 +39,22 @@ type TypesType = { type?: string; lable?: string };
 type cacheTypeOptionsType = { value: string; label: string };
 
 type Props = {
-  saved: () => void;
-  types: TypesType[];
-  validate: () => void;
-  validationErrors: validationErrorsType;
+  saved: (cacheObj: LookupTableCache) => void;
+  onCancel: () => void;
+  validationErrors?: any;
 };
 
-const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
+const StyledRow = styled(Row)`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
+
+const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
   const [type, setType] = React.useState<string>(null);
   const cachePlugins = usePluginEntities('lookupTableCaches');
+  const { types: cacheTypesFromAPI, fetchingCacheTypes } = useFetchCacheTypes();
+  const { validateCache } = useValidateCache();
 
   const plugins = React.useMemo(
     () =>
@@ -58,42 +67,49 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
   );
 
   const cacheTypes = React.useMemo(
-    () =>
-      Object.values(types)
-        .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
-        .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) =>
-          naturalSort(a.label.toLowerCase(), b.label.toLowerCase()),
-        ),
-    [types, plugins],
+    () => {
+      if (!fetchingCacheTypes) {
+        return Object.values(cacheTypesFromAPI)
+          .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
+          .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) =>
+            naturalSort(a.label.toLowerCase(), b.label.toLowerCase()),
+          );
+      }
+
+      return [];
+    },
+    [cacheTypesFromAPI, fetchingCacheTypes, plugins],
   );
 
   const cache = React.useMemo(() => {
     if (type) {
       return {
         ...INIT_CACHE,
-        config: { ...types[type]?.default_config },
+        config: { ...cacheTypesFromAPI[type]?.default_config },
       };
     }
 
     return null;
-  }, [type, types]);
+  }, [type, cacheTypesFromAPI]);
 
   const handleSelect = (selectedType: string) => {
     setType(selectedType);
   };
 
+  const validate = (cacheObj: LookupTableCache) => {
+    validateCache(cacheObj);
+  };
+
   return (
     <>
-      <Row className="content">
-        <Col lg={6} className="form form-horizontal">
+      <StyledRow>
+        <Col lg={6}>
           <Input
             id="cache-type-select"
             label="Cache Type"
             required
             autoFocus
-            help="The type of cache to configure."
-            labelClassName="col-sm-3"
-            wrapperClassName="col-sm-9">
+            help="The type of cache to configure.">
             <Select
               placeholder="Select Cache Type"
               clearable={false}
@@ -103,21 +119,22 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
             />
           </Input>
         </Col>
-      </Row>
+      </StyledRow>
       {cache && (
-        <Row className="content">
-          <Col lg={12}>
+        <StyledRow>
+          <Col lg={9}>
             <CacheForm
               cache={cache}
               type={type}
               title="Configure Cache"
               create
               saved={saved}
-              validationErrors={validationErrors}
+              onCancel={onCancel}
               validate={validate}
+              validationErrors={validationErrors}
             />
           </Col>
-        </Row>
+        </StyledRow>
       )}
     </>
   );
