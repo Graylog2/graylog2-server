@@ -17,11 +17,13 @@
 package org.graylog2.shared.inputs;
 
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class InputRegistryTest {
 
@@ -33,8 +35,12 @@ class InputRegistryTest {
             if (i % 2 == 0) {
                 var ignored = inputRegistry.stream().toList();
             } else {
+                final MessageInput input = mock(MessageInput.class);
+                when(input.getId()).thenReturn("abc");
                 //noinspection unchecked
-                inputRegistry.add(mock((IOState.class)));
+                final IOState<MessageInput> ioState = mock((IOState.class));
+                when(ioState.getStoppable()).thenReturn(input);
+                inputRegistry.add(ioState);
             }
         });
     }
