@@ -21,7 +21,7 @@ import { screen, render, within, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'helpers/selectEvent';
 import type { Url } from 'stores/configurations/ConfigurationsStore';
 
-import UrlWhiteListForm from './UrlWhiteListForm';
+import UrlAllowListForm from './UrlAllowListForm';
 
 const mockTestRegexValidity = jest.fn(() => Promise.resolve({ is_valid: true }));
 
@@ -53,7 +53,7 @@ const config = {
   disabled: false,
 };
 
-describe('UrlWhitelistForm', () => {
+describe('UrlAllowlistForm', () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -67,9 +67,9 @@ describe('UrlWhitelistForm', () => {
   it('should show allow list toggle and url table', async () => {
     const onUpdate = jest.fn();
 
-    render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+    render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
-    await screen.findByRole('checkbox', { name: /disable whitelist/i });
+    await screen.findByRole('checkbox', { name: /disable allowlist/i });
 
     config.entries.forEach(({ title }) => {
       expect(screen.getByDisplayValue(title)).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe('UrlWhitelistForm', () => {
     const onUpdate = jest.fn();
     const nextValue = 'foobar';
 
-    render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+    render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
     expect(screen.queryByDisplayValue(nextValue)).not.toBeInTheDocument();
 
@@ -109,7 +109,7 @@ describe('UrlWhitelistForm', () => {
   it('should update type changes', async () => {
     const onUpdate = jest.fn();
 
-    render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+    render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
     const row = await screen.findByRole('row', { name: /3/i });
     const select = await within(row).findByText(/exact match/i);
@@ -135,7 +135,7 @@ describe('UrlWhitelistForm', () => {
   it('should add a new row to the form', async () => {
     const onUpdate = jest.fn();
 
-    render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+    render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
     const button = (await screen.findAllByRole('button', { name: /add url/i }))[0];
 
@@ -155,7 +155,7 @@ describe('UrlWhitelistForm', () => {
   it('should delete a row', async () => {
     const onUpdate = jest.fn();
 
-    render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+    render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
     expect(screen.getByDisplayValue(config.entries[0].title)).toBeInTheDocument();
 
@@ -183,7 +183,7 @@ describe('UrlWhitelistForm', () => {
       const onUpdate = jest.fn();
       const nextValue = 'https://graylog.org';
 
-      render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+      render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
       const urlInput = screen.getByDisplayValue(config.entries[0].value);
 
@@ -208,7 +208,7 @@ describe('UrlWhitelistForm', () => {
     it('should validate title', async () => {
       const onUpdate = jest.fn();
 
-      render(<UrlWhiteListForm urls={config.entries} onUpdate={onUpdate} />);
+      render(<UrlAllowListForm urls={config.entries} onUpdate={onUpdate} />);
 
       expect(onUpdate).toHaveBeenCalledTimes(1);
       expect(onUpdate).toHaveBeenLastCalledWith(expect.any(Object), true);
@@ -229,7 +229,7 @@ describe('UrlWhitelistForm', () => {
       const onUpdate = jest.fn();
       mockTestRegexValidity.mockImplementationOnce(() => Promise.resolve({ is_valid: false }));
 
-      render(<UrlWhiteListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
+      render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
       const row = screen.getByRole('row', { name: /3/i });
       const select = within(row).getByText(/exact match/i);
@@ -270,7 +270,7 @@ describe('UrlWhitelistForm', () => {
 
       const onUpdate = jest.fn();
 
-      render(<UrlWhiteListForm urls={entries} onUpdate={onUpdate} newEntryId="f7033f1f-d50f-4323-96df-294ede41d312" />);
+      render(<UrlAllowListForm urls={entries} onUpdate={onUpdate} newEntryId="f7033f1f-d50f-4323-96df-294ede41d312" />);
 
       await screen.findByText(/required field/i);
       await screen.findByText(/not a valid url/i);

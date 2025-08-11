@@ -343,7 +343,7 @@ export const TELEMETRY_EVENT_TYPE = {
     LOG_COLLECTOR_DELETED: 'Sidecar Log Collector Deleted',
   },
   TRAFFIC_GRAPH_DAYS_CHANGED: 'Traffic Graph Days Changed',
-  URLWHITELIST_CONFIGURATION_UPDATED: 'Urlwhitelist Configuration Updated',
+  URLALLOWLIST_CONFIGURATION_UPDATED: 'Urlallowlist Configuration Updated',
   CONTENT_PACK: {
     INSTALLED: 'Content Pack Installed',
     DOWNLOADED: 'Content Pack Downloaded',

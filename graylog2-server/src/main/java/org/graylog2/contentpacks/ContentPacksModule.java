@@ -33,7 +33,7 @@ import org.graylog2.contentpacks.facades.SidecarCollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.SidecarCollectorFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.facades.StreamReferenceFacade;
-import org.graylog2.contentpacks.facades.UrlWhitelistFacade;
+import org.graylog2.contentpacks.facades.UrlAllowlistFacade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
@@ -66,7 +66,7 @@ public class ContentPacksModule extends PluginModule {
         addEntityFacade(DashboardFacade.TYPE_V2, DashboardFacade.class);
         addEntityFacade(DashboardV1Facade.TYPE_V1, DashboardV1Facade.class);
         addEntityFacade(SearchFacade.TYPE_V1, SearchFacade.class);
-        addEntityFacade(UrlWhitelistFacade.TYPE_V1, UrlWhitelistFacade.class);
+        addEntityFacade(UrlAllowlistFacade.TYPE_V1, UrlAllowlistFacade.class);
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
         addConstraintChecker(PluginVersionConstraintChecker.class);
