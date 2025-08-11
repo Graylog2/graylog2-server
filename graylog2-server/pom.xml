@@ -159,8 +159,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
-            <artifactId>owasp-java-html-sanitizer</artifactId>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
         </dependency>
 
         <dependency>
@@ -792,10 +792,6 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.proto</groupId>
-            <artifactId>opentelemetry-proto</artifactId>
         </dependency>
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->

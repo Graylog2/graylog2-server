@@ -30,8 +30,8 @@ import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/Loo
 const LOOKUP_PERMISSIONS = ['lookuptables:read'];
 
 type Props = {
-  onTableNameChange: () => void;
-  onKeyChange: () => void;
+  onTableNameChange: (arg: string) => void;
+  onKeyChange: (arg: string) => void;
   selectedTableName: string;
   selectedKeyName: string;
   nameValidation: string;
@@ -107,7 +107,6 @@ const LookupTableFields = ({
             onChange={onTableNameChange}
             options={formatLookupTables(lookupTables.tables)}
             value={selectedTableName}
-            matchProp="label"
             required
           />
           <HelpBlock>{nameValidation || 'Select the Lookup Table which should be used to get the value.'}</HelpBlock>
@@ -125,7 +124,6 @@ const LookupTableFields = ({
               onChange={onKeyChange}
               options={formatMessageFields(allFieldTypes)}
               value={selectedKeyName}
-              matchProp="label"
               allowCreate
               required
             />

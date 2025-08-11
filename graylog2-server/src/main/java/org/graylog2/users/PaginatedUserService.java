@@ -16,10 +16,11 @@
  */
 package org.graylog2.users;
 
-import org.graylog2.database.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -101,6 +102,7 @@ public class PaginatedUserService {
                 .page(page);
     }
 
+    @MustBeClosed
     public Stream<UserOverviewDTO> streamAll() {
         return MongoUtils.stream(collection.find());
     }

@@ -37,7 +37,7 @@ const StyledButton = styled(Button)(
   ({ theme }) => css`
   font-family: ${theme.fonts.family.navigation};
   font-size: ${theme.fonts.size.navigation};
-  color: ${theme.colors.variant.darker.default};
+  color: ${theme.colors.text.primary};
   
   &:hover,
   &:focus {
@@ -51,7 +51,7 @@ const StyledButton = styled(Button)(
   }
 
   &.active {
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
 
     ${activeIndicatorStyles(theme)}
 
