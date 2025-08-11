@@ -28,7 +28,7 @@ import { asMock } from 'helpers/mocking';
 import { ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-import URLWhiteListFormModal from './URLWhiteListFormModal';
+import URLAllowListFormModal from './URLAllowListFormModal';
 
 jest.mock('hooks/useCurrentUser');
 
@@ -37,7 +37,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
     'getInitialState',
     jest.fn(() => ({
       configuration: {
-        'org.graylog2.system.urlwhitelist.UrlWhitelist': {
+        'org.graylog2.system.urlallowlist.UrlAllowlist': {
           entries: [],
           disabled: false,
         },
@@ -45,12 +45,12 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
     })),
   ]),
   ConfigurationsActions: {
-    listWhiteListConfig: MockAction(),
+    listAllowListConfig: MockAction(),
   },
 }));
 
-describe('<URLWhiteListFormModal>', () => {
-  const renderSUT = () => render(<URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />);
+describe('<URLAllowListFormModal>', () => {
+  const renderSUT = () => render(<URLAllowListFormModal newUrlEntry="http://graylog.com" urlType="literal" />);
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
@@ -59,13 +59,13 @@ describe('<URLWhiteListFormModal>', () => {
   it('renders elements to add URL to allow list', async () => {
     renderSUT();
 
-    const addButton = screen.getByRole('button', { name: /add to URL Allowlist/i });
+    const addButton = screen.getByRole('button', { name: /add to url allowlist/i });
 
     expect(addButton).toBeInTheDocument();
 
     await userEvent.click(addButton);
 
-    expect(await screen.findByText('Whitelist URLs')).toBeInTheDocument();
+    expect(await screen.findByText('Allowlist URLs')).toBeInTheDocument();
     expect(screen.getByDisplayValue('http://graylog.com')).toBeInTheDocument();
     expect(screen.getByText(/exact match/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /update configuration/i })).toBeInTheDocument();
@@ -76,13 +76,13 @@ describe('<URLWhiteListFormModal>', () => {
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
     renderSUT();
 
-    expect(screen.queryByRole('button', { name: /add to URL Allowlist/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /add to url allowlist/i })).not.toBeInTheDocument();
   });
 
   it('does not render if allow list is not loaded', () => {
     asMock(ConfigurationsStore.getInitialState).mockImplementation(() => ({
       configuration: {
-        'org.graylog2.system.urlwhitelist.UrlWhitelist': undefined,
+        'org.graylog2.system.urlallowlist.UrlAllowlist': undefined,
       },
       searchesClusterConfig: undefined,
       eventsClusterConfig: undefined,
@@ -91,13 +91,13 @@ describe('<URLWhiteListFormModal>', () => {
 
     renderSUT();
 
-    expect(screen.queryByRole('button', { name: /add to URL Allowlist/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /add to url allowlist/i })).not.toBeInTheDocument();
   });
 
   it('extends existing allow list with given newUrlEntry', async () => {
     asMock(ConfigurationsStore.getInitialState).mockImplementation(() => ({
       configuration: {
-        'org.graylog2.system.urlwhitelist.UrlWhitelist': {
+        'org.graylog2.system.urlallowlist.UrlAllowlist': {
           entries: [{ id: '1234', title: 'localhost', value: 'http://localhost(:\\d+)?', type: 'regex' }],
           disabled: false,
         },
@@ -108,13 +108,13 @@ describe('<URLWhiteListFormModal>', () => {
     }));
 
     renderSUT();
-    const addButton = screen.queryByRole('button', { name: /add to URL Allowlist/i });
+    const addButton = screen.queryByRole('button', { name: /add to url allowlist/i });
 
     expect(addButton).toBeInTheDocument();
 
     await userEvent.click(addButton);
 
-    expect(await screen.findByText('Whitelist URLs')).toBeInTheDocument();
+    expect(await screen.findByText('Allowlist URLs')).toBeInTheDocument();
     expect(screen.getByDisplayValue('http://localhost(:\\d+)?')).toBeInTheDocument();
     expect(screen.getByDisplayValue('http://graylog.com')).toBeInTheDocument();
   });

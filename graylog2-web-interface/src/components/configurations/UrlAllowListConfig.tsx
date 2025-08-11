@@ -26,28 +26,28 @@ import { Button, Table } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import UrlAllowListForm from 'components/configurations/UrlAllowListForm';
+import type { AllowListConfig } from 'stores/configurations/ConfigurationsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useProductName from 'brand-customization/useProductName';
 
-const UrlWhiteListConfig = () => {
+const UrlAllowListConfig = () => {
   const productName = useProductName();
   const [showConfigModal, setShowConfigModal] = useState(false);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
-  const [viewConfig, setViewConfig] = useState<WhiteListConfig | undefined>(undefined);
-  const [formConfig, setFormConfig] = useState<WhiteListConfig | undefined>(undefined);
+  const [viewConfig, setViewConfig] = useState<AllowListConfig | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<AllowListConfig | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
 
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
   useEffect(() => {
-    ConfigurationsActions.list(ConfigurationType.URL_WHITELIST_CONFIG).then(() => {
-      const config = getConfig(ConfigurationType.URL_WHITELIST_CONFIG, configuration);
+    ConfigurationsActions.list(ConfigurationType.URL_ALLOWLIST_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.URL_ALLOWLIST_CONFIG, configuration);
 
       setViewConfig(config);
       setFormConfig(config);
@@ -80,16 +80,16 @@ const UrlWhiteListConfig = () => {
   const saveConfig = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.URL_WHITE_LIST_UPDATED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'urlwhitelist',
+      app_section: 'urlallowlist',
       app_action_value: 'configuration-save',
     });
 
-    ConfigurationsActions.updateWhitelist(ConfigurationType.URL_WHITELIST_CONFIG, formConfig).then(() => {
+    ConfigurationsActions.updateAllowlist(ConfigurationType.URL_ALLOWLIST_CONFIG, formConfig).then(() => {
       closeModal();
     });
   };
 
-  const update = (newConfig: WhiteListConfig, newIsValid: boolean) => {
+  const update = (newConfig: AllowListConfig, newIsValid: boolean) => {
     setFormConfig(newConfig);
     setIsValid(newIsValid);
   };
@@ -105,10 +105,10 @@ const UrlWhiteListConfig = () => {
       <h2>URL Allowlist Configuration {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
       <p>
         When enabled, outgoing HTTP requests from {productName} servers, such as event notifications or HTTP-based data
-        adapter requests, are validated against the whitelists configured here. Because the HTTP requests are made from
+        adapter requests, are validated against the allowlists configured here. Because the HTTP requests are made from
         the {productName} servers, they might be able to reach more sensitive systems than an external user would have
         access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
-        Whitelist administrative access is separate from data adapters and event notification configuration.
+        Allowlist administrative access is separate from data adapters and event notification configuration.
       </p>
       <Table striped bordered condensed className="top-margin">
         <thead>
@@ -121,7 +121,7 @@ const UrlWhiteListConfig = () => {
         </thead>
         <tbody>{summary()}</tbody>
       </Table>
-      <IfPermitted permissions="urlwhitelist:write">
+      <IfPermitted permissions="urlallowlist:write">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
           Edit configuration
         </Button>
@@ -130,17 +130,17 @@ const UrlWhiteListConfig = () => {
         <BootstrapModalForm
           show
           bsSize="lg"
-          title="Update Whitelist Configuration"
+          title="Update Allowlist Configuration"
           onSubmitForm={saveConfig}
           onCancel={closeModal}
           submitButtonDisabled={!isValid}
           submitButtonText="Update configuration">
-          <h3>Whitelist URLs</h3>
-          <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={update} />
+          <h3>Allowlist URLs</h3>
+          <UrlAllowListForm urls={entries} disabled={disabled} onUpdate={update} />
         </BootstrapModalForm>
       )}
     </div>
   );
 };
 
-export default UrlWhiteListConfig;
+export default UrlAllowListConfig;

@@ -49,6 +49,11 @@ public class InMemoryClusterConfigService implements ClusterConfigService {
     }
 
     @Override
+    public ClusterConfig getRaw(String key) {
+        throw new UnsupportedOperationException("not supported here");
+    }
+
+    @Override
     public <T> T getOrDefault(Class<T> type, T defaultValue) {
         return Optional.ofNullable(get(type)).orElse(defaultValue);
     }

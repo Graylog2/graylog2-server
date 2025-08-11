@@ -16,9 +16,9 @@
  */
 package org.graylog2.rest.resources.system;
 
-import org.graylog2.rest.models.system.urlwhitelist.WhitelistRegexGenerationRequest;
-import org.graylog2.rest.models.system.urlwhitelist.WhitelistRegexGenerationResponse;
-import org.graylog2.system.urlwhitelist.RegexHelper;
+import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationRequest;
+import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationResponse;
+import org.graylog2.system.urlallowlist.RegexHelper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -28,29 +28,29 @@ import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UrlWhitelistResourceTest {
+public class UrlAllowlistResourceTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
     @InjectMocks
-    UrlWhitelistResource urlWhitelistResource;
+    UrlAllowlistResource urlAllowlistResource;
 
     @Spy
     RegexHelper regexHelper;
 
     @Test
     public void generateRegexForTemplate() {
-        final WhitelistRegexGenerationRequest request =
-                WhitelistRegexGenerationRequest.create("https://example.com/api/lookup?key=${key}", "${key}");
-        final WhitelistRegexGenerationResponse response = urlWhitelistResource.generateRegex(request);
+        final AllowlistRegexGenerationRequest request =
+                AllowlistRegexGenerationRequest.create("https://example.com/api/lookup?key=${key}", "${key}");
+        final AllowlistRegexGenerationResponse response = urlAllowlistResource.generateRegex(request);
         assertThat(response.regex()).isNotBlank();
     }
 
     @Test
     public void generateRegexForUrl() {
-        final WhitelistRegexGenerationRequest request =
-                WhitelistRegexGenerationRequest.create("https://example.com/api/lookup", null);
-        final WhitelistRegexGenerationResponse response = urlWhitelistResource.generateRegex(request);
+        final AllowlistRegexGenerationRequest request =
+                AllowlistRegexGenerationRequest.create("https://example.com/api/lookup", null);
+        final AllowlistRegexGenerationResponse response = urlAllowlistResource.generateRegex(request);
         assertThat(response.regex()).isNotBlank();
     }
 }
