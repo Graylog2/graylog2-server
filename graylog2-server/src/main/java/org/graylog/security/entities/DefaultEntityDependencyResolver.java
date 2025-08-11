@@ -23,7 +23,6 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
-import org.graylog.grn.GRNTypes;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.shares.Grantee;
 import org.graylog2.contentpacks.ContentPackService;
@@ -32,6 +31,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -45,13 +45,6 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
     private final GRNRegistry grnRegistry;
     private final GRNDescriptorService descriptorService;
     private final DBGrantService grantService;
-    // Some dependencies can be ignored.
-    // E.g. To view a stream with a custom output, a user does not need output permissions
-    private static final Map<GRNType, Set<ModelType>> IGNORED_DEPENDENCIES = ImmutableMap.<GRNType, Set<ModelType>>builder()
-            .put(GRNTypes.SEARCH, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .put(GRNTypes.STREAM, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .put(GRNTypes.DASHBOARD, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .build();
 
     @Inject
     public DefaultEntityDependencyResolver(ContentPackService contentPackService,
@@ -66,14 +59,24 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
 
     @Override
     public ImmutableSet<EntityDescriptor> resolve(GRN entity) {
-        final var contentPackEntityDescriptor = toContentPackEntityDescriptor(entity);
-        final ImmutableSet<GRN> dependencies = contentPackService.resolveEntities(Set.of(contentPackEntityDescriptor)).stream()
-                .filter(dep -> {
-                    // Filter dependencies that aren't needed for grants sharing
-                    // TODO This is another reason why we shouldn't be using the content pack resolver ¯\_(ツ)_/¯
-                    final Set<ModelType> ignoredDeps = IGNORED_DEPENDENCIES.getOrDefault(entity.grnType(), ImmutableSet.of());
-                    return !ignoredDeps.contains(dep.type());
-                })
+        return resolve(Set.of(entity));
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    protected ImmutableSet<EntityDescriptor> resolve(Collection<GRN> entities) {
+        final var cpDescriptors = entities.stream().map(DefaultEntityDependencyResolver::toContentPackEntityDescriptor)
+                .collect(Collectors.toUnmodifiableSet());
+        final var dependencyGraph = contentPackService.resolveEntityDependencyGraph(cpDescriptors);
+        final var dependencies = dependencyGraph.nodes().stream()
+                .filter(dependency -> !cpDescriptors.contains(dependency)) // Don't include the given entity in dependencies
+                // Workaround to ignore outputs as dependencies of streams.
+                // To view a stream with a custom output, a user does not need output permissions. Therefore, we
+                // ignore outputs if they only appear as dependencies of streams.
+                // TODO This is another reason why we shouldn't be using the content pack resolver ¯\_(ツ)_/¯
+                .filter(dependency -> !ModelTypes.OUTPUT_V1.equals(dependency.type()) ||
+                        dependencyGraph.predecessors(dependency).stream().anyMatch(
+                                predecessor -> !ModelTypes.STREAM_V1.equals(predecessor.type()))
+                )
                 // TODO: Work around from using the content pack dependency resolver:
                 //  We've added stream_title content pack entities in https://github.com/Graylog2/graylog2-server/pull/17089,
                 //  but in this context we want to return the actual dependent Stream to add additional permissions to.
@@ -81,7 +84,6 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
                         ? org.graylog2.contentpacks.model.entities.EntityDescriptor.create(cpDescriptor.id(), ModelTypes.STREAM_V1)
                         : cpDescriptor)
                 .map(cpDescriptor -> grnRegistry.newGRN(cpDescriptor.type().name(), cpDescriptor.id().id()))
-                .filter(dependency -> !entity.equals(dependency)) // Don't include the given entity in dependencies
                 .collect(ImmutableSet.toImmutableSet());
 
         final ImmutableMap<GRN, Optional<String>> entityExcerpts = entityExcerpts();

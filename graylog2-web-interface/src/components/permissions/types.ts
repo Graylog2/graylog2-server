@@ -20,6 +20,7 @@ import type React from 'react';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { ColumnRenderer, EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type SharedEntity from 'logic/permissions/SharedEntity';
 
 export type ModalHandler = {
   toggle?: () => void;
@@ -50,18 +51,19 @@ export type TableElement<T extends EntityBase> = {
   attributeName: string;
   attributes: Array<Attribute>;
   getColumnRenderer: (entityType: string) => ColumnRenderer<T, unknown>;
-  expandedSection: (entityType: string) => {[sectionName: string]: ExpandedSectionRenderer<T>};
+  expandedSection: (entityType: string) => { [sectionName: string]: ExpandedSectionRenderer<T> };
   tableCellComponent: React.ComponentType<{
     entityId: string;
     entityType: string;
   }>;
   useCondition: () => true;
-}
+};
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     'components.shared.entityActions'?: Array<EntitySharedAction<unknown, unknown>>;
     'components.shared.entityTableElements'?: Array<TableElement<EntityBase>>;
+    'components.permission.shared.entity.tableElements'?: Array<Partial<TableElement<EntityBase>>>;
     'components.collection'?: {
       AddCollectionFormGroup: React.ComponentType<{
         entityType?: string;
@@ -70,6 +72,12 @@ declare module 'graylog-web-plugin/plugin' {
         error?: any;
         value?: Array<string>;
         onChange: (values: Pick<EntitySharePayload, 'selected_collections'>) => void;
+      }>;
+      CollectionGranteeList: React.ComponentType<{
+        entityType: SharedEntity['type'];
+        title: string;
+        entityGRN: string;
+        entityTypeTitle?: string | null | undefined;
       }>;
     };
   }

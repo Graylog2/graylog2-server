@@ -19,6 +19,7 @@ import * as React from 'react';
 import { Link } from 'components/common/router';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
+import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntityTableElements';
 
 import OwnersCell from './OwnersCell';
 
@@ -29,6 +30,7 @@ type Props = {
 
 const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, title, type, id } }: Props) => {
   const entityRoute = useShowRouteFromGRN(id);
+  const { getPluggableTableCells, pluggableAttributes } = usePluggableSharedEntityTableElements();
 
   return (
     <tr key={title + type}>
@@ -38,6 +40,7 @@ const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, t
       <td className="limited">{type}</td>
       <OwnersCell owners={owners} />
       <td className="limited">{capabilityTitle}</td>
+      {pluggableAttributes && getPluggableTableCells(id, type)}
     </tr>
   );
 };

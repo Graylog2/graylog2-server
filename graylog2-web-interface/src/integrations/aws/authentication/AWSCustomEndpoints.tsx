@@ -18,7 +18,7 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import { ExternalLink } from 'components/common';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';

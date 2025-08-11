@@ -43,6 +43,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -151,6 +152,15 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                 .stream()
                 .flatMap(q -> q.widgets().stream())
                 .filter(w -> w.id().equals(widgetId))
+                .findFirst();
+    }
+
+    @JsonIgnore
+    public Optional<WidgetPositionDTO> findPositionById(final String widgetId) {
+        return state().values()
+                .stream()
+                .map(q -> q.widgetPositions().get(widgetId))
+                .filter(Objects::nonNull)
                 .findFirst();
     }
 
