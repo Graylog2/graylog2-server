@@ -25,7 +25,7 @@ import { ApiRoutes } from 'integrations/aws/common/Routes';
 import Countdown from 'integrations/aws/common/Countdown';
 import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { ApiContext } from 'integrations/aws/context/Api';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import Icon from 'components/common/Icon';
 
 const Notice = styled.span`

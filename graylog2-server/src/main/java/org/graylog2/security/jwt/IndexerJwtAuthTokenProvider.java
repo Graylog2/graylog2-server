@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
@@ -42,6 +43,14 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
     private final JwtSecret jwtSecret;
     private final Duration tokenExpirationDuration;
     private final Duration cachingDuration;
+
+    /**
+     * Clock skew tolerance should be datanode/opensearch setting only. But there is a bug in current opensearch and the tolerance
+     * will be available only in 3.2 and newer (https://github.com/opensearch-project/security/pull/5506)
+     * Till then, we can work around it by generating tokens with extended validity in both directions
+     */
+    @Deprecated(forRemoval = true)
+    private final Duration clockSkewTolerance;
     private final Clock clock;
 
     @Inject
@@ -49,13 +58,21 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
                                        ElasticsearchClientConfiguration configuration,
                                        @RunsWithDataNode final boolean runsWithDataNode
     ) {
-        this(jwtSecret, configuration.indexerJwtAuthTokenExpirationDuration(), configuration.indexerJwtAuthTokenCachingDuration(), runsWithDataNode || configuration.indexerUseJwtAuthentication(), Clock.systemDefaultZone());
+        this(jwtSecret,
+                configuration.indexerJwtAuthTokenExpirationDuration(),
+                configuration.indexerJwtAuthTokenCachingDuration(),
+                configuration.getIndexerJwtAuthTokenClockSkewTolerance(),
+                runsWithDataNode || configuration.indexerUseJwtAuthentication(),
+                Clock.systemDefaultZone()
+        );
     }
 
-    public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret, Duration tokenExpirationDuration, Duration cachingDuration, boolean useJwtAuthentication, Clock clock) {
+    public IndexerJwtAuthTokenProvider(
+            JwtSecret jwtSecret, Duration tokenExpirationDuration, Duration cachingDuration, @Deprecated Duration clockSkewTolerance, boolean useJwtAuthentication, Clock clock) {
         this.jwtSecret = jwtSecret;
         this.tokenExpirationDuration = tokenExpirationDuration;
         this.cachingDuration = cachingDuration;
+        this.clockSkewTolerance = clockSkewTolerance;
         this.clock = clock;
         cachingSupplier = Suppliers.memoizeWithExpiration(() -> {
             if (useJwtAuthentication) {
@@ -77,11 +94,25 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
                 .issuedAt(now)
                 .subject("admin")
                 .issuer("graylog")
-                .notBefore(now)
-                .expiration(new Date(nowMillis + tokenExpirationDuration.toMilliseconds()))
+                .notBefore(getNotBefore(nowMillis))
+                .expiration(getExpiration(nowMillis))
                 .signWith(jwtSecret.getSigningKey());
 
         return builder.compact();
+    }
+
+    @Nonnull
+    private Date getNotBefore(long nowMillis) {
+        // TODO: since we can't configure clock skew tolerance in opensearch, we have to work around it. See https://github.com/opensearch-project/security/pull/5506
+        // After 3.2 release the NBF claim should be just now. Any acceptable time drift will be corrected by clock skew tolerance setting in opensearch
+        return new Date(nowMillis - clockSkewTolerance.toMilliseconds());
+    }
+
+    @Nonnull
+    private Date getExpiration(long nowMillis) {
+        // TODO: since we can't configure clock skew tolerance in opensearch, we have to work around it. See https://github.com/opensearch-project/security/pull/5506
+        // After 3.2 release the expiration claim should be just now + token expiration duration
+        return new Date(nowMillis + tokenExpirationDuration.toMilliseconds() + clockSkewTolerance.toMilliseconds());
     }
 
     public IndexerJwtAuthToken get() {
@@ -89,6 +120,6 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
     }
 
     public Provider<IndexerJwtAuthToken> alwaysEnabled() {
-        return new IndexerJwtAuthTokenProvider(jwtSecret, tokenExpirationDuration, cachingDuration, true, Clock.systemDefaultZone());
+        return new IndexerJwtAuthTokenProvider(jwtSecret, tokenExpirationDuration, cachingDuration, clockSkewTolerance, true, Clock.systemDefaultZone());
     }
 }

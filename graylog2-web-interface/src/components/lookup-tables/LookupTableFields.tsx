@@ -30,8 +30,8 @@ import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/Loo
 const LOOKUP_PERMISSIONS = ['lookuptables:read'];
 
 type Props = {
-  onTableNameChange: () => void;
-  onKeyChange: () => void;
+  onTableNameChange: (arg: string) => void;
+  onKeyChange: (arg: string) => void;
   selectedTableName: string;
   selectedKeyName: string;
   nameValidation: string;
