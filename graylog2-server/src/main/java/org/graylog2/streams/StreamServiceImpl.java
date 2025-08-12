@@ -23,7 +23,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -38,6 +37,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
@@ -95,6 +95,7 @@ public class StreamServiceImpl implements StreamService {
     private static final String COLLECTION_NAME = "streams";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
+    private final ScopedEntityMongoUtils<StreamDTO> scopedMongoUtils;
     private final StreamRuleService streamRuleService;
     private final OutputService outputService;
     private final IndexSetService indexSetService;
@@ -118,6 +119,7 @@ public class StreamServiceImpl implements StreamService {
                              EntityScopeService scopeService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
         this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedMongoUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
         this.indexSetService = indexSetService;
@@ -473,7 +475,7 @@ public class StreamServiceImpl implements StreamService {
     @Override
     public String save(Stream stream) throws ValidationException {
         final StreamImpl streamImpl = (StreamImpl) stream;
-        collection.replaceOne(idEq(Objects.requireNonNull(streamImpl.id())), streamImpl.toDTO(), new ReplaceOptions().upsert(true));
+        scopedMongoUtils.upsert(streamImpl.toDTO());
 
         return streamImpl.id();
     }
