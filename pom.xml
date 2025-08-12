@@ -92,7 +92,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
         <airline.version>3.1.0</airline.version>
-        <amqp-client.version>5.25.0</amqp-client.version>
+        <amqp-client.version>5.26.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -110,22 +110,22 @@
         <caffeine.version>3.2.2</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.181</classgraph.version>
-        <commons-codec.version>1.18.0</commons-codec.version>
-        <commons-csv.version>1.14.0</commons-csv.version>
+        <commons-codec.version>1.19.0</commons-codec.version>
+        <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.5.0</commons-exec.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
-        <commons-net.version>3.11.1</commons-net.version>
+        <commons-net.version>3.12.0</commons-net.version>
         <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.20.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.40.0</error-prone.version>
+        <error-prone.version>2.41.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.53.3</gcs.version>
+        <gcs.version>2.55.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.73.0</grpc.version>
+        <grpc.version>1.74.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -144,7 +144,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>3.1.10</jersey.version>
+        <jersey.version>3.1.11</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
@@ -178,7 +178,7 @@
         <oshi.version>6.8.2</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
-        <streamex.version>0.8.3</streamex.version>
+        <streamex.version>0.8.4</streamex.version>
         <swagger.version>1.6.16</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
@@ -195,10 +195,10 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
-        <assertj-core.version>3.27.3</assertj-core.version>
+        <assertj-core.version>3.27.4</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.6</equalsverifier.version>
+        <equalsverifier.version>4.0.7</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
@@ -448,7 +448,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.27.1</version>
+                <version>1.28.0</version>
             </dependency>
 
             <dependency>

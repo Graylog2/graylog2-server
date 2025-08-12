@@ -152,7 +152,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Opensearch heap memory. Initial and maximum heap must be identical for OpenSearch, otherwise the boot fails.
             So it's only one config option.
             """)
-    @Parameter(value = "opensearch_heap")
+    @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
 
     @Documentation("HTTP port on which the embedded opensearch listens")
@@ -224,6 +224,16 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Documentation("This configuration defines validity interval of JWT tokens")
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    @DocumentationSection(heading = "OpenSearch JWT token usage",description = """
+            communication between Graylog and OpenSearch is secured by JWT. These are the defaults used for the token usage
+            adjust them, if you have special needs.
+            """)
+    @Documentation(value = """
+            Sets a window of time, in seconds, to compensate for any disparity between the graylog server and OpenSearch node clock times,
+             thereby preventing authentication failures due to the misalignment.""")
+    @Parameter(value = "indexer_jwt_auth_token_clock_skew_tolerance")
+    Duration indexerJwtAuthTokeClockSkewTolerance = Duration.seconds(30);
 
     @Documentation("""
             The auto-generated node ID will be stored in this file and read after restarts. It is a good idea
@@ -748,5 +758,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public Duration getIndexerJwtAuthTokenExpirationDuration() {
         return indexerJwtAuthTokenExpirationDuration;
+    }
+
+    public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
+        return indexerJwtAuthTokeClockSkewTolerance;
     }
 }

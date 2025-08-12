@@ -62,7 +62,8 @@ class GranteeSharesServiceTest {
         this.grnDescriptorService = grnDescriptorService;
         final DBGrantService dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
         when(granteeService.getGranteeAliases(any(GRN.class))).thenAnswer(a -> Collections.singleton(a.getArgument(0)));
-        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService);
+        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService,
+                new PluggableEntityService(Collections.emptySet()));
     }
 
     @DisplayName("Paginated shares for a user")

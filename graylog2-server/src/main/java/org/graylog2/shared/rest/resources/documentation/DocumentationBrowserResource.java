@@ -31,11 +31,13 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
@@ -49,6 +51,7 @@ import static java.util.Objects.requireNonNull;
 @Path("/api-browser")
 @CSP(group = CSP.SWAGGER)
 @RequiresAuthentication
+@RequiresPermissions(RestPermissions.API_BROWSER_READ)
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;

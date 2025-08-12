@@ -24,10 +24,14 @@ import type EntityShareState from 'logic/permissions/EntityShareState';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type {
+  SelectionRequest,
+  FormValues as GranteesSelectFormValues,
+} from 'components/permissions/Grantee/GranteesSelector';
+import GranteesSelector from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
+import usePluggableEntityCollectionGranteeList from 'hooks/usePluggableEntityCollectionGranteeList';
 
-import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
-import GranteesSelector from './GranteesSelector';
-import GranteesList from './GranteesList';
 import ShareableEntityURL from './ShareableEntityURL';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
@@ -82,6 +86,8 @@ const EntityShareSettings = ({
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
+  const CollectionGranteeList = usePluggableEntityCollectionGranteeList();
+
   useEffect(() => {
     setDisableSubmit(validationResults?.failed);
   }, [validationResults, setDisableSubmit]);
@@ -131,9 +137,19 @@ const EntityShareSettings = ({
           onDelete={_handleDeletion}
           onCapabilityChange={_handleSelection}
           selectedGrantees={selectedGrantees}
-          title="Collaborators"
+          title="Direct Collaborators"
         />
       </Section>
+      {CollectionGranteeList && (
+        <Section>
+          <CollectionGranteeList
+            title="Collection Collaborators"
+            entityType={entityType}
+            entityTypeTitle={entityTypeTitle}
+            entityGRN={entityGRN}
+          />
+        </Section>
+      )}
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}
         validationResults={validationResults}
