@@ -115,6 +115,8 @@ describe('UrlAllowlistForm', () => {
     const select = await within(row).findByText(/exact match/i);
 
     await selectEvent.openMenu(select);
+
+    // eslint-disable-next-line testing-library/no-node-access
     await selectEvent.select(select, 'Regex');
 
     const numberCalls = 2; // First render + debounce
@@ -236,6 +238,7 @@ describe('UrlAllowlistForm', () => {
 
       await selectEvent.openMenu(select);
 
+      // eslint-disable-next-line testing-library/no-node-access
       await selectEvent.select(select, 'Regex');
 
       await screen.findByText(/not a valid java regular expression/i);
