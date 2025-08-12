@@ -19,6 +19,7 @@ package org.graylog.datanode.process.configuration.files;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import org.graylog2.security.JwtSecret;
 
 import java.io.IOException;
@@ -33,9 +34,11 @@ public class OpensearchSecurityConfigurationFile implements DatanodeConfigFile {
     private static final ObjectMapper OBJECT_MAPPER = new YAMLMapper();
     private static final Path TARGET_PATH = Path.of("opensearch-security", "config.yml");
     private final JwtSecret signingKey;
+    private final Duration clockSkewTolerance;
 
-    public OpensearchSecurityConfigurationFile(final JwtSecret signingKey) {
+    public OpensearchSecurityConfigurationFile(final JwtSecret signingKey, Duration clockSkewTolerance) {
         this.signingKey = signingKey;
+        this.clockSkewTolerance = clockSkewTolerance;
     }
 
     @Override
@@ -49,6 +52,8 @@ public class OpensearchSecurityConfigurationFile implements DatanodeConfigFile {
         Map<String, Object> contents = OBJECT_MAPPER.readValue(configSource, new TypeReference<>() {});
         Map<String, Object> config = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
         config.put("signing_key", signingKey.getBase64Encoded());
+        // TODO: this setting is ignored up to opensearch 3.2. See https://github.com/opensearch-project/security/pull/5506
+        config.put("jwt_clock_skew_tolerance_seconds", clockSkewTolerance.toSeconds());
         OBJECT_MAPPER.writeValue(stream, contents);
     }
 

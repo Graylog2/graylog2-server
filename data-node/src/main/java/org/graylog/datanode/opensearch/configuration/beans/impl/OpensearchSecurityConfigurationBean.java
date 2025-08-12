@@ -141,7 +141,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
                 .javaOpts(javaOptions(truststorePassword))
                 .trustStore(truststoreCreator.getTruststore())
                 .withConfigFile(truststoreFile(truststoreCreator, truststorePassword))
-                .withConfigFile(new OpensearchSecurityConfigurationFile(jwtSecret))
+                .withConfigFile(new OpensearchSecurityConfigurationFile(jwtSecret, localConfiguration.getIndexerJwtAuthTokenClockSkewTolerance()))
                 .build();
     }
 
