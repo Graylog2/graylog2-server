@@ -19,30 +19,54 @@ import React from 'react';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
+import usePluginEntities from 'hooks/usePluginEntities';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventsEntityTable from 'components/events/EventsEntityTable';
 
-const EventsPage = () => (
-  <DocumentTitle title="Alerts &amp; Events">
-    <EventsPageNavigation />
-    <PageHeader
-      title="Alerts &amp; Events"
-      documentationLink={{
-        title: 'Alerts documentation',
-        path: DocsHelper.PAGES.ALERTS,
-      }}>
-      <span>
-        Define Events through different conditions. Add Notifications to Events that require your attention to create
-        Alerts.
-      </span>
-    </PageHeader>
+const EventsPage = () => {
+  const AlertsPageComponent = () => {
+    const {
+      data: { valid: validSecurityLicense },
+    } = usePluggableLicenseCheck('/license/security');
+    const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
 
-    <Row className="content">
-      <Col md={12}>
-        <EventsEntityTable />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+
+    if (!validSecurityLicense) {
+      return <EventsEntityTable />;
+    }
+
+    return (
+      <>
+        {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage }) => (
+          <PluggableSecurityEventsPage />
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <DocumentTitle title="Alerts &amp; Events">
+      <EventsPageNavigation />
+      <PageHeader
+        title="Alerts &amp; Events"
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>
+          Define Events through different conditions. Add Notifications to Events that require your attention to create
+          Alerts.
+        </span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          {AlertsPageComponent()}
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+}
 
 export default EventsPage;

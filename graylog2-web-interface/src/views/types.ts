@@ -375,6 +375,11 @@ type EventProcedureSummary = {
   key: string;
 };
 
+type SecurityEventsPage = {
+  component: React.ComponentType<{}>;
+  key: string;
+}
+
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
   modalRef: () => T;
@@ -575,6 +580,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
     'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
+    'views.components.securityEventsPage'?: Array<SecurityEventsPage>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
