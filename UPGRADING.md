@@ -9,6 +9,12 @@ The `kafka-clients` library was updated to 4.x which removes support for Kafka
 brokers with version 2.0 and earlier. That means all Graylog 7.0 Kafka inputs
 can only talk to Kafka brokers with version 2.1 or newer.
 
+### Enterprise Theme Color Customization
+
+The logic for generating color shades based on custom-defined color variants (error, informative, etc.)
+has been slightly adjusted. This change ensures that the exact color specified in the customization settings
+is now used as the primary color for elements like buttons and badges in the UI.
+
 ## Configuration File Changes
 
 | Option        | Action     | Description                                    |

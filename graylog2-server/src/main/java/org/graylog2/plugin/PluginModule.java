@@ -45,8 +45,8 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
-import org.graylog.security.shares.CollectionRequestHandler;
 import org.graylog.security.entities.EntityRegistrationHandler;
+import org.graylog.security.shares.PluggableEntityHandler;
 import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -382,8 +382,8 @@ public abstract class PluginModule extends Graylog2Module {
         syncedEntitiesResolverBinder.addBinding().to(resolverClass);
     }
 
-    protected void addCollectionRequestHandler(Class<? extends CollectionRequestHandler> handlerClass) {
-        final Multibinder<CollectionRequestHandler> binder = Multibinder.newSetBinder(binder(), CollectionRequestHandler.class);
+    protected void addPluggableEntityHandler(Class<? extends PluggableEntityHandler> handlerClass) {
+        final Multibinder<PluggableEntityHandler> binder = Multibinder.newSetBinder(binder(), PluggableEntityHandler.class);
         binder.addBinding().to(handlerClass);
     }
 
