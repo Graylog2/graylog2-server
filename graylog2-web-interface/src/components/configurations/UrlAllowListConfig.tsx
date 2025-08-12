@@ -78,7 +78,7 @@ const UrlAllowListConfig = () => {
   };
 
   const saveConfig = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.URL_WHITE_LIST_UPDATED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.URL_ALLOW_LIST_UPDATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'urlallowlist',
       app_action_value: 'configuration-save',

@@ -246,7 +246,7 @@ export const TELEMETRY_EVENT_TYPE = {
     THREATINTEL_CONFIGURATION_UPDATED: 'Configurations Threat Intel Configuration Updated',
     PERMISSIONS_UPDATED: 'Configurations Permissions Updated',
     SEARCHES_UPDATED: 'Configurations Searches Updated',
-    URL_WHITE_LIST_UPDATED: 'Configurations Url White List Updated',
+    URL_ALLOW_LIST_UPDATED: 'Configurations Url Allow List Updated',
     USER_UPDATED: 'Configurations User Updated',
     CERTIFICATE_RENEWAL_UPDATED: 'Configurations Certificate Renewal Updated',
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
