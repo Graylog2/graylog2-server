@@ -22,7 +22,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import StepAuthorize from 'integrations/aws/StepAuthorize';
 import { StepsContext } from 'integrations/aws/context/Steps';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
 

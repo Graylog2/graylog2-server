@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 
-// TODO: Fix typing
-export const FormDataContext = createContext<any>(undefined);
+import type { FormDataType } from 'integrations/types';
 
-type FormDataProviderProps = {
-  children: any;
-  initialFormData?: any;
-};
+import FormDataContext from './FormDataContext';
 
-export const FormDataProvider = ({ initialFormData = {}, children }: FormDataProviderProps) => {
+type Props = React.PropsWithChildren<{
+  initialFormData?: FormDataType;
+}>;
+
+const FormDataProvider = ({ initialFormData = {}, children = undefined }: Props) => {
   const [formData, updateState] = useState(initialFormData);
 
   const setFormData = useCallback(
