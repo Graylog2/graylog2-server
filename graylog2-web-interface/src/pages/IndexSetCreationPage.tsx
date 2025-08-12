@@ -22,6 +22,8 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import { CreateIndexSet, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
 import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const SelectTemplateButton = ({ onClick }: { onClick: () => void }) => {
   const isCloud = AppConfig.isCloud();
@@ -31,7 +33,10 @@ const SelectTemplateButton = ({ onClick }: { onClick: () => void }) => {
 };
 
 const IndexSetCreationPage = () => {
-  const [showSelectTemplateModal, setShowSelectTemplateModal] = useState<boolean>(true);
+  const currentUser = useCurrentUser();
+  const [showSelectTemplateModal, setShowSelectTemplateModal] = useState<boolean>(
+    !isPermitted(currentUser.permissions, ['indexset_templates:read']),
+  );
 
   return (
     <SelectIndexSetTemplateProvider>
