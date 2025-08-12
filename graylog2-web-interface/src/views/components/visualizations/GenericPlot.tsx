@@ -100,6 +100,7 @@ type Props = {
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
+  onInitialized?: () => void;
 };
 
 type Axis = {
@@ -215,6 +216,7 @@ const GenericPlot = ({
   onUnhoverMarker = () => {},
   onZoom = () => {},
   onAfterPlot = () => {},
+  onInitialized,
 }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
@@ -248,11 +250,8 @@ const GenericPlot = ({
   );
 
   const _onMarkerClick = useCallback(
-    ({ points }: Readonly<Plotly.PlotMouseEvent>) => {
-      onClickMarker?.({
-        x: points[0].x as string,
-        y: points[0].y as string,
-      });
+    (e: Readonly<Plotly.PlotMouseEvent>) => {
+      onClickMarker?.(e);
     },
     [onClickMarker],
   );
@@ -274,6 +273,7 @@ const GenericPlot = ({
       onUnhover={onUnhoverMarker}
       onRelayout={interactive ? _onRelayout : () => {}}
       config={config}
+      onInitialized={onInitialized}
     />
   );
 };
