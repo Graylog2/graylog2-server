@@ -131,7 +131,7 @@ const Metric = ({ index }: Props) => {
                 clearable={false}
                 name={name}
                 value={value}
-                aria-label="Select a function"
+                placeholder="Select a function"
                 size="small"
                 onChange={onFunctionChange}
               />
