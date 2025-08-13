@@ -112,12 +112,8 @@ describe('UrlAllowlistForm', () => {
     render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
     const row = await screen.findByRole('row', { name: /3/i });
-    const select = await within(row).findByText(/exact match/i);
 
-    await selectEvent.openMenu(select);
-
-    // eslint-disable-next-line testing-library/no-node-access
-    await selectEvent.select(select, 'Regex');
+    await selectEvent.chooseOption('Select url type', 'Regex', { container: row });
 
     const numberCalls = 2; // First render + debounce
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -234,12 +230,7 @@ describe('UrlAllowlistForm', () => {
       render(<UrlAllowListForm urls={config.entries} disabled={config.disabled} onUpdate={onUpdate} />);
 
       const row = screen.getByRole('row', { name: /3/i });
-      const select = within(row).getByText(/exact match/i);
-
-      await selectEvent.openMenu(select);
-
-      // eslint-disable-next-line testing-library/no-node-access
-      await selectEvent.select(select, 'Regex');
+      await selectEvent.chooseOption('Select url type', 'Regex', { container: row });
 
       await screen.findByText(/not a valid java regular expression/i);
 
