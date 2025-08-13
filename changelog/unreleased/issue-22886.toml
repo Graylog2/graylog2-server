@@ -1,0 +1,5 @@
+type = "c"
+message = "New flag to enable/disable key/value pair parsing for Fortigate Syslog messages."
+
+pulls = [""]
+issues = ["22886"]

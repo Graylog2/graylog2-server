@@ -428,28 +428,51 @@ public class SyslogCodecTest {
 
     @Test
     public void testFortiGate() {
-        doTestFortigate(FORTIGATE);
+        codec = setupFortigate(true);
+        doTestFortigate(FORTIGATE, true);
     }
 
     @Test
     public void testFortiGateTrimLineBreaks() {
+        codec = setupFortigate(true);
         // Ensure that trailing line breaks are trimmed for Fortigate messages to avoid parsing error.
-        doTestFortigate(FORTIGATE + "\r\n ");
+        doTestFortigate(FORTIGATE + "\r\n ", true);
     }
 
-    private void doTestFortigate(String fortigateMessage) {
+    @Test
+    public void testFortiGateDisableKV() {
+        codec = setupFortigate(false);
+        doTestFortigate(FORTIGATE, false);
+    }
+
+    private SyslogCodec setupFortigate(boolean enableKVparsing) {
+        when(configuration.getBoolean(SyslogCodec.CK_FORTIGATE_KV)).thenReturn(enableKVparsing);
+        return new SyslogCodec(configuration, metricRegistry, messageFactory);
+    }
+
+    private void doTestFortigate(String fortigateMessage, boolean enableKVparsing) {
         final RawMessage rawMessage = buildRawMessage(fortigateMessage);
         final Message message = codec.decodeSafe(rawMessage).get();
 
         assertThat(message).isNotNull();
         assertThat(message.getMessage()).isEqualTo("date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2017, 3, 6, 12, 53, 10, DateTimeZone.UTC));
-        assertThat(message.getField("source")).isEqualTo("DEVICENAME");
-        assertThat(message.getField("level")).isEqualTo(5);
-        assertThat(message.getField("facility")).isEqualTo("syslogd");
-        assertThat(message.getField("logid")).isEqualTo("0000000013");
-        assertThat(message.getField("app")).isEqualTo("SSL_TLSv1.2");
-        assertThat(message.getField("facility_num")).isEqualTo(5);
+
+        if (enableKVparsing) {
+            assertThat(message.getField("source")).isEqualTo("DEVICENAME");
+            assertThat(message.getField("level")).isEqualTo(5);
+            assertThat(message.getField("facility")).isEqualTo("syslogd");
+            assertThat(message.getField("logid")).isEqualTo("0000000013");
+            assertThat(message.getField("app")).isEqualTo("SSL_TLSv1.2");
+            assertThat(message.getField("facility_num")).isEqualTo(5);
+        } else {
+            assertThat(message.getField("source")).isEqualTo("DEVICENAME");
+            assertThat(message.getField("level")).isEqualTo(5);
+            assertThat(message.getField("facility")).isEqualTo("syslogd");
+            assertThat(message.getField("facility_num")).isEqualTo(5);
+            assertThat(message.getField("logid")).isNull();
+            assertThat(message.getField("app")).isNull();
+        }
     }
 
     @Test
