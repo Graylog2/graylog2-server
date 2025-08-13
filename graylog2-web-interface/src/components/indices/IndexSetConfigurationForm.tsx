@@ -49,6 +49,25 @@ import useIndexSet from 'components/indices/hooks/useIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import useProductName from 'brand-customization/useProductName';
 
+type renderModifier = 'normal' | 'immutable' | 'hidden';
+const testStruct: {
+  analyzer: renderModifier;
+  shards: renderModifier;
+  replica: renderModifier;
+  maxSegments: renderModifier;
+  disableIndexOpt: renderModifier;
+  fieldTypeRefreshInterval: renderModifier;
+  rotationRetentionSection: renderModifier;
+} = {
+  analyzer: 'immutable',
+  shards: 'normal',
+  replica: 'immutable',
+  maxSegments: 'immutable',
+  disableIndexOpt: 'hidden',
+  fieldTypeRefreshInterval: 'immutable',
+  rotationRetentionSection: 'immutable',
+};
+
 type Props = {
   cancelLink: string;
   create?: boolean;
@@ -195,6 +214,7 @@ const ReadOnlyConfig = () => {
         required
       />
       <FormikInput
+        disabled={testStruct.analyzer === 'immutable'}
         type="text"
         id="index-analyzer"
         label="Analyzer"
@@ -347,6 +367,7 @@ const IndexSetConfigurationForm = ({
                     {create && <ReadOnlyConfig />}
                     <HideOnCloud>
                       <FormikInput
+                        disabled={testStruct.shards === 'immutable'}
                         type="number"
                         id="shards"
                         label="Index Shards"
