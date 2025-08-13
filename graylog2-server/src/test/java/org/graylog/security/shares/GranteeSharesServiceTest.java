@@ -16,7 +16,6 @@
  */
 package org.graylog.security.shares;
 
-import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
@@ -63,7 +62,8 @@ class GranteeSharesServiceTest {
         this.grnDescriptorService = grnDescriptorService;
         final DBGrantService dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
         when(granteeService.getGranteeAliases(any(GRN.class))).thenAnswer(a -> Collections.singleton(a.getArgument(0)));
-        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService, ImmutableSet.of());
+        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService,
+                new PluggableEntityService(Collections.emptySet()));
     }
 
     @DisplayName("Paginated shares for a user")
