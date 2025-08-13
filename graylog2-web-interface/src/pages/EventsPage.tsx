@@ -24,49 +24,47 @@ import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventsEntityTable from 'components/events/EventsEntityTable';
 
-const EventsPage = () => {
-  const AlertsPageComponent = () => {
-    const {
-      data: { valid: validSecurityLicense },
-    } = usePluggableLicenseCheck('/license/security');
-    const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
+const AlertsPageComponent = () => {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
+  const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
 
 
-    if (!validSecurityLicense) {
-      return <EventsEntityTable />;
-    }
-
-    return (
-      <>
-        {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage }) => (
-          <PluggableSecurityEventsPage />
-        ))}
-      </>
-    );
+  if (!validSecurityLicense) {
+    return <EventsEntityTable />;
   }
 
   return (
-    <DocumentTitle title="Alerts &amp; Events">
-      <EventsPageNavigation />
-      <PageHeader
-        title="Alerts &amp; Events"
-        documentationLink={{
-          title: 'Alerts documentation',
-          path: DocsHelper.PAGES.ALERTS,
-        }}>
-        <span>
-          Define Events through different conditions. Add Notifications to Events that require your attention to create
-          Alerts.
-        </span>
-      </PageHeader>
-
-      <Row className="content">
-        <Col md={12}>
-          {AlertsPageComponent()}
-        </Col>
-      </Row>
-    </DocumentTitle>
+    <>
+      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage }) => (
+        <PluggableSecurityEventsPage />
+      ))}
+    </>
   );
 }
+
+const EventsPage = () => (
+  <DocumentTitle title="Alerts &amp; Events">
+    <EventsPageNavigation />
+    <PageHeader
+      title="Alerts &amp; Events"
+      documentationLink={{
+        title: 'Alerts documentation',
+        path: DocsHelper.PAGES.ALERTS,
+      }}>
+      <span>
+        Define Events through different conditions. Add Notifications to Events that require your attention to create
+        Alerts.
+      </span>
+    </PageHeader>
+
+    <Row className="content">
+      <Col md={12}>
+        {AlertsPageComponent()}
+      </Col>
+    </Row>
+  </DocumentTitle>
+);
 
 export default EventsPage;
