@@ -100,11 +100,11 @@ class OpensearchClusterConfigurationBeanTest {
     }
 
     @Test
-    void testManagerNodesWithNoRolesSet() throws ValidationException, RepositoryException {
+    void testManagerNodesWithNoRolesSet(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
                 Map.of("hostname", "this_node_can_be_manager")), testNodeService);
 
-        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(Collections.emptyList(), Map.of()));
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(Collections.emptyList(), Map.of(), tempDir));
 
         // initial cluster manager nodes should only contain nodes that publish cluster_manager role, ignore all other nodes
         final String initialManagerNodes = configurationPart.properties().get("cluster.initial_cluster_manager_nodes");
