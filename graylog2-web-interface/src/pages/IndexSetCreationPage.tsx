@@ -45,7 +45,7 @@ const IndexSetCreationPage = () => {
               path: DocsHelper.PAGES.INDEX_MODEL,
             }}
             actions={
-              <IfPermitted permissions="indexset_templlates:read">
+              <IfPermitted permissions="indexset_templates:read">
                 <SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />
               </IfPermitted>
             }>
