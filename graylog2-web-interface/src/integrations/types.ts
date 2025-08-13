@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.shares;
 
-import org.graylog.grn.GRN;
+export type FieldData = {
+  defaultValue?: any;
+  value?: any;
+  error?: string;
+  dirty?: boolean;
+  fileName?: string;
+  fileContent?: string;
+};
 
-import java.util.Set;
-import java.util.function.Predicate;
-
-public interface CollectionRequestHandler {
-    /**
-     * Pluggable handler for actions related to collections.
-     */
-    void addToCollection(GRN entity, Set<GRN> collections);
-
-    Predicate<GRN> collectionFilter();
-}
+// This type is called FormDataType, because FormData is a reserved type
+export type FormDataType = {
+  [key: string]: FieldData;
+};

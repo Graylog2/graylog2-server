@@ -42,11 +42,11 @@ public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     static public final String SIGNING_SECRET = ContainerizedGraylogBackend.PASSWORD_SECRET;
 
-    public static final IndexerJwtAuthToken JWT_AUTH_TOKEN = createJwtAuthToken(SIGNING_SECRET, Duration.seconds(120), Duration.seconds(60));
+    public static final IndexerJwtAuthToken JWT_AUTH_TOKEN = createJwtAuthToken(SIGNING_SECRET, Duration.seconds(120), Duration.seconds(60), Duration.seconds(30));
 
     @Nonnull
-    private static IndexerJwtAuthToken createJwtAuthToken(String signingSecret, Duration tokenExpirationDuration, Duration cachingDuration) {
-        return new IndexerJwtAuthTokenProvider(new JwtSecret(signingSecret), tokenExpirationDuration, cachingDuration, true, Clock.systemDefaultZone())
+    private static IndexerJwtAuthToken createJwtAuthToken(String signingSecret, Duration tokenExpirationDuration, Duration cachingDuration, Duration clockSkewTolerance) {
+        return new IndexerJwtAuthTokenProvider(new JwtSecret(signingSecret), tokenExpirationDuration, cachingDuration, clockSkewTolerance, true, Clock.systemDefaultZone())
                 .get();
     }
 

@@ -103,9 +103,11 @@ const ClusterActions = ({ node }: Props) => {
             <MenuItem>Get recent system log messages</MenuItem>
           </LinkContainer>
         </IfPermitted>
-        <MenuItem href={apiBrowserURI} target="_blank">
-          <ExternalLink>API Browser</ExternalLink>
-        </MenuItem>
+        <IfPermitted permissions="api_browser:read">
+          <MenuItem href={apiBrowserURI} target="_blank">
+            <ExternalLink>API Browser</ExternalLink>
+          </MenuItem>
+        </IfPermitted>
       </DropdownButton>
       {showMessageProcessingModal && (
         <ConfirmDialog

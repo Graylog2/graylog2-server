@@ -89,10 +89,20 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
 
     @Nonnull
     private String buildInitialManagerNodesList() {
+        // this node itself might not be registered with the node service yet, therefore we always add it to the list.
         return nodeService.allActive().values().stream()
                 .filter(this::isManager)
                 .map(Node::getHostname)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toSet(),
+                        hostnames -> {
+                            if (localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty() ||
+                                    localConfiguration.getNodeRoles().contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
+                                hostnames.add(localConfiguration.getHostname());
+                            }
+                            return String.join(",", hostnames);
+                        }
+                ));
     }
 
     private boolean isManager(DataNodeDto n) {
