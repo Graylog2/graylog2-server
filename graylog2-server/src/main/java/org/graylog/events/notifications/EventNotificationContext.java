@@ -19,6 +19,7 @@ package org.graylog.events.notifications;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 
@@ -34,6 +35,8 @@ public abstract class EventNotificationContext {
     public abstract EventDto event();
 
     public abstract Optional<EventDefinitionDto> eventDefinition();
+
+    public abstract Optional<EventProcedure> eventProcedure();
 
     public abstract Optional<JobTriggerDto> jobTrigger();
 
@@ -57,6 +60,8 @@ public abstract class EventNotificationContext {
         public abstract Builder event(EventDto event);
 
         public abstract Builder eventDefinition(@Nullable EventDefinitionDto eventDefinition);
+
+        public abstract Builder eventProcedure(@Nullable EventProcedure eventProcedure);
 
         public abstract Builder jobTrigger(JobTriggerDto jobTrigger);
 

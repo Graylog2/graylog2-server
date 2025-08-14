@@ -71,4 +71,14 @@ public abstract class EventProcedure extends ScopedEntity {
 
         public abstract EventProcedure build();
     }
+
+    public String toTemplate() {
+        final StringBuilder procedureBuilder = new StringBuilder();
+        procedureBuilder.append("--- [Event Procedures ---------------------------\n");
+        procedureBuilder.append("Title:       " + title() + "\n");
+        procedureBuilder.append("Description: " + description() + "\n");
+        procedureBuilder.append("Steps:\n");
+
+        return procedureBuilder.toString();
+    }
 }
