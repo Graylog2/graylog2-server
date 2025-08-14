@@ -123,7 +123,8 @@ public abstract class EventNotificationModelData {
                 .eventDefinitionType(definitionDto != null ? definitionDto.config().type() : UNKNOWN)
                 .eventDefinitionTitle(definitionDto != null ? definitionDto.title() : UNKNOWN)
                 .eventDefinitionDescription(definitionDto != null ? definitionDto.description() : UNKNOWN)
-                .eventDefinitionRemediationSteps(definitionDto != null ? definitionDto.remediationSteps() : UNKNOWN)
+                .eventDefinitionRemediationSteps(definitionDto != null && definitionDto.remediationSteps() != null
+                        ? definitionDto.remediationSteps() : UNKNOWN)
                 .eventDefinitionEventProcedure(eventProcedure != null ? eventProcedure : UNKNOWN)
                 .jobDefinitionId(jobTriggerDto != null ? jobTriggerDto.jobDefinitionId() : UNKNOWN)
                 .jobTriggerId(jobTriggerDto != null ? jobTriggerDto.id() : UNKNOWN)
