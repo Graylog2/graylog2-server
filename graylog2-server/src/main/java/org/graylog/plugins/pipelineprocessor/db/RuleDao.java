@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class RuleDao extends ScopedEntity {
-    public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SOURCE = "source";
@@ -71,7 +70,8 @@ public abstract class RuleDao extends ScopedEntity {
 
     public abstract Builder toBuilder();
 
-    public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
+    // TODO not a JsonCreator, remove JsonProperty annotations
+    public static RuleDao create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                  @JsonProperty(FIELD_TITLE) String title,
                                  @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
                                  @JsonProperty(FIELD_SOURCE) String source,
@@ -83,7 +83,7 @@ public abstract class RuleDao extends ScopedEntity {
     }
 
     @JsonCreator
-    public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
+    public static RuleDao create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                  @JsonProperty(FIELD_SCOPE) @Nullable String scope,
                                  @JsonProperty(FIELD_TITLE) String title,
                                  @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,

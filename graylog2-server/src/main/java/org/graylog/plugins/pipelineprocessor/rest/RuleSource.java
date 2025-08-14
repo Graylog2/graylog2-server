@@ -83,6 +83,7 @@ public abstract class RuleSource {
 
     public abstract Builder toBuilder();
 
+    // TODO unused? since this is not a JsonCreator, the JsonProperty annotations are unnecessarily confusing
     public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                     @JsonProperty("title") String title,
                                     @JsonProperty("description") @Nullable String description,

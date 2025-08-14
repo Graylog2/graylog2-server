@@ -32,6 +32,8 @@ import java.util.List;
 @JsonAutoDetect
 public abstract class RuleBuilderDto {
 
+    @Id
+    @ObjectId
     @JsonProperty
     @Nullable
     public abstract String id();

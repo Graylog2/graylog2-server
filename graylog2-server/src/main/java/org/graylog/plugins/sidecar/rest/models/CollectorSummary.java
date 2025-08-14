@@ -20,10 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class CollectorSummary {
+    @Id
+    @ObjectId
     @JsonProperty("id")
     public abstract String id();
 
@@ -37,7 +41,7 @@ public abstract class CollectorSummary {
     public abstract String nodeOperatingSystem();
 
     @JsonCreator
-    public static CollectorSummary create(@JsonProperty("id") String id,
+    public static CollectorSummary create(@JsonProperty("id") @Id @ObjectId String id,
                                           @JsonProperty("name") String name,
                                           @JsonProperty("service_type") String serviceType,
                                           @JsonProperty("node_operating_system") String nodeOperatingSystem) {
