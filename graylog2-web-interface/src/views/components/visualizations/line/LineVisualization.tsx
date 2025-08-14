@@ -28,6 +28,9 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import Popover from 'components/common/Popover';
+import CustomOnClickPopover from 'views/components/visualizations/CustomOnClickPopover';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -90,16 +93,39 @@ const LineVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
+    const { pos, clickPoint, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick } =
+      usePlotOnClickPopover('scatter');
+
     return (
-      <XYPlot
-        config={config}
-        plotLayout={layout}
-        axisType={axisType}
-        effectiveTimerange={effectiveTimerange}
-        height={height}
-        width={width}
-        chartData={chartDataResult}
-      />
+      <>
+        <XYPlot
+          config={config}
+          plotLayout={layout}
+          axisType={axisType}
+          effectiveTimerange={effectiveTimerange}
+          height={height}
+          width={width}
+          chartData={chartDataResult}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={8}>
+          <Popover.Target>
+            <div
+              style={{
+                position: 'fixed',
+                left: pos?.left,
+                top: pos?.top,
+                width: 1,
+                height: 1,
+              }}
+            />
+          </Popover.Target>
+          <Popover.Dropdown title={String(clickPoint?.x)}>
+            <CustomOnClickPopover clickPoint={clickPoint} />
+          </Popover.Dropdown>
+        </Popover>
+      </>
     );
   },
   'line',

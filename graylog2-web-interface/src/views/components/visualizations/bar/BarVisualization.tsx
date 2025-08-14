@@ -31,6 +31,10 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
+import Popover from 'components/common/Popover';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import CustomOnClickPopover from 'views/components/visualizations/CustomOnClickPopover';
+import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -171,17 +175,48 @@ const BarVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
+    const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
+      usePlotOnClickPopover('bar');
+
     return (
-      <XYPlot
-        config={config}
-        axisType={visualizationConfig.axisType}
-        chartData={chartData}
-        effectiveTimerange={effectiveTimerange}
-        setChartColor={setChartColor}
-        height={height}
-        width={width}
-        plotLayout={layout}
-      />
+      <>
+        <XYPlot
+          config={config}
+          axisType={visualizationConfig.axisType}
+          chartData={chartData}
+          effectiveTimerange={effectiveTimerange}
+          setChartColor={setChartColor}
+          height={height}
+          width={width}
+          plotLayout={layout}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        <OverflowingComponentsContextProvider>
+          <Popover
+            opened={isPopoverOpen}
+            onChange={onPopoverChange}
+            withArrow
+            withinPortal
+            position="bottom"
+            offset={8}>
+            <Popover.Target>
+              <div
+                style={{
+                  position: 'fixed',
+                  left: pos?.left,
+                  top: pos?.top,
+                  width: 1,
+                  height: 1,
+                }}
+              />
+            </Popover.Target>
+            <Popover.Dropdown title={String(clickPoint?.x)}>
+              <CustomOnClickPopover clickPoint={clickPoint} />
+            </Popover.Dropdown>
+          </Popover>
+        </OverflowingComponentsContextProvider>
+      </>
     );
   },
   'bar',
