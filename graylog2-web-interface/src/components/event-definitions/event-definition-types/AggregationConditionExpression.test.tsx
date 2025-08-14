@@ -18,10 +18,25 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
+import { simpleEventDefinition } from 'fixtures/eventDefinition';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 
-const getComparisonExpression = (operator, value = 0) => ({
+type Expression = {
+  expr: string;
+  operator?: string;
+  child?: Expression;
+  left?: {
+    expr: string;
+    ref?: string;
+  };
+  right?: {
+    expr: string;
+    value?: number;
+  };
+};
+
+const getComparisonExpression = (operator?: string, value = 0) => ({
   expr: operator,
   left: {
     expr: 'number-ref',
@@ -33,13 +48,17 @@ const getComparisonExpression = (operator, value = 0) => ({
   },
 });
 
-const getBooleanExpression = (operator, left = getComparisonExpression(), right = getComparisonExpression()) => ({
+const getBooleanExpression = (
+  operator,
+  left: Expression = getComparisonExpression(),
+  right: Expression = getComparisonExpression(),
+) => ({
   expr: operator,
   left: left,
   right: right,
 });
 
-const getGroupExpression = (operator, child = getComparisonExpression()) => ({
+const getGroupExpression = (operator: string, child: Expression = getComparisonExpression()) => ({
   expr: 'group',
   operator: operator,
   child: child,
@@ -48,6 +67,7 @@ const getGroupExpression = (operator, child = getComparisonExpression()) => ({
 describe('AggregationConditionExpression', () => {
   const defaultEventDefinition = {
     config: {
+      ...simpleEventDefinition.config,
       series: [
         {
           id: '1234',
@@ -56,14 +76,17 @@ describe('AggregationConditionExpression', () => {
         },
       ],
     },
+    ...simpleEventDefinition,
   };
 
   describe('rendering conditions', () => {
     it('should render empty comparison expression', async () => {
       const eventDefinition = {
         config: {
+          ...simpleEventDefinition.config,
           series: [],
         },
+        ...simpleEventDefinition,
       };
 
       render(
@@ -403,10 +426,7 @@ describe('AggregationConditionExpression', () => {
         />,
       );
 
-      const select = (await screen.findAllByLabelText('Boolean Operator'))[1];
-
-      await selectEvent.openMenu(select);
-      await selectEvent.select(select, 'all');
+      await selectEvent.chooseOption('Boolean operator group 2', 'all');
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled();
@@ -448,10 +468,7 @@ describe('AggregationConditionExpression', () => {
         />,
       );
 
-      const select = (await screen.findAllByLabelText('Boolean Operator'))[0];
-
-      await selectEvent.openMenu(select);
-      await selectEvent.select(select, 'any');
+      await selectEvent.chooseOption('Global boolean operator', 'any');
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled();
@@ -472,13 +489,7 @@ describe('AggregationConditionExpression', () => {
         />,
       );
 
-      const select = (await screen.findAllByLabelText('Boolean Operator'))[0];
-
-      expect(screen.queryByText('all')).not.toBeInTheDocument();
-
-      await selectEvent.openMenu(select);
-      await selectEvent.select(select, 'all');
-
+      await selectEvent.chooseOption('Global boolean operator', 'all');
       await screen.findByText('all');
     });
   });

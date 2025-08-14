@@ -15,24 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { LookupTableForm } from 'components/lookup-tables';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
-type Props = {
-  saved: (...args: any[]) => void;
-  validate?: (...args: any[]) => void;
-  validationErrors?: any;
+type LookupTableType = LookupTable & {
+  enable_single_value: boolean;
+  enable_multi_value: boolean;
 };
 
-const LookupTableCreate = ({ saved, validate = null, validationErrors = {} }: Props) => (
-  <div>
-    <Row className="content">
-      <Col lg={8}>
-        <LookupTableForm saved={saved} create validate={validate} validationErrors={validationErrors} />
-      </Col>
-    </Row>
-  </div>
+type Props = {
+  create: boolean;
+  onClose: () => void;
+  onCacheCreateClick: () => void;
+  onDataAdapterCreateClick: () => void;
+  dataAdapter?: string;
+  cache?: string;
+  table?: LookupTableType;
+};
+
+const StyledRow = styled(Row)`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
+
+const LookupTableCreate = ({ create, onClose, onCacheCreateClick, onDataAdapterCreateClick, dataAdapter = '', cache = '', table = undefined }: Props) => (
+  <StyledRow>
+    <Col lg={6}>
+      <LookupTableForm onClose={onClose} onCacheCreateClick={onCacheCreateClick} onDataAdapterCreateClick={onDataAdapterCreateClick} create={create} dataAdapter={dataAdapter} cache={cache} table={table} />
+    </Col>
+  </StyledRow>
 );
 
 export default LookupTableCreate;
