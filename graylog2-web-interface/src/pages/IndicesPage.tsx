@@ -21,7 +21,7 @@ import Routes from 'routing/Routes';
 import { Col, Row, Button, ButtonToolbar } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import { IndexSetsComponent, IndicesPageNavigation } from 'components/indices';
 import { IndexerClusterHealth } from 'components/indexers';
 import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintenanceDropdown';
@@ -33,10 +33,14 @@ const IndicesPage = () => (
       title="Indices & Index Sets"
       actions={
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-            <Button bsStyle="success">Create index set</Button>
-          </LinkContainer>
-          <AllIndicesMaintenanceDropdown />
+          <IfPermitted permissions="indexsets:create">
+            <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
+              <Button bsStyle="success">Create index set</Button>
+            </LinkContainer>
+          </IfPermitted>
+          <IfPermitted permissions="indexranges:rebuild">
+            <AllIndicesMaintenanceDropdown />
+          </IfPermitted>
         </ButtonToolbar>
       }
       documentationLink={{
