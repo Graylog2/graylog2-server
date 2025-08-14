@@ -85,9 +85,9 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         final String streamId = connection.streamId();
 
         // verify the stream exists and is editable
-        checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        streamService.load(streamId);
+        final Stream stream = streamService.load(streamId);
+        checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
 
         // verify the pipelines exist
         for (String s : connection.pipelineIds()) {
@@ -106,7 +106,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         final String pipelineId = connection.pipelineId();
         final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
 
-        // verify the pipeline exists
+        // verify the pipeline exists and is editable
         checkPermission(PipelineRestPermissions.PIPELINE_READ, pipelineId);
         checkScope(pipelineService.load(pipelineId));
 
@@ -115,9 +115,12 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
-        connection.streamIds().forEach(streamId ->
-                checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
-        );
+        // verify the streams exist and the user has permission to edit them
+        final Set<Stream> connectedStreams = streamService.loadByIds(connection.streamIds());
+        connectedStreams.forEach(stream -> {
+            checkPermission(RestPermissions.STREAMS_EDIT, stream.getId());
+            checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
+        });
 
         // remove deleted pipeline connections
         for (PipelineConnections pipelineConnection : pipelineConnections) {
@@ -132,11 +135,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         }
 
         // update pipeline connections
-        for (String streamId : connection.streamIds()) {
-            // verify the stream exists and is editable
-            checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-            streamService.load(streamId);
-
+        for (Stream stream : connectedStreams) {
+            final String streamId = stream.getId();
             PipelineConnections updatedConnection;
             try {
                 updatedConnection = connectionsService.load(streamId);
@@ -178,7 +178,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @ApiOperation("Get all pipeline connections")
     @GET
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_READ)
-    public Set<PipelineConnections> getAll() {
+    public Set<PipelineConnections> getAll() throws NotFoundException {
         final Set<PipelineConnections> pipelineConnections = connectionsService.loadAll();
 
         final Set<PipelineConnections> filteredConnections = Sets.newHashSetWithExpectedSize(pipelineConnections.size());
@@ -200,8 +200,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         return filteredConnections;
     }
 
-    private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+    private void checkNotEditable(Stream stream, String message) {
+        if (!stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }

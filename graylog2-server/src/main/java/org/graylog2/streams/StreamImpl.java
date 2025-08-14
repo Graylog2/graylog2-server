@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @AutoValue
@@ -74,6 +76,9 @@ public abstract class StreamImpl implements Stream {
     @Id
     @JsonProperty("id")
     public abstract String id();
+
+    @JsonProperty(FIELD_SCOPE)
+    public abstract String scope();
 
     @JsonProperty(FIELD_CREATOR_USER_ID)
     public abstract String creatorUserId();
@@ -154,9 +159,10 @@ public abstract class StreamImpl implements Stream {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamImpl.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .matchingType(DEFAULT_MATCHING_TYPE)
                     .isDefault(false)
-                    .isEditable(false)
+                    .isEditable(true)
                     .removeMatchesFromDefaultStream(false)
                     .categories(List.of())
                     .outputIds(Set.of())
@@ -165,6 +171,9 @@ public abstract class StreamImpl implements Stream {
 
         @JsonProperty("id")
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
@@ -222,12 +231,9 @@ public abstract class StreamImpl implements Stream {
         @JsonProperty(FIELD_CATEGORIES)
         public abstract Builder categories(List<String> categories);
 
-        public abstract String id();
-
         public abstract StreamImpl autoBuild();
 
         public StreamImpl build() {
-            isEditable(Stream.streamIsEditable(id()));
             return autoBuild();
         }
     }
@@ -236,6 +242,12 @@ public abstract class StreamImpl implements Stream {
     @JsonIgnore
     public String getId() {
         return id();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getScope() {
+        return scope();
     }
 
     @Override
@@ -377,6 +389,7 @@ public abstract class StreamImpl implements Stream {
     // Package-private to prevent usage outside the streams package.
     static StreamImpl fromDTO(StreamDTO dto) {
         return StreamImpl.builder()
+                .scope(dto.scope())
                 .creatorUserId(dto.creatorUserId())
                 .outputIds(dto.outputIds())
                 .matchingType(dto.matchingType())
