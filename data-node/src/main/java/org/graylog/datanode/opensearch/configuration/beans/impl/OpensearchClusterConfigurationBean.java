@@ -96,7 +96,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
                 .collect(Collectors.collectingAndThen(
                         Collectors.toSet(),
                         hostnames -> {
-                            if (localConfiguration.getNodeRoles() != null &&
+                            if (localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty() ||
                                     localConfiguration.getNodeRoles().contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
                                 hostnames.add(localConfiguration.getHostname());
                             }
