@@ -75,7 +75,6 @@ public class SyslogCodec extends AbstractCodec {
     static final String CK_EXPAND_STRUCTURED_DATA = "expand_structured_data";
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
     static final String CK_TIMEZONE = "timezone";
-    static final String CK_FORTIGATE_KV = "fortigate_kv"; // Fortigate-specific key/value parsing. Off by default.
 
     private final Timer resolveTime;
     private final Timer decodeTime;
@@ -139,7 +138,7 @@ public class SyslogCodec extends AbstractCodec {
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
             e = new CiscoSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
-            e = new GLFortiGateSyslogEvent(msg.trim(), defaultTimeZone, configuration.getBoolean(CK_FORTIGATE_KV));
+            e = new GLFortiGateSyslogEvent(msg.trim(), defaultTimeZone);
         } else {
             e = new SyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         }
@@ -295,15 +294,6 @@ public class SyslogCodec extends AbstractCodec {
                     DropdownField.ValueTemplates.timeZones(true),
                     "Default time zone used when no timezone detected",
                     ConfigurationField.Optional.OPTIONAL));
-
-            r.addField(
-                    new BooleanField(
-                            CK_FORTIGATE_KV,
-                            "Fortigate KV-parsing?",
-                            false,
-                            "Perform Fortigate-specific parsing of key/value pairs?"
-                    )
-            );
 
             return r;
         }

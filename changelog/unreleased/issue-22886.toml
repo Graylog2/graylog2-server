@@ -1,5 +1,5 @@
-type = "c"
-message = "New flag to enable/disable key/value pair parsing for Fortigate Syslog messages."
+type = "a"
+message = "Prevent nested key/value pair parsing in Fortigate Syslog messages."
 
 pulls = [""]
 issues = ["22886"]

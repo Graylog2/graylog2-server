@@ -52,12 +52,12 @@ import static org.mockito.Mockito.when;
 public class SyslogCodecTest {
     private static final int YEAR = Tools.nowUTC().getYear();
     private static final String FORTIGATE = "<45>date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"";
-    private static String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
-    private static String STRUCTURED_ISSUE_845 = "<190>1 2015-01-06T20:56:33.287Z app-1 app - - [mdc@18060 ip=\"::ffff:132.123.15.30\" logger=\"{c.corp.Handler}\" session=\"4ot7\" user=\"user@example.com\" user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11\"] User page 13 requested";
-    private static String STRUCTURED_ISSUE_845_EMPTY = "<128>1 2015-01-11T16:35:21.335797+01:00 s000000.example.com - - - - tralala";
+    private static final String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
+    private static final String STRUCTURED_ISSUE_845 = "<190>1 2015-01-06T20:56:33.287Z app-1 app - - [mdc@18060 ip=\"::ffff:132.123.15.30\" logger=\"{c.corp.Handler}\" session=\"4ot7\" user=\"user@example.com\" user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11\"] User page 13 requested";
+    private static final String STRUCTURED_ISSUE_845_EMPTY = "<128>1 2015-01-11T16:35:21.335797+01:00 s000000.example.com - - - - tralala";
     // The following message from issue 549 is from a Juniper SRX 240 device.
-    private static String STRUCTURED_ISSUE_549 = "<14>1 2014-05-01T08:26:51.179Z fw01 RT_FLOW - RT_FLOW_SESSION_DENY [junos@2636.1.1.1.2.39 source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No\"]";
-    private final String UNSTRUCTURED = "<45>Oct 21 12:09:37 c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'";
+    private static final String STRUCTURED_ISSUE_549 = "<14>1 2014-05-01T08:26:51.179Z fw01 RT_FLOW - RT_FLOW_SESSION_DENY [junos@2636.1.1.1.2.39 source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No\"]";
+    private static final String UNSTRUCTURED = "<45>Oct 21 12:09:37 c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'";
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -73,7 +73,7 @@ public class SyslogCodecTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
         when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
 
@@ -428,51 +428,40 @@ public class SyslogCodecTest {
 
     @Test
     public void testFortiGate() {
-        codec = setupFortigate(true);
-        doTestFortigate(FORTIGATE, true);
+        doTestFortigate(FORTIGATE);
     }
 
     @Test
     public void testFortiGateTrimLineBreaks() {
-        codec = setupFortigate(true);
         // Ensure that trailing line breaks are trimmed for Fortigate messages to avoid parsing error.
-        doTestFortigate(FORTIGATE + "\r\n ", true);
+        doTestFortigate(FORTIGATE + "\r\n ");
     }
 
-    @Test
-    public void testFortiGateDisableKV() {
-        codec = setupFortigate(false);
-        doTestFortigate(FORTIGATE, false);
-    }
-
-    private SyslogCodec setupFortigate(boolean enableKVparsing) {
-        when(configuration.getBoolean(SyslogCodec.CK_FORTIGATE_KV)).thenReturn(enableKVparsing);
-        return new SyslogCodec(configuration, metricRegistry, messageFactory);
-    }
-
-    private void doTestFortigate(String fortigateMessage, boolean enableKVparsing) {
+    private void doTestFortigate(String fortigateMessage) {
         final RawMessage rawMessage = buildRawMessage(fortigateMessage);
         final Message message = codec.decodeSafe(rawMessage).get();
 
         assertThat(message).isNotNull();
         assertThat(message.getMessage()).isEqualTo("date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2017, 3, 6, 12, 53, 10, DateTimeZone.UTC));
+        assertThat(message.getField("source")).isEqualTo("DEVICENAME");
+        assertThat(message.getField("level")).isEqualTo(5);
+        assertThat(message.getField("facility")).isEqualTo("syslogd");
+        assertThat(message.getField("logid")).isEqualTo("0000000013");
+        assertThat(message.getField("app")).isEqualTo("SSL_TLSv1.2");
+        assertThat(message.getField("facility_num")).isEqualTo(5);
+    }
 
-        if (enableKVparsing) {
-            assertThat(message.getField("source")).isEqualTo("DEVICENAME");
-            assertThat(message.getField("level")).isEqualTo(5);
-            assertThat(message.getField("facility")).isEqualTo("syslogd");
-            assertThat(message.getField("logid")).isEqualTo("0000000013");
-            assertThat(message.getField("app")).isEqualTo("SSL_TLSv1.2");
-            assertThat(message.getField("facility_num")).isEqualTo(5);
-        } else {
-            assertThat(message.getField("source")).isEqualTo("DEVICENAME");
-            assertThat(message.getField("level")).isEqualTo(5);
-            assertThat(message.getField("facility")).isEqualTo("syslogd");
-            assertThat(message.getField("facility_num")).isEqualTo(5);
-            assertThat(message.getField("logid")).isNull();
-            assertThat(message.getField("app")).isNull();
-        }
+    @Test
+    public void testFortiGateIgnoreUrl() {
+        // Ensure that no field is generated from url string
+        final String msgIssue22886 = "<99>date=2025-06-12 time=13:17:12 devname=\"ECOC-R3-Fortigate601F\" devid=\"FG6H1FTB22902584\" eventtime=1749748631974333569 tz=\"-0400\" logid=\"1059028704\" type=\"utm\" subtype=\"app-ctrl\" eventtype=\"signature\" level=\"information\" vd=\"root\" appid=38131 user=\"USERNAME\" group=\"FSSO_Internet_Users\" srcip=10.31.110.152 srccountry=\"Reserved\" dstip=192.178.50.65 dstcountry=\"United States\" srcport=54126 dstport=443 srcintf=\"v110\" srcintfrole=\"lan\" dstintf=\"v1001\" dstintfrole=\"wan\" proto=6 service=\"HTTPS\" direction=\"outgoing\" policyid=145 poluuid=\"f499af4e-123f-51ee-81e7-ccff6743aaea\" policytype=\"policy\" sessionid=3071562305 applist=\"Clerk_Employee_Apps\" action=\"pass\" appcat=\"General.Interest\" app=\"Google.Accounts\" hostname=\"lh3.googleusercontent.com\" incidentserialno=306612941 url=\"/p/AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM=w92-h92-n-k-no\" agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36\" httpmethod=\"GET\" msg=\"General.Interest: Google.Accounts\" apprisk=\"elevated\"\n";
+        final Message message = codec.decodeSafe(buildRawMessage(msgIssue22886)).get();
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("url")).isEqualTo("/p/AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM=w92-h92-n-k-no");
+        assertThat(message.getField("F1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM")).isNull();
+        assertThat(message.getFields().containsValue("w92-h92-n-k-no")).isFalse();
     }
 
     @Test

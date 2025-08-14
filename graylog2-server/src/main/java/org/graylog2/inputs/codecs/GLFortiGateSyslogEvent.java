@@ -19,29 +19,46 @@ package org.graylog2.inputs.codecs;
 import org.graylog2.syslog4j.server.impl.event.FortiGateSyslogEvent;
 import org.joda.time.DateTimeZone;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GLFortiGateSyslogEvent extends FortiGateSyslogEvent {
-    protected final boolean enableKVparsing;
-
+    private static final Pattern KV_PATTERN = Pattern.compile("(\\w+)=([^\\s\"]*)");
+    private static final Pattern QUOTED_KV_PATTERN = Pattern.compile("(\\w+)=\"([^\"]*)\"");
     public GLFortiGateSyslogEvent(String rawEvent, DateTimeZone sysLogServerTimeZone) {
         super(rawEvent, sysLogServerTimeZone);
-        this.enableKVparsing = false;
-    }
-
-    public GLFortiGateSyslogEvent(String rawEvent, DateTimeZone sysLogServerTimeZone, boolean enableKVparsing) {
-        super(rawEvent, sysLogServerTimeZone);
-        this.enableKVparsing = enableKVparsing;
     }
 
     @Override
+    /*
+     * Filter out invalid fields that occur when the value string contains an `=`.
+     * Currently this is only known to affect url strings.
+     */
     public Map<String, String> getFields() {
-        if (enableKVparsing) {
-            return super.getFields();
-        } else {
-            return Collections.emptyMap();
-        }
-    }
+        Map<String, String> fields = new HashMap<>(super.getFields());
+        Set<String> removalKeys = new HashSet<>();
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+            String value = entry.getValue();
 
+            // If the value contains an `=`, flag any corresponding field for removal.
+            if (value != null && value.contains("=")) {
+                Matcher matcher = KV_PATTERN.matcher(value);
+                while (matcher.find()) {
+                    removalKeys.add(matcher.group(1));
+                }
+
+                matcher = QUOTED_KV_PATTERN.matcher(value);
+                while (matcher.find()) {
+                    removalKeys.add(matcher.group(1));
+                }
+            }
+        }
+        removalKeys.forEach(fields::remove);
+
+        return fields;
+    }
 }
