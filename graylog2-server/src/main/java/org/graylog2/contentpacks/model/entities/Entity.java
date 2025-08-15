@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.Typed;
 import org.graylog2.contentpacks.model.Versioned;
