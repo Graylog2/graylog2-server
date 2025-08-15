@@ -65,7 +65,7 @@ jest.mock('hooks/usePluginEntities', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => { }],
+  useQueryParam: () => [undefined, () => {}],
 }));
 
 const mockPurgeLookupTableKey = jest.fn(async () => Promise.resolve());

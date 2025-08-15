@@ -18,9 +18,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
-import {
-  LookupTableDataAdaptersStore,
-} from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import { LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import { useStore } from 'stores/connect';
 import { useFetchDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
@@ -35,7 +33,12 @@ const DataAdaptersContainer = ({ children, dataAdapter = '' }: Props) => {
 
   useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
-    fetchPaginatedDataAdapters({page: 1, pageSize: 10000, query: null, sort: { attributeId: 'name', direction: 'asc' }});
+    fetchPaginatedDataAdapters({
+      page: 1,
+      pageSize: 10000,
+      query: null,
+      sort: { attributeId: 'name', direction: 'asc' },
+    });
   }, [dataAdapter, fetchPaginatedDataAdapters]);
 
   if (!dataAdapters) {

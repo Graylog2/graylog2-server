@@ -19,12 +19,12 @@ import { Accordion } from '@mantine/core';
 
 type Props = {
   accordionItems: {
-    value: string,
-    label: string,
-    content: any,
-  }[],
-  defaultValue: string,
-}
+    value: string;
+    label: string;
+    content: any;
+  }[];
+  defaultValue: string;
+};
 
 const MantineAccordion = ({ accordionItems, defaultValue }: Props) => {
   const items = accordionItems.map((item) => (
@@ -35,8 +35,10 @@ const MantineAccordion = ({ accordionItems, defaultValue }: Props) => {
   ));
 
   return (
-    <Accordion chevronPosition="left" defaultValue={defaultValue}>{items}</Accordion>
-  )
+    <Accordion chevronPosition="left" defaultValue={defaultValue}>
+      {items}
+    </Accordion>
+  );
 };
 
 export default MantineAccordion;

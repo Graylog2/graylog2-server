@@ -22,19 +22,15 @@ import { DataAdapterCreate } from 'components/lookup-tables';
 import { LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 type Props = {
-  onClose: () => void,
-}
+  onClose: () => void;
+};
 
 const DataAdapterCreateModal = ({ onClose, validationErrors }: Props & { validationErrors: any }) => (
   <Modal show fullScreen onHide={onClose}>
     <Modal.Header>
       <Modal.Title>Create Data Adapter</Modal.Title>
     </Modal.Header>
-    <DataAdapterCreate
-      saved={onClose}
-      onCancel={onClose}
-      validationErrors={validationErrors}
-    />
+    <DataAdapterCreate saved={onClose} onCancel={onClose} validationErrors={validationErrors} />
   </Modal>
 );
 
@@ -45,4 +41,4 @@ export default connect(
     ...otherProps,
     ...dataAdaptersStore,
   }),
-)
+);
