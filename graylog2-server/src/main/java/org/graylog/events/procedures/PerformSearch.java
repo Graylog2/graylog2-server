@@ -56,20 +56,6 @@ public class PerformSearch extends Action {
         PerformSearch create(ActionDto dto);
     }
 
-    @JsonIgnore
-    public String toHtml() {
-        final StringBuilder stepBuilder = new StringBuilder();
-        stepBuilder.append(f("""
-                <li>
-                  <strong>dashboard</strong>
-                  <a href="%s">
-                    <button>Perform Search</button>
-                  </a>
-                </li>""", title()));
-
-        return stepBuilder.toString();
-    }
-
     @AutoValue
     @JsonAutoDetect
     @JsonTypeName(NAME)
@@ -109,6 +95,17 @@ public class PerformSearch extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @Override
+        public String toHtml() {
+            final StringBuilder stepBuilder = new StringBuilder();
+            stepBuilder.append(f("""
+                  <a href="%s">
+                    <button>Perform Search</button>
+                  </a>""", query())); // TODO: make propper link
+
+            return stepBuilder.toString();
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {
