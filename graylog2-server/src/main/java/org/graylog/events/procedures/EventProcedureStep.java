@@ -17,6 +17,7 @@
 package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -50,6 +51,9 @@ public abstract class EventProcedureStep extends ScopedEntity {
     }
 
     public abstract Builder toBuilder();
+
+    @JsonIgnore
+    abstract String toHtml();
 
     @AutoValue.Builder
     public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {

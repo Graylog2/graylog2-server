@@ -27,6 +27,8 @@ import org.graylog2.security.html.HTMLSanitizerConverter;
 
 import java.util.List;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @AutoValue
 @JsonDeserialize(builder = EventProcedure.Builder.class)
 public abstract class EventProcedure extends ScopedEntity {
@@ -79,6 +81,37 @@ public abstract class EventProcedure extends ScopedEntity {
         procedureBuilder.append("Description: " + description() + "\n");
         procedureBuilder.append("Steps:\n");
 
+        return procedureBuilder.toString();
+    }
+
+    public String toHtml() {
+        final StringBuilder procedureBuilder = new StringBuilder();
+        procedureBuilder.append(f("""
+                <section>
+                  <h1>Event Procedures</h1>
+                  <header>
+                    <h2>%s</h2>
+                  </header>""", title()));
+
+        procedureBuilder.append(f("""
+                <section>
+                  <h3>Description</h3>
+                  <p>No description set</p>
+                </section>""", title()));
+
+        if (steps() != null && !steps().isEmpty()) {
+            procedureBuilder.append("""
+                    <section>
+                      <h3>Event Procedure Steps</h3>
+                      <ol>""");
+            steps().forEach(step -> {procedureBuilder.append(step.toHtml());});
+            procedureBuilder.append("""
+                      </ol>
+                    </section>""");
+        }
+
+        procedureBuilder.append("""
+                </section>""");
         return procedureBuilder.toString();
     }
 }
