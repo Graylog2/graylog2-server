@@ -36,9 +36,7 @@ import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
-import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
-import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
-import org.graylog2.indexer.indexset.fields.WritableField;
+import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.validation.ValidObjectId;
@@ -53,9 +51,6 @@ import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.indexset.fields.FieldTypeProfileField.FIELD_PROFILE_ID;
-import static org.graylog2.indexer.indexset.fields.IndexAnalyzerField.FIELD_INDEX_ANALYZER;
-import static org.graylog2.indexer.indexset.fields.WritableField.FIELD_WRITABLE;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
@@ -106,7 +101,8 @@ public abstract class IndexSetConfig extends ScopedEntity implements
                                         @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL) @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS) @Nullable CustomFieldMappings customFieldMappings,
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
-                                        @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering
+                                        @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
+                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Set<IndexSetFieldRestriction> fieldRestrictions
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -147,6 +143,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
                 .fieldTypeProfile(fieldTypeProfile)
                 .dataTieringConfig(dataTiering)
                 .scope(scope)
+                .fieldRestrictions(fieldRestrictions)
                 .build();
     }
 
@@ -172,7 +169,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
         return create(id, null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null);
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -196,7 +193,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
         return create(null, DefaultEntityScope.NAME, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null);
     }
 
     /**
@@ -265,7 +262,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
     @AutoValue.Builder
     public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> implements
             ExtendedIndexSetFieldsBuilder<Builder>,
-            FieldRestrictionsFieldBuilder<Builder>{
+            FieldRestrictionsFieldBuilder<Builder> {
 
         public abstract Builder isRegular(@Nullable Boolean isRegular);
 

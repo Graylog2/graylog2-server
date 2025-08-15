@@ -39,6 +39,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
@@ -65,6 +66,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.createIndexSetConfig;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -111,9 +113,14 @@ public class IndexSetsResourceTest {
     public void setUp() throws Exception {
         this.permitted = true;
         this.indexSetsResource = createIndexSetsResource(Set.of());
-        when(indexSetRestrictionsService.createIndexSetConfig(any())).then(invocationOnMock -> {
+        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean())).then(invocationOnMock -> {
             IndexSetCreationRequest request = invocationOnMock.getArgument(0);
             return request.toIndexSetConfig(true, null);
+        });
+        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean())).then(invocationOnMock -> {
+            IndexSetUpdateRequest request = invocationOnMock.getArgument(0);
+            IndexSetConfig config = invocationOnMock.getArgument(1 );
+            return request.toIndexSetConfig(config);
         });
     }
 

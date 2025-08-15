@@ -26,6 +26,7 @@ import static org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestrictio
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = TYPE_FIELD, visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ImmutableIndexSetField.class, name = ImmutableIndexSetField.TYPE_NAME),
+        @JsonSubTypes.Type(value = ImmutableAndHiddenIndexSetField.class, name = ImmutableAndHiddenIndexSetField.TYPE_NAME),
 })
 public interface IndexSetFieldRestriction {
     String TYPE_FIELD = "type";

@@ -47,6 +47,7 @@ public class IndexSetTestUtils {
                 .fieldTypeProfile(indexSetConfig.fieldTypeProfile())
                 .dataTieringConfig(indexSetConfig.dataTieringConfig())
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
+                .fieldRestrictions(indexSetConfig.fieldRestrictions())
                 .build();
     }
 

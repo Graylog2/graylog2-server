@@ -24,7 +24,9 @@ import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,11 +41,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.createIndexSetConfig;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toCreationRequest;
+import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toUpdateRequest;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IndexSetRestrictionsServiceTest {
 
+    private static final Set<IndexSetFieldRestriction> FIELD_RESTRICTION = Set.of(
+            restriction("shards"),
+            restriction("retention_strategy.max_number_of_indices"),
+            restriction("rotation_strategy")
+    );
     @Mock
     private IndexSetTemplateService templateService;
     @Mock
@@ -62,11 +70,7 @@ class IndexSetRestrictionsServiceTest {
     @Test
     void createIndexSetConfigWithRestrictions() {
         IndexSetConfig indexSetConfig = createIndexSetConfig(null, "title").toBuilder()
-                .fieldRestrictions(Set.of(
-                        restriction("shards"),
-                        restriction("retention_strategy.max_number_of_indices"),
-                        restriction("rotation_strategy")
-                ))
+                .fieldRestrictions(FIELD_RESTRICTION)
                 .build();
         IndexSetTemplate indexSetTemplate = createIndexSetTemplate(indexSetConfig);
         IndexSetCreationRequest request = toCreationRequest(indexSetConfig).toBuilder()
@@ -74,35 +78,111 @@ class IndexSetRestrictionsServiceTest {
                 .build();
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
-        IndexSetConfig created = underTest.createIndexSetConfig(request);
+        IndexSetConfig created = underTest.createIndexSetConfig(request, false);
 
         assertThat(created).isEqualTo(indexSetConfig);
-
     }
 
     @Test
     void createIndexSetConfigWithRestrictionsAndChangedImmutableFields() {
-        Set<IndexSetFieldRestriction> restrictions = Set.of(
-                restriction("shards"),
-                restriction("retention_strategy.max_number_of_indices"),
-                restriction("rotation_strategy")
-        );
         IndexSetConfig indexSetConfig = createIndexSetConfig(null, "title").toBuilder()
-                .fieldRestrictions(restrictions)
+                .fieldRestrictions(FIELD_RESTRICTION)
                 .build();
         IndexSetTemplate indexSetTemplate = createIndexSetTemplate(indexSetConfig);
         IndexSetCreationRequest request = toCreationRequest(indexSetConfig).toBuilder()
                 .indexSetTemplateId(indexSetTemplate.id())
-                .shards(indexSetConfig.shards()+1)
+                .shards(indexSetConfig.shards() + 1)
                 .retentionStrategyConfig(NoopRetentionStrategyConfig.create(2))
                 .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(1))
                 .build();
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
-        assertThatThrownBy(() -> underTest.createIndexSetConfig(request))
-                .hasMessageContaining(restrictions.stream()
+        assertThatThrownBy(() -> underTest.createIndexSetConfig(request, false))
+                .hasMessageContaining(FIELD_RESTRICTION.stream()
                         .map(IndexSetFieldRestriction::fieldName)
                         .collect(Collectors.joining(", ")));
+    }
+
+    @Test
+    void createIndexSetConfigAndSkipRestrictionsCheck() {
+        IndexSetConfig indexSetConfig = createIndexSetConfig(null, "title").toBuilder()
+                .fieldRestrictions(FIELD_RESTRICTION)
+                .build();
+        IndexSetTemplate indexSetTemplate = createIndexSetTemplate(indexSetConfig);
+        IndexSetCreationRequest request = toCreationRequest(indexSetConfig).toBuilder()
+                .indexSetTemplateId(indexSetTemplate.id())
+                .shards(indexSetConfig.shards() + 1)
+                .build();
+        when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
+
+        IndexSetConfig created = underTest.createIndexSetConfig(request, true);
+
+        assertThat(created).isEqualTo(indexSetConfig.toBuilder()
+                .shards(request.shards())
+                .build());
+    }
+
+    @Test
+    void updateIndexSetConfigWithRestrictions() {
+        IndexSetConfig indexSetConfig = createIndexSetConfig("1", "title").toBuilder()
+                .fieldRestrictions(FIELD_RESTRICTION)
+                .build();
+        IndexSetUpdateRequest request = toUpdateRequest(indexSetConfig).toBuilder()
+                .replicas(1)
+                .build();
+
+        IndexSetConfig created = underTest.updateIndexSetConfig(request, indexSetConfig, false);
+
+        assertThat(created).isEqualTo(indexSetConfig.toBuilder()
+                .replicas(request.replicas())
+                .build());
+    }
+
+    @Test
+    void updateIndexSetConfigWithRestrictionsAndChangedImmutableFields() {
+        IndexSetConfig indexSetConfig = createIndexSetConfig("1", "title").toBuilder()
+                .fieldRestrictions(FIELD_RESTRICTION)
+                .build();
+        IndexSetUpdateRequest request = toUpdateRequest(indexSetConfig).toBuilder()
+                .replicas(1)
+                .shards(indexSetConfig.shards() + 1)
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(2))
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(1))
+                .build();
+
+        assertThatThrownBy(() -> underTest.updateIndexSetConfig(request, indexSetConfig, false))
+                .hasMessageContaining(FIELD_RESTRICTION.stream()
+                        .map(IndexSetFieldRestriction::fieldName)
+                        .collect(Collectors.joining(", ")));
+    }
+
+    @Test
+    void updateIndexSetConfigWithChangedRestrictions() {
+        IndexSetConfig indexSetConfig = createIndexSetConfig("1", "title").toBuilder()
+                .fieldRestrictions(FIELD_RESTRICTION)
+                .build();
+        IndexSetUpdateRequest request = toUpdateRequest(indexSetConfig).toBuilder()
+                .fieldRestrictions(null)
+                .build();
+
+        assertThatThrownBy(() -> underTest.updateIndexSetConfig(request, indexSetConfig, false))
+                .hasMessageContaining(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT);
+    }
+
+    @Test
+    void updateIndexSetConfigAndSkipRestrictionsCheck() {
+        IndexSetConfig indexSetConfig = createIndexSetConfig("1", "title").toBuilder()
+                .fieldRestrictions(FIELD_RESTRICTION)
+                .build();
+        IndexSetUpdateRequest request = toUpdateRequest(indexSetConfig).toBuilder()
+                .shards(indexSetConfig.shards() + 1)
+                .build();
+
+        IndexSetConfig created = underTest.updateIndexSetConfig(request, indexSetConfig, true);
+
+        assertThat(created).isEqualTo(indexSetConfig.toBuilder()
+                .shards(request.shards())
+                .build());
     }
 
     private static ImmutableIndexSetField restriction(String field) {

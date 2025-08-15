@@ -25,20 +25,27 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ParseContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.graylog2.indexer.indexset.fields.FieldRestrictionsField.FIELD_RESTRICTIONS;
+
 public class IndexSetRestrictionsService {
 
+    public static final String FIELD_RESTRICTIONS_PATH = "$." + FIELD_RESTRICTIONS;
     private final IndexSetTemplateService templateService;
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
     private final ObjectMapper objectMapper;
@@ -56,21 +63,43 @@ public class IndexSetRestrictionsService {
     }
 
 
-    public IndexSetConfig createIndexSetConfig(IndexSetCreationRequest creationRequest) {
+    public IndexSetConfig createIndexSetConfig(IndexSetCreationRequest creationRequest, boolean skipRestrictionCheck) {
         IndexSetTemplateConfig indexSetTemplateConfig = Optional.ofNullable(creationRequest.indexSetTemplateId())
                 .flatMap(templateService::get)
                 .map(IndexSetTemplate::indexSetConfig)
                 .orElse(indexSetDefaultTemplateService.getOrCreateDefaultConfig());
 
-        Set<IndexSetFieldRestriction> indexSetFieldRestrictions = indexSetTemplateConfig.fieldRestrictions();
+        if(!skipRestrictionCheck) {
+            checkRestrictions(indexSetTemplateConfig.fieldRestrictions(), doc(creationRequest), doc(indexSetTemplateConfig));
+        }
+
+        return creationRequest.toIndexSetConfig(true, indexSetTemplateConfig.fieldRestrictions());
+    }
+
+    public IndexSetConfig updateIndexSetConfig(IndexSetUpdateRequest updateRequest,
+                                               IndexSetConfig oldConfig,
+                                               boolean skipRestrictionCheck) {
+        if (!skipRestrictionCheck) {
+            DocumentContext doc1 = doc(updateRequest);
+            DocumentContext doc2 = doc(oldConfig);
+            if (!Objects.equals(doc1.read(FIELD_RESTRICTIONS_PATH), doc2.read(FIELD_RESTRICTIONS_PATH))) {
+                throw new ForbiddenException("Missing permission %s to change field %s!".formatted(
+                        RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT, FIELD_RESTRICTIONS));
+            }
+            checkRestrictions(oldConfig.fieldRestrictions(), doc1, doc2);
+        }
+        return updateRequest.toIndexSetConfig(oldConfig);
+    }
+
+    private void checkRestrictions(Set<IndexSetFieldRestriction> indexSetFieldRestrictions,
+                                   DocumentContext doc1,
+                                   DocumentContext doc2) {
 
         if (indexSetFieldRestrictions != null && !indexSetFieldRestrictions.isEmpty()) {
-            DocumentContext requestContext = createDocument(creationRequest);
-            DocumentContext templateContext = createDocument(indexSetTemplateConfig);
             List<String> invalidFields = new ArrayList<>();
             for (IndexSetFieldRestriction r : indexSetFieldRestrictions) {
                 if (r instanceof FieldComparator comparator) {
-                    if (!comparator.compare(requestContext, templateContext)) {
+                    if (!comparator.compare(doc1, doc2)) {
                         invalidFields.add(r.fieldName());
                     }
                 }
@@ -79,11 +108,9 @@ public class IndexSetRestrictionsService {
                 throw new BadRequestException("The following fields %s are immutable and cannot be changed!".formatted(invalidFields));
             }
         }
-
-        return creationRequest.toIndexSetConfig(true, indexSetTemplateConfig.fieldRestrictions());
     }
 
-    private DocumentContext createDocument(Object o) {
+    private DocumentContext doc(Object o) {
         try {
             return parseContext.parse(objectMapper.writeValueAsString(o));
         } catch (JsonProcessingException e) {

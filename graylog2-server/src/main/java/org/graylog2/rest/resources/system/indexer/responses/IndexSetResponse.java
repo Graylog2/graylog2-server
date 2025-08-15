@@ -81,6 +81,7 @@ public abstract class IndexSetResponse implements
                 .dataTieringConfig(indexSetConfig.dataTieringConfig())
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
                 .dataTieringStatus(dataTieringStatus)
+                .fieldRestrictions(indexSetConfig.fieldRestrictions())
                 .build();
     }
 

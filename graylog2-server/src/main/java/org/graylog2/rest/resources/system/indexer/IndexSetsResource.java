@@ -263,7 +263,7 @@ public class IndexSetsResource extends RestResource {
                                  @Valid @NotNull IndexSetCreationRequest indexSet) {
         try {
             checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
-            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet);
+            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet, isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
 
             final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
             if (violation.isPresent()) {
@@ -308,7 +308,8 @@ public class IndexSetsResource extends RestResource {
 
         checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTieringConfig());
 
-        final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(oldConfig);
+        final IndexSetConfig indexSetConfig = indexSetRestrictionsService.updateIndexSetConfig(updateRequest, oldConfig,
+                isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
 
         final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {

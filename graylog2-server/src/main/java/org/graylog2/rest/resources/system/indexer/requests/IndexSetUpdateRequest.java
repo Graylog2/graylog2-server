@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
+import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
 import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
 import org.graylog2.indexer.indexset.fields.UseLegacyRotationField;
 import org.graylog2.indexer.indexset.fields.WritableField;
@@ -35,7 +36,8 @@ public abstract class IndexSetUpdateRequest implements
         BaseIndexSetFields,
         UseLegacyRotationField,
         WritableField,
-        FieldTypeProfileField {
+        FieldTypeProfileField,
+        FieldRestrictionsField {
 
     public IndexSetConfig toIndexSetConfig(final IndexSetConfig oldConfig) {
         return oldConfig.toBuilder()
@@ -53,8 +55,11 @@ public abstract class IndexSetUpdateRequest implements
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .fieldTypeProfile(fieldTypeProfile())
                 .dataTieringConfig(Boolean.FALSE.equals(useLegacyRotation()) ? dataTieringConfig() : null)
+                .fieldRestrictions(fieldRestrictions())
                 .build();
     }
+
+    public abstract Builder toBuilder();
 
     public static Builder builder() {
         return AutoValue_IndexSetUpdateRequest.Builder.builder();
@@ -67,7 +72,8 @@ public abstract class IndexSetUpdateRequest implements
             BaseIndexSetFieldsBuilder<Builder>,
             UseLegacyRotationFieldBuilder<Builder>,
             WritableFieldBuilder<Builder>,
-            FieldTypeProfileFieldBuilder<Builder> {
+            FieldTypeProfileFieldBuilder<Builder>,
+            FieldRestrictionsFieldBuilder<Builder> {
 
         @JsonCreator
         public static Builder builder() {
