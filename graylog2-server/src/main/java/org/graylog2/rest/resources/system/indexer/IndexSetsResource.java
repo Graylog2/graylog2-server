@@ -55,14 +55,16 @@ import org.graylog2.indexer.IndexSetValidator.Violation;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -98,6 +100,7 @@ public class IndexSetsResource extends RestResource {
     private final SystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
+    private final IndexSetRestrictionsService indexSetRestrictionsService;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -109,7 +112,7 @@ public class IndexSetsResource extends RestResource {
                              final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
-                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -120,6 +123,7 @@ public class IndexSetsResource extends RestResource {
         this.systemJobManager = systemJobManager;
         this.tieringStatusService = tieringStatusService;
         this.openIndexSetFilterFactories = openIndexSetFilterFactories;
+        this.indexSetRestrictionsService = indexSetRestrictionsService;
     }
 
     @GET
@@ -128,14 +132,14 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
-    public IndexSetResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
-                                 @QueryParam("skip") @DefaultValue("0") int skip,
-                                 @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                 @QueryParam("limit") @DefaultValue("0") int limit,
-                                 @ApiParam(name = "stats", value = "Include index set stats.")
-                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats,
-                                 @ApiParam(name = "only_open", value = "Include only graylog open indices.")
-                                 @QueryParam("only_open") @DefaultValue("false") boolean onlyOpen) {
+    public IndexSetsResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                  @QueryParam("skip") @DefaultValue("0") int skip,
+                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                  @QueryParam("limit") @DefaultValue("0") int limit,
+                                  @ApiParam(name = "stats", value = "Include index set stats.")
+                                  @QueryParam("stats") @DefaultValue("false") boolean computeStats,
+                                  @ApiParam(name = "only_open", value = "Include only graylog open indices.")
+                                  @QueryParam("only_open") @DefaultValue("false") boolean onlyOpen) {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         Stream<IndexSetConfig> indexSetConfigStream = indexSetService.findAll()
@@ -156,14 +160,14 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
-    public IndexSetResponse search(@ApiParam(name = "searchTitle", value = "The number of elements to skip (offset).")
-                                   @QueryParam("searchTitle") String searchTitle,
-                                   @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
-                                   @QueryParam("skip") @DefaultValue("0") int skip,
-                                   @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                   @QueryParam("limit") @DefaultValue("0") int limit,
-                                   @ApiParam(name = "stats", value = "Include index set stats.")
-                                   @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+    public IndexSetsResponse search(@ApiParam(name = "searchTitle", value = "The number of elements to skip (offset).")
+                                    @QueryParam("searchTitle") String searchTitle,
+                                    @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                    @QueryParam("skip") @DefaultValue("0") int skip,
+                                    @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                    @QueryParam("limit") @DefaultValue("0") int limit,
+                                    @ApiParam(name = "stats", value = "Include index set stats.")
+                                    @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         List<IndexSetConfig> allowedConfigurations = indexSetService.searchByTitle(searchTitle).stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id())).toList();
@@ -171,7 +175,7 @@ public class IndexSetsResource extends RestResource {
         return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
     }
 
-    private IndexSetResponse getPagedIndexSetResponse(int skip, int limit, boolean computeStats, IndexSetConfig defaultIndexSet, List<IndexSetConfig> allowedConfigurations) {
+    private IndexSetsResponse getPagedIndexSetResponse(int skip, int limit, boolean computeStats, IndexSetConfig defaultIndexSet, List<IndexSetConfig> allowedConfigurations) {
         int calculatedLimit = limit > 0 ? limit : allowedConfigurations.size();
         Comparator<IndexSetConfig> titleComparator = Comparator.comparing(IndexSetConfig::title, String.CASE_INSENSITIVE_ORDER);
 
@@ -181,8 +185,8 @@ public class IndexSetsResource extends RestResource {
                 .limit(calculatedLimit)
                 .toList();
 
-        List<IndexSetSummary> indexSets = pagedConfigs.stream()
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+        List<IndexSetResponse> indexSets = pagedConfigs.stream()
+                .map(config -> IndexSetResponse.fromIndexSetConfig(config, config.equals(defaultIndexSet), null))
                 .toList();
 
 
@@ -193,7 +197,7 @@ public class IndexSetsResource extends RestResource {
                     .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
         }
 
-        return IndexSetResponse.create(allowedConfigurations.size(), indexSets, stats);
+        return IndexSetsResponse.create(allowedConfigurations.size(), indexSets, stats);
     }
 
 
@@ -217,14 +221,15 @@ public class IndexSetsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized"),
             @ApiResponse(code = 404, message = "Index set not found"),
     })
-    public IndexSetSummary get(@ApiParam(name = "id", required = true)
-                               @PathParam("id") String id) {
+    public IndexSetResponse get(@ApiParam(name = "id", required = true)
+                                @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
         final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Couldn't find index set with ID <" + id + ">"));
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
-                .map(config -> IndexSetSummary.fromIndexSetConfig(
-                        config, config.equals(defaultIndexSet),
+                .map(config -> IndexSetResponse.fromIndexSetConfig(
+                        config,
+                        config.equals(defaultIndexSet),
                         tieringStatusService.getStatus(indexSet, config)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
@@ -254,11 +259,11 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
-    public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
-                                @Valid @NotNull IndexSetSummary indexSet) {
+    public IndexSetResponse save(@ApiParam(name = "Index set configuration", required = true)
+                                 @Valid @NotNull IndexSetCreationRequest indexSet) {
         try {
             checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
-            final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig(true);
+            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet);
 
             final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
             if (violation.isPresent()) {
@@ -267,7 +272,7 @@ public class IndexSetsResource extends RestResource {
 
             final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
             final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-            return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
+            return IndexSetResponse.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet), null);
         } catch (MongoException e) {
             if (MongoUtils.isDuplicateKeyError(e)) {
                 throw new BadRequestException(e.getMessage());
@@ -285,10 +290,10 @@ public class IndexSetsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized"),
             @ApiResponse(code = 409, message = "Mismatch of IDs in URI path and payload"),
     })
-    public IndexSetSummary update(@ApiParam(name = "id", required = true)
-                                  @PathParam("id") String id,
-                                  @ApiParam(name = "Index set configuration", required = true)
-                                  @Valid @NotNull IndexSetUpdateRequest updateRequest) {
+    public IndexSetResponse update(@ApiParam(name = "id", required = true)
+                                   @PathParam("id") String id,
+                                   @ApiParam(name = "Index set configuration", required = true)
+                                   @Valid @NotNull IndexSetUpdateRequest updateRequest) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
         final IndexSetConfig oldConfig = indexSetService.get(id)
@@ -303,7 +308,7 @@ public class IndexSetsResource extends RestResource {
 
         checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTieringConfig());
 
-        final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(id, oldConfig);
+        final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(oldConfig);
 
         final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
@@ -312,7 +317,7 @@ public class IndexSetsResource extends RestResource {
 
         final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
 
-        return IndexSetSummary.fromIndexSetConfig(savedObject, isDefaultSet);
+        return IndexSetResponse.fromIndexSetConfig(savedObject, isDefaultSet, null);
     }
 
     private void checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
@@ -330,8 +335,8 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
-    public IndexSetSummary setDefault(@ApiParam(name = "id", required = true)
-                                      @PathParam("id") String id) {
+    public IndexSetResponse setDefault(@ApiParam(name = "id", required = true)
+                                       @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
         final IndexSetConfig indexSet = indexSetService.get(id)
@@ -345,7 +350,7 @@ public class IndexSetsResource extends RestResource {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
 
-        return IndexSetSummary.fromIndexSetConfig(indexSet, indexSet.equals(defaultIndexSet));
+        return IndexSetResponse.fromIndexSetConfig(indexSet, indexSet.equals(defaultIndexSet), null);
     }
 
     @DELETE

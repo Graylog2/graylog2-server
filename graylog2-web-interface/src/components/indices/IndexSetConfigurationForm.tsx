@@ -249,8 +249,18 @@ const IndexSetConfigurationForm = ({
 
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
+      const indexSetValues = values;
+
+      if(!create) {
+        delete indexSetValues.index_prefix;
+        delete indexSetValues.index_analyzer;
+        delete indexSetValues.creation_date;
+        delete indexSetValues.can_be_default
+        delete indexSetValues.default;
+      }
+
       const legacyConfig = {
-        ...values,
+        ...indexSetValues,
         data_tiering: indexSetTemplateDefaults.data_tiering,
         use_legacy_rotation: true,
       };
@@ -264,7 +274,7 @@ const IndexSetConfigurationForm = ({
       }
 
       const configWithDataTiering = {
-        ...values,
+        ...indexSetValues,
         data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore),
       };
 
