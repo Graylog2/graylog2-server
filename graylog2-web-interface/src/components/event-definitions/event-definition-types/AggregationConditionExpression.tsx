@@ -236,6 +236,7 @@ class AggregationConditionExpression extends React.Component<
         <>
           <BooleanOperatorSelector
             initialText="Messages must meet"
+            placeholder="Global boolean operator"
             operator={this.getEffectiveGlobalGroupOperator()}
             onOperatorChange={this.handleOperatorChange}
           />

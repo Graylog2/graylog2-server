@@ -302,14 +302,11 @@ describe('ExportModal', () => {
     });
 
     it('show widget selection if more than one exists', async () => {
-      const { getByLabelText, getByText } = render(
-        <SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} />,
-      );
-
-      const select = getByLabelText('Select message table');
+      const { getByText } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
 
       expect(getByText(/Please select a message table to adopt its fields./)).not.toBeNull();
 
+      const select = await selectEvent.findSelectInput('Select message table');
       await selectEvent.openMenu(select);
 
       expect(getByText('Widget 1')).not.toBeNull();
@@ -367,17 +364,11 @@ describe('ExportModal', () => {
     });
 
     it('show widget selection if more than one exists', async () => {
-      const { getByText, getByLabelText } = render(
-        <DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />,
-      );
-      const select = getByLabelText('Select message table');
+      render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
 
-      expect(getByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
+      await screen.findByText(/Please select the message table you want to export the search results for./);
 
-      await selectEvent.openMenu(select);
-
-      expect(getByText('Widget 1')).not.toBeNull();
-      expect(getByText('Widget 2')).not.toBeNull();
+      await selectEvent.assertOptionExists('Select message table', ['Widget 1', 'Widget 2']);
     });
 
     it('show widget selection with widgets from all dashboard pages', async () => {
@@ -396,13 +387,9 @@ describe('ExportModal', () => {
         .state(Immutable.Map({ 'query-id-1': stateWithOneWidget(messagesWidget()), 'query-id-2': secondViewState }))
         .build();
 
-      const { getByText, getByLabelText } = render(<DashboardExportModal view={complexView} />);
-      const select = getByLabelText('Select message table');
+      render(<DashboardExportModal view={complexView} />);
 
-      await selectEvent.openMenu(select);
-
-      expect(getByText('Widget 1')).not.toBeNull();
-      expect(getByText('Widget 2')).not.toBeNull();
+      await selectEvent.assertOptionExists('Select message table', ['Widget 1', 'Widget 2']);
     });
 
     it('preselect widget on direct widget export', () => {
