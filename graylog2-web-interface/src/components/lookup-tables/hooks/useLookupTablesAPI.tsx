@@ -53,10 +53,7 @@ export function useFetchLookupTables() {
 export function useCreateLookupTable() {
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createLookupTable,
     onSuccess: () => {
       UserNotification.success('Lookup Table created successfully');
@@ -75,10 +72,7 @@ export function useCreateLookupTable() {
 }
 
 export function useUpdateLookupTable() {
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateLookupTable,
     onSuccess: () => {
       UserNotification.success('Lookup Table updated successfully');
@@ -195,10 +189,7 @@ export function useValidateCache() {
 export function useCreateCache() {
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createCache,
     onSuccess: () => {
       UserNotification.success('Cache created successfully');
@@ -266,10 +257,7 @@ export function useFetchDataAdapterTypes() {
 export function useCreateAdapter() {
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync,
-    isPending: isLoading,
-  } = useMutation({
+  const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter created successfully');

@@ -82,7 +82,15 @@ const StyledFormSubmitWrapper = styled.div`
   margin-top: 20px;
 `;
 
-const LookupTableForm = ({ onClose, onCacheCreateClick, onDataAdapterCreateClick, create = true, table = INIT_TABLE_VALUES, dataAdapter = '', cache = '' }: Props) => {
+const LookupTableForm = ({
+  onClose,
+  onCacheCreateClick,
+  onDataAdapterCreateClick,
+  create = true,
+  table = INIT_TABLE_VALUES,
+  dataAdapter = '',
+  cache = '',
+}: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
   const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
@@ -130,8 +138,8 @@ const LookupTableForm = ({ onClose, onCacheCreateClick, onDataAdapterCreateClick
   const initialValues: LookupTableType = {
     ...INIT_TABLE_VALUES,
     ...table,
-    data_adapter_id: (table?.data_adapter_id || dataAdapter) || undefined,
-    cache_id: (table?.cache_id || cache) || undefined,
+    data_adapter_id: table?.data_adapter_id || dataAdapter || undefined,
+    cache_id: table?.cache_id || cache || undefined,
     enable_single_value: table.default_single_value !== '',
     enable_multi_value: table.default_multi_value !== '',
   };

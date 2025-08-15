@@ -27,7 +27,7 @@ function LUTTablesPage() {
 
   const showCreateModal = () => {
     setModal('LUT-CREATE');
-  }
+  };
 
   return (
     <LUTPageLayout

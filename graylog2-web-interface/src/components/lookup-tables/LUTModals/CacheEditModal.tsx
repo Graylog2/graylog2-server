@@ -25,10 +25,10 @@ import { useValidateCache } from 'components/lookup-tables/hooks/useLookupTables
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 type Props = {
-  onClose: () => void,
-  cache: LookupTableCache,
-  title: string,
-}
+  onClose: () => void;
+  cache: LookupTableCache;
+  title: string;
+};
 
 const StyledRow = styled(Row)`
   display: flex;
@@ -41,7 +41,7 @@ const CacheEditModal = ({ onClose, title, cache, validationErrors }: Props & { v
 
   const validate = (cacheObj: LookupTableCache) => {
     validateCache(cacheObj);
-  }
+  };
 
   return (
     <Modal show fullScreen onHide={onClose}>
@@ -66,11 +66,7 @@ const CacheEditModal = ({ onClose, title, cache, validationErrors }: Props & { v
   );
 };
 
-export default connect(
-  CacheEditModal,
-  { cachesStore: LookupTableCachesStore },
-  ({ cachesStore, ...otherProps }) => ({
-    ...otherProps,
-    ...cachesStore,
-  }),
-);
+export default connect(CacheEditModal, { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
+  ...otherProps,
+  ...cachesStore,
+}));

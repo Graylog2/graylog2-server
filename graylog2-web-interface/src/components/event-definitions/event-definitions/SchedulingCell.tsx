@@ -135,9 +135,7 @@ const SchedulingInfo = ({
   const searchWithinFormatted = moment
     .duration(searchWithinMs)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
-  const searchWithinMessage = searchWithinMs
-    ? `, searching within the last ${searchWithinFormatted}.`
-    : '.';
+  const searchWithinMessage = searchWithinMs ? `, searching within the last ${searchWithinFormatted}.` : '.';
 
   return (
     <>
