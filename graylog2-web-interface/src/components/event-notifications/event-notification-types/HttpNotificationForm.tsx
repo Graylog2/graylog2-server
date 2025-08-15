@@ -16,10 +16,11 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import styled from 'styled-components';
 
-import { URLWhiteListInput } from 'components/common';
+import { URLAllowListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventNotificationTypes } from 'components/event-notifications/types';
@@ -128,7 +129,7 @@ class HttpNotificationForm extends React.Component<
 
     return (
       <>
-        <URLWhiteListInput
+        <URLAllowListInput
           label="URL"
           onChange={this.handleChange}
           validationState={validation.errors.url ? 'error' : null}

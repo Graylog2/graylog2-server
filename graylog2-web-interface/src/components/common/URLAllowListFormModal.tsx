@@ -20,8 +20,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import type { ConfigurationsStoreState, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import UrlAllowListForm from 'components/configurations/UrlAllowListForm';
+import type { ConfigurationsStoreState, AllowListConfig } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
@@ -30,7 +30,7 @@ import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
+const URL_ALLOWLIST_CONFIG = 'org.graylog2.system.urlallowlist.UrlAllowlist';
 
 type Props = {
   newUrlEntry?: string;
@@ -38,31 +38,31 @@ type Props = {
   urlType?: 'regex' | 'literal';
 };
 
-const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate = () => {} }: Props) => {
+const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate = () => {} }: Props) => {
   const prevNewUrlEntry = useRef<string>();
-  const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
+  const [config, setConfig] = useState<AllowListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
-  const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
+  const urlAllowListConfig = configuration[URL_ALLOWLIST_CONFIG];
 
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
-    if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
-      ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
+    if (isPermitted(currentUser.permissions, ['urlallowlist:read'])) {
+      ConfigurationsActions.listAllowListConfig(URL_ALLOWLIST_CONFIG);
     }
   }, [currentUser]);
 
-  const setDefaultWhiteListState = useCallback(
-    (defaultUrlWhiteListConfig) => {
+  const setDefaultAllowListState = useCallback(
+    (defaultUrlAllowListConfig) => {
       const id = generateId();
       const defaultConfig = {
         entries: [
-          ...defaultUrlWhiteListConfig.entries,
+          ...defaultUrlAllowListConfig.entries,
           {
             id: id,
             title: '',
@@ -70,7 +70,7 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
             type: urlType ?? 'literal',
           },
         ],
-        disabled: defaultUrlWhiteListConfig.disabled,
+        disabled: defaultUrlAllowListConfig.disabled,
       };
       setNewUrlEntryId(id);
       setConfig(defaultConfig);
@@ -81,14 +81,14 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   useEffect(() => {
     const { entries } = config;
 
-    if (urlWhiteListConfig) {
+    if (urlAllowListConfig) {
       if (entries.length === 0 || prevNewUrlEntry.current !== newUrlEntry) {
-        setDefaultWhiteListState(urlWhiteListConfig);
+        setDefaultAllowListState(urlAllowListConfig);
       }
     }
 
     prevNewUrlEntry.current = newUrlEntry;
-  }, [setDefaultWhiteListState, urlWhiteListConfig, config, newUrlEntry, urlType]);
+  }, [setDefaultAllowListState, urlAllowListConfig, config, newUrlEntry, urlType]);
 
   const openModal = () => {
     setShowConfigModal(true);
@@ -96,7 +96,7 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
 
   const closeModal = () => {
     setShowConfigModal(false);
-    setDefaultWhiteListState(urlWhiteListConfig);
+    setDefaultAllowListState(urlAllowListConfig);
   };
 
   const handleUpdate = (nextConfig, nextIsValid) => {
@@ -110,39 +110,39 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
       event.stopPropagation();
     }
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.URLWHITELIST_CONFIGURATION_UPDATED, {
-      app_section: 'urlwhitelist',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.URLALLOWLIST_CONFIGURATION_UPDATED, {
+      app_section: 'urlallowlist',
       app_action_value: 'configuration-update',
     });
 
     if (isValid) {
-      ConfigurationsActions.updateWhitelist(URL_WHITELIST_CONFIG, config).then(() => {
+      ConfigurationsActions.updateAllowlist(URL_ALLOWLIST_CONFIG, config).then(() => {
         onUpdate();
         closeModal();
       });
     }
   };
 
-  if (urlWhiteListConfig) {
+  if (urlAllowListConfig) {
     const { entries, disabled } = config;
 
     return (
       <>
-        <IfPermitted permissions="urlwhitelist:write">
+        <IfPermitted permissions="urlallowlist:write">
           <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-            Add to URL Whitelist
+            Add to URL allowlist
           </Button>
         </IfPermitted>
         <BootstrapModalForm
           show={showConfigModal}
           bsSize="lg"
-          title="Update Whitelist Configuration"
+          title="Update Allowlist Configuration"
           onCancel={closeModal}
           onSubmitForm={saveConfig}
           submitButtonDisabled={!isValid}
           submitButtonText="Update configuration">
-          <h3>Whitelist URLs</h3>
-          <UrlWhiteListForm
+          <h3>Allowlist URLs</h3>
+          <UrlAllowListForm
             key={newUrlEntryId}
             urls={entries}
             disabled={disabled}
@@ -157,4 +157,4 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   return null;
 };
 
-export default URLWhiteListFormModal;
+export default URLAllowListFormModal;
