@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -30,6 +31,8 @@ import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Redirects the frontend to either a saved search or a defined search via the URL field.
@@ -92,6 +95,17 @@ public class PerformSearch extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @Override
+        public String toHtml() {
+            final StringBuilder stepBuilder = new StringBuilder();
+            stepBuilder.append(f("""
+                  <a href="%s">
+                    <button>Perform Search</button>
+                  </a>""", query())); // TODO: make propper link
+
+            return stepBuilder.toString();
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {

@@ -24,6 +24,8 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.procedures.EventProcedure;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.Job;
@@ -63,6 +65,7 @@ public class EventNotificationExecutionJob implements Job {
     private final Map<String, EventNotification.Factory> eventNotificationFactories;
     private final EventsConfigurationProvider configurationProvider;
     private final EventNotificationExecutionMetrics metrics;
+    private final EventProcedureProvider eventProcedureProvider;
 
     @Inject
     public EventNotificationExecutionJob(@Assisted JobDefinitionDto jobDefinition,
@@ -70,7 +73,8 @@ public class EventNotificationExecutionJob implements Job {
                                          DBEventDefinitionService eventDefinitionService,
                                          DBNotificationGracePeriodService notificationGracePeriodService,
                                          Map<String, EventNotification.Factory> eventNotificationFactories,
-                                         EventsConfigurationProvider configurationProvider, EventNotificationExecutionMetrics metrics) {
+                                         EventsConfigurationProvider configurationProvider, EventNotificationExecutionMetrics metrics,
+                                         EventProcedureProvider eventProcedureProvider) {
         this.jobConfig = (Config) jobDefinition.config();
         this.notificationService = dbNotificationService;
         this.eventDefinitionService = eventDefinitionService;
@@ -78,6 +82,7 @@ public class EventNotificationExecutionJob implements Job {
         this.eventNotificationFactories = eventNotificationFactories;
         this.configurationProvider = configurationProvider;
         this.metrics = metrics;
+        this.eventProcedureProvider = eventProcedureProvider;
     }
 
     @Override
@@ -117,11 +122,16 @@ public class EventNotificationExecutionJob implements Job {
             optionalEventDefinition = Optional.empty();
         }
 
+        final EventProcedure eventProcedure = optionalEventDefinition
+                .flatMap(eventDefinitionDto -> eventProcedureProvider.get(eventDefinitionDto.eventProcedureId()))
+                .orElse(null);
+
         EventNotificationContext notificationContext = EventNotificationContext.builder()
                 .notificationId(notification.id())
                 .notificationConfig(notification.config())
                 .event(eventDto)
                 .eventDefinition(optionalEventDefinition.get())
+                .eventProcedure(eventProcedure)
                 .jobTrigger(trigger)
                 .build();
 

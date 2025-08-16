@@ -25,6 +25,8 @@ import jakarta.annotation.Nullable;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @AutoValue
 @JsonDeserialize(builder = EventProcedureStep.Builder.class)
 public abstract class EventProcedureStep extends ScopedEntity {
@@ -50,6 +52,19 @@ public abstract class EventProcedureStep extends ScopedEntity {
     }
 
     public abstract Builder toBuilder();
+
+    public String toHtml() {
+        final StringBuilder stepBuilder = new StringBuilder();
+        stepBuilder.append(f("""
+                <li>
+                  <strong>%s</strong>
+                """, title()));
+        if (action() != null) {
+            stepBuilder.append(action().config().toHtml());
+        }
+        stepBuilder.append("</li>");
+        return stepBuilder.toString();
+    }
 
     @AutoValue.Builder
     public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
