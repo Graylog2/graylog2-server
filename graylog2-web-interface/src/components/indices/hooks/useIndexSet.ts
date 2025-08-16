@@ -34,9 +34,8 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
     const defaultIndexSet: IndexSet = {
       title: '',
       description: '',
-      index_prefix: indexSetTemplateDefaults.index_prefix,
+      index_prefix: '',
       writable: true,
-      can_be_default: true,
       shards: indexSetTemplateDefaults.shards,
       data_tiering: indexSetTemplateDefaults.data_tiering,
       replicas: indexSetTemplateDefaults.replicas,

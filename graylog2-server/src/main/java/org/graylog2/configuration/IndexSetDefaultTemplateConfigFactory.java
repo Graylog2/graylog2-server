@@ -20,7 +20,7 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
-import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.migrations.MaintenanceStrategiesHelper;
@@ -49,7 +49,7 @@ public class IndexSetDefaultTemplateConfigFactory {
                 .replicas(elasticsearchConfiguration.getReplicas())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(SimpleIndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
+                .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
                 .rotationStrategyClass(rotationConfig.left)
                 .rotationStrategyConfig(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)

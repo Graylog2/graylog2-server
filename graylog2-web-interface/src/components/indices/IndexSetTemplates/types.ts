@@ -21,7 +21,6 @@ import type { DataTieringConfig, DataTieringFormValues } from 'components/indice
 
 type IndexSetDefaultFields = Pick<
   IndexSetConfig,
-  | 'index_prefix'
   | 'index_analyzer'
   | 'shards'
   | 'replicas'
