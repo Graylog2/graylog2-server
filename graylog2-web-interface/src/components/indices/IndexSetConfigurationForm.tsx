@@ -255,7 +255,7 @@ const IndexSetConfigurationForm = ({
         delete indexSetValues.index_prefix;
         delete indexSetValues.index_analyzer;
         delete indexSetValues.creation_date;
-        delete indexSetValues.can_be_default
+        delete indexSetValues.can_be_default;
         delete indexSetValues.default;
       }
 

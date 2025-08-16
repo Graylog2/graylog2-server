@@ -273,7 +273,7 @@ public class MongoIndexSetServiceTest {
                                 1,
                                 false,
                                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL,
-                                null, null, null
+                                null, null, null, null
                         )
                 );
     }
