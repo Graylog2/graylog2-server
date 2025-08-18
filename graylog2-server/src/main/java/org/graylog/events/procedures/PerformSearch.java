@@ -100,7 +100,7 @@ public class PerformSearch extends Action {
         @Override
         public String toHtml() {
             final String link = Boolean.TRUE.equals(useSavedSearch())
-                    ? "/views/" + savedSearch()
+                    ? "views/" + savedSearch()
                     : query();
             return f("""
                       <a href="%s" style="display:inline-block;padding:.5em 1em;border:1px solid #ccc;border-radius:.4em;text-decoration:none;background:#eee">Perform Search</a>
