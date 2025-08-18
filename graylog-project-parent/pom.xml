@@ -21,7 +21,6 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>../graylog2-server</module>
-        <module>../full-backend-tests</module>
     </modules>
 
     <parent>
@@ -606,6 +605,17 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>add-full-backend-tests-module</id>
+            <activation>
+                <property>
+                    <name>!skip.full-backend-tests</name>
+                </property>
+            </activation>
+            <modules>
+                <module>../full-backend-tests</module>
+            </modules>
+        </profile>
         <profile>
             <id>java8-disable-strict-javadoc</id>
             <activation>
