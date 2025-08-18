@@ -83,17 +83,6 @@ public abstract class RuleSource {
 
     public abstract Builder toBuilder();
 
-    // TODO unused? since this is not a JsonCreator, the JsonProperty annotations are unnecessarily confusing
-    public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
-                                    @JsonProperty("title") String title,
-                                    @JsonProperty("description") @Nullable String description,
-                                    @JsonProperty("source") String source,
-                                    @JsonProperty("simulator_message") @Nullable String simulatorMessage,
-                                    @JsonProperty("created_at") @Nullable DateTime createdAt,
-                                    @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
-        return create(id, null, title, description, source, simulatorMessage, createdAt, modifiedAt);
-    }
-
     @JsonCreator
     public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                     @JsonProperty("_scope") @Nullable String scope,
