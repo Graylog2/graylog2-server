@@ -20,13 +20,14 @@ import styled from 'styled-components';
 import { Button, Panel, Input } from 'components/bootstrap';
 import FormWrap from 'integrations/aws/common/FormWrap';
 import SkipHealthCheck from 'integrations/aws/common/SkipHealthCheck';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
+import useFetch from 'integrations/hooks/useFetch';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import Countdown from 'integrations/aws/common/Countdown';
 import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { ApiContext } from 'integrations/aws/context/Api';
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import Icon from 'components/common/Icon';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 const Notice = styled.span`
   display: flex;
@@ -62,10 +63,10 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
       onChange({ target: { name: 'awsCloudwatchKinesisStreamArn', value: response.result } });
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream.value,
-    },
+    }),
   );
 
   useEffect(() => {
@@ -85,10 +86,10 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
       onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: response.type } });
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream.value,
-    },
+    }),
   );
 
   const checkForLogs = useCallback(() => {
