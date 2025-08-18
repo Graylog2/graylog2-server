@@ -318,6 +318,23 @@ public class CSVFileDataAdapterTest {
     }
 
     @Test
+    public void refreshMultiValueSuccess() throws Exception {
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueConfig(), new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+        csvFileDataAdapter.doRefresh(cachePurge);
+        assertFalse(csvFileDataAdapter.getError().isPresent());
+
+        LookupResult result1 = csvFileDataAdapter.doGet("000001");
+        assertThat(result1.multiValue())
+                .containsEntry("first_name", "Adam")
+                .containsEntry("last_name", "Alpha")
+                .containsEntry("username", "aalpha")
+                .containsEntry("phone", "123-4567")
+                .containsEntry("address", "123 Sleepy Hollow Lane");
+    }
+
+    @Test
     public void testMultiValueCIDRLookups() throws Exception {
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueCidrConfig(), new MetricRegistry(), pathChecker));
         when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
