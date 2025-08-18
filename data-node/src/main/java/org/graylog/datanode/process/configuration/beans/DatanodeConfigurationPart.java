@@ -39,6 +39,9 @@ public abstract class DatanodeConfigurationPart {
 
     public abstract List<String> javaOpts();
 
+    /**
+     * TODO: this is not used anywhere!
+     */
     public abstract Map<String, String> systemProperties();
 
     @Nullable
@@ -89,7 +92,12 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+        abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+
+        public Builder withConfigFiles(Collection<DatanodeConfigFile> configFiles) {
+            configFilesBuilder().addAll(configFiles);
+            return this;
+        }
 
         abstract ImmutableList.Builder<DatanodeConfigFile> configFilesBuilder();
 
@@ -118,10 +126,12 @@ public abstract class DatanodeConfigurationPart {
             return systemPropertiesBuilder;
         }
 
+        @Deprecated
         abstract Builder systemProperties(Map<String, String> systemProperties); // not public
 
         abstract DatanodeConfigurationPart autoBuild(); // not public
 
+        @Deprecated
         public Builder systemProperty(String key, String value) {
             systemPropertiesBuilder().put(key, value);
             return this;

@@ -81,16 +81,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <airline.version>3.1.0</airline.version>
         <amqp-client.version>5.26.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
@@ -164,7 +164,7 @@
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.52.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.18.1</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.19.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -175,7 +175,7 @@
         <shiro.version>2.0.5</shiro.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>6.8.2</oshi.version>
+        <oshi.version>6.8.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
@@ -189,7 +189,7 @@
         <zstd.version>1.5.7-4</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <jjwt.version>0.12.6</jjwt.version>
+        <jjwt.version>0.12.7</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
 
@@ -202,7 +202,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
-        <mockito.version>5.18.0</mockito.version>
+        <mockito.version>5.19.0</mockito.version>
         <restassured.version>5.5.5</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
@@ -607,7 +607,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.11.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -794,7 +794,7 @@
                                     <version>[3.9.6,3.99.99]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[17.0,17.99]</version>
+                                    <version>[21.0,21.99]</version>
                                 </requireJavaVersion>
                                 <requireOS>
                                     <family>unix</family>
@@ -1000,7 +1000,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
