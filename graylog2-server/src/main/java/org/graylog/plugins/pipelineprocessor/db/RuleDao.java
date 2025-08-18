@@ -70,17 +70,6 @@ public abstract class RuleDao extends ScopedEntity {
 
     public abstract Builder toBuilder();
 
-    public static RuleDao create(@Nullable String id,
-                                 String title,
-                                 @Nullable String description,
-                                 String source,
-                                 @Nullable DateTime createdAt,
-                                 @Nullable DateTime modifiedAt,
-                                 @Nullable RuleBuilder ruleBuilder,
-                                 @Nullable String simulatorMessage) {
-        return create(id, null, title, description, source, createdAt, modifiedAt, ruleBuilder, simulatorMessage);
-    }
-
     @JsonCreator
     public static RuleDao create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                  @JsonProperty(FIELD_SCOPE) @Nullable String scope,
