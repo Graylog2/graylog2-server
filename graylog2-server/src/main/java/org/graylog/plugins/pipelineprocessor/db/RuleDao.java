@@ -70,15 +70,14 @@ public abstract class RuleDao extends ScopedEntity {
 
     public abstract Builder toBuilder();
 
-    // TODO not a JsonCreator, remove JsonProperty annotations
-    public static RuleDao create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
-                                 @JsonProperty(FIELD_TITLE) String title,
-                                 @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
-                                 @JsonProperty(FIELD_SOURCE) String source,
-                                 @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
-                                 @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
-                                 @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder,
-                                 @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage) {
+    public static RuleDao create(@Nullable String id,
+                                 String title,
+                                 @Nullable String description,
+                                 String source,
+                                 @Nullable DateTime createdAt,
+                                 @Nullable DateTime modifiedAt,
+                                 @Nullable RuleBuilder ruleBuilder,
+                                 @Nullable String simulatorMessage) {
         return create(id, null, title, description, source, createdAt, modifiedAt, ruleBuilder, simulatorMessage);
     }
 
