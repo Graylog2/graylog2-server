@@ -16,12 +16,14 @@
  */
 import { useRef, useState, useCallback, useLayoutEffect } from 'react';
 import type Plotly from 'plotly.js/lib/core';
+import type { PlotDatum } from 'plotly.js/lib/core';
 import type { PlotMouseEvent } from 'plotly.js';
 
 type Anchor = Element;
 export type ClickPoint = PlotMouseEvent['points'][number];
 
-const getBarElement = (graphDiv: HTMLElement, curveNumber: number, pointIndex: number): Element | null => {
+const getBarElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
+  const { curveNumber, pointIndex } = pt;
   const traces = graphDiv.querySelectorAll('.barlayer .trace');
   const trace = traces[curveNumber] as HTMLElement | undefined;
   if (!trace) return null;
@@ -34,15 +36,21 @@ const getBarElement = (graphDiv: HTMLElement, curveNumber: number, pointIndex: n
 
 // 1) Return the DOM element for a *point* in a scatter/line trace.
 // Prefer the marker shape if present; otherwise fall back to the line path.
-const getScatterPointElement = (graphDiv: HTMLElement, curveNumber: number, pointIndex: number): Element | null => {
+const getScatterPointElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
   // trace index within scatterlayer
+  const { curveNumber, pointIndex } = pt;
   const traces = graphDiv.querySelectorAll('.scatterlayer .trace');
   const trace = traces[curveNumber] as HTMLElement | undefined;
   if (!trace) return null;
 
   // point node (exists when markers are rendered)
   const point = trace.querySelectorAll('.points .point')[pointIndex] as HTMLElement | undefined;
-
+  console.log({
+    trace,
+    traces,
+    point,
+    "trace.querySelectorAll('.points .point')": trace.querySelectorAll('.points .point'),
+  });
   // prefer the concrete point shape if it exists (path or circle)
   if (point) {
     return (
@@ -58,9 +66,14 @@ const getScatterPointElement = (graphDiv: HTMLElement, curveNumber: number, poin
   return trace.querySelector('.lines > path');
 };
 
+const getPieSliceElement = (graphDiv: HTMLElement, pt: PlotDatum, targetEl: Element): Element | null =>
+  // Find all pie traces
+  targetEl;
+
 const elementGetters = {
   bar: getBarElement,
   scatter: getScatterPointElement,
+  pie: getPieSliceElement,
 };
 
 const contains = (r: DOMRect, x: number, y: number) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
@@ -94,18 +107,24 @@ type Picked = {
 const pickPointByGeometry = (
   e: any,
   graphDiv: HTMLElement,
-  getEl: (graphDiv: HTMLElement, curveNumber: number, pointIndex: number) => Element | null,
+  getEl: (graphDiv: HTMLElement, pt: PlotDatum, targetEl?: Element) => Element | null,
+  targetEl: Element,
 ): Picked => {
   const { clientX, clientY } = e.event as MouseEvent;
   const candidates: Picked[] = (e.points as ClickPoint[])
     .map((pt) => {
-      const el = getEl(graphDiv, pt.curveNumber, pt.pointIndex);
+      console.log({ pt, pointNumber: pt.pointNumber });
+
+      // different chart types has different models
+      const el = getEl(graphDiv, pt, targetEl);
       if (!el) return null;
       const rect = el.getBoundingClientRect();
 
       return { pt, el, rect };
     })
     .filter((c): c is Picked => c !== null);
+
+  console.log({ candidates });
 
   if (!candidates.length) return null;
 
@@ -148,7 +167,7 @@ const usePositionUpdate = (anchor: Anchor, setFromRect: (el: Element) => void) =
   }, [anchor, setFromRect]);
 
 type Rel = { x: number; y: number }; // range [0, 1]
-type Pos = { left: number; top: number };
+export type Pos = { left: number; top: number };
 
 const usePlotOnClickPopover = (chartType: string) => {
   const graphDivRef = useRef<Plotly.PlotlyHTMLElement | null>(null);
@@ -170,10 +189,16 @@ const usePlotOnClickPopover = (chartType: string) => {
 
   usePositionUpdate(anchor, setFromRect);
 
-  const onChartClick = (e: any) => {
+  const onChartClick = (e: PlotMouseEvent) => {
     const graphDiv = graphDivRef.current ?? (e.event?.target as HTMLElement)?.closest('.js-plotly-plot');
-    const picked = graphDiv ? pickPointByGeometry(e, graphDiv as HTMLElement, elementGetters[chartType]) : null;
+    const picked = graphDiv
+      ? pickPointByGeometry(e, graphDiv as HTMLElement, elementGetters[chartType], e?.event?.target)
+      : null;
 
+    console.log({
+      picked,
+      e,
+    });
     if (!picked || !graphDiv) return;
 
     const { el, rect, pt } = picked;

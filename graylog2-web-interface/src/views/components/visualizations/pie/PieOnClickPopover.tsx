@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import type { ClickPoint } from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import Value from 'views/components/Value';
+import Popover from 'components/common/Popover';
 
 const atIndex = (v: string | string[] | undefined, i: number | undefined): T | undefined => {
   if (v == null) return undefined;
@@ -69,23 +70,28 @@ const Container = styled.span(
   `,
 );
 
-const CustomOnClickPopover = ({ clickPoint }: { clickPoint: ClickPoint }) => {
+const PieOnClickPopover = ({ clickPoint }: { clickPoint: ClickPoint }) => {
+  if (!clickPoint) return null;
+
   const traceColor = getHoverSwatchColor(clickPoint);
 
+  const { v: value, pointNumber, data } = clickPoint;
+  const valueText = data?.text?.[pointNumber];
+
   return (
-    <div>
+    <Popover.Dropdown title={String(clickPoint?.label)}>
       <Value
-        field={clickPoint.data.name}
-        value={clickPoint.y}
+        field={data.name}
+        value={value}
         render={() => (
           <Container>
-            <ValueBox $bgColor={traceColor}>{`${String(clickPoint.text ?? clickPoint.y)}`}</ValueBox>
+            <ValueBox $bgColor={traceColor}>{`${String(valueText ?? value)}`}</ValueBox>
             <span>{clickPoint.data.name}</span>
           </Container>
         )}
       />
-    </div>
+    </Popover.Dropdown>
   );
 };
 
-export default CustomOnClickPopover;
+export default PieOnClickPopover;

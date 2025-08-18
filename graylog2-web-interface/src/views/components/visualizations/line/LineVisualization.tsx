@@ -29,8 +29,8 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import Popover from 'components/common/Popover';
-import CustomOnClickPopover from 'views/components/visualizations/CustomOnClickPopover';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -109,22 +109,9 @@ const LineVisualization = makeVisualization(
           onClickMarker={onChartClick}
           onInitialized={initializeGraphDivRef}
         />
-        <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={8}>
-          <Popover.Target>
-            <div
-              style={{
-                position: 'fixed',
-                left: pos?.left,
-                top: pos?.top,
-                width: 1,
-                height: 1,
-              }}
-            />
-          </Popover.Target>
-          <Popover.Dropdown title={String(clickPoint?.x)}>
-            <CustomOnClickPopover clickPoint={clickPoint} />
-          </Popover.Dropdown>
-        </Popover>
+        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} />
+        </OnClickPopoverWrapper>
       </>
     );
   },

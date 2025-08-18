@@ -29,9 +29,13 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import { keySeparator, humanSeparator } from 'views/Constants';
 import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
+import PieOnClickPopover from 'views/components/visualizations/pie/PieOnClickPopover';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
-import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
+import type { ChartConfig } from '../GenericPlot';
 
 const maxItemsPerRow = 4;
 
@@ -105,17 +109,32 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
     generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits),
   });
 
+  const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
+    usePlotOnClickPopover('pie');
+
   return (
-    <PlotLegend
-      config={config}
-      chartData={transformedData}
-      labelMapper={labelMapper}
-      labelFields={rowPivotsToFields}
-      neverHide
-      height={height}
-      width={width}>
-      <GenericPlot chartData={transformedData} setChartColor={setChartColor} />
-    </PlotLegend>
+    <>
+      <PlotLegend
+        config={config}
+        chartData={transformedData}
+        labelMapper={labelMapper}
+        labelFields={rowPivotsToFields}
+        neverHide
+        height={height}
+        width={width}>
+        <GenericPlot
+          chartData={transformedData}
+          setChartColor={setChartColor}
+          onInitialized={initializeGraphDivRef}
+          onClickMarker={onChartClick}
+        />
+      </PlotLegend>
+      <OverflowingComponentsContextProvider>
+        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+          <PieOnClickPopover clickPoint={clickPoint} />
+        </OnClickPopoverWrapper>
+      </OverflowingComponentsContextProvider>
+    </>
   );
 }, 'pie');
 

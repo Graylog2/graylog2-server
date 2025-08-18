@@ -27,6 +27,9 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -91,16 +94,26 @@ const AreaVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
+    const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
+      usePlotOnClickPopover('scatter');
+
     return (
-      <XYPlot
-        config={config}
-        axisType={visualizationConfig.axisType}
-        plotLayout={layout}
-        effectiveTimerange={effectiveTimerange}
-        height={height}
-        width={width}
-        chartData={chartDataResult}
-      />
+      <>
+        <XYPlot
+          config={config}
+          axisType={visualizationConfig.axisType}
+          plotLayout={layout}
+          effectiveTimerange={effectiveTimerange}
+          height={height}
+          width={width}
+          chartData={chartDataResult}
+          onInitialized={initializeGraphDivRef}
+          onClickMarker={onChartClick}
+        />
+        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} />
+        </OnClickPopoverWrapper>
+      </>
     );
   },
   'area',

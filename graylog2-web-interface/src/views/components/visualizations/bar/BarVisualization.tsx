@@ -31,10 +31,10 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
-import Popover from 'components/common/Popover';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import CustomOnClickPopover from 'views/components/visualizations/CustomOnClickPopover';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
 import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -193,28 +193,9 @@ const BarVisualization = makeVisualization(
           onInitialized={initializeGraphDivRef}
         />
         <OverflowingComponentsContextProvider>
-          <Popover
-            opened={isPopoverOpen}
-            onChange={onPopoverChange}
-            withArrow
-            withinPortal
-            position="bottom"
-            offset={8}>
-            <Popover.Target>
-              <div
-                style={{
-                  position: 'fixed',
-                  left: pos?.left,
-                  top: pos?.top,
-                  width: 1,
-                  height: 1,
-                }}
-              />
-            </Popover.Target>
-            <Popover.Dropdown title={String(clickPoint?.x)}>
-              <CustomOnClickPopover clickPoint={clickPoint} />
-            </Popover.Dropdown>
-          </Popover>
+          <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+            <CartesianOnClickPopoverDropdown clickPoint={clickPoint} />
+          </OnClickPopoverWrapper>
         </OverflowingComponentsContextProvider>
       </>
     );
