@@ -33,6 +33,9 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     node.setAttribute('target', '_blank');
     node.setAttribute('rel', 'noopener noreferrer');
   }
+  if (node instanceof HTMLImageElement && node.getAttribute('src')) {
+    node.setAttribute('referrerpolicy', 'noreferrer');
+  }
 });
 
 const HTML = ({ html }: { html: string }) => parse(html);
