@@ -91,6 +91,7 @@ public abstract class IndexSetCreationRequest implements
                     .useLegacyRotation(true);
         }
 
+        @JsonProperty(INDEX_SET_TEMPLATE_ID)
         public abstract Builder indexSetTemplateId(@Nullable @ValidObjectId String indexSetTemplateId);
 
         public abstract IndexSetCreationRequest build();
