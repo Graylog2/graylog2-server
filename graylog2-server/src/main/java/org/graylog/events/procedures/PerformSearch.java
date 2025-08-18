@@ -96,15 +96,15 @@ public class PerformSearch extends Action {
 
         public abstract Builder toBuilder();
 
+        @JsonIgnore
         @Override
         public String toHtml() {
-            final StringBuilder stepBuilder = new StringBuilder();
-            stepBuilder.append(f("""
-                  <a href="%s">
-                    <button>Perform Search</button>
-                  </a>""", query())); // TODO: make propper link
-
-            return stepBuilder.toString();
+            final String link = Boolean.TRUE.equals(useSavedSearch())
+                    ? "/views/" + savedSearch()
+                    : query();
+            return f("""
+                      <a href="%s" style="display:inline-block;padding:.5em 1em;border:1px solid #ccc;border-radius:.4em;text-decoration:none;background:#eee">Perform Search</a>
+                    """, "${http_external_uri}" + link); // TODO: make propper link
         }
 
         @AutoValue.Builder

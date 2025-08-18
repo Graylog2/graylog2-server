@@ -18,12 +18,15 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Executes an existing notification with the event.
@@ -56,6 +59,18 @@ public class ExecuteNotification extends Action {
 
         public static Builder builder() {
             return Builder.create();
+        }
+
+        @JsonIgnore
+        @Override
+        public String toHtml() {
+            final StringBuilder stepBuilder = new StringBuilder();
+            stepBuilder.append(f("""
+                  <a href="%s">
+                    <button>Perform Search</button>
+                  </a>""", notificationId())); // TODO: make propper link
+
+            return stepBuilder.toString();
         }
 
         @AutoValue.Builder

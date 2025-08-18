@@ -36,9 +36,6 @@ public abstract class ActionDto {
 
     public abstract Builder toBuilder();
 
-    @JsonIgnore
-    public abstract String toHtml();
-
     @AutoValue.Builder
     public abstract static class Builder {
 

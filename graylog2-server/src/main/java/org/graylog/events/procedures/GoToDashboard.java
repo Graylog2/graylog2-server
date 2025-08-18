@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -28,6 +29,8 @@ import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Redirects the frontend to an existing dashboard.
@@ -68,6 +71,18 @@ public class GoToDashboard extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @JsonIgnore
+        @Override
+        public String toHtml() {
+            final StringBuilder stepBuilder = new StringBuilder();
+            stepBuilder.append(f("""
+                  <a href="%s">
+                    <button>Perform Search</button>
+                  </a>""", dashboardId())); // TODO: make propper link
+
+            return stepBuilder.toString();
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {

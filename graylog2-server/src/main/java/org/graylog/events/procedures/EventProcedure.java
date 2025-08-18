@@ -74,7 +74,7 @@ public abstract class EventProcedure extends ScopedEntity {
         public abstract EventProcedure build();
     }
 
-    public String toTemplate() {
+    public String toText() {
         final StringBuilder procedureBuilder = new StringBuilder();
         procedureBuilder.append("--- [Event Procedures ---------------------------\n");
         procedureBuilder.append("Title:       " + title() + "\n");
@@ -86,32 +86,30 @@ public abstract class EventProcedure extends ScopedEntity {
 
     public String toHtml() {
         final StringBuilder procedureBuilder = new StringBuilder();
+        procedureBuilder.append("""
+                <table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
+                <tr style="line-height:1.5"><th colspan="2" style="background-color:#e6e6e6">Event Procedure</th></tr>
+                """);
         procedureBuilder.append(f("""
-                <section>
-                  <h1>Event Procedures</h1>
-                  <header>
-                    <h2>%s</h2>
-                  </header>""", title()));
-
+                <tr><td width="200px">Title</td><td>%s</td></tr>
+                """, title()));
         procedureBuilder.append(f("""
-                <section>
-                  <h3>Description</h3>
-                  <p>No description set</p>
-                </section>""", title()));
+                <tr><td>Description</td><td>%s</td></tr>
+                """, description()));
 
         if (steps() != null && !steps().isEmpty()) {
             procedureBuilder.append("""
-                    <section>
-                      <h3>Event Procedure Steps</h3>
-                      <ol>""");
-            steps().forEach(step -> {procedureBuilder.append(step.toHtml());});
-            procedureBuilder.append("""
-                      </ol>
-                    </section>""");
+                    <tr><td><Strong>Steps</Strong></td>
+                    """);
+            for (int i = 1; i <= steps().size(); i++) {
+                procedureBuilder.append(steps().get(i-1).toHtml(i));
+            }
         }
 
         procedureBuilder.append("""
-                </section>""");
+                </tbody></table>
+                """);
+
         return procedureBuilder.toString();
     }
 }

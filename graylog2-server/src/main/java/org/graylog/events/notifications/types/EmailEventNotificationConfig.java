@@ -199,6 +199,8 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @Nullable
     public abstract String bccEmailsLUTKey();
 
+    public abstract Builder toBuilder();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {

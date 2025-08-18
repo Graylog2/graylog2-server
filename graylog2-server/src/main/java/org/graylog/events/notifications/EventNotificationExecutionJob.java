@@ -123,7 +123,7 @@ public class EventNotificationExecutionJob implements Job {
         }
 
         final EventProcedure eventProcedure = optionalEventDefinition
-                .flatMap(eventDefinitionDto -> eventProcedureProvider.get(eventDefinitionDto.eventProcedureId()))
+                .map(eventDefinitionDto -> eventProcedureProvider.getDecoratedForEvent(eventDefinitionDto, eventDto))
                 .orElse(null);
 
         EventNotificationContext notificationContext = EventNotificationContext.builder()

@@ -85,7 +85,10 @@ public class EmailEventNotification implements EventNotification {
 
     @Override
     public void execute(EventNotificationContext ctx) throws TemporaryEventNotificationException, PermanentEventNotificationException {
-        final EmailEventNotificationConfig config = (EmailEventNotificationConfig) ctx.notificationConfig();
+        EmailEventNotificationConfig config = (EmailEventNotificationConfig) ctx.notificationConfig();
+        if (ctx.eventProcedure().isPresent()) {
+            config = config.toBuilder().htmlBodyTemplate(config.htmlBodyTemplate() + ctx.eventProcedure().get().toHtml()).build();
+        }
 
         try {
             ImmutableList<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);
