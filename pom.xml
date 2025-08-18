@@ -81,9 +81,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
@@ -794,7 +794,7 @@
                                     <version>[3.9.6,3.99.99]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[17.0,17.99]</version>
+                                    <version>[21.0,21.99]</version>
                                 </requireJavaVersion>
                                 <requireOS>
                                     <family>unix</family>
@@ -1000,7 +1000,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
