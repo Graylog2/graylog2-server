@@ -191,7 +191,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         public abstract Builder id(String id);
 
         @JsonProperty(FIELD_ENTITY_SOURCE)
-        public abstract Builder entitySource(EntitySource source);
+        public abstract Builder entitySource(@Nullable EntitySource source);
 
         @JsonProperty(FIELD_TYPE)
         public abstract Builder type(Type type);
