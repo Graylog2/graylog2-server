@@ -27,6 +27,7 @@ type IndexSetDefaultFields = Pick<
   | 'index_optimization_max_num_segments'
   | 'index_optimization_disabled'
   | 'field_type_refresh_interval'
+  | 'field_restrictions'
 >;
 
 export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {

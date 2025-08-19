@@ -47,6 +47,7 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
       index_optimization_max_num_segments: indexSetTemplateDefaults.index_optimization_max_num_segments,
       index_optimization_disabled: indexSetTemplateDefaults.index_optimization_disabled,
       field_type_refresh_interval: indexSetTemplateDefaults.field_type_refresh_interval,
+      field_restrictions: indexSetTemplateDefaults.field_restrictions,
     };
 
     if (initialIndexSet) {

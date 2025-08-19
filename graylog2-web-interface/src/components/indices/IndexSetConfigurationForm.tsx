@@ -34,7 +34,7 @@ import {
   prepareDataTieringConfig,
   prepareDataTieringInitialValues,
 } from 'components/indices/data-tiering';
-import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetFormValues, IndexSetFieldRestriction } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -48,6 +48,7 @@ import useFeature from 'hooks/useFeature';
 import useIndexSet from 'components/indices/hooks/useIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import useProductName from 'brand-customization/useProductName';
+import FieldRestrictionsWrapper from 'components/indices/FieldRestrictionsWrapper';
 
 type Props = {
   cancelLink: string;
@@ -65,6 +66,7 @@ type RotationStrategiesProps = {
   rotationStrategies: Array<any>;
   indexSetRotationStrategy: RotationStrategyConfig;
   indexSetRotationStrategyClass: string;
+  disabled?: boolean;
 };
 
 type RetentionConfigProps = {
@@ -72,6 +74,7 @@ type RetentionConfigProps = {
   retentionStrategiesContext: RetentionStrategyContext;
   indexSetRetentionStrategy: RetentionStrategyConfig;
   IndexSetRetentionStrategyClass: string;
+  disabled?: boolean;
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -127,6 +130,7 @@ const RotationStrategies = ({
   rotationStrategies,
   indexSetRotationStrategy,
   indexSetRotationStrategyClass,
+  disabled = false,
 }: RotationStrategiesProps) => {
   if (!rotationStrategies) return <Spinner />;
 
@@ -144,6 +148,7 @@ const RotationStrategies = ({
         strategy: indexSetRotationStrategyClass,
       }}
       getState={_getRotationConfigState}
+      disabled={disabled}
     />
   );
 };
@@ -153,6 +158,7 @@ const RetentionConfig = ({
   retentionStrategiesContext,
   indexSetRetentionStrategy,
   IndexSetRetentionStrategyClass,
+  disabled = false,
 }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
 
@@ -171,11 +177,12 @@ const RetentionConfig = ({
         strategy: IndexSetRetentionStrategyClass,
       }}
       getState={_getRetentionConfigState}
+      disabled={disabled}
     />
   );
 };
 
-const ReadOnlyConfig = () => {
+const ReadOnlyConfig = ({ hiddenFields, immutableFields }: { hiddenFields: string[]; immutableFields: string[] }) => {
   const indexPrefixHelp = (
     <span>
       A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set. The prefix must start
@@ -185,23 +192,27 @@ const ReadOnlyConfig = () => {
 
   return (
     <span>
-      <FormikInput
-        type="text"
-        id="index-prefix"
-        label="Index prefix"
-        name="index_prefix"
-        help={indexPrefixHelp}
-        validate={_validateIndexPrefix}
-        required
-      />
-      <FormikInput
-        type="text"
-        id="index-analyzer"
-        label="Analyzer"
-        name="index_analyzer"
-        help="Elasticsearch analyzer for this index set."
-        required
-      />
+      <FieldRestrictionsWrapper hiddenFields={hiddenFields}>
+        <FormikInput
+          type="text"
+          id="index-prefix"
+          label="Index prefix"
+          name="index_prefix"
+          help={indexPrefixHelp}
+          validate={_validateIndexPrefix}
+          required
+          disabled={immutableFields.includes('index_prefix')}
+        />
+        <FormikInput
+          type="text"
+          id="index-analyzer"
+          label="Analyzer"
+          name="index_analyzer"
+          help="Elasticsearch analyzer for this index set."
+          required
+          disabled={immutableFields.includes('index_analyzer')}
+        />
+      </FieldRestrictionsWrapper>
     </span>
   );
 };
@@ -223,6 +234,10 @@ const IndexSetConfigurationForm = ({
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
+
+  const [immutableFields, setImmutableFields] = useState<string[]>([]);
+  const [hiddenFields, setHiddenFields] = useState<string[]>([]);
+
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
@@ -232,6 +247,9 @@ const IndexSetConfigurationForm = ({
   ];
 
   const initialSegment = (): RetentionConfigSegment => {
+    if (hiddenFields.includes('data_tiering')) return 'legacy';
+    if (hiddenFields.includes('legacy')) return 'data_tiering';
+
     if (indexSet?.use_legacy_rotation) return 'legacy';
 
     return 'data_tiering';
@@ -239,7 +257,23 @@ const IndexSetConfigurationForm = ({
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
+  const parseFieldRestrictions = (field_restrictions: IndexSetFieldRestriction[]) => {
+    const getHidden = () =>
+      field_restrictions
+        ?.filter((restriction: IndexSetFieldRestriction) => restriction.type === 'immutable_and_hidden')
+        .map((restriction: IndexSetFieldRestriction) => restriction.field_name) || [];
+
+    const getImmutable = () =>
+      field_restrictions
+        ?.filter((restriction: IndexSetFieldRestriction) => restriction.type === 'immutable')
+        .map((restriction: IndexSetFieldRestriction) => restriction.field_name) || [];
+
+    return [getImmutable(), getHidden()];
+  };
+
   useEffect(() => {
+    if (hiddenFields.includes('data_tiering')) setSelectedRetentionSegment('legacy');
+
     if (indexSet?.use_legacy_rotation) {
       setSelectedRetentionSegment('legacy');
     } else {
@@ -247,11 +281,17 @@ const IndexSetConfigurationForm = ({
     }
   }, [indexSet]);
 
+  useEffect(() => {
+    const [tmpImmutable, tmpHidden] = parseFieldRestrictions(indexSet?.field_restrictions);
+    setImmutableFields(tmpImmutable);
+    setHiddenFields(tmpHidden);
+  }, [indexSet]);
+
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
       const indexSetValues = values;
 
-      if(!create) {
+      if (!create) {
         delete indexSetValues.index_prefix;
         delete indexSetValues.index_analyzer;
         delete indexSetValues.creation_date;
@@ -291,6 +331,7 @@ const IndexSetConfigurationForm = ({
       return { ...configWithDataTiering, ...legacyindexSetTemplateDefaults, use_legacy_rotation: false };
     },
     [
+      create,
       loadingIndexSetTemplateDefaults,
       indexSetTemplateDefaults,
       selectedRetentionSegment,
@@ -354,81 +395,87 @@ const IndexSetConfigurationForm = ({
                     />
                   </Section>
                   <Section title="Details">
-                    {create && <ReadOnlyConfig />}
+                    {create && <ReadOnlyConfig hiddenFields={hiddenFields} immutableFields={immutableFields} />}
                     <HideOnCloud>
-                      <FormikInput
-                        type="number"
-                        id="shards"
-                        label="Index Shards"
-                        name="shards"
-                        help="Number of search cluster Shards used per index in this Index Set. Increasing the Index Shards improves the search cluster write speed of data stored to this Index Set by distributing the active write Index over multiple search nodes. Increasing the Index Shards can degrade search performance and increases the memory footprint of the Index. This value should not be set higher than the number of search nodes."
-                        required
-                      />
-                      <FormikInput
-                        type="number"
-                        id="replicas"
-                        label="Index Replica"
-                        name="replicas"
-                        help="Number of search cluster Replica Shards used per Index in this Index Set. Adding Replica Shards improves search performance during parallel reads of the index, such as occurs on dashboards, and is a component of HA and backup strategy. Each Replica Shard set multiplies the storage requirement and memory footprint of the index. This value should not be set higher than the number of search nodes, and typically not higher than 1.                                   "
-                        required
-                      />
-                      <FormikInput
-                        type="number"
-                        id="max-number-segments"
-                        label="Maximum Number of Segments"
-                        name="index_optimization_max_num_segments"
-                        minLength={1}
-                        help={
-                          <>
-                            <em>Advanced Option.</em> Maximum number of segments per Search Cluster Index after
-                            optimization (force merge). Setting higher values decreases the compression ratio of Index
-                            Optimization.
-                          </>
-                        }
-                        required
-                      />
-                      <FormikInput
-                        type="checkbox"
-                        id="index-optimization-disabled"
-                        label="Disable Index Optimization after Rotation"
-                        name="index_optimization_disabled"
-                        help={
-                          <>
-                            <em>Advanced Option.</em> Index Optimization is a compression process that occurs after an
-                            active Index has been rotated and reduces the size of an Index on disk. It manifests as a
-                            CPU intensive maintenance task performed by the search cluster after Index rotation.
-                            Compressing Indexes improves search performance and decreases the storage footprint of Index
-                            Sets.
-                          </>
-                        }
-                      />
-                      <Field name="field_type_refresh_interval">
-                        {({ field: { name, value, onChange } }) => (
-                          <TimeUnitInput
-                            id="field-type-refresh-interval"
-                            label="Field Type Refresh Interval"
-                            type="number"
-                            help={
-                              <>
-                                <em>Advanced Option.</em> How often the Field Type Information for the active write
-                                Index will be updated. Setting this value higher can marginally reduce search cluster
-                                overhead and improve performance, but will result in new data messages longer to be
-                                searchable in {productName}.
-                              </>
-                            }
-                            value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                            unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                            units={['SECONDS', 'MINUTES']}
-                            required
-                            update={(intervalValue: number, unit: Unit) =>
-                              onFieldTypeRefreshIntervalChange(intervalValue, unit, name, onChange, setFieldValue)
-                            }
-                          />
-                        )}
-                      </Field>
+                      <FieldRestrictionsWrapper hiddenFields={hiddenFields}>
+                        <FormikInput
+                          type="number"
+                          id="shards"
+                          label="Index Shards"
+                          name="shards"
+                          help="Number of search cluster Shards used per index in this Index Set. Increasing the Index Shards improves the search cluster write speed of data stored to this Index Set by distributing the active write Index over multiple search nodes. Increasing the Index Shards can degrade search performance and increases the memory footprint of the Index. This value should not be set higher than the number of search nodes."
+                          required
+                          disabled={immutableFields?.includes('shards')}
+                        />
+                        <FormikInput
+                          type="number"
+                          id="replicas"
+                          label="Index Replica"
+                          name="replicas"
+                          help="Number of search cluster Replica Shards used per Index in this Index Set. Adding Replica Shards improves search performance during parallel reads of the index, such as occurs on dashboards, and is a component of HA and backup strategy. Each Replica Shard set multiplies the storage requirement and memory footprint of the index. This value should not be set higher than the number of search nodes, and typically not higher than 1.                                   "
+                          required
+                          disabled={immutableFields?.includes('replicas')}
+                        />
+                        <FormikInput
+                          type="number"
+                          id="max-number-segments"
+                          label="Maximum Number of Segments"
+                          name="index_optimization_max_num_segments"
+                          minLength={1}
+                          help={
+                            <>
+                              <em>Advanced Option.</em> Maximum number of segments per Search Cluster Index after
+                              optimization (force merge). Setting higher values decreases the compression ratio of Index
+                              Optimization.
+                            </>
+                          }
+                          required
+                          disabled={immutableFields?.includes('index_optimization_max_num_segments')}
+                        />
+                        <FormikInput
+                          type="checkbox"
+                          id="index-optimization-disabled"
+                          label="Disable Index Optimization after Rotation"
+                          name="index_optimization_disabled"
+                          help={
+                            <>
+                              <em>Advanced Option.</em> Index Optimization is a compression process that occurs after an
+                              active Index has been rotated and reduces the size of an Index on disk. It manifests as a
+                              CPU intensive maintenance task performed by the search cluster after Index rotation.
+                              Compressing Indexes improves search performance and decreases the storage footprint of
+                              Index Sets.
+                            </>
+                          }
+                          disabled={immutableFields?.includes('index_optimization_disabled')}
+                        />
+                        <Field name="field_type_refresh_interval">
+                          {({ field: { name, value, onChange } }) => (
+                            <TimeUnitInput
+                              id="field-type-refresh-interval"
+                              label="Field Type Refresh Interval"
+                              type="number"
+                              help={
+                                <>
+                                  <em>Advanced Option.</em> How often the Field Type Information for the active write
+                                  Index will be updated. Setting this value higher can marginally reduce search cluster
+                                  overhead and improve performance, but will result in new data messages longer to be
+                                  searchable in {productName}.
+                                </>
+                              }
+                              value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                              unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                              units={['SECONDS', 'MINUTES']}
+                              update={(intervalValue: number, unit: Unit) =>
+                                onFieldTypeRefreshIntervalChange(intervalValue, unit, name, onChange, setFieldValue)
+                              }
+                              required
+                              immutable={immutableFields?.includes('field_type_refresh_interval')}
+                            />
+                          )}
+                        </Field>
+                      </FieldRestrictionsWrapper>
                     </HideOnCloud>
                   </Section>
-
                   <Section title="Rotation & Retention">
                     {isCloud && !enableDataTieringCloud ? (
                       <>
@@ -437,6 +484,7 @@ const IndexSetConfigurationForm = ({
                             rotationStrategies={rotationStrategies}
                             indexSetRotationStrategy={values.rotation_strategy}
                             indexSetRotationStrategyClass={values.rotation_strategy_class}
+                            disabled={immutableFields?.includes('legacy.rotation_strategy')}
                           />
                         )}
                         {indexSet.writable && (
@@ -445,16 +493,19 @@ const IndexSetConfigurationForm = ({
                             retentionStrategiesContext={retentionStrategiesContext}
                             indexSetRetentionStrategy={values.retention_strategy}
                             IndexSetRetentionStrategyClass={values.retention_strategy_class}
+                            disabled={immutableFields?.includes('legacy.retention_strategy')}
                           />
                         )}
                       </>
                     ) : (
                       <>
-                        <SegmentedControl<RetentionConfigSegment>
-                          data={retentionConfigSegments}
-                          value={selectedRetentionSegment}
-                          onChange={setSelectedRetentionSegment}
-                        />
+                        {!hiddenFields.includes('data_tiering') && !hiddenFields.includes('legacy') && (
+                          <SegmentedControl<RetentionConfigSegment>
+                            data={retentionConfigSegments}
+                            value={selectedRetentionSegment}
+                            onChange={setSelectedRetentionSegment}
+                          />
+                        )}
 
                         {selectedRetentionSegment === 'data_tiering' ? (
                           <>
@@ -474,6 +525,7 @@ const IndexSetConfigurationForm = ({
                                 rotationStrategies={rotationStrategies}
                                 indexSetRotationStrategy={values.rotation_strategy}
                                 indexSetRotationStrategyClass={values.rotation_strategy_class}
+                                disabled={immutableFields?.includes('legacy.rotation_strategy')}
                               />
                             )}
                             {indexSet.writable && (
@@ -482,6 +534,7 @@ const IndexSetConfigurationForm = ({
                                 retentionStrategiesContext={retentionStrategiesContext}
                                 indexSetRetentionStrategy={values.retention_strategy}
                                 IndexSetRetentionStrategyClass={values.retention_strategy_class}
+                                disabled={immutableFields?.includes('legacy.retention_strategy')}
                               />
                             )}
                           </ConfigSegment>
@@ -499,6 +552,7 @@ const IndexSetConfigurationForm = ({
                               setFieldValue(name, profileId);
                             }}
                             name={name}
+                            immutable={immutableFields?.includes('field_type_profile')}
                           />
                         )}
                       </Field>

@@ -63,6 +63,7 @@ type Props = {
   description?: string;
   selectPlaceholder: string;
   label: string;
+  disabled?: boolean;
   pluginExports: Array<{
     type: string;
     displayName: string;
@@ -200,6 +201,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   label,
   pluginExports,
   strategies,
+  disabled = false,
 
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod } = {
     max_index_retention_period: undefined,
@@ -355,6 +357,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               value={getActiveSelection()}
               onChange={_onSelect}
               clearable={false}
+              disabled={disabled}
             />
           </Input>
         </Col>

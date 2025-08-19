@@ -132,6 +132,8 @@ type Props = {
   pullRight?: boolean;
   /** Lets the user clear the numeric input. */
   clearable?: boolean;
+  /** Disallows user make changes to the field */
+  immutable?: boolean;
 
   name?: string;
   unitName?: string;
@@ -166,6 +168,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     pullRight: false,
     clearable: false,
     type: undefined,
+    immutable: false,
   };
 
   constructor(props) {
@@ -262,11 +265,11 @@ class TimeUnitInput extends React.Component<Props, State> {
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           <StyledInputGroup>
-            {!required && !hideCheckbox && checkbox}
+            {!required && !hideCheckbox && !this.props.immutable && checkbox}
             <FormControl
               type="number"
               name={this.props.name}
-              disabled={!this._isChecked()}
+              disabled={!this._isChecked() || this.props.immutable}
               aria-label={label || 'Time unit input'}
               onChange={this._onUpdate}
               value={defaultTo(this._getEffectiveValue(), '')}
@@ -276,7 +279,7 @@ class TimeUnitInput extends React.Component<Props, State> {
               name={this.props.unitName}
               pullRight={pullRight}
               title={unitOptions.filter((o) => o.value === unit)[0].label}
-              disabled={!this._isChecked()}>
+              disabled={!this._isChecked() || this.props.immutable}>
               {options}
             </DropdownButton>
           </StyledInputGroup>
