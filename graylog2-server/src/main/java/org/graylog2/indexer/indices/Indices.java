@@ -119,10 +119,17 @@ public class Indices {
 
     public void delete(String indexName) {
         Optional<WarmIndexInfo> snapshotInfoOptional = indicesAdapter.getWarmIndexInfo(indexName);
-        indicesAdapter.delete(indexName);
-
-        eventBus.post(IndicesDeletedEvent.create(indexName));
+        deleteIndex(indexName);
+        fireIndexDeletedEvents(indexName);
         snapshotInfoOptional.ifPresent(snapshotInfo -> eventBus.post(new WarmIndexDeletedEvent(snapshotInfo)));
+    }
+
+    public void deleteIndex(String indexName) {
+        indicesAdapter.delete(indexName);
+    }
+
+    public void fireIndexDeletedEvents(String indexName) {
+        eventBus.post(IndicesDeletedEvent.create(indexName));
     }
 
     public void close(String indexName) {
