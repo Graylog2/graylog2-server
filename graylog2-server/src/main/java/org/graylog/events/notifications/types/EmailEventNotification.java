@@ -86,7 +86,8 @@ public class EmailEventNotification implements EventNotification {
     @Override
     public void execute(EventNotificationContext ctx) throws TemporaryEventNotificationException, PermanentEventNotificationException {
         EmailEventNotificationConfig config = (EmailEventNotificationConfig) ctx.notificationConfig();
-        if (ctx.eventProcedure().isPresent()) {
+
+        if (config.includeEventProcedure() && ctx.eventProcedure().isPresent()) {
             config = config.toBuilder().htmlBodyTemplate(config.htmlBodyTemplate() + ctx.eventProcedure().get().toHtml()).build();
         }
 

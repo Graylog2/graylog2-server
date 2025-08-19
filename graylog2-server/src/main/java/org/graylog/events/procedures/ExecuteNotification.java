@@ -65,8 +65,13 @@ public class ExecuteNotification extends Action {
         @Override
         public String toHtml() {
             return f("""
-                    <td><a href="api/plugins/org.graylog.plugins.securityapp/security_events/notifications/%s/%s" target="_blank">Execute Notification</a></td>
-                    """, "${http_bind_address}", "${event.id}", notificationId());
+                    <td><a href="%s" target="_blank">View Event to Execute Notification</a></td>
+                    """, getLink());
+        }
+
+        @JsonIgnore
+        private String getLink() {
+            return "${http_external_uri}security/security-events/alerts?query=id:${event.id}";
         }
 
         @AutoValue.Builder

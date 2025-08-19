@@ -128,6 +128,7 @@ class EmailNotificationForm extends React.Component<
     lookup_bcc_emails: false,
     bcc_emails_lut_name: null,
     bcc_emails_lut_key: null,
+    include_event_procedure: false,
   };
 
   propagateChange = (key, value) => {
@@ -698,6 +699,16 @@ class EmailNotificationForm extends React.Component<
           <HelpBlock>
             {validation?.errors?.body?.[0] || 'The template that will be used to generate the email HTML body.'}
           </HelpBlock>
+        </FormGroup>
+        <FormGroup>
+          <Input
+            type="checkbox"
+            id="include_event_procedure"
+            name="include_event_procedure"
+            label="Include Event Procedure In HTML Body"
+            onChange={this.handleChange}
+            checked={config.include_event_procedure}
+          />
         </FormGroup>
       </>
     );

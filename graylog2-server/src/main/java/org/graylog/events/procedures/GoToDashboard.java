@@ -75,13 +75,23 @@ public class GoToDashboard extends Action {
         @JsonIgnore
         @Override
         public String toHtml() {
-            final StringBuilder parameters = new StringBuilder();
-            for  (Map.Entry<String, String> entry : parameters().entrySet()) {
-                parameters.append("?" + entry.getKey() + "=" + entry.getValue());
-            }
             return f("""
-                    <td><a href="%sdashboards/%s%s" target="_blank">Go to Dashboard</a></td>
-                    """, "${http_external_uri}", dashboardId(), parameters.toString());
+                    <td><a href="%s" target="_blank">Go to Dashboard</a></td>
+                    """, getLink());
+        }
+
+        @JsonIgnore
+        private String getLink() {
+            final StringBuilder link = new StringBuilder("${http_external_uri}");
+            link.append("dashboards/").append(dashboardId());
+            if (parameters() != null && !parameters().isEmpty()) {
+                link.append("?");
+                link.append(String.join("&", parameters().entrySet().stream()
+                        .map(p -> p.getKey() + "=" + p.getValue())
+                        .toList()));
+            }
+
+            return link.toString();
         }
 
         @AutoValue.Builder

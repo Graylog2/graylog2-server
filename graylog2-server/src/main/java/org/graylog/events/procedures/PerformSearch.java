@@ -99,14 +99,28 @@ public class PerformSearch extends Action {
         @JsonIgnore
         @Override
         public String toHtml() {
-            final String link = Boolean.TRUE.equals(useSavedSearch())
-                    ? "views/" + savedSearch()
-                    : "search?q=" + query();
             return f("""
                     <td><a href="%s" target="_blank">Perform Search</a></td>
-                    """, "${http_external_uri}" + link);
+                    """, getLink());
         }
 
+        @JsonIgnore
+        private String getLink() {
+            final StringBuilder link = new StringBuilder("${http_external_uri}");
+            if (Boolean.TRUE.equals(useSavedSearch())) {
+                link.append("views/").append(savedSearch());
+                if (parameters() != null && !parameters().isEmpty()) {
+                    link.append("?");
+                    link.append(String.join("&", parameters().entrySet().stream()
+                            .map(p -> p.getKey() + "=" + p.getValue())
+                            .toList()));
+                }
+            } else {
+                link.append("search?q=").append(query());
+            }
+
+            return link.toString();
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {
