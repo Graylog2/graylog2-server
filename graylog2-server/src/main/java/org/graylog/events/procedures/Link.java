@@ -66,13 +66,14 @@ public class Link extends Action {
         @JsonIgnore
         @Override
         public String toHtml() {
-            final StringBuilder stepBuilder = new StringBuilder();
-            stepBuilder.append(f("""
-                  <a href="%s">
-                    <button>Perform Search</button>
-                  </a>""", link())); // TODO: make propper link
+            return f("""
+                    <td><a href="%s" target="_blank">Follow Link</a></td>
+                    """, getLink());
+        }
 
-            return stepBuilder.toString();
+        @JsonIgnore
+        private String getLink() {
+            return link();
         }
 
         @AutoValue.Builder
