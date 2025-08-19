@@ -1394,24 +1394,5 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <!-- The frontend tests don't run if we use -DskipTests. If we want to run the frontend tests without
-                 the server tests, we activate this profile. (CI) -->
-            <id>run-frontend-tests-in-compile</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>yarn test</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>
