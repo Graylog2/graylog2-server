@@ -85,7 +85,7 @@ public class PaginatedAuthzRolesService {
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
                 .includeGrandTotal(true)
-                .page(page, role -> roleNamePermissionPredicate.test(role.name()));
+                .page(page, role -> roleNamePermissionPredicate.test(role.id()));
     }
 
     public PaginatedList<AuthzRoleDTO> findPaginatedByIds(Predicate<String> roleNamePermissionPredicate,
@@ -100,7 +100,7 @@ public class PaginatedAuthzRolesService {
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
                 .includeGrandTotal(true)
-                .page(page, role -> roleNamePermissionPredicate.test(role.name()));
+                .page(page, role -> roleNamePermissionPredicate.test(role.id()));
     }
 
     /**

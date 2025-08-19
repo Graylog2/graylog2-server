@@ -39,7 +39,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.function.Predicate;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -55,7 +54,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.UserOverviewDTO;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +124,7 @@ public class AuthzRolesResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
+        final Predicate<String> roleNamePermissionPredicate = getRoleIdPermissionPredicate();
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(roleNamePermissionPredicate, searchQuery, page, perPage, sort, order);
         final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
 
@@ -158,7 +156,7 @@ public class AuthzRolesResource extends RestResource {
         }
 
         final Predicate<String> userNamePermissionPredicate = roleName -> isPermitted(RestPermissions.USERS_READ, roleName);
-        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
+        final Predicate<String> roleNamePermissionPredicate = getRoleIdPermissionPredicate();
 
         final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(userNamePermissionPredicate, searchQuery, page, perPage, sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
@@ -175,8 +173,8 @@ public class AuthzRolesResource extends RestResource {
         return PaginatedResponse.create("users", enrichedResult, query);
     }
 
-    private Predicate<String> getRoleNamePermissionPredicate() {
-        return roleName -> isPermitted(RestPermissions.ROLES_READ, roleName);
+    private Predicate<String> getRoleIdPermissionPredicate() {
+        return roleId -> isPermitted(RestPermissions.ROLES_READ, roleId);
     }
 
     @GET
@@ -215,7 +213,7 @@ public class AuthzRolesResource extends RestResource {
         checkPermission(RestPermissions.USERS_READ, username);
         final User user = Optional.ofNullable(userService.load(username))
                 .orElseThrow(() -> new NotFoundException("Couldn't find user: " + username));
-        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
+        final Predicate<String> roleNamePermissionPredicate = getRoleIdPermissionPredicate();
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(roleNamePermissionPredicate,
                 searchQuery, page, perPage, sort, order, user.getRoleIds());
         return PaginatedResponse.create("roles", result, query);
