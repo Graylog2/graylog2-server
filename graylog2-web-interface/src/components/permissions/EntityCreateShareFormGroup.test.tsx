@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import { act } from 'react';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import MockComponent from 'helpers/mocking/MockComponent';
+import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
 
@@ -41,7 +42,7 @@ const mockEntity = {
   entityType: 'stream',
   entityId: null,
 };
-
+jest.mock('hooks/usePluggableEntityShareFormGroup');
 jest.setTimeout(10000);
 
 const SUT = ({ ...props }) => (
@@ -58,6 +59,7 @@ const SUT = ({ ...props }) => (
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(usePluggableEntityShareFormGroup).mockReturnValue(MockComponent('FormGroup'));
   });
 
   beforeAll(() => {
@@ -85,27 +87,12 @@ describe('EntityCreateShareFormGroup', () => {
     const mockOnSetEntityShare = jest.fn();
 
     render(<SUT onSetEntityShare={mockOnSetEntityShare} />);
+
     // Select a grantee
-    const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-    await act(async () => {
-      await selectEvent.openMenu(granteesSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(granteesSelect, everyone.title);
-    });
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
 
     // Select a capability
-    const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-    await act(async () => {
-      await selectEvent.openMenu(capabilitySelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(capabilitySelect, viewer.title);
-    });
+    await selectEvent.chooseOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,

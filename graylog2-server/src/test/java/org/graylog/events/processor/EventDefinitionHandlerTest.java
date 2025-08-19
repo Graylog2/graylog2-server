@@ -35,7 +35,7 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -44,6 +44,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
@@ -71,6 +72,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionHandlerTest {
@@ -89,6 +92,8 @@ public class EventDefinitionHandlerTest {
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
+    @Mock
+    private ClusterEventBus clusterEventBus;
 
     @Mock
     Provider<EntitySharesService> entitySharesServiceProvider;
@@ -115,11 +120,11 @@ public class EventDefinitionHandlerTest {
 
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
         this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
-        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock);
+        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock, clusterEventBus);
     }
 
     @Test
@@ -285,6 +290,7 @@ public class EventDefinitionHandlerTest {
             assertThat(trigger.data()).isEmpty();
             assertThat(trigger.nextTime()).isEqualTo(clock.nowUTC());
         });
+        verify(clusterEventBus, times(1)).post(new EventDefinitionUpdated(existingDto.id()));
     }
 
     @Test
@@ -430,6 +436,7 @@ public class EventDefinitionHandlerTest {
             assertThat(definition.title()).isEqualTo(existingJobDefinition.title());
             assertThat(definition.description()).isEqualTo(existingJobDefinition.description());
         });
+        verify(clusterEventBus, times(0)).post(new EventDefinitionUpdated(existingDto.id()));
     }
 
     @Test
@@ -440,6 +447,7 @@ public class EventDefinitionHandlerTest {
         assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isPresent();
 
         assertThat(handler.delete("54e3deadbeefdeadbeef0000")).isTrue();
+        verify(clusterEventBus, times(1)).post(new EventDefinitionDeleted("54e3deadbeefdeadbeef0000"));
 
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isNotPresent();
         assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isNotPresent();

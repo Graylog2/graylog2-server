@@ -41,6 +41,8 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
 
+import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
+
 const fetchNotifications = () => {
   EventNotificationsActions.listAll();
 };
@@ -100,7 +102,7 @@ const EventDefinitionFormContainer = ({
   const [isDirty, setIsDirty] = useState(false);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
-
+  const { createEventDefinition } = useEventDefinitionMutations();
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
@@ -202,7 +204,7 @@ const EventDefinitionFormContainer = ({
         app_action_value: 'create-event-definition-button',
       });
 
-      EventDefinitionsActions.create(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      createEventDefinition(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),

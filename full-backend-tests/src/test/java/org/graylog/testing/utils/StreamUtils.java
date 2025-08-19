@@ -19,7 +19,7 @@ package org.graylog.testing.utils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.security.shares.CreateEntityRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +41,8 @@ public final class StreamUtils {
                                @JsonProperty("index_set_id") String indexSetId) {}
 
     public static String createStream(Supplier<RequestSpecification> spec, String title, String indexSetId, StreamRule... streamRules) {
-        final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
+        final CreateEntityRequest<CreateStreamRequest> body = CreateEntityRequest.create(
+                new CreateStreamRequest(title, List.of(streamRules), indexSetId), null);
         final String streamId = given()
                 .spec(spec.get())
                 .when()

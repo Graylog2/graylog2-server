@@ -24,8 +24,8 @@ import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
-import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
+import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDependencyPermissionChecker;
@@ -65,9 +65,10 @@ public class EntitySharesService {
     private final EntityDependencyPermissionChecker entityDependencyPermissionChecker;
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
+    private final PluggableEntityService pluggableEntityService;
     private final EventBus serverEventBus;
     private final Set<SyncedEntitiesResolver> entitiesResolvers;
-    private final BuiltinCapabilities builtinCapabilities;
+    private final CapabilityRegistry capabilityRegistry;
 
     @Inject
     public EntitySharesService(final DBGrantService grantService,
@@ -75,25 +76,28 @@ public class EntitySharesService {
                                final EntityDependencyPermissionChecker entityDependencyPermissionChecker,
                                final GRNRegistry grnRegistry,
                                final GranteeService granteeService,
+                               final PluggableEntityService pluggableEntityService,
                                final EventBus serverEventBus,
                                final Set<SyncedEntitiesResolver> entitiesResolvers,
-                               final BuiltinCapabilities builtinCapabilities) {
+                               final CapabilityRegistry capabilityRegistry) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
+        this.pluggableEntityService = pluggableEntityService;
         this.serverEventBus = serverEventBus;
         this.entitiesResolvers = entitiesResolvers;
-        this.builtinCapabilities = builtinCapabilities;
+        this.capabilityRegistry = capabilityRegistry;
     }
 
     /**
      * Prepares the sharing operation by running some checks and returning available capabilities and grantees
      * as well as active shares and information about missing dependencies for a specific entity.
-     * @param ownedEntity    the entity that should be shared and is owned by the sharing user
-     * @param request        sharing request
-     * @param sharingUser    the sharing user
+     *
+     * @param ownedEntity the entity that should be shared and is owned by the sharing user
+     * @param request     sharing request
+     * @param sharingUser the sharing user
      * @return the response
      */
     public EntityShareResponse prepareShare(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
@@ -120,6 +124,7 @@ public class EntitySharesService {
 
     /**
      * Checks for missing permissions on multiple entities.
+     *
      * @param selectedCapabilities check these capabilities
      * @param entityGRNs           check these entities
      * @param sharingUser          the sharing user
@@ -177,8 +182,9 @@ public class EntitySharesService {
     /**
      * Similar to generic prepare without a specific entity; but also checks for missing permissions on specified
      * dependent entities.
-     * @param entityGRNs check permissions on these entities
-     * @param sharingUser         the sharing user
+     *
+     * @param entityGRNs  check permissions on these entities
+     * @param sharingUser the sharing user
      * @return eligible grantees and missing permissions on dependencies
      */
     public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
@@ -254,9 +260,10 @@ public class EntitySharesService {
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
 
+        request.selectedCollections().ifPresent(collections -> pluggableEntityService.onCreate(ownedEntity, collections));
+
         final ImmutableMap<GRN, Capability> selectedGranteeCapabilities = request.selectedGranteeCapabilities()
                 .orElse(ImmutableMap.of());
-
         final String userName = sharingUser.getName();
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser, ownedEntity);
@@ -335,9 +342,9 @@ public class EntitySharesService {
     /**
      * Applies the share request to related entities, that we want to keep in sync.
      *
-     * @param ownedEntity the parent entity
+     * @param ownedEntity  the parent entity
      * @param shareRequest the sharing request to apply to the related entities
-     * @param sharingUser the sharing user
+     * @param sharingUser  the sharing user
      * @return set of synced entities
      */
     private Set<GRN> resolveImplicitGrants(GRN ownedEntity, EntityShareRequest shareRequest, User sharingUser) {
@@ -378,8 +385,7 @@ public class EntitySharesService {
         EntityShareRequest shareRequest = EntityShareRequest.create(
                 existingGrants.stream()
                         .filter(grant -> modifiableGranteeGRNs.contains(grant.grantee()))
-                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability))
-        );
+                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability)));
 
         return updateEntityShares(grnClone, shareRequest, sharingUser);
     }
@@ -463,7 +469,7 @@ public class EntitySharesService {
 
     private ImmutableSet<AvailableCapability> getAvailableCapabilities() {
         // TODO: Don't use GRNs for capabilities
-        return builtinCapabilities.allSharingCapabilities().stream()
+        return capabilityRegistry.allSharingCapabilities().stream()
                 .map(descriptor -> EntityShareResponse.AvailableCapability.create(descriptor.capability().toId(), descriptor.title()))
                 .collect(ImmutableSet.toImmutableSet());
     }

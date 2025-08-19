@@ -17,7 +17,7 @@
 import React, { useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Icon } from 'components/common';
+import { StatusIcon } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 
 import style from './PluginList.css';
@@ -36,7 +36,7 @@ const PluginList = () => {
 
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <Icon name={plugin ? 'check_circle' : 'radio_button_unchecked'} />
+        <StatusIcon active={!!plugin} />
         &nbsp;
         {ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
