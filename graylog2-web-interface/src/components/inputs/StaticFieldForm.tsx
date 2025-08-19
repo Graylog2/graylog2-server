@@ -23,7 +23,7 @@ import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 
 type Props = {
   input: InputType;
-  setShowModal: (boolean) => void;
+  setShowModal: (show: boolean) => void;
 };
 
 const StaticFieldForm = ({ input, setShowModal }: Props) => {

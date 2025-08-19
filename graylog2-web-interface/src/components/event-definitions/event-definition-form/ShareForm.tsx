@@ -19,15 +19,22 @@ import React from 'react';
 import { Col, Row } from 'components/bootstrap';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { createGRN } from 'logic/permissions/GRN';
 
 import commonStyles from '../common/commonStyles.css';
+import type { EventDefinition } from '../event-definitions-types';
 
 type Props = {
   onChange: (name: string, value: EntitySharePayload) => void;
+  eventDefinition: EventDefinition;
 };
 
-const ShareForm = ({ onChange }: Props) => {
+const ShareForm = ({ onChange, eventDefinition }: Props) => {
   const handleEntityShareSet = (entityShare?: EntitySharePayload) => onChange('share_request', entityShare);
+  const streamDependenciesGRN = eventDefinition?.config?.streams?.map((streamId) => createGRN('stream', streamId)) || [];
+  const notificationDependenciesGRN = eventDefinition?.notifications?.map((notification) =>
+    createGRN('notification', notification.notification_id),
+  );
 
   return (
     <Row>
@@ -40,6 +47,7 @@ const ShareForm = ({ onChange }: Props) => {
           onSetEntityShare={handleEntityShareSet}
           entityType="event_definition"
           entityTitle=""
+          dependenciesGRN={[...streamDependenciesGRN, ...notificationDependenciesGRN]}
         />
       </Col>
     </Row>

@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 
 import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
 import StopPropagation from 'views/components/common/StopPropagation';
+import { widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
 
 type Props = {
   children: React.ReactNode;
@@ -27,16 +29,24 @@ type Props = {
   header?: string;
 };
 
-const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header = 'Actions' }: Props) => (
-  <StopPropagation data-testid={dataTestid}>
-    <Menu position="bottom" withinPortal zIndex={1051}>
-      <Menu.Target>{element}</Menu.Target>
-      <Menu.Dropdown>
-        <MenuItem header>{header}</MenuItem>
-        {children}
-      </Menu.Dropdown>
-    </Menu>
-  </StopPropagation>
-);
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefined, header = 'Actions' }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
+
+  return (
+    <StopPropagation data-testid={dataTestid}>
+      <span className={isOpen ? widgetActionsDropdownOpenClass : ''}>
+        <Menu position="bottom" withinPortal onChange={toggleIsOpen}>
+          <Menu.Target>{element}</Menu.Target>
+          <Menu.Dropdown>
+            <MenuItem header>{header}</MenuItem>
+            {children}
+          </Menu.Dropdown>
+        </Menu>
+      </span>
+    </StopPropagation>
+  );
+};
 
 export default ActionDropdown;

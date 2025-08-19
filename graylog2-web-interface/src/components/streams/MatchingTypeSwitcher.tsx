@@ -69,6 +69,8 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
         'Success',
       );
 
+      setMatchingType(undefined);
+
       return response;
     });
   };

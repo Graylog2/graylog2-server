@@ -28,7 +28,7 @@ type Props = {
   stream: Stream | undefined;
 };
 
-const StreamRuleList = ({ matchData, onDelete = () => {}, onSubmit = () => {}, stream }: Props) => {
+const StreamRuleList = ({ matchData = undefined, onDelete = () => {}, onSubmit = () => {}, stream }: Props) => {
   if (!stream) {
     return <Spinner />;
   }

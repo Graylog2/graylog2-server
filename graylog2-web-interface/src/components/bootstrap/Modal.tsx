@@ -19,15 +19,17 @@ import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
+import zIndices from 'theme/z-indices';
 
 export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
 
 const ModalOverlay = styled(MantineModal.Overlay)`
-  z-index: 1040;
+  z-index: ${zIndices.modalOverlay};
 `;
 
 const ModalContent = styled(MantineModal.Content)`
-  z-index: 1050;
+  z-index: ${zIndices.modalBody};
+  border-radius: 10px;
 `;
 
 const ModalRoot = styled(MantineModal.Root)(
@@ -54,9 +56,9 @@ type Props = {
   children: React.ReactNode;
   show?: boolean;
   bsSize?: ModalSize;
-  enforceFocus?: boolean;
   backdrop?: boolean;
   closable?: boolean;
+  fullScreen?: boolean;
 };
 
 const Modal = ({
@@ -64,16 +66,17 @@ const Modal = ({
   show = false,
   children,
   bsSize = undefined,
-  enforceFocus = false,
   backdrop = true,
   closable = true,
+  fullScreen = false,
 }: Props) => (
   <ModalRoot
     opened={show}
     onClose={onHide}
     size={sizeForMantine(bsSize)}
-    trapFocus={enforceFocus}
-    closeOnEscape={closable}>
+    trapFocus
+    closeOnEscape={closable}
+    fullScreen={fullScreen}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </ModalRoot>

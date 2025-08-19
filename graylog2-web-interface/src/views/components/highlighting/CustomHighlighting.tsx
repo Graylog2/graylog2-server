@@ -41,7 +41,7 @@ type Props = {
   value?: any;
 };
 
-const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: Props) => {
+const CustomHighlighting = ({ children = undefined, field: fieldName, value: fieldValue = undefined }: Props) => {
   const highlightingRules = useContext(HighlightingRulesContext);
 
   const matchingRule = useMemo(

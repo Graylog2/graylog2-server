@@ -23,7 +23,11 @@ import { ClipboardButton, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Version from 'util/Version';
 
-const useExtractors = (inputId: string) => useQuery(['extractors', inputId], () => API.Extractors.list(inputId));
+const useExtractors = (inputId: string) =>
+  useQuery({
+    queryKey: ['extractors', inputId],
+    queryFn: () => API.Extractors.list(inputId),
+  });
 
 type Props = {
   id: string;

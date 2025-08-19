@@ -1,0 +1,5 @@
+type = "a"
+message = "Added new pipeline function hex_to_decimal_byte_list to convert a hexadecimal string to an array of decimal values."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10181"]
+pulls = ["22786"]

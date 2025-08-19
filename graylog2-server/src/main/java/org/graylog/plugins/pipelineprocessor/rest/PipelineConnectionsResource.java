@@ -49,7 +49,7 @@ import org.graylog2.streams.StreamService;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines", tags = {CLOUD_VISIBLE})
@@ -58,7 +58,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineConnectionsResource extends RestResource implements PluginRestResource {
-    private static final RateLimitedLog LOG = getRateLimitedLog(PipelineConnectionsResource.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(PipelineConnectionsResource.class);
 
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;
@@ -76,7 +76,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         this.entityScopeService = entityScopeService;
     }
 
-    @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
+    @ApiOperation(value = "Connect processing pipelines to a stream")
     @POST
     @Path("/to_stream")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
@@ -84,9 +84,9 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
 
+        // verify the stream exists and is editable
         checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
-        // verify the stream exists
-        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         streamService.load(streamId);
 
         // verify the pipelines exist
@@ -97,7 +97,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         return connectionsService.save(connection);
     }
 
-    @ApiOperation(value = "Connect streams to a processing pipeline", notes = "")
+    @ApiOperation(value = "Connect streams to a processing pipeline")
     @POST
     @Path("/to_pipeline")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
@@ -106,7 +106,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         final String pipelineId = connection.pipelineId();
         final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
 
-        // verify the pipeline exists and is editable
+        // verify the pipeline exists
         checkPermission(PipelineRestPermissions.PIPELINE_READ, pipelineId);
         checkScope(pipelineService.load(pipelineId));
 
@@ -118,6 +118,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         connection.streamIds().forEach(streamId ->
                 checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
         );
+
         // remove deleted pipeline connections
         for (PipelineConnections pipelineConnection : pipelineConnections) {
             if (!connection.streamIds().contains(pipelineConnection.streamId())) {
@@ -132,8 +133,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
         // update pipeline connections
         for (String streamId : connection.streamIds()) {
-            // verify the stream exist
-            checkPermission(RestPermissions.STREAMS_READ, streamId);
+            // verify the stream exists and is editable
+            checkPermission(RestPermissions.STREAMS_EDIT, streamId);
             streamService.load(streamId);
 
             PipelineConnections updatedConnection;
@@ -177,7 +178,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @ApiOperation("Get all pipeline connections")
     @GET
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_READ)
-    public Set<PipelineConnections> getAll() throws NotFoundException {
+    public Set<PipelineConnections> getAll() {
         final Set<PipelineConnections> pipelineConnections = connectionsService.loadAll();
 
         final Set<PipelineConnections> filteredConnections = Sets.newHashSetWithExpectedSize(pipelineConnections.size());

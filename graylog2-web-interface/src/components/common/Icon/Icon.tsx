@@ -29,6 +29,7 @@ const sizeMap = {
   '3x': '3.45em',
   '4x': '4.60em',
   '5x': '5.75em',
+  'huge': '10.35em',
 };
 
 const spinAnimation = keyframes`
@@ -40,14 +41,17 @@ const spinAnimation = keyframes`
   }
 `;
 
+type ColorVariants = 'success' | 'warning';
+
 const StyledSpan = styled.span<{
   $size: string;
   $spin: boolean;
   $rotation: RotateProp;
   $flip: FlipProp;
   $fill: boolean;
+  $bsStyle: ColorVariants | undefined;
 }>(
-  ({ $size, $spin, $rotation, $flip, $fill }) => css`
+  ({ $bsStyle, $size, $spin, $rotation, $flip, $fill, theme }) => css`
     font-variation-settings:
       'opsz' 48,
       'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
@@ -60,10 +64,12 @@ const StyledSpan = styled.span<{
         `
       : 'none'};
     vertical-align: middle;
+    color: ${$bsStyle ? theme.colors.button[$bsStyle].background : 'inherit'};
   `,
 );
 
 type Props = {
+  bsStyle?: ColorVariants; // if this prop is not defined, the inherited font color will be used.
   className?: string;
   'data-testid'?: string;
   /** Name of Material Symbol icon */
@@ -93,21 +99,22 @@ type Props = {
  * Have a look at the `BrandIcon` component for brand icons.
  */
 const Icon = ({
+  bsStyle = undefined,
   name,
   type = 'solid',
-  size,
-  className,
+  size = undefined,
+  className = undefined,
   rotation = 0,
   spin = false,
-  flip,
-  style,
-  'data-testid': testId,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  onFocus,
-  tabIndex,
-  title,
+  flip = undefined,
+  style = undefined,
+  'data-testid': testId = undefined,
+  onClick = undefined,
+  onMouseEnter = undefined,
+  onMouseLeave = undefined,
+  onFocus = undefined,
+  tabIndex = undefined,
+  title = undefined,
 }: Props) => (
   <StyledSpan
     className={`material-symbols-rounded ${className ?? ''}`}
@@ -119,6 +126,7 @@ const Icon = ({
     onMouseEnter={onMouseEnter}
     onMouseLeave={onMouseLeave}
     tabIndex={tabIndex}
+    $bsStyle={bsStyle}
     $rotation={rotation}
     $flip={flip}
     $size={size}

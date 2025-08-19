@@ -86,7 +86,7 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
 
     a&,
     button& {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
 
       .list-group-item-heading {
         color: ${theme.colors.variant.darkest.default};
@@ -159,10 +159,10 @@ type Props = React.PropsWithChildren<{
   onKeyDown?: React.ComponentProps<typeof StyledListGroupItem>['onKeyDown'];
 }>;
 
-const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps = {}, ...rest }, ref) => (
+const ListGroupItem = ({ containerProps = {}, ...rest }: Props, ref: React.ForwardedRef<HTMLElement>) => (
   <RefContainer ref={ref} {...containerProps}>
     <StyledListGroupItem {...rest} />
   </RefContainer>
-));
+);
 
-export default ListGroupItem;
+export default forwardRef(ListGroupItem);

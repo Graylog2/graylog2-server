@@ -16,11 +16,11 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
@@ -116,6 +116,15 @@ public class ScopedEntityMongoUtilsTest {
         assertThatThrownBy(() -> scopedEntityMongoUtils.create(invalidScoped))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(collection.countDocuments()).isEqualTo(0L);
+    }
+
+    @Test
+    void testScopeModificationDisallowed() {
+        final ScopedDTO nonDeletableScope = ScopedDTO.builder().name("test").scope(NonDeletableScope.NAME).build();
+        final String id = scopedEntityMongoUtils.create(nonDeletableScope);
+        final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(DefaultEntityScope.NAME).build();
+        assertThatThrownBy(() -> scopedEntityMongoUtils.update(updated))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     static class ImmutableScope extends EntityScope {

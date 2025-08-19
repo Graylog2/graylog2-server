@@ -28,6 +28,7 @@ import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -55,6 +56,7 @@ import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackReque
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamRuleService;
@@ -104,8 +106,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
-        final Set<ValueReference> outputIds = stream.getOutputs().stream()
-                .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
+        final Set<ValueReference> outputIds = stream.getOutputIds().stream()
+                .map(output -> entityDescriptorIds.getOrThrow(output.toHexString(), ModelTypes.OUTPUT_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
@@ -312,8 +314,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            stream.getOutputs().stream()
-                    .map(Output::getId)
+            stream.getOutputIds().stream()
+                    .map(ObjectId::toHexString)
                     .map(ModelId::of)
                     .map(id -> EntityDescriptor.create(id, ModelTypes.OUTPUT_V1))
                     .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));
@@ -352,5 +354,10 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .forEach(outputEntity -> mutableGraph.putEdge(entity, outputEntity));
 
         return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
     }
 }

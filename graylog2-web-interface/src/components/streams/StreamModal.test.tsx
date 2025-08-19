@@ -89,21 +89,13 @@ describe('StreamModal', () => {
       name: /description/i,
     });
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
     expect(title).toHaveValue(exampleStream.title);
     expect(description).toHaveValue(exampleStream.description);
 
     await userEvent.type(title, ' and further title');
     await userEvent.type(description, ' and further description');
 
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(indexSetSelect, 'Example Index Set');
-    });
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
 
     await screen.findByText('Example Index Set');
 
@@ -121,14 +113,12 @@ describe('StreamModal', () => {
     });
 
     await waitFor(() =>
-      expect(onSubmit).toHaveBeenCalledWith(
-        {
-          description: 'Stream Description and further description',
-          index_set_id: 'index-set-id-2',
-          remove_matches_from_default_stream: false,
-          title: 'Stream Title and further title',
-        }
-      ),
+      expect(onSubmit).toHaveBeenCalledWith({
+        description: 'Stream Description and further description',
+        index_set_id: 'index-set-id-2',
+        remove_matches_from_default_stream: false,
+        title: 'Stream Title and further title',
+      }),
     );
   });
 
@@ -148,35 +138,9 @@ describe('StreamModal', () => {
     userEvent.type(title, 'New title');
     userEvent.type(description, 'New description');
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(indexSetSelect, 'Example Index Set');
-    });
-
-    const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-    await act(async () => {
-      await selectEvent.openMenu(granteesSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(granteesSelect, everyone.title);
-    });
-
-    const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-    await act(async () => {
-      await selectEvent.openMenu(capabilitySelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(capabilitySelect, viewer.title);
-    });
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
+    await selectEvent.chooseOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,
@@ -208,8 +172,9 @@ describe('StreamModal', () => {
         share_request: {
           selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
             [everyone.id]: viewer.id,
-          })
-        }}),
+          }),
+        },
+      }),
     );
   });
 });

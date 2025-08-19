@@ -60,10 +60,10 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .map(OpensearchKeystoreItem::key)
@@ -98,10 +98,10 @@ class SearchableSnapshotsConfigurationBeanTest {
                 gcsRepositoryConfiguration,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .hasSize(1)
@@ -112,19 +112,21 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .containsEntry("node.search.cache.size", "10gb");
     }
 
-    private OpensearchConfigurationParams emptyBuildParams() {
-        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap());
+    private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
+        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap(), tempDir);
     }
 
     @Test
-    void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         // no s3 repo configuration properties given by the user
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
+
+        final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 datanodeConfiguration(Map.of(
-                        "path_repo", "/mnt/data/snapshots",
+                        "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -132,16 +134,16 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .isEmpty();
 
         Assertions.assertThat(configurationPart.properties())
-                .containsEntry("path.repo", "/mnt/data/snapshots")
+                .containsEntry("path.repo", snapshotsPath)
                 .containsEntry("node.search.cache.size", "10gb");
     }
 
@@ -160,7 +162,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided
@@ -191,20 +193,22 @@ class SearchableSnapshotsConfigurationBeanTest {
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
-        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams()))
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams(tempDir)))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
     }
 
     @Test
-    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
+
+        final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 datanodeConfiguration(Map.of(
                         "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
-                        "path_repo", "/mnt/data/snapshots",
+                        "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
                 )),
                 datanodeDirectories(tempDir),
@@ -212,13 +216,13 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided, we have to use only those that are given in the configuration
 
         Assertions.assertThat(configurationPart.properties())
-                .containsEntry("path.repo", "/mnt/data/snapshots")
+                .containsEntry("path.repo", snapshotsPath)
                 .doesNotContainEntry("node.search.cache.size", "10gb");
     }
 

@@ -16,8 +16,8 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
 
@@ -124,6 +124,9 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
         // Else, the entity does not exist in the database, This could be a new entity--check it
         Optional<T> current = scopedEntity.id() == null ? Optional.empty()
                 : Optional.ofNullable(collection.find(idEq(scopedEntity.id())).first());
+        if (current.isPresent() && (!current.get().scope().equals(scopedEntity.scope()))) {
+            throw new IllegalArgumentException("Entity scope cannot be modified.");
+        }
         return current
                 .map(t -> entityScopeService.isMutable(t, scopedEntity))
                 .orElseGet(() -> entityScopeService.isMutable(scopedEntity));

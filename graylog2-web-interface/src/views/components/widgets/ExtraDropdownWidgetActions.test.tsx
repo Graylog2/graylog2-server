@@ -29,9 +29,11 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraWidgetActionsWithoutMenu = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
+const ExtraWidgetActionsWithoutMenu = ({
+  ...props
+}: Omit<React.ComponentProps<typeof OriginalExtraWidgetActions>, 'setComponents'>) => (
   <TestStoreProvider>
-    <OriginalExtraWidgetActions {...props} />
+    <OriginalExtraWidgetActions setComponents={jest.fn()} {...props} />
   </TestStoreProvider>
 );
 
@@ -41,6 +43,7 @@ describe('ExtraWidgetActions', () => {
   const widget = Widget.empty();
   const dummyActionWithoutIsHidden: WidgetActionType = {
     type: 'dummy-action',
+    position: 'dropdown',
     title: () => 'Dummy Action',
     action: jest.fn(() => async () => {}),
   };
@@ -59,8 +62,7 @@ describe('ExtraWidgetActions', () => {
   const dummyActionWithMenuPosition: WidgetActionType = {
     position: 'menu',
     type: 'dummy-action',
-    title: () => 'Dummy Action',
-    action: jest.fn(() => async () => {}),
+    component: () => <>Dummy Action</>,
   };
   useViewsPlugin();
 
