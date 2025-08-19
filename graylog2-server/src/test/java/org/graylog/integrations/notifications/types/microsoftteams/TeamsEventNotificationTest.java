@@ -104,7 +104,7 @@ public class TeamsEventNotificationTest {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
+                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration(), false),
                 customizationConfig);
     }
 
@@ -345,7 +345,7 @@ public class TeamsEventNotificationTest {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
+                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration(), false),
                 customizationConfig);
 
         TeamsMessage actual = teamsEventNotification.createTeamsMessage(eventNotificationContext, TeamsEventNotificationConfig.builder().iconUrl(expectedImage).build());
