@@ -122,8 +122,6 @@ public class EmailEventNotification implements EventNotification {
             throw new TemporaryEventNotificationException("Notification has email recipients and is triggered, but email transport is not configured. " +
                     e.getMessage());
         } catch (Exception e) {
-            // TODO: get rid of this printStackTrace
-            e.printStackTrace();
             String exceptionDetail = e.toString();
             if (e.getCause() != null) {
                 exceptionDetail += " (" + e.getCause() + ")";
