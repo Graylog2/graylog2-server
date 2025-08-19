@@ -42,7 +42,7 @@ const UserActionLinks = ({ userId, userIsReadOnly, username }: Props) => (
         </LinkContainer>
       </IfPermitted>
     )}
-    <IfPermitted permissions={[`user:tokenlist:${username}`]}>
+    <IfPermitted permissions={[`users:tokenlist:${username}`]}>
       <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
         <Button bsStyle="success">Edit Tokens</Button>
       </LinkContainer>
