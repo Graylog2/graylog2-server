@@ -101,11 +101,12 @@ public class PerformSearch extends Action {
         public String toHtml() {
             final String link = Boolean.TRUE.equals(useSavedSearch())
                     ? "views/" + savedSearch()
-                    : query();
+                    : "search?q=" + query();
             return f("""
-                      <a href="%s" style="display:inline-block;padding:.5em 1em;border:1px solid #ccc;border-radius:.4em;text-decoration:none;background:#eee">Perform Search</a>
-                    """, "${http_external_uri}" + link); // TODO: make propper link
+                    <td><a href="%s" target="_blank">Perform Search</a></td>
+                    """, "${http_external_uri}" + link);
         }
+
 
         @AutoValue.Builder
         public abstract static class Builder {

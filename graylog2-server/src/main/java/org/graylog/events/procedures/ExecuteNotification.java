@@ -64,13 +64,9 @@ public class ExecuteNotification extends Action {
         @JsonIgnore
         @Override
         public String toHtml() {
-            final StringBuilder stepBuilder = new StringBuilder();
-            stepBuilder.append(f("""
-                  <a href="%s">
-                    <button>Perform Search</button>
-                  </a>""", notificationId())); // TODO: make propper link
-
-            return stepBuilder.toString();
+            return f("""
+                    <td><a href="api/plugins/org.graylog.plugins.securityapp/security_events/notifications/%s/%s" target="_blank">Execute Notification</a></td>
+                    """, "${http_bind_address}", "${event.id}", notificationId());
         }
 
         @AutoValue.Builder

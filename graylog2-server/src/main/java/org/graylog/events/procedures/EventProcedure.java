@@ -88,7 +88,7 @@ public abstract class EventProcedure extends ScopedEntity {
         final StringBuilder procedureBuilder = new StringBuilder();
         procedureBuilder.append("""
                 <table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
-                <tr style="line-height:1.5"><th colspan="2" style="background-color:#e6e6e6">Event Procedure</th></tr>
+                <tr style="line-height:1.5"><th colspan="3" style="background-color:#e6e6e6">Event Procedure</th></tr>
                 """);
         procedureBuilder.append(f("""
                 <tr><td width="200px">Title</td><td>%s</td></tr>

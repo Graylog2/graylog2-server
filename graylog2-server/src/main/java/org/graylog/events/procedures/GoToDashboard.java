@@ -75,13 +75,13 @@ public class GoToDashboard extends Action {
         @JsonIgnore
         @Override
         public String toHtml() {
-            final StringBuilder stepBuilder = new StringBuilder();
-            stepBuilder.append(f("""
-                  <a href="%s">
-                    <button>Perform Search</button>
-                  </a>""", dashboardId())); // TODO: make propper link
-
-            return stepBuilder.toString();
+            final StringBuilder parameters = new StringBuilder();
+            for  (Map.Entry<String, String> entry : parameters().entrySet()) {
+                parameters.append("?" + entry.getKey() + "=" + entry.getValue());
+            }
+            return f("""
+                    <td><a href="%sdashboards/%s%s" target="_blank">Go to Dashboard</a></td>
+                    """, "${http_external_uri}", dashboardId(), parameters.toString());
         }
 
         @AutoValue.Builder
