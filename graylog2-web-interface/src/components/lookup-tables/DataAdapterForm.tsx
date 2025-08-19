@@ -263,7 +263,7 @@ const DataAdapterForm = ({
                   </fieldset>
                 </Col>
                 <Col lg={6} style={{ marginTop: 10 }}>
-                  {DocComponent ? <DocComponent /> : null}
+                  {DocComponent ? <DocComponent dataAdapterId={dataAdapter?.id} /> : null}
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
