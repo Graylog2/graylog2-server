@@ -53,10 +53,10 @@ import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackView;
+import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationsResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackList;
@@ -106,7 +106,7 @@ public class ContentPackResource extends RestResource {
     @RequiresPermissions(RestPermissions.CONTENT_PACK_READ)
     public ContentPackList listContentPacks() {
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
-        Set<ModelId> contentPackIds = contentPacks.stream().map(x -> x.id()).collect(Collectors.toSet());
+        Set<ModelId> contentPackIds = contentPacks.stream().map(Identified::id).collect(Collectors.toSet());
         Map<ModelId, Map<Integer, ContentPackMetadata>> metaData =
                 contentPackInstallationPersistenceService.getInstallationMetadata(contentPackIds);
 
@@ -125,7 +125,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
-        Set<ModelId> contentPackIds = contentPacks.stream().map(x -> x.id()).collect(Collectors.toSet());
+        Set<ModelId> contentPackIds = contentPacks.stream().map(Identified::id).collect(Collectors.toSet());
         Map<ModelId, Map<Integer, ContentPackMetadata>> metaData =
                 contentPackInstallationPersistenceService.getInstallationMetadata(contentPackIds);
         return ContentPackList.create(contentPacks.size(), contentPacks, metaData);
@@ -270,7 +270,7 @@ public class ContentPackResource extends RestResource {
 
         final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
 
-        LOG.debug("Deleted {} content packs with id {} and revision", deleted, contentPackId, revision);
+        LOG.debug("Deleted {} content packs with id {} and revision {}", deleted, contentPackId, revision);
     }
 
     @POST
@@ -294,15 +294,11 @@ public class ContentPackResource extends RestResource {
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
-        final User currentUser = getCurrentUser();
-        final String userName = currentUser == null ? "unknown" : currentUser.getName();
-        final ContentPackInstallation installation = contentPackService.installContentPack(
+        return contentPackService.installContentPack(
                 contentPack,
                 contentPackInstallationRequest.parameters(),
                 contentPackInstallationRequest.comment(),
                 userContext);
-
-        return installation;
     }
 
     @GET

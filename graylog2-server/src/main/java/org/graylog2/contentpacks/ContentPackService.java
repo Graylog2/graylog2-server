@@ -33,6 +33,7 @@ import jakarta.ws.rs.ForbiddenException;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -122,9 +123,8 @@ public class ContentPackService {
                                                       String comment,
                                                       String username) {
         return UserContext.runAs(username, userService, () -> {
-            final UserContext userContext;
             try {
-                userContext = new UserContext.Factory(userService).create();
+                final var userContext = new UserContext.Factory(userService).create();
                 return installContentPack(contentPack, parameters, comment, userContext);
             } catch (UserContextMissingException e) {
                 throw new IllegalArgumentException("User Context missing", e);
@@ -146,7 +146,8 @@ public class ContentPackService {
     private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
                                                        Map<String, ValueReference> parameters,
                                                        String comment,
-                                                       UserContext userContext) {
+                                                       UserContext userContext,
+                                                       EntityShareRequest shareRequest) {
         ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -206,6 +207,8 @@ public class ContentPackService {
                     allEntities.put(entityDescriptor, createdEntity.entity());
                 }
             }
+
+            // shareRequest.capabilities()
         } catch (Exception e) {
             rollback(createdEntities);
 
