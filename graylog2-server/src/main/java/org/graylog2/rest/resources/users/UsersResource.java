@@ -49,6 +49,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.function.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -126,6 +127,7 @@ import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
@@ -272,7 +274,6 @@ public class UsersResource extends RestResource {
     @Timed
     @Path("/paginated")
     @ApiOperation(value = "Get paginated list of users")
-    @RequiresPermissions(RestPermissions.USERS_LIST)
     @Produces(MediaType.APPLICATION_JSON)
     public PaginatedResponse<UserOverviewDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -293,8 +294,15 @@ public class UsersResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
+        final Predicate<String> userNamePermissionPredicate;
+        if (isPermitted(RestPermissions.USERS_LIST)) {
+            userNamePermissionPredicate = username -> true;
+        } else {
+            userNamePermissionPredicate = username -> isPermitted(USERS_READ, username);
+        }
+
         final PaginatedList<UserOverviewDTO> result = paginatedUserService
-                .findPaginated(searchQuery, page, perPage, sort, order);
+                .findPaginated(userNamePermissionPredicate, searchQuery, page, perPage, sort, order);
         final Set<String> allRoleIds = result.stream().flatMap(userDTO -> {
             if (userDTO.roles() != null) {
                 return userDTO.roles().stream();
@@ -516,12 +524,13 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{username}")
-    @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
+        checkPermission(USERS_EDIT, username);
+
         if (userManagementService.delete(username) == 0) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -529,12 +538,14 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("id/{userId}")
-    @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
                                @PathParam("userId") String userId) {
+        final User user = loadUserById(userId);
+        checkPermission(USERS_EDIT, user.getName());
+
         if (userManagementService.deleteById(userId) == 0) {
             throw new NotFoundException("Couldn't find user " + userId);
         }
