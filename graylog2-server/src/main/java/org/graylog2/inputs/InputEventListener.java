@@ -16,162 +16,67 @@
  */
 package org.graylog2.inputs;
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
-import org.graylog2.cluster.leader.LeaderChangedEvent;
+import jakarta.inject.Singleton;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.plugin.system.NodeId;
-import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
-import org.graylog2.rest.models.system.inputs.responses.InputSetup;
-import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
-    private final InputService inputService;
-    private final NodeId nodeId;
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
 
     @Inject
-    public InputEventListener(EventBus eventBus,
-                              InputLauncher inputLauncher,
+    public InputEventListener(InputLauncher inputLauncher,
                               InputRegistry inputRegistry,
-                              InputService inputService,
-                              NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
                               ServerStatus serverStatus) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
-        this.inputService = inputService;
-        this.nodeId = nodeId;
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
-        eventBus.register(this);
     }
 
-    @Subscribe
-    public void inputCreated(InputCreated inputCreatedEvent) {
-        final String inputId = inputCreatedEvent.id();
+    public void inputCreated(String inputId) {
         LOG.debug("Input created: {}", inputId);
-        final Input input;
-        try {
-            input = inputService.find(inputId);
-        } catch (NotFoundException e) {
-            LOG.warn("Received InputCreated event but could not find input {}", inputId, e);
-            return;
-        }
 
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
-
-        if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
-            startInput(input);
-        }
+        inputRegistry.remove(inputId);
+        inputLauncher.launch(inputId);
     }
 
-    @Subscribe
-    public void inputUpdated(InputUpdated inputUpdatedEvent) {
-        final String inputId = inputUpdatedEvent.id();
+    public void inputUpdated(String inputId) {
         LOG.debug("Input updated: {}", inputId);
-        final Input input;
-        try {
-            input = inputService.find(inputId);
-        } catch (NotFoundException e) {
-            LOG.warn("Received InputUpdated event but could not find input {}", inputId, e);
-            return;
-        }
-
-        final boolean startInput;
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
-            inputRegistry.remove(inputState);
-        } else {
-            startInput = false;
-        }
-
-        if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
-            startInput(input);
-        }
+        inputRegistry.remove(inputId);
+        inputLauncher.launch(inputId);
     }
 
-    private void startInput(Input input) {
-        final MessageInput messageInput;
-        try {
-            messageInput = inputService.getMessageInput(input);
-        } catch (NoSuchInputTypeException e) {
-            LOG.warn("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
-            return;
-        }
-        if (!inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
-            startMessageInput(messageInput);
-        } else {
-            LOG.info("Not launching 'onlyOnePerCluster' input {} because this node is not the leader.",
-                    input.toIdentifier());
-        }
+    public void inputDeleted(String inputId) {
+        LOG.debug("Input deleted: {}", inputId);
+        inputRegistry.remove(inputId);
     }
 
-    private void startMessageInput(MessageInput messageInput) {
-        messageInput.initialize();
-
-        final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
-        inputRegistry.add(newInputState);
+    public void inputSetup(String inputId) {
+        LOG.debug("Input setup: {}", inputId);
+        inputRegistry.setup(inputId);
+        LOG.debug("Input created for setup: {}", inputId);
+        inputLauncher.launch(inputId);
     }
 
-    @Subscribe
-    public void inputDeleted(InputDeleted inputDeletedEvent) {
-        LOG.debug("Input deleted: {}", inputDeletedEvent.id());
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
-    }
-
-    @Subscribe
-    public void inputSetup(InputSetup inputSetupEvent) {
-        LOG.info("Input setup: {}", inputSetupEvent.id());
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputSetupEvent.id());
-        if (inputState != null) {
-            inputRegistry.setup(inputState);
-        } else {
-            final String inputId = inputSetupEvent.id();
-            LOG.debug("Input created for setup: {}", inputId);
-            final Input input;
-            try {
-                input = inputService.find(inputId);
-            } catch (NotFoundException e) {
-                LOG.warn("Received InputSetupEvent event but could not find input {}", inputId, e);
-                return;
-            }
-
-            if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
-                startInput(input);
-            }
-        }
-    }
-
-    @Subscribe
-    public void leaderChanged(LeaderChangedEvent event) {
+    public void leaderChanged() {
         if (serverStatus.getLifecycle() == Lifecycle.STARTING) {
             LOG.debug("Ignoring LeaderChangedEvent during server startup.");
             return;
@@ -182,7 +87,7 @@ public class InputEventListener {
                 if (input.onlyOnePerCluster() && input.isGlobal() && (inputState == null || inputState.canBeStarted())
                         && inputLauncher.shouldStartAutomatically(input)) {
                     LOG.info("Got leader role. Starting input {}", input.toIdentifier());
-                    startMessageInput(input);
+                    inputLauncher.launch(input.getId());
                 }
             }
         } else {
@@ -191,7 +96,7 @@ public class InputEventListener {
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
                         LOG.info("Lost leader role. Stopping input {}", input.toIdentifier());
-                        inputDeleted(InputDeleted.create(input.getId()));
+                        inputDeleted(input.getId());
                     });
         }
     }
