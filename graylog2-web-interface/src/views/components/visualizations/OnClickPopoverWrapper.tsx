@@ -26,7 +26,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const OnClickPopoverWrapper = ({ children = null, isPopoverOpen, onPopoverChange, pos }: Props) => (
-  <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={8}>
+  <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={0}>
     <Popover.Target>
       <div
         style={{

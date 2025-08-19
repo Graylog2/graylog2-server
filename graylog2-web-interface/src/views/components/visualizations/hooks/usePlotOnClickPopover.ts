@@ -14,218 +14,267 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useRef, useState, useCallback, useLayoutEffect } from 'react';
+import { useRef, useState, useLayoutEffect } from 'react';
 import type Plotly from 'plotly.js/lib/core';
 import type { PlotDatum } from 'plotly.js/lib/core';
-import type { PlotMouseEvent } from 'plotly.js';
+import type { PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
+import map from 'lodash/map';
+import compact from 'lodash/compact';
+import flatMap from 'lodash/flatMap';
+import minBy from 'lodash/minBy';
 
-type Anchor = Element;
-export type ClickPoint = PlotMouseEvent['points'][number];
+type ClickPoint = PlotMouseEvent['points'][number];
+type Pos = { left: number; top: number } | null;
+type Rel = { x: number; y: number };
 
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+/** ---------- DOM getters ---------- */
 const getBarElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
   const { curveNumber, pointIndex } = pt;
-  const traces = graphDiv.querySelectorAll('.barlayer .trace');
-  const trace = traces[curveNumber] as HTMLElement | undefined;
+  const trace = graphDiv.querySelectorAll('.barlayer .trace')[curveNumber] as HTMLElement | undefined;
   if (!trace) return null;
-  const points = trace.querySelectorAll('.point');
-  const point = points[pointIndex] as HTMLElement | undefined;
-  if (!point) return null;
+  const point = trace.querySelectorAll('.point')[pointIndex!] as HTMLElement | undefined;
 
-  return point.querySelector('rect') ?? point.querySelector('path');
+  return point?.querySelector('rect') ?? point?.querySelector('path') ?? null;
 };
 
-// 1) Return the DOM element for a *point* in a scatter/line trace.
-// Prefer the marker shape if present; otherwise fall back to the line path.
-const getScatterPointElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
-  // trace index within scatterlayer
+const getScatterMarkerElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
   const { curveNumber, pointIndex } = pt;
-  const traces = graphDiv.querySelectorAll('.scatterlayer .trace');
-  const trace = traces[curveNumber] as HTMLElement | undefined;
+  const trace = graphDiv.querySelectorAll('.scatterlayer .trace')[curveNumber] as HTMLElement | undefined;
+
   if (!trace) return null;
 
-  // point node (exists when markers are rendered)
-  const point = trace.querySelectorAll('.points .point')[pointIndex] as HTMLElement | undefined;
-  console.log({
-    trace,
-    traces,
-    point,
-    "trace.querySelectorAll('.points .point')": trace.querySelectorAll('.points .point'),
-  });
-  // prefer the concrete point shape if it exists (path or circle)
-  if (point) {
-    return (
-      point.querySelector('path') ||
-      point.querySelector('circle') ||
-      point.querySelector('use') || // symbols-as-use
-      null
-    );
-  }
-
-  // markers not rendered (mode: "lines" only) -> fall back to the line path
-  // (you'll anchor to the whole line; see note below about precise position)
-  return trace.querySelector('.lines > path');
+  return trace.querySelectorAll('.points .point')[pointIndex!] ?? null;
 };
 
-const getPieSliceElement = (graphDiv: HTMLElement, pt: PlotDatum, targetEl: Element): Element | null =>
-  // Find all pie traces
-  targetEl;
+const getPieSliceElement = (_: HTMLElement, __: PlotDatum, targetEl: Element): Element | null => targetEl;
 
-const elementGetters = {
-  bar: getBarElement,
-  scatter: getScatterPointElement,
-  pie: getPieSliceElement,
+/** ---------- math helpers ---------- */
+type Px = { x: number; y: number };
+
+const projectT = (P: Px, A: Px, B: Px) => {
+  const vx = B.x - A.x;
+  const vy = B.y - A.y;
+  const wx = P.x - A.x;
+  const wy = P.y - A.y;
+  const len2 = vx * vx + vy * vy || 1;
+
+  return (wx * vx + wy * vy) / len2;
 };
 
-const contains = (r: DOMRect, x: number, y: number) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+const dataToPagePx = (gd: any, pt: ClickPoint, xVal: any, yVal: any) => {
+  const fl = gd._fullLayout;
+  const xa = (pt as any).xaxis?.l2p ? (pt as any).xaxis : fl[(pt as any).xaxis?._name ?? 'xaxis'];
+  const ya = (pt as any).yaxis?.l2p ? (pt as any).yaxis : fl[(pt as any).yaxis?._name ?? 'yaxis'];
+  if (!xa?.l2p || !xa?.d2l || !ya?.l2p || !ya?.d2l) return null;
+  const gx = xa.l2p(xa.d2l(xVal));
+  const gy = ya.l2p(ya.d2l(yVal));
+  if (!Number.isFinite(gx) || !Number.isFinite(gy)) return null;
+  const rect = (gd as HTMLElement).getBoundingClientRect();
 
-/** Distance from (x,y) to rect (0 if inside) */
-const distToRect = (r: DOMRect, x: number, y: number) => {
-  let dx = 0;
-  if (x < r.left) {
-    dx = r.left - x;
-  } else if (x > r.right) {
-    dx = x - r.right;
-  }
-
-  let dy = 0;
-  if (y < r.top) {
-    dy = r.top - y;
-  } else if (y > r.bottom) {
-    dy = y - r.bottom;
-  }
-
-  return Math.hypot(dx, dy);
+  return { x: rect.left + fl._size.l + gx, y: rect.top + fl._size.t + gy };
 };
 
-type Picked = {
-  pt: ClickPoint;
-  el: Element;
-  rect: DOMRect;
-} | null;
+/** ---------- Anchors ---------- */
+type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint };
+type Anchor = ElementAnchor;
 
-/** Pick the point whose bar rect contains the click; fallback to nearest rect */
-const pickPointByGeometry = (
-  e: any,
-  graphDiv: HTMLElement,
-  getEl: (graphDiv: HTMLElement, pt: PlotDatum, targetEl?: Element) => Element | null,
-  targetEl: Element,
-): Picked => {
-  const { clientX, clientY } = e.event as MouseEvent;
-  const candidates: Picked[] = (e.points as ClickPoint[])
-    .map((pt) => {
-      console.log({ pt, pointNumber: pt.pointNumber });
+/** ---------- rAF updater ---------- */
+const useAnchorPosition = (anchor: Anchor | null, gdRef: React.RefObject<PlotlyHTMLElement>) => {
+  const [pos, setPos] = useState<Pos>(null);
 
-      // different chart types has different models
-      const el = getEl(graphDiv, pt, targetEl);
-      if (!el) return null;
-      const rect = el.getBoundingClientRect();
-
-      return { pt, el, rect };
-    })
-    .filter((c): c is Picked => c !== null);
-
-  console.log({ candidates });
-
-  if (!candidates.length) return null;
-
-  // 1) exact hit: rect that contains the click
-  const hit = candidates.find((c) => contains(c!.rect, clientX, clientY));
-  if (hit) return hit;
-
-  // 2) fallback: closest rect to the click point
-  return candidates.reduce((best, c) => {
-    if (!best) return c;
-
-    return distToRect(c.rect, clientX, clientY) < distToRect(best.rect, clientX, clientY) ? c : best;
-  }, null as Picked);
-};
-
-const usePositionUpdate = (anchor: Anchor, setFromRect: (el: Element) => void) =>
   useLayoutEffect(() => {
-    if (!anchor) return undefined;
-    let prev = { left: -1, top: -1, w: -1, h: -1 };
-    let raf = 0;
+    if (!anchor) return;
+    let rafId = 0 as unknown as number;
+    let prev = { left: NaN, top: NaN };
 
     const tick = () => {
-      if (!anchor) return;
-      const r = anchor.getBoundingClientRect();
-      // update only if changed to avoid extra renders
-      if (r.left !== prev.left || r.top !== prev.top || r.width !== prev.w || r.height !== prev.h) {
-        prev = { left: r.left, top: r.top, w: r.width, h: r.height };
-        // setPos({ left: r.left + r.width / 2, top: r.top });
-        setFromRect(anchor);
+      let p: Pos = null;
+      if (anchor.kind === 'element') {
+        const r = anchor.el.getBoundingClientRect();
+        p = { left: r.left + r.width * anchor.rel.x, top: r.top + r.height * anchor.rel.y };
+      }
+
+      if (p && (p.left !== prev.left || p.top !== prev.top)) {
+        prev = p;
+        setPos(p);
       }
       // eslint-disable-next-line compat/compat
-      raf = requestAnimationFrame(tick);
+      rafId = requestAnimationFrame(tick);
     };
-
-    // kick it off
     tick();
 
     // eslint-disable-next-line consistent-return
-    return () => cancelAnimationFrame(raf);
-  }, [anchor, setFromRect]);
+    return () => cancelAnimationFrame(rafId);
+  }, [anchor, gdRef]);
 
-type Rel = { x: number; y: number }; // range [0, 1]
-export type Pos = { left: number; top: number };
+  return pos;
+};
 
-const usePlotOnClickPopover = (chartType: string) => {
-  const graphDivRef = useRef<Plotly.PlotlyHTMLElement | null>(null);
-  const [anchor, setAnchor] = useState<Anchor>(null);
-  const [pos, setPos] = useState<Pos | null>({ left: 0, top: 0 });
-  const [rel, setRel] = useState<Rel>({ x: 0.5, y: 0 });
-  const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
-  const setFromRect = useCallback(
-    (el: Element) => {
-      const r = el.getBoundingClientRect();
-      // setPos({ left: r.left + r.width / 2, top: r.top });
-      setPos({
-        left: r.left + r.width * rel.x,
-        top: r.top + r.height * rel.y,
-      });
-    },
-    [rel.x, rel.y],
+/** ---------- shared nearest element picker ---------- */
+const pickNearestElementAnchor = (
+  e: PlotMouseEvent,
+  candidates: { pt: ClickPoint; el: Element; rect: DOMRect }[],
+): ElementAnchor | null => {
+  const { clientX, clientY } = e.event as MouseEvent;
+  if (!candidates.length) return null;
+
+  const inside = candidates.find(
+    ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
 
-  usePositionUpdate(anchor, setFromRect);
+  const picked =
+    inside ??
+    minBy(candidates, ({ rect }) => {
+      let dx = 0;
+      if (clientX < rect.left) {
+        dx = rect.left - clientX;
+      } else if (clientX > rect.right) {
+        dx = clientX - rect.right;
+      }
+
+      let dy = 0;
+      if (clientY < rect.top) {
+        dy = rect.top - clientY;
+      } else if (clientY > rect.bottom) {
+        dy = clientY - rect.bottom;
+      }
+
+      return Math.hypot(dx, dy);
+    });
+
+  if (!picked) return null;
+  const { el, rect, pt } = picked;
+  const rel: Rel = {
+    x: clamp01((clientX - rect.left) / Math.max(rect.width, 1)),
+    y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
+  };
+
+  return { kind: 'element', el, rel, pt };
+};
+
+/** ---------- make element anchor (bar / pie) ---------- */
+const makeElementAnchor = (
+  e: PlotMouseEvent,
+  gd: PlotlyHTMLElement,
+  chartType: 'bar' | 'pie',
+): ElementAnchor | null => {
+  const getEl =
+    chartType === 'bar'
+      ? getBarElement
+      : (graphDiv: HTMLElement, pt: PlotDatum, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
+
+  const graphDiv = gd as unknown as HTMLElement;
+  const targetEl = (e.event?.target as Element) || graphDiv;
+
+  const candidates = compact(
+    map(e.points as ClickPoint[], (pt) => {
+      const el = getEl(graphDiv, pt, targetEl);
+
+      return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
+    }),
+  );
+
+  return pickNearestElementAnchor(e, candidates);
+};
+
+const getScatterLineElements = (gd: HTMLElement, click: Px, pt: PlotDatum) => {
+  const fd: any = pt.fullData ?? (gd as any)._fullData?.[pt.curveNumber];
+  const xs: any[] = fd?.x ?? [];
+  const ys: any[] = fd?.y ?? [];
+  const i = (pt.pointIndex ?? pt.pointNumber ?? 0) as number;
+  const segs: [number, number][] = compact([i > 0 ? [i - 1, i] : null, i < xs.length - 1 ? [i, i + 1] : null]);
+
+  return map(segs, ([i0, i1]) => {
+    const A = dataToPagePx(gd, pt, xs[i0], ys[i0]);
+    const B = dataToPagePx(gd, pt, xs[i1], ys[i1]);
+    if (!A || !B) return null;
+    const t = clamp01(projectT(click, A, B));
+    const px = A.x + t * (B.x - A.x);
+    const py = A.y + t * (B.y - A.y);
+    const d = Math.hypot(click.x - px, click.y - py);
+
+    const el = (gd.querySelectorAll('.scatterlayer .trace')[pt.curveNumber] as HTMLElement)?.querySelector(
+      '.lines path.js-line',
+    ) as Element | null;
+
+    return { el, pt, d, px, py };
+  });
+};
+/** ---------- scatter anchor ---------- */
+const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
+  const graphDiv = gd as unknown as HTMLElement;
+
+  // try markers
+  const markerCandidates = compact(
+    map(e.points, (pt) => {
+      const el = getScatterMarkerElement(graphDiv, pt as PlotDatum);
+
+      return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
+    }),
+  );
+
+  const bestMarker = pickNearestElementAnchor(e, markerCandidates);
+  if (bestMarker) return bestMarker;
+
+  // otherwise lines
+  const { clientX, clientY } = e.event as MouseEvent;
+  const click: Px = { x: clientX, y: clientY };
+
+  const lineCandidates = compact(
+    flatMap(e.points as ClickPoint[], (pt) => getScatterLineElements(graphDiv, click, pt)),
+  );
+
+  const { el, pt, px, py } = minBy(lineCandidates, 'd');
+  const rect = el.getBoundingClientRect();
+
+  const rel: Rel = {
+    x: clamp01((px - rect.left) / Math.max(rect.width, 1)),
+    y: clamp01((py - rect.top) / Math.max(rect.height, 1)),
+  };
+
+  return { kind: 'element', rel, el, pt };
+};
+
+/** ---------- hook ---------- */
+const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie') => {
+  const gdRef = useRef<Plotly.PlotlyHTMLElement | null>(null);
+  const [anchor, setAnchor] = useState<Anchor | null>(null);
+  const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
+
+  const pos = useAnchorPosition(anchor, gdRef);
+
+  const initializeGraphDivRef = (_: Plotly.PlotlyHTMLElement, gd: Plotly.PlotlyHTMLElement) => {
+    gdRef.current = gd;
+  };
 
   const onChartClick = (e: PlotMouseEvent) => {
-    const graphDiv = graphDivRef.current ?? (e.event?.target as HTMLElement)?.closest('.js-plotly-plot');
-    const picked = graphDiv
-      ? pickPointByGeometry(e, graphDiv as HTMLElement, elementGetters[chartType], e?.event?.target)
-      : null;
+    const gd =
+      gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
+    if (!gd) return;
 
-    console.log({
-      picked,
-      e,
-    });
-    if (!picked || !graphDiv) return;
+    if (chartType === 'scatter') {
+      const a = makeScatterAnchor(e, gd);
+      if (!a) return;
+      setAnchor(a);
+      setClickPoint(a.pt);
 
-    const { el, rect, pt } = picked;
-    if (!el) return;
-    const { clientX, clientY } = e.event as MouseEvent;
-    const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-    const relX = clamp01((clientX - rect.left) / (rect.width || 1));
-    const relY = clamp01((clientY - rect.top) / (rect.height || 1));
+      return;
+    }
 
-    setRel({ x: relX, y: relY });
-    setFromRect(el);
-    setAnchor(el);
-    setClickPoint(pt);
+    // bar / pie
+    const a = makeElementAnchor(e, gd, chartType);
+    if (!a) return;
+    setAnchor(a);
+    setClickPoint(a.pt);
+  };
+
+  const onPopoverChange = (isOpen: boolean) => {
+    if (!isOpen) setAnchor(null);
   };
 
   const isPopoverOpen = !!anchor && !!pos;
-
-  const onPopoverChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      setAnchor(null);
-      setPos(null);
-    }
-  };
-
-  const initializeGraphDivRef = (_: Plotly.PlotlyHTMLElement, gd: Plotly.PlotlyHTMLElement) => {
-    graphDivRef.current = gd;
-  };
 
   return {
     initializeGraphDivRef,
