@@ -60,7 +60,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(OpensearchNodeRole.SEARCH);
@@ -98,7 +98,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 gcsRepositoryConfiguration,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(OpensearchNodeRole.SEARCH);
@@ -112,8 +112,8 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .containsEntry("node.search.cache.size", "10gb");
     }
 
-    private OpensearchConfigurationParams emptyBuildParams() {
-        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap());
+    private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
+        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap(), tempDir);
     }
 
     @Test
@@ -134,7 +134,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(OpensearchNodeRole.SEARCH);
@@ -162,7 +162,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided
@@ -193,7 +193,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
-        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams()))
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams(tempDir)))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
     }
@@ -216,7 +216,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided, we have to use only those that are given in the configuration
