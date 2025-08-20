@@ -76,13 +76,12 @@ public abstract class EventProcedure extends ScopedEntity {
 
     // TODO: Build this out if needed
     public String toText() {
-        final StringBuilder procedureBuilder = new StringBuilder();
-        procedureBuilder.append("--- [Event Procedures ---------------------------\n");
-        procedureBuilder.append("Title:       " + title() + "\n");
-        procedureBuilder.append("Description: " + description() + "\n");
-        procedureBuilder.append("Steps:\n");
+        final String procedureBuilder = "--- [Event Procedures ---------------------------\n" +
+                "Title:       " + title() + "\n" +
+                "Description: " + description() + "\n" +
+                "Steps:\n";
 
-        return procedureBuilder.toString();
+        return procedureBuilder;
     }
 
     public String toHtml() {
