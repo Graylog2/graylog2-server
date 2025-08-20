@@ -94,9 +94,9 @@ public class EmailEventNotification implements EventNotification {
         EmailEventNotificationConfig config = (EmailEventNotificationConfig) ctx.notificationConfig();
 
         if (config.includeEventProcedure() && ctx.eventDefinition().isPresent()) {
-            final Optional<EventProcedure> eventProcedure = ctx.eventDefinition()
-                    .map(eventDefinitionDto -> eventProcedureProvider.getDecoratedForEvent(eventDefinitionDto, ctx.event()));
-            if  (eventProcedure.isPresent()) {
+            final Optional<EventProcedure> eventProcedure = eventProcedureProvider
+                    .getDecoratedForEvent(ctx.eventDefinition().get().eventProcedureId(), ctx.event());
+            if (eventProcedure.isPresent()) {
                 config = config.toBuilder().htmlBodyTemplate(config.htmlBodyTemplate() + eventProcedure.get().toHtml()).build();
             }
         }
