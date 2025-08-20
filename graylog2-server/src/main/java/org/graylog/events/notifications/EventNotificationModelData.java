@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.event.EventDto;
-import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
@@ -39,8 +38,6 @@ public abstract class EventNotificationModelData {
     public static final String FIELD_EVENT_DEFINITION_TITLE = "event_definition_title";
     public static final String FIELD_EVENT_DEFINITION_DESCRIPTION = "event_definition_description";
     public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
-    public static final String FIELD_EVENT_PROCEDURE_TEXT = "event_procedure_text";
-    public static final String FIELD_EVENT_PROCEDURE_HTML = "event_procedure_html";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
     public static final String FIELD_JOB_TRIGGER_ID = "job_trigger_id";
     public static final String FIELD_EVENT = "event";
@@ -60,12 +57,6 @@ public abstract class EventNotificationModelData {
 
     @JsonProperty(FIELD_REMEDIATION_STEPS)
     public abstract String remediationSteps();
-
-    @JsonProperty(FIELD_EVENT_PROCEDURE_TEXT)
-    public abstract String eventProcedureText();
-
-    @JsonProperty(FIELD_EVENT_PROCEDURE_HTML)
-    public abstract String eventProcedureHtml();
 
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
@@ -97,10 +88,6 @@ public abstract class EventNotificationModelData {
 
         public abstract Builder remediationSteps(String remediationSteps);
 
-        public abstract Builder eventProcedureText(String eventProcedureText);
-
-        public abstract Builder eventProcedureHtml(String eventProcedureHtml);
-
         public abstract Builder jobDefinitionId(String jobDefinitionId);
 
         public abstract Builder jobTriggerId(String jobTriggerId);
@@ -116,23 +103,16 @@ public abstract class EventNotificationModelData {
         return of(ctx.eventDefinition().orElse(null),
                 ctx.jobTrigger().orElse(null),
                 ctx.event(),
-                backlog,
-                ctx.eventProcedure().orElse(null));
+                backlog);
     }
 
-    public static EventNotificationModelData of(EventDefinitionDto definitionDto,
-                                                JobTriggerDto jobTriggerDto,
-                                                EventDto event,
-                                                List<MessageSummary> backlog,
-                                                EventProcedure eventProcedure) {
+    public static EventNotificationModelData of(EventDefinitionDto definitionDto, JobTriggerDto jobTriggerDto, EventDto event, List<MessageSummary> backlog) {
         return EventNotificationModelData.builder()
                 .eventDefinitionId(definitionDto != null ? definitionDto.id() : UNKNOWN)
                 .eventDefinitionType(definitionDto != null ? definitionDto.config().type() : UNKNOWN)
                 .eventDefinitionTitle(definitionDto != null ? definitionDto.title() : UNKNOWN)
                 .eventDefinitionDescription(definitionDto != null ? definitionDto.description() : UNKNOWN)
                 .remediationSteps(Optional.ofNullable(definitionDto).map(EventDefinitionDto::remediationSteps).orElse(UNKNOWN))
-                .eventProcedureText(eventProcedure != null ? eventProcedure.toText() : UNKNOWN)
-                .eventProcedureHtml(eventProcedure != null ? eventProcedure.toHtml() : UNKNOWN)
                 .jobDefinitionId(jobTriggerDto != null ? jobTriggerDto.jobDefinitionId() : UNKNOWN)
                 .jobTriggerId(jobTriggerDto != null ? jobTriggerDto.id() : UNKNOWN)
                 .event(event)
