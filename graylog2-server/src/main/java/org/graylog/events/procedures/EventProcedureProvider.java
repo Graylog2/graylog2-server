@@ -22,7 +22,5 @@ import java.util.Optional;
 
 public interface EventProcedureProvider {
 
-    default Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event) {
-        return Optional.empty();
-    }
+    Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event);
 }
