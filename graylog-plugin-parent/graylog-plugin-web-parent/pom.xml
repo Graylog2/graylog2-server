@@ -30,6 +30,10 @@
 
     <name>Graylog Plugin with Web support Parent POM</name>
 
+    <properties>
+        <skip.web.tests>false</skip.web.tests>
+    </properties>
+
     <profiles>
         <profile>
             <id>web-interface-build</id>
