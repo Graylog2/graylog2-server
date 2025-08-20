@@ -51,6 +51,7 @@ import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.contentpacks.ContentPackInstallationHook;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
@@ -500,5 +501,13 @@ public abstract class PluginModule extends Graylog2Module {
 
             dbEntitiesBinder().addBinding().toInstance(entitiesClass);
         }
+    }
+
+    protected void addContentPackInstallationHook(Class<? extends ContentPackInstallationHook> contentPackInstallationHook) {
+        contentPackInstallationHookBinder().addBinding().to(contentPackInstallationHook);
+    }
+
+    protected Multibinder<ContentPackInstallationHook> contentPackInstallationHookBinder() {
+        return Multibinder.newSetBinder(binder(), ContentPackInstallationHook.class);
     }
 }

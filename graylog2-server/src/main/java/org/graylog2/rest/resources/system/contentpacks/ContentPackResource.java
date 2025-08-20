@@ -43,6 +43,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
@@ -298,7 +299,8 @@ public class ContentPackResource extends RestResource {
                 contentPack,
                 contentPackInstallationRequest.parameters(),
                 contentPackInstallationRequest.comment(),
-                userContext);
+                userContext,
+                contentPackInstallationRequest.shareRequest().orElse(EntityShareRequest.EMPTY));
     }
 
     @GET

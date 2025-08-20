@@ -74,5 +74,7 @@ public class ContentPacksModule extends PluginModule {
         registerJacksonSubtype(MessageListEntity.class);
         registerJacksonSubtype(PivotEntity.class);
         registerJacksonSubtype(EventListEntity.class);
+
+        addContentPackInstallationHook(ShareEntitiesHook.class);
     }
 }
