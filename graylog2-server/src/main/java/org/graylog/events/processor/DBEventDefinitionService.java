@@ -17,7 +17,6 @@
 package org.graylog.events.processor;
 
 import com.google.errorprone.annotations.MustBeClosed;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
@@ -26,7 +25,8 @@ import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
@@ -69,19 +69,19 @@ public class DBEventDefinitionService {
     private final ScopedEntityMongoUtils<EventDefinitionDto> scopedEntityMongoUtils;
     private final MongoPaginationHelper<EventDefinitionDto> paginationHelper;
     private final DBEventProcessorStateService stateService;
-    private final EntityOwnershipService entityOwnerShipService;
+    private final EntityRegistrar entityRegistrar;
     private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
     public DBEventDefinitionService(MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
+                                    EntityRegistrar entityRegistrar, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.stateService = stateService;
-        this.entityOwnerShipService = entityOwnerShipService;
+        this.entityRegistrar = entityRegistrar;
         this.searchFiltersRefetcher = searchFiltersRefetcher;
     }
 
@@ -103,7 +103,7 @@ public class DBEventDefinitionService {
 
     public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
         final EventDefinitionDto dto = save(eventDefinitionDto);
-        entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
+        entityRegistrar.registerNewEventDefinition(dto.id(), user);
         return dto;
     }
 
@@ -177,7 +177,7 @@ public class DBEventDefinitionService {
         } catch (Exception e) {
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
-        entityOwnerShipService.unregisterEventDefinition(id);
+        entityRegistrar.unregisterEventDefinition(id);
         return deleteSupplier.get();
     }
 
@@ -227,9 +227,11 @@ public class DBEventDefinitionService {
     }
 
     public List<EventDefinitionDto> getByIds(Collection<String> ids) {
-        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
-                .map(this::getEventDefinitionWithRefetchedFilters)
-                .toList();
+        try (final var stream = stream(collection.find(MongoUtils.stringIdsIn(ids)))) {
+            return stream
+                    .map(this::getEventDefinitionWithRefetchedFilters)
+                    .toList();
+        }
     }
 
     /**

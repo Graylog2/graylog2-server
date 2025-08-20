@@ -81,7 +81,7 @@ const _generateSeries =
       zmax: zMax,
       originalName: name,
       colorbar: {
-        tickfont: { color: theme.colors.global.textDefault },
+        tickfont: { color: theme.colors.text.primary },
       },
     };
   };

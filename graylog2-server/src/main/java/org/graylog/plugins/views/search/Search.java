@@ -166,10 +166,12 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         final Set<Query> withMappedStreamCategories = new HashSet<>();
 
         for (Query query : withStreamCategories) {
-            final Set<String> mappedStreamIds = categoryMappingFunction.apply(query.usedStreamCategories())
-                    .filter(streamPermissions::canReadStream)
-                    .collect(toSet());
-            withMappedStreamCategories.add(query.addStreamsToFilter(mappedStreamIds));
+            try (var stream = categoryMappingFunction.apply(query.usedStreamCategories())) {
+                final Set<String> mappedStreamIds = stream
+                        .filter(streamPermissions::canReadStream)
+                        .collect(toSet());
+                withMappedStreamCategories.add(query.addStreamsToFilter(mappedStreamIds));
+            }
         }
 
         final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
@@ -195,11 +197,13 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 if (!st.hasStreamCategories()) {
                     mappedSearchTypes.add(st);
                 } else {
-                    final Set<String> mappedStreamIds = categoryMappingFunction.apply(st.streamCategories())
-                            .filter(streamPermissions::canReadStream)
-                            .collect(toSet());
-                    mappedStreamIds.addAll(st.streams());
-                    mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                    try (var stream = categoryMappingFunction.apply(st.streamCategories())) {
+                        final Set<String> mappedStreamIds = stream
+                                .filter(streamPermissions::canReadStream)
+                                .collect(toSet());
+                        mappedStreamIds.addAll(st.streams());
+                        mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                    }
                 }
             }
             withMappedStreamCategories.add(query.toBuilder().searchTypes(mappedSearchTypes).build());

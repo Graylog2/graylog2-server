@@ -27,6 +27,8 @@ const supportedTypes = new Set([
   'search_filter',
   'role',
   'output',
+  'collection',
+  'collection_entities',
 ]);
 
 const typePrefixCornerCasesMap = {

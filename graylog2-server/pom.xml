@@ -59,6 +59,7 @@
         <mainClass>org.graylog2.bootstrap.Main</mainClass>
         <webInterface.path>../graylog2-web-interface</webInterface.path>
         <skip.web.build>false</skip.web.build>
+        <skip.web.tests>false</skip.web.tests>
 
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
@@ -159,8 +160,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
-            <artifactId>owasp-java-html-sanitizer</artifactId>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
         </dependency>
 
         <dependency>
@@ -1322,6 +1323,7 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                    <skipTests>${skip.web.tests}</skipTests>
                                 </configuration>
                             </execution>
                         </executions>

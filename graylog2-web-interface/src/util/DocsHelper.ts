@@ -38,7 +38,7 @@ const docsHelper = {
     ES_CLUSTER_STATUS_RED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
     ES_CLUSTER_UNAVAILABLE: 'setting_up_graylog/opensearch.htm#GraylogConfigurationSettings',
     ES_OPEN_FILE_LIMITS: 'setting_up_graylog/opensearch.htm#GraylogConfigurationSettings',
-    EVENT_PROCEDURES: 'what_more_can_graylog_do_for_me/remediation_steps.htm', // placeholder remediation steps
+    EVENT_PROCEDURES: 'what_more_can_graylog_do_for_me/event_procedures.htm',
     EXTRACTORS: 'making_sense_of_your_log_data/extractors.htm',
     GRAYLOG_DATA_NODE: 'downloading_and_installing_graylog/install_graylog_data_node.htm',
     INDEXER_FAILURES: 'getting_in_log_data/indexer_failures.html',
@@ -67,6 +67,7 @@ const docsHelper = {
     TIME_FRAME_SELECTOR: 'making_sense_of_your_log_data/time_frame_selector.html',
     UPGRADE_GUIDE: 'upgrading_graylog/upgrading_graylog.html',
     USERS_ROLES: 'setting_up_graylog/users_teams.htm',
+    DATA_LAKE: 'setting_up_graylog/data_lake.htm',
     DATA_LAKE_PREVIEW: 'setting_up_graylog/data_lake_preview.htm',
     WELCOME: '', // Welcome page to the documentation
     DATA_TIERING: 'setting_up_graylog/data_tiering.htm',

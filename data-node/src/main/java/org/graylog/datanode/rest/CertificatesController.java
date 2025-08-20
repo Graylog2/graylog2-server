@@ -52,7 +52,7 @@ public class CertificatesController {
     public Map<OpensearchKeystoreProvider.Store, KeyStoreDto> getCertificates() {
         Map<OpensearchKeystoreProvider.Store, KeyStoreDto> certificates = new HashMap<>();
         try {
-            KeyStore keystore = datanodeKeystore.loadKeystore();
+            KeyStore keystore = datanodeKeystore.getSafeCopy().loadKeystore();
             certificates.put(OpensearchKeystoreProvider.Store.CONFIGURED, KeyStoreDto.fromKeyStore(keystore));
         } catch (DatanodeKeystoreException | KeyStoreException e) {
             log.error("Could not load datanode keystore", e);
