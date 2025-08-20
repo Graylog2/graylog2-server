@@ -35,12 +35,12 @@ const IndexSetProfileConfiguration = ({
   value,
   onChange,
   name,
-  immutable = false,
+  disabled = false,
 }: {
   name: string;
   value: string;
   onChange: (value: string | null) => void;
-  immutable?: boolean;
+  disabled?: boolean;
 }) => {
   const { isLoading, options } = useProfileOptions();
   const _onChange = (val: string) => onChange(val || null);
@@ -63,7 +63,7 @@ const IndexSetProfileConfiguration = ({
               inputId={name}
               options={options}
               value={value}
-              disabled={isLoading || immutable}
+              disabled={isLoading || disabled}
               onChange={_onChange}
             />
           </Input>

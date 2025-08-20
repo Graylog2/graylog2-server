@@ -16,16 +16,25 @@
  */
 import * as React from 'react';
 
-type FieldRestrictionsWrapperProps = {
+type HiddenFieldWrapperProps = {
   hiddenFields: string[];
+  namePrefix?: string | null;
+  isPermitted: boolean;
   children: React.ReactNode;
 };
 
-const FieldRestrictionsWrapper = ({ children, hiddenFields, ...rest }: FieldRestrictionsWrapperProps) => (
+const HiddenFieldWrapper = ({
+  children,
+  hiddenFields,
+  namePrefix = null,
+  isPermitted,
+  ...rest
+}: HiddenFieldWrapperProps) => (
   <>
     {React.Children.map(children, (child) => {
       if (React.isValidElement(child)) {
-        if (hiddenFields?.includes(child.props.name)) return null;
+        if (hiddenFields?.includes(namePrefix ? namePrefix + child.props.name : child.props.name) && !isPermitted)
+          return null;
 
         return React.cloneElement(child, rest);
       }
@@ -35,4 +44,4 @@ const FieldRestrictionsWrapper = ({ children, hiddenFields, ...rest }: FieldRest
   </>
 );
 
-export default FieldRestrictionsWrapper;
+export default HiddenFieldWrapper;
