@@ -62,7 +62,7 @@ const INIT_ADAPTER = {
   custom_error_ttl: null,
   custom_error_ttl_unit: null,
   config: {},
-}
+};
 
 const DataAdapterForm = ({
   type,
@@ -127,14 +127,20 @@ const DataAdapterForm = ({
     });
   };
 
-  const updateCustomErrorTTL = (value: number, enabled: boolean, unit: string, values: LookupTableAdapter, setValues: any) => {
+  const updateCustomErrorTTL = (
+    value: number,
+    enabled: boolean,
+    unit: string,
+    values: LookupTableAdapter,
+    setValues: any,
+  ) => {
     setValues({
       ...values,
       custom_error_ttl: value,
       custom_error_ttl_enabled: enabled,
       custom_error_ttl_unit: unit,
     });
-  }
+  };
 
   const handleValidation = (values: LookupTableAdapter) => {
     const errors: any = {};
@@ -191,23 +197,25 @@ const DataAdapterForm = ({
         onSubmit={handleSubmit}
         enableReinitialize>
         {({ errors, values, setValues, setFieldValue, isSubmitting }) => {
-          const configFieldSet = plugin && React.createElement(plugin.formComponent, {
-            config: values.config,
-            validationMessage,
-            validationState,
-            updateConfig: (newConfig) => setFieldValue('config', newConfig),
-            handleFormEvent: (event) => {
-              const { name, value, type: typeFromTarget, checked } = event.target;
-              const updatedValue = typeFromTarget === 'checkbox' ? checked : value;
+          const configFieldSet =
+            plugin &&
+            React.createElement(plugin.formComponent, {
+              config: values.config,
+              validationMessage,
+              validationState,
+              updateConfig: (newConfig) => setFieldValue('config', newConfig),
+              handleFormEvent: (event) => {
+                const { name, value, type: typeFromTarget, checked } = event.target;
+                const updatedValue = typeFromTarget === 'checkbox' ? checked : value;
 
-              setFieldValue(`config.${name}`, updatedValue);
-            },
-            setFieldValue,
-            ref: (ref) => {
-              configRef.current = ref;
-              setConfigReady(true);
-            },
-          });
+                setFieldValue(`config.${name}`, updatedValue);
+              },
+              setFieldValue,
+              ref: (ref) => {
+                configRef.current = ref;
+                setConfigReady(true);
+              },
+            });
 
           return (
             <Form className="form form-horizontal">

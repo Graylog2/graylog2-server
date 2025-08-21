@@ -51,41 +51,44 @@ function CacheList() {
   const { fetchPaginatedCaches, cachesKeyFn } = useFetchCaches();
   const { renderActions } = useActions();
 
-  const handleFetchCaches = React.useCallback(async (searchParams: SearchParams) => {
-    const resp = await fetchPaginatedCaches(searchParams);
+  const handleFetchCaches = React.useCallback(
+    async (searchParams: SearchParams) => {
+      const resp = await fetchPaginatedCaches(searchParams);
 
-    const overrides: Record<string, Partial<Attribute>> = {
-      title: { sortable: true },
-      name: { sortable: true },
-      description: { sortable: false },
-    };
+      const overrides: Record<string, Partial<Attribute>> = {
+        title: { sortable: true },
+        name: { sortable: true },
+        description: { sortable: false },
+      };
 
-    const expectedIds = cacheListElements.defaultLayout.defaultDisplayedAttributes;
+      const expectedIds = cacheListElements.defaultLayout.defaultDisplayedAttributes;
 
-    const attrMap = new Map<string, Attribute>();
+      const attrMap = new Map<string, Attribute>();
 
-    (resp.attributes ?? []).forEach((attr) => {
-      const override = overrides[attr.id] ?? {};
-      attrMap.set(attr.id, { ...attr, ...override });
-    });
+      (resp.attributes ?? []).forEach((attr) => {
+        const override = overrides[attr.id] ?? {};
+        attrMap.set(attr.id, { ...attr, ...override });
+      });
 
-    expectedIds.forEach((id) => {
-      if (!attrMap.has(id)) {
-        const override = overrides[id] ?? {};
-        attrMap.set(id, {
-          id,
-          title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-          type: 'STRING',
-          ...override,
-        });
-      }
-    });
+      expectedIds.forEach((id) => {
+        if (!attrMap.has(id)) {
+          const override = overrides[id] ?? {};
+          attrMap.set(id, {
+            id,
+            title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+            type: 'STRING',
+            ...override,
+          });
+        }
+      });
 
-    return Promise.resolve({
-      ...resp,
-      attributes: Array.from(attrMap.values()),
-    });
-  }, [fetchPaginatedCaches]);
+      return Promise.resolve({
+        ...resp,
+        attributes: Array.from(attrMap.values()),
+      });
+    },
+    [fetchPaginatedCaches],
+  );
 
   return (
     <ModalProvider>
