@@ -37,7 +37,7 @@ const DetailTitle = styled.dt`
 const DetailValue = styled.dd(
   ({ theme }) => css`
     margin-left: 180px;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     &:not(:last-child) {
       border-bottom: 1px solid ${theme.colors.variant.lightest.default};
@@ -135,9 +135,7 @@ const SchedulingInfo = ({
   const searchWithinFormatted = moment
     .duration(searchWithinMs)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
-  const searchWithinMessage = searchWithinMs
-    ? `, searching within the last ${searchWithinFormatted}.`
-    : '.';
+  const searchWithinMessage = searchWithinMs ? `, searching within the last ${searchWithinFormatted}.` : '.';
 
   return (
     <>
