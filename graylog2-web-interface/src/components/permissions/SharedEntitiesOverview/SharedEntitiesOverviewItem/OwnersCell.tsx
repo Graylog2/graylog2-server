@@ -52,7 +52,7 @@ const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
 
       return <TitleWithLink entityId={id} title={title} />;
     case 'team':
-      if (!isPermitted(currentUser.permissions, 'teams:list')) return <span>{title}</span>;
+      if (!isPermitted(currentUser.permissions, 'team:read')) return <span>{title}</span>;
 
       return <TitleWithLink entityId={id} title={title} />;
     case 'global':
