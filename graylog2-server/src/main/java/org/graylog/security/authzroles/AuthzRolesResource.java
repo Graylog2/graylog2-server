@@ -124,7 +124,7 @@ public class AuthzRolesResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final Predicate<String> roleNamePermissionPredicate = getRoleIdPermissionPredicate();
+        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(roleNamePermissionPredicate, searchQuery, page, perPage, sort, order);
         final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
 
@@ -156,7 +156,7 @@ public class AuthzRolesResource extends RestResource {
         }
 
         final Predicate<String> userNamePermissionPredicate = roleName -> isPermitted(RestPermissions.USERS_READ, roleName);
-        final Predicate<String> roleNamePermissionPredicate = getRoleIdPermissionPredicate();
+        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
 
         final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(userNamePermissionPredicate, searchQuery, page, perPage, sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
@@ -173,8 +173,8 @@ public class AuthzRolesResource extends RestResource {
         return PaginatedResponse.create("users", enrichedResult, query);
     }
 
-    private Predicate<String> getRoleIdPermissionPredicate() {
-        return roleId -> isPermitted(RestPermissions.ROLES_READ, roleId);
+    private Predicate<String> getRoleNamePermissionPredicate() {
+        return roleName -> isPermitted(RestPermissions.ROLES_READ, roleName);
     }
 
     @GET
@@ -213,7 +213,7 @@ public class AuthzRolesResource extends RestResource {
         checkPermission(RestPermissions.USERS_READ, username);
         final User user = Optional.ofNullable(userService.load(username))
                 .orElseThrow(() -> new NotFoundException("Couldn't find user: " + username));
-        final Predicate<String> roleNamePermissionPredicate = getRoleIdPermissionPredicate();
+        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(roleNamePermissionPredicate,
                 searchQuery, page, perPage, sort, order, user.getRoleIds());
         return PaginatedResponse.create("roles", result, query);
