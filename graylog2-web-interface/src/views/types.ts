@@ -378,7 +378,7 @@ type EventProcedureSummary = {
 type SecurityEventsPage = {
   component: React.ComponentType<{}>;
   key: string;
-}
+};
 
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
