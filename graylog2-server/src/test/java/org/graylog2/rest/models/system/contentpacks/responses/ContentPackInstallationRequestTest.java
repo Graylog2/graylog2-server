@@ -19,7 +19,6 @@ package org.graylog2.rest.models.system.contentpacks.responses;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class ContentPackInstallationRequestTest {
                 "param2", ValueReference.of(42),
                 "param3", ValueReference.of(3.14d),
                 "param4", ValueReference.of(true));
-        final ContentPackInstallationRequest request = ContentPackInstallationRequest.create(parameters, "comment", EntityShareRequest.EMPTY);
+        final ContentPackInstallationRequest request = ContentPackInstallationRequest.create(parameters, "comment");
         final JsonNode node = objectMapper.valueToTree(request);
         assertThat(node.path("comment").asText()).isEqualTo("comment");
         assertThat(node.path("parameters").path("param1").path("@type").asText()).isEqualTo("string");
@@ -69,7 +68,7 @@ public class ContentPackInstallationRequestTest {
                 "param2", ValueReference.of(42),
                 "param3", ValueReference.of(3.14d),
                 "param4", ValueReference.of(true));
-        final ContentPackInstallationRequest expected = ContentPackInstallationRequest.create(parameters, "comment", EntityShareRequest.EMPTY);
+        final ContentPackInstallationRequest expected = ContentPackInstallationRequest.create(parameters, "comment");
         assertThat(actual).isEqualTo(expected);
     }
 }

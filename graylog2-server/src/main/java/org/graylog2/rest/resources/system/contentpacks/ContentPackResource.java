@@ -43,6 +43,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -289,16 +290,17 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision") int revision,
             @ApiParam(name = "installation request", value = "Content pack installation request", required = true)
-            @Valid @NotNull ContentPackInstallationRequest contentPackInstallationRequest,
+            @Valid @NotNull CreateEntityRequest<ContentPackInstallationRequest> contentPackInstallationRequest,
             @Context UserContext userContext) {
         checkPermission(RestPermissions.CONTENT_PACK_INSTALL, id.toString());
+        final var request = contentPackInstallationRequest.entity();
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
         return contentPackService.installContentPack(
                 contentPack,
-                contentPackInstallationRequest.parameters(),
-                contentPackInstallationRequest.comment(),
+                request.parameters(),
+                request.comment(),
                 userContext,
                 contentPackInstallationRequest.shareRequest().orElse(EntityShareRequest.EMPTY));
     }

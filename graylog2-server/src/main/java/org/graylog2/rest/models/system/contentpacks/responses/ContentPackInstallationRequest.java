@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 @JsonAutoDetect
 @AutoValue
@@ -40,15 +38,11 @@ public abstract class ContentPackInstallationRequest {
     @Nullable
     public abstract String comment();
 
-    @JsonProperty("share_request")
-    public abstract Optional<EntityShareRequest> shareRequest();
-
     @JsonCreator
     public static ContentPackInstallationRequest create(
             @JsonProperty("parameters") @Nullable Map<String, ValueReference> parameters,
-            @JsonProperty("comment") @Nullable String comment,
-            @JsonProperty("share_request") @Nullable EntityShareRequest shareRequest) {
+            @JsonProperty("comment") @Nullable String comment) {
         final Map<String, ValueReference> parameterMap = parameters == null ? Collections.emptyMap() : parameters;
-        return new AutoValue_ContentPackInstallationRequest(parameterMap, comment, Optional.ofNullable(shareRequest));
+        return new AutoValue_ContentPackInstallationRequest(parameterMap, comment);
     }
 }
