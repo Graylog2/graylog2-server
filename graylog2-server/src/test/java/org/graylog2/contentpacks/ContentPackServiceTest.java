@@ -31,7 +31,6 @@ import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.fields.FieldValueType;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -178,9 +177,6 @@ public class ContentPackServiceTest {
     @Mock
     private ContentPackInstallationPersistenceService contentPackInstallService;
     @Mock
-    private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
-
-    @Mock
     InputService inputService;
     @Mock
     InputRegistry inputRegistry;
@@ -223,7 +219,7 @@ public class ContentPackServiceTest {
         outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityRegistrar),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar),
