@@ -36,7 +36,6 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.aggregation.AggregationConditions;
-import org.graylog.grn.GRNRegistry;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -54,7 +53,6 @@ import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntityShareRequest;
-import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
@@ -199,10 +197,6 @@ public class ContentPackServiceTest {
     Configuration configuration;
     @Mock
     EntityRegistrar entityRegistrar;
-    @Mock
-    EntitySharesService entitySharesService;
-    @Mock
-    GRNRegistry grnRegistry;
 
     private ContentPackService contentPackService;
 
@@ -211,7 +205,6 @@ public class ContentPackServiceTest {
     private GrokPattern grokPattern;
     private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
     private ImmutableMap<ModelId, Object> entityObjectMap;
-    private User user;
 
     @BeforeEach
     public void setUp() throws Exception {
