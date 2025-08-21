@@ -21,16 +21,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog2.database.MongoEntity;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = EntitySource.Builder.class)
-public abstract class EntitySource {
+public abstract class EntitySource implements MongoEntity {
     public static final String USER_DEFINED = "USER_DEFINED";
     public static final String CONTENT_PACK = "CONTENT_PACK";
 
+    public static final String FIELD_ID = "id";
     public static final String FIELD_SOURCE = "source";
     public static final String FIELD_ENTITY_ID = "entity_id";
     public static final String FIELD_PARENT_ID = "parent_id";
@@ -66,6 +69,12 @@ public abstract class EntitySource {
                     .source(USER_DEFINED);
         }
 
+        @ObjectId
+        @Id
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
+        @ObjectId
         @JsonProperty(FIELD_ENTITY_ID)
         public abstract Builder entityId(String entityId);
 

@@ -24,7 +24,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import jakarta.validation.constraints.NotBlank;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.database.MongoEntity;
+import org.graylog2.database.entities.EntitySource;
+import org.graylog2.database.entities.SourcedMongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = ViewSummaryDTO.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
-public abstract class ViewSummaryDTO implements ViewLike, MongoEntity {
+public abstract class ViewSummaryDTO implements ViewLike, SourcedMongoEntity {
     @ObjectId
     @Id
     @Nullable
@@ -103,6 +104,9 @@ public abstract class ViewSummaryDTO implements ViewLike, MongoEntity {
         @Id
         @JsonProperty(ViewDTO.FIELD_ID)
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_ENTITY_SOURCE)
+        public abstract Builder entitySource(@Nullable EntitySource source);
 
         @JsonProperty(ViewDTO.FIELD_TYPE)
         public abstract Builder type(ViewDTO.Type type);

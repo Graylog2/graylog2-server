@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.utils;
+package org.graylog2.database.pagination;
 
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.UnwindOptions;
-import com.mongodb.client.model.Variable;
-import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -32,7 +25,6 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.EntitySource;
-import org.graylog2.database.entities.SourcedMongoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,33 +35,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.mongodb.client.model.Aggregates.limit;
-import static com.mongodb.client.model.Aggregates.match;
-import static com.mongodb.client.model.Aggregates.project;
-import static com.mongodb.client.model.Projections.excludeId;
-import static com.mongodb.client.model.Projections.include;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 @MongoDBFixtures("entity-source-testing.json")
-class EntitySourceAggregationTest {
-    private static final List<Bson> LOOKUP_PIPELINE = List.of(
-            match(Filters.expr(new Document("$eq", List.of("$entity_id", "$$vid")))),
-            project(Projections.fields(excludeId(), include(EntitySource.FIELD_SOURCE, EntitySource.FIELD_PARENT_ID))),
-            limit(1)
-    );
-
-    private static final Bson LOOKUP = Aggregates.lookup(
-            "entity_source",
-            List.of(new Variable<>("vid", "$_id")),
-            LOOKUP_PIPELINE,
-            SourcedMongoEntity.FIELD_ENTITY_SOURCE
-    );
-
-    private static final Bson UNWIND = Aggregates.unwind("$entity_source",
-            new UnwindOptions().preserveNullAndEmptyArrays(true));
+class EntitySourceLookupTest {
 
     private MongoCollection<ViewDTO> collection;
 
@@ -81,7 +53,7 @@ class EntitySourceAggregationTest {
 
     @Test
     void testLookupWithSource() {
-        try (var stream = stream(collection.aggregate(List.of(LOOKUP, UNWIND)))) {
+        try (var stream = stream(collection.aggregate(List.of(EntitySourceLookup.LOOKUP, EntitySourceLookup.UNWIND)))) {
             final Map<String, ViewDTO> viewMap = stream.collect(Collectors.toMap(ViewDTO::id, Function.identity()));
 
             final ViewDTO illuminateDashboard = viewMap.get("6890b706dc8217538b763006");
