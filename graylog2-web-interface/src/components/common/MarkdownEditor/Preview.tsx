@@ -22,7 +22,12 @@ import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height?: number | string; $noBackground?: boolean; $noBorder?: boolean }>`
+const Container = styled.div<{
+  $height?: number | string;
+  $noBackground?: boolean;
+  $noBorder?: boolean;
+  $maxHeight?: number | string;
+}>`
   position: relative;
   padding: 8px 0;
   background-color: ${({ theme, $noBackground }) =>
@@ -36,11 +41,14 @@ const Container = styled.div<{ $height?: number | string; $noBackground?: boolea
   flex-grow: 1;
   overflow: hidden;
 
-  height: ${({ $height }) =>
+  height: ${({ $height, $maxHeight }) =>
     // eslint-disable-next-line no-nested-ternary
-    $height ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
+    $height && !$maxHeight ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
   min-height: 100px;
   width: 100%;
+  max-height: ${({ $maxHeight }) =>
+    // eslint-disable-next-line no-nested-ternary
+    $maxHeight ? (NumberUtils.isNumber($maxHeight) ? `${$maxHeight}px` : $maxHeight) : 'auto'};
 `;
 
 const ExpandIconButton = styled(IconButton)`
@@ -117,11 +125,13 @@ type Props = {
   noBackground?: boolean;
   noBorder?: boolean;
   noPadding?: boolean;
+  maxHeight?: number | string;
 };
 
 function Preview({
   value,
-  height = 100,
+  height = undefined,
+  maxHeight = undefined,
   show,
   withFullView = false,
   noBackground = false,
@@ -132,7 +142,7 @@ function Preview({
 
   return (
     show && (
-      <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
+      <Container $height={height} $maxHeight={maxHeight} $noBackground={noBackground} $noBorder={noBorder}>
         <MarkdownStyles $noPadding={noPadding}>
           <Markdown text={value} />
         </MarkdownStyles>
