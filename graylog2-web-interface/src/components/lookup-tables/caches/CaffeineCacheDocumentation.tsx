@@ -32,7 +32,7 @@ const CaffeineCacheDocumentation = () => {
     {
       value: 'time_based_expiration',
       label: 'Time Based Expiration',
-      content:
+      content: (
         <div>
           <h5 style={{ marginBottom: 10 }}>Expire after access</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
@@ -45,11 +45,12 @@ const CaffeineCacheDocumentation = () => {
           <p style={{ marginBottom: 10, padding: 0 }}>
             The cache will remove entries after a fixed time since they have been entered into the cache.
             <br />
-            This results in entries that are never older than the given time, which can be important for regularly changing
-            data, such as configuration state of external systems.
+            This results in entries that are never older than the given time, which can be important for regularly
+            changing data, such as configuration state of external systems.
           </p>
-        </div>,
-    }
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -65,7 +66,7 @@ const CaffeineCacheDocumentation = () => {
 
       <hr />
 
-      <MantineAccordion accordionItems={accordionItems} defaultValue='cache_size' />
+      <MantineAccordion accordionItems={accordionItems} defaultValue="cache_size" />
     </div>
   );
 };
