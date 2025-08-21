@@ -49,7 +49,24 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -80,6 +97,7 @@ import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.TokenSummary;
 import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
+import org.graylog2.rest.models.users.responses.UsernameAvailabilityResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -104,24 +122,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.extra.PeriodDuration;
 
-import javax.annotation.Nullable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -139,8 +139,13 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "Users", description = "User accounts", tags = {CLOUD_VISIBLE})
 public class UsersResource extends RestResource {
+    protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
+            .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
+            .put(UserOverviewDTO.FIELD_EMAIL, SearchQueryField.create(UserOverviewDTO.FIELD_EMAIL))
+            .build();
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
-
     private final UserManagementService userManagementService;
     private final PaginatedUserService paginatedUserService;
     private final AccessTokenService accessTokenService;
@@ -151,13 +156,6 @@ public class UsersResource extends RestResource {
     private final DefaultSecurityManager securityManager;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
-
-    protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
-            .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
-            .put(UserOverviewDTO.FIELD_EMAIL, SearchQueryField.create(UserOverviewDTO.FIELD_EMAIL))
-            .build();
 
     @Inject
     public UsersResource(UserManagementService userManagementService,
@@ -279,9 +277,9 @@ public class UsersResource extends RestResource {
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @ApiParam(name = "sort",
-                                                                value = "The field to sort the result on",
-                                                                required = true,
-                                                                allowableValues = "title,description")
+                                                              value = "The field to sort the result on",
+                                                              required = true,
+                                                              allowableValues = "title,description")
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
@@ -347,7 +345,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
                            @Valid @NotNull CreateUserRequest cr) throws ValidationException {
-        if (userManagementService.load(cr.username()) != null) {
+        if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
             throw new BadRequestException(msg);
@@ -388,6 +386,19 @@ public class UsersResource extends RestResource {
                 .build(user.getName());
 
         return Response.created(userUri).build();
+    }
+
+    @GET
+    @RequiresPermissions(RestPermissions.USERS_CREATE)
+    @Path("/username_availability")
+    @ApiOperation(value = "Check if a username is still available")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkUsernameAvailability(@ApiParam(name = "username") @QueryParam("username") String username) {
+        return Response.ok(new UsernameAvailabilityResponse(username, !isUserNameInUse(username))).build();
+    }
+
+    private boolean isUserNameInUse(String username) {
+        return userManagementService.load(username) != null;
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
@@ -682,7 +693,7 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true)
             @PathParam("userId") @NotBlank String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
-                      defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
+                    defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
             @PathParam("newStatus") @NotBlank String newStatusString,
             @Context UserContext userContext) throws ValidationException {
 
@@ -721,12 +732,6 @@ public class UsersResource extends RestResource {
         }
 
         return TokenList.create(tokenList.build());
-    }
-
-    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
-        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
-            return this.tokenTTL.orElseGet(defaultSupplier);
-        }
     }
 
     @POST
@@ -886,15 +891,21 @@ public class UsersResource extends RestResource {
                 .build();
     }
 
+    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
+        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
+            return this.tokenTTL.orElseGet(defaultSupplier);
+        }
+    }
+
     private static class AllUserSessions {
         private final Map<String, Optional<MongoDbSession>> sessions;
 
-        public static AllUserSessions create(MongoDBSessionService sessionService) {
-            return new AllUserSessions(sessionService.loadAll());
-        }
-
         private AllUserSessions(Collection<MongoDbSession> sessions) {
             this.sessions = getLastSessionForUser(sessions);
+        }
+
+        public static AllUserSessions create(MongoDBSessionService sessionService) {
+            return new AllUserSessions(sessionService.loadAll());
         }
 
         public Optional<MongoDbSession> forUser(User user) {
