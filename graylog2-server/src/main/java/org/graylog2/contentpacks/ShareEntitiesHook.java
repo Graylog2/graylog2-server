@@ -36,6 +36,9 @@ public class ShareEntitiesHook implements ContentPackInstallationHook {
 
     @Override
     public void afterInstallation(ContentPackInstallation installation, EntityShareRequest shareRequest, UserContext userContext) {
+        if (shareRequest.grantees().isEmpty()) {
+            return;
+        }
         final var user = userContext.getUser();
         final var allEntities = installation.entities();
         final var entityGRNs = allEntities.stream()
