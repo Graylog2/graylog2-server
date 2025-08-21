@@ -24,7 +24,6 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import jakarta.inject.Inject;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.EntityPermissions;
@@ -63,8 +62,8 @@ public class StreamReferenceFacade extends StreamFacade {
     private final StreamService streamService;
 
     @Inject
-    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration, IndexSetService indexSetService, UserService userService) {
-        super(objectMapper, streamService, streamRuleService, legacyAlertsMigration, indexSetService, userService);
+    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, IndexSetService indexSetService, UserService userService) {
+        super(objectMapper, streamService, streamRuleService, indexSetService, userService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
     }

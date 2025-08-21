@@ -55,45 +55,48 @@ function DataAdapterList() {
   const { fetchPaginatedDataAdapters, dataAdaptersKeyFn } = useFetchDataAdapters();
   const { renderActions } = useActions();
 
-  const handleFetchAdapters = React.useCallback(async (searchParams: SearchParams) => {
-    const resp = await fetchPaginatedDataAdapters(searchParams);
+  const handleFetchAdapters = React.useCallback(
+    async (searchParams: SearchParams) => {
+      const resp = await fetchPaginatedDataAdapters(searchParams);
 
-    const overrides: Record<string, Partial<Attribute>> = {
-      title: { sortable: true },
-      name: { sortable: true },
-      description: { sortable: false },
-    };
+      const overrides: Record<string, Partial<Attribute>> = {
+        title: { sortable: true },
+        name: { sortable: true },
+        description: { sortable: false },
+      };
 
-    const expectedIds = adapterListElements.defaultLayout.defaultDisplayedAttributes;
+      const expectedIds = adapterListElements.defaultLayout.defaultDisplayedAttributes;
 
-    const attrMap = new Map<string, Attribute>();
+      const attrMap = new Map<string, Attribute>();
 
-    (resp.attributes ?? []).forEach((attr) => {
-      const override = overrides[attr.id] ?? {};
-      attrMap.set(attr.id, { ...attr, ...override });
-    });
+      (resp.attributes ?? []).forEach((attr) => {
+        const override = overrides[attr.id] ?? {};
+        attrMap.set(attr.id, { ...attr, ...override });
+      });
 
-    expectedIds.forEach((id) => {
-      if (!attrMap.has(id)) {
-        const override = overrides[id] ?? {};
-        attrMap.set(id, {
-          id,
-          title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-          type: 'STRING',
-          ...override,
-        });
-      }
-    });
+      expectedIds.forEach((id) => {
+        if (!attrMap.has(id)) {
+          const override = overrides[id] ?? {};
+          attrMap.set(id, {
+            id,
+            title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+            type: 'STRING',
+            ...override,
+          });
+        }
+      });
 
-    setNames({
-      adapterNames: resp.list.map((adapter: DataAdapterEntity) => adapter.name),
-    });
+      setNames({
+        adapterNames: resp.list.map((adapter: DataAdapterEntity) => adapter.name),
+      });
 
-    return Promise.resolve({
-      ...resp,
-      attributes: Array.from(attrMap.values()),
-    });
-  }, [fetchPaginatedDataAdapters]);
+      return Promise.resolve({
+        ...resp,
+        attributes: Array.from(attrMap.values()),
+      });
+    },
+    [fetchPaginatedDataAdapters],
+  );
 
   return (
     <ModalProvider>

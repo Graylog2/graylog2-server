@@ -54,7 +54,7 @@ const ButtonInner = styled.div`
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   white-space: break-spaces;
   text-align: center;
   gap: 0.3rem;

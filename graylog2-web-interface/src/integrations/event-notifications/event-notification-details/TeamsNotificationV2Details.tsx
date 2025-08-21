@@ -28,7 +28,7 @@ const NewExampleWell = styled(Well)(
     font-family: ${theme.fonts.family.monospace};
     font-size: ${theme.fonts.size.body};
     white-space: pre-wrap;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
   `,
 );
 
