@@ -142,7 +142,7 @@ const StyledWell = styled(Well)(
     margin-bottom: 0;
     padding: 9px;
     font-family: ${theme.fonts.family.monospace};
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     ul {
       padding: 0;

@@ -59,6 +59,7 @@
         <mainClass>org.graylog2.bootstrap.Main</mainClass>
         <webInterface.path>../graylog2-web-interface</webInterface.path>
         <skip.web.build>false</skip.web.build>
+        <skip.web.tests>false</skip.web.tests>
 
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
@@ -155,7 +156,7 @@
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
+            <artifactId>okhttp-jvm</artifactId>
         </dependency>
 
         <dependency>
@@ -556,6 +557,10 @@
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
+            <artifactId>netty-transport-classes-epoll</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-epoll</artifactId>
             <classifier>linux-x86_64</classifier>
         </dependency>
@@ -563,6 +568,10 @@
           <groupId>io.netty</groupId>
           <artifactId>netty-transport-native-epoll</artifactId>
           <classifier>linux-aarch_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-classes-kqueue</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -738,7 +747,7 @@
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>mockwebserver</artifactId>
+            <artifactId>mockwebserver3</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -1322,6 +1331,7 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                    <skipTests>${skip.web.tests}</skipTests>
                                 </configuration>
                             </execution>
                         </executions>

@@ -159,9 +159,9 @@
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.121.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>4.12.0</okhttp.version>
+        <netty.version>4.2.4.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.72.Final</netty-tcnative-boringssl-static.version>
+        <okhttp.version>5.1.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.52.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.19.0</opentelemetry-instrumentation.version>
@@ -189,7 +189,7 @@
         <zstd.version>1.5.7-4</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <jjwt.version>0.12.7</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
 
@@ -203,10 +203,10 @@
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <mockito.version>5.19.0</mockito.version>
-        <restassured.version>5.5.5</restassured.version>
+        <restassured.version>5.5.6</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <testcontainers.opensearch.version>2.1.3</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>3.0.2</testcontainers.opensearch.version>
         <graalvm.version>24.2.2</graalvm.version>
 
         <!-- Nodejs dependencies -->
@@ -298,6 +298,11 @@
                 <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-storage</artifactId>
                 <version>${gcs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-classes</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -421,12 +426,14 @@
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
+                <artifactId>okhttp-bom</artifactId>
                 <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-tls</artifactId>
+                <artifactId>okhttp-jvm</artifactId><!-- This one is not in the bom as of 5.0.0 -->
                 <version>${okhttp.version}</version>
             </dependency>
             <dependency>
