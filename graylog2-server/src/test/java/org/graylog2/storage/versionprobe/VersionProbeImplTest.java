@@ -241,6 +241,7 @@ class VersionProbeImplTest {
                 secret,
                 Duration.seconds(60),
                 Duration.seconds(30),
+                Duration.seconds(30),
                 useJwtAuthentication,
                 Clock.systemDefaultZone()
         ).get();

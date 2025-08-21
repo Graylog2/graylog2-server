@@ -19,6 +19,7 @@ package org.graylog2.inputs.syslog.tcp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.TooLongFrameException;
 import org.junit.After;
@@ -113,5 +114,19 @@ public class SyslogTCPFramingRouterHandlerTest {
         assertThat(channel.writeInbound(emptyBuffer)).isTrue();
         assertThat((ByteBuf) channel.readInbound()).isEqualTo(emptyBuffer);
         assertThat((ByteBuf) channel.readInbound()).isNull();
+    }
+
+    @Test
+    public void testRetainedBufferReleasedDuringException() {
+        // Creates an initial reference count of 1
+        final ByteBuf buf = Unpooled.copiedBuffer("2025-07-29 12:34:56 myhost myapp: This is a test syslog message\n", StandardCharsets.US_ASCII);
+        assertThat(buf.refCnt()).isNotZero();
+
+        // Trying to decode aboves msg throws an exception
+        assertThatExceptionOfType(DecoderException.class)
+                .isThrownBy(() -> channel.writeInbound(buf));
+
+        // Buffer is properly released even after running into an exception
+        assertThat(buf.refCnt()).isZero();
     }
 }

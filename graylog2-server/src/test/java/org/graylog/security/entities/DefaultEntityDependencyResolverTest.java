@@ -17,11 +17,13 @@
 package org.graylog.security.entities;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.GraphBuilder;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.DBGrantService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -46,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("UnstableApiUsage")
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
@@ -83,7 +86,9 @@ class DefaultEntityDependencyResolverTest {
         when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt));
 
         final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
-        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(streamDescriptor));
+        final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
+        dependencyGraph.addNode(streamDescriptor);
+        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
             GRN grnArg = a.getArgument(0);
@@ -108,7 +113,9 @@ class DefaultEntityDependencyResolverTest {
 
         when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
         final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
-        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(streamDescriptor));
+        final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
+        dependencyGraph.addNode(streamDescriptor);
+        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
             GRN grnArg = a.getArgument(0);
@@ -139,7 +146,9 @@ class DefaultEntityDependencyResolverTest {
         when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt, streamRefExcerpt));
 
         final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_REF_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
-        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(streamDescriptor));
+        final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
+        dependencyGraph.addNode(streamDescriptor);
+        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
             GRN grnArg = a.getArgument(0);
@@ -163,11 +172,41 @@ class DefaultEntityDependencyResolverTest {
     void resolveEventProcedureDependency() {
         final EntityDescriptor definitionDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_DEFINITION_V1).id(ModelId.of("54e3deadbeefdeadbeefafff")).build();
         final EntityDescriptor procedureDescriptor = EntityDescriptor.builder().type(ModelTypes.EVENT_PROCEDURE_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
-        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(definitionDescriptor, procedureDescriptor));
+        final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
+        dependencyGraph.addNode(definitionDescriptor);
+        dependencyGraph.putEdge(definitionDescriptor, procedureDescriptor);
+        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         final GRN definitionGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
         grnRegistry.registerType(GRNType.create("event_procedure"));
         final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(definitionGrn);
         assertThat(missingDependencies).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Try to resolve with an output dependency")
+    void resolveWithOutputDependency() {
+        final var output1 = EntityDescriptor.builder().type(ModelTypes.OUTPUT_V1).id(ModelId.of("output-1-id")).build();
+        final var output2 = EntityDescriptor.builder().type(ModelTypes.OUTPUT_V1).id(ModelId.of("output-2-id")).build();
+        final var stream = EntityDescriptor.builder().type(ModelTypes.STREAM_V1).id(ModelId.of("stream-id")).build();
+        // just for testing purposes, let's assume we'd allow event definitions to depend directly on outputs
+        final var dashboard = EntityDescriptor.builder().type(ModelTypes.EVENT_DEFINITION_V1).id(ModelId.of("event-definition-id")).build();
+
+        // we'll resolve this dependency graph for whatever entity we pass in
+        final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
+        dependencyGraph.addNode(stream);
+        dependencyGraph.addNode(dashboard);
+        dependencyGraph.putEdge(stream, output1);
+        dependencyGraph.putEdge(dashboard, output2);
+        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+
+        // output1 should be ignored because it is only a dependency of the stream
+        final var dependencies = entityDependencyResolver.resolve(grnRegistry.newGRN(GRNTypes.DASHBOARD, "dashboard-id"));
+        assertThat(dependencies)
+                .extracting(org.graylog.security.entities.EntityDescriptor::id)
+                .containsExactlyInAnyOrder(grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, "event-definition-id"),
+                        grnRegistry.newGRN(GRNTypes.STREAM, "stream-id"),
+                        grnRegistry.newGRN(GRNTypes.OUTPUT, "output-2-id")
+                );
     }
 }

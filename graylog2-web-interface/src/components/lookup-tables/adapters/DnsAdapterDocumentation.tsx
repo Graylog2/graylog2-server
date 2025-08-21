@@ -17,6 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { MantineAccordion } from 'components/bootstrap';
+
 const StyledPre = styled.pre(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
@@ -102,50 +104,89 @@ const DnsAdapterDocumentation = () => {
   "ttl": 200000
 }`;
 
+  const accordionItems = [
+    {
+      value: 'ipv4',
+      label: 'Resolve hostname to IPv4 address (A)',
+      content: (
+        <div>
+          <p style={styleMarginBottom}>
+            Returns both a <code>single_value</code> containing one of the IPv4 addresses that the hostname resolves to,
+            and a <code>multi_value</code> containing all IPv4 addresses that the hostname resolves to. Input for this
+            type must be a pure domain name (eg. <code>api.example.com</code>).
+          </p>
+          <StyledPre>{aResponse}</StyledPre>
+        </div>
+      ),
+    },
+    {
+      value: 'ipv6',
+      label: 'Resolve hostname to IPv6 address (AAAA)',
+      content: (
+        <div>
+          <p style={styleMarginBottom}>
+            Returns both a <code>single_value</code> containing one of the IPv6 addresses that the hostname resolves to,
+            and a <code>multi_value</code> containing all IPv6 addresses that the hostname resolves to. Input for this
+            type must be a pure domain name (eg. <code>api.example.com</code>).
+          </p>
+          <StyledPre>{aaaaResponse}</StyledPre>
+        </div>
+      ),
+    },
+    {
+      value: 'ipv4&ipv6',
+      label: 'Resolve hostname to IPv4 and IPv6 address (A and AAAA)',
+      content: (
+        <div>
+          <p style={styleMarginBottom}>
+            Returns both a <code>single_value</code> containing one of the IPv4 or IPv6 addresses that the hostname
+            resolves to (will return IPv4 if available), and a <code>multi_value</code> containing all IPv4 and IPv6
+            addresses that the hostname resolves to. Input for this type must be a pure domain name (eg.{' '}
+            <code>api.example.com</code>).
+          </p>
+          <StyledPre>{aAndAaaaResponse}</StyledPre>
+        </div>
+      ),
+    },
+    {
+      value: 'ptr',
+      label: 'Reverse lookup (PTR)',
+      content: (
+        <div>
+          <p style={styleMarginBottom}>
+            Returns a <code>single_value</code> containing the PTR value if defined for the IP address. The{' '}
+            <code>domain</code> field displays the domain name (with no subdomains). The <code>full_domain</code> field
+            displays the full un-trimmed host name/PTR value. The input for this type must be a pure IPv4 or IPv6
+            address (eg. <code>10.0.0.1</code> or <code>2622:f3b0:4000:812::200c</code>).
+          </p>
+          <StyledPre>{ptrResponse}</StyledPre>
+        </div>
+      ),
+    },
+    {
+      value: 'txt',
+      label: 'Text lookup (TXT)',
+      content: (
+        <div>
+          <p style={styleMarginBottom}>
+            Returns a <code>multi_value</code> with all TXT records defined for the hostname. Input for this type must
+            be a pure domain name (eg. <code>api.example.com</code>).
+          </p>
+          <StyledPre>{txtResponse}</StyledPre>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <h3 style={styleMarginBottom}>Configuration</h3>
 
       <h5 style={styleMarginBottom}>DNS Lookup Type</h5>
 
-      <p style={styleMarginBottom}>
-        <strong>Resolve hostname to IPv4 address (A)</strong>: Returns both a <code>single_value</code> containing one
-        of the IPv4 addresses that the hostname resolves to, and a <code>multi_value</code> containing all IPv4
-        addresses that the hostname resolves to. Input for this type must be a pure domain name (eg.{' '}
-        <code>api.example.com</code>).
-      </p>
-      <StyledPre>{aResponse}</StyledPre>
+      <MantineAccordion accordionItems={accordionItems} defaultValue="ipv4" />
 
-      <p style={styleMarginBottom}>
-        <strong>Resolve hostname to IPv6 address (AAAA)</strong>: Returns both a <code>single_value</code> containing
-        one of the IPv6 addresses that the hostname resolves to, and a <code>multi_value</code> containing all IPv6
-        addresses that the hostname resolves to. Input for this type must be a pure domain name (eg.{' '}
-        <code>api.example.com</code>).
-      </p>
-      <StyledPre>{aaaaResponse}</StyledPre>
-
-      <p style={styleMarginBottom}>
-        <strong>Resolve hostname to IPv4 and IPv6 address (A and AAAA)</strong>: Returns both a{' '}
-        <code>single_value</code> containing one of the IPv4 or IPv6 addresses that the hostname resolves to (will
-        return IPv4 if available), and a <code>multi_value</code> containing all IPv4 and IPv6 addresses that the
-        hostname resolves to. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).
-      </p>
-      <StyledPre>{aAndAaaaResponse}</StyledPre>
-
-      <p style={styleMarginBottom}>
-        <strong>Reverse lookup (PTR)</strong>: Returns a <code>single_value</code> containing the PTR value if defined
-        for the IP address. The <code>domain</code> field displays the domain name (with no subdomains). The{' '}
-        <code>full_domain</code> field displays the full un-trimmed host name/PTR value. The input for this type must be
-        a pure IPv4 or IPv6 address (eg. <code>10.0.0.1</code> or <code>2622:f3b0:4000:812::200c</code>).
-      </p>
-      <StyledPre>{ptrResponse}</StyledPre>
-
-      <p style={styleMarginBottom}>
-        <strong>Text lookup (TXT)</strong>: Returns a <code>multi_value</code> with all TXT records defined for the
-        hostname. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).
-      </p>
-      <StyledPre>{txtResponse}</StyledPre>
-
+      <hr />
       <h5 style={styleMarginBottom}>DNS Server IP Addresses</h5>
 
       <p style={styleMarginBottom}>

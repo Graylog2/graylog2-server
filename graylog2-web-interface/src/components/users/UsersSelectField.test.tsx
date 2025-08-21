@@ -59,10 +59,7 @@ describe('<UsersSelectField>', () => {
     renderUSF('');
     await act(() => mockLoadUserPaginatedPromise.then());
 
-    const select = screen.getByText(/select user\(s\)\.\.\./i);
-    await selectEvent.openMenu(select);
-
-    await selectEvent.select(select, 'admin (Administrator)');
+    await selectEvent.chooseOption('select user', 'admin (Administrator)');
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith('admin'));
   });
