@@ -94,6 +94,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PasswordComplexityConfig;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserConfiguration;
@@ -130,6 +131,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
+import static org.graylog2.users.PasswordComplexityConfig.VALID_SPECIAL_CHARACTERS;
 
 @RequiresAuthentication
 @Path("/users")
@@ -163,8 +165,10 @@ public class UsersResource extends RestResource {
                          AccessTokenService accessTokenService,
                          RoleService roleService,
                          MongoDBSessionService sessionService,
-                         UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager,
-                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService) {
+                         UserSessionTerminationService sessionTerminationService,
+                         DefaultSecurityManager securityManager,
+                         GlobalAuthServiceConfig globalAuthServiceConfig,
+                         ClusterConfigService clusterConfigService) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -347,6 +351,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
+        validatePasswordComplexity(cr.password(), clusterConfigService);
 
         // Create user.
         User user = userManagementService.create();
@@ -380,6 +385,33 @@ public class UsersResource extends RestResource {
                 .build(user.getName());
 
         return Response.created(userUri).build();
+    }
+
+    private void validatePasswordComplexity(String password, ClusterConfigService clusterConfigService) {
+        final PasswordComplexityConfig config = clusterConfigService.get(PasswordComplexityConfig.class);
+        if (config == null) {
+            String msg = "No password complexity configuration found - unable to validate password security.";
+            LOG.error(msg);
+            throw new BadRequestException(msg);
+        }
+        if (password == null || password.isBlank()) {
+            throw new BadRequestException("Password cannot be empty.");
+        }
+        if (password.length() < config.minLength()) {
+            throw new BadRequestException("Password must be at least " + config.minLength() + " characters long.");
+        }
+        if (config.requireUppercase() && password.chars().noneMatch(Character::isUpperCase)) {
+            throw new BadRequestException("Password must contain at least one uppercase letter.");
+        }
+        if (config.requireLowercase() && password.chars().noneMatch(Character::isLowerCase)) {
+            throw new BadRequestException("Password must contain at least one lowercase letter.");
+        }
+        if (config.requireNumbers() && password.chars().noneMatch(Character::isDigit)) {
+            throw new BadRequestException("Password must contain at least one number.");
+        }
+        if (config.requireSpecialCharacters() && password.chars().noneMatch(ch -> VALID_SPECIAL_CHARACTERS.indexOf(ch) >= 0)) {
+            throw new BadRequestException("Password must contain at least one special character from: " + VALID_SPECIAL_CHARACTERS);
+        }
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
@@ -652,6 +684,7 @@ public class UsersResource extends RestResource {
         }
 
         if (changeAllowed) {
+            validatePasswordComplexity(cr.password(), clusterConfigService);
             if (checkOldPassword) {
                 userManagementService.changePassword(user, cr.oldPassword(), cr.password());
             } else {
