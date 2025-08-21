@@ -420,7 +420,7 @@ const TemplateForm = ({
                     />
                     {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>
-                        <DataTieringConfiguration valuesPrefix="index_set_config" />
+                        <DataTieringConfiguration valuesPrefix="index_set_config" hasFieldRestrictionPermission={false}/>
                       </ConfigSegment>
                     ) : (
                       <ConfigSegment>

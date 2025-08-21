@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
+import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
 import org.graylog2.indexer.indexset.fields.UseLegacyRotationField;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
 import org.graylog2.validation.ValidObjectId;
@@ -37,9 +38,10 @@ import java.util.Set;
 @JsonDeserialize(builder = IndexSetCreationRequest.Builder.class)
 public abstract class IndexSetCreationRequest implements
         ExtendedIndexSetFields,
-        UseLegacyRotationField {
+        UseLegacyRotationField,
+        FieldRestrictionsField {
 
-    public static final String INDEX_SET_TEMPLATE_ID = "index_set_template_id";
+    private static final String INDEX_SET_TEMPLATE_ID = "index_set_template_id";
 
     @Nullable
     @JsonProperty(INDEX_SET_TEMPLATE_ID)
@@ -82,7 +84,8 @@ public abstract class IndexSetCreationRequest implements
     @AutoValue.Builder
     public abstract static class Builder implements
             ExtendedIndexSetFieldsBuilder<Builder>,
-            UseLegacyRotationFieldBuilder<Builder> {
+            UseLegacyRotationFieldBuilder<Builder>,
+            FieldRestrictionsFieldBuilder<Builder> {
 
         @JsonCreator
         public static Builder builder() {

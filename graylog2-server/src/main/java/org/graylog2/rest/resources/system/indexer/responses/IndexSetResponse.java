@@ -34,9 +34,9 @@ public abstract class IndexSetResponse implements
         UseLegacyRotationField,
         FieldRestrictionsField {
 
-    public static final String FIELD_DEFAULT = "default";
-    public static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
-    public static final String FIELD_DATA_TIERING_STATUS = "data_tiering_status";
+    private static final String FIELD_DEFAULT = "default";
+    private static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
+    private static final String FIELD_DATA_TIERING_STATUS = "data_tiering_status";
 
 
     @JsonProperty(FIELD_DEFAULT)
