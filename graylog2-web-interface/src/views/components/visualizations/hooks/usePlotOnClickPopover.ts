@@ -40,11 +40,15 @@ const getBarElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => 
 };
 
 const getScatterMarkerElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
-  const { curveNumber, pointIndex } = pt;
-  const trace = graphDiv.querySelectorAll('.scatterlayer .trace')[curveNumber] as HTMLElement | undefined;
+  const {
+    fullData: { uid },
+    pointIndex,
+  } = pt;
+
+  const trace = graphDiv.querySelector(`.scatterlayer .trace.trace${uid}`) as HTMLElement | undefined;
   if (!trace) return null;
 
-  return trace.querySelectorAll('.points .point')[pointIndex!] ?? null;
+  return trace.querySelectorAll('.points .point')[pointIndex] ?? null;
 };
 
 const getPieSliceElement = (_: HTMLElement, __: PlotDatum, targetEl: Element): Element | null => targetEl;
@@ -198,6 +202,26 @@ const pickNearestElementAnchor = (
   const inside = candidates.find(
     ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
+  console.log({
+    inside,
+    candidates,
+  });
+
+  const candidatesWithDistances = candidates.map((candidate) => {
+    const rect = candidate.rect as DOMRect;
+    let dx = 0;
+    if (clientX < rect.left) dx = rect.left - clientX;
+    else if (clientX > rect.right) dx = clientX - rect.right;
+    let dy = 0;
+    if (clientY < rect.top) dy = rect.top - clientY;
+    else if (clientY > rect.bottom) dy = clientY - rect.bottom;
+    const d = Math.hypot(dx, dy);
+
+    return { d, candidate };
+  });
+
+  console.log({ candidatesWithDistances });
+
   const picked =
     inside ??
     minBy(candidates, ({ rect }) => {
