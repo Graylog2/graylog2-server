@@ -37,6 +37,7 @@ const Title = styled.div`
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
+
   &:hover {
     color: ${({ theme }) => theme.colors.link.hover};
     text-decoration: underline;
