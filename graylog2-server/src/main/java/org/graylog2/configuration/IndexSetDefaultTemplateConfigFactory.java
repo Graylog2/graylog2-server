@@ -20,17 +20,17 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.migrations.MaintenanceStrategiesHelper;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.joda.time.Duration;
 
 public class IndexSetDefaultTemplateConfigFactory {
 
-    final private ElasticsearchConfiguration elasticsearchConfiguration;
-    final private MaintenanceStrategiesHelper maintenanceStrategiesHelper;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
+    private final MaintenanceStrategiesHelper maintenanceStrategiesHelper;
 
     @Inject
     public IndexSetDefaultTemplateConfigFactory(ElasticsearchConfiguration elasticsearchConfiguration, MaintenanceStrategiesHelper maintenanceStrategiesHelper) {
@@ -49,7 +49,7 @@ public class IndexSetDefaultTemplateConfigFactory {
                 .replicas(elasticsearchConfiguration.getReplicas())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
+                .fieldTypeRefreshInterval(new Duration(elasticsearchConfiguration.getIndexFieldTypeRefreshInterval().toMilliseconds()))
                 .rotationStrategyClass(rotationConfig.left)
                 .rotationStrategyConfig(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)
