@@ -226,9 +226,10 @@ const IndexSetConfigurationForm = ({
 
   const detailsSectionRenderable = (): boolean => {
     let tmp = false;
-    const detailsFields = [
-      'index_prefix',
-      'index_analyzer',
+
+    const detailsFieldsCreateAdditions = ['index_prefix', 'index_analyzer'];
+
+    const detailsFieldsEdit = [
       'shards',
       'replicas',
       'index_optimization_max_num_segments',
@@ -236,7 +237,9 @@ const IndexSetConfigurationForm = ({
       'field_type_refresh_interval',
     ];
 
-    detailsFields.forEach((field) => {
+    const checkFields = create ? [...detailsFieldsEdit, ...detailsFieldsCreateAdditions] : detailsFieldsEdit;
+
+    checkFields.forEach((field) => {
       if (!hiddenFields.includes(field)) tmp = true;
     });
 

@@ -82,14 +82,6 @@ const IndexSetRotationRetentionConfigurationSection = ({
   const dataTieringRenderable = (): boolean => {
     if (hiddenFields.includes('data_tiering') && !hasFieldRestrictionPermission) return false;
 
-    if (
-      hiddenFields.includes('data_tiering.index_lifetime_max') &&
-      hiddenFields.includes('data_tiering.index_lifetime_min') &&
-      hiddenFields.includes('data_tiering.archive_before_deletion') &&
-      !hasFieldRestrictionPermission
-    )
-      return false;
-
     if (isCloud && !enableDataTieringCloud) return false;
 
     return true;

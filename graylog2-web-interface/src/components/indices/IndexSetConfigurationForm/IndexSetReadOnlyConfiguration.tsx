@@ -62,7 +62,7 @@ const IndexSetReadOnlyConfiguration = ({
           help={indexPrefixHelp}
           validate={_validateIndexPrefix}
           required
-          disabled={immutableFields.includes('index_prefix')}
+          disabled={immutableFields.includes('index_prefix') && !hasFieldRestrictionPermission}
         />
         <FormikInput
           type="text"
@@ -71,7 +71,7 @@ const IndexSetReadOnlyConfiguration = ({
           name="index_analyzer"
           help="Elasticsearch analyzer for this index set."
           required
-          disabled={immutableFields.includes('index_analyzer')}
+          disabled={immutableFields.includes('index_analyzer') && !hasFieldRestrictionPermission}
         />
       </HiddenFieldWrapper>
     </span>
