@@ -22,27 +22,19 @@ import { CacheCreate } from 'components/lookup-tables';
 import { LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 
 type Props = {
-  onClose: () => void,
-}
+  onClose: () => void;
+};
 
 const CacheCreateModal = ({ onClose, validationErrors }: Props & { validationErrors: any }) => (
   <Modal show fullScreen onHide={onClose}>
     <Modal.Header>
       <Modal.Title>Create Cache</Modal.Title>
     </Modal.Header>
-    <CacheCreate
-      saved={onClose}
-      onCancel={onClose}
-      validationErrors={validationErrors}
-    />
+    <CacheCreate saved={onClose} onCancel={onClose} validationErrors={validationErrors} />
   </Modal>
 );
 
-export default connect(
-  CacheCreateModal,
-  { cachesStore: LookupTableCachesStore },
-  ({ cachesStore, ...otherProps }) => ({
-    ...otherProps,
-    ...cachesStore,
-  }),
-);
+export default connect(CacheCreateModal, { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
+  ...otherProps,
+  ...cachesStore,
+}));

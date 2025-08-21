@@ -78,7 +78,7 @@ const Grid = styled.div(
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: 1fr;
-    grid-gap: ${theme.spacings.md};
+    gap: ${theme.spacings.md};
   `,
 );
 
