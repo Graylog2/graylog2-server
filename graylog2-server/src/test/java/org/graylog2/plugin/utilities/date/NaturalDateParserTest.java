@@ -74,7 +74,7 @@ public class NaturalDateParserTest {
             {"monday at 7", "07:00:00"}
     };
 
-    final String[][] multipleDaytestsThatAlignToAGivenTime =  {
+    final String[][] multipleDaytestsThatAlignToAGivenTime = {
             {"monday to friday at 7", "07:00:00"},
             {"monday to friday at 7:59", "07:59:00"},
             {"monday to friday at 7:59:59", "07:59:59"}
@@ -212,8 +212,8 @@ public class NaturalDateParserTest {
     }
 
     /**
-     *  Bug from https://github.com/joestelmach/natty/issues
-     *  Test is ignored because it fails, test can be used in the future to check if it's solved
+     * Bug from https://github.com/joestelmach/natty/issues
+     * Test is ignored because it fails, test can be used in the future to check if it's solved
      */
     @Test
     @Disabled
@@ -275,7 +275,7 @@ public class NaturalDateParserTest {
 
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(startOfToday);
         assertThat(result.getTo()).as("should differ from").isNotEqualTo(startOfToday);
-     }
+    }
 
     @Test
     public void testParseLastMonday() throws Exception {
@@ -366,7 +366,7 @@ public class NaturalDateParserTest {
     public void testParseAlignToStartOfDay() throws Exception {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
-        for(String test: testsThatAlignToStartOfDay) {
+        for (String test : testsThatAlignToStartOfDay) {
             NaturalDateParser.Result result = naturalDateParser.parse(test);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
@@ -385,7 +385,7 @@ public class NaturalDateParserTest {
     public void multipleDaytestParseAlignToAGivenTime() throws Exception {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
-        for(String[] test: multipleDaytestsThatAlignToAGivenTime) {
+        for (String[] test : multipleDaytestsThatAlignToAGivenTime) {
             NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
@@ -399,12 +399,12 @@ public class NaturalDateParserTest {
     public void singleDaytestParseAlignToAGivenTime() throws Exception {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
-        for(String[] test: singleDaytestsThatAlignToAGivenTime) {
+        for (String[] test : singleDaytestsThatAlignToAGivenTime) {
             NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
 
-            assertThat(df.print(result.getFrom())).as("time part of date should equal "+ test[1] + " in").isEqualTo(test[1]);
+            assertThat(df.print(result.getFrom())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
         }
     }
 
@@ -413,7 +413,7 @@ public class NaturalDateParserTest {
         final NaturalDateParser naturalDateParser = new NaturalDateParser("Antarctica/Palmer");
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
-        for(String test: testsThatAlignToStartOfDay) {
+        for (String test : testsThatAlignToStartOfDay) {
             NaturalDateParser.Result result = naturalDateParser.parse(test);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
