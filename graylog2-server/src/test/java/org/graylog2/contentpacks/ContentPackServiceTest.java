@@ -140,7 +140,10 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, WithAuthorizationExtension.class})
@@ -197,6 +200,8 @@ public class ContentPackServiceTest {
     Configuration configuration;
     @Mock
     EntityRegistrar entityRegistrar;
+    @Mock
+    ContentPackInstallationHook contentPackInstallationHook;
 
     private ContentPackService contentPackService;
 
@@ -223,7 +228,7 @@ public class ContentPackServiceTest {
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService, Set.of());
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService, Set.of(contentPackInstallationHook));
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -292,6 +297,8 @@ public class ContentPackServiceTest {
         when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
 
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+
+        verify(contentPackInstallationHook, times(1)).afterInstallation(any(ContentPackInstallation.class), eq(EntityShareRequest.EMPTY), any(UserContext.class));
     }
 
     @Test
