@@ -23,9 +23,9 @@ import com.mongodb.client.model.UnwindOptions;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog2.database.entities.DBEntitySourceService;
-import org.graylog2.database.entities.EntitySource;
 import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.entities.source.DBEntitySourceService;
+import org.graylog2.database.entities.source.EntitySource;
 
 import java.util.List;
 

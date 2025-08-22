@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.entities;
+package org.graylog2.database.entities.source;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -28,10 +30,10 @@ import org.mongojack.ObjectId;
 import java.util.Optional;
 
 @AutoValue
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = EntitySource.Builder.class)
 public abstract class EntitySource implements MongoEntity {
     public static final String USER_DEFINED = "USER_DEFINED";
-    public static final String CONTENT_PACK = "CONTENT_PACK";
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_SOURCE = "source";
@@ -40,7 +42,7 @@ public abstract class EntitySource implements MongoEntity {
 
     @Nullable
     @ObjectId
-    @JsonProperty(value = FIELD_ENTITY_ID, access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(FIELD_ENTITY_ID)
     public abstract String entityId();
 
     @JsonProperty(FIELD_SOURCE)
@@ -49,12 +51,9 @@ public abstract class EntitySource implements MongoEntity {
     @JsonProperty(FIELD_PARENT_ID)
     public abstract Optional<String> parentId();
 
+    @JsonIgnore
     public boolean isCloned() {
         return parentId().isPresent();
-    }
-
-    public static EntitySource defaultSource() {
-        return Builder.create().build();
     }
 
     public static Builder builder() {

@@ -70,6 +70,8 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -118,6 +120,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
     private final EntitySharesService entitySharesService;
+    private final EntitySourceService entitySourceService;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -129,7 +132,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
                          AuditEventSender auditEventSender,
                          ObjectMapper objectMapper,
-                         EntitySharesService entitySharesService) {
+                         EntitySharesService entitySharesService,
+                         EntitySourceService entitySourceService) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -141,6 +145,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.entitySharesService = entitySharesService;
+        this.entitySourceService = entitySourceService;
     }
 
     @GET
@@ -232,6 +237,28 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) {
+        return createView(createEntityRequest, userContext, searchUser);
+    }
+
+    @POST
+    @ApiOperation("Duplicate an existing view")
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    @Path("{id}")
+    public ViewDTO duplicate(@ApiParam(name = "id") @PathParam("id") @NotEmpty String existingViewId,
+                             @ApiParam @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
+                             @Context UserContext userContext,
+                             @Context SearchUser searchUser) {
+        final ViewDTO dto = createView(createEntityRequest, userContext, searchUser);
+        // Save a link to the original view this one was cloned from
+        entitySourceService.create(EntitySource.builder()
+                .entityId(dto.id())
+                .parentId(existingViewId)
+                .build()
+        );
+        return dto;
+    }
+
+    private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
         final ViewDTO dto = createEntityRequest.entity();
         if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
@@ -396,6 +423,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
 
         dbService.delete(id);
+        entitySourceService.deleteByEntityId(id);
         triggerDeletedEvent(view);
         recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
         return view;

@@ -18,6 +18,7 @@ package org.graylog2.database.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.database.MongoEntity;
+import org.graylog2.database.entities.source.EntitySource;
 
 import java.util.Optional;
 

@@ -14,29 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.entities;
+package org.graylog2.database.entities.source;
 
 import jakarta.inject.Inject;
-import org.graylog2.database.MongoCollection;
-import org.graylog2.database.MongoCollections;
 
-import static org.graylog2.database.utils.MongoUtils.objectIdEq;
+public class EntitySourceService {
 
-public class DBEntitySourceService {
-
-    public static final String COLLECTION_NAME = "entity_source";
-    private final MongoCollection<EntitySource> collection;
+    private final DBEntitySourceService dbEntitySourceService;
 
     @Inject
-    public DBEntitySourceService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection(COLLECTION_NAME, EntitySource.class);
+    public EntitySourceService(DBEntitySourceService dbEntitySourceService) {
+        this.dbEntitySourceService = dbEntitySourceService;
     }
 
     public void create(EntitySource entitySource) {
-        collection.insertOne(entitySource);
+        dbEntitySourceService.create(entitySource);
     }
 
     public void deleteByEntityId(String entityId) {
-        collection.deleteMany(objectIdEq(EntitySource.FIELD_ENTITY_ID, entityId));
+        dbEntitySourceService.deleteByEntityId(entityId);
     }
 }
