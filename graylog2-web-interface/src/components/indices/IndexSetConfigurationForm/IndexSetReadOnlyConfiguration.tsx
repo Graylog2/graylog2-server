@@ -16,7 +16,6 @@
  */
 import React from 'react';
 
-import HiddenFieldWrapper from 'components/indices/IndexSetConfigurationForm/HiddenFieldWrapper';
 import { FormikInput } from 'components/common';
 
 const _validateIndexPrefix = (value: string) => {
@@ -53,17 +52,16 @@ const IndexSetReadOnlyConfiguration = ({
 
   return (
     <span>
-      <HiddenFieldWrapper hiddenFields={hiddenFields} isPermitted={hasFieldRestrictionPermission}>
-        <FormikInput
-          type="text"
-          id="index-prefix"
-          label="Index prefix"
-          name="index_prefix"
-          help={indexPrefixHelp}
-          validate={_validateIndexPrefix}
-          required
-          disabled={immutableFields.includes('index_prefix') && !hasFieldRestrictionPermission}
-        />
+      <FormikInput
+        type="text"
+        id="index-prefix"
+        label="Index prefix"
+        name="index_prefix"
+        help={indexPrefixHelp}
+        validate={_validateIndexPrefix}
+        required
+      />
+      {(!hiddenFields.includes('index_analyzer') || hasFieldRestrictionPermission) && (
         <FormikInput
           type="text"
           id="index-analyzer"
@@ -73,7 +71,7 @@ const IndexSetReadOnlyConfiguration = ({
           required
           disabled={immutableFields.includes('index_analyzer') && !hasFieldRestrictionPermission}
         />
-      </HiddenFieldWrapper>
+      )}
     </span>
   );
 };

@@ -210,6 +210,25 @@ const IndexSetConfigurationForm = ({
     setFieldTypeRefreshIntervalUnit(unit);
   };
 
+  const detailsSectionRenderable = (): boolean => {
+    if (create) return true;
+    let tmp = false;
+
+    const detailsFieldsEdit = [
+      'shards',
+      'replicas',
+      'index_optimization_max_num_segments',
+      'index_optimization_disabled',
+      'field_type_refresh_interval',
+    ];
+
+    detailsFieldsEdit.forEach((field) => {
+      if (!hiddenFields.includes(field)) tmp = true;
+    });
+
+    return tmp;
+  };
+
   if (!indexSet) return null;
 
   const onCancel = () => history.push(cancelLink);
@@ -222,28 +241,6 @@ const IndexSetConfigurationForm = ({
     }
 
     return indexSet as unknown as IndexSetFormValues;
-  };
-
-  const detailsSectionRenderable = (): boolean => {
-    let tmp = false;
-
-    const detailsFieldsCreateAdditions = ['index_prefix', 'index_analyzer'];
-
-    const detailsFieldsEdit = [
-      'shards',
-      'replicas',
-      'index_optimization_max_num_segments',
-      'index_optimization_disabled',
-      'field_type_refresh_interval',
-    ];
-
-    const checkFields = create ? [...detailsFieldsEdit, ...detailsFieldsCreateAdditions] : detailsFieldsEdit;
-
-    checkFields.forEach((field) => {
-      if (!hiddenFields.includes(field)) tmp = true;
-    });
-
-    return tmp;
   };
 
   return (
@@ -384,25 +381,21 @@ const IndexSetConfigurationForm = ({
                     selectedRetentionSegment={selectedRetentionSegment}
                     setSelectedRetentionSegment={setSelectedRetentionSegment}
                   />
-                  {isIndexFieldTypeChangeAllowed(indexSet) &&
-                    (!hiddenFields?.includes('field_type_profile') || hasFieldRestrictionPermission) && (
-                      <Section title="Field Type Profile">
-                        <Field name="field_type_profile">
-                          {({ field: { name, value } }) => (
-                            <IndexSetProfileConfiguration
-                              value={value}
-                              onChange={(profileId) => {
-                                setFieldValue(name, profileId);
-                              }}
-                              name={name}
-                              disabled={
-                                immutableFields?.includes('field_type_profile') && !hasFieldRestrictionPermission
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Section>
-                    )}
+                  {isIndexFieldTypeChangeAllowed(indexSet) && (
+                    <Section title="Field Type Profile">
+                      <Field name="field_type_profile">
+                        {({ field: { name, value } }) => (
+                          <IndexSetProfileConfiguration
+                            value={value}
+                            onChange={(profileId) => {
+                              setFieldValue(name, profileId);
+                            }}
+                            name={name}
+                          />
+                        )}
+                      </Field>
+                    </Section>
+                  )}
                   <Section title="Important Note">
                     <Alert bsStyle="info">
                       These changes do not apply to any existing indices. They only apply to newly created indices. To

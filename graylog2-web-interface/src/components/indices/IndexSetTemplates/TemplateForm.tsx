@@ -340,12 +340,6 @@ const TemplateForm = ({
                   </Section>
                   <Section title="Details">
                     <FormikInput
-                      name="index_set_config.index_prefix"
-                      label="Index Prefix"
-                      id="index-set-template-index-prefix"
-                      help="Index Prefix"
-                    />
-                    <FormikInput
                       name="index_set_config.index_analyzer"
                       label="Index Analyzer"
                       id="index-set-template-index-analyzer"
