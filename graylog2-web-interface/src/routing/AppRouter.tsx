@@ -283,10 +283,10 @@ const AppRouter = () => {
             },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&
-            enableDataNodeMigration && {
-              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
-              element: <DataNodesMigrationPage />,
-            },
+              enableDataNodeMigration && {
+                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+                element: <DataNodesMigrationPage />,
+              },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },

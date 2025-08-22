@@ -81,16 +81,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <airline.version>3.1.0</airline.version>
         <amqp-client.version>5.26.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
@@ -159,12 +159,12 @@
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.121.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>4.12.0</okhttp.version>
+        <netty.version>4.2.4.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.72.Final</netty-tcnative-boringssl-static.version>
+        <okhttp.version>5.1.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.52.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.18.1</opentelemetry-instrumentation.version>
+        <opentelemetry.version>1.53.0</opentelemetry.version>
+        <opentelemetry-instrumentation.version>2.19.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -175,7 +175,7 @@
         <shiro.version>2.0.5</shiro.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>6.8.2</oshi.version>
+        <oshi.version>6.8.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
@@ -189,7 +189,7 @@
         <zstd.version>1.5.7-4</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <jjwt.version>0.12.6</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
 
@@ -202,11 +202,11 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
-        <mockito.version>5.18.0</mockito.version>
-        <restassured.version>5.5.5</restassured.version>
+        <mockito.version>5.19.0</mockito.version>
+        <restassured.version>5.5.6</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <testcontainers.opensearch.version>2.1.3</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>3.0.2</testcontainers.opensearch.version>
         <graalvm.version>24.2.2</graalvm.version>
 
         <!-- Nodejs dependencies -->
@@ -298,6 +298,11 @@
                 <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-storage</artifactId>
                 <version>${gcs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-classes</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -421,12 +426,14 @@
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
+                <artifactId>okhttp-bom</artifactId>
                 <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-tls</artifactId>
+                <artifactId>okhttp-jvm</artifactId><!-- This one is not in the bom as of 5.0.0 -->
                 <version>${okhttp.version}</version>
             </dependency>
             <dependency>
@@ -607,7 +614,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.11.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -662,7 +669,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.3.2</version>
+                    <version>4.9.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -794,7 +801,7 @@
                                     <version>[3.9.6,3.99.99]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[17.0,17.99]</version>
+                                    <version>[21.0,21.99]</version>
                                 </requireJavaVersion>
                                 <requireOS>
                                     <family>unix</family>
@@ -1000,7 +1007,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>

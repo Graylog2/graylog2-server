@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -63,25 +63,11 @@ const submitWidgetConfigForm = async () => {
   await userEvent.click(applyButton);
 };
 
-const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
-  const newFunctionSelect = screen.getAllByLabelText('Select a function')[elementIndex];
-  const newFieldSelect = screen.getAllByLabelText('Select a field')[elementIndex];
+const selectMetric = async (functionName: string, fieldName: string, elementIndex = 0) => {
+  const metricContainer = await screen.findByTestId(`metric-${elementIndex}`);
 
-  await act(async () => {
-    await selectEvent.openMenu(newFunctionSelect);
-  });
-
-  await act(async () => {
-    await selectEvent.select(newFunctionSelect, functionName);
-  });
-
-  await act(async () => {
-    await selectEvent.openMenu(newFieldSelect);
-  });
-
-  await act(async () => {
-    await selectEvent.select(newFieldSelect, fieldName);
-  });
+  await selectEvent.chooseOption('Select a function', functionName, { container: metricContainer });
+  await selectEvent.chooseOption('Select a field', fieldName, { container: metricContainer });
 };
 
 const extendedTimeout = applyTimeoutMultiplier(30000);
@@ -132,9 +118,7 @@ describe('AggregationWizard', () => {
 
       await addMetric();
 
-      const functionSelect = await screen.findByLabelText('Select a function');
-      await selectEvent.openMenu(functionSelect);
-      await selectEvent.select(functionSelect, 'Minimum');
+      await selectEvent.chooseOption('Select a function', 'Minimum');
 
       await screen.findByText('Field is required for function min.');
     },
@@ -218,17 +202,10 @@ describe('AggregationWizard', () => {
       renderSUT({ config, onChange: onChangeMock });
 
       await selectMetric('Percentile', 'http_method');
-      const percentileInput = await screen.findByLabelText('Select percentile');
 
       expect(screen.getByText('Percentile is required.')).toBeInTheDocument();
 
-      await act(async () => {
-        await selectEvent.openMenu(percentileInput);
-      });
-
-      await act(async () => {
-        await selectEvent.select(percentileInput, '50');
-      });
+      await selectEvent.chooseOption('Select percentile', '50');
 
       await submitWidgetConfigForm();
 
@@ -265,9 +242,7 @@ describe('AggregationWizard', () => {
 
       await selectMetric('Minimum', 'http_method', 1);
 
-      await act(async () => {
-        await submitWidgetConfigForm();
-      });
+      await submitWidgetConfigForm();
 
       const updatedConfig = config
         .toBuilder()
