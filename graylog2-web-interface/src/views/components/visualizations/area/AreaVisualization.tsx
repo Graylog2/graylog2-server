@@ -111,7 +111,7 @@ const AreaVisualization = makeVisualization(
           onClickMarker={onChartClick}
         />
         <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} />
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
         </OnClickPopoverWrapper>
       </>
     );

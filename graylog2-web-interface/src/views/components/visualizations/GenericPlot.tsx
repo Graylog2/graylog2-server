@@ -18,7 +18,8 @@ import * as React from 'react';
 import { useContext, useMemo, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import type { Layout } from 'plotly.js';
+import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
+import type Plotly from 'plotly.js/lib/core';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -96,11 +97,11 @@ type Props = {
   layout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string) => void;
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
-  onClickMarker?: (event: OnClickMarkerEvent) => void;
+  onClickMarker?: (event: PlotMouseEvent) => void;
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
-  onInitialized?: () => void;
+  onInitialized?: (figure: unknown, graphDiv: PlotlyHTMLElement) => void;
 };
 
 type Axis = {
@@ -216,7 +217,7 @@ const GenericPlot = ({
   onUnhoverMarker = () => {},
   onZoom = () => {},
   onAfterPlot = () => {},
-  onInitialized,
+  onInitialized = () => {},
 }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);

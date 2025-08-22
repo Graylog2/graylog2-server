@@ -47,7 +47,7 @@ export type Props = {
   plotLayout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string, userTimezone: string) => boolean;
   onClickMarker?: GenericPlotProps['onClickMarker'];
-  onInitialized?: (figure: Readonly<Plotly.Figure>, graphDiv: Plotly.PlotlyHTMLElement) => void;
+  onInitialized?: (figure: unknown, graphDiv: Plotly.PlotlyHTMLElement) => void;
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -100,7 +100,6 @@ const XYPlot = ({
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
-
   const layout: Partial<PlotLayout> = merge({}, defaultLayout, plotLayout);
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps

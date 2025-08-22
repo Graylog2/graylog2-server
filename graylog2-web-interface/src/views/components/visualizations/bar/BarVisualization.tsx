@@ -194,7 +194,7 @@ const BarVisualization = makeVisualization(
         />
         <OverflowingComponentsContextProvider>
           <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-            <CartesianOnClickPopoverDropdown clickPoint={clickPoint} />
+            <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
           </OnClickPopoverWrapper>
         </OverflowingComponentsContextProvider>
       </>

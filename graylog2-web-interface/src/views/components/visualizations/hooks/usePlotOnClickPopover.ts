@@ -15,22 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useRef, useState, useLayoutEffect, useCallback } from 'react';
-import type Plotly from 'plotly.js/lib/core';
 import type { PlotDatum } from 'plotly.js/lib/core';
-import type { PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
+import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import map from 'lodash/map';
 import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
 import minBy from 'lodash/minBy';
 
-type ClickPoint = PlotMouseEvent['points'][number];
-type Pos = { left: number; top: number } | null;
+export type ClickPoint = PlotMouseEvent['points'][number];
+export type Pos = { left: number; top: number } | null;
 type Rel = { x: number; y: number };
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
 /** ---------- DOM getters ---------- */
-const getBarElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
+const getBarElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
   const { curveNumber, pointIndex } = pt;
   const trace = graphDiv.querySelectorAll('.barlayer .trace')[curveNumber] as HTMLElement | undefined;
   if (!trace) return null;
@@ -39,9 +38,9 @@ const getBarElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => 
   return point?.querySelector('rect') ?? point?.querySelector('path') ?? null;
 };
 
-const getScatterMarkerElement = (graphDiv: HTMLElement, pt: PlotDatum): Element | null => {
+const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
   const {
-    fullData: { uid },
+    data: { uid },
     pointIndex,
   } = pt;
 
@@ -51,7 +50,7 @@ const getScatterMarkerElement = (graphDiv: HTMLElement, pt: PlotDatum): Element 
   return trace.querySelectorAll('.points .point')[pointIndex] ?? null;
 };
 
-const getPieSliceElement = (_: HTMLElement, __: PlotDatum, targetEl: Element): Element | null => targetEl;
+const getPieSliceElement = (_: HTMLElement, __: ClickPoint, targetEl: Element): Element | null => targetEl;
 
 /** ---------- math helpers ---------- */
 type Px = { x: number; y: number };
@@ -80,7 +79,7 @@ const projectT = (P: Px, A: Px, B: Px) => {
  * Convert a data-space coordinate (xVal, yVal) to **page pixel coordinates**
  * so we can compare against mouse clicks.
  */
-const dataToPagePx = (gd: any, pt: ClickPoint, xVal: any, yVal: any) => {
+const dataToPagePx = (gd: PlotlyHTMLElementWithInternals, pt: ClickPoint, xVal: any, yVal: any) => {
   const fl = gd._fullLayout;
 
   // Get the axis objects (may be stored differently depending on pt)
@@ -127,7 +126,7 @@ const useAnchorPosition = (anchor: Anchor | null, gdRef: React.RefObject<PlotlyH
     if (!anchor) {
       setPos(null);
 
-      return;
+      return null;
     }
 
     let prev = { left: NaN, top: NaN };
@@ -202,10 +201,6 @@ const pickNearestElementAnchor = (
   const inside = candidates.find(
     ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
-  console.log({
-    inside,
-    candidates,
-  });
 
   const candidatesWithDistances = candidates.map((candidate) => {
     const rect = candidate.rect as DOMRect;
@@ -276,11 +271,17 @@ const makeElementAnchor = (
  *  - px, py: projected point coordinates in page pixels
  *  - valuePx, valuePy: value point coordinates in page pixels
  */
-const getScatterLineElements = (gd: HTMLElement, click: Px, pt: PlotDatum) => {
+
+interface PlotlyHTMLElementWithInternals extends PlotlyHTMLElement {
+  _fullData?: any[];
+  _fullLayout?: any;
+}
+
+const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint) => {
   // Get the full data for this trace (array of x/y values)
-  const fd: any = pt.fullData ?? (gd as any)._fullData?.[pt.curveNumber];
-  const xs: any[] = fd?.x ?? [];
-  const ys: any[] = fd?.y ?? [];
+  const fd: PlotData = pt.data ?? (gd as PlotlyHTMLElementWithInternals)._fullData?.[pt.curveNumber];
+  const xs = fd?.x ?? [];
+  const ys = fd?.y ?? [];
 
   // Current index in the data array
   const i = (pt.pointIndex ?? pt.pointNumber ?? 0) as number;
@@ -317,10 +318,10 @@ const getScatterLineElements = (gd: HTMLElement, click: Px, pt: PlotDatum) => {
 };
 
 const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
-  const graphDiv = gd as unknown as HTMLElement;
+  const graphDiv = gd;
   const markerCandidates = compact(
     map(e.points, (pt) => {
-      const el = getScatterMarkerElement(graphDiv, pt as PlotDatum);
+      const el = getScatterMarkerElement(graphDiv, pt as ClickPoint);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
     }),
@@ -347,12 +348,12 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
 
 /** ---------- hook ---------- */
 const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap') => {
-  const gdRef = useRef<Plotly.PlotlyHTMLElement | null>(null);
+  const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
   const pos = useAnchorPosition(anchor, gdRef);
 
-  const initializeGraphDivRef = (_: Plotly.PlotlyHTMLElement, gd: Plotly.PlotlyHTMLElement) => {
+  const initializeGraphDivRef = (_: unknown, gd: PlotlyHTMLElement) => {
     gdRef.current = gd;
   };
 

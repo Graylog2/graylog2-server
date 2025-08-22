@@ -38,7 +38,7 @@ const OnClickPopoverWrapper = ({ children = null, isPopoverOpen, onPopoverChange
         }}
       />
     </Popover.Target>
-    {children}
+    {isPopoverOpen && children}
   </Popover>
 );
 export default OnClickPopoverWrapper;

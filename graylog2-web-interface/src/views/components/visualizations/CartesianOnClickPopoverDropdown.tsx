@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { ClickPoint } from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import Value from 'views/components/Value';
 import Popover from 'components/common/Popover';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { keySeparator } from 'views/Constants';
 
 const atIndex = (v: string | string[] | undefined, i: number | undefined): T | undefined => {
   if (v == null) return undefined;
@@ -70,22 +72,97 @@ const Container = styled.span(
   `,
 );
 
-const CartesianOnClickPopoverDropdown = ({ clickPoint }: { clickPoint: ClickPoint }) => {
-  if (!clickPoint) return null;
+const DivContainer = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xxs};
+  `,
+);
+type ValueToRender = { value: number | string; text: string; field: string };
+type ValuesToRender = {
+  rowPivotValues: Array<ValueToRender>;
+  columnPivotValues: Array<ValueToRender>;
+  metricValue: ValueToRender;
+};
+
+const CartesianOnClickPopoverDropdown = ({
+  clickPoint,
+  config,
+}: {
+  clickPoint: ClickPoint;
+  config: AggregationWidgetConfig;
+}) => {
   const traceColor = getHoverSwatchColor(clickPoint);
+  const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValuesToRender>(() => {
+    if (!clickPoint || !config) return {};
+    const splitNames = (clickPoint.data.originalName ?? clickPoint.data.name).split(keySeparator);
+    const metric = splitNames.pop();
+
+    const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
+
+    const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+    const splitXValues = `${String(clickPoint.x)}`.split(keySeparator);
+
+    return {
+      rowPivotValues: splitXValues.map((value, i) => ({ value, field: rowPivotsToFields[i], text: value })),
+      columnPivotValues: splitNames.map((value, i) => ({ value, field: columnPivotsToFields[i], text: value })),
+      metricValue: { value: clickPoint.y, field: metric, text: `${String(clickPoint.text ?? clickPoint.y)}` },
+    };
+  }, [clickPoint, config]);
+
+  console.log({ rowPivotValues, columnPivotValues, metricValue });
 
   return (
-    <Popover.Dropdown title={String(clickPoint?.x)}>
-      <Value
-        field={clickPoint.data.name}
-        value={clickPoint.y}
-        render={() => (
-          <Container>
-            <ValueBox $bgColor={traceColor}>{`${String(clickPoint.text ?? clickPoint.y)}`}</ValueBox>
-            <span>{clickPoint.data.name}</span>
-          </Container>
+    <Popover.Dropdown>
+      <DivContainer>
+        {metricValue && (
+          <Value
+            field={metricValue.field}
+            value={metricValue.value}
+            render={() => (
+              <Container>
+                <ValueBox $bgColor={traceColor}>{metricValue.text}</ValueBox>
+                <span>{metricValue.field}</span>
+              </Container>
+            )}
+          />
         )}
-      />
+        {!!rowPivotValues?.length && (
+          <>
+            {rowPivotValues?.map(({ text, value, field }) => (
+              <Value
+                key={`${value}-${field}`}
+                field={field}
+                value={value}
+                render={() => (
+                  <Container>
+                    <ValueBox $bgColor={traceColor}>{text}</ValueBox>
+                    <span>{field}</span>
+                  </Container>
+                )}
+              />
+            ))}
+          </>
+        )}
+        {!!columnPivotValues?.length && (
+          <>
+            {columnPivotValues?.map(({ text, value, field }) => (
+              <Value
+                field={field}
+                value={value}
+                key={`${value}-${field}`}
+                render={() => (
+                  <Container>
+                    <ValueBox $bgColor={traceColor}>{text}</ValueBox>
+                    <span>{field}</span>
+                  </Container>
+                )}
+              />
+            ))}
+          </>
+        )}
+      </DivContainer>
     </Popover.Dropdown>
   );
 };

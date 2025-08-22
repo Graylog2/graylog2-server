@@ -61,8 +61,9 @@ const LineVisualization = makeVisualization(
       ({ type, name, labels, values, originalName, fullPath }) => ({
         type,
         name,
-        x: _mapKeys(labels),
+        x: labels,
         y: values,
+        originalLabels: labels,
         originalName,
         line: { shape: toPlotly(interpolation) },
         ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
@@ -96,6 +97,8 @@ const LineVisualization = makeVisualization(
     const { pos, clickPoint, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick } =
       usePlotOnClickPopover('scatter');
 
+    console.log({ chartDataResult });
+
     return (
       <>
         <XYPlot
@@ -110,7 +113,7 @@ const LineVisualization = makeVisualization(
           onInitialized={initializeGraphDivRef}
         />
         <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} />
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
         </OnClickPopoverWrapper>
       </>
     );

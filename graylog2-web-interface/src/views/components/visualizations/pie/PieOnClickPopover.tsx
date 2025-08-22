@@ -21,19 +21,19 @@ import type { ClickPoint } from 'views/components/visualizations/hooks/usePlotOn
 import Value from 'views/components/Value';
 import Popover from 'components/common/Popover';
 
-const atIndex = (v: string | string[] | undefined, i: number | undefined): T | undefined => {
+const atIndex = (v: string | string[] | undefined, i: number | undefined): string => {
   if (v == null) return undefined;
   if (Array.isArray(v)) {
     if (typeof i !== 'number') return undefined;
 
-    return (v as T[])[i];
+    return v[i];
   }
 
-  return v as T;
+  return v;
 };
 /** Best-effort “hover swatch” color for common traces (bar/scatter/pie). */
 export function getHoverSwatchColor(pt: ClickPoint): string | undefined {
-  const fd = pt.fullData;
+  const fd = pt.data;
 
   const idx = pt.pointIndex ?? pt.pointNumber;
 
