@@ -17,9 +17,13 @@
 import React, { act } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-
-import ContentPack from 'logic/content-packs/ContentPack';
+import { StoreMock as MockStore } from 'helpers/mocking';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
+
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  EntityShareActions: { prepare: async () => {} },
+  EntityShareStore: MockStore(['getInitialState', () => ({})]),
+}));
 
 describe('<ContentPackInstall />', () => {
   const parameter = {
@@ -30,6 +34,8 @@ describe('<ContentPackInstall />', () => {
   };
 
   const entity = {
+    id: '1',
+    v: '1',
     type: {
       name: 'grok_pattern',
       version: '1',
@@ -38,19 +44,22 @@ describe('<ContentPackInstall />', () => {
       title: { '@type': 'string', '@value': 'franz' },
       descr: { '@type': 'string', '@value': 'hans' },
     },
+    toJSON: () => ({}),
+    constraints: [],
   };
 
-  const contentPack = ContentPack.builder()
-    .id(1)
-    .rev(2)
-    .name('UFW Grok Patterns')
-    .description('Grok Patterns to extract informations from UFW logfiles')
-    .summary('This is a summary')
-    .url('www.graylog.com')
-    .vendor('graylog.com')
-    .parameters([parameter])
-    .entities([entity])
-    .build();
+  const contentPack = {
+    id: '1',
+    v: '1',
+    rev: 2,
+    name: 'UFW Grok Patterns',
+    description: 'Grok Patterns to extract informations from UFW logfiles',
+    summary: 'This is a summary',
+    url: 'www.graylog.com',
+    vendor: 'graylog.com',
+    parameters: [parameter],
+    entities: [entity],
+  };
 
   it('should render a install', async () => {
     render(<ContentPackInstall contentPack={contentPack} />);
@@ -60,7 +69,7 @@ describe('<ContentPackInstall />', () => {
 
   it('should call install when called', async () => {
     const installFn = jest.fn((id, rev, param) => {
-      expect(id).toBe(1);
+      expect(id).toBe('1');
       expect(rev).toBe(2);
       expect(param).toEqual({ comment: 'Test', parameters: { PARAM: { '@type': 'string', '@value': 'parameter' } } });
     });

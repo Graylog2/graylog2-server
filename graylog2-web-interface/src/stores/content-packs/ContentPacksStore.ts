@@ -22,15 +22,21 @@ import fetch from 'logic/rest/FetchProvider';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { ContentPackMetadata, ContentPackInstallation } from 'components/content-packs/Types';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type Actions = {
-  create: (pack: string) => Promise<unknown>;
+  create: (pack: {}) => Promise<unknown>;
   list: () => Promise<unknown>;
   get: (id: string) => Promise<{ contentPackRevisions: ContentPackRevisions }>;
   getRev: () => Promise<unknown>;
   delete: (id: string) => Promise<unknown>;
   deleteRev: (id: string, revision: number) => Promise<unknown>;
-  install: (contentPackId: string, contentPackRev: string, parameters: {}) => Promise<unknown>;
+  install: (
+    contentPackId: string,
+    contentPackRev: number,
+    parameters: {},
+    shareRequest: EntitySharePayload,
+  ) => Promise<unknown>;
   installList: (id: string) => Promise<unknown>;
   uninstall: (uninstallContentPackId: string, uninstallInstallId: string) => Promise<unknown>;
   uninstallDetails: (id: string, installId: string) => Promise<unknown>;
@@ -136,11 +142,11 @@ export const ContentPacksStore = singletonStore('core.ContentPacks', () =>
       ContentPacksActions.deleteRev.promise(promise);
     },
 
-    install(contentPackId, revision, parameters) {
+    install(contentPackId, revision, parameters, shareRequest) {
       const promise = fetch(
         'POST',
         URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.install(contentPackId, revision).url),
-        { entity: parameters },
+        { entity: parameters, share_request: shareRequest },
       );
 
       ContentPacksActions.install.promise(promise);
