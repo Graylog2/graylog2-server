@@ -38,11 +38,7 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const DataAdapterCreate = ({
-  saved,
-  onCancel,
-  validationErrors = {},
-}: DataAdapterCreateProps) => {
+const DataAdapterCreate = ({ saved, onCancel, validationErrors = {} }: DataAdapterCreateProps) => {
   const [type, setType] = React.useState<string | undefined>(undefined);
   const [dataAdapter, setDataAdapter] = React.useState<any>(undefined);
   const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
@@ -65,7 +61,9 @@ const DataAdapterCreate = ({
 
           if (!adapterPlugins[typeItem.type]) {
             // eslint-disable-next-line no-console
-            console.error(`Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`);
+            console.error(
+              `Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`,
+            );
 
             return {
               value: typeItem.type,
@@ -85,18 +83,21 @@ const DataAdapterCreate = ({
     return [];
   }, [types, fetchingDataAdapterTypes, adapterPlugins]);
 
-  const handleTypeSelect = React.useCallback((adapterType: string) => {
-    const defaultConfig = ObjectUtils.clone(types[adapterType].default_config);
+  const handleTypeSelect = React.useCallback(
+    (adapterType: string) => {
+      const defaultConfig = ObjectUtils.clone(types[adapterType].default_config);
 
-    setType(adapterType);
-    setDataAdapter({
-      id: null,
-      title: '',
-      name: '',
-      description: '',
-      config: defaultConfig,
-    });
-  }, [types]);
+      setType(adapterType);
+      setDataAdapter({
+        id: null,
+        title: '',
+        name: '',
+        description: '',
+        config: defaultConfig,
+      });
+    },
+    [types],
+  );
 
   const validate = (adapter) => {
     validateDataAdapter(adapter);

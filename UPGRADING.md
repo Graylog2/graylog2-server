@@ -3,6 +3,13 @@ Upgrading to Graylog 7.0.x
 
 ## Breaking Changes
 
+### Java 21
+
+Graylog now requires Java 21 to run. Earlier versions are no longer supported.
+
+Our operating system packages and container images are shipping with the
+correct Java version.
+
 ### Kafka Inputs
 
 The `kafka-clients` library was updated to 4.x which removes support for Kafka

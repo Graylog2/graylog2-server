@@ -73,7 +73,12 @@ const availableEntityTypes = {
   stream: 'Stream',
   dashboard: 'Dashboard',
   search: 'Saved Search',
+  search_filter: 'Search Filter',
   event_definition: 'Event Definition',
+  event_procedure: 'Event Procedure',
+  notification: 'Notification',
+  report: 'Report',
+  sigma_rule: 'Sigma Rule',
 };
 
 const availableCapabilities = {

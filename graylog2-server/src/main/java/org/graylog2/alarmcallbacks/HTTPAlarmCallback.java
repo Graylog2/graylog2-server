@@ -40,7 +40,8 @@ import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -134,8 +135,8 @@ public class HTTPAlarmCallback implements AlarmCallback {
         }
 
         try {
-            new URL(url);
-        } catch (MalformedURLException e) {
+            var ignored = new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             throw new ConfigurationException("Malformed URL '" + url + "'", e);
         }
 
