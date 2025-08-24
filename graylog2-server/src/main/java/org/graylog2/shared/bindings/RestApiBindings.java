@@ -19,6 +19,7 @@ package org.graylog2.shared.bindings;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
 import jakarta.ws.rs.container.DynamicFeature;
+import org.graylog.mcp.server.McpResource;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.resources.RestResourcesModule;
@@ -58,6 +59,8 @@ public class RestApiBindings extends PluginModule {
         install(new WebResourcesModule());
         install(new RestResourcesModule(configuration));
         install(new RestResourcesSharedModule());
+
+        addSystemRestResource(McpResource.class);
     }
 
     private void bindDynamicFeatures() {
