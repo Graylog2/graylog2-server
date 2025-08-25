@@ -34,7 +34,7 @@ const DSVHTTPAdapterDocumentation = () => {
     {
       value: 'example_1',
       label: 'Example 1',
-      content:
+      content: (
         <div>
           <h5 style={{ marginBottom: 10 }}>Configuration</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
@@ -46,12 +46,13 @@ const DSVHTTPAdapterDocumentation = () => {
 
           <h5 style={{ marginBottom: 10 }}>DSV File</h5>
           <pre>{csvFile1}</pre>
-        </div>,
+        </div>
+      ),
     },
     {
       value: 'example_2',
       label: 'Example 2',
-      content:
+      content: (
         <div>
           <h5 style={{ marginBottom: 10 }}>Configuration</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
@@ -64,6 +65,7 @@ const DSVHTTPAdapterDocumentation = () => {
           <h5 style={{ marginBottom: 10 }}>DSV File</h5>
           <pre>{csvFile2}</pre>
         </div>
+      ),
     },
   ];
 
@@ -82,7 +84,7 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <hr />
 
-      <MantineAccordion accordionItems={accordionItems} defaultValue='example_1' />
+      <MantineAccordion accordionItems={accordionItems} defaultValue="example_1" />
     </div>
   );
 };
