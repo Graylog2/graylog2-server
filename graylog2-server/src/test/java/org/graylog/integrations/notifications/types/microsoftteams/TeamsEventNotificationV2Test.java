@@ -194,7 +194,7 @@ public class TeamsEventNotificationV2Test {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration(), false));
     }
 
     @Test

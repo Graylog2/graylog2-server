@@ -128,6 +128,7 @@ class EmailNotificationForm extends React.Component<
     lookup_bcc_emails: false,
     bcc_emails_lut_name: null,
     bcc_emails_lut_key: null,
+    include_event_procedure: false,
   };
 
   propagateChange = (key, value) => {
@@ -263,7 +264,7 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {validation?.errors?.recipients[0] || 'Add email addresses that will receive this Notification.'}
+          {validation?.errors?.recipients?.[0] || 'Add email addresses that will receive this Notification.'}
         </HelpBlock>
       </FormGroup>
     );
@@ -281,7 +282,7 @@ class EmailNotificationForm extends React.Component<
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
         help={
-          validation?.errors?.recipients_lut_key[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.recipients_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
         }
         value={config.recipients_lut_key || ''}
         onChange={this.handleChange}
@@ -321,7 +322,7 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {validation?.errors?.cc_emails[0] || 'Add email addresses that will be on the CC line of this Notification.'}
+          {validation?.errors?.cc_emails?.[0] || 'Add email addresses that will be on the CC line of this Notification.'}
         </HelpBlock>
       </FormGroup>
     );
@@ -339,7 +340,7 @@ class EmailNotificationForm extends React.Component<
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.cc_emails_lut_key ? 'error' : null}
         help={
-          validation?.errors?.cc_emails_lut_key[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.cc_emails_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
         }
         value={config.cc_emails_lut_key || ''}
         onChange={this.handleChange}
@@ -379,7 +380,7 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {validation?.errors?.bcc_emails[0] ||
+          {validation?.errors?.bcc_emails?.[0] ||
             'Add email addresses that will be on the BCC line of this Notification.'}
         </HelpBlock>
       </FormGroup>
@@ -398,7 +399,7 @@ class EmailNotificationForm extends React.Component<
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.bcc_emails_lut_key ? 'error' : null}
         help={
-          validation?.errors?.bcc_emails_lut_key[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.bcc_emails_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
         }
         value={config.bcc_emails_lut_key || ''}
         onChange={this.handleChange}
@@ -435,7 +436,7 @@ class EmailNotificationForm extends React.Component<
         type="text"
         bsStyle={validation.errors.sender ? 'error' : null}
         help={
-          validation?.errors?.sender[0] ||
+          validation?.errors?.sender?.[0] ||
           'The email address that should be used as the notification sender. Leave it empty to use the default sender address.'
         }
         value={config.sender || ''}
@@ -455,7 +456,7 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.sender_lut_key ? 'error' : null}
-        help={validation?.errors?.sender_lut_key[0] || 'Event Field name whose value will be used as Lookup Table Key.'}
+        help={validation?.errors?.sender_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'}
         value={config.sender_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -486,7 +487,7 @@ class EmailNotificationForm extends React.Component<
         label="Reply-To (Optional)"
         type="text"
         bsStyle={validation.errors.replyto ? 'error' : null}
-        help={validation?.errors?.reply_to[0] || 'The email address that recipients should use for replies.'}
+        help={validation?.errors?.reply_to?.[0] || 'The email address that recipients should use for replies.'}
         value={config.reply_to || ''}
         onChange={this.handleChange}
       />
@@ -505,7 +506,7 @@ class EmailNotificationForm extends React.Component<
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.reply_to_lut_key ? 'error' : null}
         help={
-          validation?.errors?.reply_to_lut_key[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.reply_to_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
         }
         value={config.reply_to_lut_key || ''}
         onChange={this.handleChange}
@@ -538,7 +539,7 @@ class EmailNotificationForm extends React.Component<
           label="Subject"
           type="text"
           bsStyle={validation.errors.subject ? 'error' : null}
-          help={validation?.errors?.subject[0] || 'The subject that should be used for the email notification.'}
+          help={validation?.errors?.subject?.[0] || 'The subject that should be used for the email notification.'}
           value={config.subject || ''}
           onChange={this.handleChange}
           required
@@ -590,7 +591,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('user_recipients')}
             />
             <HelpBlock>
-              {validation?.errors?.recipients[0] || 'Select users that will receive this Notification.'}
+              {validation?.errors?.recipients?.[0] || 'Select users that will receive this Notification.'}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -616,7 +617,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('cc_users')}
             />
             <HelpBlock>
-              {validation?.errors?.cc_users[0] || 'Select users that will be on the CC line of this Notification.'}
+              {validation?.errors?.cc_users?.[0] || 'Select users that will be on the CC line of this Notification.'}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -642,7 +643,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('bcc_users')}
             />
             <HelpBlock>
-              {validation?.errors?.bcc_users[0] || 'Select users that will be on the BCC line of this Notification.'}
+              {validation?.errors?.bcc_users?.[0] || 'Select users that will be on the BCC line of this Notification.'}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -683,7 +684,7 @@ class EmailNotificationForm extends React.Component<
             onChange={this.handleBodyTemplateChange}
           />
           <HelpBlock>
-            {validation?.errors?.body[0] || 'The template that will be used to generate the email body.'}
+            {validation?.errors?.body?.[0] || 'The template that will be used to generate the email body.'}
           </HelpBlock>
         </FormGroup>
         <FormGroup controlId="notification-body-template" validationState={validation.errors.body ? 'error' : null}>
@@ -696,8 +697,18 @@ class EmailNotificationForm extends React.Component<
             onChange={this.handleHtmlBodyTemplateChange}
           />
           <HelpBlock>
-            {validation?.errors?.body[0] || 'The template that will be used to generate the email HTML body.'}
+            {validation?.errors?.body?.[0] || 'The template that will be used to generate the email HTML body.'}
           </HelpBlock>
+        </FormGroup>
+        <FormGroup>
+          <Input
+            type="checkbox"
+            id="include_event_procedure"
+            name="include_event_procedure"
+            label="Include Event Procedure In HTML Body"
+            onChange={this.handleChange}
+            checked={config.include_event_procedure}
+          />
         </FormGroup>
       </>
     );

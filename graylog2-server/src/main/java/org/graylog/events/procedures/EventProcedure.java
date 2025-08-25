@@ -27,6 +27,8 @@ import org.graylog2.security.html.HTMLSanitizerConverter;
 
 import java.util.List;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @AutoValue
 @JsonDeserialize(builder = EventProcedure.Builder.class)
 public abstract class EventProcedure extends ScopedEntity {
@@ -70,5 +72,44 @@ public abstract class EventProcedure extends ScopedEntity {
         }
 
         public abstract EventProcedure build();
+    }
+
+    // TODO: Build this out if needed
+    public String toText() {
+        final String procedureBuilder = "--- [Event Procedures ---------------------------\n" +
+                "Title:       " + title() + "\n" +
+                "Description: " + description() + "\n" +
+                "Steps:\n";
+
+        return procedureBuilder;
+    }
+
+    public String toHtml() {
+        final StringBuilder procedureBuilder = new StringBuilder();
+        procedureBuilder.append("""
+                <table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
+                <tr style="line-height:1.5"><th colspan="3" style="background-color:#e6e6e6">Event Procedure</th></tr>
+                """);
+        procedureBuilder.append(f("""
+                <tr><td width="200px">Title</td><td>%s</td></tr>
+                """, title()));
+        procedureBuilder.append(f("""
+                <tr><td>Description</td><td>%s</td></tr>
+                """, description()));
+
+        if (steps() != null && !steps().isEmpty()) {
+            procedureBuilder.append("""
+                    <tr><td><Strong>Steps</Strong></td>
+                    """);
+            for (int i = 1; i <= steps().size(); i++) {
+                procedureBuilder.append(steps().get(i-1).toHtml(i));
+            }
+        }
+
+        procedureBuilder.append("""
+                </tbody></table>
+                """);
+
+        return procedureBuilder.toString();
     }
 }

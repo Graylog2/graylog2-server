@@ -18,6 +18,7 @@ package org.graylog.events.notifications;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.MessageSummary;
@@ -33,13 +34,18 @@ public class TemplateModelProvider {
     private final CustomizationConfig customizationConfig;
     private final ObjectMapperProvider objectMapperProvider;
     private final URI httpExternalUri;
+    private final Boolean isDevelopmentServer;
 
     @Inject
-    public TemplateModelProvider(CustomizationConfig customizationConfig, ObjectMapperProvider objectMapperProvider, HttpConfiguration httpConfiguration) {
+    public TemplateModelProvider(CustomizationConfig customizationConfig,
+                                 ObjectMapperProvider objectMapperProvider,
+                                 HttpConfiguration httpConfiguration,
+                                 @Named("isDevelopmentServer") Boolean isDevelopmentServer) {
         this.customizationConfig = customizationConfig;
         this.objectMapperProvider = objectMapperProvider;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
 
+        this.isDevelopmentServer = isDevelopmentServer;
     }
 
     public Map<String, Object> of(EventNotificationContext ctx, List<MessageSummary> backlog, DateTimeZone timeZone) {
@@ -52,7 +58,7 @@ public class TemplateModelProvider {
         return ImmutableMap.<String, Object>builder()
                 .putAll(customFields)
                 .putAll(objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT))
-                .put("http_external_uri", this.httpExternalUri)
+                .put("http_external_uri", isDevelopmentServer ? URI.create("http://localhost:8080/") : this.httpExternalUri)
                 .put("product_name", customizationConfig.productName())
                 .build();
     }

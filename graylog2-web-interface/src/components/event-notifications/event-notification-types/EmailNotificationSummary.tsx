@@ -184,6 +184,10 @@ const EmailNotificationSummary = ({ notification = {}, ...otherProps }: EmailNot
           </Well>
         </td>
       </tr>
+      <tr>
+        <td>Include Event Procedure In HTML Body</td>
+        <td>{notification.config.include_event_procedure ? 'Yes' : 'No'}</td>
+      </tr>
     </>
   </CommonNotificationSummary>
 );

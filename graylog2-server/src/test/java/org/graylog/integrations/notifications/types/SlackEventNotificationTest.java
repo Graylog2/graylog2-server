@@ -103,7 +103,7 @@ public class SlackEventNotificationTest {
                 mockNotificationService,
                 nodeId,
                 mockSlackClient,
-                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration(), false));
     }
 
     private void getDummySlackNotificationConfig() {
