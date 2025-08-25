@@ -1,0 +1,154 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "6822125135a24c5405fdeabc"
+      },
+      "type": "DASHBOARD",
+      "title": "Windows;Authentication",
+      "summary": "Windows Authentication Dashboards",
+      "description": "Windows authentication dashboards",
+      "search_id": "6822125135a24c5405fdeabb",
+      "properties": [],
+      "requires": {},
+      "state": {
+        "84312ca2-c5e1-49bb-8892-9cb7b0c6067d": {
+          "titles": {},
+          "widgets": [],
+          "widget_mapping": {},
+          "positions": {},
+          "display_mode_settings": {
+            "positions": {}
+          }
+        }
+      },
+      "owner": null,
+      "created_at": {
+        "$date": "2020-03-15T22:57:26.352Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-05-12T15:22:57.312Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "6824a95255eb3731adc1e552"
+      },
+      "type": "DASHBOARD",
+      "title": "DUPE-Illuminate:Windows;Authentication",
+      "summary": "Windows Authentication Dashboards",
+      "description": "Track authentication activity for Windows systems",
+      "search_id": "6822125135a24c5405fdeabb",
+      "properties": [],
+      "requires": {},
+      "state": {
+        "84312ca2-c5e1-49bb-8892-9cb7b0c6067d": {
+          "titles": {},
+          "widgets": [],
+          "widget_mapping": {},
+          "positions": {},
+          "display_mode_settings": {
+            "positions": {}
+          }
+        }
+      },
+      "owner": "admin",
+      "created_at": {
+        "$date": "2020-03-15T22:57:26.352Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-05-14T14:31:56.271Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "684082a26487e66561c02ac5"
+      },
+      "type": "DASHBOARD",
+      "title": "Empty dashboard",
+      "summary": "Empty dashboard",
+      "description": "Empty dashboard",
+      "search_id": "684082a16487e66561c02ac4",
+      "properties": [],
+      "requires": {
+        "parameters": {
+          "name": "Graylog Enterprise",
+          "version": "3.1.0",
+          "url": "https://www.graylog.org/enterprise",
+          "description": "Graylog Enterprise",
+          "author": "Graylog, Inc.",
+          "unique_id": "org.graylog.plugins.enterprise.EnterprisePlugin"
+        }
+      },
+      "state": {
+        "90f371ee-4957-44ac-9ca0-7801fd783658": {
+          "titles": {},
+          "widgets": [],
+          "widget_mapping": {},
+          "positions": {},
+          "display_mode_settings": {
+            "positions": {}
+          }
+        }
+      },
+      "owner": "admin",
+      "created_at": {
+        "$date": "2025-06-04T17:29:52.905Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-06-04T17:30:24.455Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "6890b706dc8217538b763006"
+      },
+      "type": "DASHBOARD",
+      "title": "Illuminate:AWS Security Lake",
+      "summary": " Overview dashboards for AWS Security Lake",
+      "description": "Description of this dashboard.",
+      "search_id": "6890b706dc8217538b763005",
+      "properties": [],
+      "requires": {},
+      "state": {
+        "c007e84c-8d57-4fb7-aa39-22d1dd7b8a71": {
+          "titles": {},
+          "widgets": [],
+          "widget_mapping": {},
+          "positions": {},
+          "display_mode_settings": {
+            "positions": {}
+          }
+        }
+      },
+      "owner": "admin",
+      "created_at": {
+        "$date": "2023-12-27T14:09:40.003Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-08-04T13:35:02.022Z"
+      }
+    }
+  ],
+  "entity_source": [
+    {
+      "_id": {
+        "$oid": "689e006e5176394abd89b03d"
+      },
+      "entity_id": {
+        "$oid": "6890b706dc8217538b763006"
+      },
+      "source": "ILLUMINATE"
+    },
+    {
+      "_id": {
+        "$oid": "689e02455176394abd89b03e"
+      },
+      "entity_id": {
+        "$oid": "6824a95255eb3731adc1e552"
+      },
+      "source": "USER_DEFINED",
+      "parent_id": "0a05ab4d-c0d0-4a4f-aab3-e0c300991c10"
+    }
+  ]
+}
