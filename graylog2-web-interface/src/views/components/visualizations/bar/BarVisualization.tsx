@@ -31,6 +31,9 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -171,17 +174,27 @@ const BarVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
+    const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
+      usePlotOnClickPopover('bar');
+
     return (
-      <XYPlot
-        config={config}
-        axisType={visualizationConfig.axisType}
-        chartData={chartData}
-        effectiveTimerange={effectiveTimerange}
-        setChartColor={setChartColor}
-        height={height}
-        width={width}
-        plotLayout={layout}
-      />
+      <>
+        <XYPlot
+          config={config}
+          axisType={visualizationConfig.axisType}
+          chartData={chartData}
+          effectiveTimerange={effectiveTimerange}
+          setChartColor={setChartColor}
+          height={height}
+          width={width}
+          plotLayout={layout}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
+        </OnClickPopoverWrapper>
+      </>
     );
   },
   'bar',

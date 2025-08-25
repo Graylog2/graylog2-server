@@ -28,6 +28,9 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -58,8 +61,9 @@ const LineVisualization = makeVisualization(
       ({ type, name, labels, values, originalName, fullPath }) => ({
         type,
         name,
-        x: _mapKeys(labels),
+        x: labels,
         y: values,
+        originalLabels: labels,
         originalName,
         line: { shape: toPlotly(interpolation) },
         ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
@@ -90,16 +94,28 @@ const LineVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
+    const { pos, clickPoint, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick } =
+      usePlotOnClickPopover('scatter');
+
+    console.log({ chartDataResult });
+
     return (
-      <XYPlot
-        config={config}
-        plotLayout={layout}
-        axisType={axisType}
-        effectiveTimerange={effectiveTimerange}
-        height={height}
-        width={width}
-        chartData={chartDataResult}
-      />
+      <>
+        <XYPlot
+          config={config}
+          plotLayout={layout}
+          axisType={axisType}
+          effectiveTimerange={effectiveTimerange}
+          height={height}
+          width={width}
+          chartData={chartDataResult}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
+        </OnClickPopoverWrapper>
+      </>
     );
   },
   'line',
