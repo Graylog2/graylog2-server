@@ -18,7 +18,7 @@ import type { SyntheticEvent } from 'react';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
-import { URLWhiteListInput, KeyValueTable } from 'components/common';
+import { URLAllowListInput, KeyValueTable } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
 type Headers = { [key: string]: string };
@@ -53,7 +53,7 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
 
     return (
       <fieldset>
-        <URLWhiteListInput
+        <URLAllowListInput
           label="Lookup URL"
           onChange={handleFormEvent}
           validationMessage={validationMessage(

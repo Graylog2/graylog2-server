@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
+package org.graylog2.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -23,9 +23,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import static com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
-@JsonSubTypes({@Type(value = LiteralWhitelistEntry.class, name = "literal"),
-        @Type(value = RegexWhitelistEntry.class, name = "regex")})
-public interface WhitelistEntry {
+@JsonSubTypes({@Type(value = LiteralAllowlistEntry.class, name = "literal"),
+        @Type(value = RegexAllowlistEntry.class, name = "regex")})
+public interface AllowlistEntry {
     enum Type {
         @JsonProperty("literal")
         LITERAL,
@@ -45,5 +45,5 @@ public interface WhitelistEntry {
     @JsonProperty("value")
     String value();
 
-    boolean isWhitelisted(String url);
+    boolean isAllowlisted(String url);
 }

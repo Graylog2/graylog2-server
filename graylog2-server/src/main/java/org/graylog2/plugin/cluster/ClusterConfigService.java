@@ -54,6 +54,16 @@ public interface ClusterConfigService {
     ClusterConfig getRaw(Class<?> key);
 
     /**
+     * Retrieve raw config entry. This is a generic method that can be used to retrieve entries that
+     * no longer have a specific Java class representation in the codebase (because they
+     * were removed or renamed).
+     *
+     * @param key The key that is used to find the cluster config object in the database.
+     * @return An instance of the raw persisted Java class or {@code null} if it couldn't be retrieved.
+     */
+    ClusterConfig getRaw(String key);
+
+    /**
      * Retrieve Java class of a certain type from the cluster configuration or return a default value
      * in case that failed.
      *

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
+package org.graylog2.system.urlallowlist;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Utility class to help creating an appropriate regex to be used in a whitelist entry.
+ * Utility class to help creating an appropriate regex to be used in an allowlist entry.
  */
 public class RegexHelper {
     /**

@@ -165,7 +165,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
 
             if (!state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty()) {
                 final Set<SearchType> searchTypesToKeep = !state.keepSearchTypes().isEmpty()
-                        ? filterForWhiteListFromState(searchTypes(), state)
+                        ? filterForAllowListFromState(searchTypes(), state)
                         : searchTypes();
 
                 final Set<SearchType> searchTypesWithOverrides = applyAvailableOverrides(state, searchTypesToKeep);
@@ -178,7 +178,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return this;
     }
 
-    private Set<SearchType> filterForWhiteListFromState(Set<SearchType> previousSearchTypes, ExecutionStateGlobalOverride state) {
+    private Set<SearchType> filterForAllowListFromState(Set<SearchType> previousSearchTypes, ExecutionStateGlobalOverride state) {
         return previousSearchTypes.stream()
                 .filter(st -> state.keepSearchTypes().contains(st.id()))
                 .collect(toSet());
