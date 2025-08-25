@@ -164,7 +164,7 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
   if (outputs && types && (!streamId || assignableOutputs)) {
     const createOutputDropdown = isPermitted(permissions, ['outputs:create']) ? (
       <CreateOutputDropdown
-        types={types.types}
+        types={types}
         onSubmit={_handleCreateOutput}
         getTypeDefinition={OutputsStore.loadAvailable}
       />
