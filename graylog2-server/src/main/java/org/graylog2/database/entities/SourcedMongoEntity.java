@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.entities;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.entities.source.EntitySource;
@@ -23,8 +24,9 @@ import org.graylog2.database.entities.source.EntitySource;
 import java.util.Optional;
 
 public interface SourcedMongoEntity extends MongoEntity {
-    String FIELD_ENTITY_SOURCE = "entity_source";
+    String FIELD_ENTITY_SOURCE = "_entity_source";
 
     @JsonProperty(value = FIELD_ENTITY_SOURCE, access = JsonProperty.Access.READ_ONLY)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     Optional<EntitySource> entitySource();
 }

@@ -34,4 +34,8 @@ public class EntitySourceService {
     public void deleteByEntityId(String entityId) {
         dbEntitySourceService.deleteByEntityId(entityId);
     }
+
+    public void handleEntityIdChange(String oldEntityId, String newEntityId) {
+        dbEntitySourceService.updateParentId(oldEntityId, newEntityId);
+    }
 }

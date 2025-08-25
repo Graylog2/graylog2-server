@@ -423,7 +423,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
 
         dbService.delete(id);
-        entitySourceService.deleteByEntityId(id);
         triggerDeletedEvent(view);
         recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
         return view;

@@ -60,6 +60,8 @@ public abstract class EntitySource implements MongoEntity {
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
@@ -81,7 +83,7 @@ public abstract class EntitySource implements MongoEntity {
         public abstract Builder source(String source);
 
         @JsonProperty(FIELD_PARENT_ID)
-        public abstract Builder parentId(String parentId);
+        public abstract Builder parentId(@Nullable String parentId);
 
         public abstract EntitySource build();
     }
