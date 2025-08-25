@@ -140,7 +140,7 @@ export const ContentPacksStore = singletonStore('core.ContentPacks', () =>
       const promise = fetch(
         'POST',
         URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.install(contentPackId, revision).url),
-        parameters,
+        { entity: parameters },
       );
 
       ContentPacksActions.install.promise(promise);

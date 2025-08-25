@@ -25,7 +25,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.shares.Grantee;
-import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -41,17 +41,17 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class DefaultEntityDependencyResolver implements EntityDependencyResolver {
-    private final ContentPackService contentPackService;
+    private final ContentPackEntityResolver contentPackEntityResolver;
     private final GRNRegistry grnRegistry;
     private final GRNDescriptorService descriptorService;
     private final DBGrantService grantService;
 
     @Inject
-    public DefaultEntityDependencyResolver(ContentPackService contentPackService,
+    public DefaultEntityDependencyResolver(ContentPackEntityResolver contentPackEntityResolver,
                                            GRNRegistry grnRegistry,
                                            GRNDescriptorService descriptorService,
                                            DBGrantService grantService) {
-        this.contentPackService = contentPackService;
+        this.contentPackEntityResolver = contentPackEntityResolver;
         this.grnRegistry = grnRegistry;
         this.descriptorService = descriptorService;
         this.grantService = grantService;
@@ -66,7 +66,7 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
     protected ImmutableSet<EntityDescriptor> resolve(Collection<GRN> entities) {
         final var cpDescriptors = entities.stream().map(DefaultEntityDependencyResolver::toContentPackEntityDescriptor)
                 .collect(Collectors.toUnmodifiableSet());
-        final var dependencyGraph = contentPackService.resolveEntityDependencyGraph(cpDescriptors);
+        final var dependencyGraph = contentPackEntityResolver.resolveEntityDependencyGraph(cpDescriptors);
         final var dependencies = dependencyGraph.nodes().stream()
                 .filter(dependency -> !cpDescriptors.contains(dependency)) // Don't include the given entity in dependencies
                 // Workaround to ignore outputs as dependencies of streams.
@@ -118,7 +118,7 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
 
     private ImmutableMap<GRN, Optional<String>> entityExcerpts() {
         // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
-        return contentPackService.listAllEntityExcerpts().stream()
+        return contentPackEntityResolver.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
                 .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name()).newGRNBuilder().entity(e.id().id()).build(),
                         v -> Optional.ofNullable(v.title())));
