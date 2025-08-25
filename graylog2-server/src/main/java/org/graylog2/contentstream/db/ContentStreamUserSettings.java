@@ -40,7 +40,7 @@ public abstract class ContentStreamUserSettings implements MongoEntity {
     }
 
     @JsonCreator
-    public static ContentStreamUserSettings create(@JsonProperty("id") @Id @ObjectId String id,
+    public static ContentStreamUserSettings create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                                    @JsonProperty(FIELD_USER_ID) String userId,
                                                    @JsonProperty(FIELD_CONTENT_ENABLED) Boolean contentStreamEnabled,
                                                    @JsonProperty(FIELD_RELEASES_ENABLED) Boolean releasesEnabled,
@@ -58,7 +58,7 @@ public abstract class ContentStreamUserSettings implements MongoEntity {
     @Id
     @ObjectId
     @Nullable
-    @JsonProperty
+    @JsonProperty(FIELD_ID)
     public abstract String id();
 
     @JsonProperty(FIELD_USER_ID)
