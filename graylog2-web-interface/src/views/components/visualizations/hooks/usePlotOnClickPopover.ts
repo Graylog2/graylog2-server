@@ -126,7 +126,7 @@ const useAnchorPosition = (anchor: Anchor | null, gdRef: React.RefObject<PlotlyH
     if (!anchor) {
       setPos(null);
 
-      return null;
+      return;
     }
 
     let prev = { left: NaN, top: NaN };

@@ -33,7 +33,6 @@ import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizatio
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
-import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
 
 import type { Generator } from '../ChartData';
@@ -192,11 +191,9 @@ const BarVisualization = makeVisualization(
           onClickMarker={onChartClick}
           onInitialized={initializeGraphDivRef}
         />
-        <OverflowingComponentsContextProvider>
-          <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-            <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
-          </OnClickPopoverWrapper>
-        </OverflowingComponentsContextProvider>
+        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
+        </OnClickPopoverWrapper>
       </>
     );
   },

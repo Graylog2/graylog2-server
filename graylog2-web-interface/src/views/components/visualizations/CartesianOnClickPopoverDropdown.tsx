@@ -35,7 +35,8 @@ const atIndex = (v: string | string[] | undefined, i: number | undefined): T | u
 };
 /** Best-effort “hover swatch” color for common traces (bar/scatter/pie). */
 export function getHoverSwatchColor(pt: ClickPoint): string | undefined {
-  const fd = pt.fullData;
+  if (!pt) return null;
+  const fd = pt.data;
 
   const idx = pt.pointIndex ?? pt.pointNumber;
 

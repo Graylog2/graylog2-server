@@ -131,7 +131,7 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
       </PlotLegend>
       <OverflowingComponentsContextProvider>
         <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <PieOnClickPopover clickPoint={clickPoint} />
+          <PieOnClickPopover clickPoint={clickPoint} config={config} />
         </OnClickPopoverWrapper>
       </OverflowingComponentsContextProvider>
     </>

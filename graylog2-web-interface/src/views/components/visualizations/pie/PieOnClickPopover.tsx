@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { ClickPoint } from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import Value from 'views/components/Value';
 import Popover from 'components/common/Popover';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { keySeparator } from 'views/Constants';
 
 const atIndex = (v: string | string[] | undefined, i: number | undefined): string => {
   if (v == null) return undefined;
@@ -70,13 +72,33 @@ const Container = styled.span(
   `,
 );
 
-const PieOnClickPopover = ({ clickPoint }: { clickPoint: ClickPoint }) => {
+const PieOnClickPopover = ({ clickPoint, config }: { clickPoint: ClickPoint; config: AggregationWidgetConfig }) => {
   if (!clickPoint) return null;
 
   const traceColor = getHoverSwatchColor(clickPoint);
 
   const { v: value, pointNumber, data } = clickPoint;
   const valueText = data?.text?.[pointNumber];
+
+  const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValuesToRender>(() => {
+    if (!clickPoint || !config) return {};
+    const splitNames = (clickPoint.data.originalName ?? clickPoint.data.name).split(keySeparator);
+    // const splitNames = clickPoint.data.originalLabels?.[clickPoint.pointNumber].split(keySeparator);
+    const metric = splitNames.pop();
+
+    const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
+
+    const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+    const splitXValues = String(clickPoint.data.originalLabels?.[clickPoint.pointNumber]).split(keySeparator);
+
+    return {
+      rowPivotValues: splitXValues.map((value, i) => ({ value, field: rowPivotsToFields[i], text: value })),
+      columnPivotValues: splitNames.map((value, i) => ({ value, field: columnPivotsToFields[i], text: value })),
+      metricValue: { value: clickPoint.y, field: metric, text: `${String(clickPoint.text ?? clickPoint.y)}` },
+    };
+  }, [clickPoint, config]);
+
+  console.log({ clickPoint, rowPivotValues, columnPivotValues, metricValue });
 
   return (
     <Popover.Dropdown title={String(clickPoint?.label)}>

@@ -18,6 +18,7 @@ import React from 'react';
 
 import Popover from 'components/common/Popover';
 import type { Pos } from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
 
 type Props = React.PropsWithChildren<{
   isPopoverOpen: boolean;
@@ -26,19 +27,21 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const OnClickPopoverWrapper = ({ children = null, isPopoverOpen, onPopoverChange, pos }: Props) => (
-  <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={0}>
-    <Popover.Target>
-      <div
-        style={{
-          position: 'fixed',
-          left: pos?.left,
-          top: pos?.top,
-          width: 1,
-          height: 1,
-        }}
-      />
-    </Popover.Target>
-    {isPopoverOpen && children}
-  </Popover>
+  <OverflowingComponentsContextProvider>
+    <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={0}>
+      <Popover.Target>
+        <div
+          style={{
+            position: 'fixed',
+            left: pos?.left,
+            top: pos?.top,
+            width: 1,
+            height: 1,
+          }}
+        />
+      </Popover.Target>
+      {children}
+    </Popover>
+  </OverflowingComponentsContextProvider>
 );
 export default OnClickPopoverWrapper;
