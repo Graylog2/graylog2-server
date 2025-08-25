@@ -52,6 +52,7 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
@@ -139,7 +140,10 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, WithAuthorizationExtension.class})
@@ -196,27 +200,25 @@ public class ContentPackServiceTest {
     Configuration configuration;
     @Mock
     EntityRegistrar entityRegistrar;
+    @Mock
+    ContentPackInstallationHook contentPackInstallationHook;
 
     private ContentPackService contentPackService;
-    private Set<PluginMetaData> pluginMetaData;
-    private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
-    private Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2;
 
     private ContentPackV1 contentPack;
     private ContentPackInstallation contentPackInstallation;
     private GrokPattern grokPattern;
     private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
     private ImmutableMap<ModelId, Object> entityObjectMap;
-    private User user;
 
     @BeforeEach
     public void setUp() throws Exception {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 contentPackInstallService;
         final Set<ConstraintChecker> constraintCheckers = Collections.singleton(new GraylogVersionConstraintChecker());
-        pluginMetaData = new HashSet<>();
-        outputFactories = new HashMap<>();
-        outputFactories2 = new HashMap<>();
+        final Set<PluginMetaData> pluginMetaData = new HashSet<>();
+        final Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories = new HashMap<>();
+        final Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService),
@@ -226,7 +228,7 @@ public class ContentPackServiceTest {
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService, Set.of(contentPackInstallationHook));
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -294,7 +296,9 @@ public class ContentPackServiceTest {
         when(viewService.saveWithOwner(any(), any())).thenReturn(ViewDTO.builder().id("id").title("title").searchId("id").state(Collections.emptyMap()).build());
         when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
 
-        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+
+        verify(contentPackInstallationHook, times(1)).afterInstallation(any(ContentPackInstallation.class), eq(EntityShareRequest.EMPTY), any(UserContext.class));
     }
 
     @Test
@@ -327,11 +331,11 @@ public class ContentPackServiceTest {
         when(mockUser.getName()).thenReturn(TEST_USER);
         when(userService.load(TEST_USER)).thenReturn(mockUser);
         when(userService.loadById(TEST_USER)).thenReturn(mockUser);
-        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
         assertThat(captor.getValue().entities()).hasSize(1);
 
         when(configuration.isCloud()).thenReturn(true);
-        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
         assertThat(captor.getValue().entities()).isEmpty();
     }
 
@@ -351,7 +355,7 @@ public class ContentPackServiceTest {
                 .build();
 
         UserContext userContext = SecurityTestUtils.getUserContext(userService);
-        assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", userContext))
+        assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", userContext, EntityShareRequest.EMPTY))
                 .isInstanceOf(ContentPackException.class);
     }
 

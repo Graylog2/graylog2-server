@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -48,6 +49,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.migrations.V20230601104500_AddSourcesPageV2.MigrationCompleted;
@@ -77,11 +79,11 @@ class V20230601104500_AddSourcesPageV2Test {
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null, null);
+            super(null, null, Map.of(), null, null, null, Set.of());
         }
 
         @Override
-        public ContentPackInstallation installContentPack(ContentPack contentPack, Map<String, ValueReference> parameters, String comment, String user) {
+        public ContentPackInstallation installContentPack(ContentPack contentPack, Map<String, ValueReference> parameters, String comment, String user, EntityShareRequest shareRequest) {
             return ContentPackInstallation.builder()
                     .contentPackId(contentPack.id())
                     .createdBy(user)

@@ -33,6 +33,7 @@ import jakarta.ws.rs.ForbiddenException;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -100,6 +101,7 @@ public class ContentPackService {
     private final ObjectMapper objectMapper;
     private final Configuration configuration;
     private final UserService userService;
+    private final Set<ContentPackInstallationHook> contentPackInstallationHooks;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
@@ -107,25 +109,27 @@ public class ContentPackService {
                               Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
                               ObjectMapper objectMapper,
                               Configuration configuration,
-                              UserService userService) {
+                              UserService userService,
+                              Set<ContentPackInstallationHook> contentPackInstallationHooks) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
         this.objectMapper = objectMapper;
         this.configuration = configuration;
         this.userService = userService;
+        this.contentPackInstallationHooks = contentPackInstallationHooks;
     }
 
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
-                                                      String username) {
+                                                      String username,
+                                                      EntityShareRequest shareRequest) {
         return UserContext.runAs(username, userService, () -> {
-            final UserContext userContext;
             try {
-                userContext = new UserContext.Factory(userService).create();
-                return installContentPack(contentPack, parameters, comment, userContext);
+                final var userContext = new UserContext.Factory(userService).create();
+                return installContentPack(contentPack, parameters, comment, userContext, shareRequest);
             } catch (UserContextMissingException e) {
                 throw new IllegalArgumentException("User Context missing", e);
             }
@@ -135,9 +139,10 @@ public class ContentPackService {
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
-                                                      UserContext userContext) {
+                                                      UserContext userContext,
+                                                      EntityShareRequest shareRequest) {
         if (contentPack instanceof ContentPackV1 contentPackV1) {
-            return installContentPack(contentPackV1, parameters, comment, userContext);
+            return installContentPack(contentPackV1, parameters, comment, userContext, shareRequest);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -146,7 +151,8 @@ public class ContentPackService {
     private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
                                                        Map<String, ValueReference> parameters,
                                                        String comment,
-                                                       UserContext userContext) {
+                                                       UserContext userContext,
+                                                       EntityShareRequest shareRequest) {
         ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -222,6 +228,8 @@ public class ContentPackService {
                 .createdAt(Instant.now())
                 .createdBy(userContext.getUser().getName())
                 .build();
+
+        contentPackInstallationHooks.forEach(hook -> hook.afterInstallation(installation, shareRequest, userContext));
 
         return contentPackInstallationPersistenceService.insert(installation);
     }

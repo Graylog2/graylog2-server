@@ -29,7 +29,7 @@ jest.useFakeTimers();
 
 describe('<ContentPackSelection />', () => {
   it('renders with empty content pack', () => {
-    const contentPack = new ContentPack.builder().build();
+    const contentPack = ContentPack.builder().build();
     render(<ContentPackSelection contentPack={contentPack} />);
 
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
@@ -64,7 +64,7 @@ describe('<ContentPackSelection />', () => {
       resultedState = state;
     });
 
-    const contentPack = new ContentPack.builder().build();
+    const contentPack = ContentPack.builder().build();
     render(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
 
     await userEvent.paste(screen.getByLabelText(/name/i), 'name');
