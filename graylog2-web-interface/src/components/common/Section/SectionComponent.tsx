@@ -34,15 +34,18 @@ type Props = {
   disableCollapseButton?: boolean;
 };
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+const Header = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: ${theme.spacings.xs};
 
-  *:not(:first-child) {
-    margin-left: 10px;
-  }
-`;
+    *:not(:first-child) {
+      margin-left: 10px;
+    }
+  `,
+);
 
 export const Headline = styled.h2`
   margin-bottom: 5px;
