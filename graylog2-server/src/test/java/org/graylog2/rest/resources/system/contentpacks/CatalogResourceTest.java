@@ -16,18 +16,14 @@
  */
 package org.graylog2.rest.resources.system.contentpacks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
-import org.graylog2.Configuration;
-import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
-import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelId;
@@ -42,7 +38,6 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitl
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
-import org.graylog2.shared.users.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -57,22 +52,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CatalogResourceTest {
 
     private EntityFacade<Void> mockEntityFacade = Mockito.mock(EntityFacade.class);
 
-    private ContentPackService contentPackService;
+    private ContentPackEntityResolver contentPackEntityResolver;
 
     @Before
     public void setUp() {
-        final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
-                mock(ContentPackInstallationPersistenceService.class);
-        final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), mock(Configuration.class), mock(UserService.class), Set.of());
+        contentPackEntityResolver = new ContentPackEntityResolver(entityFacades);
     }
 
     @Test
@@ -86,7 +77,7 @@ public class CatalogResourceTest {
         );
         when(mockEntityFacade.listEntityExcerpts()).thenReturn(entityExcerpts);
 
-        final CatalogResource resource = new CatalogResource(contentPackService, (r, p) -> EntitiesTitleResponse.EMPTY_RESPONSE);
+        final CatalogResource resource = new CatalogResource((r, p) -> EntitiesTitleResponse.EMPTY_RESPONSE, contentPackEntityResolver);
 
         final CatalogIndexResponse catalogIndexResponse = resource.showEntityIndex();
 
@@ -114,7 +105,7 @@ public class CatalogResourceTest {
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 
-        final CatalogResource resource = new CatalogResource(contentPackService, (r, p) -> EntitiesTitleResponse.EMPTY_RESPONSE);
+        final CatalogResource resource = new CatalogResource((r, p) -> EntitiesTitleResponse.EMPTY_RESPONSE, contentPackEntityResolver);
 
         final CatalogResolveResponse catalogResolveResponse = resource.resolveEntities(request);
 
@@ -129,7 +120,7 @@ public class CatalogResourceTest {
                 Set.of()
         );
 
-        final CatalogResource resource = new CatalogResource(contentPackService, (r, p) -> expectedResponse);
+        final CatalogResource resource = new CatalogResource((r, p) -> expectedResponse, contentPackEntityResolver);
 
         final EntitiesTitleResponse actualResponse = resource.getTitles(request, TestSearchUser.builder().build());
         assertEquals(expectedResponse, actualResponse);

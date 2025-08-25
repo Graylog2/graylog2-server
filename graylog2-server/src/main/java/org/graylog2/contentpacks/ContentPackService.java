@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.common.graph.ElementOrder;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -30,10 +29,12 @@ import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
 import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -60,7 +61,6 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
@@ -76,7 +76,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,7 +100,8 @@ public class ContentPackService {
     private final ObjectMapper objectMapper;
     private final Configuration configuration;
     private final UserService userService;
-    private final Set<ContentPackInstallationHook> contentPackInstallationHooks;
+    private final GRNRegistry grnRegistry;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
@@ -110,14 +110,16 @@ public class ContentPackService {
                               ObjectMapper objectMapper,
                               Configuration configuration,
                               UserService userService,
-                              Set<ContentPackInstallationHook> contentPackInstallationHooks) {
+                              GRNRegistry grnRegistry,
+                              EntitySharesService entitySharesService) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
         this.objectMapper = objectMapper;
         this.configuration = configuration;
         this.userService = userService;
-        this.contentPackInstallationHooks = contentPackInstallationHooks;
+        this.grnRegistry = grnRegistry;
+        this.entitySharesService = entitySharesService;
     }
 
 
@@ -229,9 +231,21 @@ public class ContentPackService {
                 .createdBy(userContext.getUser().getName())
                 .build();
 
-        contentPackInstallationHooks.forEach(hook -> hook.afterInstallation(installation, shareRequest, userContext));
+        shareEntities(installation, shareRequest, userContext);
 
         return contentPackInstallationPersistenceService.insert(installation);
+    }
+
+    public void shareEntities(ContentPackInstallation installation, EntityShareRequest shareRequest, UserContext userContext) {
+        if (shareRequest.grantees().isEmpty()) {
+            return;
+        }
+        final var user = userContext.getUser();
+        final var allEntities = installation.entities();
+        final var entityGRNs = allEntities.stream()
+                .map(entity -> grnRegistry.newGRN(entity.type().name(), entity.id().id()))
+                .toList();
+        entityGRNs.forEach((grn) -> entitySharesService.updateEntityShares(grn, shareRequest, user));
     }
 
     private Map<EntityDescriptor, Object> getMapWithSystemStreamEntities() {
@@ -393,78 +407,6 @@ public class ContentPackService {
                 .build();
     }
 
-    public Set<EntityExcerpt> listAllEntityExcerpts() {
-        final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
-        entityFacades.values().forEach(facade -> entityIndexBuilder.addAll(facade.listEntityExcerpts()));
-        return entityIndexBuilder.build();
-    }
-
-    public Map<String, EntityExcerpt> getEntityExcerpts() {
-        return listAllEntityExcerpts().stream().collect(Collectors.toMap(x -> x.id().id(), x -> x));
-    }
-
-    public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
-        return resolveEntityDependencyGraph(unresolvedEntities).nodes();
-    }
-
-    public Graph<EntityDescriptor> resolveEntityDependencyGraph(Collection<EntityDescriptor> unresolvedEntities) {
-        final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
-                .allowsSelfLoops(false)
-                .nodeOrder(ElementOrder.insertion())
-                .build();
-        unresolvedEntities.forEach(dependencyGraph::addNode);
-
-        final HashSet<EntityDescriptor> resolvedEntities = new HashSet<>();
-        final MutableGraph<EntityDescriptor> finalDependencyGraph = resolveDependencyGraph(dependencyGraph, resolvedEntities);
-
-        LOG.debug("Final dependency graph: {}", finalDependencyGraph);
-
-        return finalDependencyGraph;
-    }
-
-    private MutableGraph<EntityDescriptor> resolveDependencyGraph(Graph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
-        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.from(dependencyGraph).build();
-        Graphs.merge(mutableGraph, dependencyGraph);
-
-        for (EntityDescriptor entityDescriptor : dependencyGraph.nodes()) {
-            LOG.debug("Resolving entity {}", entityDescriptor);
-            if (resolvedEntities.contains(entityDescriptor)) {
-                LOG.debug("Entity {} already resolved, skipping.", entityDescriptor);
-                continue;
-            }
-
-            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
-            final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
-            LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
-
-            Graphs.merge(mutableGraph, graph);
-            LOG.trace("New dependency graph: {}", mutableGraph);
-
-            resolvedEntities.add(entityDescriptor);
-            final Graph<EntityDescriptor> result = resolveDependencyGraph(mutableGraph, resolvedEntities);
-            Graphs.merge(mutableGraph, result);
-        }
-
-        return mutableGraph;
-    }
-
-    public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
-        // It's important to only compute the EntityDescriptor IDs once per #collectEntities call! Otherwise we
-        // will get broken references between the entities.
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(resolvedEntities);
-
-        final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
-        for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            if (EntityDescriptorIds.isSystemStreamDescriptor(entityDescriptor)) {
-                continue;
-            }
-            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
-
-            facade.exportEntity(entityDescriptor, entityDescriptorIds).ifPresent(entities::add);
-        }
-
-        return entities.build();
-    }
 
     private ImmutableGraph<Entity> buildEntityGraph(Entity rootEntity,
                                                     Set<Entity> entities,

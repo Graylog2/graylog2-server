@@ -36,6 +36,8 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.aggregation.AggregationConditions;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -53,6 +55,7 @@ import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
@@ -71,7 +74,6 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
@@ -109,7 +111,6 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
@@ -130,17 +131,14 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -201,7 +199,9 @@ public class ContentPackServiceTest {
     @Mock
     EntityRegistrar entityRegistrar;
     @Mock
-    ContentPackInstallationHook contentPackInstallationHook;
+    GRNRegistry grnRegistry;
+    @Mock
+    EntitySharesService entitySharesService;
 
     private ContentPackService contentPackService;
 
@@ -228,7 +228,7 @@ public class ContentPackServiceTest {
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService, Set.of(contentPackInstallationHook));
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService, grnRegistry, entitySharesService);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -298,7 +298,7 @@ public class ContentPackServiceTest {
 
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
 
-        verify(contentPackInstallationHook, times(1)).afterInstallation(any(ContentPackInstallation.class), eq(EntityShareRequest.EMPTY), any(UserContext.class));
+        verify(entitySharesService, times(1)).updateEntityShares(any(GRN.class), any(EntityShareRequest.class), any(User.class));
     }
 
     @Test
@@ -357,60 +357,6 @@ public class ContentPackServiceTest {
         UserContext userContext = SecurityTestUtils.getUserContext(userService);
         assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", userContext, EntityShareRequest.EMPTY))
                 .isInstanceOf(ContentPackException.class);
-    }
-
-    @Test
-    public void resolveEntitiesWithEmptyInput() {
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(Collections.emptySet());
-        assertThat(resolvedEntities).isEmpty();
-    }
-
-    @Test
-    public void resolveEntitiesWithNoDependencies() throws NotFoundException {
-        final StreamMock streamMock = new StreamMock(ImmutableMap.of(
-                "_id", "stream-1234",
-                StreamImpl.FIELD_TITLE, "Stream Title"
-        ));
-
-        when(streamService.load("stream-1234")).thenReturn(streamMock);
-
-        final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1)
-        );
-
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
-        assertThat(resolvedEntities).containsOnly(EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1));
-    }
-
-    @Test
-    public void resolveEntitiesWithTransitiveDependencies() throws NotFoundException {
-        final ObjectId streamId = ObjectId.get();
-        final ObjectId outputId = ObjectId.get();
-        final StreamMock streamMock = new StreamMock(streamId,
-                ImmutableMap.of(
-                        StreamImpl.FIELD_TITLE, "Stream Title"),
-                List.of(),
-                Set.of(OutputImpl.create(
-                        outputId.toHexString(),
-                        "Output Title",
-                        "org.example.outputs.SomeOutput",
-                        "admin",
-                        Collections.emptyMap(),
-                        new Date(0L),
-                        null
-                )), null);
-
-        when(streamService.load(streamId.toHexString())).thenReturn(streamMock);
-
-        final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create(streamId.toHexString(), ModelTypes.STREAM_V1)
-        );
-
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
-        assertThat(resolvedEntities).containsOnly(
-                EntityDescriptor.create(streamId.toHexString(), ModelTypes.STREAM_V1),
-                EntityDescriptor.create(outputId.toHexString(), ModelTypes.OUTPUT_V1)
-        );
     }
 
     @Test
