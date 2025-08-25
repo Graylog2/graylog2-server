@@ -38,6 +38,8 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
+import org.graylog.grn.providers.BultinGRNTypeProvider;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -52,6 +54,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.security.Capability;
 import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntityShareRequest;
@@ -139,7 +142,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -199,8 +204,6 @@ public class ContentPackServiceTest {
     @Mock
     EntityRegistrar entityRegistrar;
     @Mock
-    GRNRegistry grnRegistry;
-    @Mock
     EntitySharesService entitySharesService;
 
     private ContentPackService contentPackService;
@@ -228,7 +231,8 @@ public class ContentPackServiceTest {
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService, grnRegistry, entitySharesService);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades,
+                new ObjectMapper(), configuration, userService, new GRNRegistry(Set.of(new BultinGRNTypeProvider())), entitySharesService);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -298,7 +302,39 @@ public class ContentPackServiceTest {
 
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
 
-        verify(entitySharesService, times(1)).updateEntityShares(any(GRN.class), any(EntityShareRequest.class), any(User.class));
+        verify(entitySharesService, never()).updateEntityShares(any(GRN.class), any(EntityShareRequest.class), any(User.class));
+    }
+
+    @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, RestPermissions.EVENT_DEFINITIONS_CREATE})
+    public void installContentPackWithSharingConfiguration() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
+        ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+        }
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+        when(searchDbService.save(any())).thenReturn(Search.builder().id("id").build());
+        when(viewService.saveWithOwner(any(), any())).thenReturn(ViewDTO.builder().id("id").title("title").searchId("id").state(Collections.emptyMap()).build());
+        when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
+
+        final var entityShareRequest = EntityShareRequest.create(Map.of(GRN.builder().type("user").grnType(GRNTypes.USER).entity("deadbeef").build(), Capability.VIEW));
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, entityShareRequest);
+
+        verify(entitySharesService, times(entities.size())).updateEntityShares(any(GRN.class), eq(entityShareRequest), any(User.class));
     }
 
     @Test
