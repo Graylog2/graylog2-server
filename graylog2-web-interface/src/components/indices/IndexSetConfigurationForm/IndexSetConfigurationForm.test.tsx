@@ -52,6 +52,7 @@ const indexSet = {
   index_template_type: null,
   writable: true,
   default: false,
+  field_restrictions: [],
 };
 
 const retentionStrategies = [
@@ -212,7 +213,7 @@ const rotationStrategies = [
 
 const indexSetTemplateDefaults = {
   index_prefix: 'default_index_prefix',
-  index_analyzer: 'default_index_analyser',
+  index_analyzer: 'default_index_analyzer',
   shards: 1,
   replicas: 1,
   index_optimization_max_num_segments: 1,
@@ -236,6 +237,7 @@ const indexSetTemplateDefaults = {
     index_lifetime_min: '10',
     index_lifetime_max: '30',
   },
+  field_restrictions: [],
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
@@ -282,8 +284,8 @@ describe('IndexSetConfigurationForm', () => {
   it('Should render create IndexSetConfigurationForm', async () => {
     render(<SUT create />);
 
-    const indexPrefix = await screen.findByDisplayValue(/default_index_prefix/i);
+    const indexAnalyzer = await screen.findByDisplayValue(/default_index_analyzer/i);
 
-    expect(indexPrefix).toBeInTheDocument();
+    expect(indexAnalyzer).toBeInTheDocument();
   });
 });
