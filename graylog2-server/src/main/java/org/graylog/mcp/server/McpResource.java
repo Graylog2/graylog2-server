@@ -30,6 +30,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -50,6 +51,7 @@ public class McpResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @SkipCSRFProtection("server-to-server")
+    @NoAuditEvent("prototype")
     public Response post(@Context HttpHeaders headers, String body) throws IOException {
         final String accept = Optional.ofNullable(headers.getHeaderString(HttpHeaders.ACCEPT)).orElse("");
         final JsonNode payload = (body == null || body.isEmpty()) ? NullNode.getInstance() : objectMapper.readTree(body);
@@ -97,6 +99,7 @@ public class McpResource extends RestResource {
     @GET
     @Produces("text/event-stream")
     @SkipCSRFProtection("server-to-server")
+    @NoAuditEvent("prototype")
     public Response get() {
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
     }
