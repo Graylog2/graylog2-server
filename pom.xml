@@ -150,12 +150,12 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250517</json-org.version>
         <json-path.version>2.9.0</json-path.version>
-        <jsoup.version>1.21.1</jsoup.version>
+        <jsoup.version>1.21.2</jsoup.version>
         <kafka.version>4.0.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.1</log4j.version>
         <lucene.version>9.12.2</lucene.version>
-        <metrics.version>4.2.33</metrics.version>
+        <metrics.version>4.2.34</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -198,7 +198,7 @@
         <assertj-core.version>3.27.4</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.7</equalsverifier.version>
+        <equalsverifier.version>4.0.9</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
