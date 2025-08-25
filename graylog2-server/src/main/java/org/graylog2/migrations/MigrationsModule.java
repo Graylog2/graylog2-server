@@ -77,5 +77,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20250506090000_AddInputTypesPermissions.class);
         addMigration(V20250721090000_AddClusterConfigurationPermission.class);
         addMigration(V20250804104500_TightenTokenSecurity.class);
+        addMigration(V20250820180000_ReapplyIndexSetScopeMigration.class);
     }
 }
