@@ -38,7 +38,9 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -49,6 +51,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
@@ -121,10 +124,19 @@ public class DashboardsResource extends RestResource {
                                                             allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
-        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+        Predicate<ViewSummaryDTO> predicate = switch (scope) {
             case READ -> searchUser::canReadView;
             case UPDATE -> searchUser::canUpdateView;
         };
+
+        final Optional<String> entitySourceFilter = SourcedMongoEntityUtils.filterValue(filters);
+        if (entitySourceFilter.isPresent()) {
+            final String source = entitySourceFilter.get();
+            final boolean filterUserDefined = source.equals(EntitySource.USER_DEFINED);
+            // If filtering for USER_DEFINED content, then the filter needs to include documents without an entity source at all
+            predicate = predicate.and(view -> view.entitySource().map(s -> s.source().equals(source)).orElse(filterUserDefined));
+            filters = SourcedMongoEntityUtils.removeEntitySourceFilter(filters);
+        }
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;

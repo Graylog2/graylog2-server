@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
    only documents which have the corresponding type.
  */
 @DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ)
-public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity {
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";
     public enum Type {
         SEARCH,
@@ -184,14 +184,14 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SourcedMongoEntity.Builder<ViewDTO, Builder> {
         @ObjectId
         @Id
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
 
         @JsonProperty(FIELD_ENTITY_SOURCE)
-        public abstract Builder entitySource(@Nullable EntitySource source);
+        public abstract Builder entitySource(Optional<EntitySource> source);
 
         @JsonProperty(FIELD_TYPE)
         public abstract Builder type(Type type);
