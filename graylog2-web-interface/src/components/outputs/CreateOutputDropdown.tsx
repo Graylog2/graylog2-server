@@ -60,7 +60,7 @@ const CreateOutputDropdown = ({ types, getTypeDefinition, onSubmit }: CreateOutp
     },
     [getTypeDefinition],
   );
-  const outputTypes = useMemo(() => Object.entries(types).map(([name, type]) => formatOutputType(type, name)), []);
+  const outputTypes = useMemo(() => Object.entries(types).map(([name, type]) => formatOutputType(type, name)), [types]);
 
   return (
     <div>
