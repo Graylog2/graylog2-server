@@ -47,6 +47,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -97,7 +98,15 @@ public class EmailEventNotification implements EventNotification {
             final Optional<EventProcedure> eventProcedure = eventProcedureProvider
                     .getDecoratedForEvent(ctx.eventDefinition().get().eventProcedureId(), ctx.event());
             if (eventProcedure.isPresent()) {
-                config = config.toBuilder().htmlBodyTemplate(config.htmlBodyTemplate() + eventProcedure.get().toHtml()).build();
+                if (!isNullOrEmpty(config.htmlBodyTemplate())) {
+                    config = config.toBuilder()
+                            .htmlBodyTemplate(config.htmlBodyTemplate() + eventProcedure.get().toHtml())
+                            .build();
+                } else {
+                    config = config.toBuilder()
+                            .bodyTemplate(config.bodyTemplate() + eventProcedure.get().toText())
+                            .build();
+                }
             }
         }
 

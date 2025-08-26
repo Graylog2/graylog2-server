@@ -27,7 +27,10 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -98,6 +101,12 @@ public class PerformSearch extends Action {
 
         @JsonIgnore
         @Override
+        public String toText() {
+            return getLink();
+        }
+
+        @JsonIgnore
+        @Override
         public String toHtml() {
             return f("""
                     <td><a href="%s" target="_blank">Perform Search</a></td>
@@ -106,20 +115,22 @@ public class PerformSearch extends Action {
 
         @JsonIgnore
         private String getLink() {
-            final StringBuilder link = new StringBuilder("${http_external_uri}");
+            final URIBuilder uriBuilder = new URIBuilder();
+            final StringBuilder linkBuilder = new StringBuilder();
             if (Boolean.TRUE.equals(useSavedSearch())) {
-                link.append("views/").append(savedSearch());
+                uriBuilder.setPath("views/" +  savedSearch());
+                linkBuilder.append("views/").append(savedSearch());
                 if (parameters() != null && !parameters().isEmpty()) {
-                    link.append("?");
-                    link.append(String.join("&", parameters().entrySet().stream()
+                    linkBuilder.append("?");
+                    linkBuilder.append(String.join("&", parameters().entrySet().stream()
                             .map(p -> p.getKey() + "=" + p.getValue())
                             .toList()));
                 }
             } else {
-                link.append("search?q=").append(query());
+                linkBuilder.append("search?q=").append(query());
             }
 
-            return link.toString();
+            return "${http_external_uri}" + URI.create(linkBuilder.toString()).toString();
         }
 
         @AutoValue.Builder

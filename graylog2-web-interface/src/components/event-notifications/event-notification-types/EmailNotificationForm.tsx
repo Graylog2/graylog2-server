@@ -705,7 +705,7 @@ class EmailNotificationForm extends React.Component<
             type="checkbox"
             id="include_event_procedure"
             name="include_event_procedure"
-            label="Include Event Procedure In HTML Body"
+            label="Include Event Procedure in Email Body"
             onChange={this.handleChange}
             checked={config.include_event_procedure}
           />

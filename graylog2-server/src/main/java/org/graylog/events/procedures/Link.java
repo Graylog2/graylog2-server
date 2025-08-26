@@ -65,6 +65,12 @@ public class Link extends Action {
 
         @JsonIgnore
         @Override
+        public String toText() {
+            return getLink();
+        }
+
+        @JsonIgnore
+        @Override
         public String toHtml() {
             return f("""
                     <td><a href="%s" target="_blank">Follow Link</a></td>

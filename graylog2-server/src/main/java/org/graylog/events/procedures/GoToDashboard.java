@@ -27,6 +27,7 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
@@ -74,6 +75,12 @@ public class GoToDashboard extends Action {
 
         @JsonIgnore
         @Override
+        public String toText() {
+            return getLink();
+        }
+
+        @JsonIgnore
+        @Override
         public String toHtml() {
             return f("""
                     <td><a href="%s" target="_blank">Go to Dashboard</a></td>
@@ -82,7 +89,7 @@ public class GoToDashboard extends Action {
 
         @JsonIgnore
         private String getLink() {
-            final StringBuilder link = new StringBuilder("${http_external_uri}");
+            final StringBuilder link = new StringBuilder();
             link.append("dashboards/").append(dashboardId());
             if (parameters() != null && !parameters().isEmpty()) {
                 link.append("?");
@@ -91,7 +98,7 @@ public class GoToDashboard extends Action {
                         .toList()));
             }
 
-            return link.toString();
+            return "${http_external_uri}" + URI.create(link.toString()).toString();
         }
 
         @AutoValue.Builder
