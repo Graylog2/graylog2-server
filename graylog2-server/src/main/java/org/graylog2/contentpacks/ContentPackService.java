@@ -243,6 +243,7 @@ public class ContentPackService {
         final var user = userContext.getUser();
         final var allEntities = installation.entities();
         final var entityGRNs = allEntities.stream()
+                .filter(entity -> grnRegistry.supportsType(entity.type().name()))
                 .map(entity -> grnRegistry.newGRN(entity.type().name(), entity.id().id()))
                 .toList();
         entityGRNs.forEach((grn) -> entitySharesService.updateEntityShares(grn, shareRequest, user));
