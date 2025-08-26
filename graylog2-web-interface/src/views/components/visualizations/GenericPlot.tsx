@@ -97,7 +97,7 @@ type Props = {
   layout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string) => void;
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
-  onClickMarker?: (event: PlotMouseEvent) => void;
+  onClickMarker?: (markerEvent: OnClickMarkerEvent, event?: PlotMouseEvent) => void;
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
@@ -252,7 +252,13 @@ const GenericPlot = ({
 
   const _onMarkerClick = useCallback(
     (e: Readonly<Plotly.PlotMouseEvent>) => {
-      onClickMarker?.(e);
+      onClickMarker?.(
+        {
+          x: e.points[0].x as string,
+          y: e.points[0].y as string,
+        },
+        e,
+      );
     },
     [onClickMarker],
   );

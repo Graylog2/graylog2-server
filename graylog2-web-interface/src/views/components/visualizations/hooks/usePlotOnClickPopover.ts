@@ -22,6 +22,7 @@ import flatMap from 'lodash/flatMap';
 import minBy from 'lodash/minBy';
 
 import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -360,7 +361,7 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
     setClickPoint(a.pt);
   }, []);
 
-  const onChartClick = (e: PlotMouseEvent) => {
+  const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
