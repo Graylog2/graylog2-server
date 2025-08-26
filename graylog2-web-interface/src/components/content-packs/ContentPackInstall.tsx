@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import { Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
-import { ContentPackInstallation, ContentPackParameter } from 'components/content-packs/Types';
-import styled from 'styled-components';
+import type { ContentPackInstallation, ContentPackParameter } from 'components/content-packs/Types';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import ContentPackUtils from './ContentPackUtils';
 import ContentPackEntitiesList from './ContentPackEntitiesList';
-import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
-import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type ContentPackInstallProps = {
   contentPack: ContentPackInstallation;
@@ -42,6 +42,7 @@ type State = {
 const EntitiesListContainer = styled.div`
   margin-top: 20px;
 `;
+
 class ContentPackInstall extends React.Component<ContentPackInstallProps, State> {
   static defaultProps = {
     onInstall: () => {},
@@ -169,7 +170,7 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, State>
         />
         {parameterInputs.length > 0 && (
           <>
-            <label>Configure Parameter(s):</label>
+            <strong>Configure Parameter(s):</strong>
             {parameterInputs}
           </>
         )}

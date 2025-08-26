@@ -17,6 +17,7 @@
 import React, { act } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+
 import { StoreMock as MockStore } from 'helpers/mocking';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 
