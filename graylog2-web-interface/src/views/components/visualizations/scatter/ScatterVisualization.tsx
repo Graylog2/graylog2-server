@@ -24,13 +24,11 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import type { Generator } from 'views/components/visualizations/ChartData';
-import useMapKeys from 'views/components/visualizations/useMapKeys';
-import { keySeparator, humanSeparator } from 'views/Constants';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 
 import XYPlot from '../XYPlot';
 
@@ -39,33 +37,19 @@ const ScatterVisualization = makeVisualization(
     const visualizationConfig = (config.visualizationConfig ??
       ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
     const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
-    const mapKeys = useMapKeys();
-    const rowPivotFields = useMemo(
-      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
-      [config?.rowPivots],
-    );
-    const _mapKeys = useCallback(
-      (labels: string[]) =>
-        labels.map((label) =>
-          label
-            .split(keySeparator)
-            .map((l, i) => mapKeys(l, rowPivotFields[i]))
-            .join(humanSeparator),
-        ),
-      [mapKeys, rowPivotFields],
-    );
+
     const rows = useMemo(() => retrieveChartData(data), [data]);
     const seriesGenerator: Generator = useCallback(
       ({ type, name, labels, values, originalName, fullPath }) => ({
         type,
         name,
-        x: _mapKeys(labels),
+        x: labels,
         y: values,
         mode: 'markers',
         originalName,
         ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
       }),
-      [_mapKeys, getChartDataSettingsWithCustomUnits],
+      [getChartDataSettingsWithCustomUnits],
     );
     const _chartDataResult = useChartData(rows, {
       widgetConfig: config,

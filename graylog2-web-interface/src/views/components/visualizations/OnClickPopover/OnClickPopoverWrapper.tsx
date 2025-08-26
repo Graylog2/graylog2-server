@@ -17,8 +17,8 @@
 import React from 'react';
 
 import Popover from 'components/common/Popover';
-import type { Pos } from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
+import type { Pos } from 'views/components/visualizations/OnClickPopover/Types';
 
 type Props = React.PropsWithChildren<{
   isPopoverOpen: boolean;

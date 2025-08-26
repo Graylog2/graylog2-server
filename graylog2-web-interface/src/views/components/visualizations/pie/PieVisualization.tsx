@@ -31,8 +31,8 @@ import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visua
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
-import PieOnClickPopover from 'views/components/visualizations/pie/PieOnClickPopover';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
+import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 
 import GenericPlot from '../GenericPlot';
 import type { ChartConfig } from '../GenericPlot';
@@ -131,7 +131,7 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
       </PlotLegend>
       <OverflowingComponentsContextProvider>
         <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <PieOnClickPopover clickPoint={clickPoint} config={config} />
+          <PieOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
         </OnClickPopoverWrapper>
       </OverflowingComponentsContextProvider>
     </>

@@ -17,12 +17,12 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { ClickPoint } from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import Value from 'views/components/Value';
 import Popover from 'components/common/Popover';
+import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 
-const ValueBox = styled.span<{ $bgColor: string }>(
-  ({ theme, $bgColor }) => css`
+const ValueBox = styled.span<{ $bgColor?: string }>(
+  ({ theme }) => css`
     padding: ${theme.spacings.xxs};
   `,
 );

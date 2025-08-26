@@ -15,16 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useRef, useState, useLayoutEffect, useCallback } from 'react';
-import type { PlotDatum } from 'plotly.js/lib/core';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import map from 'lodash/map';
 import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
 import minBy from 'lodash/minBy';
 
-export type ClickPoint = PlotMouseEvent['points'][number];
-export type Pos = { left: number; top: number } | null;
-type Rel = { x: number; y: number };
+import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -40,7 +37,7 @@ const getBarElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null =>
 
 const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
   const {
-    data: { uid },
+    fullData: { uid },
     pointIndex,
   } = pt;
 
@@ -122,7 +119,7 @@ const plotlyListeners = ['plotly_relayout', 'plotly_relayouting', 'plotly_redraw
 const useAnchorPosition = (anchor: Anchor | null, gdRef: React.RefObject<PlotlyHTMLElement>) => {
   const [pos, setPos] = useState<Pos>(null);
 
-  useLayoutEffect(() => {
+  useLayoutEffect((): void | (() => void) => {
     if (!anchor) {
       setPos(null);
 
@@ -202,6 +199,8 @@ const pickNearestElementAnchor = (
     ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
 
+  // TODO: add extra candidates to if distance is not so big
+  /*
   const candidatesWithDistances = candidates.map((candidate) => {
     const rect = candidate.rect as DOMRect;
     let dx = 0;
@@ -214,8 +213,7 @@ const pickNearestElementAnchor = (
 
     return { d, candidate };
   });
-
-  console.log({ candidatesWithDistances });
+  */
 
   const picked =
     inside ??
@@ -248,7 +246,7 @@ const makeElementAnchor = (
   const getEl =
     chartType === 'bar'
       ? getBarElement
-      : (graphDiv: HTMLElement, pt: PlotDatum, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
+      : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
   const graphDiv = gd as unknown as HTMLElement;
   const targetEl = (e.event?.target as Element) || graphDiv;
   const candidates = compact(
@@ -320,7 +318,7 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
 const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
   const graphDiv = gd;
   const markerCandidates = compact(
-    map(e.points, (pt) => {
+    map(e.points, (pt: ClickPoint) => {
       const el = getScatterMarkerElement(graphDiv, pt as ClickPoint);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;

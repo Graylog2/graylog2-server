@@ -42,6 +42,7 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
   const { eventDefinition, isScheduled } = extractSchedulerInfo(rest);
 
   return EventsDefinitions.create(isScheduled, {
+    // @ts-ignore
     entity: eventDefinition,
     share_request: {
       selected_collections: share_request?.selected_collections,
@@ -52,6 +53,7 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
 
 const useEventDefinitionMutations = () => {
   const createMutation = useMutation({
+    // @ts-ignore
     mutationFn: createEventDefinition,
     onError: (errorThrown) => {
       UserNotification.error(

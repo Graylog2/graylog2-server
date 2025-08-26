@@ -24,16 +24,14 @@ import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
-import useMapKeys from 'views/components/visualizations/useMapKeys';
-import { keySeparator, humanSeparator } from 'views/Constants';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import CartesianOnClickPopoverDropdown from 'views/components/visualizations/CartesianOnClickPopoverDropdown';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopoverWrapper';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -93,22 +91,6 @@ const BarVisualization = makeVisualization(
       [visualizationConfig],
     );
 
-    const mapKeys = useMapKeys();
-    const rowPivotFields = useMemo(
-      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
-      [config?.rowPivots],
-    );
-    const _mapKeys = useCallback(
-      (labels: string[]) =>
-        labels.map((label) =>
-          label
-            .split(keySeparator)
-            .map((l, i) => mapKeys(l, rowPivotFields[i]))
-            .join(humanSeparator),
-        ),
-      [mapKeys, rowPivotFields],
-    );
-
     const getBarChartDataSettingsWithCustomUnits = useBarChartDataSettingsWithCustomUnits({
       config,
       barmode,
@@ -117,12 +99,11 @@ const BarVisualization = makeVisualization(
     const _seriesGenerator: Generator = useCallback(
       ({ type, name, labels, values, originalName, total, idx, fullPath }): ChartDefinition => {
         const opacity = visualizationConfig?.opacity ?? 1.0;
-        const mappedKeys = _mapKeys(labels);
 
         return {
           type,
           name,
-          x: mappedKeys,
+          x: labels,
           y: values,
           opacity,
           originalName,
@@ -133,11 +114,11 @@ const BarVisualization = makeVisualization(
             values,
             idx,
             total,
-            xAxisItemsLength: mappedKeys.length,
+            xAxisItemsLength: labels.length,
           }),
         };
       },
-      [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits],
+      [visualizationConfig?.opacity, getBarChartDataSettingsWithCustomUnits],
     );
 
     const rows = useMemo(() => retrieveChartData(data), [data]);
