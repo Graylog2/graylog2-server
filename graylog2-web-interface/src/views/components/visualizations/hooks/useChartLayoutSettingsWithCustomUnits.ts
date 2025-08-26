@@ -48,7 +48,12 @@ const useChartLayoutSettingsWithCustomUnits = ({
   );
 
   return useCallback(() => {
-    if (!unitFeatureEnabled) return {};
+    if (!unitFeatureEnabled)
+      return {
+        xaxis: {
+          ...ticksConfig,
+        },
+      };
 
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
