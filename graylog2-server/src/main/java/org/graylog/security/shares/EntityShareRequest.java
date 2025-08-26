@@ -34,6 +34,7 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class EntityShareRequest {
+    public static final EntityShareRequest EMPTY = empty();
 
     public static final String SELECTED_GRANTEE_CAPABILITIES = "selected_grantee_capabilities";
     public static final String SELECTED_COLLECTIONS = "selected_collections";
@@ -62,6 +63,10 @@ public abstract class EntityShareRequest {
         final ImmutableMap<GRN, Capability> capabilities = selectedGranteeCapabilities == null ? null : ImmutableMap.copyOf(selectedGranteeCapabilities);
         final ImmutableSet<GRN> collections = selectedCollections == null ? null : ImmutableSet.copyOf(selectedCollections);
         return new AutoValue_EntityShareRequest(Optional.ofNullable(capabilities), Optional.ofNullable(collections));
+    }
+
+    public static EntityShareRequest empty() {
+        return create(Map.of(), List.of());
     }
 
     public static EntityShareRequest create(
