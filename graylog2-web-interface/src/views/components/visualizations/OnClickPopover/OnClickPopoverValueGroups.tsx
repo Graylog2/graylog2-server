@@ -32,8 +32,8 @@ const DivContainer = styled.div(
 
 const ValueBox = styled.span<{ $bgColor: string | number }>(
   ({ theme, $bgColor }) => css`
-    background-color: ${$bgColor};
-    color: ${theme.utils.contrastingColor(String($bgColor))};
+    background-color: ${$bgColor ?? 'inherit'};
+    color: ${$bgColor ? theme.utils.contrastingColor(String($bgColor)) : 'inherit'};
     padding: ${theme.spacings.xxs};
   `,
 );

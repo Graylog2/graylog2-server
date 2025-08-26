@@ -181,7 +181,7 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
         onClickMarker={onChartClick}
       />
       <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-        <HeatmapOnClickPopover clickPoint={clickPoint} />
+        <HeatmapOnClickPopover clickPoint={clickPoint} config={config} />
       </OnClickPopoverWrapper>
     </Container>
   );

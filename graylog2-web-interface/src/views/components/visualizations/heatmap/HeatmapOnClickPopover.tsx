@@ -14,44 +14,58 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React, { useMemo } from 'react';
 
-import Value from 'views/components/Value';
 import Popover from 'components/common/Popover';
-import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { ClickPoint, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
+import { keySeparator } from 'views/Constants';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 
-const ValueBox = styled.span<{ $bgColor?: string }>(
-  ({ theme }) => css`
-    padding: ${theme.spacings.xxs};
-  `,
-);
+const HeatmapOnClickPopover = ({ clickPoint, config }: { config: AggregationWidgetConfig; clickPoint: ClickPoint }) => {
+  const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
+    if (!clickPoint || !config) return {};
+    const splitXValues: Array<string | number> = (clickPoint.x as string).split(keySeparator);
+    const traceColor = null;
+    const metric: string = splitXValues.pop() as string;
 
-const Container = styled.span(
-  ({ theme }) => css`
-    display: inline-flex;
-    align-items: center;
-    gap: ${theme.spacings.xxs};
-    font-size: ${theme.fonts.size.tiny};
-  `,
-);
+    const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
-const HeatmapOnClickPopover = ({ clickPoint }: { clickPoint: ClickPoint }) => {
-  if (!clickPoint) return null;
+    const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+    const splitYValues: Array<string | number> = `${String(clickPoint.y)}`.split(keySeparator);
+
+    return {
+      rowPivotValues: splitYValues.map((value, i) => ({
+        value,
+        field: rowPivotsToFields[i],
+        text: String(value),
+        traceColor,
+      })),
+      columnPivotValues: splitXValues.map((value, i) => ({
+        value,
+        field: columnPivotsToFields[i],
+        text: String(value),
+        traceColor,
+      })),
+      metricValue: {
+        value: clickPoint.z,
+        field: metric,
+        text: String(clickPoint.z),
+        traceColor,
+      },
+    };
+  }, [clickPoint, config]);
 
   return (
-    <Popover.Dropdown title={String(clickPoint?.x)}>
-      <Value
-        field={clickPoint.data.name}
-        value={clickPoint.y}
-        render={() => (
-          <Container>
-            <ValueBox>{`${String(clickPoint.text ?? clickPoint.y)}`}</ValueBox>
-            <span>{clickPoint.data.name}</span>
-          </Container>
-        )}
-      />
-    </Popover.Dropdown>
+    clickPoint && (
+      <Popover.Dropdown title={String(clickPoint?.z)}>
+        <OnClickPopoverValueGroups
+          columnPivotValues={columnPivotValues}
+          metricValue={metricValue}
+          rowPivotValues={rowPivotValues}
+        />
+      </Popover.Dropdown>
+    )
   );
 };
 
