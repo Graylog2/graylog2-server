@@ -41,6 +41,8 @@ public abstract class IndexSetUpdateRequest implements
 
     public IndexSetConfig toIndexSetConfig(final IndexSetConfig oldConfig) {
         return oldConfig.toBuilder()
+                .id(oldConfig.id())
+                .scope(oldConfig.scope())
                 .title(title())
                 .description(description())
                 .isWritable(isWritable())
