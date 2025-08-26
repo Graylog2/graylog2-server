@@ -17,7 +17,9 @@
 package org.graylog2.rest.resources.system.indexer.requests;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
@@ -30,6 +32,7 @@ import org.graylog2.shared.fields.TitleAndDescriptionFields;
 
 @AutoValue
 @JsonDeserialize(builder = IndexSetUpdateRequest.Builder.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class IndexSetUpdateRequest implements
         IdField,
         TitleAndDescriptionFields,
@@ -68,6 +71,8 @@ public abstract class IndexSetUpdateRequest implements
     }
 
     @AutoValue.Builder
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder implements
             IdFieldBuilder<Builder>,
             TitleAndDescriptionFieldsBuilder<Builder>,
