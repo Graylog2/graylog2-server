@@ -90,7 +90,7 @@
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.15.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.22.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
