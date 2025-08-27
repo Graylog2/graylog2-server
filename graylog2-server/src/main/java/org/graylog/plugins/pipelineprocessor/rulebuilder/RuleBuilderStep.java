@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
@@ -83,7 +84,7 @@ public abstract class RuleBuilderStep {
     public abstract List<String> errors();
 
     @JsonCreator
-    public static RuleBuilderStep create(@JsonProperty(FIELD_ID) @Nullable String id,
+    public static RuleBuilderStep create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                          @JsonProperty(FIELD_FUNCTION) @Nullable String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
                                          @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
