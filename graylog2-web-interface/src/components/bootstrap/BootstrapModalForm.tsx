@@ -28,7 +28,7 @@ type Props = {
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   show: boolean;
   submitButtonText?: string;
-  onSubmitForm?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmitForm?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onCancel: () => void;
   title: string | React.ReactNode;
   children: React.ReactNode;
