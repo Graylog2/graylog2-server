@@ -33,6 +33,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static java.util.Objects.requireNonNullElse;
+
 public class NaturalDateParser {
     private final TimeZone timeZone;
     private final ZoneId zoneId;
@@ -157,7 +159,7 @@ public class NaturalDateParser {
             throw new DateNotParsableException("Unparsable date: " + string);
         }
 
-        return new Result(from, to, this.dateTimeZone);
+        return new Result(referenceDate, from, to, this.dateTimeZone);
     }
 
     public static class Result {
@@ -165,20 +167,10 @@ public class NaturalDateParser {
         private final DateTime to;
         private final DateTimeZone dateTimeZone;
 
-        public Result(final Date from, final Date to, final DateTimeZone dateTimeZone) {
+        public Result(final Date referenceDate, final Date from, final Date to, final DateTimeZone dateTimeZone) {
             this.dateTimeZone = dateTimeZone;
-
-            if (from != null) {
-                this.from = new DateTime(from, this.dateTimeZone);
-            } else {
-                this.from = Tools.now(this.dateTimeZone);
-            }
-
-            if (to != null) {
-                this.to = new DateTime(to, this.dateTimeZone);
-            } else {
-                this.to = Tools.now(this.dateTimeZone);
-            }
+            this.from = new DateTime(requireNonNullElse(from, referenceDate), this.dateTimeZone);
+            this.to = new DateTime(requireNonNullElse(to, referenceDate), this.dateTimeZone);
         }
 
         public DateTime getFrom() {
