@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -65,13 +66,13 @@ public class Link extends Action {
 
         @JsonIgnore
         @Override
-        public String toText() {
+        public String toText(EventDto event) {
             return getLink();
         }
 
         @JsonIgnore
         @Override
-        public String toHtml() {
+        public String toHtml(EventDto event) {
             return f("""
                     <td><a href="%s" target="_blank">Follow Link</a></td>
                     """, getLink());

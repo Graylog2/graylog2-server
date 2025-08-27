@@ -22,10 +22,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.events.event.EventDto;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 @JsonDeserialize(builder = EventProcedureStep.Builder.class)
@@ -53,25 +52,12 @@ public abstract class EventProcedureStep extends ScopedEntity {
 
     public abstract Builder toBuilder();
 
-    public String toText(int stepNum) {
-        final StringBuilder textBuilder = new StringBuilder();
-        textBuilder.append(f("%d. %s        %s      ", stepNum, title(), description()));
-        if (action() != null) {
-            textBuilder.append(action().config().toText());
-        }
-        return textBuilder.toString();
+    public String toText(EventDto event) {
+        return action() != null ? action().config().toText(event) : "";
     }
 
-    public String toHtml(int stepNum) {
-        final StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.append(f("""
-                <tr><td>%d. %s</td><td>%s</td>
-                """, stepNum, title(), description()));
-        if (action() != null) {
-            htmlBuilder.append(action().config().toHtml());
-        }
-        htmlBuilder.append("</tr>");
-        return htmlBuilder.toString();
+    public String toHtml(EventDto event) {
+        return action() != null ? action().config().toHtml(event) : "";
     }
 
     @AutoValue.Builder

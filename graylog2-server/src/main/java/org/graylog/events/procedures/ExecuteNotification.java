@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 
-import static org.graylog.events.procedures.TemplateURI.HTTP_EXTERNAL_URI;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
@@ -64,21 +64,24 @@ public class ExecuteNotification extends Action {
 
         @JsonIgnore
         @Override
-        public String toText() {
-            return getLink();
+        public String toText(EventDto event) {
+            return getLink(event);
         }
 
         @JsonIgnore
         @Override
-        public String toHtml() {
+        public String toHtml(EventDto event) {
             return f("""
                     <td><a href="%s" target="_blank">View Event to Execute Notification</a></td>
-                    """, getLink());
+                    """, getLink(event));
         }
 
         @JsonIgnore
-        private String getLink() {
-            return HTTP_EXTERNAL_URI + "security/security-events/alerts?query=id:${event.id}";
+        private String getLink(EventDto event) {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("security/security-events/alerts");
+            uriBuilder.addParameter("query", "id:" + event.id());
+            return uriBuilder.build().getLink();
         }
 
         @AutoValue.Builder

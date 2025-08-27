@@ -70,6 +70,11 @@ record TemplateURI(String path, Map<String, String> parameters) {
             return this;
         }
 
+        public Builder setTimeRange(String rawPath) {
+            this.path = rawPath;
+            return this;
+        }
+
         TemplateURI build() {
             return new TemplateURI(path, parameters);
         }

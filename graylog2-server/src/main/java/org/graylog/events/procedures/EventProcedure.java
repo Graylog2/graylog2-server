@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.events.event.EventDto;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
 
@@ -74,8 +75,7 @@ public abstract class EventProcedure extends ScopedEntity {
         public abstract EventProcedure build();
     }
 
-    // TODO: Build this out if needed
-    public String toText() {
+    public String toText(EventDto event) {
         final StringBuilder textBuilder = new StringBuilder();
         textBuilder.append(f("""
                 --- [Event Procedure] ----------------------------
@@ -86,16 +86,17 @@ public abstract class EventProcedure extends ScopedEntity {
                 Steps:""", title(), description()));
 
         if (steps() != null && !steps().isEmpty()) {
-            for (int i = 1; i <= steps().size(); i++) {
-                textBuilder.append("\n");
-                textBuilder.append(steps().get(i-1).toText(i));
+            for (int i = 0; i < steps().size(); i++) {
+                final EventProcedureStep step = steps().get(i);
+                textBuilder.append("\n")
+                        .append(f("%d. %s\n\t%s\n\t%s", i + 1, step.title(), step.description(), step.toText(event)));
             }
         }
 
         return textBuilder.toString();
     }
 
-    public String toHtml() {
+    public String toHtml(EventDto event) {
         final StringBuilder htmlBuilder = new StringBuilder();
         htmlBuilder.append("""
                 <table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
@@ -112,8 +113,12 @@ public abstract class EventProcedure extends ScopedEntity {
             htmlBuilder.append("""
                     <tr><td><Strong>Steps</Strong></td>
                     """);
-            for (int i = 1; i <= steps().size(); i++) {
-                htmlBuilder.append(steps().get(i-1).toHtml(i));
+            for (int i = 0; i < steps().size(); i++) {
+                final EventProcedureStep step = steps().get(i);
+                htmlBuilder.append(f("""
+                        <tr><td>%d. %s</td><td>%s</td>
+                        """, i + 1, step.title(), step.description()));
+                htmlBuilder.append(step.toHtml(event));
             }
         }
 

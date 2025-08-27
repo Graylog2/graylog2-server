@@ -27,6 +27,7 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
@@ -98,27 +99,34 @@ public class PerformSearch extends Action {
 
         @JsonIgnore
         @Override
-        public String toText() {
-            return getLink();
+        public String toText(EventDto event) {
+            return getLink(event);
         }
 
         @JsonIgnore
         @Override
-        public String toHtml() {
+        public String toHtml(EventDto event) {
             return f("""
                     <td><a href="%s" target="_blank">Perform Search</a></td>
-                    """, getLink());
+                    """, getLink(event));
         }
 
         @JsonIgnore
-        private String getLink() {
+        private String getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             if (Boolean.TRUE.equals(useSavedSearch())) {
-                uriBuilder.setPath("views/" +  savedSearch());
+                uriBuilder.setPath("views/" + savedSearch());
                 uriBuilder.setParameters(parameters());
             } else {
                 uriBuilder.setPath("search");
-                uriBuilder.addParameter("q",  query());
+                uriBuilder.addParameter("q", query());
+            }
+            if (event.replayInfo().isPresent()
+                    && event.replayInfo().get().timerangeStart() != null
+                    && event.replayInfo().get().timerangeEnd() != null) {
+                uriBuilder.addParameter("rangetype", "absolute");
+                uriBuilder.addParameter("from", event.replayInfo().get().timerangeStart().toString());
+                uriBuilder.addParameter("to", event.replayInfo().get().timerangeEnd().toString());
             }
 
             return uriBuilder.build().getLink();
