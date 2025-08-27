@@ -19,9 +19,9 @@ import concat from 'lodash/concat';
 import remove from 'lodash/remove';
 
 import generateId from 'logic/generateId';
+import type { ContentPackEntity, ContentPackParameter } from 'components/content-packs/Types';
 
 import Entity from './Entity';
-import { ContentPackEntity, ContentPackParameter } from 'components/content-packs/Types';
 
 export default class ContentPack {
   private _value: {
@@ -36,6 +36,7 @@ export default class ContentPack {
     parameters: ContentPackParameter[];
     entities: ContentPackEntity[];
   };
+
   constructor(
     v: number,
     id: string,
@@ -120,7 +121,7 @@ export default class ContentPack {
   toBuilder() {
     const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
       Map({
         v,
@@ -163,7 +164,7 @@ export default class ContentPack {
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .v(1)
       .id(generateId())
@@ -180,6 +181,7 @@ export default class ContentPack {
 
 class Builder {
   private value: Map<string, unknown>;
+
   constructor(value: Map<string, unknown> = Map()) {
     this.value = value;
   }

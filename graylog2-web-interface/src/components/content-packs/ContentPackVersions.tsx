@@ -19,10 +19,10 @@ import React from 'react';
 import { DataTable } from 'components/common';
 import ContentPackVersionItem from 'components/content-packs/components/ContentPackVersionItem';
 import type { ContentPackInstallation } from 'components/content-packs/Types';
-
-import './ContentPackVersions.css';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+
+import './ContentPackVersions.css';
 
 type Props = {
   contentPackRevisions: ContentPackRevisions;
