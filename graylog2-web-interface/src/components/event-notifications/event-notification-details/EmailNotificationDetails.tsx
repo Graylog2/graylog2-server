@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
+import useSecurityLicenseValid from 'components/event-notifications/hooks/useSecurityLicenseValid';
 
 import styles from '../event-notification-types/EmailNotificationSummary.css';
 
@@ -144,6 +145,12 @@ const EmailNotificationDetails = ({ notification }: EmailNotificationDetailsProp
           </Well>
         }
       />
+      {useSecurityLicenseValid() && (
+        <ReadOnlyFormGroup
+          label="Include Event Procedure in Email Body"
+          value={notification.config.include_event_procedure ? 'Yes' : 'No'}
+        />
+      )}
     </>
   );
 };

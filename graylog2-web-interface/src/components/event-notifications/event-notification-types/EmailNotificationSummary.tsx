@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { Well } from 'components/bootstrap';
+import useSecurityLicenseValid from 'components/event-notifications/hooks/useSecurityLicenseValid';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 import styles from './EmailNotificationSummary.css';
@@ -184,10 +185,12 @@ const EmailNotificationSummary = ({ notification = {}, ...otherProps }: EmailNot
           </Well>
         </td>
       </tr>
-      <tr>
-        <td>Include Event Procedure in Email Body</td>
-        <td>{notification.config.include_event_procedure ? 'Yes' : 'No'}</td>
-      </tr>
+      {useSecurityLicenseValid() && (
+        <tr>
+          <td>Include Event Procedure in Email Body</td>
+          <td>{notification.config.include_event_procedure ? 'Yes' : 'No'}</td>
+        </tr>
+      )}
     </>
   </CommonNotificationSummary>
 );

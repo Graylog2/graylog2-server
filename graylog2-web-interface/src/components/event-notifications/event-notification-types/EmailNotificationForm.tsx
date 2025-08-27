@@ -23,6 +23,7 @@ import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import useSecurityLicenseValid from 'components/event-notifications/hooks/useSecurityLicenseValid';
 
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
@@ -85,6 +86,25 @@ const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="
 
 // eslint-disable-next-line no-template-curly-in-string
 const LOOKUP_KEY_PLACEHOLDER_TEXT = '${event.group_by_fields.group_by_field}';
+
+const EventProcedureCheckbox = ({checked, onChange}) => {
+  if (!useSecurityLicenseValid()) {
+    return null;
+  }
+
+  return (
+    <FormGroup>
+      <Input
+        type="checkbox"
+        id="include_event_procedure"
+        name="include_event_procedure"
+        label="Include Event Procedure in Email Body"
+        onChange={onChange}
+        checked={checked}
+      />
+    </FormGroup>
+  );
+};
 
 type EmailNotificationFormProps = {
   config: any;
@@ -700,16 +720,10 @@ class EmailNotificationForm extends React.Component<
             {validation?.errors?.body?.[0] || 'The template that will be used to generate the email HTML body.'}
           </HelpBlock>
         </FormGroup>
-        <FormGroup>
-          <Input
-            type="checkbox"
-            id="include_event_procedure"
-            name="include_event_procedure"
-            label="Include Event Procedure in Email Body"
-            onChange={this.handleChange}
-            checked={config.include_event_procedure}
-          />
-        </FormGroup>
+        <EventProcedureCheckbox
+          checked={config.include_event_procedure}
+          onChange={this.handleChange}
+        />
       </>
     );
   }
