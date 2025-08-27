@@ -35,7 +35,6 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.rest.models.SortOrder;
@@ -48,7 +47,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
@@ -104,14 +102,9 @@ public class SavedSearchesResource extends RestResource {
         }
 
         Predicate<ViewSummaryDTO> predicate = searchUser::canReadView;
-        final Optional<String> entitySourceFilter = SourcedMongoEntityUtils.filterValue(filters);
-        if (entitySourceFilter.isPresent()) {
-            final String source = entitySourceFilter.get();
-            final boolean filterUserDefined = source.equals(EntitySource.USER_DEFINED);
-            // If filtering for USER_DEFINED content, then the filter needs to include documents without an entity source at all
-            predicate = predicate.and(view -> view.entitySource().map(s -> s.source().equals(source)).orElse(filterUserDefined));
-            filters = SourcedMongoEntityUtils.removeEntitySourceFilter(filters);
-        }
+        final SourcedMongoEntityUtils.FilterPredicate<ViewSummaryDTO> filterPredicate = SourcedMongoEntityUtils.handleEntitySourceFilter(filters, predicate);
+        filters = filterPredicate.filters();
+        predicate = filterPredicate.predicate();
 
         try {
             final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
