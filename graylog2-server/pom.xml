@@ -59,6 +59,7 @@
         <mainClass>org.graylog2.bootstrap.Main</mainClass>
         <webInterface.path>../graylog2-web-interface</webInterface.path>
         <skip.web.build>false</skip.web.build>
+        <skip.web.tests>false</skip.web.tests>
 
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
@@ -1152,6 +1153,17 @@
             </build>
         </profile>
         <profile>
+            <id>skip-web-interface-tests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <skip.web.tests>true</skip.web.tests>
+            </properties>
+        </profile>
+        <profile>
             <id>web-interface-build</id>
             <activation>
                 <property>
@@ -1270,6 +1282,7 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                    <skipTests>${skip.web.tests}</skipTests>
                                 </configuration>
                             </execution>
                             <execution>
