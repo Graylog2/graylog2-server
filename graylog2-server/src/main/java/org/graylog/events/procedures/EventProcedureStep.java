@@ -63,15 +63,15 @@ public abstract class EventProcedureStep extends ScopedEntity {
     }
 
     public String toHtml(int stepNum) {
-        final StringBuilder stepBuilder = new StringBuilder();
-        stepBuilder.append(f("""
+        final StringBuilder htmlBuilder = new StringBuilder();
+        htmlBuilder.append(f("""
                 <tr><td>%d. %s</td><td>%s</td>
                 """, stepNum, title(), description()));
         if (action() != null) {
-            stepBuilder.append(action().config().toHtml());
+            htmlBuilder.append(action().config().toHtml());
         }
-        stepBuilder.append("</tr>");
-        return stepBuilder.toString();
+        htmlBuilder.append("</tr>");
+        return htmlBuilder.toString();
     }
 
     @AutoValue.Builder
