@@ -27,7 +27,6 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
@@ -89,16 +88,10 @@ public class GoToDashboard extends Action {
 
         @JsonIgnore
         private String getLink() {
-            final StringBuilder link = new StringBuilder();
-            link.append("dashboards/").append(dashboardId());
-            if (parameters() != null && !parameters().isEmpty()) {
-                link.append("?");
-                link.append(String.join("&", parameters().entrySet().stream()
-                        .map(p -> p.getKey() + "=" + p.getValue())
-                        .toList()));
-            }
-
-            return "${http_external_uri}" + URI.create(link.toString()).toString();
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("dashboards/" + dashboardId());
+            uriBuilder.setParameters(parameters());
+            return uriBuilder.build().getLink();
         }
 
         @AutoValue.Builder

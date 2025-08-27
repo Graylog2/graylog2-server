@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 
+import static org.graylog.events.procedures.TemplateURI.HTTP_EXTERNAL_URI;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
@@ -77,7 +78,7 @@ public class ExecuteNotification extends Action {
 
         @JsonIgnore
         private String getLink() {
-            return "${http_external_uri}security/security-events/alerts?query=id:${event.id}";
+            return HTTP_EXTERNAL_URI + "security/security-events/alerts?query=id:${event.id}";
         }
 
         @AutoValue.Builder
