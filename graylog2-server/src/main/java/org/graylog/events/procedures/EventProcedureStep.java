@@ -55,7 +55,7 @@ public abstract class EventProcedureStep extends ScopedEntity {
 
     public String toText(int stepNum) {
         final StringBuilder textBuilder = new StringBuilder();
-        textBuilder.append(f("%d. %s                  %s    ", stepNum, title(), description()));
+        textBuilder.append(f("%d. %s        %s      ", stepNum, title(), description()));
         if (action() != null) {
             textBuilder.append(action().config().toText());
         }
