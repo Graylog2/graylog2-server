@@ -99,7 +99,7 @@ type Props = {
   config: AggregationWidgetConfig;
   chartData: any;
   labelFields?: (config: Props['config']) => Array<string>;
-  labelMapper?: (data: Array<any>) => Array<string> | undefined | null;
+  metricMapper?: (data: Array<any>) => Array<string> | undefined | null;
   neverHide?: boolean;
   height: number;
   width: number;
@@ -237,7 +237,7 @@ const PlotLegend = ({
   children,
   config,
   chartData,
-  labelMapper = defaultLabelMapper,
+  metricMapper = defaultLabelMapper,
   labelFields = columnPivotsToFields,
   neverHide = false,
   height,
@@ -249,7 +249,7 @@ const PlotLegend = ({
   const fieldTypes = useContext(FieldTypesContext);
   const { limitHeight } = useContext(WidgetRenderingContext);
 
-  const labels = labelMapper(chartData);
+  const labels = metricMapper(chartData);
   const Container = limitHeight ? FixedContainer : VariableContainer;
 
   if (!neverHide && !focusedWidget?.editing && series.length <= 1 && columnPivots.length <= 0) {

@@ -20,9 +20,12 @@ import map from 'lodash/map';
 import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
 import minBy from 'lodash/minBy';
+import sortBy from 'lodash/sortBy';
+import uniqBy from 'lodash/uniqBy';
 
 import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
+import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -98,7 +101,7 @@ const dataToPagePx = (gd: PlotlyHTMLElementWithInternals, pt: ClickPoint, xVal: 
 };
 
 /** ---------- Anchors ---------- */
-type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint };
+type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint; rPts?: Array<ClickPoint> };
 type Anchor = ElementAnchor;
 
 /** ---------- helpers for pos updates ---------- */
@@ -200,8 +203,6 @@ const pickNearestElementAnchor = (
     ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
 
-  // TODO: add extra candidates to if distance is not so big
-  /*
   const candidatesWithDistances = candidates.map((candidate) => {
     const rect = candidate.rect as DOMRect;
     let dx = 0;
@@ -214,28 +215,21 @@ const pickNearestElementAnchor = (
 
     return { d, candidate };
   });
-  */
 
-  const picked =
-    inside ??
-    minBy(candidates, ({ rect }) => {
-      let dx = 0;
-      if (clientX < rect.left) dx = rect.left - clientX;
-      else if (clientX > rect.right) dx = clientX - rect.right;
-      let dy = 0;
-      if (clientY < rect.top) dy = rect.top - clientY;
-      else if (clientY > rect.bottom) dy = clientY - rect.bottom;
+  const rPts = sortBy(
+    candidatesWithDistances.filter(({ d }) => d < CANDIDATE_PICK_RADIUS),
+    'd',
+  ).map(({ candidate }) => candidate.pt);
 
-      return Math.hypot(dx, dy);
-    });
-  if (!picked) return null;
-  const { el, rect, pt } = picked;
+  const closest = inside ?? minBy(candidatesWithDistances, 'd').candidate;
+  if (!closest) return null;
+  const { el, rect, pt } = closest;
   const rel: Rel = {
     x: clamp01((clientX - rect.left) / Math.max(rect.width, 1)),
     y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', el, rel, pt };
+  return { kind: 'element', el, rel, pt, rPts };
 };
 
 /** ---------- bar/pie anchors ---------- */
@@ -257,6 +251,8 @@ const makeElementAnchor = (
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
     }),
   );
+
+  console.log({ candidates });
 
   return pickNearestElementAnchor(e, candidates);
 };
@@ -333,6 +329,15 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
     flatMap(e.points as ClickPoint[], (pt) => getScatterLineElements(graphDiv, click, pt)),
   );
   const best = minBy(lineCandidates, 'd');
+  // we need unique pt because in this case one pt can have several related lines
+  const rPts = uniqBy(
+    sortBy(
+      lineCandidates.filter(({ d }) => d < CANDIDATE_PICK_RADIUS),
+      'd',
+    ).map(({ pt }) => pt),
+    'pointIndex',
+  );
+
   if (!best) return null;
   const { el, pt, valuePx, valuePy } = best;
   if (!el) return null;
@@ -342,7 +347,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
     y: clamp01((valuePy - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', rel, el, pt };
+  return { kind: 'element', rel, el, pt, rPts };
 };
 
 /** ---------- hook ---------- */
@@ -350,6 +355,7 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
+  const [clickPointsInRadius, setClickPointsInRadius] = useState<ClickPoint[] | null>(null);
   const pos = useAnchorPosition(anchor, gdRef);
 
   const initializeGraphDivRef = (_: unknown, gd: PlotlyHTMLElement) => {
@@ -359,6 +365,7 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
   const applyAnchor = useCallback((a: ElementAnchor) => {
     setAnchor(a);
     setClickPoint(a.pt);
+    setClickPointsInRadius(a.rPts);
   }, []);
 
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
@@ -383,7 +390,7 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
 
   const isPopoverOpen = !!anchor && !!pos;
 
-  return { initializeGraphDivRef, onChartClick, onPopoverChange, isPopoverOpen, pos, clickPoint };
+  return { initializeGraphDivRef, onChartClick, onPopoverChange, isPopoverOpen, pos, clickPoint, clickPointsInRadius };
 };
 
 export default usePlotOnClickPopover;

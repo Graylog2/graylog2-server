@@ -117,7 +117,7 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
       <PlotLegend
         config={config}
         chartData={transformedData}
-        labelMapper={labelMapper}
+        metricMapper={labelMapper}
         labelFields={rowPivotsToFields}
         neverHide
         height={height}

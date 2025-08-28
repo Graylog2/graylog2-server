@@ -29,6 +29,7 @@ import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizatio
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
+import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
 
 import XYPlot from '../XYPlot';
 
@@ -70,8 +71,15 @@ const ScatterVisualization = makeVisualization(
 
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
-    const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
-      usePlotOnClickPopover('scatter');
+    const {
+      pos,
+      onPopoverChange,
+      isPopoverOpen,
+      initializeGraphDivRef,
+      onChartClick,
+      clickPoint,
+      clickPointsInRadius,
+    } = usePlotOnClickPopover('scatter');
 
     return (
       <>
@@ -87,7 +95,12 @@ const ScatterVisualization = makeVisualization(
           onInitialized={initializeGraphDivRef}
         />
         <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
+          <DropdownSwitcher
+            component={CartesianOnClickPopoverDropdown}
+            clickPoint={clickPoint}
+            config={config}
+            clickPointsInRadius={clickPointsInRadius}
+          />
         </OnClickPopoverWrapper>
       </>
     );
