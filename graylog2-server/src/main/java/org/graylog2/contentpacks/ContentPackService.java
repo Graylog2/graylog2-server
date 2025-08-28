@@ -61,6 +61,7 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
@@ -412,7 +413,6 @@ public class ContentPackService {
                 .build();
     }
 
-<<<<<<< HEAD
     public Set<EntityExcerpt> listAllEntityExcerpts() {
         final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
         entityFacades.values().forEach(facade -> entityIndexBuilder.addAll(facade.listEntityExcerpts()));
@@ -422,71 +422,6 @@ public class ContentPackService {
     public Map<String, EntityExcerpt> getEntityExcerpts() {
         return listAllEntityExcerpts().stream().collect(Collectors.toMap(x -> x.id().id(), x -> x));
     }
-
-    public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
-        return resolveEntityDependencyGraph(unresolvedEntities).nodes();
-    }
-
-    public Graph<EntityDescriptor> resolveEntityDependencyGraph(Collection<EntityDescriptor> unresolvedEntities) {
-        final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
-                .allowsSelfLoops(false)
-                .nodeOrder(ElementOrder.insertion())
-                .build();
-        unresolvedEntities.forEach(dependencyGraph::addNode);
-
-        final HashSet<EntityDescriptor> resolvedEntities = new HashSet<>();
-        final MutableGraph<EntityDescriptor> finalDependencyGraph = resolveDependencyGraph(dependencyGraph, resolvedEntities);
-
-        LOG.debug("Final dependency graph: {}", finalDependencyGraph);
-
-        return finalDependencyGraph;
-    }
-
-    private MutableGraph<EntityDescriptor> resolveDependencyGraph(Graph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
-        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.from(dependencyGraph).build();
-        Graphs.merge(mutableGraph, dependencyGraph);
-
-        for (EntityDescriptor entityDescriptor : dependencyGraph.nodes()) {
-            LOG.debug("Resolving entity {}", entityDescriptor);
-            if (resolvedEntities.contains(entityDescriptor)) {
-                LOG.debug("Entity {} already resolved, skipping.", entityDescriptor);
-                continue;
-            }
-
-            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
-            final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
-            LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
-
-            Graphs.merge(mutableGraph, graph);
-            LOG.trace("New dependency graph: {}", mutableGraph);
-
-            resolvedEntities.add(entityDescriptor);
-            final Graph<EntityDescriptor> result = resolveDependencyGraph(mutableGraph, resolvedEntities);
-            Graphs.merge(mutableGraph, result);
-        }
-
-        return mutableGraph;
-    }
-
-    public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
-        // It's important to only compute the EntityDescriptor IDs once per #collectEntities call! Otherwise we
-        // will get broken references between the entities.
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.withSystemStreams(streamService.getSystemStreamIds(true), resolvedEntities);
-
-        final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
-        for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            if (ModelTypes.STREAM_V1.equals(entityDescriptor.type()) && streamService.getSystemStreamIds(true).contains(entityDescriptor.id().id())) {
-                continue;
-            }
-            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
-
-            facade.exportEntity(entityDescriptor, entityDescriptorIds).ifPresent(entities::add);
-        }
-
-        return entities.build();
-    }
-=======
->>>>>>> origin/master
 
     private ImmutableGraph<Entity> buildEntityGraph(Entity rootEntity,
                                                     Set<Entity> entities,
