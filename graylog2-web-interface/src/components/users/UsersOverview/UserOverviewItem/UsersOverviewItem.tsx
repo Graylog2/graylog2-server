@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 import type UserOverview from 'logic/users/UserOverview';
+import { RestrictedAccessTooltip } from 'components/common';
 import RolesCell from 'components/permissions/RolesCell';
 
 import ActionsCell from './ActionsCell';
@@ -29,6 +33,11 @@ type Props = {
   user: UserOverview;
   isActive: boolean;
 };
+
+const NameColumn = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const UsersOverviewItem = ({
   user,
@@ -45,19 +54,33 @@ const UsersOverviewItem = ({
     authServiceEnabled,
   },
   isActive,
-}: Props) => (
-  <tr key={username} className={isActive ? 'active' : ''}>
-    <LoggedInCell lastActivity={lastActivity} sessionActive={sessionActive} clientAddress={clientAddress} />
-    <td className="limited">
-      <Link to={Routes.SYSTEM.USERS.show(id)}>{fullName}</Link>
-    </td>
-    <td className="limited">{username}</td>
-    <td className="limited">{email}</td>
-    <td className="limited">{clientAddress}</td>
-    <StatusCell accountStatus={accountStatus} authServiceEnabled={authServiceEnabled} />
-    <RolesCell roles={roles} />
-    <ActionsCell user={user} />
-  </tr>
-);
+}: Props) => {
+  const currentUser = useCurrentUser();
+  const hasEditPermissions = isPermitted(currentUser.permissions, `users:edit:${id}`);
+
+  return (
+    <tr key={username} className={isActive ? 'active' : ''}>
+      <LoggedInCell lastActivity={lastActivity} sessionActive={sessionActive} clientAddress={clientAddress} />
+      <td className="limited">
+        <NameColumn>
+          {hasEditPermissions ? (
+            <Link to={Routes.SYSTEM.USERS.show(id)}>{fullName}</Link>
+          ) : (
+            <>
+              {fullName}
+              <RestrictedAccessTooltip entityName="user" capabilityName="view" />
+            </>
+          )}
+        </NameColumn>
+      </td>
+      <td className="limited">{username}</td>
+      <td className="limited">{email}</td>
+      <td className="limited">{clientAddress}</td>
+      <StatusCell accountStatus={accountStatus} authServiceEnabled={authServiceEnabled} />
+      <RolesCell roles={roles} />
+      <ActionsCell user={user} />
+    </tr>
+  );
+};
 
 export default UsersOverviewItem;
