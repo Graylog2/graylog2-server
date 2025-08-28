@@ -44,7 +44,7 @@ const Container = styled.div<{
   height: ${({ $height, $maxHeight }) =>
     // eslint-disable-next-line no-nested-ternary
     $height && !$maxHeight ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
-  min-height: 100px;
+  min-height: 50px;
   width: 100%;
   max-height: ${({ $maxHeight }) =>
     // eslint-disable-next-line no-nested-ternary
@@ -63,7 +63,7 @@ const ExpandIconButton = styled(IconButton)`
 const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
   overflow: hidden auto;
   height: 100%;
-  padding: 0 ${({ $noPadding }) => ($noPadding ? '0' : '8px')};
+  padding: ${({ $noPadding }) => ($noPadding ? '4px 0' : '0 8px')};
 
   container-type: inline-size;
 
