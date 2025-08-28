@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
@@ -51,6 +52,7 @@ describe('<ContentPackEdit />', () => {
     .summary('A old content pack')
     .vendor('Beinstein')
     .url('http://beinstein.com')
+    // @ts-ignore
     .entities([enrichedEntity])
     .parameters([parameter])
     .build();
@@ -95,13 +97,13 @@ describe('<ContentPackEdit />', () => {
       />,
     );
 
-    (await screen.findByRole('button', { name: 'Next' })).click();
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
 
     await screen.findByText(/Parameters list/i);
 
-    (await screen.findByRole('button', { name: 'Next' })).click();
+    await userEvent.click(await screen.findByRole('button', { name: 'Next' }));
 
-    (await screen.findByRole('button', { name: 'Create' })).click();
+    await userEvent.click(await screen.findByRole('button', { name: 'Create' }));
 
     await waitFor(() => {
       expect(saveFn).toHaveBeenCalled();
