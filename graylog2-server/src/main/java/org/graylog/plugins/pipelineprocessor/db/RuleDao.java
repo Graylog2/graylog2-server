@@ -65,7 +65,7 @@ public abstract class RuleDao implements ScopedEntity<RuleDao.Builder> {
     public abstract String simulatorMessage();
 
     public static Builder builder() {
-        return new AutoValue_RuleDao.Builder();
+        return new AutoValue_RuleDao.Builder().scope(DefaultEntityScope.NAME);
     }
 
     public abstract Builder toBuilder();

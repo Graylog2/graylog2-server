@@ -58,7 +58,7 @@ public abstract class PipelineDao implements ScopedEntity<PipelineDao.Builder> {
     public abstract DateTime modifiedAt();
 
     public static Builder builder() {
-        return new AutoValue_PipelineDao.Builder();
+        return new AutoValue_PipelineDao.Builder().scope(DefaultEntityScope.NAME);
     }
 
     public abstract Builder toBuilder();
