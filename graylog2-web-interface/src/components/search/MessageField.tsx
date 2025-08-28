@@ -22,10 +22,10 @@ import { FULL_MESSAGE_FIELD } from 'views/Constants';
 const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
 
 type MessageFieldProps = {
-  customFieldActions?: React.ReactNode;
+  customFieldActions?: React.ReactElement;
   fieldName: string;
   message: any;
-  renderForDisplay: (...args: any[]) => void;
+  renderForDisplay: (name: string) => React.ReactElement;
   value: any;
 };
 

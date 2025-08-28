@@ -20,9 +20,9 @@ import { MessageField } from 'components/search';
 import { MessageDetailsDefinitionList } from 'components/common';
 
 type MessageFieldsProps = {
-  customFieldActions?: React.ReactNode;
+  customFieldActions?: React.ReactElement;
   message: any;
-  renderForDisplay: (...args: any[]) => void;
+  renderForDisplay: (name: string) => React.ReactElement;
 };
 
 class MessageFields extends React.Component<

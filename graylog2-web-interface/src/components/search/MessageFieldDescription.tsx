@@ -31,7 +31,7 @@ const MessageTerms = styled.span(
 type MessageFieldDescriptionProps = {
   message: any;
   fieldName: string;
-  renderForDisplay: (name: string) => React.ReactNode;
+  renderForDisplay: (name: string) => React.ReactElement;
   customFieldActions?: React.ReactElement;
 };
 
