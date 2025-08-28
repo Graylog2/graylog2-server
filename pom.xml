@@ -125,7 +125,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.74.0</grpc.version>
+        <grpc.version>1.75.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -814,7 +814,7 @@
                     <dependency>
                         <groupId>de.skuzzle.enforcer</groupId>
                         <artifactId>restrict-imports-enforcer-rule</artifactId>
-                        <version>2.6.1</version>
+                        <version>3.0.0</version>
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>
