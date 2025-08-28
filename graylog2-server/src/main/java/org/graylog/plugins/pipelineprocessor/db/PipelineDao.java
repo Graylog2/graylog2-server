@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 
 @AutoValue
-public abstract class PipelineDao extends ScopedEntity {
+public abstract class PipelineDao implements ScopedEntity<PipelineDao.Builder> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -88,10 +88,12 @@ public abstract class PipelineDao extends ScopedEntity {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         public abstract PipelineDao build();
 
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 
