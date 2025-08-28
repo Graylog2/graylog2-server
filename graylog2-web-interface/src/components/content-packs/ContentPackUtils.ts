@@ -14,8 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { ContentPackParameter } from 'components/content-packs/Types';
+
 const ContentPackUtils = {
-  convertToString(parameter) {
+  convertToString(parameter: ContentPackParameter): string {
     switch (parameter.type) {
       case 'integer':
       case 'double':
@@ -27,7 +29,7 @@ const ContentPackUtils = {
     }
   },
 
-  convertValue(type, value) {
+  convertValue(type: string, value: any) {
     switch (type) {
       case 'integer':
         return parseInt(value, 10);
