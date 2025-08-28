@@ -23,8 +23,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
@@ -43,7 +44,7 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 @JsonDeserialize(builder = StreamDTO.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)
 // Package-private to prevent usage outside the streams package.
-abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
+abstract class StreamDTO extends ScopedEntity {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
@@ -125,10 +126,11 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
 
     @AutoValue.Builder
     // Package-private to prevent usage outside the streams package.
-    abstract static class Builder implements BuildableMongoEntity.Builder<StreamDTO, Builder> {
+    abstract static class Builder extends AbstractBuilder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .matchingType(DEFAULT_MATCHING_TYPE)
                     .isDefault(false)
                     .isEditable(false)
@@ -189,7 +191,6 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
         public abstract StreamDTO autoBuild();
 
         public StreamDTO build() {
-            isEditable(Stream.streamIsEditable(id()));
             return autoBuild();
         }
     }
