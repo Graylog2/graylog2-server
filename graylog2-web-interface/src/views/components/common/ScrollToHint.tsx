@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
@@ -48,13 +48,14 @@ const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLE
 };
 
 type Props = {
-  scrollContainer: React.RefObject<HTMLDivElement>;
+  scrollContainer: React.RefObject<HTMLElement>;
   title: string;
   // When the dependency changes, the hint will be displayed if this component is not visible.
-  ifValueChanges: unknown;
+  ifValueChanges?: unknown;
+  ifTrue?: boolean;
 };
 
-const ScrollToHint = ({ ifValueChanges, scrollContainer, title }: Props) => {
+const ScrollToHint = ({ ifValueChanges = undefined, scrollContainer, title, ifTrue = true }: Props) => {
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -63,13 +64,14 @@ const ScrollToHint = ({ ifValueChanges, scrollContainer, title }: Props) => {
   // show the scroll hint if necessary
   useEffect(() => {
     if (
+      ifTrue &&
       scrollTargetRef.current &&
       scrollContainer.current &&
       !isElementVisibleInContainer(scrollTargetRef.current, scrollContainer.current)
     ) {
       setShowHint(true);
     }
-  }, [ifValueChanges, setShowHint, scrollContainer]);
+  }, [ifTrue, ifValueChanges, setShowHint, scrollContainer]);
 
   // hide the hint automatically
   useEffect(() => {
@@ -81,6 +83,15 @@ const ScrollToHint = ({ ifValueChanges, scrollContainer, title }: Props) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [showHint, isHovered]);
+
+  const iconName = useMemo(() => {
+    const currentScroll = scrollContainer.current?.scrollTop;
+    const elementTop = scrollTargetRef?.current?.getBoundingClientRect().top;
+
+    return elementTop !== undefined && currentScroll !== undefined && elementTop > currentScroll
+      ? 'arrow_downward'
+      : 'arrow_upward';
+  }, [scrollContainer]);
 
   const scrollToTarget = () => {
     setShowHint(false);
@@ -99,7 +110,7 @@ const ScrollToHint = ({ ifValueChanges, scrollContainer, title }: Props) => {
           aria-label={title}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}>
-          <Icon name="arrow_upward" />
+          <Icon name={iconName} />
         </ScrollHint>
       )}
     </>
