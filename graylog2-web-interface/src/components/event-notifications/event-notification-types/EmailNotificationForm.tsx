@@ -23,7 +23,7 @@ import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import useSecurityLicenseValid from 'components/event-notifications/hooks/useSecurityLicenseValid';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
@@ -88,7 +88,11 @@ const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="
 const LOOKUP_KEY_PLACEHOLDER_TEXT = '${event.group_by_fields.group_by_field}';
 
 const EventProcedureCheckbox = ({checked, onChange}) => {
-  if (!useSecurityLicenseValid()) {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
+
+  if (!validSecurityLicense) {
     return null;
   }
 

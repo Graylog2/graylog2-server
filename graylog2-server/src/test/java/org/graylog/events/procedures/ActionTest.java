@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,12 +59,57 @@ public class ActionTest {
     public void testPerformSearchToText_savedSearch() {
         when(event.replayInfo()).thenReturn(replayInfo());
 
-        String actionText = performSavedSearchConfig().toText(event);
+        String actionText = goToDashboardConfig().toText(event);
 
         assertThat(actionText).contains("${http_external_uri}views/" + ID);
         assertThat(actionText).contains("rangetype=absolute");
         assertThat(actionText).contains("from=" + TIMERANGE_START);
         assertThat(actionText).contains("to=" + TIMERANGE_END);
+        assertThat(actionText).contains("param1=" + "value1");
+        assertThat(actionText).contains("param2=" + "value2");
+    }
+
+    @Test
+    public void testGoToDashboardToText() {
+        when(event.replayInfo()).thenReturn(replayInfo());
+
+        String actionText = performSavedSearchConfig().toText(event);
+
+        assertThat(actionText).contains("${http_external_uri}dashboards/" + ID);
+        assertThat(actionText).contains("rangetype=absolute");
+        assertThat(actionText).contains("from=" + TIMERANGE_START);
+        assertThat(actionText).contains("to=" + TIMERANGE_END);
+        assertThat(actionText).contains("param1=" + "value1");
+        assertThat(actionText).contains("param2=" + "value2");
+    }
+
+    @Test
+    public void testExecuteNotificationToText() {
+        when(event.replayInfo()).thenReturn(replayInfo());
+
+        String actionText = performSavedSearchConfig().toText(event);
+
+        assertThat(actionText).contains("${http_external_uri}security/security-events/alerts" + ID);
+        assertThat(actionText).contains("rangetype=absolute");
+        assertThat(actionText).contains("from=" + TIMERANGE_START);
+        assertThat(actionText).contains("to=" + TIMERANGE_END);
+        assertThat(actionText).contains("param1=" + "value1");
+        assertThat(actionText).contains("param2=" + "value2");
+    }
+
+    private ExecuteNotification.Config executeNotificationConfig() {
+        return ExecuteNotification.Config.builder()
+                .type(ExecuteNotification.NAME)
+                .notificationId(ID)
+                .build();
+    }
+
+    private GoToDashboard.Config goToDashboardConfig() {
+        return GoToDashboard.Config.builder()
+                .type(GoToDashboard.NAME)
+                .dashboardId(ID)
+                .parameters(Map.of("param1", "value1", "param2", "value2"))
+                .build();
     }
 
     private PerformSearch.Config performSearchQueryConfig() {
@@ -79,6 +125,7 @@ public class ActionTest {
                 .type(PerformSearch.NAME)
                 .useSavedSearch(true)
                 .savedSearch(ID)
+                .parameters(Map.of("param1", "value1", "param2", "value2"))
                 .build();
     }
 
