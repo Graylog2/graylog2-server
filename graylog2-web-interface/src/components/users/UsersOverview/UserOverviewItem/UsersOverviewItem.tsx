@@ -34,7 +34,7 @@ type Props = {
   isActive: boolean;
 };
 
-const NameColumn = styled.div`
+const NameColumnWrapper = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -62,7 +62,7 @@ const UsersOverviewItem = ({
     <tr key={username} className={isActive ? 'active' : ''}>
       <LoggedInCell lastActivity={lastActivity} sessionActive={sessionActive} clientAddress={clientAddress} />
       <td className="limited">
-        <NameColumn>
+        <NameColumnWrapper>
           {hasEditPermissions ? (
             <Link to={Routes.SYSTEM.USERS.show(id)}>{fullName}</Link>
           ) : (
@@ -71,7 +71,7 @@ const UsersOverviewItem = ({
               <RestrictedAccessTooltip entityName="user" capabilityName="view" />
             </>
           )}
-        </NameColumn>
+        </NameColumnWrapper>
       </td>
       <td className="limited">{username}</td>
       <td className="limited">{email}</td>
