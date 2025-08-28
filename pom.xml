@@ -125,7 +125,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.3.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.74.0</grpc.version>
+        <grpc.version>1.75.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -133,7 +133,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.19.1</jackson.version>
+        <jackson.version>2.19.2</jackson.version>
         <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -814,7 +814,7 @@
                     <dependency>
                         <groupId>de.skuzzle.enforcer</groupId>
                         <artifactId>restrict-imports-enforcer-rule</artifactId>
-                        <version>2.6.1</version>
+                        <version>3.0.0</version>
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>
@@ -946,7 +946,7 @@
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
                             io.trino.hadoop.$internal.**
-                            autovalue.shaded.org.**
+                            autovalue.shaded.**
 
                             @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject
