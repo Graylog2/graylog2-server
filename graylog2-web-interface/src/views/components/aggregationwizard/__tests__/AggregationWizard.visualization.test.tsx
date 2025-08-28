@@ -134,12 +134,6 @@ const expectSubmitButtonToBeDisabled = async () => {
   expect(submitButton).toBeDisabled();
 };
 
-const selectOption = async (ariaLabel: string, option: string) => {
-  const select = await screen.findByLabelText(ariaLabel);
-  await selectEvent.openMenu(select);
-  await selectEvent.select(select, option);
-};
-
 describe('AggregationWizard/Visualizations', () => {
   beforeAll(() => PluginStore.register(visualizationPlugin));
 
@@ -156,10 +150,7 @@ describe('AggregationWizard/Visualizations', () => {
     const onChange = jest.fn();
     render(<SimpleAggregationWizard onChange={onChange} />);
 
-    const visualizationSelect = await screen.findByLabelText('Select visualization type');
-
-    await selectEvent.openMenu(visualizationSelect);
-    await selectEvent.select(visualizationSelect, 'Without Config');
+    await selectEvent.chooseOption('Select visualization type', 'Without Config');
 
     userEvent.click(await findWidgetConfigSubmitButton());
 
@@ -174,7 +165,7 @@ describe('AggregationWizard/Visualizations', () => {
     const onChange = jest.fn();
     render(<SimpleAggregationWizard onChange={onChange} />);
 
-    await selectOption('Select visualization type', 'Extra Config Required');
+    await selectEvent.chooseOption('Select visualization type', 'Extra Config Required');
 
     await waitFor(async () => {
       await expectSubmitButtonToBeDisabled();
@@ -188,13 +179,13 @@ describe('AggregationWizard/Visualizations', () => {
       expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
     });
 
-    await selectOption('Select Mode', 'anothermode');
+    await selectEvent.chooseOption('Select Mode', 'anothermode');
 
     await waitFor(async () => {
       await expectSubmitButtonToBeDisabled();
     });
 
-    await selectOption('Select Favorite Color', 'Yellow');
+    await selectEvent.chooseOption('Select Favorite Color', 'Yellow');
 
     const submitButton = await findWidgetConfigSubmitButton();
 

@@ -18,6 +18,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
@@ -47,7 +48,7 @@ export const LookupTableCachesActions = singletonActions('core.LookupTableCaches
 
 type StoreState = {
   caches: LookupTableCache[];
-  types: any,
+  types: any;
   pagination: {
     page: number;
     per_page: number;
@@ -55,7 +56,7 @@ type StoreState = {
     count: number;
     query: string | null;
   };
-  validationErrors: any,
+  validationErrors: any;
 };
 export const LookupTableCachesStore = singletonStore('core.LookupTableCaches', () =>
   Reflux.createStore<StoreState>({
@@ -98,14 +99,8 @@ export const LookupTableCachesStore = singletonStore('core.LookupTableCaches', (
       return promise;
     },
 
-    searchPaginated(page, perPage, query) {
-      let url;
-
-      if (query) {
-        url = this._url(`caches?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}`);
-      } else {
-        url = this._url(`caches?page=${page}&per_page=${perPage}`);
-      }
+    searchPaginated(page, perPage, query, sort?: string, order?: 'asc' | 'desc') {
+      const url = this._url(PaginationURL('caches', page, perPage, query, { sort, order }));
 
       const promise = fetch('GET', url);
 

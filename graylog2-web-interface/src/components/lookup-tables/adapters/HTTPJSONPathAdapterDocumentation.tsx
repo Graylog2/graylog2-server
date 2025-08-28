@@ -69,50 +69,55 @@ const HTTPJSONPathAdapterDocumentation = () => {
     {
       value: 'lookup_url',
       label: 'Lookup URL',
-      content:
+      content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
             The URL that will be used for the HTTP request. To use the <em>lookup key</em> in the URL, the
             <code>{'${key}'}</code>
-            value can be used. This variable will be replaced by the actual key that is passed to a lookup function. <br />
+            value can be used. This variable will be replaced by the actual key that is passed to a lookup function.{' '}
+            <br />
             (example: <code>{'https://example.com/api/lookup?key=${key}'}</code>)
           </p>
-        </div>,
+        </div>
+      ),
     },
     {
       value: 'single_value',
       label: 'Single value JSONPath',
-      content:
+      content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
             This JSONPath expression will be used to parse the <em>single value</em> of the lookup result. (example:{' '}
             <code>$.user.full_name</code>)
           </p>
-        </div>,
+        </div>
+      ),
     },
     {
       value: 'multi_value',
       label: 'Multi value JSONPath',
-      content:
+      content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
             This JSONPath expression will be used to parse the <em>multi value</em> of the lookup result. (example:{' '}
-            <code>$.users[*]</code>) The multi value JSONPath setting is <em>optional</em>. Without it, the single value is
-            also present in the multi value result.
+            <code>$.users[*]</code>) The multi value JSONPath setting is <em>optional</em>. Without it, the single value
+            is also present in the multi value result.
           </p>
-        </div>,
+        </div>
+      ),
     },
     {
       value: 'http_useragent',
       label: 'HTTP User-Agent',
-      content:
+      content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some contact
-            details so owners of the services you query know whom to contact if issues arise. (like excessive API requests
-            from your cluster)
+            This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some
+            contact details so owners of the services you query know whom to contact if issues arise. (like excessive
+            API requests from your cluster)
           </p>
-        </div>,
+        </div>
+      ),
     },
   ];
 
@@ -131,7 +136,7 @@ const HTTPJSONPathAdapterDocumentation = () => {
 
       <h3 style={{ marginBottom: 10 }}>Configuration</h3>
 
-      <MantineAccordion accordionItems={accordionItems} defaultValue='lookup_url' />
+      <MantineAccordion accordionItems={accordionItems} defaultValue="lookup_url" />
 
       <hr />
 
@@ -231,6 +236,6 @@ const HTTPJSONPathAdapterDocumentation = () => {
       <pre>{pipelineRule}</pre>
     </div>
   );
-}
+};
 
 export default HTTPJSONPathAdapterDocumentation;

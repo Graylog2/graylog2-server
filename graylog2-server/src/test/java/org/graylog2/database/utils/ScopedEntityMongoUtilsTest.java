@@ -124,6 +124,15 @@ public class ScopedEntityMongoUtilsTest {
         assertThat(collection.countDocuments()).isEqualTo(0L);
     }
 
+    @Test
+    void testScopeModificationDisallowed() {
+        final ScopedDTO nonDeletableScope = ScopedDTO.builder().name("test").scope(NonDeletableScope.NAME).build();
+        final String id = scopedEntityMongoUtils.create(nonDeletableScope);
+        final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(DefaultEntityScope.NAME).build();
+        assertThatThrownBy(() -> scopedEntityMongoUtils.update(updated))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
     static class ImmutableScope extends EntityScope {
 
         public static final String NAME = "IMMUTABLE";

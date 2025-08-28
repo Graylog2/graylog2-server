@@ -24,6 +24,7 @@ import { useFetchCaches } from 'components/lookup-tables/hooks/useLookupTablesAP
 import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 import LUTModals from 'components/lookup-tables/LUTModals';
 import type { CacheEntity } from 'components/lookup-tables/types';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 
 import { cacheListElements } from './constants';
 import columnRenderers from './column-renderers';
@@ -50,6 +51,45 @@ function CacheList() {
   const { fetchPaginatedCaches, cachesKeyFn } = useFetchCaches();
   const { renderActions } = useActions();
 
+  const handleFetchCaches = React.useCallback(
+    async (searchParams: SearchParams) => {
+      const resp = await fetchPaginatedCaches(searchParams);
+
+      const overrides: Record<string, Partial<Attribute>> = {
+        title: { sortable: true },
+        name: { sortable: true },
+        description: { sortable: false },
+      };
+
+      const expectedIds = cacheListElements.defaultLayout.defaultDisplayedAttributes;
+
+      const attrMap = new Map<string, Attribute>();
+
+      (resp.attributes ?? []).forEach((attr) => {
+        const override = overrides[attr.id] ?? {};
+        attrMap.set(attr.id, { ...attr, ...override });
+      });
+
+      expectedIds.forEach((id) => {
+        if (!attrMap.has(id)) {
+          const override = overrides[id] ?? {};
+          attrMap.set(id, {
+            id,
+            title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+            type: 'STRING',
+            ...override,
+          });
+        }
+      });
+
+      return Promise.resolve({
+        ...resp,
+        attributes: Array.from(attrMap.values()),
+      });
+    },
+    [fetchPaginatedCaches],
+  );
+
   return (
     <ModalProvider>
       <ErrorsProvider>
@@ -61,7 +101,7 @@ function CacheList() {
               columnsOrder={cacheListElements.columnOrder}
               queryHelpComponent={queryHelpComponent}
               tableLayout={cacheListElements.defaultLayout}
-              fetchEntities={fetchPaginatedCaches}
+              fetchEntities={handleFetchCaches}
               keyFn={cachesKeyFn}
               actionsCellWidth={100}
               entityAttributesAreCamelCase={false}

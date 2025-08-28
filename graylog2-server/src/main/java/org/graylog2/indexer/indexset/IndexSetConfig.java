@@ -72,7 +72,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
     );
 
     @JsonCreator
-    public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static IndexSetConfig create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                         @JsonProperty(FIELD_SCOPE) @Nullable String scope,
                                         @JsonProperty(FIELD_TITLE) @NotBlank String title,
                                         @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
@@ -202,7 +202,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                 .scope(DefaultEntityScope.NAME);
     }
 
-    @JsonProperty("id")
+    @JsonProperty(FIELD_ID)
     @Nullable
     @Id
     @ObjectId

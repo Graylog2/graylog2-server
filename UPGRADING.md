@@ -3,6 +3,13 @@ Upgrading to Graylog 7.0.x
 
 ## Breaking Changes
 
+### Java 21
+
+Graylog now requires Java 21 to run. Earlier versions are no longer supported.
+
+Our operating system packages and container images are shipping with the
+correct Java version.
+
 ### Kafka Inputs
 
 The `kafka-clients` library was updated to 4.x which removes support for Kafka
@@ -28,6 +35,8 @@ is now used as the primary color for elements like buttons and badges in the UI.
   all existing users with the `Reader` role to ensure backwards compatibility. New users that will be created in the
   future need to be explicitly assigned to the `Cluster Configuration Reader` role if they should be able to access the
   page.
+- Only admins are allowed to create a new API token. Existing tokens are not affected by this change. Also, new tokens
+  will expire after 30 days by default.
 
 ## Java API Changes
 
@@ -50,6 +59,7 @@ is now used as the primary color for elements like buttons and badges in the UI.
   - Sigma rules
   - Event procedure
   - Event step
+  - Content Pack installation
   
   <br> For example, the request payload to create a stream might now look like this:
 

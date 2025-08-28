@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.common.graph.ElementOrder;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -30,9 +29,12 @@ import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.UserContext;
 import org.graylog.security.UserContextMissingException;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -59,7 +61,6 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
@@ -76,7 +77,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,6 +102,8 @@ public class ContentPackService {
     private final Configuration configuration;
     private final UserService userService;
     private final StreamService streamService;
+    private final GRNRegistry grnRegistry;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
@@ -110,7 +112,9 @@ public class ContentPackService {
                               ObjectMapper objectMapper,
                               Configuration configuration,
                               UserService userService,
-                              StreamService streamService) {
+                              StreamService streamService,
+                              GRNRegistry grnRegistry,
+                              EntitySharesService entitySharesService) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
@@ -118,17 +122,19 @@ public class ContentPackService {
         this.configuration = configuration;
         this.userService = userService;
         this.streamService = streamService;
+        this.grnRegistry = grnRegistry;
+        this.entitySharesService = entitySharesService;
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
-                                                      String username) {
+                                                      String username,
+                                                      EntityShareRequest shareRequest) {
         return UserContext.runAs(username, userService, () -> {
-            final UserContext userContext;
             try {
-                userContext = new UserContext.Factory(userService).create();
-                return installContentPack(contentPack, parameters, comment, userContext);
+                final var userContext = new UserContext.Factory(userService).create();
+                return installContentPack(contentPack, parameters, comment, userContext, shareRequest);
             } catch (UserContextMissingException e) {
                 throw new IllegalArgumentException("User Context missing", e);
             }
@@ -138,9 +144,10 @@ public class ContentPackService {
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
-                                                      UserContext userContext) {
+                                                      UserContext userContext,
+                                                      EntityShareRequest shareRequest) {
         if (contentPack instanceof ContentPackV1 contentPackV1) {
-            return installContentPack(contentPackV1, parameters, comment, userContext);
+            return installContentPack(contentPackV1, parameters, comment, userContext, shareRequest);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -149,7 +156,8 @@ public class ContentPackService {
     private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
                                                        Map<String, ValueReference> parameters,
                                                        String comment,
-                                                       UserContext userContext) {
+                                                       UserContext userContext,
+                                                       EntityShareRequest shareRequest) {
         ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -226,7 +234,22 @@ public class ContentPackService {
                 .createdBy(userContext.getUser().getName())
                 .build();
 
+        shareEntities(installation, shareRequest, userContext);
+
         return contentPackInstallationPersistenceService.insert(installation);
+    }
+
+    public void shareEntities(ContentPackInstallation installation, EntityShareRequest shareRequest, UserContext userContext) {
+        if (shareRequest.grantees().isEmpty()) {
+            return;
+        }
+        final var user = userContext.getUser();
+        final var allEntities = installation.entities();
+        final var entityGRNs = allEntities.stream()
+                .filter(entity -> grnRegistry.supportsType(entity.type().name()))
+                .map(entity -> grnRegistry.newGRN(entity.type().name(), entity.id().id()))
+                .toList();
+        entityGRNs.forEach((grn) -> entitySharesService.updateEntityShares(grn, shareRequest, user));
     }
 
     private Map<EntityDescriptor, Object> getMapWithSystemStreamEntities() {
@@ -389,6 +412,7 @@ public class ContentPackService {
                 .build();
     }
 
+<<<<<<< HEAD
     public Set<EntityExcerpt> listAllEntityExcerpts() {
         final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
         entityFacades.values().forEach(facade -> entityIndexBuilder.addAll(facade.listEntityExcerpts()));
@@ -461,6 +485,8 @@ public class ContentPackService {
 
         return entities.build();
     }
+=======
+>>>>>>> origin/master
 
     private ImmutableGraph<Entity> buildEntityGraph(Entity rootEntity,
                                                     Set<Entity> entities,
