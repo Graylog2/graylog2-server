@@ -21,7 +21,6 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { createGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
-import { isPermitted } from 'util/PermissionsMixin';
 import type UserOverview from 'logic/users/UserOverview';
 import { RestrictedAccessTooltip } from 'components/common';
 import RolesCell from 'components/permissions/RolesCell';
