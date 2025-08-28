@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
@@ -53,13 +53,28 @@ type Props = {
   // When the dependency changes, the hint will be displayed if this component is not visible.
   ifValueChanges?: unknown;
   ifTrue?: boolean;
+  autoScroll?: boolean;
 };
 
-const ScrollToHint = ({ ifValueChanges = undefined, scrollContainer, title, ifTrue = true }: Props) => {
+const ScrollToHint = ({
+  ifValueChanges = undefined,
+  scrollContainer,
+  title,
+  ifTrue = true,
+  autoScroll = false,
+}: Props) => {
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const timeoutRef = useRef(null);
+
+  const scrollToTarget = useCallback(() => {
+    setShowHint(false);
+    setIsHovered(false);
+    if (scrollTargetRef.current) {
+      scrollTargetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   // show the scroll hint if necessary
   useEffect(() => {
@@ -69,9 +84,12 @@ const ScrollToHint = ({ ifValueChanges = undefined, scrollContainer, title, ifTr
       scrollContainer.current &&
       !isElementVisibleInContainer(scrollTargetRef.current, scrollContainer.current)
     ) {
+      if (autoScroll) {
+        scrollToTarget();
+      }
       setShowHint(true);
     }
-  }, [ifTrue, ifValueChanges, setShowHint, scrollContainer]);
+  }, [ifTrue, ifValueChanges, setShowHint, scrollContainer, scrollToTarget, autoScroll]);
 
   // hide the hint automatically
   useEffect(() => {
@@ -92,14 +110,6 @@ const ScrollToHint = ({ ifValueChanges = undefined, scrollContainer, title, ifTr
       ? 'arrow_downward'
       : 'arrow_upward';
   }, [scrollContainer]);
-
-  const scrollToTarget = () => {
-    setShowHint(false);
-    setIsHovered(false);
-    if (scrollTargetRef.current) {
-      scrollTargetRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <>
