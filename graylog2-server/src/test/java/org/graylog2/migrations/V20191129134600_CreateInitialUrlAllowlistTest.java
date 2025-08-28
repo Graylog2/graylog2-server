@@ -21,9 +21,9 @@ import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.system.urlwhitelist.RegexHelper;
-import org.graylog2.system.urlwhitelist.UrlWhitelist;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.RegexHelper;
+import org.graylog2.system.urlallowlist.UrlAllowlist;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,11 +39,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class V20191129134600_CreateInitialUrlWhitelistTest {
+public class V20191129134600_CreateInitialUrlAllowlistTest {
     @Mock
     private ClusterConfigService configService;
     @Mock
-    private UrlWhitelistService whitelistService;
+    private UrlAllowlistService allowlistService;
     @Mock
     private DBDataAdapterService dataAdapterService;
     @Mock
@@ -52,7 +52,7 @@ public class V20191129134600_CreateInitialUrlWhitelistTest {
     private RegexHelper regexHelper;
 
     @InjectMocks
-    private V20191129134600_CreateInitialUrlWhitelist migration;
+    private V20191129134600_CreateInitialUrlAllowlist migration;
 
     @Before
     public void setUp() throws Exception {
@@ -69,23 +69,23 @@ public class V20191129134600_CreateInitialUrlWhitelistTest {
 
         migration.upgrade();
 
-        final ArgumentCaptor<UrlWhitelist> captor = ArgumentCaptor.forClass(UrlWhitelist.class);
-        verify(whitelistService).saveWhitelist(captor.capture());
+        final ArgumentCaptor<UrlAllowlist> captor = ArgumentCaptor.forClass(UrlAllowlist.class);
+        verify(allowlistService).saveAllowlist(captor.capture());
 
-        final UrlWhitelist whitelist = captor.getValue();
+        final UrlAllowlist allowlist = captor.getValue();
 
-        final String whitelisted = "https://www.graylog.com/message/test.json/message";
-        final String notWhitelisted = "https://wwwXgraylogXcom/message/testXjson/messsage";
+        final String allowlisted = "https://www.graylog.com/message/test.json/message";
+        final String notAllowlisted = "https://wwwXgraylogXcom/message/testXjson/messsage";
 
-        assertThat(whitelist.isWhitelisted(whitelisted)).withFailMessage(
-                "Whitelist " + whitelist + " is expected to consider url <" + whitelisted + "> whitelisted.")
+        assertThat(allowlist.isAllowlisted(allowlisted)).withFailMessage(
+                        "allowlist " + allowlist + " is expected to consider url <" + allowlisted + "> allowlisted.")
                 .isTrue();
-        assertThat(whitelist.isWhitelisted(notWhitelisted)).withFailMessage(
-                "Whitelist " + whitelist + " is expected to consider url <" + notWhitelisted + "> not whitelisted.")
+        assertThat(allowlist.isAllowlisted(notAllowlisted)).withFailMessage(
+                        "allowlist " + allowlist + " is expected to consider url <" + notAllowlisted + "> not allowlisted.")
                 .isFalse();
-        assertThat(whitelist.entries()
+        assertThat(allowlist.entries()
                 .size()).isEqualTo(1);
-        assertThat(whitelist.entries()
+        assertThat(allowlist.entries()
                 .get(0)
                 .value()).isEqualTo("^\\Qhttps://www.graylog.com/\\E.*?\\Q/test.json/\\E.*?$");
     }

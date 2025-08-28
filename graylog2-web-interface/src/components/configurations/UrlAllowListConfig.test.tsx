@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import MockStore from 'helpers/mocking/StoreMock';
 
-import UrlWhiteListConfig from './UrlWhiteListConfig';
+import UrlAllowListConfig from './UrlAllowListConfig';
 
 const mockConfig = {
   entries: [
@@ -50,7 +50,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
     'getInitialState',
     () => ({
       configuration: {
-        'org.graylog2.system.urlwhitelist.UrlWhitelist': mockConfig,
+        'org.graylog2.system.urlallowlist.UrlAllowlist': mockConfig,
       },
     }),
   ]),
@@ -59,10 +59,10 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-describe('UrlWhiteListConfig', () => {
-  describe('render the UrlWhiteListConfig component', () => {
+describe('UrlAllowListConfig', () => {
+  describe('render the UrlAllowListConfig component', () => {
     it('should display Url list table', async () => {
-      render(<UrlWhiteListConfig />);
+      render(<UrlAllowListConfig />);
       await screen.findByText('Test Item 1');
       await screen.findByText('Test Item 2');
       await screen.findByText('Test Item 3');

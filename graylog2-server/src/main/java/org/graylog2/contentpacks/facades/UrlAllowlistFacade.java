@@ -34,95 +34,94 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Version;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
-import org.graylog2.system.urlwhitelist.WhitelistEntry;
+import org.graylog2.system.urlallowlist.AllowlistEntry;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.contentpacks.model.ModelTypes.URL_WHITELIST_ENTRY_V1;
+import static org.graylog2.contentpacks.model.ModelTypes.URL_ALLOWLIST_ENTRY_V1;
 
-public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
-    public static final ModelType TYPE_V1 = URL_WHITELIST_ENTRY_V1;
+public class UrlAllowlistFacade implements EntityFacade<AllowlistEntry> {
+    public static final ModelType TYPE_V1 = URL_ALLOWLIST_ENTRY_V1;
 
     private final ObjectMapper objectMapper;
-    private final UrlWhitelistService urlWhitelistService;
+    private final UrlAllowlistService urlAllowlistService;
 
     @Inject
-    public UrlWhitelistFacade(ObjectMapper objectMapper, UrlWhitelistService urlWhitelistService) {
+    public UrlAllowlistFacade(ObjectMapper objectMapper, UrlAllowlistService urlAllowlistService) {
         this.objectMapper = objectMapper;
-        this.urlWhitelistService = urlWhitelistService;
+        this.urlAllowlistService = urlAllowlistService;
     }
 
     @Override
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
 
-        return urlWhitelistService.getEntry(modelId.id())
+        return urlAllowlistService.getEntry(modelId.id())
                 .map(entry -> EntityV1.builder()
-                        .id(ModelId.of(entityDescriptorIds.getOrThrow(entry.id(), URL_WHITELIST_ENTRY_V1)))
-                        .type(URL_WHITELIST_ENTRY_V1)
+                        .id(ModelId.of(entityDescriptorIds.getOrThrow(entry.id(), URL_ALLOWLIST_ENTRY_V1)))
+                        .type(URL_ALLOWLIST_ENTRY_V1)
                         .data(objectMapper.convertValue(entry, JsonNode.class))
                         .constraints(ImmutableSet.of(GraylogVersionConstraint.of(Version.from(3, 1, 3))))
                         .build());
     }
 
     @Override
-    public NativeEntity<WhitelistEntry> createNativeEntity(Entity entity, Map<String, ValueReference> parameters,
+    public NativeEntity<AllowlistEntry> createNativeEntity(Entity entity, Map<String, ValueReference> parameters,
                                                            Map<EntityDescriptor, Object> nativeEntities, String username) {
 
         if (!(entity instanceof EntityV1)) {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
 
-        final WhitelistEntry whitelistEntry =
-                objectMapper.convertValue(((EntityV1) entity).data(), WhitelistEntry.class);
+        final AllowlistEntry allowlistEntry =
+                objectMapper.convertValue(((EntityV1) entity).data(), AllowlistEntry.class);
 
-        urlWhitelistService.addEntry(whitelistEntry);
+        urlAllowlistService.addEntry(allowlistEntry);
 
-        return NativeEntity.create(entity.id(), whitelistEntry.id(), TYPE_V1, createTitle(whitelistEntry),
-                whitelistEntry);
+        return NativeEntity.create(entity.id(), allowlistEntry.id(), TYPE_V1, createTitle(allowlistEntry),
+                allowlistEntry);
     }
 
     @Override
-    public Optional<NativeEntity<WhitelistEntry>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+    public Optional<NativeEntity<AllowlistEntry>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
         final ModelId modelId = nativeEntityDescriptor.id();
-        return urlWhitelistService.getEntry(modelId.id())
+        return urlAllowlistService.getEntry(modelId.id())
                 .map(entry -> NativeEntity.create(nativeEntityDescriptor, entry));
     }
 
     @Override
-    public void delete(WhitelistEntry nativeEntity) {
-        urlWhitelistService.removeEntry(nativeEntity.id());
+    public void delete(AllowlistEntry nativeEntity) {
+        urlAllowlistService.removeEntry(nativeEntity.id());
     }
 
     @Override
-    public EntityExcerpt createExcerpt(WhitelistEntry whitelistEntry) {
+    public EntityExcerpt createExcerpt(AllowlistEntry allowlistEntry) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(whitelistEntry.id()))
-                .type(URL_WHITELIST_ENTRY_V1)
-                .title(createTitle(whitelistEntry))
+                .id(ModelId.of(allowlistEntry.id()))
+                .type(URL_ALLOWLIST_ENTRY_V1)
+                .title(createTitle(allowlistEntry))
                 .build();
     }
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return urlWhitelistService.getWhitelist()
+        return urlAllowlistService.getAllowlist()
                 .entries()
                 .stream()
                 .map(this::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
-    private String createTitle(WhitelistEntry entry) {
+    private String createTitle(AllowlistEntry entry) {
         return entry.title() + " [" + entry.value() + "]";
     }
 
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
-        return EntityPermissions.of(RestPermissions.URL_WHITELIST_WRITE);
+        return EntityPermissions.of(RestPermissions.URL_ALLOWLIST_WRITE);
     }
 }

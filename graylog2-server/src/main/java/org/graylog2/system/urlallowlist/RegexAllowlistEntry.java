@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
+package org.graylog2.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,12 +28,12 @@ import java.util.regex.PatternSyntaxException;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class RegexWhitelistEntry implements WhitelistEntry {
+public abstract class RegexAllowlistEntry implements AllowlistEntry {
     private Pattern pattern;
 
     @JsonCreator
-    public static RegexWhitelistEntry create(@JsonProperty("id") String id, @JsonProperty("title") String title,
-            @JsonProperty("value") String value) {
+    public static RegexAllowlistEntry create(@JsonProperty("id") String id, @JsonProperty("title") String title,
+                                             @JsonProperty("value") String value) {
 
         // compile the pattern early so that we can catch illegal expressions asap
         final Pattern pattern;
@@ -41,16 +41,16 @@ public abstract class RegexWhitelistEntry implements WhitelistEntry {
             pattern = Pattern.compile(value, Pattern.DOTALL);
         } catch (PatternSyntaxException e) {
             throw new IllegalArgumentException(
-                    "Cannot create whitelist entry for invalid regular expression '" + value + "': " + e.getMessage(),
+                    "Cannot create allowlist entry for invalid regular expression '" + value + "': " + e.getMessage(),
                     e);
         }
-        final RegexWhitelistEntry whitelistEntry = new AutoValue_RegexWhitelistEntry(id, Type.REGEX, title, value);
-        whitelistEntry.pattern = pattern;
-        return whitelistEntry;
+        final RegexAllowlistEntry allowlistEntry = new AutoValue_RegexAllowlistEntry(id, Type.REGEX, title, value);
+        allowlistEntry.pattern = pattern;
+        return allowlistEntry;
     }
 
     @Override
-    public boolean isWhitelisted(String url) {
+    public boolean isAllowlisted(String url) {
         return pattern.matcher(url).find();
     }
 }

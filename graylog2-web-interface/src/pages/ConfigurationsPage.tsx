@@ -28,7 +28,7 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
-import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
@@ -119,12 +119,12 @@ const ConfigurationsPage = () => {
           },
         },
         {
-          name: 'URL Whitelist',
-          hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
+          name: 'URL Allowlist',
+          hide: !isPermitted(currentUser.permissions, ['urlallowlist:read']),
           SectionComponent: ConfigurationSection,
           props: {
-            ConfigurationComponent: UrlWhiteListConfig,
-            title: 'URL Whitelist',
+            ConfigurationComponent: UrlAllowListConfig,
+            title: 'URL allowlist',
           },
         },
         {
