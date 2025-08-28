@@ -40,12 +40,6 @@ public abstract class RuleFragment implements MongoEntity, BuildableMongoEntity<
     public static final String FIELD_CONDITION = "isCondition";
     public static final String FIELD_DESCRIPTOR = "descriptor";
 
-    @JsonIgnore
-    @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
-
     @JsonProperty(FIELD_NAME)
     public String getName() {
         return descriptor().name();
@@ -102,7 +96,7 @@ public abstract class RuleFragment implements MongoEntity, BuildableMongoEntity<
 
     @JsonCreator
     public static RuleFragment create(
-            @Id @ObjectId @JsonProperty("_id") @Nullable String id,
+            @JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
             @JsonProperty(FIELD_FRAGMENT) String fragment,
             @JsonProperty(FIELD_FRAGMENT_OUTPUT) @Nullable String fragmentOutputVariable,
             @JsonProperty(FIELD_CONDITION) boolean isCondition,

@@ -19,15 +19,16 @@ import React from 'react';
 import { DataTable } from 'components/common';
 import ContentPackVersionItem from 'components/content-packs/components/ContentPackVersionItem';
 import type { ContentPackInstallation } from 'components/content-packs/Types';
+import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import './ContentPackVersions.css';
-import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
   contentPackRevisions: ContentPackRevisions;
   onDeletePack?: (id: string) => void;
   onChange?: (id: string) => void;
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
+  onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
 const headerFormatter = (header: React.ReactNode) => {

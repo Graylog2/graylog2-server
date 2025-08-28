@@ -47,7 +47,7 @@ const CreateContentPackPage = () => {
   }, []);
 
   const _onStateChanged = (newState: {
-    contentPack: unknown;
+    contentPack: ContentPack;
     selectedEntities: unknown;
     appliedParameter: unknown;
   }) => {
@@ -62,7 +62,7 @@ const CreateContentPackPage = () => {
   const _onSave = () => {
     const { contentPack } = contentPackState;
 
-    ContentPacksActions.create.triggerPromise(contentPack.toJSON()).then(
+    ContentPacksActions.create(contentPack.toJSON()).then(
       () => {
         UserNotification.success('Content pack imported successfully', 'Success!');
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);

@@ -55,7 +55,7 @@ public abstract class GrokPattern implements MongoEntity, BuildableMongoEntity<G
     public abstract String contentPack();
 
     @JsonCreator
-    public static GrokPattern create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static GrokPattern create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                      @JsonProperty(FIELD_NAME) String name,
                                      @JsonProperty(FIELD_PATTERN) String pattern,
                                      @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack) {
