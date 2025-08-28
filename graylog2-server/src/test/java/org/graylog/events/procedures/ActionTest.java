@@ -56,10 +56,23 @@ public class ActionTest {
     }
 
     @Test
+    public void testPerformSearchToHtml_query() {
+        when(event.replayInfo()).thenReturn(replayInfo());
+
+        String actionHtml = performSearchQueryConfig().toHtml(event);
+
+        assertThat(actionHtml).contains("${http_external_uri}search?q=");
+        assertThat(actionHtml).contains(COMPLEX_SEARCH_QUERY_URI_SAFE);
+        assertThat(actionHtml).contains("rangetype=absolute");
+        assertThat(actionHtml).contains("from=" + TIMERANGE_START);
+        assertThat(actionHtml).contains("to=" + TIMERANGE_END);
+    }
+
+    @Test
     public void testPerformSearchToText_savedSearch() {
         when(event.replayInfo()).thenReturn(replayInfo());
 
-        String actionText = goToDashboardConfig().toText(event);
+        String actionText = performSavedSearchConfig().toText(event);
 
         assertThat(actionText).contains("${http_external_uri}views/" + ID);
         assertThat(actionText).contains("rangetype=absolute");
@@ -70,31 +83,53 @@ public class ActionTest {
     }
 
     @Test
-    public void testGoToDashboardToText() {
+    public void testPerformSearchToHtml_savedSearch() {
         when(event.replayInfo()).thenReturn(replayInfo());
 
-        String actionText = performSavedSearchConfig().toText(event);
+        String actionHtml = performSavedSearchConfig().toHtml(event);
+
+        assertThat(actionHtml).contains("${http_external_uri}views/" + ID);
+        assertThat(actionHtml).contains("rangetype=absolute");
+        assertThat(actionHtml).contains("from=" + TIMERANGE_START);
+        assertThat(actionHtml).contains("to=" + TIMERANGE_END);
+        assertThat(actionHtml).contains("param1=" + "value1");
+        assertThat(actionHtml).contains("param2=" + "value2");
+    }
+
+    @Test
+    public void testGoToDashboardToText() {
+        String actionText = goToDashboardConfig().toText(event);
 
         assertThat(actionText).contains("${http_external_uri}dashboards/" + ID);
-        assertThat(actionText).contains("rangetype=absolute");
-        assertThat(actionText).contains("from=" + TIMERANGE_START);
-        assertThat(actionText).contains("to=" + TIMERANGE_END);
+        assertThat(actionText).contains("param1=" + "value1");
+        assertThat(actionText).contains("param2=" + "value2");
+    }
+
+    @Test
+    public void testGoToDashboardToHtml() {
+        String actionText = goToDashboardConfig().toHtml(event);
+
+        assertThat(actionText).contains("${http_external_uri}dashboards/" + ID);
         assertThat(actionText).contains("param1=" + "value1");
         assertThat(actionText).contains("param2=" + "value2");
     }
 
     @Test
     public void testExecuteNotificationToText() {
-        when(event.replayInfo()).thenReturn(replayInfo());
+        when(event.id()).thenReturn(ID);
 
-        String actionText = performSavedSearchConfig().toText(event);
+        String actionText = executeNotificationConfig().toText(event);
 
-        assertThat(actionText).contains("${http_external_uri}security/security-events/alerts" + ID);
-        assertThat(actionText).contains("rangetype=absolute");
-        assertThat(actionText).contains("from=" + TIMERANGE_START);
-        assertThat(actionText).contains("to=" + TIMERANGE_END);
-        assertThat(actionText).contains("param1=" + "value1");
-        assertThat(actionText).contains("param2=" + "value2");
+        assertThat(actionText).contains("${http_external_uri}security/security-events/alerts?query=id:" + ID);
+    }
+
+    @Test
+    public void testExecuteNotificationToHtml() {
+        when(event.id()).thenReturn(ID);
+
+        String actionHtml = executeNotificationConfig().toHtml(event);
+
+        assertThat(actionHtml).contains("${http_external_uri}security/security-events/alerts?query=id:" + ID);
     }
 
     private ExecuteNotification.Config executeNotificationConfig() {
