@@ -61,7 +61,6 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
@@ -411,16 +410,6 @@ public class ContentPackService {
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
                 .entityGrants(ImmutableMap.copyOf(entityGrants))
                 .build();
-    }
-
-    public Set<EntityExcerpt> listAllEntityExcerpts() {
-        final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
-        entityFacades.values().forEach(facade -> entityIndexBuilder.addAll(facade.listEntityExcerpts()));
-        return entityIndexBuilder.build();
-    }
-
-    public Map<String, EntityExcerpt> getEntityExcerpts() {
-        return listAllEntityExcerpts().stream().collect(Collectors.toMap(x -> x.id().id(), x -> x));
     }
 
     private ImmutableGraph<Entity> buildEntityGraph(Entity rootEntity,
