@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
 import org.mongojack.Id;
@@ -75,7 +76,7 @@ public abstract class EventProcedureStep implements ScopedEntity<EventProcedureS
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventProcedureStep.Builder();
+            return new AutoValue_EventProcedureStep.Builder().scope(DefaultEntityScope.NAME);
         }
 
         public abstract EventProcedureStep build();
