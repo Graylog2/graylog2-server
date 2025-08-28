@@ -59,7 +59,7 @@ module.exports = {
       rules: {
         'jest/expect-expect': [
           'error',
-          { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*', 'selectEvent.assertOptionExists(*'] },
+          { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*', 'selectEvent.assertOptionExists*'] },
         ],
         'react/jsx-no-constructed-context-values': 'off',
         'testing-library/await-async-events': 'off',

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
@@ -82,7 +83,7 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
                     });
 
             try {
-                contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", configuration.getRootUsername());
+                contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", configuration.getRootUsername(), EntityShareRequest.EMPTY);
             } catch (ContentPackException e) {
                 LOG.warn("Could not install default grok patterns: the installation found some modified default grok" +
                         "patterns in your setup and did not update them. If you wish to use the default grok" +
