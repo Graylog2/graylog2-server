@@ -19,7 +19,8 @@ import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
+import { createGRN } from 'logic/permissions/GRN';
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import { isPermitted } from 'util/PermissionsMixin';
 import type UserOverview from 'logic/users/UserOverview';
 import { RestrictedAccessTooltip } from 'components/common';
@@ -55,8 +56,8 @@ const UsersOverviewItem = ({
   },
   isActive,
 }: Props) => {
-  const currentUser = useCurrentUser();
-  const hasEditPermissions = isPermitted(currentUser.permissions, `users:edit:${id}`);
+  const grn = createGRN('user', id);
+  const hasEditPermissions = useHasEntityPermissionByGRN(grn, 'edit');
 
   return (
     <tr key={username} className={isActive ? 'active' : ''}>

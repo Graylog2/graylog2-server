@@ -18,14 +18,14 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { isPermitted } from 'util/PermissionsMixin';
+import { createGRN } from 'logic/permissions/GRN';
 import type Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
 import { RestrictedAccessTooltip } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 
 type Props = {
   owners: GranteesList;
@@ -55,11 +55,12 @@ type OwnerTitleProps = {
 };
 
 const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
-  const currentUser = useCurrentUser();
+  const grn = createGRN(type, id);
+  const hasEditPermission = useHasEntityPermissionByGRN(grn, 'edit');
 
   switch (type) {
     case 'user':
-      if (!isPermitted(currentUser.permissions, `users:edit:${id}`))
+      if (!hasEditPermission)
         return (
           <OwnerTitleWrapper>
             {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
@@ -68,7 +69,7 @@ const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
 
       return <TitleWithLink title={title} entityId={id} />;
     case 'team':
-      if (!isPermitted(currentUser.permissions, `team:edit:${id}`))
+      if (!hasEditPermission)
         return (
           <OwnerTitleWrapper>
             {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />

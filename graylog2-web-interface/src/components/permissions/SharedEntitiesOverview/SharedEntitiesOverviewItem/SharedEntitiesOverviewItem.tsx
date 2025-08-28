@@ -17,8 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import { RestrictedAccessTooltip } from 'components/common';
 import { Link } from 'components/common/router';
 import type SharedEntity from 'logic/permissions/SharedEntity';
@@ -40,8 +39,7 @@ const NameColumnWrapper = styled.div`
 const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, title, type, id } }: Props) => {
   const entityRoute = useShowRouteFromGRN(id);
   const { getPluggableTableCells, pluggableAttributes } = usePluggableSharedEntityTableElements();
-  const currentUser = useCurrentUser();
-  const hasEditPermissions = isPermitted(currentUser.permissions, `${type}:edit:${id}`);
+  const hasEditPermissions = useHasEntityPermissionByGRN(id, 'edit');
 
   return (
     <tr key={title + type}>
