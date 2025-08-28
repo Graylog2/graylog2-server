@@ -323,8 +323,10 @@ public class ContentPackServiceTest {
                 .id(ModelId.of("dead-beef"))
                 .build();
 
-        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
             when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
         }
         when(mockUser.getId()).thenReturn(TEST_USER);
         when(mockUser.getName()).thenReturn(TEST_USER);
