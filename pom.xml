@@ -92,7 +92,7 @@
         <!-- See: "Explicitly setting up instrumentation for inline mocking (Java 21+)" at
              https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
              We use the "@{}" property syntax to delay property resolution for the argLine config in surefire. -->
-        <common.surefire.args>-javaagent:@{org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</common.surefire.args>
+        <common.surefire.args>-javaagent:${org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</common.surefire.args>
         <common.failsafe.args>-Djava.awt.headless=true</common.failsafe.args>
 
         <!-- Dependencies -->
