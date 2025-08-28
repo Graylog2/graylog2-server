@@ -39,7 +39,7 @@ const NameColumnWrapper = styled.div`
 const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, title, type, id } }: Props) => {
   const entityRoute = useShowRouteFromGRN(id);
   const { getPluggableTableCells, pluggableAttributes } = usePluggableSharedEntityTableElements();
-  const hasEditPermissions = useHasEntityPermissionByGRN(id, 'edit');
+  const hasEditPermissions = useHasEntityPermissionByGRN(id, 'read');
 
   return (
     <tr key={title + type}>
