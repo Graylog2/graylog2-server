@@ -252,8 +252,6 @@ const makeElementAnchor = (
     }),
   );
 
-  console.log({ candidates });
-
   return pickNearestElementAnchor(e, candidates);
 };
 
