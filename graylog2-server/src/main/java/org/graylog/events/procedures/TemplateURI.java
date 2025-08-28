@@ -58,7 +58,7 @@ record TemplateURI(String path, Map<String, String> parameters) {
         }
 
         public Builder setParameters(Map<String, String> parameters) {
-            this.parameters = parameters;
+            this.parameters = new HashMap<>(parameters);
             return this;
         }
 

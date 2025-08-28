@@ -79,13 +79,11 @@ public abstract class EventProcedure extends ScopedEntity {
         final StringBuilder textBuilder = new StringBuilder();
         textBuilder.append(f("""
                 --- [Event Procedure] ----------------------------
-                Title:       ${event_definition_title}
                 Title:       %s
-                Description: %s
-
-                Steps:""", title(), description()));
+                Description: %s""", title(), description()));
 
         if (steps() != null && !steps().isEmpty()) {
+            textBuilder.append("\n\n").append("Steps:");
             for (int i = 0; i < steps().size(); i++) {
                 final EventProcedureStep step = steps().get(i);
                 textBuilder.append("\n")
