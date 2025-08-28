@@ -128,7 +128,7 @@ const DashboardActionsMenu = () => {
           pluggableSaveViewControls,
         );
 
-        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare));
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id));
       }
 
       return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));

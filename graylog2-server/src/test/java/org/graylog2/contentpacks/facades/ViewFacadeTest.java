@@ -71,6 +71,7 @@ import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -111,7 +112,7 @@ public class ViewFacadeTest {
         protected TestViewService(ClusterConfigService clusterConfigService,
                                   MongoCollections mongoCollections) {
             super(clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mongoCollections);
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections);
         }
     }
 
