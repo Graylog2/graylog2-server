@@ -74,6 +74,7 @@ class PaginatedAuthzRolesServiceTest {
         when(searchQuery.toBson()).thenReturn(Filters.empty());
 
         final PaginatedList<AuthzRoleDTO> result = service.findPaginatedByIds(
+                name -> true,
                 searchQuery,
                 1,
                 10,
