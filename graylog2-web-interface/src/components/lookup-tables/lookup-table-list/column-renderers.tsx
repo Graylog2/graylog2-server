@@ -88,7 +88,7 @@ const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) =
     setEntity(<Cache cache={caches[cacheId]} />);
   }, [cacheId, caches, setModal, setTitle, setEntity]);
 
-  if (!caches || !cacheId) return <i>No cache</i>;
+  if (!caches || !cacheId || !caches[cacheId]) return <i>No cache</i>;
 
   const cacheErrorText = errors?.cacheErrors[caches[cacheId].name];
 
@@ -110,7 +110,7 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
     setEntity(<DataAdapter dataAdapter={dataAdapters[dataAdapterId]} />);
   }, [dataAdapterId, dataAdapters, setModal, setTitle, setEntity]);
 
-  if (!dataAdapters || !dataAdapterId) return <i>No data adapters</i>;
+  if (!dataAdapters || !dataAdapterId || !dataAdapters[dataAdapterId]) return <i>No data adapters</i>;
 
   const adapterErrorText = errors?.adapterErrors[dataAdapters[dataAdapterId].name];
 

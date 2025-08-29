@@ -129,7 +129,7 @@
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.56.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
-        <geoip2.version>4.3.1</geoip2.version>
+        <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.75.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
@@ -161,12 +161,12 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.1</log4j.version>
         <lucene.version>9.12.2</lucene.version>
-        <metrics.version>4.2.34</metrics.version>
+        <metrics.version>4.2.35</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.4.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.72.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.73.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.1.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.53.0</opentelemetry.version>
