@@ -38,6 +38,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitl
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -57,13 +58,13 @@ import static org.mockito.Mockito.when;
 public class CatalogResourceTest {
 
     private EntityFacade<Void> mockEntityFacade = Mockito.mock(EntityFacade.class);
-
+    private StreamService streamService = Mockito.mock(StreamService.class);
     private ContentPackEntityResolver contentPackEntityResolver;
 
     @Before
     public void setUp() {
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
-        contentPackEntityResolver = new ContentPackEntityResolver(entityFacades);
+        contentPackEntityResolver = new ContentPackEntityResolver(entityFacades, streamService);
     }
 
     @Test
