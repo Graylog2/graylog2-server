@@ -56,6 +56,10 @@ public abstract class EntityShareRequest {
                 .orElse(ImmutableSet.of());
     }
 
+    public boolean isEmpty() {
+        return grantees().isEmpty() && selectedCollections().filter(collections -> !collections.isEmpty()).isEmpty();
+    }
+
     @JsonCreator
     public static EntityShareRequest create(
             @JsonProperty(SELECTED_GRANTEE_CAPABILITIES) @Nullable Map<GRN, Capability> selectedGranteeCapabilities,
