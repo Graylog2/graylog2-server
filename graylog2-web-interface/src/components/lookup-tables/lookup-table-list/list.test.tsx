@@ -67,7 +67,7 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => { }],
+  useQueryParam: () => [undefined, () => {}],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
