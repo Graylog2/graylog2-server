@@ -19,29 +19,29 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
-import type { GenericEntityType } from 'logic/lookup-tables/types';
+import type { GenericEntityType, LookupTable } from 'logic/lookup-tables/types';
 import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
 
 import { attributes } from './constants';
 import LookupTableList from './index';
 
-const mockFetchPaginatedLookupTables = jest.fn(async () =>
-  Promise.resolve({
-    attributes,
-    list: [...LOOKUP_TABLES],
-    pagination: {
-      page: 1,
-      total: LOOKUP_TABLES.length,
-      per_page: 20,
-      count: 10,
-      query: null,
-    },
-    meta: {
-      caches: { ...CACHES_MAP },
-      adapters: { ...ADAPTERS_MAP },
-    },
-  }),
-);
+const LOOKUP_TABLES_LIST = {
+  attributes,
+  list: [...LOOKUP_TABLES],
+  pagination: {
+    page: 1,
+    total: LOOKUP_TABLES.length,
+    per_page: 20,
+    count: 10,
+    query: null,
+  },
+  meta: {
+    caches: { ...CACHES_MAP },
+    adapters: { ...ADAPTERS_MAP },
+  },
+};
+
+const mockFetchPaginatedLookupTables = jest.fn(async () => Promise.resolve(LOOKUP_TABLES_LIST));
 
 const mockFetchErrors = jest.fn(async () => Promise.resolve({ ...ERROR_STATE }));
 const mockDeleteLookupTable = jest.fn(async () => Promise.resolve());
@@ -67,7 +67,7 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => {}],
+  useQueryParam: () => [undefined, () => { }],
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
@@ -131,5 +131,33 @@ describe('Lookup Table List', () => {
     userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 
     expect(mockDeleteLookupTable).toHaveBeenLastCalledWith(LOOKUP_TABLES[0].id);
+  });
+
+  it("should show a message when cache or data adapter don't exists", async () => {
+    const auxTableList: Array<LookupTable> = [
+      {
+        id: 'table-without-cache-adapter',
+        _scope: 'DEFAULT',
+        title: 'table-without-cache-adapter',
+        description: 'Table without cache or adapter test description',
+        name: 'Table without cache or adapter test name',
+        cache_id: undefined,
+        data_adapter_id: undefined,
+        content_pack: null,
+        default_single_value: '',
+        default_single_value_type: 'NULL',
+        default_multi_value: '',
+        default_multi_value_type: 'NULL',
+      },
+      ...LOOKUP_TABLES,
+    ];
+
+    const auxPaginatedList = { ...LOOKUP_TABLES_LIST, list: auxTableList };
+    mockFetchPaginatedLookupTables.mockImplementation(async () => Promise.resolve(auxPaginatedList));
+
+    render(<LookupTableList />);
+
+    await screen.findByText(/No cache/i);
+    await screen.findByText(/No data adapters/i);
   });
 });
