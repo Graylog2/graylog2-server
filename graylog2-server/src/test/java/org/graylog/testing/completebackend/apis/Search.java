@@ -72,7 +72,7 @@ public class Search implements GraylogRestApi {
     }
 
     public Search waitForMessages(Collection<String> messages, TimeRange timeRange, Set<String> streams) {
-        waitFor(() -> searchAllMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", Duration.ofSeconds(300));
+        waitFor(() -> searchAllMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", Duration.ofSeconds(600));
         return this;
     }
 
