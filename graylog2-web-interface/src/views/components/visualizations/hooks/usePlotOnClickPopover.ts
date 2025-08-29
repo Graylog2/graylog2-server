@@ -30,13 +30,56 @@ import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
 /** ---------- DOM getters ---------- */
-const getBarElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
+const getBarElement = (
+  graphDiv: HTMLElement,
+  pt: ClickPoint,
+  curveNumberRenderIndexMapper: Record<number, number>,
+): Element | null => {
   const { curveNumber, pointIndex } = pt;
-  const trace = graphDiv.querySelectorAll('.barlayer .trace')[curveNumber] as HTMLElement | undefined;
+  const traceIndex = curveNumberRenderIndexMapper[curveNumber];
+  const trace = graphDiv.querySelectorAll('.cartesianlayer .trace')[traceIndex] as HTMLElement | undefined;
+
   if (!trace) return null;
   const point = trace.querySelectorAll('.point')[pointIndex!] as HTMLElement | undefined;
 
   return point?.querySelector('rect') ?? point?.querySelector('path') ?? null;
+};
+
+
+const listSubplotOrder = (gd: HTMLElement): string[] => {
+  const subplots = gd.querySelectorAll<SVGGElement>('.cartesianlayer g.subplot');
+  const out: string[] = [];
+
+  subplots.forEach((node) => {
+    // Each subplot node has classes like "subplot xy" or "subplot x2y3"
+    // We want the specific id class (not the generic "subplot")
+    const idClass = Array.from(node.classList).find((cls) => cls !== 'subplot');
+    if (idClass) out.push(idClass);
+    else out.push(''); // fallback to empty string if somehow missing
+  });
+
+  return out;
+};
+
+const createBarElementGetter = (gd: PlotlyHTMLElement & { _fullData: Array<any> }) => {
+  const fullData = gd._fullData;
+  const curveNumberGroupedBySubPlot = fullData.reduce(
+    (acc, { xaxis, yaxis }, curveNumber) => {
+      const subplot = `${xaxis ?? 'x'}${yaxis ?? 'y'}`;
+      (acc[subplot] ||= []).push(curveNumber);
+
+      return acc;
+    },
+    {} as Record<string, number[]>,
+  );
+  const subPlotDOMOrder = listSubplotOrder(gd);
+
+  const curveNumberRenderIndexArray = flatMap(
+    subPlotDOMOrder.map((subPlotId) => curveNumberGroupedBySubPlot[subPlotId]),
+  );
+  const curveNumberRenderIndexMapper = Object.fromEntries(curveNumberRenderIndexArray.map((v, i) => [v, i]));
+
+  return (graphDiv: HTMLElement, pt: ClickPoint) => getBarElement(graphDiv, pt, curveNumberRenderIndexMapper);
 };
 
 const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
@@ -240,7 +283,7 @@ const makeElementAnchor = (
 ): ElementAnchor | null => {
   const getEl =
     chartType === 'bar'
-      ? getBarElement
+      ? createBarElementGetter(gd as PlotlyHTMLElement & { _fullData: Array<any> })
       : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
   const graphDiv = gd as unknown as HTMLElement;
   const targetEl = (e.event?.target as Element) || graphDiv;
