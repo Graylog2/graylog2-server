@@ -39,7 +39,7 @@ public record Config(
     public record Logo(SVG light, SVG dark) {}
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
-    public record Login(Optional<SVG> background, Optional<Boolean> showLogo) {}
+    public record Login(Optional<SVG> background, @JsonProperty("show_logo") Optional<Boolean> showLogo) {}
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Welcome(Optional<WelcomeItem> news,
