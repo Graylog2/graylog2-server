@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 
 import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
@@ -26,66 +27,47 @@ type EditOutputButtonProps = {
   onUpdate?: (...args: any[]) => void;
 };
 
-class EditOutputButton extends React.Component<
-  EditOutputButtonProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    disabled: false,
-    onUpdate: () => {},
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      typeDefinition: undefined,
-    };
-  }
-
-  handleClick = () => {
-    const { getTypeDefinition, output } = this.props;
-
-    getTypeDefinition(output.type, (definition) => {
-      this.setState({ typeDefinition: definition.requested_configuration });
+const EditOutputButton = ({
+  output,
+  disabled = false,
+  getTypeDefinition,
+  onUpdate = () => {},
+}: EditOutputButtonProps) => {
+  const [typeDefinition, setTypeDefinition] = useState<any>(null);
+  const onModalClose = () => setTypeDefinition(null);
+  const handleClick = () => {
+    getTypeDefinition(output.type, (definition: any) => {
+      setTypeDefinition(definition.requested_configuration);
     });
   };
 
-  _handleSubmit = (data) => {
-    const { onUpdate, output } = this.props;
-    this.setState({ typeDefinition: null });
+  const handleSubmit = (data: any) => {
     onUpdate(output, data);
+    onModalClose();
   };
 
-  render() {
-    const { typeDefinition } = this.state;
-    const { disabled, output } = this.props;
-
-    return (
-      <span>
-        <Button disabled={disabled} onClick={this.handleClick}>
-          Edit
-        </Button>
-        {typeDefinition && (
-          <ConfigurationForm
-            initialShow
-            cancelAction={() => this.setState({ typeDefinition: null })}
-            key={`configuration-form-output-${output.id}`}
-            configFields={typeDefinition}
-            title={`Editing Output ${output.title}`}
-            typeName={output.type}
-            titleHelpText="Select a name of your new output that describes it."
-            submitAction={this._handleSubmit}
-            submitButtonText="Update output"
-            values={output.configuration}
-            titleValue={output.title}
-          />
-        )}
-      </span>
-    );
-  }
-}
+  return (
+    <span>
+      <Button disabled={disabled} onClick={handleClick}>
+        Edit
+      </Button>
+      {typeDefinition && (
+        <ConfigurationForm
+          initialShow
+          cancelAction={() => onModalClose()}
+          key={`configuration-form-output-${output.id}`}
+          configFields={typeDefinition}
+          title={`Editing Output ${output.title}`}
+          typeName={output.type}
+          titleHelpText="Select a name of your new output that describes it."
+          submitAction={handleSubmit}
+          submitButtonText="Update output"
+          values={output.configuration}
+          titleValue={output.title}
+        />
+      )}
+    </span>
+  );
+};
 
 export default EditOutputButton;
