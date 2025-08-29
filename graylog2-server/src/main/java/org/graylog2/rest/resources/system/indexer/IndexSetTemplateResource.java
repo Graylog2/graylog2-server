@@ -39,7 +39,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -90,7 +89,6 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/{template_id}")
     @Timed
-    @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets template by id")
     public IndexSetTemplateResponse retrieveById(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ, templateId);
@@ -100,7 +98,6 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/default_config")
     @Timed
-    @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets default template")
     public IndexSetTemplateConfig getDefaultConfig() {
         return indexSetDefaultTemplateService.getOrCreateDefaultConfig();
@@ -109,7 +106,6 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/paginated")
     @Timed
-    @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets template by id")
     public PageListResponse<IndexSetTemplateResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                               @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,

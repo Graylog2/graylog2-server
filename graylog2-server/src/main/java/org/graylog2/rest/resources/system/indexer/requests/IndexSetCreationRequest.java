@@ -17,77 +17,86 @@
 package org.graylog2.rest.resources.system.indexer.requests;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
+import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
-import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
 import org.graylog2.indexer.indexset.fields.UseLegacyRotationField;
-import org.graylog2.indexer.indexset.fields.WritableField;
-import org.graylog2.shared.fields.IdField;
-import org.graylog2.shared.fields.TitleAndDescriptionFields;
+import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
+import org.graylog2.validation.ValidObjectId;
+
+import javax.annotation.Nullable;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = IndexSetUpdateRequest.Builder.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class IndexSetUpdateRequest implements
-        IdField,
-        TitleAndDescriptionFields,
-        BaseIndexSetFields,
+@WithBeanGetter
+@JsonDeserialize(builder = IndexSetCreationRequest.Builder.class)
+public abstract class IndexSetCreationRequest implements
+        ExtendedIndexSetFields,
         UseLegacyRotationField,
-        WritableField,
-        FieldTypeProfileField,
         FieldRestrictionsField {
 
-    public IndexSetConfig toIndexSetConfig(final IndexSetConfig oldConfig) {
-        return oldConfig.toBuilder()
-                .id(oldConfig.id())
-                .scope(oldConfig.scope())
+    private static final String INDEX_SET_TEMPLATE_ID = "index_set_template_id";
+
+    @Nullable
+    @JsonProperty(INDEX_SET_TEMPLATE_ID)
+    @ValidObjectId
+    public abstract String indexSetTemplateId();
+
+    public IndexSetConfig toIndexSetConfig(boolean isRegular, Set<IndexSetFieldRestriction> fieldRestrictions) {
+        final IndexSetConfig.Builder builder = IndexSetConfig.builder()
                 .title(title())
                 .description(description())
                 .isWritable(isWritable())
+                .isRegular(isRegular)
+                .indexPrefix(indexPrefix())
                 .shards(shards())
                 .replicas(replicas())
                 .rotationStrategyClass(rotationStrategyClass())
                 .rotationStrategyConfig(rotationStrategyConfig())
                 .retentionStrategyClass(retentionStrategyClass())
                 .retentionStrategyConfig(retentionStrategyConfig())
+                .creationDate(creationDate())
+                .indexAnalyzer(indexAnalyzer())
+                .indexTemplateName(indexPrefix() + "-template")
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .fieldTypeProfile(fieldTypeProfile())
                 .dataTieringConfig(Boolean.FALSE.equals(useLegacyRotation()) ? dataTieringConfig() : null)
-                .fieldRestrictions(fieldRestrictions())
-                .build();
+                .fieldRestrictions(fieldRestrictions);
+
+        final IndexSetConfig.Builder builderWithTemplateType = indexTemplateType().map(builder::indexTemplateType).orElse(builder);
+        return builderWithTemplateType.build();
+    }
+
+    public static Builder builder() {
+        return AutoValue_IndexSetCreationRequest.Builder.builder();
     }
 
     public abstract Builder toBuilder();
 
-    public static Builder builder() {
-        return AutoValue_IndexSetUpdateRequest.Builder.builder();
-    }
-
     @AutoValue.Builder
-    @JsonPOJOBuilder(withPrefix = "")
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder implements
-            IdFieldBuilder<Builder>,
-            TitleAndDescriptionFieldsBuilder<Builder>,
-            BaseIndexSetFieldsBuilder<Builder>,
+            ExtendedIndexSetFieldsBuilder<Builder>,
             UseLegacyRotationFieldBuilder<Builder>,
-            WritableFieldBuilder<Builder>,
-            FieldTypeProfileFieldBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder> {
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_IndexSetUpdateRequest.Builder()
+            return new AutoValue_IndexSetCreationRequest.Builder()
+                    .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
                     .useLegacyRotation(true);
         }
 
-        public abstract IndexSetUpdateRequest build();
+        @JsonProperty(INDEX_SET_TEMPLATE_ID)
+        public abstract Builder indexSetTemplateId(@Nullable @ValidObjectId String indexSetTemplateId);
+
+        public abstract IndexSetCreationRequest build();
     }
 }
