@@ -25,6 +25,7 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Data object that can be used in notifications to provide structured data to plugins.
@@ -36,6 +37,7 @@ public abstract class EventNotificationModelData {
     public static final String FIELD_EVENT_DEFINITION_TYPE = "event_definition_type";
     public static final String FIELD_EVENT_DEFINITION_TITLE = "event_definition_title";
     public static final String FIELD_EVENT_DEFINITION_DESCRIPTION = "event_definition_description";
+    public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
     public static final String FIELD_JOB_TRIGGER_ID = "job_trigger_id";
     public static final String FIELD_EVENT = "event";
@@ -52,6 +54,9 @@ public abstract class EventNotificationModelData {
 
     @JsonProperty(FIELD_EVENT_DEFINITION_DESCRIPTION)
     public abstract String eventDefinitionDescription();
+
+    @JsonProperty(FIELD_REMEDIATION_STEPS)
+    public abstract String remediationSteps();
 
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
@@ -81,6 +86,8 @@ public abstract class EventNotificationModelData {
 
         public abstract Builder eventDefinitionDescription(String description);
 
+        public abstract Builder remediationSteps(String remediationSteps);
+
         public abstract Builder jobDefinitionId(String jobDefinitionId);
 
         public abstract Builder jobTriggerId(String jobTriggerId);
@@ -105,6 +112,7 @@ public abstract class EventNotificationModelData {
                 .eventDefinitionType(definitionDto != null ? definitionDto.config().type() : UNKNOWN)
                 .eventDefinitionTitle(definitionDto != null ? definitionDto.title() : UNKNOWN)
                 .eventDefinitionDescription(definitionDto != null ? definitionDto.description() : UNKNOWN)
+                .remediationSteps(Optional.ofNullable(definitionDto).map(EventDefinitionDto::remediationSteps).orElse(UNKNOWN))
                 .jobDefinitionId(jobTriggerDto != null ? jobTriggerDto.jobDefinitionId() : UNKNOWN)
                 .jobTriggerId(jobTriggerDto != null ? jobTriggerDto.id() : UNKNOWN)
                 .event(event)
