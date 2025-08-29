@@ -77,7 +77,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
     );
 
     @JsonCreator
-    public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static IndexSetConfig create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                         @JsonProperty(FIELD_SCOPE) @Nullable String scope,
                                         @JsonProperty(FIELD_TITLE) @NotBlank String title,
                                         @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
@@ -208,6 +208,23 @@ public abstract class IndexSetConfig extends ScopedEntity implements
                 .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
                 .scope(DefaultEntityScope.NAME);
     }
+
+    @JsonProperty(FIELD_ID)
+    @Nullable
+    @Id
+    @ObjectId
+    public abstract String id();
+
+    @JsonProperty(FIELD_TITLE)
+    @NotBlank
+    public abstract String title();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_WRITABLE)
+    public abstract boolean isWritable();
 
     /**
      * Indicates whether this index set is intended to

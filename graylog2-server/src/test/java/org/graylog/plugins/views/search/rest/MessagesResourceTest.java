@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -70,7 +71,7 @@ public class MessagesResourceTest {
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithMessageList(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
-        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"), (categories) -> Stream.of());
+        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"), (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS);
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 

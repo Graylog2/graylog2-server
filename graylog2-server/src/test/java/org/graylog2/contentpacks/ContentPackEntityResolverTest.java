@@ -58,7 +58,7 @@ class ContentPackEntityResolverTest {
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, mock(StreamRuleService.class), mock(IndexSetService.class), mock(UserService.class))
         );
-        this.contentPackEntityResolver = new ContentPackEntityResolver(entityFacades);
+        this.contentPackEntityResolver = new ContentPackEntityResolver(entityFacades, streamService);
     }
 
     @Test
