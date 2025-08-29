@@ -640,7 +640,7 @@
                             <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                29167547c1d89ae5df44f9880f9fe8aa405d2518d1c7b4f29822b96ed18a0d6c4914b8c251a6b27553a6ccf43db3920addec23ee57e39a8345ce99f5748ca139
+                                b1d961d168bd2a36d31a22b85478b1024650fe464fe7ed642b7fd5f30bc2bdf686f6ec6b53cac93e18f13a4621b22bd121f1ebf06a9975e524f34524e059d955
                             </sha512>
                         </configuration>
                     </execution>
