@@ -37,6 +37,7 @@ type Props<Configuration extends object> = {
     [key: string]: ConfigurationField;
   };
   children?: React.ReactNode;
+  initialShow?: boolean;
   titleHelpText?: string;
   includeTitleField?: boolean;
   submitAction: (data: ConfigurationFormData<Configuration>) => void;
@@ -71,6 +72,7 @@ const ConfigurationForm = <Configuration extends object>(
     configFields = defaultConfigFields,
     children = null,
     titleHelpText = '',
+    initialShow = false,
     includeTitleField = true,
     submitAction,
     title = null,
@@ -82,7 +84,7 @@ const ConfigurationForm = <Configuration extends object>(
   }: Props<Configuration>,
   ref: React.ForwardedRef<RefType<Configuration>>,
 ) => {
-  const [showConfigurationModal, setShowConfigurationModal] = useState(false);
+  const [showConfigurationModal, setShowConfigurationModal] = useState(initialShow);
   const [titleValue, setTitleValue] = useState(undefined);
   const [values, setValues] = useState<{ [key: string]: any } | undefined>(undefined);
   const [fieldStates, setFieldStates] = useState<{ [key: string]: any } | undefined>({});
