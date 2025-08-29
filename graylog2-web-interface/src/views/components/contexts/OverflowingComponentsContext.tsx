@@ -14,12 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export const DECIMAL_PLACES = 1;
-export const Y_POSITION_AXIS_STEP = 0.1;
-export const DEFAULT_AXIS_KEY = 'withoutUnit';
-export const TIME_AXIS_LABELS_QUANTITY = 4;
-export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
+import { singleton } from 'logic/singleton';
+import type { ActionComponents } from 'views/components/actions/ActionHandler';
 
-export const UNIT_FEATURE_FLAG = 'configurable_value_units';
-export const CANDIDATE_PICK_RADIUS = 10;
+export type OverflowingComponentsContextType = {
+  overflowingComponents: ActionComponents;
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<ActionComponents>>;
+};
+
+const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
+
+export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);
