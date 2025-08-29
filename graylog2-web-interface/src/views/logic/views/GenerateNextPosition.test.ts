@@ -36,7 +36,11 @@ describe('GenerateNextPosition', () => {
     const positions = Immutable.Map<string, WidgetPosition>();
     const newPositions = GenerateNextPosition(positions, widgets);
 
-    expect(newPositions).toMatchSnapshot();
+    expect(newPositions).toEqual(
+      Immutable.Map({
+        'foo-1': WidgetPosition.builder().col(1).row(1).height(5).width(6).build(),
+      }),
+    );
   });
 
   it('should add a new widget to the first row and column to other widgets', () => {
@@ -47,6 +51,11 @@ describe('GenerateNextPosition', () => {
     const positions = Immutable.Map({ foo: oldWidgetPosition });
     const newPositions = GenerateNextPosition(positions, widgets);
 
-    expect(newPositions).toMatchSnapshot();
+    expect(newPositions).toEqual(
+      Immutable.Map({
+        'foo-1': WidgetPosition.builder().col(1).row(10).height(5).width(6).build(),
+        foo: oldWidgetPosition,
+      }),
+    );
   });
 });

@@ -41,9 +41,8 @@ export const ConcatPositions = (
   const curUpdatedPositions = curPositions
     .map((initialPosition) => {
       const row = rowIncrement + initialPosition.row;
-      const widgetPosition = initialPosition.toBuilder().row(row).build();
 
-      return widgetPosition;
+      return initialPosition.toBuilder().row(row).build();
     })
     .toMap();
 
@@ -53,22 +52,17 @@ export const ConcatPositions = (
 export default (
   widgetPositions: Immutable.Map<string, WidgetPosition>,
   widgets: Array<Widget>,
+  height: number = undefined,
+  width: number = undefined,
 ): Immutable.Map<string, WidgetPosition> => {
-  const widgetsWithPosition = widgets.filter((widget) => widgetPositions.has(widget.id));
-
   const widgetsWithoutPosition = widgets.filter((widget) => !widgetPositions.has(widget.id));
 
   const newPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(
-    widgetsWithoutPosition.map((widget) => [widget.id, GetPositionForNewWidget(widget)]),
+    widgetsWithoutPosition.map((widget) => [
+      widget.id,
+      GetPositionForNewWidget(widget, widgetPositions, height, width),
+    ]),
   );
 
-  const updatedPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(
-    widgetsWithPosition.map((widget) => {
-      const widgetPosition = widgetPositions.get(widget.id);
-
-      return [widget.id, widgetPosition];
-    }),
-  );
-
-  return ConcatPositions(newPositions, updatedPositions);
+  return widgetPositions.merge(newPositions);
 };
