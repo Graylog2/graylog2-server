@@ -81,7 +81,7 @@ class V20230601104500_AddSourcesPageV2Test {
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null, null, mock(GRNRegistry.class), mock(EntitySharesService.class));
+            super(null, null, Map.of(), null, null, null, null, mock(GRNRegistry.class), mock(EntitySharesService.class));
         }
 
         @Override

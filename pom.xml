@@ -89,6 +89,12 @@
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
+        <!-- See: "Explicitly setting up instrumentation for inline mocking (Java 21+)" at
+             https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+             We use the "@{}" property syntax to delay property resolution for the argLine config in surefire. -->
+        <common.surefire.args>-javaagent:@{org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</common.surefire.args>
+        <common.failsafe.args>-Djava.awt.headless=true</common.failsafe.args>
+
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <airline.version>3.1.0</airline.version>
@@ -717,10 +723,42 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <!-- Required to get Mockito's JAR path for the surefire argLine. -->
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>${common.surefire.args}</argLine>
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                    <includes>
+                        <include>**/*Spec.class</include>
+                        <include>**/*Test.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <forkCount>1</forkCount>
                     <skip>false</skip>
+                    <argLine>${common.failsafe.args}</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -946,7 +984,7 @@
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
                             io.trino.hadoop.$internal.**
-                            autovalue.shaded.org.**
+                            autovalue.shaded.**
 
                             @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject
