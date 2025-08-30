@@ -416,6 +416,14 @@
                 </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>io.modelcontextprotocol.sdk</groupId>
+                <artifactId>mcp-bom</artifactId>
+                <type>pom</type>
+                <version>${mcp-bom.version}</version>
+                <scope>import</scope>
+            </dependency>
+
             <!-- Test dependencies -->
             <dependency>
                 <groupId>junit</groupId>
