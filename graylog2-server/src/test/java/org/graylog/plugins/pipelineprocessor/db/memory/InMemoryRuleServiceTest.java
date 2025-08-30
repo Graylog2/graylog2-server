@@ -43,7 +43,7 @@ public class InMemoryRuleServiceTest {
 
         try {
             service.load("1");
-            fail("Should throw an exception");
+            var ignored = fail("Should throw an exception");
         } catch (NotFoundException e) {
             assertThat(e).hasMessage("No such rule with id 1");
         }
@@ -51,7 +51,7 @@ public class InMemoryRuleServiceTest {
 
     @Test
     public void storeRetrieve() {
-        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
+        RuleDao rule = RuleDao.create(null, null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
         final RuleDao savedRule = service.save(rule);
 
         // saving should create a copy with an id
@@ -62,7 +62,7 @@ public class InMemoryRuleServiceTest {
         try {
             loaded = service.load(savedRule.id());
         } catch (NotFoundException e) {
-            fail("The rule should be found");
+            var ignored = fail("The rule should be found");
             loaded = null;
         }
         assertThat(loaded).isNotNull().isEqualTo(savedRule);
@@ -70,14 +70,14 @@ public class InMemoryRuleServiceTest {
         service.delete(loaded);
         try {
             service.load(loaded.id());
-            fail("Deleted rules should not be found anymore");
+            var ignore = fail("Deleted rules should not be found anymore");
         } catch (NotFoundException ignored) {
         }
     }
 
     @Test
     public void loadByName() throws NotFoundException {
-        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
+        RuleDao rule = RuleDao.create(null, null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
         final RuleDao savedRule = service.save(rule);
         final RuleDao loadedRule = service.loadByName(savedRule.title());
         assertThat(loadedRule).isEqualTo(savedRule);
@@ -92,32 +92,27 @@ public class InMemoryRuleServiceTest {
 
     @Test
     public void uniqueTitles() {
-        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
-        RuleDao rule2 = RuleDao.create(null,
-                "test",
-                "some other description",
-                "rule \"test\" when false then end",
-                null,
-                null, null, null);
+        RuleDao rule = RuleDao.create(null, null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
+        RuleDao rule2 = RuleDao.create(null, null, "test", "some other description", "rule \"test\" when false then end", null, null, null, null);
 
         final RuleDao saved = service.save(rule);
         try {
             service.save(rule2);
-            fail("Titles must be unique for two different rules");
+            var ignored = fail("Titles must be unique for two different rules");
         } catch (IllegalArgumentException ignored) {
         }
 
         try {
             service.save(saved.toBuilder().createdAt(DateTime.now(DateTimeZone.UTC)).build());
         } catch (IllegalArgumentException e) {
-            fail("Updating an existing rule should be possible");
+            var ignored = fail("Updating an existing rule should be possible");
         }
 
         service.delete(saved);
         try {
             service.save(rule);
         } catch (IllegalArgumentException e) {
-            fail("Removing a rule should clean up the title index.");
+            var ignored = fail("Removing a rule should clean up the title index.");
         }
     }
 
@@ -125,10 +120,10 @@ public class InMemoryRuleServiceTest {
     @Test
     public void loadMultiple() {
 
-        RuleDao rule1 = service.save(RuleDao.create(null, "test1", "description", "rule \"test1\" when true then end", null, null, null, null));
-        RuleDao rule2 = service.save(RuleDao.create(null, "test2", "description", "rule \"test2\" when true then end", null, null, null, null));
-        RuleDao rule3 = service.save(RuleDao.create(null, "test3", "description", "rule \"test3\" when true then end", null, null, null, null));
-        RuleDao rule4 = service.save(RuleDao.create(null, "test4", "description", "rule \"test4\" when true then end", null, null, null, null));
+        RuleDao rule1 = service.save(RuleDao.create(null, null, "test1", "description", "rule \"test1\" when true then end", null, null, null, null));
+        RuleDao rule2 = service.save(RuleDao.create(null, null, "test2", "description", "rule \"test2\" when true then end", null, null, null, null));
+        RuleDao rule3 = service.save(RuleDao.create(null, null, "test3", "description", "rule \"test3\" when true then end", null, null, null, null));
+        RuleDao rule4 = service.save(RuleDao.create(null, null, "test4", "description", "rule \"test4\" when true then end", null, null, null, null));
 
         assertThat(service.loadAll()).containsExactlyInAnyOrder(rule1, rule2, rule3, rule4);
 

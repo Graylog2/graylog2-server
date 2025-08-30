@@ -15,13 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+export type ContentPackParameter = {
+  title: string;
+  name: string;
+  description?: string;
+  type: string;
+  default_value: any;
+};
+
 export type ContentPackInstallation = {
   created_at?: string;
   description: string;
   entities?: Array<ContentPackEntity>;
   id: string;
   name: string;
-  parameters?: Array<any>;
+  parameters?: Array<ContentPackParameter>;
   rev: number;
   server_version?: string;
   summary: string;
@@ -43,6 +51,7 @@ export type ContentPackEntity = {
   v: string;
   data: Data;
   constraints: Array<Constraint>;
+  toJSON: () => unknown;
 };
 
 export interface EntityType {

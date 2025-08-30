@@ -36,6 +36,9 @@ import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -107,7 +110,9 @@ public class StreamCatalogTest {
                 indexSetService,
                 mongoIndexSetFactory,
                 entityRegistrar,
-                clusterEventBus, Set.of());
+                clusterEventBus,
+                Set.of(),
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

@@ -78,6 +78,7 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
     public IndexSetConfig toIndexSetConfig(final String id, final IndexSetConfig oldConfig) {
         return IndexSetConfig.builder()
                 .id(id)
+                .scope(oldConfig.scope())
                 .title(title())
                 .description(description())
                 .isWritable(isWritable())

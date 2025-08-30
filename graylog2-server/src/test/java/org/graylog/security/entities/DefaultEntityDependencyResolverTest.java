@@ -31,7 +31,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -58,11 +58,11 @@ class DefaultEntityDependencyResolverTest {
 
     private EntityDependencyResolver entityDependencyResolver;
     private GRNRegistry grnRegistry;
-    private ContentPackService contentPackService;
+    private ContentPackEntityResolver contentPackEntityResolver;
     private GRNDescriptorService grnDescriptorService;
 
     @BeforeEach
-    void setUp(@Mock ContentPackService contentPackService,
+    void setUp(@Mock ContentPackEntityResolver contentPackEntityResolver,
                GRNRegistry grnRegistry,
                @Mock GRNDescriptorService grnDescriptorService,
                MongoDBTestService mongodb,
@@ -70,9 +70,9 @@ class DefaultEntityDependencyResolverTest {
 
         this.grnRegistry = grnRegistry;
         DBGrantService dbGrantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
-        this.contentPackService = contentPackService;
+        this.contentPackEntityResolver = contentPackEntityResolver;
         this.grnDescriptorService = grnDescriptorService;
-        entityDependencyResolver = new DefaultEntityDependencyResolver(contentPackService, grnRegistry, grnDescriptorService, dbGrantService);
+        entityDependencyResolver = new DefaultEntityDependencyResolver(contentPackEntityResolver, grnRegistry, grnDescriptorService, dbGrantService);
     }
 
     @Test
@@ -83,12 +83,12 @@ class DefaultEntityDependencyResolverTest {
                 .type(ModelTypes.STREAM_V1)
                 .id(ModelId.of("54e3deadbeefdeadbeefaffe"))
                 .title(TEST_TITLE).build();
-        when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt));
+        when(contentPackEntityResolver.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt));
 
         final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
         final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
         dependencyGraph.addNode(streamDescriptor);
-        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+        when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
             GRN grnArg = a.getArgument(0);
@@ -111,11 +111,11 @@ class DefaultEntityDependencyResolverTest {
     @DisplayName("Try resolve with a broken dependency")
     void resolveWithInclompleteDependency() {
 
-        when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
+        when(contentPackEntityResolver.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
         final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
         final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
         dependencyGraph.addNode(streamDescriptor);
-        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+        when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
             GRN grnArg = a.getArgument(0);
@@ -143,12 +143,12 @@ class DefaultEntityDependencyResolverTest {
                 .type(ModelTypes.STREAM_REF_V1)
                 .id(ModelId.of("54e3deadbeefdeadbeefaffe"))
                 .title(TEST_TITLE).build();
-        when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt, streamRefExcerpt));
+        when(contentPackEntityResolver.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt, streamRefExcerpt));
 
         final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_REF_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
         final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
         dependencyGraph.addNode(streamDescriptor);
-        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+        when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
             GRN grnArg = a.getArgument(0);
@@ -175,7 +175,7 @@ class DefaultEntityDependencyResolverTest {
         final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
         dependencyGraph.addNode(definitionDescriptor);
         dependencyGraph.putEdge(definitionDescriptor, procedureDescriptor);
-        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+        when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         final GRN definitionGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
         grnRegistry.registerType(GRNType.create("event_procedure"));
@@ -198,7 +198,7 @@ class DefaultEntityDependencyResolverTest {
         dependencyGraph.addNode(dashboard);
         dependencyGraph.putEdge(stream, output1);
         dependencyGraph.putEdge(dashboard, output2);
-        when(contentPackService.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+        when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
 
         // output1 should be ignored because it is only a dependency of the stream
         final var dependencies = entityDependencyResolver.resolve(grnRegistry.newGRN(GRNTypes.DASHBOARD, "dashboard-id"));

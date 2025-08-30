@@ -19,11 +19,36 @@ import concat from 'lodash/concat';
 import remove from 'lodash/remove';
 
 import generateId from 'logic/generateId';
+import type { ContentPackEntity, ContentPackParameter } from 'components/content-packs/Types';
 
 import Entity from './Entity';
 
 export default class ContentPack {
-  constructor(v, id, rev, name, summary, description, vendor, url, parameters, entitieValues) {
+  private _value: {
+    v: number;
+    id: string;
+    rev: number;
+    name: string;
+    summary: string;
+    description: string;
+    vendor: string;
+    url: string;
+    parameters: ContentPackParameter[];
+    entities: ContentPackEntity[];
+  };
+
+  constructor(
+    v: number,
+    id: string,
+    rev: number,
+    name: string,
+    summary: string,
+    description: string,
+    vendor: string,
+    url: string,
+    parameters: ContentPackParameter[],
+    entitieValues: ContentPackEntity[],
+  ) {
     const entities = entitieValues.map((e) => {
       if (e instanceof Entity) {
         return e;
@@ -96,7 +121,7 @@ export default class ContentPack {
   toBuilder() {
     const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
       Map({
         v,
@@ -139,7 +164,7 @@ export default class ContentPack {
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .v(1)
       .id(generateId())
@@ -155,66 +180,72 @@ export default class ContentPack {
 }
 
 class Builder {
-  constructor(value = Map()) {
+  private value: Map<string, unknown>;
+
+  constructor(value: Map<string, unknown> = Map()) {
     this.value = value;
   }
 
-  v(value) {
+  v(value: number) {
     this.value = this.value.set('v', value);
 
     return this;
   }
 
-  id(value) {
+  id(value: string) {
     this.value = this.value.set('id', value);
 
     return this;
   }
 
-  rev(value) {
+  rev(value: number) {
     this.value = this.value.set('rev', value);
 
     return this;
   }
 
-  name(value) {
+  name(value: string) {
     this.value = this.value.set('name', value);
 
     return this;
   }
 
-  summary(value) {
+  summary(value: string) {
     this.value = this.value.set('summary', value);
 
     return this;
   }
 
-  description(value) {
+  description(value: string) {
     this.value = this.value.set('description', value);
 
     return this;
   }
 
-  vendor(value) {
+  vendor(value: string) {
     this.value = this.value.set('vendor', value);
 
     return this;
   }
 
-  url(value) {
+  url(value: string) {
     this.value = this.value.set('url', value);
 
     return this;
   }
 
-  parameters(value) {
+  parameters(value: ContentPackParameter[]) {
     this.value = this.value.set('parameters', value);
 
     return this;
   }
 
-  removeParameter(value) {
-    const parameters = this.value.get('parameters').slice(0);
+  private getParameters() {
+    return this.value.get('parameters') as ContentPackParameter[];
+  }
+
+  removeParameter(value: ContentPackParameter) {
+    const parameters = this.getParameters().slice(0);
 
     remove(parameters, (parameter) => parameter.name === value.name);
     this.value = this.value.set('parameters', parameters);
@@ -222,8 +253,8 @@ class Builder {
     return this;
   }
 
-  addParameter(value) {
-    const parameters = this.value.get('parameters');
+  addParameter(value: ContentPackParameter) {
+    const parameters = this.getParameters();
     const newParameters = concat(parameters, value);
 
     this.value = this.value.set('parameters', newParameters);
@@ -231,7 +262,7 @@ class Builder {
     return this;
   }
 
-  entities(value) {
+  entities(value: Array<ContentPackEntity>) {
     this.value = this.value.set('entities', value);
 
     return this;
@@ -240,6 +271,7 @@ class Builder {
   build() {
     const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = this.value.toObject();
 
+    // @ts-ignore
     return new ContentPack(v, id, rev, name, summary, description, vendor, url, parameters, entities);
   }
 }

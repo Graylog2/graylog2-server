@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @JsonIgnoreProperties({"default_template_crc"})
 public abstract class Collector implements BuildableMongoEntity<Collector, Collector.Builder> {
-    public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_SERVICE_TYPE = "service_type";
     public static final String FIELD_NODE_OPERATING_SYSTEM = "node_operating_system";
@@ -39,12 +38,6 @@ public abstract class Collector implements BuildableMongoEntity<Collector, Colle
     public static final String FIELD_EXECUTE_PARAMETERS = "execute_parameters";
     public static final String FIELD_VALIDATION_PARAMETERS = "validation_parameters";
     public static final String FIELD_DEFAULT_TEMPLATE = "default_template";
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_NAME)
     public abstract String name();
@@ -99,7 +92,7 @@ public abstract class Collector implements BuildableMongoEntity<Collector, Colle
     }
 
     @JsonCreator
-    public static Collector create(@JsonProperty(FIELD_ID) @Nullable String id,
+    public static Collector create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                    @JsonProperty(FIELD_NAME) String name,
                                    @JsonProperty(FIELD_SERVICE_TYPE) String serviceType,
                                    @JsonProperty(FIELD_NODE_OPERATING_SYSTEM) String nodeOperatingSystem,

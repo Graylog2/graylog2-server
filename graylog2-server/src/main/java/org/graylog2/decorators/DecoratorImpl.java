@@ -81,7 +81,7 @@ public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorIm
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static DecoratorImpl create(@JsonProperty(FIELD_ID) @JsonAlias("_" + FIELD_ID) @Id @ObjectId @Nullable String id,
+    public static DecoratorImpl create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                        @JsonProperty(FIELD_TYPE) String type,
                                        @JsonProperty(FIELD_CONFIG) Map<String, Object> config,
                                        @JsonProperty(FIELD_STREAM) Optional<String> stream,

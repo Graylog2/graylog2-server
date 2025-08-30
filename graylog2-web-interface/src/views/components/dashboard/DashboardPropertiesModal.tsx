@@ -71,7 +71,7 @@ const DashboardPropertiesModal = ({
     }
   };
 
-  const _onSave = (e: React.FormEvent<HTMLFormElement>) => {
+  const _onSave = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     onSave(updatedDashboard, sharePayload);
     onClose();

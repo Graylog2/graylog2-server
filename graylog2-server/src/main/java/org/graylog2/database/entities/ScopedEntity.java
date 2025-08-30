@@ -26,7 +26,6 @@ import org.mongojack.ObjectId;
  * has the required id and _scope fields.
  */
 public abstract class ScopedEntity implements MongoEntity {
-    public static final String FIELD_ID = "id";
     public static final String FIELD_SCOPE = "_scope";
 
     @JsonProperty(FIELD_SCOPE)
