@@ -41,11 +41,15 @@ import java.util.UUID;
 @Path("/mcp")
 public class McpResource extends RestResource {
 
-    @Context
     ObjectMapper objectMapper;
 
-    @Inject
     McpService mcpService;
+
+    @Inject
+    public McpResource(McpService mcpService, ObjectMapper objectMapper) {
+        this.mcpService = mcpService;
+        this.objectMapper = objectMapper;
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

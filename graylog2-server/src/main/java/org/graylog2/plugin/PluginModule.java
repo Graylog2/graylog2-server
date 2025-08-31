@@ -36,6 +36,7 @@ import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypeProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -500,5 +501,13 @@ public abstract class PluginModule extends Graylog2Module {
 
             dbEntitiesBinder().addBinding().toInstance(entitiesClass);
         }
+    }
+
+    protected MapBinder<String, Tool<?, ?>> mcpToolBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<Tool<?, ?>>() {});
+    }
+
+    protected void addMcpTool(String name, Class<? extends Tool<?, ?>> toolClass) {
+        mcpToolBinder().addBinding(name).to(toolClass);
     }
 }

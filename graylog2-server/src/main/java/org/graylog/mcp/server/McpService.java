@@ -16,22 +16,18 @@
  */
 package org.graylog.mcp.server;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.ServerVersion;
-import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Singleton
@@ -39,12 +35,12 @@ public class McpService {
     private static final Logger LOG = LoggerFactory.getLogger(McpService.class);
 
     private final ObjectMapper objectMapper;
-    private final StreamService streamService;
+    private final Map<String, Tool<?, ?>> tools;
 
     @Inject
-    protected McpService(ObjectMapper objectMapper, StreamService streamService) {
+    protected McpService(ObjectMapper objectMapper, Map<String, Tool<?, ?>> tools) {
         this.objectMapper = objectMapper;
-        this.streamService = streamService;
+        this.tools = tools;
     }
 
     public Optional<McpSchema.Result> handle(McpSchema.JSONRPCRequest request, String sessionId) throws McpException {
@@ -72,39 +68,32 @@ public class McpService {
             case McpSchema.METHOD_PING -> {
                 return Optional.empty();
             }
+            case McpSchema.METHOD_RESOURCES_LIST -> {
+                return Optional.of(new McpSchema.ListResourcesResult(List.of(), null));
+            }
+            case McpSchema.METHOD_RESOURCES_READ -> {
+                final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                return Optional.of(new McpSchema.ReadResourceResult(List.of()));
+            }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.info("Listing available tools");
-                List<McpSchema.Tool> tools = Lists.newArrayList();
-                tools.add(McpSchema.Tool.builder()
-                        .name("list_streams")
-                        .description("List of streams available in this Graylog cluster in CSV format")
-                        .inputSchema("""
-                                {
-                                   "type": "object",
-                                   "properties": {},
-                                   "required": []
-                                 }
-                                """)
-                        .build());
-                return Optional.of(new McpSchema.ListToolsResult(tools, null));
+                final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> McpSchema.Tool.builder()
+                        .name(tool.name())
+                        .title(tool.title())
+                        .description(tool.description())
+                        .inputSchema(tool.inputSchema())
+                        .build()).toList();
+                return Optional.of(new McpSchema.ListToolsResult(toolList, null));
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
                 final McpSchema.CallToolRequest callToolRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 LOG.info("Calling MCP tool: {}", callToolRequest);
-                switch (callToolRequest.name()) {
-                    case "list_streams" -> {
-                        final List<Stream> streams = streamService.loadAll();
-                        final StringWriter writer = new StringWriter();
-                        final CSVWriter csvWriter = new CSVWriter(writer);
-                        csvWriter.writeNext(new String[]{"id", "name", "description", "index_set"});
-                        streams.forEach(stream -> {
-                            csvWriter.writeNext(new String[]{stream.getId(), stream.getTitle(), stream.getDescription(), stream.getIndexSet().getConfig().title()});
-                        });
-                        return Optional.of(McpSchema.CallToolResult.builder()
-                                .addTextContent(writer.toString())
-                                .build());
-                    }
-                    default -> throw new McpException("Unknown tool named: " + callToolRequest.name());
+                if (tools.containsKey(callToolRequest.name())) {
+                    final Tool<?, ?> tool = tools.get(callToolRequest.name());
+                    final Object result = tool.apply(callToolRequest.arguments());
+                    return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                } else {
+                    throw new McpException("Unknown tool named: " + callToolRequest.name());
                 }
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());
