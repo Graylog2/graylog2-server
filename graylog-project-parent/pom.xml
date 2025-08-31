@@ -423,6 +423,11 @@
                 <version>${mcp-bom.version}</version>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-generator</artifactId>
+                <version>${json-schema-generator.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

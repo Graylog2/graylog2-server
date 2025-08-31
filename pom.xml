@@ -199,6 +199,7 @@
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
         <mcp-bom.version>0.11.2</mcp-bom.version>
+        <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
