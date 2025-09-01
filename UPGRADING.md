@@ -59,6 +59,7 @@ is now used as the primary color for elements like buttons and badges in the UI.
   - Sigma rules
   - Event procedure
   - Event step
+  - Content Pack installation
   
   <br> For example, the request payload to create a stream might now look like this:
 
