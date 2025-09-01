@@ -30,7 +30,7 @@ const scTheme = SawmillSC(mantineTheme);
 
 type Props = {
   children: React.ReactNode;
-  env?: string;
+  env?: 'default' | 'test';
 };
 
 const DefaultProviders = ({ children, env = undefined }: Props) => (
