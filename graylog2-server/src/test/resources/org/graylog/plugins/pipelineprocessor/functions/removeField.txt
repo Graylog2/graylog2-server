@@ -8,5 +8,8 @@ then
   set_field(field: "i2", value: "i2");
 
   remove_field(field:"f1");
-  remove_field(field:"f.", invert:true);
+
+  // invalid - should be NO-OP
+  remove_field(field:"f.");
+  remove_field(field:"dummy");
 end
