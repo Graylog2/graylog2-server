@@ -37,6 +37,7 @@ type Props<Configuration extends object> = {
     [key: string]: ConfigurationField;
   };
   children?: React.ReactNode;
+  initialShow?: boolean;
   titleHelpText?: string;
   includeTitleField?: boolean;
   submitAction: (data: ConfigurationFormData<Configuration>) => void;
@@ -72,6 +73,7 @@ const ConfigurationForm = forwardRef(
       configFields = defaultConfigFields,
       children = null,
       titleHelpText = '',
+      initialShow = false,
       includeTitleField = true,
       submitAction,
       title = null,
@@ -83,7 +85,7 @@ const ConfigurationForm = forwardRef(
     }: Props<Configuration>,
     ref: React.ForwardedRef<RefType<Configuration>>,
   ) => {
-    const [showConfigurationModal, setShowConfigurationModal] = useState(false);
+    const [showConfigurationModal, setShowConfigurationModal] = useState(initialShow);
     const [titleValue, setTitleValue] = useState(undefined);
     const [values, setValues] = useState<{ [key: string]: any } | undefined>(undefined);
     const [fieldStates, setFieldStates] = useState<{ [key: string]: any } | undefined>({});
@@ -132,8 +134,7 @@ const ConfigurationForm = forwardRef(
       if (!diff) {
         const isOptionalToNumber = (optional: boolean): number => (optional ? 1 : 0);
 
-        diff =
-          isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
+        diff = isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
       }
 
       if (!diff) {
@@ -163,10 +164,10 @@ const ConfigurationForm = forwardRef(
           const fieldState = fieldStates[fieldName as string];
 
           if (
-            fieldIsEncrypted(configField) &&
-            !fieldState?.dirty &&
-            fieldValue &&
-            (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined
+            fieldIsEncrypted(configField)
+            && !fieldState?.dirty
+            && fieldValue
+            && (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined
           ) {
             return [fieldName, { keep_value: true }];
           }
@@ -217,16 +218,14 @@ const ConfigurationForm = forwardRef(
       const value = values[key];
 
       return (
-        <ConfigurationFormField
-          key={key}
-          typeName={typeName}
-          configField={configField}
-          configKey={key}
-          configValue={value}
-          autoFocus={autoFocus}
-          dirty={fieldStates[key]?.dirty}
-          onChange={handleChange}
-        />
+        <ConfigurationFormField key={key}
+                                typeName={typeName}
+                                configField={configField}
+                                configKey={key}
+                                configValue={value}
+                                autoFocus={autoFocus}
+                                dirty={fieldStates[key]?.dirty}
+                                onChange={handleChange} />
       );
     };
 
@@ -235,13 +234,11 @@ const ConfigurationForm = forwardRef(
 
     if (includeTitleField) {
       titleElement = (
-        <TitleField
-          key={`${typeName}-title`}
-          typeName={typeName}
-          value={titleValue}
-          onChange={handleTitleChange}
-          helpText={titleHelpText}
-        />
+        <TitleField key={`${typeName}-title`}
+                    typeName={typeName}
+                    value={titleValue}
+                    onChange={handleTitleChange}
+                    helpText={titleHelpText} />
       );
 
       shouldAutoFocus = false;
@@ -262,12 +259,11 @@ const ConfigurationForm = forwardRef(
     });
 
     return (
-      <WrapperComponent
-        show={showConfigurationModal}
-        title={title}
-        onCancel={handleCancel}
-        onSubmitForm={save}
-        submitButtonText={submitButtonText}>
+      <WrapperComponent show={showConfigurationModal}
+                        title={title}
+                        onCancel={handleCancel}
+                        onSubmitForm={save}
+                        submitButtonText={submitButtonText}>
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
           {children}
