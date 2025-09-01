@@ -46,14 +46,14 @@ const GridContainer = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr auto;
-  grid-gap: 0;
+  gap: 0;
 `;
 
 const SingleItemGrid = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  grid-gap: 0;
+  gap: 0;
 `;
 
 const NumberBox = styled(ElementDimensions)`
