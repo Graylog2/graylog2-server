@@ -23,9 +23,10 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -39,13 +40,12 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
@@ -62,8 +62,8 @@ public class StreamReferenceFacade extends StreamFacade {
     private final StreamService streamService;
 
     @Inject
-    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration, IndexSetService indexSetService, UserService userService) {
-        super(objectMapper, streamService, streamRuleService, legacyAlertsMigration, indexSetService, userService);
+    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, IndexSetService indexSetService, UserService userService) {
+        super(objectMapper, streamService, streamRuleService, indexSetService, userService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
     }
@@ -194,5 +194,10 @@ public class StreamReferenceFacade extends StreamFacade {
     public static String getStreamEntityIdOrThrow(String id, EntityDescriptorIds entityDescriptorIds) {
         return getStreamEntityId(id, entityDescriptorIds).orElseThrow(() ->
                 new ContentPackException("Couldn't find entity " + id + "/" + ModelTypes.STREAM_V1 + " or " + ModelTypes.STREAM_REF_V1));
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
     }
 }

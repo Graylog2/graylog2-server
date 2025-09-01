@@ -34,6 +34,7 @@ type Props = {
   pageSizes?: Array<number>;
   showPageSizeSelect?: boolean;
   totalItems: number;
+  enforcePageBounds?: boolean;
 };
 
 const ListBase = ({
@@ -48,6 +49,7 @@ const ListBase = ({
   setPagination,
   showPageSizeSelect,
   totalItems,
+  enforcePageBounds,
 }: Required<Props> & {
   currentPageSize: number;
   currentPage: number;
@@ -75,8 +77,10 @@ const ListBase = ({
   );
 
   useEffect(() => {
-    if (numberPages > 0 && currentPage > numberPages) _onChangePage(numberPages);
-  }, [currentPage, numberPages, _onChangePage]);
+    if (enforcePageBounds && numberPages > 0 && currentPage > numberPages) {
+      _onChangePage(numberPages);
+    }
+  }, [enforcePageBounds, currentPage, numberPages, _onChangePage]);
 
   return (
     <>
@@ -95,6 +99,7 @@ const ListBase = ({
       <IfInteractive>
         <div className={`text-center pagination-wrapper ${className ?? ''}`}>
           <Pagination
+            warnIfPageOutOfBounds={false}
             totalPages={numberPages}
             currentPage={currentPage}
             hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
@@ -162,47 +167,39 @@ const ListWithOwnState = ({
 const PaginatedList = ({
   activePage = 1,
   children,
-  className,
+  className = undefined,
   hideFirstAndLastPageLinks = false,
   hidePreviousAndNextPageLinks = false,
-  onChange,
+  onChange = undefined,
   pageSize = DEFAULT_PAGE_SIZES[0],
   pageSizes = DEFAULT_PAGE_SIZES,
   showPageSizeSelect = true,
   totalItems,
   useQueryParameter = true,
+  enforcePageBounds = true,
 }: Props & {
   activePage?: number;
   pageSize?: number;
   useQueryParameter?: boolean;
 }) => {
+  const baseProps = {
+    enforcePageBounds: enforcePageBounds,
+    className: className,
+    hideFirstAndLastPageLinks: hideFirstAndLastPageLinks,
+    hidePreviousAndNextPageLinks: hidePreviousAndNextPageLinks,
+    onChange: onChange,
+    pageSizes: pageSizes,
+    pageSize: pageSize,
+    showPageSizeSelect: showPageSizeSelect,
+    totalItems: totalItems,
+  };
+
   if (useQueryParameter) {
-    return (
-      <ListBasedOnQueryParams
-        className={className}
-        hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
-        hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
-        onChange={onChange}
-        pageSizes={pageSizes}
-        pageSize={pageSize}
-        showPageSizeSelect={showPageSizeSelect}
-        totalItems={totalItems}>
-        {children}
-      </ListBasedOnQueryParams>
-    );
+    return <ListBasedOnQueryParams {...baseProps}>{children}</ListBasedOnQueryParams>;
   }
 
   return (
-    <ListWithOwnState
-      className={className}
-      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
-      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
-      onChange={onChange}
-      pageSizes={pageSizes}
-      pageSize={pageSize}
-      showPageSizeSelect={showPageSizeSelect}
-      totalItems={totalItems}
-      activePage={activePage}>
+    <ListWithOwnState {...baseProps} activePage={activePage}>
       {children}
     </ListWithOwnState>
   );

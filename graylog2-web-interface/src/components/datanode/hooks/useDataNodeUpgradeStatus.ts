@@ -72,6 +72,7 @@ export interface DatanodeUpgradeStatus {
   shard_replication_enabled: boolean;
   cluster_state: ClusterState;
   server_version: Version;
+  warnings: string[];
 }
 
 export const saveNodeToUpgrade = (node_name: string) => localStorage.setItem('datanode-to-upgrade', node_name);
@@ -124,19 +125,19 @@ const useDataNodeUpgradeStatus = (): {
   isInitialLoading: boolean;
   error: any;
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery(
-    ['datanode-upgrade-status'],
-    () =>
+  const { data, refetch, isInitialLoading, error } = useQuery({
+    queryKey: ['datanode-upgrade-status'],
+
+    queryFn: () =>
       defaultOnError(
         fetchDataNodeUpgradeStatus(),
         'Loading Data Node upgrade status failed',
         'Could not load Data Node upgrade status',
       ),
-    {
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
-    },
-  );
+
+    notifyOnChangeProps: ['data', 'error'],
+    refetchInterval: 5000,
+  });
 
   return {
     data,

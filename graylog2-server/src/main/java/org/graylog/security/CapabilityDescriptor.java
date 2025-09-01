@@ -17,6 +17,9 @@
 package org.graylog.security;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.SetMultimap;
+import org.graylog.grn.GRNType;
+import org.graylog2.plugin.security.Permission;
 
 import java.util.Set;
 
@@ -26,14 +29,10 @@ public abstract class CapabilityDescriptor {
 
     public abstract String title();
 
-    public abstract Set<String> permissions();
+    public abstract SetMultimap<GRNType, Permission> permissions();
 
-    public static CapabilityDescriptor create(Capability capability, String title, Set<String> permissions) {
-        return builder()
-                .capability(capability)
-                .title(title)
-                .permissions(permissions)
-                .build();
+    public Set<Permission> permissionsFor(GRNType grnType) {
+        return permissions().get(grnType);
     }
 
     public static Builder builder() {
@@ -46,7 +45,7 @@ public abstract class CapabilityDescriptor {
 
         public abstract Builder title(String title);
 
-        public abstract Builder permissions(Set<String> permissions);
+        public abstract Builder permissions(SetMultimap<GRNType, Permission> permissions);
 
         public abstract CapabilityDescriptor build();
     }

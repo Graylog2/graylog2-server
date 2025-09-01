@@ -56,7 +56,10 @@ const metricNames = {
 
 const JournalDetails = ({ nodeId }: Props) => {
   const { metrics: metricsState } = useStore(MetricsStore);
-  const { data: journalInformation } = useQuery(['journal', 'info', nodeId], () => JournalStore.get(nodeId));
+  const { data: journalInformation } = useQuery({
+    queryKey: ['journal', 'info', nodeId],
+    queryFn: () => JournalStore.get(nodeId),
+  });
 
   useEffect(() => {
     if (journalInformation?.enabled) {

@@ -16,18 +16,16 @@
  */
 package org.graylog.security;
 
+import jakarta.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
-import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.shared.users.UserService;
-
-import jakarta.inject.Inject;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -78,14 +76,39 @@ public class UserContext implements HasUser {
     /**
      * Build a temporary Shiro Subject and run the callable within that context
      *
-     * @param username The username of the subject
+     * @param username    The username of the subject
+     * @param userService The userService to resolve the userId from the username
+     * @param callable    The callable to be executed
+     * @param <T>         The return type of the callable.
+     * @return whatever the callable returns.
+     */
+    public static <T> T runAs(String username, UserService userService, Callable<T> callable) {
+        User user = userService.load(username);
+        if (user == null) {
+            throw new IllegalArgumentException("Unknown user <" + username + ">");
+        }
+        final Subject subject = new Subject.Builder()
+                .principals(new SimplePrincipalCollection(user.getId(), "runAs-context"))
+                .authenticated(true)
+                .sessionCreationEnabled(false)
+                .buildSubject();
+
+        return subject.execute(callable);
+
+    }
+
+
+    /**
+     * Build a temporary Shiro Subject and run the callable within that context
+     *
+     * @param userId The userId of the subject
      * @param callable The callable to be executed
      * @param <T>      The return type of the callable.
      * @return whatever the callable returns.
      */
-    public static <T> T runAs(String username, Callable<T> callable) {
+    public static <T> T runAs(String userId, Callable<T> callable) {
         final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(username, "runAs-context"))
+                .principals(new SimplePrincipalCollection(userId, "runAs-context"))
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();
@@ -96,12 +119,12 @@ public class UserContext implements HasUser {
     /**
      * Build a temporary Shiro Subject and run the callable within that context
      *
-     * @param username The username of the subject
+     * @param userId The userId of the subject
      * @param runnable The runnable to be executed
      */
-    public static void runAs(String username, Runnable runnable) {
+    public static void runAs(String userId, Runnable runnable) {
         final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(username, "runAs-context"))
+                .principals(new SimplePrincipalCollection(userId, "runAs-context"))
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();
@@ -125,7 +148,7 @@ public class UserContext implements HasUser {
     }
 
     protected boolean isOwner(GRN entity) {
-        return subject.isPermitted(GRNPermission.create(RestPermissions.ENTITY_OWN, entity));
+        return subject.isPermitted(Permission.ENTITY_OWN.toShiroPermission(entity));
     }
 
     /**

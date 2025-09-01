@@ -17,7 +17,6 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.eventbus.EventBus;
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -61,29 +60,25 @@ public class DatanodeKeystore {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
 
-    public static final RandomStringUtils RANDOM_STRING_UTILS = RandomStringUtils.secure();
+    private static final RandomStringUtils RANDOM_STRING_UTILS = RandomStringUtils.secure();
+    private static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
+    public static String DATANODE_KEY_ALIAS = "datanode";
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystore.class);
-    private final DatanodeDirectories datanodeDirectories;
+    private final Path keystoreFile;
     private final String passwordSecret;
 
-    public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
-    public static String DATANODE_KEY_ALIAS = "datanode";
     private final EventBus eventBus;
 
     @Inject
-    public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
-        this(configuration.datanodeDirectories(), passwordSecret, eventBus);
-    }
-
-    public DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
-        this.datanodeDirectories = datanodeDirectories;
+    public DatanodeKeystore(DatanodeDirectories datanodeDirectories, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
+        this.keystoreFile = datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
         this.passwordSecret = passwordSecret;
         this.eventBus = eventBus;
     }
 
     public synchronized boolean exists() {
-        return Files.exists(keystorePath());
+        return Files.exists(keystoreFile);
     }
 
     public synchronized boolean hasSignedCertificate() throws DatanodeKeystoreException {
@@ -105,11 +100,6 @@ public class DatanodeKeystore {
         } catch (KeyStoreException e) {
             throw new DatanodeKeystoreException("Failed to check if datanode certificate is self-signed.", e);
         }
-    }
-
-    @Nonnull
-    private Path keystorePath() {
-        return datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
     }
 
     public synchronized KeyStore create(KeyPair keyPair) throws DatanodeKeystoreException {
@@ -138,7 +128,7 @@ public class DatanodeKeystore {
     }
 
     private synchronized KeyStore persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
-        try (FileOutputStream fos = new FileOutputStream(keystorePath().toFile())) {
+        try (FileOutputStream fos = new FileOutputStream(keystoreFile.toFile())) {
             keystore.store(fos, passwordSecret.toCharArray());
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
@@ -153,8 +143,8 @@ public class DatanodeKeystore {
         }
     }
 
-    public synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
-        try (FileInputStream fis = new FileInputStream(keystorePath().toFile())) {
+    private synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
+        try (FileInputStream fis = new FileInputStream(keystoreFile .toFile())) {
             KeyStore keystore = KeyStore.getInstance(PKCS12);
             keystore.load(fis, passwordSecret.toCharArray());
             return keystore;

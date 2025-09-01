@@ -139,7 +139,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
           })}
         </List>
         <Space h="md" />
-        You can always <RestartConfigurationButton compact variant="light" color="red" /> the configuration
+        You can always <RestartConfigurationButton /> the configuration
       </Grid.Col>
       <Grid.Col span={{ base: 12, md: 6, orderMd: 1 }}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}

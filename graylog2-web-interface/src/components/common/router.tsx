@@ -58,7 +58,7 @@ const isLeftClickEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
 const isModifiedEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
   !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
 
-const LinkContainer = ({ children, onClick, to: toProp, relativeActive = false, ...rest }: Props) => {
+const LinkContainer = ({ children, onClick = undefined, to: toProp, relativeActive = false, ...rest }: Props) => {
   const { pathname } = useLocation();
   const {
     props: { onClick: childrenOnClick, className, disabled },

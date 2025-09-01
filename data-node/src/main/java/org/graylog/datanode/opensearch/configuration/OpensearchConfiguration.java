@@ -46,36 +46,35 @@ public class OpensearchConfiguration {
     private final String hostname;
     private final int httpPort;
     private final List<DatanodeConfigurationPart> configurationParts;
-    private final OpensearchConfigurationDir opensearchConfigurationDir;
+    private final OpensearchConfigurationDir opensearchConfigTargetDir;
     private final DatanodeDirectories datanodeDirectories;
 
-    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, String hostname, int httpPort, List<DatanodeConfigurationPart> configurationParts) {
+    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, OpensearchConfigurationDir opensearchConfigTargetDir, String hostname, int httpPort, List<DatanodeConfigurationPart> configurationParts) {
         this.opensearchDistribution = opensearchDistribution;
+        this.datanodeDirectories = datanodeDirectories;
+        this.opensearchConfigTargetDir = opensearchConfigTargetDir;
         this.hostname = hostname;
         this.httpPort = httpPort;
         this.configurationParts = configurationParts;
-        this.datanodeDirectories = datanodeDirectories;
-        this.opensearchConfigurationDir = datanodeDirectories.createUniqueOpensearchProcessConfigurationDir();
     }
 
     @Nonnull
     private String buildRolesList() {
-        return configurationParts.stream()
-                .flatMap(cfg -> cfg.nodeRoles().stream())
-                .collect(Collectors.joining(","));
+         return String.join(",", opensearchRoles());
     }
 
     public Environment getEnv() {
-        final Environment env = new Environment(System.getenv());
+        return new Environment(System.getenv())
+                .withOpensearchJavaHome(opensearchDistribution.getOpensearchJavaHome())
+                .withOpensearchJavaOpts(getJavaOpts())
+                .withOpensearchPathConf(opensearchConfigTargetDir.configurationRoot());
+    }
 
-        List<String> javaOpts = new LinkedList<>();
-
-        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
-                .forEach(javaOpts::addAll);
-
-        env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
-        return env;
+    @Nonnull
+    private List<String> getJavaOpts() {
+        return configurationParts.stream()
+                .flatMap(part -> part.javaOpts().stream())
+                .collect(Collectors.toList());
     }
 
     public HttpHost getRestBaseUrl() {
@@ -127,6 +126,7 @@ public class OpensearchConfiguration {
     public List<String> opensearchRoles() {
         return configurationParts.stream()
                 .flatMap(cfg -> cfg.nodeRoles().stream())
+                .distinct()
                 .collect(Collectors.toList());
     }
 
@@ -160,8 +160,8 @@ public class OpensearchConfiguration {
         return opensearchDistribution;
     }
 
-    public OpensearchConfigurationDir getOpensearchConfigurationDir() {
-        return opensearchConfigurationDir;
+    public OpensearchConfigurationDir getOpensearchConfigTargetDir() {
+        return opensearchConfigTargetDir;
     }
 
     public DatanodeDirectories getDatanodeDirectories() {

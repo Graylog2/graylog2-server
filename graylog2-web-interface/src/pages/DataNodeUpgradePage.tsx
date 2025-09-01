@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
@@ -30,6 +30,12 @@ import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeU
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
+
+const ServerVersion = styled.dl(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
@@ -86,11 +92,20 @@ const upgradeInstructionsDocumentationMessage = (
 );
 
 const DataNodeUpgradePage = () => {
+  const upgradeListRef = useRef();
+
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
 
+  const scrollIntoDataNodeUpgradedList = () => {
+    if (!isInitialLoading && upgradeListRef?.current) {
+      (upgradeListRef.current as HTMLTableSectionElement).scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const startNodeUpgrade = async (node: DataNodeInformation) => {
+    scrollIntoDataNodeUpgradedList();
     saveNodeToUpgrade(node?.hostname);
     setOpenUpgradeConfirmDialog(true);
     stopShardReplication();
@@ -182,6 +197,13 @@ const DataNodeUpgradePage = () => {
               <Alert bsStyle="success">All your Data Nodes are Up-to-date.</Alert>
             )}
             {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
+            {(data?.warnings?.length || 0) > 0 && (
+              <Alert bsStyle="danger">
+                {data.warnings.map((warning) => (
+                  <p>{warning}</p>
+                ))}
+              </Alert>
+            )}
           </Col>
           <Col xs={12}>
             <h3>
@@ -212,6 +234,10 @@ const DataNodeUpgradePage = () => {
               />
             </h3>
             <StyledHorizontalDl>
+              <dt>Server Version:</dt>
+              <ServerVersion>
+                <b>{data?.server_version?.version || ''}</b>
+              </ServerVersion>
               {upgradeMethod === 'rolling-upgrade' && (
                 <>
                   <dt>Shard Replication:</dt>
@@ -269,7 +295,10 @@ const DataNodeUpgradePage = () => {
               </dd>
               <dt>Number of Shards:</dt>
               <dd>
-                {data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)
+                {data?.cluster_state?.active_shards || 0} active,&nbsp;
+                {data?.cluster_state?.initializing_shards || 0} initializing,&nbsp;
+                {data?.cluster_state?.relocating_shards || 0} relocating,&nbsp;
+                {data?.cluster_state?.unassigned_shards || 0} unassigned
               </dd>
             </StyledHorizontalDl>
             <br />
@@ -329,7 +358,7 @@ const DataNodeUpgradePage = () => {
                   <h3>Upgraded Nodes</h3>
                   <br />
                   <Table>
-                    <tbody>
+                    <tbody ref={upgradeListRef}>
                       {data?.up_to_date_nodes?.map((upgraded_node) => (
                         <tr key={upgraded_node?.hostname}>
                           <td>

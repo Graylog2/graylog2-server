@@ -24,13 +24,13 @@ const navTabsStyles = css(
       > li {
         > a {
           transition: background-color 150ms ease-in-out;
-          color: ${theme.colors.global.textDefault};
+          color: ${theme.colors.text.primary};
           border-color: ${theme.colors.variant.lighter.default} ${theme.colors.variant.lighter.default}
             ${theme.colors.variant.default};
 
           &:hover {
             background-color: ${theme.colors.variant.lightest.default};
-            color: ${theme.colors.global.textDefault};
+            color: ${theme.colors.text.primary};
           }
         }
 

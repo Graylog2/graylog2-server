@@ -19,7 +19,6 @@ package org.graylog2.indexer.ranges;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.assertj.jodatime.api.Assertions;
-import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.audit.NullAuditEventSender;
@@ -134,6 +133,9 @@ public class MongoIndexRangeServiceTest {
 
         assertThat(indexRanges).containsExactly(
                 MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000008"), "graylog_deflect", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42)
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000002"), "graylog_2", new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), 42),
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000003"), "graylog_3", new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), 42),
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000004"), "graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42)
         );
     }
 
@@ -147,7 +149,7 @@ public class MongoIndexRangeServiceTest {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
 
         assertThat(indexRanges).containsOnly(
-                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000003"), "graylog_1", new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), 42)
+                MongoIndexRange.create("55e0261a0cc6980000000003", "graylog_1", new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), 42)
         );
     }
 

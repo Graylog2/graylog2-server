@@ -20,7 +20,8 @@ import styled from 'styled-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import moment from 'moment';
 
-import { Title, Space, Button, Group, NumberInput, Input } from 'preflight/components/common';
+import { Title, Space, Group, NumberInput, Input } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -75,11 +76,14 @@ const defaultFormValues = {
 const RenewalPolicyConfiguration = () => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: onCreateRenewalPolicy } = useMutation(createPolicy, {
+  const { mutateAsync: onCreateRenewalPolicy } = useMutation({
+    mutationFn: createPolicy,
+
     onSuccess: () => {
       UserNotification.success('Renewal policy created successfully');
-      queryClient.invalidateQueries(RENEWAL_POLICY_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: RENEWAL_POLICY_QUERY_KEY });
     },
+
     onError: (error) => {
       UserNotification.error(`Renewal policy creation failed with error: ${error}`);
     },

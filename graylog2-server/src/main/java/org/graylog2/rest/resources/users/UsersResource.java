@@ -372,7 +372,7 @@ public class UsersResource extends RestResource {
             user.setStartpage(startpage.type(), startpage.id());
         }
 
-        final String id = userManagementService.create(user);
+        final String id = userManagementService.create(user, getCurrentUser());
         LOG.debug("Saved user {} with id {}", user.getName(), id);
 
         final URI userUri = getUriBuilderToSelf().path(UsersResource.class)
@@ -388,6 +388,7 @@ public class UsersResource extends RestResource {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
                 List<String> unknownRoles = new ArrayList<>();
                 roles.forEach(roleName -> {
+                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
                     if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
                         unknownRoles.add(roleName);
                     }
@@ -726,13 +727,9 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
         final User futureOwner = loadUserById(userId);
-        final User currentUser = getCurrentUser();
 
-        if (currentUser == null) {
-            throw new ForbiddenException("Not allowed to create tokens for unknown user.");
-        }
-        if (!isPermitted(USERS_TOKENCREATE, currentUser.getName())) {
-            throw new ForbiddenException(currentUser.getName() + " is not allowed to create token.");
+        if (!isPermitted(USERS_TOKENCREATE, futureOwner.getName())) {
+            throw new ForbiddenException("You are not allowed to create a token for user " + futureOwner.getName() + ".");
         }
 
         if (body == null) {

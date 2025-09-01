@@ -19,9 +19,7 @@ import React from 'react';
 
 import { Alert } from 'components/bootstrap';
 
-class MaxmindAdapterDocumentation extends React.Component {
-  render() {
-    const cityFields = `{
+const CITY_FIELDS = `{
     "city": { "geoname_id": 5375480, "names": { "en": "Mountain View" } },
     "location": {
       "accuracy_radius": 1000,
@@ -36,7 +34,7 @@ class MaxmindAdapterDocumentation extends React.Component {
     "subdivisions": [ { "geoname_id": 5332921, "iso_code": "CA", "names": { "en": "California" } } ],
 }`;
 
-    const countryFields = `{
+const COUNTRY_FIELDS = `{
     "continent": { "code": "NA", "geoname_id": 6255149, "names": { "en": "North America" } },
     "country": { "geoname_id": 6252001, "iso_code": "US", "names": { "en": "United States" } },
     "registered_country": { "geoname_id": 6252001, "iso_code": "US", "names": { } },
@@ -51,48 +49,45 @@ class MaxmindAdapterDocumentation extends React.Component {
     }
 }`;
 
-    const asnFields = `{
+const ASN_FIELDS = `{
     "as_number": 15169,
     "as_organization": "Google LLC"
 }`;
 
-    return (
-      <div>
-        <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
+const MaxmindAdapterDocumentation = () => (
+  <div>
+    <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
 
-        <Alert style={{ marginBottom: 10 }} bsStyle="info" title="Limitations">
-          <p>Currently the ASN, city and country databases are supported.</p>
-          <p>For support of additional database types, please visit our support channels.</p>
-        </Alert>
+    <Alert style={{ marginBottom: 10 }} bsStyle="info" title="Limitations">
+      <p>Currently the ASN, city and country databases are supported.</p>
+      <p>For support of additional database types, please visit our support channels.</p>
+    </Alert>
 
-        <hr />
+    <hr />
 
-        <h3 style={{ marginBottom: 10 }}>ASN database fields</h3>
+    <h3 style={{ marginBottom: 10 }}>ASN database fields</h3>
 
-        <pre>{asnFields}</pre>
+    <pre>{ASN_FIELDS}</pre>
 
-        <h3 style={{ marginBottom: 10 }}>Country database fields</h3>
+    <h3 style={{ marginBottom: 10 }}>Country database fields</h3>
 
-        <pre>{countryFields}</pre>
+    <pre>{COUNTRY_FIELDS}</pre>
 
-        <h3 style={{ marginBottom: 10 }}>City database fields</h3>
+    <h3 style={{ marginBottom: 10 }}>City database fields</h3>
 
-        <p>
-          In addition to the fields provided by the country database, the city database also includes the following
-          fields:
-        </p>
+    <p>
+      In addition to the fields provided by the country database, the city database also includes the following fields:
+    </p>
 
-        <pre>{cityFields}</pre>
+    <pre>{CITY_FIELDS}</pre>
 
-        <p>
-          For a complete documentation of the fields, please see MaxMind's{' '}
-          <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">
-            developer documentation
-          </a>
-        </p>
-      </div>
-    );
-  }
-}
+    <p>
+      For a complete documentation of the fields, please see MaxMind's{' '}
+      <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">
+        developer documentation
+      </a>
+    </p>
+  </div>
+);
 
 export default MaxmindAdapterDocumentation;

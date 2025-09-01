@@ -41,7 +41,7 @@ const DateRow = styled(Row)(
     font-size: 0.9rem;
     font-weight: normal;
     background-color: ${theme.colors.global.background};
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   `,
 );
 
@@ -54,13 +54,15 @@ const ClearDate = styled(Icon)(
 );
 
 type Props = {
-  values: Array<string>;
+  values: Array<string> | undefined;
   onChange: (arg: Array<string>) => void;
 };
 
-const DateFilter = ({ values = [], onChange }: Props) => {
+const DateFilter = ({ values: valuesProps, onChange }: Props) => {
   const [currentDate, setCurrentDate] = React.useState<string>(null);
   const [dateRange, setDateRange] = React.useState<boolean>(false);
+
+  const values = valuesProps ?? [];
 
   const toggleDateRange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const auxDateRange = e.target.checked;

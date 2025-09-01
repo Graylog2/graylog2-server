@@ -21,7 +21,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -29,8 +32,6 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,17 +44,20 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
     private final ContentPackService contentPackService;
     private final ObjectMapper objectMapper;
     private final ClusterConfigService configService;
+    private final Configuration configuration;
     private final ContentPackPersistenceService contentPackPersistenceService;
 
     @Inject
     public V20180924111644_AddDefaultGrokPatterns(final ContentPackPersistenceService contentPackPersistenceService,
                                                   final ContentPackService contentPackService,
                                                   final ObjectMapper objectMapper,
-                                                  final ClusterConfigService clusterConfigService) {
+                                                  final ClusterConfigService clusterConfigService,
+                                                  final Configuration configuration) {
         this.contentPackService = contentPackService;
         this.objectMapper = objectMapper;
         this.contentPackPersistenceService = contentPackPersistenceService;
         this.configService = clusterConfigService;
+        this.configuration = configuration;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
                     });
 
             try {
-                contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", "admin");
+                contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", configuration.getRootUsername(), EntityShareRequest.EMPTY);
             } catch (ContentPackException e) {
                 LOG.warn("Could not install default grok patterns: the installation found some modified default grok" +
                         "patterns in your setup and did not update them. If you wish to use the default grok" +

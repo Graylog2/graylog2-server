@@ -41,14 +41,17 @@ const spinAnimation = keyframes`
   }
 `;
 
+type ColorVariants = 'success' | 'warning';
+
 const StyledSpan = styled.span<{
   $size: string;
   $spin: boolean;
   $rotation: RotateProp;
   $flip: FlipProp;
   $fill: boolean;
+  $bsStyle: ColorVariants | undefined;
 }>(
-  ({ $size, $spin, $rotation, $flip, $fill }) => css`
+  ({ $bsStyle, $size, $spin, $rotation, $flip, $fill, theme }) => css`
     font-variation-settings:
       'opsz' 48,
       'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
@@ -61,10 +64,12 @@ const StyledSpan = styled.span<{
         `
       : 'none'};
     vertical-align: middle;
+    color: ${$bsStyle ? theme.colors.button[$bsStyle].background : 'inherit'};
   `,
 );
 
 type Props = {
+  bsStyle?: ColorVariants; // if this prop is not defined, the inherited font color will be used.
   className?: string;
   'data-testid'?: string;
   /** Name of Material Symbol icon */
@@ -94,6 +99,7 @@ type Props = {
  * Have a look at the `BrandIcon` component for brand icons.
  */
 const Icon = ({
+  bsStyle = undefined,
   name,
   type = 'solid',
   size = undefined,
@@ -102,7 +108,7 @@ const Icon = ({
   spin = false,
   flip = undefined,
   style = undefined,
-  'data-testid': testId,
+  'data-testid': testId = undefined,
   onClick = undefined,
   onMouseEnter = undefined,
   onMouseLeave = undefined,
@@ -120,6 +126,7 @@ const Icon = ({
     onMouseEnter={onMouseEnter}
     onMouseLeave={onMouseLeave}
     tabIndex={tabIndex}
+    $bsStyle={bsStyle}
     $rotation={rotation}
     $flip={flip}
     $size={size}

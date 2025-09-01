@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -57,8 +56,8 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -69,13 +68,13 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -96,6 +95,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
+import org.graylog2.rest.resources.streams.responses.StreamDTOResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
@@ -103,7 +103,6 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
-import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
@@ -115,7 +114,6 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -137,14 +135,14 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
-    private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
+    private static final String DEFAULT_SORT_FIELD = StreamImpl.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(StreamDTO.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set")
+            EntityAttribute.builder().id(StreamImpl.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_TITLE).title("Title").searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_INDEX_SET_ID).title("Index set")
                     .relatedCollection(MongoIndexSetService.COLLECTION_NAME)
                     .hidden(true)
                     .filterable(true)
@@ -170,6 +168,7 @@ public class StreamResource extends RestResource {
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
     private final EntitySharesService entitySharesService;
+    private final ClusterEventBus clusterEventBus;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -184,7 +183,8 @@ public class StreamResource extends RestResource {
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService,
-                          EntitySharesService entitySharesService) {
+                          EntitySharesService entitySharesService,
+                          ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
@@ -196,6 +196,7 @@ public class StreamResource extends RestResource {
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
+        this.clusterEventBus = clusterEventBus;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
@@ -214,12 +215,11 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final UnwrappedCreateEntityRequest<CreateStreamRequest> unwrappedCreateEntityRequest,
+    public Response create(@ApiParam(name = "JSON body", required = true) final CreateEntityRequest<CreateStreamRequest> createEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
-        final CreateStreamRequest cr = unwrappedCreateEntityRequest.getEntity();
+        final CreateStreamRequest cr = createEntityRequest.entity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
-        stream.setDisabled(true);
 
         final IndexSet indexSet = stream.getIndexSet();
         checkIndexSet(indexSet);
@@ -235,7 +235,7 @@ public class StreamResource extends RestResource {
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
-        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest ->
+        createEntityRequest.shareRequest().ifPresent(shareRequest ->
                 entitySharesService.updateEntityShares(GRNTypes.STREAM, result.streamId(), shareRequest, userContext.getUser()));
 
         return Response.created(streamUri).entity(result).build();
@@ -246,7 +246,7 @@ public class StreamResource extends RestResource {
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of streams")
     @Produces(MediaType.APPLICATION_JSON)
-    public PageListResponse<StreamDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<StreamDTOResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
@@ -258,14 +258,14 @@ public class StreamResource extends RestResource {
                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
-        final PaginatedList<StreamDTO> result = paginatedStreamService
+        final Predicate<StreamImpl> permissionFilter = stream -> isPermitted(RestPermissions.STREAMS_READ, stream.id());
+        final PaginatedList<StreamImpl> result = paginatedStreamService
                 .findPaginated(dbQueryCreator.createDbQuery(filters, query), permissionFilter, page, perPage, sort, order);
 
-        final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
+        final List<String> streamIds = result.stream().map(StreamImpl::id).toList();
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
 
-        final List<StreamDTO> streams = result
+        final List<StreamImpl> streams = result
                 .stream()
                 .map(streamDTO -> {
                     final List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
@@ -273,10 +273,10 @@ public class StreamResource extends RestResource {
                 })
                 .toList();
         final long total = paginatedStreamService.count();
-        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
-                streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        final PaginatedList<StreamDTOResponse> streamDTOS = new PaginatedList<>(
+                streams.stream().map(this::dtoToResponse).toList(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
-        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streamDTOS, attributes, settings);
     }
 
     @GET
@@ -375,50 +375,12 @@ public class StreamResource extends RestResource {
     public StreamResponse update(@ApiParam(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "JSON body", required = true)
-                                 @Valid @NotNull UpdateStreamRequest cr,
+                                 @Valid @NotNull UpdateStreamRequest request,
                                  @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be edited.");
 
-        final Stream stream = streamService.load(streamId);
-
-        if (!Strings.isNullOrEmpty(cr.title())) {
-            stream.setTitle(cr.title().strip());
-        }
-
-        stream.setDescription(cr.description());
-
-        if (cr.matchingType() != null) {
-            try {
-                stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
-            } catch (IllegalArgumentException e) {
-                throw new BadRequestException("Invalid matching type '" + cr.matchingType()
-                        + "' specified. Should be one of: " + Arrays.toString(Stream.MatchingType.values()));
-            }
-        }
-
-        final Boolean removeMatchesFromDefaultStream = cr.removeMatchesFromDefaultStream();
-        if (removeMatchesFromDefaultStream != null) {
-            stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
-        }
-
-        // Apparently we are sending partial resources sometimes so do not overwrite the index set
-        // id if it's null/empty in the update request.
-        if (!Strings.isNullOrEmpty(cr.indexSetId())) {
-            stream.setIndexSetId(cr.indexSetId());
-        }
-
-        final IndexSet indexSet = indexSetRegistry.get(stream.getIndexSetId())
-                .orElseThrow(() -> new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!"));
-
-        if (!indexSet.getConfig().isWritable()) {
-            throw new BadRequestException("Assigned index set must be writable!");
-        }
-        if (!indexSet.getConfig().isRegularIndex()) {
-            throw new BadRequestException("Assigned index set is not usable");
-        }
-
-        streamService.save(stream);
+        final Stream stream = streamService.update(streamId, request);
 
         recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
@@ -626,26 +588,24 @@ public class StreamResource extends RestResource {
                 .map(streamRule -> streamRuleService.copy(null, streamRule))
                 .collect(Collectors.toSet());
 
-        final Map<String, Object> streamData = Map.of(
-                StreamImpl.FIELD_TITLE, cr.title().strip(),
-                StreamImpl.FIELD_DESCRIPTION, cr.description(),
-                StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
-                StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
-                StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
-                StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
-                StreamImpl.FIELD_DISABLED, true,
-                StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
-        );
+        final Stream stream = StreamImpl.builder()
+                .id(new ObjectId().toHexString())
+                .title(cr.title().strip())
+                .description(cr.description())
+                .creatorUserId(creatorUser)
+                .createdAt(Tools.nowUTC())
+                .matchingType(sourceStream.getMatchingType())
+                .removeMatchesFromDefaultStream(cr.removeMatchesFromDefaultStream())
+                .disabled(true)
+                .indexSetId(cr.indexSetId())
+                .build();
 
-        final Stream stream = streamService.create(streamData);
         final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
-        final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
-                .map(Output::getId)
-                .map(ObjectId::new)
-                .collect(Collectors.toSet());
-        streamService.addOutputs(savedStreamObjectId, outputIds);
+        streamService.addOutputs(savedStreamObjectId, sourceStream.getOutputIds());
+
+        entitySharesService.cloneEntityGrants(GRNTypes.STREAM, streamId, savedStreamId, userContext.getUser());
 
         var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
@@ -727,10 +687,10 @@ public class StreamResource extends RestResource {
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
 
-        final Set<String> existingStreams = streamService.loadByIds(streamIds)
-                .stream()
-                .map(Persisted::getId)
-                .collect(Collectors.toSet());
+        final Set<String> existingStreams;
+        try (var stream = streamService.streamDTOByIds(streamIds)) {
+            existingStreams = stream.map(Stream::getId).collect(Collectors.toSet());
+        }
 
         final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
 
@@ -759,11 +719,11 @@ public class StreamResource extends RestResource {
     private StreamResponse streamToResponse(Stream stream) {
         return StreamResponse.create(
                 stream.getId(),
-                (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+                stream.getCreatorUserId(),
                 outputsToSummaries(stream.getOutputs()),
                 stream.getMatchingType().name(),
                 stream.getDescription(),
-                stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
+                stream.getCreatedAt().toString(),
                 stream.getDisabled(),
                 stream.getStreamRules(),
                 stream.getTitle(),
@@ -771,6 +731,26 @@ public class StreamResource extends RestResource {
                 stream.isDefaultStream(),
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
+                stream.getCategories(),
+                stream.isEditable()
+        );
+    }
+
+    private StreamDTOResponse dtoToResponse(Stream stream) {
+        return new StreamDTOResponse(stream.getId(),
+                stream.getCreatorUserId(),
+                stream.getOutputIds(),
+                stream.getMatchingType(),
+                stream.getDescription(),
+                stream.getCreatedAt(),
+                stream.getStreamRules(),
+                stream.getDisabled(),
+                stream.getTitle(),
+                stream.getContentPack(),
+                firstNonNull(stream.isDefaultStream(), false),
+                stream.getRemoveMatchesFromDefaultStream(),
+                stream.getIndexSetId(),
+                stream.isEditable(),
                 stream.getCategories()
         );
     }
@@ -783,7 +763,7 @@ public class StreamResource extends RestResource {
     }
 
     private void checkNotEditableStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
+        if (!streamService.isEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }

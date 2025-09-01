@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
 
 import type { GRN } from 'logic/permissions/types';
@@ -25,20 +24,24 @@ import type EntityShareState from 'logic/permissions/EntityShareState';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type {
+  SelectionRequest,
+  FormValues as GranteesSelectFormValues,
+} from 'components/permissions/Grantee/GranteesSelector';
+import GranteesSelector from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
+import usePluggableEntityCollectionGranteeList from 'hooks/usePluggableEntityCollectionGranteeList';
 
-import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
-import GranteesSelector from './GranteesSelector';
-import GranteesList from './GranteesList';
 import ShareableEntityURL from './ShareableEntityURL';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
 type Props = {
   entityGRN: GRN;
   description: string;
-  entityType: $PropertyType<SharedEntity, 'type'>;
-  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityType: SharedEntity['type'];
+  entityTitle: SharedEntity['title'];
   entityShareState: EntityShareState;
-  setDisableSubmit: (boolean) => void;
+  setDisableSubmit: (disabled: boolean) => void;
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>;
   showShareableEntityURL?: boolean;
   entityTypeTitle?: string | null | undefined;
@@ -82,6 +85,8 @@ const EntityShareSettings = ({
   entityTypeTitle = null,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
+
+  const CollectionGranteeList = usePluggableEntityCollectionGranteeList();
 
   useEffect(() => {
     setDisableSubmit(validationResults?.failed);
@@ -132,9 +137,19 @@ const EntityShareSettings = ({
           onDelete={_handleDeletion}
           onCapabilityChange={_handleSelection}
           selectedGrantees={selectedGrantees}
-          title="Collaborators"
+          title="Direct Collaborators"
         />
       </Section>
+      {CollectionGranteeList && (
+        <Section>
+          <CollectionGranteeList
+            title="Collection Collaborators"
+            entityType={entityType}
+            entityTypeTitle={entityTypeTitle}
+            entityGRN={entityGRN}
+          />
+        </Section>
+      )}
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}
         validationResults={validationResults}

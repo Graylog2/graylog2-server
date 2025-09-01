@@ -26,6 +26,7 @@ import org.graylog.grn.GRN;
 import org.graylog.security.Capability;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,11 +34,16 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class EntityShareRequest {
+    public static final EntityShareRequest EMPTY = empty();
 
     public static final String SELECTED_GRANTEE_CAPABILITIES = "selected_grantee_capabilities";
+    public static final String SELECTED_COLLECTIONS = "selected_collections";
 
     @JsonProperty(SELECTED_GRANTEE_CAPABILITIES)
     public abstract Optional<ImmutableMap<GRN, Capability>> selectedGranteeCapabilities();
+
+    @JsonProperty(SELECTED_COLLECTIONS)
+    public abstract Optional<Set<GRN>> selectedCollections();
 
     public Set<GRN> grantees() {
         return selectedGranteeCapabilities().map(ImmutableMap::keySet).orElse(ImmutableSet.of());
@@ -51,8 +57,20 @@ public abstract class EntityShareRequest {
     }
 
     @JsonCreator
-    public static EntityShareRequest create(@JsonProperty("selected_grantee_capabilities") @Nullable Map<GRN, Capability> selectedGranteeCapabilities) {
-        final ImmutableMap<GRN, Capability> value = selectedGranteeCapabilities == null ? null : ImmutableMap.copyOf(selectedGranteeCapabilities);
-        return new AutoValue_EntityShareRequest(Optional.ofNullable(value));
+    public static EntityShareRequest create(
+            @JsonProperty(SELECTED_GRANTEE_CAPABILITIES) @Nullable Map<GRN, Capability> selectedGranteeCapabilities,
+            @JsonProperty(SELECTED_COLLECTIONS) @Nullable List<GRN> selectedCollections) {
+        final ImmutableMap<GRN, Capability> capabilities = selectedGranteeCapabilities == null ? null : ImmutableMap.copyOf(selectedGranteeCapabilities);
+        final ImmutableSet<GRN> collections = selectedCollections == null ? null : ImmutableSet.copyOf(selectedCollections);
+        return new AutoValue_EntityShareRequest(Optional.ofNullable(capabilities), Optional.ofNullable(collections));
+    }
+
+    public static EntityShareRequest empty() {
+        return create(Map.of(), List.of());
+    }
+
+    public static EntityShareRequest create(
+            Map<GRN, Capability> selectedGranteeCapabilities) {
+        return create(selectedGranteeCapabilities, null);
     }
 }

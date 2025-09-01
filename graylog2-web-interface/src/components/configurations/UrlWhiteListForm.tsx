@@ -41,7 +41,11 @@ const StyledTable = styled(Table)`
   margin-top: 10px;
 `;
 
-const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => void): Promise<ValidationResult> => {
+const validateUrlEntry = async (
+  idx: number,
+  entry: Url,
+  callback?: (idx: number, entry: Url, validationResult: { [key: string]: { valid: boolean } }) => void,
+): Promise<ValidationResult> => {
   const validationResult = {
     title: { valid: false },
     value: { valid: false },
@@ -217,7 +221,6 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
             <Select
               clearable={false}
               options={options}
-              matchProp="label"
               placeholder="Select url type"
               onChange={(option: string) => _onUpdateType(idx, option)}
               value={url.type}
