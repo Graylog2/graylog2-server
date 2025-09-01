@@ -66,20 +66,17 @@ const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
     [cachePlugins],
   );
 
-  const cacheTypes = React.useMemo(
-    () => {
-      if (!fetchingCacheTypes) {
-        return Object.values(cacheTypesFromAPI)
-          .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
-          .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) =>
-            naturalSort(a.label.toLowerCase(), b.label.toLowerCase()),
-          );
-      }
+  const cacheTypes = React.useMemo(() => {
+    if (!fetchingCacheTypes) {
+      return Object.values(cacheTypesFromAPI)
+        .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
+        .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) =>
+          naturalSort(a.label.toLowerCase(), b.label.toLowerCase()),
+        );
+    }
 
-      return [];
-    },
-    [cacheTypesFromAPI, fetchingCacheTypes, plugins],
-  );
+    return [];
+  }, [cacheTypesFromAPI, fetchingCacheTypes, plugins]);
 
   const cache = React.useMemo(() => {
     if (type) {
@@ -104,12 +101,7 @@ const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
     <>
       <StyledRow>
         <Col lg={6}>
-          <Input
-            id="cache-type-select"
-            label="Cache Type"
-            required
-            autoFocus
-            help="The type of cache to configure.">
+          <Input id="cache-type-select" label="Cache Type" required autoFocus help="The type of cache to configure.">
             <Select
               placeholder="Select Cache Type"
               clearable={false}

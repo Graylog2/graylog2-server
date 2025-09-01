@@ -66,7 +66,7 @@ public class ClientCertResource extends RestResource {
     public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
             final Duration certificateLifetime = certificateLifetime(request);
-            var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password(), certificateLifetime);
+            var cert = clientCertGenerator.generateClientCert(request.principal(), request.roles(), request.password(), certificateLifetime);
             return Response.ok().entity(cert).build();
         } catch (ClientCertGenerationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();

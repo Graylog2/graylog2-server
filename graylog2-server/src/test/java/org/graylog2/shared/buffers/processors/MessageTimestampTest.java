@@ -35,6 +35,7 @@ import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -60,6 +61,11 @@ class MessageTimestampTest {
         DateTimeUtils.setCurrentMillisProvider(clock);
 
         processBufferProcessor = createProcessor(Duration.ofDays(GRACE_PERIOD_DAYS));
+    }
+
+    @AfterEach
+    void tearDown() {
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
