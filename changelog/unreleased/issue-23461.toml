@@ -1,0 +1,5 @@
+type = "c"
+message = "Revert deprecated pipeline function `remove_field` to single field matching in preparation for future removal."
+
+pulls = [""]
+issues = ["23461"]
