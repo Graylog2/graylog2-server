@@ -44,8 +44,8 @@ describe('EditOutputButton', () => {
 
     expect(getTypeDefinition).toHaveBeenCalledWith('test-type', expect.any(Function));
 
-    await screen.findByRole('heading', { name: /Editing Output Test Output/i });
-    userEvent.click(await screen.findByRole('button', { name: /update output/i }));
+    await screen.findByRole('heading', { name: /Editing Output Test Output/i, hidden: true });
+    userEvent.click(await screen.findByRole('button', { name: /update output/i, hidden: true }));
   });
 
   it('calls onUpdate and closes modal form on submit', async () => {
@@ -55,12 +55,12 @@ describe('EditOutputButton', () => {
     const onUpdate = jest.fn();
     render(<EditOutputButton output={mockOutput} getTypeDefinition={getTypeDefinition} onUpdate={onUpdate} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /edit/i }));
-    userEvent.click(await screen.findByRole('button', { name: /update output/i }));
+    userEvent.click(await screen.findByRole('button', { name: /edit/i, hidden: true }));
+    userEvent.click(await screen.findByRole('button', { name: /update output/i, hidden: true }));
 
     expect(onUpdate).toHaveBeenCalledWith(mockOutput, expect.anything());
 
-    expect(screen.queryByRole('heading', { name: /Editing Output Test Output/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Editing Output Test Output/i, hidden: true })).not.toBeInTheDocument();
   });
 
   it('closes modal form on cancel', async () => {
@@ -72,10 +72,10 @@ describe('EditOutputButton', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /edit/i }));
 
-    await screen.findByRole('heading', { name: /Editing Output Test Output/i });
-    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+    await screen.findByRole('heading', { name: /Editing Output Test Output/i, hidden: true });
+    userEvent.click(await screen.findByRole('button', { name: /cancel/i, hidden: true }));
 
     expect(onUpdate).not.toHaveBeenCalled();
-    expect(screen.queryByRole('heading', { name: /Editing Output Test Output/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Editing Output Test Output/i, hidden: true })).not.toBeInTheDocument();
   });
 });
