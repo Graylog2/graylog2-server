@@ -32,13 +32,6 @@ import java.util.Set;
 @JsonAutoDetect
 public abstract class PipelineConnections implements MongoEntity,
         BuildableMongoEntity<PipelineConnections, PipelineConnections.Builder> {
-
-    @JsonProperty("id")
-    @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
-
     @JsonProperty
     public abstract String streamId();
 
@@ -46,7 +39,7 @@ public abstract class PipelineConnections implements MongoEntity,
     public abstract Set<String> pipelineIds();
 
     @JsonCreator
-    public static PipelineConnections create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
+    public static PipelineConnections create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                              @JsonProperty("stream_id") String streamId,
                                              @JsonProperty("pipeline_ids") Set<String> pipelineIds) {
         return builder()
