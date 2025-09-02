@@ -250,11 +250,8 @@ const makeElementAnchor = (
   gd: PlotlyHTMLElement,
   chartType: 'bar' | 'pie' | 'heatmap',
 ): ElementAnchor | null => {
-  const getEl =
-    chartType === 'bar'
-      ? getBarElement
-      : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
-  const graphDiv = gd as unknown as HTMLElement;
+  const getEl = chartType === 'bar' ? getBarElement : getPieSliceElement;
+  const graphDiv = gd;
   const targetEl = (e.event?.target as Element) || graphDiv;
   const candidates = compact(
     map(e.points as ClickPoint[], (pt) => {
