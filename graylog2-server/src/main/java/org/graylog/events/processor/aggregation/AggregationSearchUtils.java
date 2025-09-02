@@ -185,7 +185,7 @@ public class AggregationSearchUtils {
 
             // TODO: Can we find a useful source value?
             final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
-            message.addFields(fields);
+            event.setFields(fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 
             // Ask any event query modifier for its state and collect it into the event modifier state
             final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
