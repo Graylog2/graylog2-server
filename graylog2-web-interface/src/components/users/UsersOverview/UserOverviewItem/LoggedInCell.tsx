@@ -19,9 +19,7 @@ import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
-import { OverlayTrigger, RelativeTime } from 'components/common';
-
-import LoggedInIcon from '../../LoggedInIcon';
+import { OverlayTrigger, RelativeTime, StatusIcon } from 'components/common';
 
 type Props = {
   lastActivity: $PropertyType<UserOverview, 'lastActivity'>,
@@ -51,7 +49,7 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
                       )
                       : <>Not logged in</>}
                     rootClose>
-      <LoggedInIcon active={sessionActive} />
+      <StatusIcon active={sessionActive} />
     </OverlayTrigger>
   </Td>
 );

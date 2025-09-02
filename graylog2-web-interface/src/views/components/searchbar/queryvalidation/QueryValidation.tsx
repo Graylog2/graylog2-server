@@ -27,8 +27,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import usePluginEntities from 'hooks/usePluginEntities';
+import type { QueryValidationState, ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -173,8 +172,11 @@ const deduplicateExplanations = (explanations: Explanations | undefined): Explan
   return deduplicated;
 };
 
-const QueryValidation = () => {
-  const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
+type Props = {
+  validationExplanations?: ValidationExplanations;
+};
+
+const QueryValidation = ({ validationExplanations = [] }: Props) => {
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
@@ -222,7 +224,7 @@ const QueryValidation = () => {
                 )}
               </Explanation>
             ))}
-            {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+            {validationExplanations.map((PlugableExplanation, index) => (
               // eslint-disable-next-line react/no-array-index-key
               (<PlugableExplanation validationState={validationState} key={index} />)),
             )}

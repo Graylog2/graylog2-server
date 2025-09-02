@@ -14,31 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import { useRef } from 'react';
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamCountBadge from 'components/streams/StreamCountBadge';
+import Icon from 'components/common/Icon';
 
 type Props = {
-  stream: Stream
-}
-
-const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
-
-  const outputCount = stream.outputs?.length || 0;
-
-  return (
-    <StreamCountBadge disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
-      {outputCount}
-    </StreamCountBadge>
-  );
+  active: boolean;
+  className?: string;
 };
 
-export default OutputsCell;
+const StatusIcon = ({ active, className = undefined }: Props) => (
+  <Icon
+    name={active ? 'check_circle' : 'cancel'}
+    bsStyle={active ? 'success' : undefined}
+    className={className}
+    title={active ? 'Yes' : 'No'}
+  />
+);
+
+export default StatusIcon;
