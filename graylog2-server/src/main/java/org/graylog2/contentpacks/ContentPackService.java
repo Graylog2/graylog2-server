@@ -240,7 +240,7 @@ public class ContentPackService {
     }
 
     public void shareEntities(ContentPackInstallation installation, EntityShareRequest shareRequest, UserContext userContext) {
-        if (shareRequest.grantees().isEmpty()) {
+        if (shareRequest.isEmpty()) {
             return;
         }
         final var user = userContext.getUser();
