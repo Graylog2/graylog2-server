@@ -40,12 +40,13 @@ public class TokenCollectingQueryParser extends QueryParser {
     private final Set<ImmutableToken> processedTokens = new HashSet<>();
     private final Map<Query, Collection<ImmutableToken>> tokenLookup = new IdentityHashMap<>();
 
-    public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        this(new CollectingQueryParserTokenManager(), defaultFieldName, analyzer);
+    public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer, Integer maxClauseCount) {
+        this(new CollectingQueryParserTokenManager(), defaultFieldName, analyzer, maxClauseCount);
     }
 
-    TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer) {
+    TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer, Integer maxClauseCount) {
         super(collectingQueryParserTokenManager);
+        BooleanQuery.setMaxClauseCount(maxClauseCount);
         this.tokenManager = collectingQueryParserTokenManager;
         this.init(defaultFieldName, analyzer);
     }

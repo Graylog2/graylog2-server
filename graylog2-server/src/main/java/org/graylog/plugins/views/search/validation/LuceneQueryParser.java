@@ -29,14 +29,17 @@ public class LuceneQueryParser {
     public static final Analyzer ANALYZER = new WhitespaceAnalyzer();
 
     private final boolean allowLeadingWildcard;
+    private final Integer maxClauseCount;
 
     @Inject
-    public LuceneQueryParser(@Named("allow_leading_wildcard_searches") final boolean allowLeadingWildcard) {
+    public LuceneQueryParser(@Named("allow_leading_wildcard_searches") final boolean allowLeadingWildcard,
+                             @Named("opensearch_indices_query_bool_max_clause_count") final Integer maxClauseCount) {
         this.allowLeadingWildcard = allowLeadingWildcard;
+        this.maxClauseCount = maxClauseCount;
     }
 
     public ParsedQuery parse(final String query) throws ParseException {
-        final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER);
+        final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER, maxClauseCount);
         parser.setSplitOnWhitespace(true);
         parser.setAllowLeadingWildcard(allowLeadingWildcard);
 
