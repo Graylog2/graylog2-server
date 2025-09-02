@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -34,7 +36,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @AutoValue
 @JsonAutoDetect
 abstract class Dashboard implements MongoEntity {
-    private static final String FIELD_ID = "_id";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_CONTENT_PACK = "content_pack";
@@ -42,9 +43,6 @@ abstract class Dashboard implements MongoEntity {
     private static final String FIELD_CREATED_AT = "created_at";
     private static final String EMBEDDED_WIDGETS = "widgets";
     private static final String EMBEDDED_POSITIONS = "positions";
-
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_TITLE)
     abstract String title();
@@ -69,7 +67,7 @@ abstract class Dashboard implements MongoEntity {
 
     @JsonCreator
     static Dashboard create(
-            @JsonProperty(FIELD_ID) String id,
+            @JsonProperty(FIELD_ID) @Id @ObjectId String id,
             @JsonProperty(FIELD_TITLE) String title,
             @JsonProperty(FIELD_DESCRIPTION) String description,
             @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack,
