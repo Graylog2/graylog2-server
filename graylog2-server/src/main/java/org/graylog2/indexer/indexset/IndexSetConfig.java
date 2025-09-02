@@ -265,9 +265,11 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
 
     @JsonIgnore
     public boolean isRegularIndex() {
+        if (isRegular().isPresent()) {
+            return isRegular().get();
+        }
         final String indexTemplate = indexTemplateType().orElse(null);
-        return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate) ||
-                isRegular().orElse(false));
+        return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate));
     }
 
     @JsonIgnore
