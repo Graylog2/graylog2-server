@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
-public class ScopedEntityMongoUtils<T extends ScopedEntity> {
+public class ScopedEntityMongoUtils<T extends ScopedEntity<?>> {
     private final MongoCollection<T> collection;
     private final EntityScopeService entityScopeService;
 
