@@ -25,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
+import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -66,14 +67,22 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private final DatanodeDirectories datanodeDirectories;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
     private final GCSRepositoryConfiguration gcsRepositoryConfiguration;
+    private final HdfsRepositoryConfiguration hdfsRepositoryConfiguration;
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
     @Inject
-    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, DatanodeDirectories datanodeDirectories, S3RepositoryConfiguration s3RepositoryConfiguration, GCSRepositoryConfiguration gcsRepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
+    public SearchableSnapshotsConfigurationBean(
+            Configuration localConfiguration,
+            DatanodeDirectories datanodeDirectories,
+            S3RepositoryConfiguration s3RepositoryConfiguration,
+            GCSRepositoryConfiguration gcsRepositoryConfiguration,
+            HdfsRepositoryConfiguration hdfsRepositoryConfiguration,
+            Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
         this.datanodeDirectories = datanodeDirectories;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
         this.gcsRepositoryConfiguration = gcsRepositoryConfiguration;
+        this.hdfsRepositoryConfiguration = hdfsRepositoryConfiguration;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
@@ -204,7 +213,10 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private boolean snapshotsAreConfigured() {
-        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo() || gcsRepositoryConfiguration.isRepositoryEnabled();
+        return s3RepositoryConfiguration.isRepositoryEnabled() ||
+                isSharedFileSystemRepo() ||
+                gcsRepositoryConfiguration.isRepositoryEnabled() ||
+                hdfsRepositoryConfiguration.isRepositoryEnabled();
     }
 
     private boolean isSharedFileSystemRepo() {
