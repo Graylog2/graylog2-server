@@ -98,7 +98,7 @@ public class MongoCollections {
     /**
      * Provides utility methods for creating, updating, and deleting ScopedEntity objects
      */
-    public <T extends ScopedEntity> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
+    public <T extends ScopedEntity<?>> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
         return new ScopedEntityMongoUtils<>(collection, entityScopeService);
     }
 

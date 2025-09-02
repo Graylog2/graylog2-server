@@ -37,9 +37,7 @@ export type AvailableOutputSummary = {
   type: string;
 };
 export type AvailableOutputTypes = {
-  [_key: string]: {
-    [_key: string]: AvailableOutputSummary;
-  };
+  [_key: string]: AvailableOutputSummary;
 };
 
 export const fetchOutputsTypes = () => {
@@ -69,7 +67,7 @@ const useAvailableOutputTypes = (
   });
 
   return {
-    data,
+    data: data?.types,
     refetch,
     isInitialLoading,
   };
