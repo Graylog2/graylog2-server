@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class ValidationMessageTest {
 
-    private final LuceneQueryParser luceneQueryParser = new LuceneQueryParser(false);
+    private final LuceneQueryParser luceneQueryParser = new LuceneQueryParser(false, 32768);
 
     @Test
     void fromException() {
