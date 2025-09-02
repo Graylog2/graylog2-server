@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState, useLayoutEffect, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import map from 'lodash/map';
 import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
 import minBy from 'lodash/minBy';
+import { useFloating } from '@floating-ui/react';
 
-import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
@@ -106,94 +107,6 @@ const dataToPagePx = (gd: PlotlyHTMLElementWithInternals, pt: ClickPoint, xVal: 
 /** ---------- Anchors ---------- */
 type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint };
 type Anchor = ElementAnchor;
-
-/** ---------- helpers for pos updates ---------- */
-const getScrollParents = (el: Element | null): (Element | Window)[] => {
-  const out: (Element | Window)[] = [];
-  let node: Element | null = el?.parentElement ?? null;
-  const re = /(auto|scroll|overlay)/;
-  while (node) {
-    const cs = getComputedStyle(node);
-    if (re.test(cs.overflow) || re.test(cs.overflowY) || re.test(cs.overflowX)) out.push(node);
-    node = node.parentElement;
-  }
-  out.push(window);
-
-  return out;
-};
-
-const plotlyListeners = ['plotly_relayout', 'plotly_relayouting', 'plotly_redraw', 'plotly_animated'];
-const useAnchorPosition = (anchor: Anchor | null, gdRef: React.RefObject<PlotlyHTMLElement>) => {
-  const [pos, setPos] = useState<Pos>(null);
-
-  useLayoutEffect((): void | (() => void) => {
-    if (!anchor) {
-      setPos(null);
-
-      return;
-    }
-
-    let prev = { left: NaN, top: NaN };
-    let rafId = 0 as unknown as number;
-    let queued = false;
-
-    const raf = (cb: FrameRequestCallback) =>
-      // eslint-disable-next-line compat/compat
-      (window.requestAnimationFrame ? window.requestAnimationFrame(cb) : setTimeout(cb, 25)) as unknown as number;
-    const caf = (id: number) =>
-      window.cancelAnimationFrame ? window.cancelAnimationFrame(id) : clearTimeout(id as any);
-
-    const compute = () => {
-      queued = false;
-      let p = null;
-      if (anchor.kind === 'element') {
-        const r = anchor.el.getBoundingClientRect();
-        p = { left: r.left + r.width * anchor.rel.x, top: r.top + r.height * anchor.rel.y };
-      }
-
-      if (p && (p.left !== prev.left || p.top !== prev.top)) {
-        prev = p;
-        setPos(p);
-      }
-    };
-
-    const queue = () => {
-      if (queued) return;
-      queued = true;
-      rafId = raf(compute);
-    };
-
-    queue();
-
-    // eslint-disable-next-line compat/compat
-    const roAnchor = new ResizeObserver(queue);
-    roAnchor.observe(anchor.el);
-
-    const gdEl = gdRef.current as unknown as Element | null;
-    // eslint-disable-next-line compat/compat
-    const roGd = new ResizeObserver(queue);
-    if (gdEl) roGd.observe(gdEl);
-
-    const anyGd: any = gdRef.current;
-    plotlyListeners.forEach((name) => anyGd?.on?.(name, queue));
-
-    const parents = getScrollParents(anchor.el);
-    parents.forEach((p) => p.addEventListener('scroll', queue, { passive: true }));
-    window.addEventListener('resize', queue, { passive: true });
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      caf(rafId);
-      roAnchor.disconnect();
-      roGd.disconnect();
-      parents.forEach((p) => p.removeEventListener('scroll', queue));
-      window.removeEventListener('resize', queue);
-      plotlyListeners.forEach((name) => anyGd?.removeListener?.(name, queue));
-    };
-  }, [anchor, gdRef]);
-
-  return pos;
-};
 
 /** ---------- nearest element anchor ---------- */
 const pickNearestElementAnchor = (
@@ -365,7 +278,12 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
-  const pos = useAnchorPosition(anchor, gdRef);
+  const { refs, floatingStyles } = useFloating({
+    elements: {
+      reference: anchor?.el,
+    },
+    transform: false,
+  });
 
   const initializeGraphDivRef = (_: unknown, gd: PlotlyHTMLElement) => {
     gdRef.current = gd;
@@ -389,12 +307,16 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     if (!isOpen) setAnchor(null);
   };
 
-  const isPopoverOpen = !!anchor && !!pos;
+  const isPopoverOpen = !!anchor;
 
   const PopoverComponent = popoverComponent(chartType);
 
   const popover = (
-    <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+    <OnClickPopoverWrapper
+      isPopoverOpen={isPopoverOpen}
+      onPopoverChange={onPopoverChange}
+      ref={refs.setFloating}
+      style={floatingStyles}>
       <PopoverComponent clickPoint={clickPoint} config={config} />
     </OnClickPopoverWrapper>
   );

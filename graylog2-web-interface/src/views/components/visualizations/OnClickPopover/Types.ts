@@ -38,5 +38,4 @@ export type ExtraPlotData = {
   z: Datum;
 };
 export type ClickPoint = PlotMouseEvent['points'][number] & ExtraPlotData;
-export type Pos = { left: number; top: number } | null;
 export type Rel = { x: number; y: number };
