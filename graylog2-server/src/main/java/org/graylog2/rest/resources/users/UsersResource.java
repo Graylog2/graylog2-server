@@ -49,24 +49,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -121,6 +103,25 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.extra.PeriodDuration;
+
+import javax.annotation.Nullable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
@@ -257,8 +258,11 @@ public class UsersResource extends RestResource {
         final List<User> users = userManagementService.loadAll();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
-        userManagementService.getRootUser().ifPresent(adminUser ->
-                resultUsers.add(toUserResponse(adminUser, includePermissions, optSessions))
+        userManagementService.getRootUser().ifPresent(adminUser -> {
+                    if (isPermitted(USERS_READ, adminUser.getName())) {
+                        resultUsers.add(toUserResponse(adminUser, includePermissions, optSessions));
+                    }
+                }
         );
 
         for (User user : users) {
@@ -315,7 +319,8 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find roles: " + e.getMessage());
         }
 
-        final UserOverviewDTO adminUser = getAdminUserDTO(sessions);
+        final Map<String, Object> adminContextMap = new HashMap<>();
+        getAdminUserDTO(sessions).ifPresent(adminUserDTO -> adminContextMap.put("admin_user", adminUserDTO));
 
         final Optional<AuthServiceBackendDTO> activeAuthService = globalAuthServiceConfig.getActiveBackendConfig();
 
@@ -333,7 +338,7 @@ public class UsersResource extends RestResource {
 
         final PaginatedList<UserOverviewDTO> userOverviewDTOS = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("users", userOverviewDTOS, query, Collections.singletonMap("admin_user", adminUser));
+        return PaginatedResponse.create("users", userOverviewDTOS, query, adminContextMap);
     }
 
     @POST
@@ -871,24 +876,15 @@ public class UsersResource extends RestResource {
         return result;
     }
 
-    private UserOverviewDTO getAdminUserDTO(AllUserSessions sessions) {
-        final Optional<User> optionalAdmin = userManagementService.getRootUser();
-        if (optionalAdmin.isEmpty()) {
-            return null;
-        }
-        final User admin = optionalAdmin.get();
-        final Set<String> adminRoles = userManagementService.getRoleNames(admin);
-        final Optional<MongoDbSession> lastSession = sessions.forUser(admin);
-        return UserOverviewDTO.builder()
-                .username(admin.getName())
-                .fullName(admin.getFullName())
-                .email(admin.getEmail())
-                .externalUser(admin.isExternalUser())
-                .readOnly(admin.isReadOnly())
-                .id(admin.getId())
-                .fillSession(lastSession)
-                .roles(adminRoles)
-                .build();
+    private Optional<UserOverviewDTO> getAdminUserDTO(AllUserSessions sessions) {
+        return userManagementService
+                .getRootUser()
+                .filter(rootUser -> isPermitted(USERS_READ, rootUser.getName()))
+                .map(rootUser -> {
+                    final Set<String> adminRoles = userManagementService.getRoleNames(rootUser);
+                    final Optional<MongoDbSession> lastSession = sessions.forUser(rootUser);
+                    return UserOverviewDTO.builder().username(rootUser.getName()).fullName(rootUser.getFullName()).email(rootUser.getEmail()).externalUser(rootUser.isExternalUser()).readOnly(rootUser.isReadOnly()).id(rootUser.getId()).fillSession(lastSession).roles(adminRoles).build();
+                });
     }
 
     public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
