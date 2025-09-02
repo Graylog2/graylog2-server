@@ -38,6 +38,10 @@ public class LuceneQueryParser {
         this.maxClauseCount = maxClauseCount;
     }
 
+    public LuceneQueryParser(final boolean allowLeadingWildcard) {
+        this(allowLeadingWildcard, 32768);
+    }
+
     public ParsedQuery parse(final String query) throws ParseException {
         final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER, maxClauseCount);
         parser.setSplitOnWhitespace(true);
