@@ -383,14 +383,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
-    if (chartType === 'scatter') {
-      const a = makeScatterAnchor(e, gd);
-      if (!a) return;
-      applyAnchor(a);
-
-      return;
-    }
-    const a = makeElementAnchor(e, gd, chartType);
+    const a = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
     if (!a) return;
     applyAnchor(a);
   };
