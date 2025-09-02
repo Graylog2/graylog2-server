@@ -134,7 +134,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                true, false,
+                true, null,
                 "regular_index_test",
                 4,
                 1,
@@ -150,7 +150,6 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(false);
         assertThat(config.isRegularIndex()).isTrue();
     }
 
@@ -160,7 +159,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                true, false,
+                true, null,
                 "regular_index_test",
                 4,
                 1,
@@ -176,7 +175,6 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(false);
         assertThat(config.isRegularIndex()).isTrue();
     }
 
@@ -238,7 +236,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                false, true,
+                false, null,
                 "regular_index_test",
                 4,
                 1,
@@ -254,7 +252,6 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(true);
         assertThat(config.isRegularIndex()).isFalse();
     }
 
