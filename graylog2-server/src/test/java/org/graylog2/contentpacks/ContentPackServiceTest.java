@@ -141,6 +141,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -232,7 +233,7 @@ public class ContentPackServiceTest {
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades,
-                new ObjectMapper(), configuration, userService, new GRNRegistry(Set.of(new BultinGRNTypeProvider())), entitySharesService);
+                new ObjectMapper(), configuration, userService, streamService, new GRNRegistry(Set.of(new BultinGRNTypeProvider())), entitySharesService);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -289,8 +290,10 @@ public class ContentPackServiceTest {
                 .id(ModelId.of("dead-beef"))
                 .build();
 
-        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
             when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
         }
         when(mockUser.getId()).thenReturn(TEST_USER);
         when(mockUser.getName()).thenReturn(TEST_USER);
@@ -320,8 +323,10 @@ public class ContentPackServiceTest {
                 .id(ModelId.of("dead-beef"))
                 .build();
 
-        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
             when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
         }
         when(mockUser.getId()).thenReturn(TEST_USER);
         when(mockUser.getName()).thenReturn(TEST_USER);
@@ -475,7 +480,7 @@ public class ContentPackServiceTest {
                 .build();
         final AggregationEventProcessorConfigEntity aggregationConfig = AggregationEventProcessorConfigEntity.builder()
                 .query(ValueReference.of("author: \"Jane Hopper\""))
-                .streams(Stream.ALL_SYSTEM_STREAM_IDS)
+                .streams(ALL_SYSTEM_STREAM_IDS)
                 .groupBy(ImmutableList.of("project"))
                 .series(ImmutableList.of(series).stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(condition)
@@ -527,7 +532,7 @@ public class ContentPackServiceTest {
                 .filters(Collections.emptyList())
                 .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
                 .query(ElasticsearchQueryString.of("author: Talon Karrde"))
-                .streams(Stream.ALL_SYSTEM_STREAM_IDS)
+                .streams(ALL_SYSTEM_STREAM_IDS)
                 .config(MessageListConfigDTO.Builder.builder()
                         .fields(ImmutableSet.of())
                         .showMessageRow(false)
