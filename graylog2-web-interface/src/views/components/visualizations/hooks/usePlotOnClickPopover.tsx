@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import { useRef, useState, useLayoutEffect, useCallback } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import map from 'lodash/map';
@@ -23,6 +24,11 @@ import minBy from 'lodash/minBy';
 
 import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
+import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/HeatmapOnClickPopover';
+import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -345,8 +351,20 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   return { kind: 'element', rel, el, pt };
 };
 
+type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap';
+
+const popoverComponent = (chartType: ChartType) => {
+  switch (chartType) {
+    case 'heatmap':
+      return HeatmapOnClickPopover;
+    case 'pie':
+      return PieOnClickPopoverDropdown;
+    default:
+      return CartesianOnClickPopoverDropdown;
+  }
+};
 /** ---------- hook ---------- */
-const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap') => {
+const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
@@ -383,7 +401,15 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
 
   const isPopoverOpen = !!anchor && !!pos;
 
-  return { initializeGraphDivRef, onChartClick, onPopoverChange, isPopoverOpen, pos, clickPoint };
+  const PopoverComponent = popoverComponent(chartType);
+
+  const popover = (
+    <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
+      <PopoverComponent clickPoint={clickPoint} config={config} />
+    </OnClickPopoverWrapper>
+  );
+
+  return { initializeGraphDivRef, onChartClick, popover };
 };
 
 export default usePlotOnClickPopover;

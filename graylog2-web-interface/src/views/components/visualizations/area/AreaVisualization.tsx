@@ -26,8 +26,6 @@ import useEvents from 'views/components/visualizations/useEvents';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -77,8 +75,7 @@ const AreaVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
-    const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
-      usePlotOnClickPopover('scatter');
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
 
     return (
       <>
@@ -93,9 +90,7 @@ const AreaVisualization = makeVisualization(
           onInitialized={initializeGraphDivRef}
           onClickMarker={onChartClick}
         />
-        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <CartesianOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
-        </OnClickPopoverWrapper>
+        {popover}
       </>
     );
   },

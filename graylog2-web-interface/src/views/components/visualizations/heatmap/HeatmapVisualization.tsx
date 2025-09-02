@@ -30,8 +30,6 @@ import useChartData from 'views/components/visualizations/useChartData';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
-import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/HeatmapOnClickPopover';
 
 import GenericPlot from '../GenericPlot';
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
@@ -169,8 +167,7 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
     leafValueMatcher: _leafSourceMatcher,
   });
   const layout = _chartLayout(heatmapData);
-  const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
-    usePlotOnClickPopover('heatmap');
+  const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('heatmap', config);
 
   return (
     <Container $height={height} $width={width}>
@@ -180,9 +177,7 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
         onInitialized={initializeGraphDivRef}
         onClickMarker={onChartClick}
       />
-      <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-        <HeatmapOnClickPopover clickPoint={clickPoint} config={config} />
-      </OnClickPopoverWrapper>
+      {popover}
     </Container>
   );
 }, 'heatmap');
