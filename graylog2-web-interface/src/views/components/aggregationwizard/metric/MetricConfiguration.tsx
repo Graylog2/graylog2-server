@@ -21,10 +21,10 @@ import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Col, Input } from 'components/bootstrap';
+import { Col, Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
+import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/common';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
@@ -40,6 +40,13 @@ import FieldSelect from '../FieldSelect';
 type Props = {
   index: number;
 };
+
+const EventAnnotationCheckbox = styled(Checkbox)`
+  input[type='checkbox'] {
+    margin-right: 0;
+    right: 0;
+  }
+`;
 
 const Wrapper = styled.div``;
 
@@ -261,6 +268,27 @@ const Metric = ({ index }: Props) => {
           wrapperClassName="col-sm-9"
         />
       </Col>
+      <Col sm={1}>
+        <IconButton size="lg" name="data_thresholding" title="Show line threshholds" />
+      </Col>
+      <Field name="visualization.eventAnnotation">
+        {({ field: { name, value = false }, meta: { error } }) => (
+          <Input
+            id={`${name}-input`}
+            label="Show line threshholds"
+            error={error}
+            labelClassName="col-sm-11"
+            wrapperClassName="col-sm-1">
+            <EventAnnotationCheckbox
+              id={`${name}-input`}
+              name={name}
+              onChange={() => setFieldValue(name, !value)}
+              checked={value}
+              className="pull-right"
+            />
+          </Input>
+        )}
+      </Field>
     </Wrapper>
   );
 };

@@ -40,10 +40,12 @@ const useChartLayoutSettingsWithCustomUnits = ({
   const theme = useTheme();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { unitTypeMapper } = useMemo(
+  const { unitTypeMapper, fieldNameToAxisNameMapper } = useMemo(
     () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
     [config.series, widgetUnits],
   );
+  const tsh = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
+  console.log({ tsh })
 
   return useCallback(() => {
     if (!unitFeatureEnabled) return {};

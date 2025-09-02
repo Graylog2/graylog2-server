@@ -16,39 +16,51 @@
  */
 import * as Immutable from 'immutable';
 
+type SeriesThreshold = {
+  name: string;
+  color: string;
+  value: number;
+};
+
 export type SeriesConfigJson = {
   name: string;
+  thresholds: Array<SeriesThreshold>;
 };
 
 type InternalState = {
   name: string | undefined | null;
+  thresholds?: Array<SeriesThreshold> | undefined | null;
 };
 
 export default class SeriesConfig {
   private readonly _value: InternalState;
 
-  constructor(name: string | undefined | null) {
-    this._value = { name };
+  constructor(name: string | undefined | null, thresholds: Array<SeriesThreshold> | undefined | null) {
+    this._value = { name, thresholds };
   }
 
   get name() {
     return this._value.name;
   }
 
-  toJSON() {
-    const { name } = this._value;
+  get thresholds() {
+    return this._value.thresholds;
+  }
 
-    return { name };
+  toJSON() {
+    const { name, thresholds } = this._value;
+
+    return { name, thresholds };
   }
 
   static fromJSON(value: SeriesConfigJson) {
-    const { name } = value;
+    const { name, thresholds } = value;
 
-    return new SeriesConfig(name);
+    return new SeriesConfig(name, thresholds);
   }
 
   static empty() {
-    return new SeriesConfig(null);
+    return new SeriesConfig(null, null);
   }
 
   toBuilder() {
@@ -70,9 +82,13 @@ class Builder {
     return new Builder(this.value.set('name', newName));
   }
 
-  build() {
-    const { name } = this.value.toObject();
+  thresholds(thresholds: Array<SeriesThreshold>) {
+    return new Builder(this.value.set('thresholds', thresholds));
+  }
 
-    return new SeriesConfig(name);
+  build() {
+    const { name, thresholds } = this.value.toObject();
+
+    return new SeriesConfig(name, thresholds);
   }
 }
