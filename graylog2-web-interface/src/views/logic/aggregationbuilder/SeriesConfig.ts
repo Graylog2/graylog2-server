@@ -16,7 +16,7 @@
  */
 import * as Immutable from 'immutable';
 
-type SeriesThreshold = {
+export type SeriesThreshold = {
   name: string;
   color: string;
   value: number;

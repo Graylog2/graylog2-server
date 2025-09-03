@@ -28,6 +28,7 @@ import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import generateDomain from 'views/components/visualizations/utils/generateDomain';
 import useXAxisTicks from 'views/components/visualizations/hooks/useXAxisTicks';
+import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
 
 const useChartLayoutSettingsWithCustomUnits = ({
   config,
@@ -47,7 +48,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
     [config.series, widgetUnits],
   );
   const tsh = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
-  console.log({ tsh })
+  console.log({ tsh });
 
   return useCallback(() => {
     if (!unitFeatureEnabled)
@@ -68,6 +69,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
 
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
+      shapes: tsh,
       hovermode: 'x',
       xaxis: {
         domain: generateDomain(Object.keys(unitTypeMapper)?.length),

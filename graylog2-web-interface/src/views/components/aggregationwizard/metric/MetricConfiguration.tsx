@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext, getIn } from 'formik';
+import { Field, useFormikContext, getIn, FieldArray } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Col, Input, Checkbox } from 'components/bootstrap';
+import { Col, Input, Checkbox, Button } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/common';
@@ -34,6 +34,7 @@ import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import ThresholdFormItem from 'views/components/aggregationwizard/metric/ThresholdFormItem';
 
 import FieldSelect from '../FieldSelect';
 
@@ -271,7 +272,7 @@ const Metric = ({ index }: Props) => {
       <Col sm={1}>
         <IconButton size="lg" name="data_thresholding" title="Show line threshholds" />
       </Col>
-      <Field name="visualization.eventAnnotation">
+      <Field name={`metrics.${index}.show-thresholds`}>
         {({ field: { name, value = false }, meta: { error } }) => (
           <Input
             id={`${name}-input`}
@@ -289,6 +290,25 @@ const Metric = ({ index }: Props) => {
           </Input>
         )}
       </Field>
+      <FieldArray
+        name={`metrics.${index}.thresholds`}
+        validateOnChange={false}
+        render={({ remove, push }) => (
+          <>
+            {metrics?.[index].thresholds.map((_, tIndex) => (
+              <ThresholdFormItem
+                remove={remove}
+                key={`${index}-${tIndex}`}
+                thresholdIndex={tIndex}
+                metricIndex={tIndex}
+              />
+            ))}
+            <Button onClick={push} bsSize="xs">
+              Add
+            </Button>
+          </>
+        )}
+      />
     </Wrapper>
   );
 };

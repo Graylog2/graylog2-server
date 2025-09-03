@@ -26,6 +26,7 @@ import PropagateDisableSubmissionState from 'views/components/aggregationwizard/
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { AutoTimeConfig, TimeUnitConfig, DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { SeriesThreshold } from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import { updateWidgetAggregationElements } from './AggregationWizard';
 
@@ -42,6 +43,7 @@ export type MetricFormValues = {
   name?: string | undefined;
   percentile?: number | undefined;
   strategy?: string;
+  thresholds?: Array<SeriesThreshold>;
 };
 
 export type GroupingDirection = 'row' | 'column';
