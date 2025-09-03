@@ -23,6 +23,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
@@ -46,7 +47,7 @@ public class TokenCollectingQueryParser extends QueryParser {
 
     TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer, Integer maxClauseCount) {
         super(collectingQueryParserTokenManager);
-        BooleanQuery.setMaxClauseCount(maxClauseCount);
+        IndexSearcher.setMaxClauseCount(maxClauseCount);
         this.tokenManager = collectingQueryParserTokenManager;
         this.init(defaultFieldName, analyzer);
     }
