@@ -67,52 +67,50 @@ const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
 
   container-type: inline-size;
 
-  & > div {
-    & > h1,
-    & > h2,
-    & > h3,
-    & > h4,
-    & > h5,
-    & > h6 {
-      margin-bottom: 8px;
-      font-family: ${({ theme }) => theme.fonts.family.body};
+  & > h1,
+  & > h2,
+  & > h3,
+  & > h4,
+  & > h5,
+  & > h6 {
+    margin-bottom: 8px;
+    font-family: ${({ theme }) => theme.fonts.family.body};
+  }
+
+  & > hr {
+    margin: 16px 0;
+    border: none;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
+  }
+
+  & ul,
+  & ol {
+    padding-left: 1.5rem;
+    margin: 8px 0;
+
+    & > li {
+      padding: 4px 0;
     }
+  }
 
-    & > hr {
-      margin: 16px 0;
-      border: none;
-      border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
-    }
+  & ul {
+    list-style-type: disc;
+  }
 
-    & ul,
-    & ol {
-      padding-left: 1.5rem;
-      margin: 8px 0;
+  & p {
+    white-space: pre;
+    margin: 8px 0;
+  }
 
-      & > li {
-        padding: 4px 0;
-      }
-    }
+  & table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 8px 0;
 
-    & ul {
-      list-style-type: disc;
-    }
-
-    & p {
-      white-space: pre-wrap;
-      margin: 8px 0;
-    }
-
-    & table {
-      border-collapse: collapse;
-      border-spacing: 0;
-      margin: 8px 0;
-
-      & th,
-      & td {
-        border: 1px solid ${({ theme }) => theme.colors.input.border};
-        padding: 4px 8px;
-      }
+    & th,
+    & td {
+      border: 1px solid ${({ theme }) => theme.colors.input.border};
+      padding: 4px 8px;
     }
   }
 `;
