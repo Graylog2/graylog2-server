@@ -14,22 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import * as React from 'react';
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import DefaultProviders from './DefaultProviders';
+import { singleton } from 'logic/singleton';
+import type { ActionComponents } from 'views/components/actions/ActionHandler';
 
-type Props = {
-  children: React.ReactNode;
+export type OverflowingComponentsContextType = {
+  overflowingComponents: ActionComponents;
+  setOverflowingComponents: (components: ActionComponents) => void;
 };
 
-const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultProviders env="test">{children}</DefaultProviders>
-    </MemoryRouter>
-  </DefaultQueryClientProvider>
-);
+const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
 
-export default WrappingContainer;
+export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);
