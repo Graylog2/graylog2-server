@@ -60,7 +60,8 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 public abstract class IndexSetConfig extends ScopedEntity implements
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,
-        FieldRestrictionsField {
+        FieldRestrictionsField,
+        ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
@@ -277,9 +278,11 @@ public abstract class IndexSetConfig extends ScopedEntity implements
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> implements
+    public abstract static class Builder implements
             ExtendedIndexSetFieldsBuilder<Builder>,
-            FieldRestrictionsFieldBuilder<Builder> {
+            FieldRestrictionsFieldBuilder<Builder>,
+            ScopedEntity.Builder<Builder> {
+        public abstract Builder scope(String scope);
 
         public abstract Builder isRegular(@Nullable Boolean isRegular);
 
