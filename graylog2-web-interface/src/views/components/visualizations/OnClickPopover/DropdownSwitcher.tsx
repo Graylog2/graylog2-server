@@ -18,7 +18,6 @@ import React, { useState, useEffect } from 'react';
 
 import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Popover from 'components/common/Popover';
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
 
 type Props = {
@@ -60,14 +59,10 @@ const DropdownSwitcher = ({
 
   if (!selectedClickPoint) return null;
 
-  return (
-    <Popover.Dropdown>
-      {showComponent ? (
-        <Component clickPoint={selectedClickPoint} config={config} />
-      ) : (
-        <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
-      )}
-    </Popover.Dropdown>
+  return showComponent ? (
+    <Component clickPoint={selectedClickPoint} config={config} />
+  ) : (
+    <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
   );
 };
 

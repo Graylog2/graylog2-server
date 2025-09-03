@@ -19,14 +19,11 @@ import { useRef, useState, useCallback } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import minBy from 'lodash/minBy';
 import { useFloating } from '@floating-ui/react';
-import map from 'lodash/map';
-import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
-import minBy from 'lodash/minBy';
 import sortBy from 'lodash/sortBy';
 import uniqBy from 'lodash/uniqBy';
 
-import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
@@ -34,6 +31,7 @@ import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/Heatm
 import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
+import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -52,7 +50,6 @@ const getBarElement = (
 
   return point?.querySelector('rect') ?? point?.querySelector('path') ?? null;
 };
-
 
 const listSubplotOrder = (gd: HTMLElement): string[] => {
   const subplots = gd.querySelectorAll<SVGGElement>('.cartesianlayer g.subplot');
@@ -212,13 +209,13 @@ const makeElementAnchor = (
       : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
   const graphDiv = gd as unknown as HTMLElement;
   const targetEl = (e.event?.target as Element) || graphDiv;
-  const candidates = compact(
-    map(e.points as ClickPoint[], (pt) => {
+  const candidates = e.points
+    .map((pt: ClickPoint) => {
       const el = getEl(graphDiv, pt, targetEl);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    }),
-  );
+    })
+    .filter((candidate) => !!candidate);
 
   return pickNearestElementAnchor(e, candidates);
 };
@@ -280,19 +277,20 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
 
 const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
   const graphDiv = gd;
-  const markerCandidates = compact(
-    map(e.points, (pt: ClickPoint) => {
+  const markerCandidates = e.points
+    .map((pt: ClickPoint) => {
       const el = getScatterMarkerElement(graphDiv, pt as ClickPoint);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    }),
-  );
+    })
+    .filter((candidate) => !!candidate);
+
   const bestMarker = pickNearestElementAnchor(e, markerCandidates);
   if (bestMarker) return bestMarker;
   const { clientX, clientY } = e.event as MouseEvent;
   const click: Px = { x: clientX, y: clientY };
-  const lineCandidates = compact(
-    flatMap(e.points as ClickPoint[], (pt) => getScatterLineElements(graphDiv, click, pt)),
+  const lineCandidates = flatMap(e.points as ClickPoint[], (pt) => getScatterLineElements(graphDiv, click, pt)).filter(
+    (candidate) => !!candidate,
   );
   const best = minBy(lineCandidates, 'd');
   // we need unique pt because in this case one pt can have several related lines
@@ -386,7 +384,12 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
       onPopoverChange={onPopoverChange}
       ref={refs.setFloating}
       style={floatingStyles}>
-      <PopoverComponent clickPoint={clickPoint} config={config} />
+      <DropdownSwitcher
+        component={PopoverComponent}
+        clickPoint={clickPoint}
+        config={config}
+        clickPointsInRadius={clickPointsInRadius}
+      />
     </OnClickPopoverWrapper>
   );
 
