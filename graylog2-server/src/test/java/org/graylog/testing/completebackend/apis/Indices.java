@@ -104,6 +104,7 @@ public class Indices implements GraylogRestApi {
         return createIndexSet(indexSetSummary);
     }
 
+    // fails with a 404 if the index set does not exist
     public GraylogApiResponse listOpenIndices(String indexSetId) {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -118,13 +119,28 @@ public class Indices implements GraylogRestApi {
         return new GraylogApiResponse(response);
     }
 
+    // can be used as in "waitForIndexNames", does not fail if the index set does not exist/is not yet available
+    public List<String> listOpenIndicesWithEmptyResultOnError(String indexSetId) {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/" + indexSetId + "/open");
+
+        if(response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("indices.*.index_name");
+        } else {
+            return List.of();
+        }
+    }
+
     public List<String> waitForIndexNames(String indexSetId) throws ExecutionException, RetryException {
         return RetryerBuilder.<List<String>>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(30))
                 .retryIfResult(List::isEmpty)
                 .build()
-                .call(() -> listOpenIndices(indexSetId).properJSONPath().read("indices.*.index_name"));
+                .call(() -> listOpenIndicesWithEmptyResultOnError(indexSetId));
     }
 
     private boolean isDeflectorUp(String indexSetId) {
