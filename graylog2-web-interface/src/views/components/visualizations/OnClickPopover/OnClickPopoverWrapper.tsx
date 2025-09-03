@@ -25,9 +25,18 @@ type Props = React.PropsWithChildren<{
   style: React.CSSProperties;
 }>;
 
-const OnClickPopoverWrapper = ({ children = null, isPopoverOpen, onPopoverChange, style }: Props, ref) => (
+const OnClickPopoverWrapper = (
+  { children = null, isPopoverOpen, onPopoverChange, style }: Props,
+  ref: (node: HTMLElement) => void,
+) => (
   <OverflowingComponentsContextProvider>
-    <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={0}>
+    <Popover
+      opened={isPopoverOpen}
+      onChange={onPopoverChange}
+      withArrow
+      withinPortal={false}
+      position="bottom"
+      offset={0}>
       <Popover.Target>
         <div ref={ref} style={style} />
       </Popover.Target>
