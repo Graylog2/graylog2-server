@@ -44,7 +44,7 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 @JsonDeserialize(builder = StreamDTO.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)
 // Package-private to prevent usage outside the streams package.
-abstract class StreamDTO extends ScopedEntity {
+abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
@@ -126,7 +126,7 @@ abstract class StreamDTO extends ScopedEntity {
 
     @AutoValue.Builder
     // Package-private to prevent usage outside the streams package.
-    abstract static class Builder extends AbstractBuilder<Builder> {
+    abstract static class Builder implements ScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
@@ -138,6 +138,9 @@ abstract class StreamDTO extends ScopedEntity {
                     .categories(List.of())
                     .outputIds(Set.of());
         }
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
