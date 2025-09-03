@@ -18,30 +18,31 @@ import React from 'react';
 
 import Popover from 'components/common/Popover';
 import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
-import type { Pos } from 'views/components/visualizations/OnClickPopover/Types';
 
 type Props = React.PropsWithChildren<{
   isPopoverOpen: boolean;
   onPopoverChange: (isOpen: boolean) => void;
-  pos: Pos;
+  style: React.CSSProperties;
 }>;
 
-const OnClickPopoverWrapper = ({ children = null, isPopoverOpen, onPopoverChange, pos }: Props) => (
+const OnClickPopoverWrapper = (
+  { children = null, isPopoverOpen, onPopoverChange, style }: Props,
+  ref: (node: HTMLElement) => void,
+) => (
   <OverflowingComponentsContextProvider>
-    <Popover opened={isPopoverOpen} onChange={onPopoverChange} withArrow withinPortal position="bottom" offset={0}>
+    <Popover
+      opened={isPopoverOpen}
+      onChange={onPopoverChange}
+      withArrow
+      withinPortal={false}
+      position="bottom"
+      offset={0}>
       <Popover.Target>
-        <div
-          style={{
-            position: 'fixed',
-            left: pos?.left,
-            top: pos?.top,
-            width: 1,
-            height: 1,
-          }}
-        />
+        <div ref={ref} style={style} />
       </Popover.Target>
       {children}
     </Popover>
   </OverflowingComponentsContextProvider>
 );
-export default OnClickPopoverWrapper;
+
+export default React.forwardRef(OnClickPopoverWrapper);

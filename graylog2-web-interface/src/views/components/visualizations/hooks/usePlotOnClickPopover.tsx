@@ -14,8 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useRef, useState, useLayoutEffect, useCallback } from 'react';
+import * as React from 'react';
+import { useRef, useState, useCallback } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
+import minBy from 'lodash/minBy';
+import { useFloating } from '@floating-ui/react';
 import map from 'lodash/map';
 import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
@@ -25,6 +28,11 @@ import uniqBy from 'lodash/uniqBy';
 
 import type { Rel, Pos, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
+import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
+import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
+import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/HeatmapOnClickPopover';
+import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -123,7 +131,12 @@ const projectT = (P: Px, A: Px, B: Px) => {
  * Convert a data-space coordinate (xVal, yVal) to **page pixel coordinates**
  * so we can compare against mouse clicks.
  */
-const dataToPagePx = (gd: PlotlyHTMLElementWithInternals, pt: ClickPoint, xVal: any, yVal: any) => {
+const dataToPagePx = (
+  gd: PlotlyHTMLElementWithInternals,
+  pt: ClickPoint,
+  xVal: any,
+  yVal: any,
+): { x: number; y: number } => {
   const fl = gd._fullLayout;
 
   // Get the axis objects (may be stored differently depending on pt)
@@ -146,94 +159,6 @@ const dataToPagePx = (gd: PlotlyHTMLElementWithInternals, pt: ClickPoint, xVal: 
 /** ---------- Anchors ---------- */
 type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint; rPts?: Array<ClickPoint> };
 type Anchor = ElementAnchor;
-
-/** ---------- helpers for pos updates ---------- */
-const getScrollParents = (el: Element | null): (Element | Window)[] => {
-  const out: (Element | Window)[] = [];
-  let node: Element | null = el?.parentElement ?? null;
-  const re = /(auto|scroll|overlay)/;
-  while (node) {
-    const cs = getComputedStyle(node);
-    if (re.test(cs.overflow) || re.test(cs.overflowY) || re.test(cs.overflowX)) out.push(node);
-    node = node.parentElement;
-  }
-  out.push(window);
-
-  return out;
-};
-
-const plotlyListeners = ['plotly_relayout', 'plotly_relayouting', 'plotly_redraw', 'plotly_animated'];
-const useAnchorPosition = (anchor: Anchor | null, gdRef: React.RefObject<PlotlyHTMLElement>) => {
-  const [pos, setPos] = useState<Pos>(null);
-
-  useLayoutEffect((): void | (() => void) => {
-    if (!anchor) {
-      setPos(null);
-
-      return;
-    }
-
-    let prev = { left: NaN, top: NaN };
-    let rafId = 0 as unknown as number;
-    let queued = false;
-
-    const raf = (cb: FrameRequestCallback) =>
-      // eslint-disable-next-line compat/compat
-      (window.requestAnimationFrame ? window.requestAnimationFrame(cb) : setTimeout(cb, 25)) as unknown as number;
-    const caf = (id: number) =>
-      window.cancelAnimationFrame ? window.cancelAnimationFrame(id) : clearTimeout(id as any);
-
-    const compute = () => {
-      queued = false;
-      let p = null;
-      if (anchor.kind === 'element') {
-        const r = anchor.el.getBoundingClientRect();
-        p = { left: r.left + r.width * anchor.rel.x, top: r.top + r.height * anchor.rel.y };
-      }
-
-      if (p && (p.left !== prev.left || p.top !== prev.top)) {
-        prev = p;
-        setPos(p);
-      }
-    };
-
-    const queue = () => {
-      if (queued) return;
-      queued = true;
-      rafId = raf(compute);
-    };
-
-    queue();
-
-    // eslint-disable-next-line compat/compat
-    const roAnchor = new ResizeObserver(queue);
-    roAnchor.observe(anchor.el);
-
-    const gdEl = gdRef.current as unknown as Element | null;
-    // eslint-disable-next-line compat/compat
-    const roGd = new ResizeObserver(queue);
-    if (gdEl) roGd.observe(gdEl);
-
-    const anyGd: any = gdRef.current;
-    plotlyListeners.forEach((name) => anyGd?.on?.(name, queue));
-
-    const parents = getScrollParents(anchor.el);
-    parents.forEach((p) => p.addEventListener('scroll', queue, { passive: true }));
-    window.addEventListener('resize', queue, { passive: true });
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      caf(rafId);
-      roAnchor.disconnect();
-      roGd.disconnect();
-      parents.forEach((p) => p.removeEventListener('scroll', queue));
-      window.removeEventListener('resize', queue);
-      plotlyListeners.forEach((name) => anyGd?.removeListener?.(name, queue));
-    };
-  }, [anchor, gdRef]);
-
-  return pos;
-};
 
 /** ---------- nearest element anchor ---------- */
 const pickNearestElementAnchor = (
@@ -320,12 +245,12 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
   const ys = fd?.y ?? [];
 
   // Current index in the data array
-  const i = (pt.pointIndex ?? pt.pointNumber ?? 0) as number;
+  const i: number = pt.pointIndex ?? pt.pointNumber ?? 0;
 
   // Build candidate segments: one before (i-1 → i), one after (i → i+1)
-  const segs: [number, number][] = compact([i > 0 ? [i - 1, i] : null, i < xs.length - 1 ? [i, i + 1] : null]);
+  const segs = [i > 0 ? [i - 1, i] : null, i < xs.length - 1 ? [i, i + 1] : null].filter((seg) => !!seg);
 
-  return map(segs, ([i0, i1]) => {
+  return segs.map(([i0, i1]) => {
     // Convert endpoints from data space → page pixels
     const A = dataToPagePx(gd, pt, xs[i0], ys[i0]);
     const B = dataToPagePx(gd, pt, xs[i1], ys[i1]);
@@ -391,13 +316,42 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   return { kind: 'element', rel, el, pt, rPts };
 };
 
+type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap';
+
+const popoverComponent = (chartType: ChartType) => {
+  switch (chartType) {
+    case 'heatmap':
+      return HeatmapOnClickPopover;
+    case 'pie':
+      return PieOnClickPopoverDropdown;
+    default:
+      return CartesianOnClickPopoverDropdown;
+  }
+};
+
+const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
+  name: 'alignByRelativeCoords',
+  options: rel,
+  fn: ({ x, y, rects }) => ({
+    x: x + rects.reference.width * rel.x,
+    y: y + rects.reference.height * rel.y,
+  }),
+});
+
 /** ---------- hook ---------- */
-const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap') => {
+const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
+  const { refs, floatingStyles } = useFloating({
+    placement: 'top-start',
+    elements: {
+      reference: anchor?.el,
+    },
+    transform: false,
+    middleware: [alignByRelativeCoords(anchor?.rel)],
+  });
   const [clickPointsInRadius, setClickPointsInRadius] = useState<ClickPoint[] | null>(null);
-  const pos = useAnchorPosition(anchor, gdRef);
 
   const initializeGraphDivRef = (_: unknown, gd: PlotlyHTMLElement) => {
     gdRef.current = gd;
@@ -413,14 +367,7 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
-    if (chartType === 'scatter') {
-      const a = makeScatterAnchor(e, gd);
-      if (!a) return;
-      applyAnchor(a);
-
-      return;
-    }
-    const a = makeElementAnchor(e, gd, chartType);
+    const a = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
     if (!a) return;
     applyAnchor(a);
   };
@@ -429,9 +376,21 @@ const usePlotOnClickPopover = (chartType: 'bar' | 'scatter' | 'pie' | 'heatmap')
     if (!isOpen) setAnchor(null);
   };
 
-  const isPopoverOpen = !!anchor && !!pos;
+  const isPopoverOpen = !!anchor;
 
-  return { initializeGraphDivRef, onChartClick, onPopoverChange, isPopoverOpen, pos, clickPoint, clickPointsInRadius };
+  const PopoverComponent = popoverComponent(chartType);
+
+  const popover = (
+    <OnClickPopoverWrapper
+      isPopoverOpen={isPopoverOpen}
+      onPopoverChange={onPopoverChange}
+      ref={refs.setFloating}
+      style={floatingStyles}>
+      <PopoverComponent clickPoint={clickPoint} config={config} />
+    </OnClickPopoverWrapper>
+  );
+
+  return { initializeGraphDivRef, onChartClick, popover };
 };
 
 export default usePlotOnClickPopover;

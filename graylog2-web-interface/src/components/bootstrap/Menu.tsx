@@ -74,7 +74,7 @@ const StyledMenuItem = styled(MantineMenu.Item)(
     font-size: ${theme.fonts.size.body};
     white-space: nowrap;
 
-    &[data-hovered],
+    &:hover,
     &:focus {
       text-decoration: none;
       color: inherit;

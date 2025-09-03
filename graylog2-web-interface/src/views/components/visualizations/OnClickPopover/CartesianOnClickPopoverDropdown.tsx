@@ -17,6 +17,7 @@
 import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
+import Popover from 'components/common/Popover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator } from 'views/Constants';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
@@ -74,13 +75,15 @@ const CartesianOnClickPopoverDropdown = ({
   }, [clickPoint, config, traceColor]);
 
   return (
-    <DivContainer>
-      <OnClickPopoverValueGroups
-        columnPivotValues={columnPivotValues}
-        metricValue={metricValue}
-        rowPivotValues={rowPivotValues}
-      />
-    </DivContainer>
+    <Popover.Dropdown>
+      <DivContainer>
+        <OnClickPopoverValueGroups
+          columnPivotValues={columnPivotValues}
+          metricValue={metricValue}
+          rowPivotValues={rowPivotValues}
+        />
+      </DivContainer>
+    </Popover.Dropdown>
   );
 };
 

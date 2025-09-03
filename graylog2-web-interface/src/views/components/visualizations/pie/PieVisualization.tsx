@@ -31,8 +31,6 @@ import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visua
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
-import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 
 import GenericPlot from '../GenericPlot';
 import type { ChartConfig } from '../GenericPlot';
@@ -109,15 +107,14 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
     generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits),
   });
 
-  const { pos, onPopoverChange, isPopoverOpen, initializeGraphDivRef, onChartClick, clickPoint } =
-    usePlotOnClickPopover('pie');
+  const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('pie', config);
 
   return (
     <>
       <PlotLegend
         config={config}
         chartData={transformedData}
-        metricMapper={labelMapper}
+        labelMapper={labelMapper}
         labelFields={rowPivotsToFields}
         neverHide
         height={height}
@@ -129,11 +126,7 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
           onClickMarker={onChartClick}
         />
       </PlotLegend>
-      <OverflowingComponentsContextProvider>
-        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <PieOnClickPopoverDropdown clickPoint={clickPoint} config={config} />
-        </OnClickPopoverWrapper>
-      </OverflowingComponentsContextProvider>
+      <OverflowingComponentsContextProvider>{popover}</OverflowingComponentsContextProvider>
     </>
   );
 }, 'pie');

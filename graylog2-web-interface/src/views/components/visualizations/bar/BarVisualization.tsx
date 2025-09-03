@@ -30,9 +30,6 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
-import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
-import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
-import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -156,15 +153,7 @@ const BarVisualization = makeVisualization(
       return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
-    const {
-      pos,
-      onPopoverChange,
-      isPopoverOpen,
-      initializeGraphDivRef,
-      onChartClick,
-      clickPoint,
-      clickPointsInRadius,
-    } = usePlotOnClickPopover('bar');
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config);
 
     return (
       <>
@@ -180,14 +169,7 @@ const BarVisualization = makeVisualization(
           onClickMarker={onChartClick}
           onInitialized={initializeGraphDivRef}
         />
-        <OnClickPopoverWrapper isPopoverOpen={isPopoverOpen} onPopoverChange={onPopoverChange} pos={pos}>
-          <DropdownSwitcher
-            clickPointsInRadius={clickPointsInRadius}
-            config={config}
-            clickPoint={clickPoint}
-            component={CartesianOnClickPopoverDropdown}
-          />
-        </OnClickPopoverWrapper>
+        {popover}
       </>
     );
   },
