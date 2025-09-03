@@ -27,6 +27,7 @@ import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import generateDomain from 'views/components/visualizations/utils/generateDomain';
+import useXAxisTicks from 'views/components/visualizations/hooks/useXAxisTicks';
 
 const useChartLayoutSettingsWithCustomUnits = ({
   config,
@@ -38,6 +39,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
   chartData: Array<ChartDefinition>;
 }) => {
   const theme = useTheme();
+  const ticksConfig = useXAxisTicks(config, chartData);
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { unitTypeMapper, fieldNameToAxisNameMapper } = useMemo(
@@ -48,7 +50,12 @@ const useChartLayoutSettingsWithCustomUnits = ({
   console.log({ tsh })
 
   return useCallback(() => {
-    if (!unitFeatureEnabled) return {};
+    if (!unitFeatureEnabled)
+      return {
+        xaxis: {
+          ...ticksConfig,
+        },
+      };
 
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
@@ -62,11 +69,14 @@ const useChartLayoutSettingsWithCustomUnits = ({
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
       hovermode: 'x',
-      xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
+      xaxis: {
+        domain: generateDomain(Object.keys(unitTypeMapper)?.length),
+        ...ticksConfig,
+      },
     };
 
     return _layouts;
-  }, [barmode, chartData, config, theme, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
+  }, [barmode, chartData, config, theme, ticksConfig, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
 };
 
 export default useChartLayoutSettingsWithCustomUnits;

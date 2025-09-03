@@ -139,7 +139,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
         <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -161,7 +161,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.1</log4j.version>
         <lucene.version>9.12.2</lucene.version>
-        <metrics.version>4.2.35</metrics.version>
+        <metrics.version>4.2.36</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
