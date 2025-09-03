@@ -17,9 +17,6 @@
 import * as React from 'react';
 import { useRef, useState, useCallback } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
-import map from 'lodash/map';
-import compact from 'lodash/compact';
-import flatMap from 'lodash/flatMap';
 import minBy from 'lodash/minBy';
 import { useFloating } from '@floating-ui/react';
 
@@ -84,7 +81,12 @@ const projectT = (P: Px, A: Px, B: Px) => {
  * Convert a data-space coordinate (xVal, yVal) to **page pixel coordinates**
  * so we can compare against mouse clicks.
  */
-const dataToPagePx = (gd: PlotlyHTMLElementWithInternals, pt: ClickPoint, xVal: any, yVal: any) => {
+const dataToPagePx = (
+  gd: PlotlyHTMLElementWithInternals,
+  pt: ClickPoint,
+  xVal: any,
+  yVal: any,
+): { x: number; y: number } => {
   const fl = gd._fullLayout;
 
   // Get the axis objects (may be stored differently depending on pt)
@@ -166,13 +168,13 @@ const makeElementAnchor = (
   const getEl = chartType === 'bar' ? getBarElement : getPieSliceElement;
   const graphDiv = gd;
   const targetEl = (e.event?.target as Element) || graphDiv;
-  const candidates = compact(
-    map(e.points as ClickPoint[], (pt) => {
+  const candidates = (e.points as ClickPoint[])
+    .map((pt) => {
       const el = getEl(graphDiv, pt, targetEl);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    }),
-  );
+    })
+    .filter((candidate) => !!candidate);
 
   return pickNearestElementAnchor(e, candidates);
 };
@@ -199,12 +201,12 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
   const ys = fd?.y ?? [];
 
   // Current index in the data array
-  const i = (pt.pointIndex ?? pt.pointNumber ?? 0) as number;
+  const i: number = pt.pointIndex ?? pt.pointNumber ?? 0;
 
   // Build candidate segments: one before (i-1 → i), one after (i → i+1)
-  const segs: [number, number][] = compact([i > 0 ? [i - 1, i] : null, i < xs.length - 1 ? [i, i + 1] : null]);
+  const segs = [i > 0 ? [i - 1, i] : null, i < xs.length - 1 ? [i, i + 1] : null].filter((seg) => !!seg);
 
-  return map(segs, ([i0, i1]) => {
+  return segs.map(([i0, i1]) => {
     // Convert endpoints from data space → page pixels
     const A = dataToPagePx(gd, pt, xs[i0], ys[i0]);
     const B = dataToPagePx(gd, pt, xs[i1], ys[i1]);
@@ -234,20 +236,20 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
 
 const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
   const graphDiv = gd;
-  const markerCandidates = compact(
-    map(e.points, (pt: ClickPoint) => {
+  const markerCandidates = e.points
+    .map((pt: ClickPoint) => {
       const el = getScatterMarkerElement(graphDiv, pt as ClickPoint);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    }),
-  );
+    })
+    .filter((candidate) => !!candidate);
   const bestMarker = pickNearestElementAnchor(e, markerCandidates);
   if (bestMarker) return bestMarker;
   const { clientX, clientY } = e.event as MouseEvent;
   const click: Px = { x: clientX, y: clientY };
-  const lineCandidates = compact(
-    flatMap(e.points as ClickPoint[], (pt) => getScatterLineElements(graphDiv, click, pt)),
-  );
+  const lineCandidates = (e.points as ClickPoint[])
+    .flatMap((pt) => getScatterLineElements(graphDiv, click, pt))
+    .filter((candidate) => !!candidate);
   const best = minBy(lineCandidates, 'd');
   if (!best) return null;
   const { el, pt, valuePx, valuePy } = best;
