@@ -272,6 +272,7 @@ describe('SearchActionsMenu', () => {
         .build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
+
       expect(screen.queryByText('Pluggable component!')).not.toBeInTheDocument();
     });
 
