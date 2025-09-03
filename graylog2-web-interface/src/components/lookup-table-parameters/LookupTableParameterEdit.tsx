@@ -142,7 +142,7 @@ const LookupTableParameterEdit = ({
             </p>
             <h5>Limitations</h5>
             <p>
-              Please note that maximum number of supported results is depending on the{' '}
+              Please note that maximum number of supported results is depending on the
               <StyledInlineCode>opensearch_indices_query_bool_max_clause_count</StyledInlineCode> setting. If the lookup
               table returns more results, the query will fail in your indexer.
             </p>
