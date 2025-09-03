@@ -169,7 +169,7 @@ public class PipelineFacadeTest {
     public void exportNativeEntityWithDefaultStream() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor defaultStreamDescriptor = EntityDescriptor.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, defaultStreamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.withSystemStreams(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, defaultStreamDescriptor);
 
         assertThat(entityDescriptorIds.get(defaultStreamDescriptor)).isEqualTo(Optional.of(Stream.DEFAULT_STREAM_ID));
 
@@ -232,6 +232,7 @@ public class PipelineFacadeTest {
                 return Stream.DEFAULT_STREAM_ID;
             }
         };
+        when(streamService.getSystemStreamIds(true)).thenReturn(Stream.ALL_SYSTEM_STREAM_IDS);
         when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(fakeDefaultStream);
 
         final Map<EntityDescriptor, Object> nativeEntities = Collections.emptyMap();

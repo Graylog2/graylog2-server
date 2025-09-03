@@ -14,31 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const ContentPackUtils = {
-  convertToString(parameter) {
-    switch (parameter.type) {
-      case 'integer':
-      case 'double':
-        return parameter.default_value.toString();
-      case 'boolean':
-        return parameter.default_value ? 'true' : 'false';
-      default:
-        return parameter.default_value;
-    }
-  },
+import * as React from 'react';
 
-  convertValue(type, value) {
-    switch (type) {
-      case 'integer':
-        return parseInt(value, 10);
-      case 'double':
-        return parseFloat(value);
-      case 'boolean':
-        return value === 'true';
-      default:
-        return value;
-    }
-  },
+import { singleton } from 'logic/singleton';
+import type { ActionComponents } from 'views/components/actions/ActionHandler';
+
+export type OverflowingComponentsContextType = {
+  overflowingComponents: ActionComponents;
+  setOverflowingComponents: (components: ActionComponents) => void;
 };
 
-export default ContentPackUtils;
+const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
+
+export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);

@@ -32,11 +32,6 @@ import javax.annotation.Nullable;
 @AutoValue
 @WithBeanGetter
 public abstract class ClusterConfig implements MongoEntity {
-    @Id
-    @ObjectId
-    @Nullable
-    public abstract String id();
-
     @JsonProperty
     @Nullable
     public abstract String type();
@@ -54,7 +49,7 @@ public abstract class ClusterConfig implements MongoEntity {
     public abstract String lastUpdatedBy();
 
     @JsonCreator
-    public static ClusterConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static ClusterConfig create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                        @JsonProperty("type") @Nullable String type,
                                        @JsonProperty("payload") @Nullable Object payload,
                                        @JsonProperty("last_updated") @Nullable DateTime lastUpdated,

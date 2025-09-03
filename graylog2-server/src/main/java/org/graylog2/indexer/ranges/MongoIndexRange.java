@@ -20,11 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -35,9 +35,10 @@ import java.util.List;
 @JsonAutoDetect
 public abstract class MongoIndexRange implements IndexRange {
     @Id
+    @ObjectId
     @Nullable
     @JsonProperty("_id")
-    public abstract ObjectId id();
+    public abstract String id();
 
     @JsonProperty(FIELD_INDEX_NAME)
     @Override
@@ -76,7 +77,7 @@ public abstract class MongoIndexRange implements IndexRange {
     @Nullable
     public abstract List<String> streamIds();
 
-    public static MongoIndexRange create(ObjectId id,
+    public static MongoIndexRange create(String id,
                                          String indexName,
                                          DateTime begin,
                                          DateTime end,
@@ -87,7 +88,7 @@ public abstract class MongoIndexRange implements IndexRange {
     }
 
     @JsonCreator
-    public static MongoIndexRange create(@JsonProperty("_id") @Id @Nullable ObjectId id,
+    public static MongoIndexRange create(@JsonProperty("_id") @Id @ObjectId @Nullable String id,
                                          @JsonProperty(FIELD_INDEX_NAME) String indexName,
                                          @JsonProperty(FIELD_BEGIN) long beginMillis,
                                          @JsonProperty(FIELD_END) long endMillis,
@@ -109,7 +110,7 @@ public abstract class MongoIndexRange implements IndexRange {
         return create(null, indexName, begin, end, calculatedAt, calculationDuration, streamIds);
     }
 
-    public static MongoIndexRange create(ObjectId id,
+    public static MongoIndexRange create(String id,
                                          String indexName,
                                          DateTime begin,
                                          DateTime end,
