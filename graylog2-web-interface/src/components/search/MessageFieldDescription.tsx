@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import Immutable from 'immutable';
+import * as React from 'react';
+import { useMemo, useState } from 'react';
+import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
 import { FULL_MESSAGE_FIELD, MESSAGE_FIELD } from 'views/Constants';
+import type { Message } from 'views/components/messagelist/Types';
 
 const MessageTerms = styled.span(
   ({ theme }) => css`
@@ -29,64 +31,46 @@ const MessageTerms = styled.span(
 );
 
 type MessageFieldDescriptionProps = {
-  message: any;
+  message: Message;
   fieldName: string;
   renderForDisplay: (name: string) => React.ReactElement;
   customFieldActions?: React.ReactElement;
 };
 
-class MessageFieldDescription extends React.Component<
-  MessageFieldDescriptionProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    customFieldActions: undefined,
-  };
+const MessageFieldDescription = ({
+  customFieldActions = undefined,
+  fieldName,
+  message,
+  renderForDisplay,
+}: MessageFieldDescriptionProps) => {
+  const [messageTerms, setMessageTerms] = useState(Immutable.List<string>());
 
-  constructor(props) {
-    super(props);
+  const shouldShowTerms = useMemo(() => messageTerms.size !== 0, [messageTerms]);
 
-    this.state = {
-      messageTerms: Immutable.List(),
-    };
-  }
+  const formattedTerms = useMemo(
+    () => messageTerms.map((term) => <MessageTerms key={term}>{term}</MessageTerms>).toArray(),
+    [messageTerms],
+  );
 
-  _shouldShowTerms = () => {
-    const { messageTerms } = this.state;
+  const formattedFieldActions = useMemo(
+    () => (customFieldActions ? React.cloneElement(customFieldActions, { fieldName, message }) : null),
+    [customFieldActions, fieldName, message],
+  );
 
-    return messageTerms.size !== 0;
-  };
+  const className = fieldName === MESSAGE_FIELD || fieldName === FULL_MESSAGE_FIELD ? 'message-field' : '';
+  console.log('foo');
 
-  _getFormattedTerms = () => {
-    const { messageTerms } = this.state;
-
-    return messageTerms.map((term) => <MessageTerms key={term}>{term}</MessageTerms>);
-  };
-
-  _getFormattedFieldActions = () => {
-    const { customFieldActions, fieldName, message } = this.props;
-
-    return customFieldActions ? React.cloneElement(customFieldActions, { fieldName, message }) : null;
-  };
-
-  render() {
-    const { fieldName, renderForDisplay } = this.props;
-    const className = fieldName === MESSAGE_FIELD || fieldName === FULL_MESSAGE_FIELD ? 'message-field' : '';
-
-    return (
-      <dd className={className} key={`${fieldName}dd`}>
-        {this._getFormattedFieldActions()}
-        <div className="field-value">{renderForDisplay(fieldName)}</div>
-        {this._shouldShowTerms() && (
-          <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
-            Field terms: &nbsp;{this._getFormattedTerms()}
-          </Alert>
-        )}
-      </dd>
-    );
-  }
-}
+  return (
+    <dd className={className} key={`${fieldName}dd`}>
+      {formattedFieldActions}
+      <div className="field-value">{renderForDisplay(fieldName)}</div>
+      {shouldShowTerms && (
+        <Alert bsStyle="info" onDismiss={() => setMessageTerms(Immutable.List())}>
+          Field terms: &nbsp;{formattedTerms}
+        </Alert>
+      )}
+    </dd>
+  );
+};
 
 export default MessageFieldDescription;

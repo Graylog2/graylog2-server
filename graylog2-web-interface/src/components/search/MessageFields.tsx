@@ -18,37 +18,24 @@ import React from 'react';
 
 import { MessageField } from 'components/search';
 import { MessageDetailsDefinitionList } from 'components/common';
+import type { Message } from 'views/components/messagelist/Types';
 
 type MessageFieldsProps = {
   customFieldActions?: React.ReactElement;
-  message: any;
+  message: Message;
   renderForDisplay: (name: string) => React.ReactElement;
 };
-
-class MessageFields extends React.Component<
-  MessageFieldsProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    customFieldActions: undefined,
-  };
-
-  _formatFields = (fields) =>
+const MessageFields = ({ message, ...rest }: MessageFieldsProps) => {
+  const _formatFields = (fields: { [key: string]: any }) =>
     Object.keys(fields)
       .sort()
-      .map((key) => <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} />);
+      .map((key) => <MessageField key={key} message={message} {...rest} fieldName={key} />);
 
-  render() {
-    const { message } = this.props;
+  const { _id, ...formatted_fields } = message.fields;
+  const formattedFields = message.formatted_fields ?? formatted_fields;
+  const fields = _formatFields(formattedFields);
 
-    const { _id, ...formatted_fields } = message.fields;
-    const formattedFields = message.formatted_fields || formatted_fields;
-    const fields = this._formatFields(formattedFields);
-
-    return <MessageDetailsDefinitionList className="message-details-fields">{fields}</MessageDetailsDefinitionList>;
-  }
-}
+  return <MessageDetailsDefinitionList className="message-details-fields">{fields}</MessageDetailsDefinitionList>;
+};
 
 export default MessageFields;

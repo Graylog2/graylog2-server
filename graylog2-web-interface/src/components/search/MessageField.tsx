@@ -17,40 +17,26 @@
 import React from 'react';
 
 import { MessageFieldDescription } from 'components/search';
-import { FULL_MESSAGE_FIELD } from 'views/Constants';
-
-const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
+import type { Message } from 'views/components/messagelist/Types';
 
 type MessageFieldProps = {
   customFieldActions?: React.ReactElement;
   fieldName: string;
-  message: any;
+  message: Message;
   renderForDisplay: (name: string) => React.ReactElement;
-  value: any;
 };
 
-const MessageField = ({
-  message,
-  value,
-  fieldName,
-  customFieldActions = undefined,
-  renderForDisplay,
-}: MessageFieldProps) => {
-  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
-
-  return (
-    <span>
-      <dt key={`${fieldName}Title`}>{fieldName}</dt>
-      <MessageFieldDescription
-        key={`${fieldName}Description`}
-        message={message}
-        fieldName={fieldName}
-        fieldValue={innerValue}
-        renderForDisplay={renderForDisplay}
-        customFieldActions={customFieldActions}
-      />
-    </span>
-  );
-};
+const MessageField = ({ message, fieldName, customFieldActions = undefined, renderForDisplay }: MessageFieldProps) => (
+  <span>
+    <dt key={`${fieldName}Title`}>{fieldName}</dt>
+    <MessageFieldDescription
+      key={`${fieldName}Description`}
+      message={message}
+      fieldName={fieldName}
+      renderForDisplay={renderForDisplay}
+      customFieldActions={customFieldActions}
+    />
+  </span>
+);
 
 export default MessageField;
