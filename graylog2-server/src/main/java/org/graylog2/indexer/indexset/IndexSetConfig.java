@@ -57,7 +57,7 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @WithBeanGetter
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ)
-public abstract class IndexSetConfig extends ScopedEntity implements
+public abstract class IndexSetConfig implements
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,
         FieldRestrictionsField,
@@ -118,7 +118,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
             scope = Boolean.FALSE.equals(isRegular) ? NonDeletableSystemScope.NAME : DefaultEntityScope.NAME;
         }
 
-        return AutoValue_IndexSetConfig.builder()
+        return IndexSetConfig.builder()
                 .id(id)
                 .title(title)
                 .description(description)
@@ -202,7 +202,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements
      * appropriate defaults.
      */
     public static Builder builder() {
-        return new AutoValue_IndexSetConfig.Builder()
+        return new $AutoValue_IndexSetConfig.Builder()
                 // Index sets are writable by default.
                 .isWritable(true)
                 .customFieldMappings(new CustomFieldMappings())
@@ -216,16 +216,9 @@ public abstract class IndexSetConfig extends ScopedEntity implements
     @ObjectId
     public abstract String id();
 
-    @JsonProperty(FIELD_TITLE)
-    @NotBlank
-    public abstract String title();
-
     @JsonProperty(FIELD_DESCRIPTION)
     @Nullable
     public abstract String description();
-
-    @JsonProperty(FIELD_WRITABLE)
-    public abstract boolean isWritable();
 
     /**
      * Indicates whether this index set is intended to
@@ -275,14 +268,11 @@ public abstract class IndexSetConfig extends ScopedEntity implements
                 .result();
     }
 
-    public abstract Builder toBuilder();
-
     @AutoValue.Builder
     public abstract static class Builder implements
             ExtendedIndexSetFieldsBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder>,
             ScopedEntity.Builder<Builder> {
-        public abstract Builder scope(String scope);
 
         public abstract Builder isRegular(@Nullable Boolean isRegular);
 
