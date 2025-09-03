@@ -18,6 +18,7 @@ package org.graylog.security.shares;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
@@ -54,6 +55,11 @@ public abstract class EntityShareRequest {
                 .map(ImmutableMap::values)
                 .map(ImmutableSet::copyOf)
                 .orElse(ImmutableSet.of());
+    }
+
+    @JsonIgnore
+    public boolean isEmpty() {
+        return grantees().isEmpty() && selectedCollections().filter(collections -> !collections.isEmpty()).isEmpty();
     }
 
     @JsonCreator
