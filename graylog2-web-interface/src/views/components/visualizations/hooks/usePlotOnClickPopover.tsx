@@ -273,16 +273,28 @@ const popoverComponent = (chartType: ChartType) => {
       return CartesianOnClickPopoverDropdown;
   }
 };
+
+const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
+  name: 'alignByRelativeCoords',
+  options: rel,
+  fn: ({ x, y, rects }) => ({
+    x: x + rects.reference.width * rel.x,
+    y: y + rects.reference.height * rel.y,
+  }),
+});
+
 /** ---------- hook ---------- */
 const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
   const { refs, floatingStyles } = useFloating({
+    placement: 'top-start',
     elements: {
       reference: anchor?.el,
     },
     transform: false,
+    middleware: [alignByRelativeCoords(anchor?.rel)],
   });
 
   const initializeGraphDivRef = (_: unknown, gd: PlotlyHTMLElement) => {
