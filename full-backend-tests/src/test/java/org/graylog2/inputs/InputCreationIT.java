@@ -19,13 +19,13 @@ package org.graylog2.inputs;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class InputCreationIT {
 
     private final GraylogApis apis;

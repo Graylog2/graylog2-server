@@ -26,7 +26,7 @@ import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.completebackend.RunningGraylogBackend;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
@@ -91,7 +91,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         final Map<String, String> configParams = descriptor.getAdditionalConfigurationParameters();
 
         if (Lifecycle.VM.equals(descriptor.getLifecycle())) {
-            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer, withEnabledWebhookServer, configParams, datanodePluginJarsProvider)) {
+            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, GraylogBackendConfiguration.defaultImportLicenses, withEnabledMailServer, withEnabledWebhookServer, configParams, datanodePluginJarsProvider)) {
                 this.execute(request, descriptor.getChildren(), backend);
             } catch (Exception exception) {
                 /* Fail hard if the containerized backend failed to start. */
@@ -101,7 +101,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         } else if (Lifecycle.CLASS.equals(descriptor.getLifecycle())) {
             for (TestDescriptor td : descriptor.getChildren()) {
                 List<URL> fixtures = mongoDBFixtures;
-                boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultImportLicenses;
+                boolean preImportLicense = GraylogBackendConfiguration.defaultImportLicenses;
                 if (td instanceof ContainerMatrixTestClassDescriptor) {
                     fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                     preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();

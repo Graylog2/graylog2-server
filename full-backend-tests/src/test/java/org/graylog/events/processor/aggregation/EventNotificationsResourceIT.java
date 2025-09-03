@@ -17,20 +17,17 @@
 package org.graylog.events.processor.aggregation;
 
 import com.github.rholder.retry.RetryException;
-import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.WebhookRequest;
 import org.graylog.testing.completebackend.WebhookServerInstance;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
 public class EventNotificationsResourceIT {
     private final GraylogApis graylogApis;
     private final WebhookServerInstance webhookTester;

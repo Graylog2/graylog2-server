@@ -24,7 +24,7 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class SearchSyncIT {
     static final int GELF_HTTP_PORT = 12201;
 

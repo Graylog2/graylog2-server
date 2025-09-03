@@ -18,7 +18,7 @@ package org.graylog.shared.system.stats;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -30,7 +30,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisabledIfEnvironmentVariable(named = "GITHUB_WORKSPACE", matches = ".+")
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class SystemStatsIT {
     private final GraylogApis api;
 

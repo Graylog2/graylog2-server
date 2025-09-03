@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views;
 
-import  au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVParser;
 import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
@@ -29,7 +29,7 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -54,8 +54,8 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS,
-                                   searchVersions = {SearchServer.ES7, SearchServer.OS2})
+@GraylogBackendConfiguration(serverLifecycle = CLASS,
+                             searchVersions = {SearchServer.ES7, SearchServer.OS2})
 public class ScriptingApiResourceIT {
 
     public static final String DEFAULT_STREAM = "000000000000000000000001";

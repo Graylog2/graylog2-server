@@ -21,7 +21,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import javax.annotation.Nullable;
@@ -29,7 +29,6 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
-import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -37,7 +36,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
+@GraylogBackendConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
 public class SuggestionResourceIT {
     private final GraylogApis api;
 

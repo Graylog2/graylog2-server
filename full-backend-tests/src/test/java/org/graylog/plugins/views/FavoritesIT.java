@@ -20,7 +20,7 @@ import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collections;
@@ -30,18 +30,15 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class FavoritesIT {
     private static final String USERNAME = "john.doe1";
     private static final String PASSWORD = "asdfgh";
-    private final GraylogApis api;
-
-    public FavoritesIT(GraylogApis apis) {
-        this.api = apis;
-    }
+    private GraylogApis api;
 
     @BeforeAll
-    public void init() {
+    public void init(GraylogApis api) {
+        this.api = api;
         api.users().createUser(new Users.User(
                 USERNAME,
                 PASSWORD,

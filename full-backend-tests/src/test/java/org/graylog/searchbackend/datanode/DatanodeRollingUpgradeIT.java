@@ -18,12 +18,8 @@ package org.graylog.searchbackend.datanode;
 
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
 import java.util.List;
 

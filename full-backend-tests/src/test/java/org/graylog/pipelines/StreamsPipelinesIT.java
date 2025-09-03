@@ -18,7 +18,7 @@ package org.graylog.pipelines;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -31,7 +31,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class StreamsPipelinesIT {
     private static final String pipeline1Title = "Test Pipeline 1";
     private static final String pipeline2Title = "Test Pipeline 2";

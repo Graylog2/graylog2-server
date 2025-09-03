@@ -26,7 +26,7 @@ import org.graylog.testing.completebackend.NoPluginJarsProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.storage.SearchVersion;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -188,7 +188,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         return withWebhookServerEnabled;
     }
 
-    public boolean matches(ContainerMatrixTestsConfiguration config) {
+    public boolean matches(GraylogBackendConfiguration config) {
         return config.serverLifecycle().equals(this.getLifecycle())
                 && config.mavenProjectDirProvider().equals(this.getMavenProjectDirProvider())
                 && config.pluginJarsProvider().equals(this.getPluginJarsProvider())
@@ -200,25 +200,25 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                 && paramsMatching(config);
     }
 
-    private boolean paramsMatching(ContainerMatrixTestsConfiguration config) {
+    private boolean paramsMatching(GraylogBackendConfiguration config) {
         final Map<String, String> params = Arrays.stream(config.additionalConfigurationParameters())
-                .collect(Collectors.toMap(ContainerMatrixTestsConfiguration.ConfigurationParameter::key, ContainerMatrixTestsConfiguration.ConfigurationParameter::value));
+                .collect(Collectors.toMap(GraylogBackendConfiguration.ConfigurationParameter::key, GraylogBackendConfiguration.ConfigurationParameter::value));
         final Map<String, String> containerParams = this.getAdditionalConfigurationParameters();
         return containerParams.size() == params.size() && containerParams.entrySet().stream().allMatch(entry -> Objects.equals(params.get(entry.getKey()), entry.getValue()));
     }
 
-    private boolean featureFlagsMatching(ContainerMatrixTestsConfiguration config) {
+    private boolean featureFlagsMatching(GraylogBackendConfiguration config) {
         final List<String> configFlags = Arrays.stream(config.enabledFeatureFlags()).toList();
         final List<String> containerFlags = this.getEnabledFeatureFlags();
         return containerFlags.size() == configFlags.size() && containerFlags.containsAll(configFlags);
     }
 
 
-    private static  Set<MongodbServer> getMongodbServers(ContainerMatrixTestsConfiguration config) {
+    private static  Set<MongodbServer> getMongodbServers(GraylogBackendConfiguration config) {
         return Sets.newHashSet(config.mongoVersions());
     }
 
-    private boolean isMatchingSearchServer(ContainerMatrixTestsConfiguration config) {
+    private boolean isMatchingSearchServer(GraylogBackendConfiguration config) {
         final var optional = getSearchVersionOverride();
         if(optional.isPresent()) {
             if(config.searchVersions().length == 0) {
@@ -232,7 +232,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         }
     }
 
-    private static Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
+    private static Set<SearchVersion> getSearchServers(GraylogBackendConfiguration config) {
         return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
     }
 

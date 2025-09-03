@@ -19,12 +19,12 @@ package org.graylog.testing.fullbackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 import static io.restassured.RestAssured.given;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, additionalConfigurationParameters = {
-        @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, additionalConfigurationParameters = {
+        @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
 })
 class AutomaticLeaderElectionStartupIT {
     private final GraylogApis api;

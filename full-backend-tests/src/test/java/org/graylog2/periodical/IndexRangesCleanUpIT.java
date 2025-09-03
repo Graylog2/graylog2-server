@@ -23,7 +23,7 @@ import com.github.rholder.retry.WaitStrategies;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class IndexRangesCleanUpIT {
     public static final String RANGE_CLEANUP_PREFIX = "range-cleanup";
     public static final String INDEX_TWO = RANGE_CLEANUP_PREFIX + "_1";

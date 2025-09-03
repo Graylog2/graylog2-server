@@ -21,13 +21,13 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.OS2_LATEST)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.OS2_LATEST)
 public class JsonParsingErrorsIT {
     private static final String SYNC_SEARCH = "/views/search/sync";
     private static final String STREAMS = "/streams";

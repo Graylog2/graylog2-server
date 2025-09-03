@@ -23,7 +23,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
@@ -43,7 +43,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsNot.not;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {OS1, ES7, OS2, OS2_LATEST})
+@GraylogBackendConfiguration(searchVersions = {OS1, ES7, OS2, OS2_LATEST})
 public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     @SuppressWarnings("unused")

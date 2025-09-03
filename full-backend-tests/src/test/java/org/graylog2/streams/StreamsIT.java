@@ -20,7 +20,7 @@ import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,7 +32,7 @@ import static io.restassured.RestAssured.given;
 import static org.graylog2.rest.models.tools.responses.PageListResponse.ELEMENTS_FIELD_NAME;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 

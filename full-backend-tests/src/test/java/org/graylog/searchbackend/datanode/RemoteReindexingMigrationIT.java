@@ -35,7 +35,7 @@ import org.graylog.storage.opensearch2.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.IndexState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +48,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV)
+@GraylogBackendConfiguration(searchVersions = SearchServer.DATANODE_DEV)
 public class RemoteReindexingMigrationIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteReindexingMigrationIT.class);

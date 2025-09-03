@@ -39,7 +39,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 /**
- * This annotation can be used to create tests for a matrix of ES- and Mongo-instances
+ * Use this to run a test with a configured Graylog backend extension.
  */
 @Target({TYPE})
 @Retention(RUNTIME)
@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @ExtendWith(GraylogBackendExtension.class)
 @TestInstance(PER_CLASS)
 @Testable
-public @interface ContainerMatrixTestsConfiguration {
+public @interface GraylogBackendConfiguration {
 
     @interface ConfigurationParameter {
         String key();
@@ -68,12 +68,14 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
      */
+    @Deprecated(forRemoval = true)
     SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST};
 
     /**
      * matrix rule
      * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
      */
+    @Deprecated(forRemoval = true)
     MongodbServer[] mongoVersions() default {MongodbServer.MONGO5};
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules

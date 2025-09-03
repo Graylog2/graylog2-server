@@ -18,9 +18,8 @@ package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.utils.IndexSetUtils;
 import org.graylog.testing.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,7 +30,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class AssignStreamsToIndexSetIT {
     private static final String STREAMS_RESOURCE = "/streams";
 

@@ -18,10 +18,9 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
@@ -30,7 +29,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = SearchServer.OS1)
+@GraylogBackendConfiguration(serverLifecycle = CLASS, searchVersions = SearchServer.OS1)
 public class QueryValidationResourceIT {
 
     private final GraylogApis api;

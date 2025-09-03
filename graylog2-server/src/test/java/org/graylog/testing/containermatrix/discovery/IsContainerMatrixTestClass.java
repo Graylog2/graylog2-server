@@ -16,11 +16,7 @@
  */
 package org.graylog.testing.containermatrix.discovery;
 
-import com.google.common.collect.Sets;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.storage.SearchVersion;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsContainerMatrixTest;
@@ -31,18 +27,8 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.getSearchVersionOverride;
-import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.isCompatible;
 
 public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     private static final IsContainerMatrixTest isTestMethod = new IsContainerMatrixTest();
@@ -64,9 +50,9 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     }
 
     private boolean matchAnnotationToContainer(Class<?> candidate) {
-        Optional<ContainerMatrixTestsConfiguration> annotation = AnnotationSupport.findAnnotation(candidate, ContainerMatrixTestsConfiguration.class);
+        Optional<GraylogBackendConfiguration> annotation = AnnotationSupport.findAnnotation(candidate, GraylogBackendConfiguration.class);
         if (annotation.isPresent()) {
-            ContainerMatrixTestsConfiguration config = annotation.get();
+            GraylogBackendConfiguration config = annotation.get();
             if (container instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
                 return true;
             } else {
@@ -80,7 +66,7 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
 
     @Override
     public boolean test(Class<?> candidate) {
-        if (AnnotationSupport.isAnnotated(candidate, ContainerMatrixTestsConfiguration.class)) {
+        if (AnnotationSupport.isAnnotated(candidate, GraylogBackendConfiguration.class)) {
             boolean annotationMatchesContext = matchAnnotationToContainer(candidate);
             boolean isContainer = isPotentialTestContainer.test(candidate);
             boolean hasTestMethod = hasTestOrTestFactoryOrTestTemplateMethods(candidate);

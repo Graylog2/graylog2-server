@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Provides a MongoDB database service for tests.
  */
-public class MongoDBTestService implements AutoCloseable {
+public class  MongoDBTestService implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBTestService.class);
 
     private static final String DEFAULT_DATABASE_NAME = "graylog";

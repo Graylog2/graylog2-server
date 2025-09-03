@@ -20,10 +20,10 @@ import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
-@ContainerMatrixTestsConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
-                                   searchVersions = {SearchServer.DATANODE_DEV})
+@GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
+                             searchVersions = {SearchServer.DATANODE_DEV})
 public class WebInterfaceAssetsResourceIT extends WebInterfaceAssetsResourceBase {
     public WebInterfaceAssetsResourceIT(GraylogApis graylogApis) {
         super(graylogApis);

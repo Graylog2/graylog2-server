@@ -33,7 +33,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collection;
@@ -51,7 +51,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
+@GraylogBackendConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;

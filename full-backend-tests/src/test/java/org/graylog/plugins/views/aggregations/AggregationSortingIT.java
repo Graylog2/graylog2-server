@@ -27,7 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
@@ -42,7 +42,7 @@ import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 import static org.hamcrest.Matchers.is;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
+@GraylogBackendConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
 public class AggregationSortingIT {
     private static final String numericField = "numeric_field";
     private static final String nonNumericField = "non_numeric_field";

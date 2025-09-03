@@ -21,13 +21,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.OS2_LATEST)
+@GraylogBackendConfiguration(searchVersions = SearchServer.OS2_LATEST)
 public class EntitySuggestionsIT {
     private final GraylogApis api;
 

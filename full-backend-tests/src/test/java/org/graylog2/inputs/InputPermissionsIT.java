@@ -24,7 +24,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,7 +36,7 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.VM, searchVersions = SearchServer.DATANODE_DEV)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.VM, searchVersions = SearchServer.DATANODE_DEV)
 public class InputPermissionsIT {
 
     private final GraylogApis apis;

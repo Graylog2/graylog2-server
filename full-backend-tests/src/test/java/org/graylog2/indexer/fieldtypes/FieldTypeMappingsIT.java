@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.time.Duration;
@@ -31,7 +31,7 @@ import java.util.Set;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration()
+@GraylogBackendConfiguration()
 public class FieldTypeMappingsIT {
     private static final String INDEX_PREFIX = "custom-mappings";
     private final GraylogApis api;

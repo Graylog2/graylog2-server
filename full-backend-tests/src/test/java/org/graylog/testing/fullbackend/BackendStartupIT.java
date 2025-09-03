@@ -20,7 +20,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MailServerInstance;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.utils.SearchUtils;
 import org.hamcrest.Matchers;
 
@@ -29,7 +29,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 class BackendStartupIT {
     private final GraylogApis api;
 

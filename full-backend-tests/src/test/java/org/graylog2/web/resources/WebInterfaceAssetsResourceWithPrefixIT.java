@@ -20,12 +20,12 @@ import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
-@ContainerMatrixTestsConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
-                                   searchVersions = {SearchServer.DATANODE_DEV},
-                                   additionalConfigurationParameters = {
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
+@GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
+                             searchVersions = {SearchServer.DATANODE_DEV},
+                             additionalConfigurationParameters = {
+                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
                                    })
 public class WebInterfaceAssetsResourceWithPrefixIT extends WebInterfaceAssetsResourceBase {
     public WebInterfaceAssetsResourceWithPrefixIT(GraylogApis graylogApis) {

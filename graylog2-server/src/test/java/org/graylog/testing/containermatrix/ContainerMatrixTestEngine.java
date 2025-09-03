@@ -24,7 +24,7 @@ import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
@@ -77,7 +77,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                 .enableAnnotationInfo()
                 .acceptPackages("org.graylog", "org.graylog2");
         try (final ScanResult scanResult = classGraph.scan()) {
-            annotatedClasses = scanResult.getClassesWithAnnotation(ContainerMatrixTestsConfiguration.class.getCanonicalName()).stream()
+            annotatedClasses = scanResult.getClassesWithAnnotation(GraylogBackendConfiguration.class.getCanonicalName()).stream()
                     .map(ClassInfo::loadClass)
                     .collect(Collectors.toSet());
         }
@@ -88,10 +88,10 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return ENGINE_ID;
     }
 
-    private <T> Set<T> get(Set<Class<?>> annotatedClasses, Function<ContainerMatrixTestsConfiguration, Stream<T>> mapTo) {
+    private <T> Set<T> get(Set<Class<?>> annotatedClasses, Function<GraylogBackendConfiguration, Stream<T>> mapTo) {
         return annotatedClasses
                 .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, GraylogBackendConfiguration.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .flatMap(mapTo)
@@ -132,15 +132,15 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private Map<String, String> getAdditionalConfigurationParameters(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.additionalConfigurationParameters()))
+        return get(annotatedClasses, (GraylogBackendConfiguration annotation) -> Arrays.stream(annotation.additionalConfigurationParameters()))
                 .stream().collect(Collectors.toMap(
-                        ContainerMatrixTestsConfiguration.ConfigurationParameter::key,
-                        ContainerMatrixTestsConfiguration.ConfigurationParameter::value
+                        GraylogBackendConfiguration.ConfigurationParameter::key,
+                        GraylogBackendConfiguration.ConfigurationParameter::value
                 ));
     }
 
     public static List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Class<?> annotatedClass) {
-        return AnnotationSupport.findAnnotation(annotatedClass, ContainerMatrixTestsConfiguration.class)
+        return AnnotationSupport.findAnnotation(annotatedClass, GraylogBackendConfiguration.class)
                 .map(annotation -> {
                     if (annotation.serverLifecycle().equals(lifecycle)) {
                         return Arrays.asList(annotation.enabledFeatureFlags());
@@ -152,7 +152,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
 
     public static List<URL> getMongoDBFixtures(Lifecycle lifecycle, Class<?> annotatedClass) {
         final List<URL> urls = new ArrayList<>();
-        AnnotationSupport.findAnnotation(annotatedClass, ContainerMatrixTestsConfiguration.class).ifPresent(anno -> {
+        AnnotationSupport.findAnnotation(annotatedClass, GraylogBackendConfiguration.class).ifPresent(anno -> {
             // only aggregate, if it's VM Lifecycle
             if (anno.serverLifecycle().equals(lifecycle)) {
                 final String[] fixtures = anno.mongoDBFixtures();
@@ -240,7 +240,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
 
     @Nonnull
     private Stream<ContainerMatrixTestsDescriptor> testClassToDescriptors(Class<?> clazz, ContainerMatrixEngineDescriptor engineDescriptor) {
-        final ContainerMatrixTestsConfiguration annotation = clazz.getAnnotation(ContainerMatrixTestsConfiguration.class);
+        final GraylogBackendConfiguration annotation = clazz.getAnnotation(GraylogBackendConfiguration.class);
         final Class<? extends MavenProjectDirProvider> mavenProjectDirProvider = annotation.mavenProjectDirProvider();
         final Class<? extends PluginJarsProvider> pluginJarsProvider = annotation.pluginJarsProvider();
         final Class<? extends PluginJarsProvider> datanodePluginJarsProvider = annotation.datanodePluginJarsProvider();

@@ -19,7 +19,7 @@ package org.junit.jupiter.engine.discovery;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.containermatrix.discovery.IsContainerMatrixTestClass;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -138,8 +138,8 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
     }
 
     private boolean preImportLicense(Class<?> aClass) {
-        Optional<ContainerMatrixTestsConfiguration> annotation = AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class);
-        return annotation.map(ContainerMatrixTestsConfiguration::importLicenses).orElse(ContainerMatrixTestsConfiguration.defaultImportLicenses);
+        Optional<GraylogBackendConfiguration> annotation = AnnotationSupport.findAnnotation(aClass, GraylogBackendConfiguration.class);
+        return annotation.map(GraylogBackendConfiguration::importLicenses).orElse(GraylogBackendConfiguration.defaultImportLicenses);
     }
 
     private ClassBasedTestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {

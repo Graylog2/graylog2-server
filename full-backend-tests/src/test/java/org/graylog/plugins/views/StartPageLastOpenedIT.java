@@ -20,7 +20,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -30,7 +30,7 @@ import java.util.Map;
 
 import static org.hamcrest.core.StringContains.containsString;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StartPageLastOpenedIT {
     private final GraylogApis api;
 

@@ -20,7 +20,7 @@ import io.restassured.response.Response;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -29,7 +29,7 @@ import java.util.Arrays;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.OS2)
+@GraylogBackendConfiguration(searchVersions = SearchServer.OS2)
 public class MessagesResourceIT {
     private final GraylogApis api;
 
