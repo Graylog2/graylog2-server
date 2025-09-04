@@ -1,5 +1,5 @@
 type = "a"
-message = 'Install opensearch plugin for HDFS snapshot reposity in datanode'
+message = 'Install opensearch plugin for HDFS snapshot repository in datanode'
 
 issues = ['Graylog2/graylog-plugin-enterprise#11706']
 pulls = ["23507"]
