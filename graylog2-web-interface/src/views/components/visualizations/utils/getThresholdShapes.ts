@@ -15,81 +15,63 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import flatten from 'lodash/flatten';
+import type { Shape } from 'plotly.js';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import { convertValueToBaseUnit } from 'views/components/visualizations/utils/unitConverters';
+import { convertValueToBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
-
-export type ThresholdShape = {
-  type: string;
-  x0: number;
-  x1: number;
-  y0: number;
-  y1: number;
-  name: string;
-  xref: string;
-  yref: string;
-  line: {
-    color: string;
-  };
-  label: {
-    text: string;
-    font: {
-      color: string;
-    };
-  };
-};
+import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 const getThresholdShapes = (
   series: AggregationWidgetConfig['series'],
   widgetUnits: UnitsConfig,
   fieldNameToAxisNameMapper: MappersForYAxis['fieldNameToAxisNameMapper'],
-): Array<ThresholdShape> => {
-  const thresholds = series?.map((serieso) => {
-    const updatedSeriesConfig = SeriesConfig.empty()
-      .toBuilder()
-      .thresholds([{ value: 200, name: 'My TH', color: 'green' }])
-      .build();
-    const curSeries = serieso.toBuilder().config(updatedSeriesConfig).build();
-
+): Array<Partial<Shape>> => {
+  const thresholds = series?.map((curSeries) => {
     const { field } = parseSeries(curSeries.function) ?? {};
     const seriesUnit = widgetUnits.getFieldUnit(field);
 
     return curSeries.config.thresholds?.map(({ color, value, name }) => {
-      const baseUnitValue =
-        seriesUnit && seriesUnit?.isDefined
-          ? convertValueToBaseUnit(value, { abbrev: seriesUnit.abbrev, unitType: seriesUnit.unitType }).value
-          : value;
-      const yref: string = fieldNameToAxisNameMapper?.[field ?? NO_FIELD_NAME_SERIES] ?? 'y';
+      const conversionParams =
+        seriesUnit && seriesUnit.isDefined ? { abbrev: seriesUnit?.abbrev, unitType: seriesUnit?.unitType } : null;
 
-      return {
+      const baseUnitValue = conversionParams ? convertValueToBaseUnit(Number(value), conversionParams).value : value;
+      const yref: Shape['yref'] = fieldNameToAxisNameMapper?.[field ?? NO_FIELD_NAME_SERIES] ?? 'y';
+
+      const prettified = conversionParams ? getPrettifiedValue(Number(value), conversionParams) : null;
+      const formattedValueWithUnitLabel = prettified
+        ? formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev, 0)
+        : value;
+
+      const shape: Partial<Shape> = {
         type: 'line',
         x0: 0,
         x1: 1,
         y0: baseUnitValue,
         y1: baseUnitValue,
-        name: 'Traffic Limit',
         xref: 'paper',
         yref,
+        name,
         line: {
           color,
         },
         label: {
-          text: name,
+          text: `${name} (${formattedValueWithUnitLabel})`,
           textposition: 'top right',
           font: {
             color,
           },
         },
       };
+
+      return shape;
     });
   });
 
-  return flatten(thresholds);
+  return flatten(thresholds).filter((th) => !!th);
 };
 
 export default getThresholdShapes;

@@ -86,7 +86,13 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) =>
   formMetrics.map((metric) =>
     Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
       .toBuilder()
-      .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
+      .config(
+        SeriesConfig.empty()
+          .toBuilder()
+          .name(metric.name)
+          .thresholds(metric?.showThresholds ? metric.thresholds : null)
+          .build(),
+      )
       .build(),
   );
 
@@ -98,6 +104,8 @@ export const seriesToMetrics = (series: Array<Series>) =>
       function: func,
       field,
       name: s.config?.name,
+      thresholds: s.config.thresholds,
+      showThresholds: !!s.config.thresholds?.length,
     };
 
     if (percentile) {

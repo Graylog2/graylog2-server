@@ -44,6 +44,7 @@ export type MetricFormValues = {
   percentile?: number | undefined;
   strategy?: string;
   thresholds?: Array<SeriesThreshold>;
+  showThresholds?: boolean;
 };
 
 export type GroupingDirection = 'row' | 'column';

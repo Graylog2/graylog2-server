@@ -35,7 +35,7 @@ type InternalState = {
 export default class SeriesConfig {
   private readonly _value: InternalState;
 
-  constructor(name: string | undefined | null, thresholds: Array<SeriesThreshold> | undefined | null) {
+  constructor(name: string | undefined | null, thresholds: Array<SeriesThreshold> | undefined | null = undefined) {
     this._value = { name, thresholds };
   }
 

@@ -15,32 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
-import { Button } from '@mantine/core';
 
 import Popover from 'components/common/Popover';
 import ColorPicker from 'components/common/ColorPicker';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { Col } from 'components/bootstrap';
-import { FormikInput } from 'components/common';
+import { FormikInput, IconButton } from 'components/common';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import { mappedUnitsFromJSON } from 'views/components/visualizations/utils/unitConverters';
+
+const ColorHintWrapper = styled.div`
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const ColorHint = styled.div(
-  ({ color }) => css`
+  ({ color, theme }) => css`
     cursor: pointer;
-    background-color: ${color} !important; /* Needed for report generation */
-    -webkit-print-color-adjust: exact !important; /* Needed for report generation */
-    width: 12px;
-    height: 12px;
+    background-color: ${color};
+    width: ${theme.spacings.md};
+    height: ${theme.spacings.md};
   `,
 );
 
-type Props = { metricIndex: number; thresholdIndex: number; remove: () => void };
+type Props = { metricIndex: number; thresholdIndex: number; remove: (index?: number) => unknown };
 
 const ThresholdFormItem = ({ metricIndex, remove, thresholdIndex }: Props) => {
   const {
-    values: { metrics },
+    values: { metrics, units },
     setFieldValue,
   } = useFormikContext<WidgetConfigFormValues>();
 
@@ -48,12 +55,20 @@ const ThresholdFormItem = ({ metricIndex, remove, thresholdIndex }: Props) => {
   const togglePopover = () => setShowPopover((show) => !show);
 
   const _onColorSelect = (color: string) =>
-    setFieldValue(`metrics.${metricIndex}.thresholds.${thresholdIndex}.name`, color);
+    setFieldValue(`metrics.${metricIndex}.thresholds.${thresholdIndex}.color`, color).then(togglePopover);
 
   const curColor = useMemo(
     () => metrics?.[metricIndex]?.thresholds?.[thresholdIndex]?.color,
     [metricIndex, metrics, thresholdIndex],
   );
+
+  const curUnitName = useMemo(() => {
+    const field = metrics?.[metricIndex]?.field;
+    const unit = units?.[field];
+    if (!unit?.abbrev || !unit?.unitType) return null;
+
+    return mappedUnitsFromJSON[unit.unitType].find(({ abbrev }) => abbrev === unit?.abbrev).name;
+  }, [metricIndex, metrics, units]);
 
   return (
     <>
@@ -69,29 +84,34 @@ const ThresholdFormItem = ({ metricIndex, remove, thresholdIndex }: Props) => {
           wrapperClassName="col-sm-9"
         />
       </Col>
-      <Col sm={3}>
+      <Col sm={1}>
+        <IconButton size="sm" onClick={() => remove()} name="delete" title="Remove threshold" />
+      </Col>
+      <Col sm={11}>
+        <FormikInput
+          key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-value`}
+          id="thresholdValue"
+          label="Value"
+          bsSize="small"
+          placeholder="Specify threshold value"
+          name={`metrics.${metricIndex}.thresholds.${thresholdIndex}.value`}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+          help={curUnitName && `Value is in ${curUnitName}s`}
+        />
+      </Col>
+      <Col sm={1}>
         <Popover position="top" withArrow opened={showPopover}>
           <Popover.Target>
-            <ColorHint aria-label="Color Hint" onClick={togglePopover} color={curColor} />
+            <ColorHintWrapper>
+              <ColorHint aria-label="Color Hint" onClick={togglePopover} color={curColor} />
+            </ColorHintWrapper>
           </Popover.Target>
           <Popover.Dropdown title="Color configuration for threshold">
             <ColorPicker color={curColor} colors={defaultColors} onChange={_onColorSelect} />
           </Popover.Dropdown>
         </Popover>
       </Col>
-      <Col sm={8}>
-        <FormikInput
-          key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-value`}
-          id="thresholdValue"
-          bsSize="small"
-          placeholder="Specify threshold value"
-          name={`metrics.${metricIndex}.thresholds.${thresholdIndex}.value`}
-          wrapperClassName="col-sm-7"
-        />
-      </Col>
-      <Button onClick={remove} bsSize="xs">
-        Remove
-      </Button>
     </>
   );
 };

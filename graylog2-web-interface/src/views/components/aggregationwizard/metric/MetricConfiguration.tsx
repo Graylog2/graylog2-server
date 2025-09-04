@@ -19,9 +19,10 @@ import { Field, useFormikContext, getIn, FieldArray } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
+import random from 'lodash/random';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Col, Input, Checkbox, Button } from 'components/bootstrap';
+import { Col, Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/common';
@@ -35,6 +36,7 @@ import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import ThresholdFormItem from 'views/components/aggregationwizard/metric/ThresholdFormItem';
+import { colors } from 'views/components/visualizations/Colors';
 
 import FieldSelect from '../FieldSelect';
 
@@ -42,14 +44,28 @@ type Props = {
   index: number;
 };
 
-const EventAnnotationCheckbox = styled(Checkbox)`
+const StyledCheckbox = styled(Checkbox)`
   input[type='checkbox'] {
-    margin-right: 0;
-    right: 0;
+    // margin-right: 0;
+    // right: 0;
   }
 `;
 
 const Wrapper = styled.div``;
+
+export const ActionWrapper = styled.div`
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ThresholdsContainer = styled.div(
+  ({ theme }) => `
+  padding-bottom: ${theme.spacings.sm};
+`,
+);
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
   defaultCompare(label1, label2);
@@ -122,6 +138,21 @@ const Metric = ({ index }: Props) => {
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
   const showUnitType = unitFeatureEnabled && isFunctionAllowsUnit(currentFunction);
+
+  const createThreshold = () => {
+    const pallet = colors[random(0, colors.length - 1)];
+    const randomColor = pallet[random(0, pallet.length - 1)];
+
+    return {
+      color: randomColor,
+      name: '',
+      value: 0,
+    };
+  };
+
+  const addThresholds = () => {
+    setFieldValue(`metrics.${index}.thresholds`, [...currentMetric.thresholds, createThreshold()]);
+  };
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
@@ -269,46 +300,52 @@ const Metric = ({ index }: Props) => {
           wrapperClassName="col-sm-9"
         />
       </Col>
-      <Col sm={1}>
-        <IconButton size="lg" name="data_thresholding" title="Show line threshholds" />
+      <Col sm={11}>
+        <Field name={`metrics.${index}.showThresholds`}>
+          {({ field: { name, value = false }, meta: { error } }) => (
+            <Input id={`${name}-input`} error={error} wrapperClassName="col-sm-12">
+              <StyledCheckbox
+                title="Show line threshholds"
+                id={`${name}-input`}
+                name={name}
+                onChange={() => {
+                  const newVal = !value;
+                  setFieldValue(name, newVal);
+                  if (newVal && !currentMetric.thresholds?.length) {
+                    setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
+                  }
+                }}
+                checked={value}>
+                Show line thresholds
+              </StyledCheckbox>
+            </Input>
+          )}
+        </Field>
       </Col>
-      <Field name={`metrics.${index}.show-thresholds`}>
-        {({ field: { name, value = false }, meta: { error } }) => (
-          <Input
-            id={`${name}-input`}
-            label="Show line threshholds"
-            error={error}
-            labelClassName="col-sm-11"
-            wrapperClassName="col-sm-1">
-            <EventAnnotationCheckbox
-              id={`${name}-input`}
-              name={name}
-              onChange={() => setFieldValue(name, !value)}
-              checked={value}
-              className="pull-right"
-            />
-          </Input>
-        )}
-      </Field>
-      <FieldArray
-        name={`metrics.${index}.thresholds`}
-        validateOnChange={false}
-        render={({ remove, push }) => (
-          <>
-            {metrics?.[index].thresholds.map((_, tIndex) => (
-              <ThresholdFormItem
-                remove={remove}
-                key={`${index}-${tIndex}`}
-                thresholdIndex={tIndex}
-                metricIndex={tIndex}
-              />
-            ))}
-            <Button onClick={push} bsSize="xs">
-              Add
-            </Button>
-          </>
-        )}
-      />
+      {currentMetric.showThresholds && (
+        <Col sm={1}>
+          <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
+        </Col>
+      )}
+      {currentMetric.showThresholds && (
+        <FieldArray
+          name={`metrics.${index}.thresholds`}
+          validateOnChange={false}
+          render={({ remove }) => (
+            <ThresholdsContainer>
+              {metrics?.[index]?.thresholds?.map((_, tIndex) => (
+                <ThresholdFormItem
+                  remove={remove}
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`${index}-${tIndex}`}
+                  thresholdIndex={tIndex}
+                  metricIndex={index}
+                />
+              ))}
+            </ThresholdsContainer>
+          )}
+        />
+      )}
     </Wrapper>
   );
 };

@@ -48,7 +48,6 @@ const useChartLayoutSettingsWithCustomUnits = ({
     [config.series, widgetUnits],
   );
   const tsh = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
-  console.log({ tsh });
 
   return useCallback(() => {
     if (!unitFeatureEnabled)
@@ -78,7 +77,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
     };
 
     return _layouts;
-  }, [barmode, chartData, config, theme, ticksConfig, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
+  }, [barmode, chartData, config, theme, ticksConfig, tsh, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
 };
 
 export default useChartLayoutSettingsWithCustomUnits;
