@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -120,128 +104,98 @@ type Props = React.ComponentProps<typeof Checkbox> & {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-type State = {
-  expanded: boolean;
-};
+const ExpandableListItem = ({
+  header,
+  checked = false,
+  indetermined = false,
+  selectable = true,
+  expandable = true,
+  expanded = false,
+  stayExpanded = false,
+  subheader,
+  children = [],
+  padded = true,
+  readOnly = false,
+  onChange = () => undefined,
+  ...otherProps
+}: Props) => {
+  const [isExpanded, setIsExpanded] = React.useState(expanded);
+  const checkboxRef = React.useRef<any>(null);
 
-interface CheckboxInstance {
-  indeterminate: boolean;
-  click: () => void;
-}
-
-/**
- * The ExpandableListItem is needed to render a ExpandableList.
- */
-class ExpandableListItem extends React.Component<Props, State> {
-  private _checkbox: CheckboxInstance | undefined;
-
-  static defaultProps = {
-    checked: false,
-    indetermined: false,
-    expandable: true,
-    expanded: false,
-    selectable: true,
-    children: [],
-    subheader: undefined,
-    stayExpanded: false,
-    padded: true,
-    readOnly: false,
-    onChange: () => undefined,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      expanded: props.expanded,
-    };
-  }
-
-  componentDidMount() {
-    const { indetermined } = this.props;
-
-    if (indetermined && this._checkbox) {
-      this._checkbox.indeterminate = indetermined;
+  React.useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = indetermined;
     }
-  }
+  }, [indetermined]);
 
-  componentDidUpdate(prevProps) {
-    const { expanded, indetermined } = this.props;
-
-    if (prevProps.expanded !== expanded) {
-      this._toggleExpand();
+  React.useEffect(() => {
+    if (expanded !== isExpanded) {
+      if (stayExpanded) {
+        setIsExpanded(true);
+      } else {
+        setIsExpanded(expanded);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded, stayExpanded]);
 
-    if (this._checkbox) {
-      this._checkbox.indeterminate = indetermined;
-    }
-  }
-
-  _toggleExpand = () => {
-    const { stayExpanded } = this.props;
-    const { expanded } = this.state;
-
+  const _toggleExpand = React.useCallback(() => {
     if (stayExpanded) {
-      this.setState({ expanded: true });
+      setIsExpanded(true);
     } else {
-      this.setState({ expanded: !expanded });
+      setIsExpanded((prev) => !prev);
     }
-  };
+  }, [stayExpanded]);
 
-  _clickOnHeader = () => {
-    if (this._checkbox) {
-      this._checkbox.click();
+  const _clickOnHeader = React.useCallback(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.click();
     }
-  };
+  }, []);
 
-  render() {
-    const { expanded } = this.state;
-    const { padded } = this.props;
-    const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
-    const headerToRender = selectable ? (
-      <Header type="button" tabIndex={0} onClick={this._clickOnHeader}>
-        {header}
-      </Header>
-    ) : (
-      header
-    );
-    const inputProps = _filterInputProps(otherProps);
+  const inputProps = _filterInputProps(otherProps);
 
-    return (
-      <ItemWrap $padded={padded}>
-        <Container>
-          {selectable && (
-            <Checkbox
-              inputRef={(ref) => {
-                this._checkbox = ref;
-              }}
-              inline
-              title="Select item"
-              checked={checked}
-              {...inputProps}
-            />
-          )}
-          {expandable && (
-            <Toggle
-              role="button"
-              tabIndex={0}
-              onClick={this._toggleExpand}
-              title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
-              <IconContainer>
-                <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
-              </IconContainer>
-            </Toggle>
-          )}
-          <HeaderWrap className="header">
-            {headerToRender}
-            {subheader && <Subheader>{subheader}</Subheader>}
-          </HeaderWrap>
-        </Container>
+  const headerToRender = selectable ? (
+    <Header type="button" tabIndex={0} onClick={_clickOnHeader}>
+      {header}
+    </Header>
+  ) : (
+    header
+  );
 
-        <ExpandableContent>{expanded && children}</ExpandableContent>
-      </ItemWrap>
-    );
-  }
-}
+  return (
+    <ItemWrap $padded={padded}>
+      <Container>
+        {selectable && (
+          <Checkbox
+            inputRef={checkboxRef}
+            inline
+            title="Select item"
+            checked={checked}
+            readOnly={readOnly}
+            onChange={onChange}
+            {...inputProps}
+          />
+        )}
+        {expandable && (
+          <Toggle
+            role="button"
+            tabIndex={0}
+            onClick={_toggleExpand}
+            title={`${isExpanded ? 'Shrink' : 'Expand'} list item`}>
+            <IconContainer>
+              <Icon name={isExpanded ? 'expand_circle_up' : 'expand_circle_down'} />
+            </IconContainer>
+          </Toggle>
+        )}
+        <HeaderWrap className="header">
+          {headerToRender}
+          {subheader && <Subheader>{subheader}</Subheader>}
+        </HeaderWrap>
+      </Container>
+      <ExpandableContent>{isExpanded && children}</ExpandableContent>
+    </ItemWrap>
+  );
+};
 
 export default ExpandableListItem;
