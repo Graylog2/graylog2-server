@@ -389,9 +389,7 @@ const TemplateForm = ({
                     <Field name="index_set_config.field_type_refresh_interval">
                       {({ field: { name, value, onChange } }) => (
                         <TimeUnitInput
-                          id="field-type-refresh-interval"
                           label="Field Type Refresh Interval"
-                          type="number"
                           help={
                             <>
                               <em>Advanced Option.</em> How often the Field Type Information for the active write Index
