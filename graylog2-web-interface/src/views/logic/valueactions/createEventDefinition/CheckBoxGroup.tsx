@@ -18,7 +18,7 @@ import React, { useCallback, useMemo } from 'react';
 import mapValues from 'lodash/mapValues';
 
 import type { Checked } from 'views/logic/valueactions/createEventDefinition/types';
-import { ExpandableList, ExpandableListItem } from 'components/common';
+import { ExpandableList, ExpandableCheckboxListItem } from 'components/common';
 
 const CHECKBOX_STATES = {
   Checked: 'Checked',
@@ -70,26 +70,25 @@ const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
   );
 
   return (
-    <ExpandableListItem
+    <ExpandableCheckboxListItem
       header={groupLabel}
-      expanded
-      padded={false}
+      value={groupLabel}
       checked={value === CHECKBOX_STATES.Checked}
-      indetermined={value === CHECKBOX_STATES.Indeterminate}
+      indeterminate={value === CHECKBOX_STATES.Indeterminate}
       onChange={groupOnChange}>
       <ExpandableList>
         {Object.entries(checked).map(([key, isChecked]) => (
-          <ExpandableListItem
+          <ExpandableCheckboxListItem
             expandable={false}
             header={labels[key]}
-            padded={false}
             key={key}
+            value={key}
             checked={isChecked}
             onChange={(e) => itemOnChange(key, e)}
           />
         ))}
       </ExpandableList>
-    </ExpandableListItem>
+    </ExpandableCheckboxListItem>
   );
 };
 

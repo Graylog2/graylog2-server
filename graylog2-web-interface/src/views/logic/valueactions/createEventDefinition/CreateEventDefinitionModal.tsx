@@ -28,12 +28,12 @@ import type {
   Checked,
   ModalData,
   MappedData,
-  StrategyId,
+  StrategyId
 } from 'views/logic/valueactions/createEventDefinition/types';
 import CheckBoxGroup from 'views/logic/valueactions/createEventDefinition/CheckBoxGroup';
 import { aggregationGroup, searchGroup, labels } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
-import { ExpandableList, ExpandableListItem, Icon } from 'components/common';
+import { ExpandableList, Icon, ExpandableCheckboxListItem } from 'components/common';
 import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
@@ -155,12 +155,12 @@ const CreateEventDefinitionModal = ({
                 />
               )}
               {Object.entries(restChecks).map(([key, isChecked]) => (
-                <ExpandableListItem
+                <ExpandableCheckboxListItem
                   key={key}
+                  value={key}
                   checked={isChecked}
                   onChange={() => onCheckboxChange({ [key]: !isChecked })}
                   header={restLabels[key]}
-                  padded={false}
                   expandable={false}
                 />
               ))}
