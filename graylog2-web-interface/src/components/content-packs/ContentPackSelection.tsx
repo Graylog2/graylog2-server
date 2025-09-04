@@ -20,7 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
+import { ExpandableList, Icon, SearchForm, ExpandableCheckboxListItem } from 'components/common';
 import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
@@ -35,7 +35,6 @@ const HeaderText = styled.span`
 
 const HeaderIcon = styled(Icon)(
   ({ theme }) => `
-  padding-top: ${theme.spacings.xxs};
   padding-right: ${theme.spacings.xxs};
 `,
 );
@@ -117,13 +116,12 @@ const List = ({
           }
 
           return (
-            <ExpandableListItem
+            <ExpandableCheckboxListItem
               key={entityType}
               value={entityType}
               onChange={() => updateSelectionGroup(entityType)}
-              indetermined={_isUndetermined(entityType)}
+              indeterminate={_isUndetermined(entityType)}
               checked={isGroupSelected(entityType)}
-              padded={false}
               header={toDisplayTitle(entityType)}>
               {group
                 .sort((a, b) => naturalSort(a.title, b.title))
@@ -134,13 +132,14 @@ const List = ({
                   return (
                     <Input
                       type="checkbox"
+                      formGroupClassName="form-group no-bm"
                       label={header}
                       checked={checked}
                       onChange={() => updateSelectionEntity(entity)}
                     />
                   );
                 })}
-            </ExpandableListItem>
+            </ExpandableCheckboxListItem>
           );
         })}
     </ExpandableList>
