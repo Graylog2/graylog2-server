@@ -24,13 +24,13 @@ import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = ImmutableAndHiddenIndexSetField.Builder.class)
-public abstract class ImmutableAndHiddenIndexSetField implements IndexSetFieldRestriction, FieldComparator {
+@JsonDeserialize(builder = HiddenIndexSetField.Builder.class)
+public abstract class HiddenIndexSetField implements IndexSetFieldRestriction, FieldRestrictionValidator {
 
-    public static final String TYPE_NAME = "immutable_and_hidden";
+    public static final String TYPE_NAME = "hidden";
 
     public static Builder builder() {
-        return AutoValue_ImmutableAndHiddenIndexSetField.Builder.create();
+        return AutoValue_HiddenIndexSetField.Builder.create();
     }
 
     @AutoValue.Builder
@@ -38,11 +38,11 @@ public abstract class ImmutableAndHiddenIndexSetField implements IndexSetFieldRe
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_ImmutableAndHiddenIndexSetField.Builder()
+            return new AutoValue_HiddenIndexSetField.Builder()
                     .type(TYPE_FIELD);
         }
 
-        public abstract ImmutableAndHiddenIndexSetField build();
+        public abstract HiddenIndexSetField build();
     }
 }
 

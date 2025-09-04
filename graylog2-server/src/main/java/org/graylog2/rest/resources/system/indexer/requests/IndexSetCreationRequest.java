@@ -31,7 +31,7 @@ import org.graylog2.validation.ValidObjectId;
 import javax.annotation.Nullable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.Map;
 
 @AutoValue
 @WithBeanGetter
@@ -48,7 +48,7 @@ public abstract class IndexSetCreationRequest implements
     @ValidObjectId
     public abstract String indexSetTemplateId();
 
-    public IndexSetConfig toIndexSetConfig(boolean isRegular, Set<IndexSetFieldRestriction> fieldRestrictions) {
+    public IndexSetConfig toIndexSetConfig(boolean isRegular, Map<String, IndexSetFieldRestriction> fieldRestrictions) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()
                 .title(title())
                 .description(description())

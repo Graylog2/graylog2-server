@@ -46,6 +46,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -103,7 +104,7 @@ public abstract class IndexSetConfig implements
                                         @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS) @Nullable CustomFieldMappings customFieldMappings,
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Set<IndexSetFieldRestriction> fieldRestrictions
+                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, IndexSetFieldRestriction> fieldRestrictions
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;

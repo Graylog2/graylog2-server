@@ -20,14 +20,23 @@ package org.graylog2.indexer.indexset.restrictions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.jayway.jsonpath.DocumentContext;
 import org.graylog.autovalue.WithBeanGetter;
+
+import java.util.Objects;
 
 @AutoValue
 @WithBeanGetter
 @JsonDeserialize(builder = ImmutableIndexSetField.Builder.class)
-public abstract class ImmutableIndexSetField implements IndexSetFieldRestriction, FieldComparator {
+public abstract class ImmutableIndexSetField implements IndexSetFieldRestriction, FieldRestrictionValidator {
 
     public static final String TYPE_NAME = "immutable";
+
+    @Override
+    public boolean validate(String fieldName, DocumentContext doc1, DocumentContext doc2) {
+        String path = "$." + fieldName;
+        return Objects.equals(doc1.read(path), doc2.read(path));
+    }
 
     public static Builder builder() {
         return AutoValue_ImmutableIndexSetField.Builder.create();

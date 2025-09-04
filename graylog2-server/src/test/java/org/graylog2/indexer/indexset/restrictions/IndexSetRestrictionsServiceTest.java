@@ -33,9 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,11 +46,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class IndexSetRestrictionsServiceTest {
 
-    private static final Set<IndexSetFieldRestriction> FIELD_RESTRICTION = Set.of(
-            restriction("shards"),
-            restriction("retention_strategy.max_number_of_indices"),
-            restriction("rotation_strategy")
+    private static final Map<String, IndexSetFieldRestriction> FIELD_RESTRICTION = Map.of(
+            "shards", ImmutableIndexSetField.builder().build(),
+            "retention_strategy.max_number_of_indices", ImmutableIndexSetField.builder().build(),
+            "rotation_strategy", ImmutableIndexSetField.builder().build()
     );
+
     @Mock
     private IndexSetTemplateService templateService;
     @Mock
@@ -98,9 +98,7 @@ class IndexSetRestrictionsServiceTest {
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
         assertThatThrownBy(() -> underTest.createIndexSetConfig(request, false))
-                .hasMessageContaining(FIELD_RESTRICTION.stream()
-                        .map(IndexSetFieldRestriction::fieldName)
-                        .collect(Collectors.joining(", ")));
+                .hasMessageContaining(String.join(", ", FIELD_RESTRICTION.keySet()));
     }
 
     @Test
@@ -151,9 +149,7 @@ class IndexSetRestrictionsServiceTest {
                 .build();
 
         assertThatThrownBy(() -> underTest.updateIndexSetConfig(request, indexSetConfig, false))
-                .hasMessageContaining(FIELD_RESTRICTION.stream()
-                        .map(IndexSetFieldRestriction::fieldName)
-                        .collect(Collectors.joining(", ")));
+                .hasMessageContaining(String.join(", ", FIELD_RESTRICTION.keySet()));
     }
 
     @Test
@@ -183,12 +179,6 @@ class IndexSetRestrictionsServiceTest {
         assertThat(created).isEqualTo(indexSetConfig.toBuilder()
                 .shards(request.shards())
                 .build());
-    }
-
-    private static ImmutableIndexSetField restriction(String field) {
-        return ImmutableIndexSetField.builder()
-                .fieldName(field)
-                .build();
     }
 
     private static IndexSetTemplate createIndexSetTemplate(IndexSetConfig indexSetConfig) {

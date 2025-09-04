@@ -37,9 +37,9 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.graylog2.indexer.indexset.fields.FieldRestrictionsField.FIELD_RESTRICTIONS;
 
@@ -91,21 +91,22 @@ public class IndexSetRestrictionsService {
         return updateRequest.toIndexSetConfig(oldConfig);
     }
 
-    private void checkRestrictions(Set<IndexSetFieldRestriction> indexSetFieldRestrictions,
+    private void checkRestrictions(Map<String, IndexSetFieldRestriction> indexSetFieldRestrictions,
                                    DocumentContext doc1,
                                    DocumentContext doc2) {
 
         if (indexSetFieldRestrictions != null && !indexSetFieldRestrictions.isEmpty()) {
             List<String> invalidFields = new ArrayList<>();
-            for (IndexSetFieldRestriction r : indexSetFieldRestrictions) {
-                if (r instanceof FieldComparator comparator) {
-                    if (!comparator.compare(doc1, doc2)) {
-                        invalidFields.add(r.fieldName());
-                    }
+
+            for (Map.Entry<String, IndexSetFieldRestriction> entry : indexSetFieldRestrictions.entrySet()) {
+                IndexSetFieldRestriction r = entry.getValue();
+                if (r instanceof FieldRestrictionValidator validator && !validator.validate(entry.getKey(), doc1, doc2)) {
+                    invalidFields.add(entry.getKey());
                 }
             }
+
             if (!invalidFields.isEmpty()) {
-                throw new BadRequestException("The following fields %s are immutable and cannot be changed!".formatted(invalidFields));
+                throw new BadRequestException("The following fields %s violated defined restrictions!".formatted(invalidFields));
             }
         }
     }

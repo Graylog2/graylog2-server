@@ -18,14 +18,10 @@ package org.graylog2.indexer.indexset.restrictions;
 
 import com.jayway.jsonpath.DocumentContext;
 
-import java.util.Objects;
+public interface FieldRestrictionValidator {
 
-public interface FieldComparator {
-
-    String fieldName();
-
-    default boolean compare(DocumentContext doc1, DocumentContext doc2) {
-        String path = "$." + fieldName();
-        return Objects.equals(doc1.read(path), doc2.read(path));
+    // Default validation is NOOP
+    default boolean validate(String fieldName, DocumentContext doc1, DocumentContext doc2) {
+        return true;
     }
 }
