@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import * as React from 'react';
 
-import { SystemOutputs } from '@graylog/server-api';
+import { singleton } from 'logic/singleton';
+import type { ActionComponents } from 'views/components/actions/ActionHandler';
 
-const useOutputTypes = () => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['outputs', 'types'],
-    queryFn: () => SystemOutputs.available(),
-  });
-
-  return { types: data?.types, isLoading: isInitialLoading };
+export type OverflowingComponentsContextType = {
+  overflowingComponents: ActionComponents;
+  setOverflowingComponents: (components: ActionComponents) => void;
 };
 
-export default useOutputTypes;
+const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
+
+export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);

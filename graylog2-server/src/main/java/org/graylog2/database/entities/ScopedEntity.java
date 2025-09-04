@@ -25,24 +25,22 @@ import org.mongojack.ObjectId;
  * Entity base class, which can be used to enforce that each entity implementation
  * has the required id and _scope fields.
  */
-public abstract class ScopedEntity implements MongoEntity {
-    public static final String FIELD_SCOPE = "_scope";
+public interface ScopedEntity<B extends ScopedEntity.Builder<B>> extends MongoEntity {
+    String FIELD_SCOPE = "_scope";
 
     @JsonProperty(FIELD_SCOPE)
-    public abstract String scope();
+    String scope();
 
-    public abstract static class AbstractBuilder<SELF extends AbstractBuilder<SELF>> {
+    B toBuilder();
 
-        protected AbstractBuilder() {
-            scope(DefaultEntityScope.NAME);
-        }
+    interface Builder<B> {
 
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
-        public abstract SELF id(String id);
+        B id(String id);
 
         @JsonProperty(FIELD_SCOPE)
-        public abstract SELF scope(String scope);
+        B scope(String scope);
     }
 }

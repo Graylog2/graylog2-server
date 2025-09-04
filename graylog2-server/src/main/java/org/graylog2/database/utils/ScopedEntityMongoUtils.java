@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.utils;
 
+import com.mongodb.client.model.ReplaceOptions;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.entities.EntityScopeService;
@@ -27,7 +28,7 @@ import java.util.Optional;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
-public class ScopedEntityMongoUtils<T extends ScopedEntity> {
+public class ScopedEntityMongoUtils<T extends ScopedEntity<?>> {
     private final MongoCollection<T> collection;
     private final EntityScopeService entityScopeService;
 
@@ -48,6 +49,20 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
         ensureValidScope(entity);
         ensureMutability(entity);
         collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity);
+        return entity;
+    }
+
+    /**
+     * Performs a valid scope and mutability check before updating an existing entity or inserting it if it doesn't
+     * already exist.
+     *
+     * @param entity ScopedEntity to be updated
+     * @return the newly updated entity
+     */
+    public T upsert(T entity) {
+        ensureValidScope(entity);
+        ensureMutability(entity);
+        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity, new ReplaceOptions().upsert(true));
         return entity;
     }
 

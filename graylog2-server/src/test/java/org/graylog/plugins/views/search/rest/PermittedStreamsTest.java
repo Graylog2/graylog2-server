@@ -24,72 +24,75 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 
 public class PermittedStreamsTest {
+    private final Supplier<Collection<String>> SYSTEM_STREAM_ID_PROVIDER = () -> NON_EDITABLE_STREAM_IDS;
 
     @Test
     public void findsStreams() {
-        final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"), (categories) -> Stream.of());
+        final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"), (categories) -> Stream.of(), SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadAllMessageStreams(id -> true);
         assertThat(result).containsExactlyInAnyOrder("oans", "zwoa", "gsuffa");
     }
 
     @Test
     public void filtersOutNonPermittedStreams() {
-        final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"), (categories) -> Stream.of());
+        final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"), (categories) -> Stream.of(), SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadAllMessageStreams(id -> id.equals("gsuffa"));
         assertThat(result).containsExactly("gsuffa");
     }
 
     @Test
     public void returnsEmptyListIfNoStreamsFound() {
-        final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"), (categories) -> Stream.of());
+        final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"), (categories) -> Stream.of(), SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadAllMessageStreams(id -> false);
         assertThat(result).isEmpty();
     }
 
     @Test
     public void filtersDefaultStreams() {
-        final PermittedStreams sut = new PermittedStreams(() -> Streams.concat(NON_MESSAGE_STREAM_IDS.stream(), java.util.stream.Stream.of("i'm ok")), (categories) -> Stream.of());
+        final PermittedStreams sut = new PermittedStreams(() -> Streams.concat(NON_MESSAGE_STREAM_IDS.stream(), java.util.stream.Stream.of("i'm ok")), (categories) -> Stream.of(), SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadAllMessageStreams(id -> true);
         assertThat(result).containsExactly("i'm ok");
     }
 
     @Test
     public void findsStreamsFromCategories() {
-        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping);
+        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping, SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadWithCategories(List.of("colors"), (streamId) -> true);
         assertThat(result).containsExactlyInAnyOrder("red", "yellow", "blue");
     }
 
     @Test
     public void findsStreamsFromMultipleCategories() {
-        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping);
+        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping, SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadWithCategories(List.of("colors", "numbers"), (streamId) -> true);
         assertThat(result).containsExactlyInAnyOrder("red", "yellow", "blue", "one", "two", "three");
     }
 
     @Test
     public void findsStreamsFromCategoriesWithPermissions() {
-        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping);
+        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping, SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadWithCategories(List.of("colors"), (streamId) -> streamId.equals("red") || streamId.equals("blue"));
         assertThat(result).containsExactlyInAnyOrder("red", "blue");
     }
 
     @Test
     public void returnsEmptyIfNoStreamCategoriesMatch() {
-        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping);
+        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping, SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadWithCategories(List.of("invalid_category"), (streamId) -> true);
         assertThat(result).isEmpty();
     }
 
     @Test
     public void returnsEmptyIfPermissionsFilter() {
-        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping);
+        final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping, SYSTEM_STREAM_ID_PROVIDER);
         ImmutableSet<String> result = sut.loadWithCategories(List.of("colors", "numbers", "animals"), (streamId) -> false);
         assertThat(result).isEmpty();
     }
