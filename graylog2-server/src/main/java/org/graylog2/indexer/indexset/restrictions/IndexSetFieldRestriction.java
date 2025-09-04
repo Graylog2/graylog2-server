@@ -38,6 +38,6 @@ public interface IndexSetFieldRestriction {
     interface IndexSetFieldRestrictionBuilder<T> {
 
         @JsonProperty(TYPE_FIELD)
-        T type(@NotNull String fieldName);
+        T type(@NotNull String typeName);
     }
 }

@@ -104,7 +104,7 @@ public abstract class IndexSetConfig implements
                                         @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS) @Nullable CustomFieldMappings customFieldMappings,
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, IndexSetFieldRestriction> fieldRestrictions
+                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;

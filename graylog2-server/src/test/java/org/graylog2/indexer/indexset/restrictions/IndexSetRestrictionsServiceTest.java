@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset.restrictions;
 
+import jakarta.ws.rs.BadRequestException;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -35,21 +36,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.createIndexSetConfig;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toCreationRequest;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toUpdateRequest;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IndexSetRestrictionsServiceTest {
 
-    private static final Map<String, IndexSetFieldRestriction> FIELD_RESTRICTION = Map.of(
-            "shards", ImmutableIndexSetField.builder().build(),
-            "retention_strategy.max_number_of_indices", ImmutableIndexSetField.builder().build(),
-            "rotation_strategy", ImmutableIndexSetField.builder().build()
+    private static final Map<String, Set<IndexSetFieldRestriction>> FIELD_RESTRICTION = Map.of(
+            "shards", Set.of(ImmutableIndexSetField.builder().build()),
+            "retention_strategy.max_number_of_indices", Set.of(ImmutableIndexSetField.builder().build()),
+            "rotation_strategy", Set.of(ImmutableIndexSetField.builder().build(), HiddenIndexSetField.builder().build())
     );
 
     @Mock
@@ -97,8 +101,11 @@ class IndexSetRestrictionsServiceTest {
                 .build();
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
-        assertThatThrownBy(() -> underTest.createIndexSetConfig(request, false))
-                .hasMessageContaining(String.join(", ", FIELD_RESTRICTION.keySet()));
+        final BadRequestException exception = assertThrows(BadRequestException.class, () ->
+                underTest.createIndexSetConfig(request, false));
+        for (Map.Entry<String, Set<IndexSetFieldRestriction>> entry : FIELD_RESTRICTION.entrySet()) {
+            assertThat(exception.getMessage()).contains(f("%s : %s", entry.getKey(), ImmutableIndexSetField.TYPE_NAME));
+        }
     }
 
     @Test
@@ -148,8 +155,11 @@ class IndexSetRestrictionsServiceTest {
                 .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(1))
                 .build();
 
-        assertThatThrownBy(() -> underTest.updateIndexSetConfig(request, indexSetConfig, false))
-                .hasMessageContaining(String.join(", ", FIELD_RESTRICTION.keySet()));
+        final BadRequestException exception = assertThrows(BadRequestException.class, () ->
+                underTest.updateIndexSetConfig(request, indexSetConfig, false));
+        for (Map.Entry<String, Set<IndexSetFieldRestriction>> entry : FIELD_RESTRICTION.entrySet()) {
+            assertThat(exception.getMessage()).contains(f("%s : %s", entry.getKey(), ImmutableIndexSetField.TYPE_NAME));
+        }
     }
 
     @Test

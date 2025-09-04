@@ -21,17 +21,18 @@ import jakarta.annotation.Nullable;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface FieldRestrictionsField {
     String FIELD_RESTRICTIONS = "field_restrictions";
 
     @Nullable
     @JsonProperty(value = FieldRestrictionsField.FIELD_RESTRICTIONS)
-    Map<String, IndexSetFieldRestriction> fieldRestrictions();
+    Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions();
 
     interface FieldRestrictionsFieldBuilder<T> {
 
         @JsonProperty(FieldRestrictionsField.FIELD_RESTRICTIONS)
-        T fieldRestrictions(Map<String, IndexSetFieldRestriction> fieldRestrictions);
+        T fieldRestrictions(Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions);
     }
 }

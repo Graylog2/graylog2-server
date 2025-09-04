@@ -39,7 +39,7 @@ public abstract class HiddenIndexSetField implements IndexSetFieldRestriction, F
         @JsonCreator
         public static Builder create() {
             return new AutoValue_HiddenIndexSetField.Builder()
-                    .type(TYPE_FIELD);
+                    .type(TYPE_NAME);
         }
 
         public abstract HiddenIndexSetField build();

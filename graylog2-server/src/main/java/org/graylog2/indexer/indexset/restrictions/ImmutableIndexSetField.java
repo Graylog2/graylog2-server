@@ -48,7 +48,7 @@ public abstract class ImmutableIndexSetField implements IndexSetFieldRestriction
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ImmutableIndexSetField.Builder()
-                    .type(TYPE_FIELD);
+                    .type(TYPE_NAME);
         }
 
         public abstract ImmutableIndexSetField build();
