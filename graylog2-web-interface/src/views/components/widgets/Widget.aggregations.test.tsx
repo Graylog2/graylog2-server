@@ -36,6 +36,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import suppressConsole from 'helpers/suppressConsole';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -204,7 +205,10 @@ describe('Aggregation Widget', () => {
 
         // Change widget time range
         const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
-        await userEvent.click(timeRangePickerButton);
+        // Suppressing nested form error for now, until usage of `NestedForms` is fixed
+        await suppressConsole(async () => {
+          await userEvent.click(timeRangePickerButton);
+        });
 
         const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
         jest.setSystemTime(mockedUnixTime);
