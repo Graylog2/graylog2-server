@@ -58,7 +58,6 @@ const MessageFieldDescription = ({
   );
 
   const className = fieldName === MESSAGE_FIELD || fieldName === FULL_MESSAGE_FIELD ? 'message-field' : '';
-  console.log('foo');
 
   return (
     <dd className={className} key={`${fieldName}dd`}>

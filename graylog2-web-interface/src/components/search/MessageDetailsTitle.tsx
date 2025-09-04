@@ -32,6 +32,6 @@ const Title = styled.h3(
   `,
 );
 
-const MessageDetailsTitle = ({ children }: React.PropsWithChildren<{}>) => <Title>{children}</Title>;
+const MessageDetailsTitle = ({ children = undefined }: React.PropsWithChildren<{}>) => <Title>{children}</Title>;
 
 export default MessageDetailsTitle;
