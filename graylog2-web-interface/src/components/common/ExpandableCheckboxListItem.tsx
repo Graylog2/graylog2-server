@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react';
 
 import { ExpandableListItem } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
-import StopPropagation from 'views/components/common/StopPropagation';
 
 const Header = ({ checked, readOnly, onChange, children, indeterminate }) => {
   const checkboxRef = useRef<HTMLInputElement>();
@@ -15,18 +14,24 @@ const Header = ({ checked, readOnly, onChange, children, indeterminate }) => {
   }, [indeterminate]);
 
   return (
-    <Checkbox
-      inputRef={(ref) => {
-        checkboxRef.current = ref;
-      }}
-      title="Select item"
-      checked={checked}
-      readOnly={readOnly}
-      onClick={(e) => e.stopPropagation()}
-      onChange={onChange}
-      inline>
-      <StopPropagation>{children}</StopPropagation>
-    </Checkbox>
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+    <span onClick={(e) => e.stopPropagation()}>
+      <Checkbox
+        inputRef={(ref) => {
+          checkboxRef.current = ref;
+        }}
+        title="Select item"
+        checked={checked}
+        readOnly={readOnly}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          e.stopPropagation();
+          onChange(e);
+        }}
+        inline>
+        {children}
+      </Checkbox>
+    </span>
   );
 };
 

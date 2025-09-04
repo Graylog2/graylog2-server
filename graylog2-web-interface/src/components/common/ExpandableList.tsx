@@ -17,7 +17,20 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { Accordion } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
+const StyledAccordion = styled(Accordion)(
+  ({ theme }) => css`
+    .mantine-Accordion-chevron {
+      margin-left: ${theme.spacings.xxs};
+      margin-right: ${theme.spacings.sm};
+    }
+
+    .mantine-Accordion-content {
+      padding-left: 11px;
+    }
+  `,
+);
 type Props = PropsWithChildren<{
   className?: string;
   value?: string[];
@@ -37,7 +50,7 @@ const ExpandableList = ({
   className = undefined,
   onChange = undefined,
 }: Props) => (
-  <Accordion
+  <StyledAccordion
     chevronPosition="left"
     multiple
     variant="unstyled"
@@ -46,7 +59,7 @@ const ExpandableList = ({
     defaultValue={defaultValue}
     className={className}>
     {children}
-  </Accordion>
+  </StyledAccordion>
 );
 
 export default ExpandableList;
