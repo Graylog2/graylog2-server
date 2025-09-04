@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotEmpty;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
@@ -33,7 +32,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class CreateStreamRequest {
     @JsonProperty
     public abstract String title();

@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class FsStats {
     @JsonProperty("filesystems")
     public abstract Map<String, Filesystem> filesystems();
@@ -39,7 +37,6 @@ public abstract class FsStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Filesystem {
         @JsonProperty
         public abstract String path();
@@ -54,11 +51,11 @@ public abstract class FsStats {
 
         @JsonProperty
         @Nullable
-        public  abstract String typeName();
+        public abstract String typeName();
 
         @JsonProperty
         @Nullable
-        public  abstract String sysTypeName();
+        public abstract String sysTypeName();
 
         @JsonProperty
         public abstract long total();

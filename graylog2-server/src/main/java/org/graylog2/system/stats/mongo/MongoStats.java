@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.net.HostAndPort;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class MongoStats {
     @JsonProperty
     public abstract List<HostAndPort> servers();

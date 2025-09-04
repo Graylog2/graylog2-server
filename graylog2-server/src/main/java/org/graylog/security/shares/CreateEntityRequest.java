@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.Valid;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class CreateEntityRequest<T> {
     // Avoids error: "HV000131: A method return value must not be marked for cascaded validation more than once in a class hierarchy"

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class UrlWhitelist {
 
     @JsonProperty("entries")
@@ -39,7 +37,7 @@ public abstract class UrlWhitelist {
 
     @JsonCreator
     public static UrlWhitelist create(@JsonProperty("entries") List<WhitelistEntry> entries,
-            @JsonProperty("disabled") boolean disabled) {
+                                      @JsonProperty("disabled") boolean disabled) {
         return builder().entries(entries)
                 .disabled(disabled)
                 .build();
@@ -58,7 +56,7 @@ public abstract class UrlWhitelist {
      *
      * @param url The URL to check.
      * @return {@code false} if the whitelist is enabled and no whitelist entry matches the given url. {@code true} if
-     *         there is a whitelist entry matching the given url or if the whitelist is disabled.
+     * there is a whitelist entry matching the given url or if the whitelist is disabled.
      */
     public boolean isWhitelisted(String url) {
         if (disabled()) {

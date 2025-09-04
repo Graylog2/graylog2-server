@@ -25,7 +25,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
@@ -40,7 +39,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     public static final String FIELD_DEFAULT = "default";

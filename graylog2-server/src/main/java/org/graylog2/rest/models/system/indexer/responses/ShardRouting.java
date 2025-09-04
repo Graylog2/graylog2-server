@@ -19,14 +19,14 @@ package org.graylog2.rest.models.system.indexer.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
+@JsonDeserialize(builder = ShardRouting.Builder.class)
 @AutoValue
-@WithBeanGetter
 public abstract class ShardRouting {
     @JsonProperty("id")
     public abstract int id();
@@ -55,20 +55,28 @@ public abstract class ShardRouting {
     @Nullable
     public abstract String relocatingTo();
 
-    @JsonCreator
-    public static ShardRouting create(@JsonProperty("id") int id,
-                                      @JsonProperty("state") String state,
-                                      @JsonProperty("active") boolean active,
-                                      @JsonProperty("primary") boolean primary,
-                                      @JsonProperty("node_id") String nodeId,
-                                      @JsonProperty("node_name") @Nullable String nodeName,
-                                      @JsonProperty("node_hostname") @Nullable String nodeHostname,
-                                      @JsonProperty("relocating_to") @Nullable String relocatingTo) {
-        return new AutoValue_ShardRouting(id, state, active, primary, nodeId, nodeName, nodeHostname, relocatingTo);
+    public static ShardRouting create(int id,
+                                      String state,
+                                      boolean active,
+                                      boolean primary,
+                                      String nodeId,
+                                      @Nullable String nodeName,
+                                      @Nullable String nodeHostname,
+                                      @Nullable String relocatingTo) {
+        return Builder.create()
+                .id(id)
+                .state(state)
+                .active(active)
+                .primary(primary)
+                .nodeId(nodeId)
+                .nodeName(nodeName)
+                .nodeHostname(nodeHostname)
+                .relocatingTo(relocatingTo)
+                .build();
     }
 
     public static Builder builder() {
-        return new AutoValue_ShardRouting.Builder();
+        return Builder.create();
     }
 
     public ShardRouting withNodeDetails(String nodeName, String nodeHostname) {
@@ -82,21 +90,34 @@ public abstract class ShardRouting {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_ShardRouting.Builder();
+        }
+
+        @JsonProperty("id")
         public abstract Builder id(int id);
 
+        @JsonProperty("state")
         public abstract Builder state(String state);
 
+        @JsonProperty("active")
         public abstract Builder active(boolean active);
 
+        @JsonProperty("primary")
         public abstract Builder primary(boolean primary);
 
+        @JsonProperty("node_id")
         public abstract Builder nodeId(String nodeId);
 
-        public abstract Builder nodeName(String nodeName);
+        @JsonProperty("node_name")
+        public abstract Builder nodeName(@Nullable String nodeName);
 
-        public abstract Builder nodeHostname(String nodeHostname);
+        @JsonProperty("node_hostname")
+        public abstract Builder nodeHostname(@Nullable String nodeHostname);
 
-        public abstract Builder relocatingTo(String relocatingTo);
+        @JsonProperty("relocating_to")
+        public abstract Builder relocatingTo(@Nullable String relocatingTo);
 
         abstract ShardRouting build();
     }

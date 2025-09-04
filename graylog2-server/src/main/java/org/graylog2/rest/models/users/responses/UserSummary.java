@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.permission.WildcardPermission;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.Startpage;
@@ -36,7 +35,6 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class UserSummary {
 
     @JsonProperty

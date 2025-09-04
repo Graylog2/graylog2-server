@@ -20,20 +20,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class RegexWhitelistEntry implements WhitelistEntry {
     private Pattern pattern;
 
     @JsonCreator
     public static RegexWhitelistEntry create(@JsonProperty("id") String id, @JsonProperty("title") String title,
-            @JsonProperty("value") String value) {
+                                             @JsonProperty("value") String value) {
 
         // compile the pattern early so that we can catch illegal expressions asap
         final Pattern pattern;

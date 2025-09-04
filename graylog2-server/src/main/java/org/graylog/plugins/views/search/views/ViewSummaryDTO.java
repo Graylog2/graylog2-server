@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import jakarta.validation.constraints.NotBlank;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -41,7 +40,6 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = ViewSummaryDTO.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@WithBeanGetter
 public abstract class ViewSummaryDTO implements ViewLike, MongoEntity {
     @ObjectId
     @Id

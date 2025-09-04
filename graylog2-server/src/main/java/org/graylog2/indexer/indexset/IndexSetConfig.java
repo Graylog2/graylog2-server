@@ -26,7 +26,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
@@ -52,7 +51,6 @@ import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYP
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)

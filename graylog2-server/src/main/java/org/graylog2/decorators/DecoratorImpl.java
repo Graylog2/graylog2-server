@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotBlank;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
 import org.mongojack.Id;
@@ -36,7 +35,6 @@ import static org.graylog2.database.DbEntity.NO_TITLE;
 import static org.graylog2.shared.security.RestPermissions.DECORATORS_READ;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @DbEntity(collection = "decorators",
           titleField = NO_TITLE,

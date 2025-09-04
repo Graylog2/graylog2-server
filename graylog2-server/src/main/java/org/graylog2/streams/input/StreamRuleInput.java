@@ -18,10 +18,8 @@ package org.graylog2.streams.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 public abstract class StreamRuleInput {
 
     @JsonProperty

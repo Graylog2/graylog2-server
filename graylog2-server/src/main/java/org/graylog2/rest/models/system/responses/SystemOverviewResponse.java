@@ -20,36 +20,46 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class SystemOverviewResponse {
     @JsonProperty
     public abstract String facility();
+
     @JsonProperty
     public abstract String codename();
+
     @JsonProperty
     public abstract String nodeId();
+
     @JsonProperty
     public abstract String clusterId();
+
     @JsonProperty
     public abstract String version();
+
     @JsonProperty
     public abstract String startedAt();
+
     @JsonProperty("is_processing")
     public abstract boolean isProcessing();
+
     @JsonProperty
     public abstract String hostname();
+
     @JsonProperty
     public abstract String lifecycle();
+
     @JsonProperty
     public abstract String lbStatus();
+
     @JsonProperty
     public abstract String timezone();
+
     @JsonProperty("operating_system")
     public abstract String operatingSystem();
+
     @JsonProperty("is_leader")
     public abstract boolean isLeader();
 

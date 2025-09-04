@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import jakarta.validation.Valid;
@@ -29,7 +28,6 @@ import jakarta.validation.constraints.NotNull;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class RotationStrategySummary {
     @JsonProperty
     public abstract String strategy();

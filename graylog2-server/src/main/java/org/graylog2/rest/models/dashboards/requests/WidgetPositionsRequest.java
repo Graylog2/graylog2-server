@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,7 +28,6 @@ import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class WidgetPositionsRequest {
     @JsonProperty
     public abstract List<WidgetPosition> positions();
@@ -41,7 +39,6 @@ public abstract class WidgetPositionsRequest {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class WidgetPosition {
         @JsonProperty
         public abstract String id();
