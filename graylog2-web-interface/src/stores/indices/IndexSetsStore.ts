@@ -49,6 +49,7 @@ export type IndexSetConfig = {
   field_type_refresh_interval: number;
   field_type_profile?: string | null;
   index_template_type?: string;
+  index_set_template_id?: string | null;
   writable: boolean;
   default?: boolean;
   use_legacy_rotation?: boolean;
