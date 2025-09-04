@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
@@ -172,7 +172,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
       }),
     );
 
-    await waitForElementToBeRemoved(submitButton);
+    expect(submitButton).not.toBeInTheDocument();
   });
 
   it('not runs action to update config on submitting form when description is empty', async () => {
