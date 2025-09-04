@@ -19,6 +19,8 @@ import React from 'react';
 import { Accordion } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
+import { nonInteractiveListItemClass } from 'components/common/ExpandableListItem';
+
 const StyledAccordion = styled(Accordion)(
   ({ theme }) => css`
     .mantine-Accordion-chevron {
@@ -29,8 +31,23 @@ const StyledAccordion = styled(Accordion)(
     .mantine-Accordion-content {
       padding-left: 11px;
     }
+
+    .mantine-Accordion-label {
+      padding-top: ${theme.spacings.sm};
+      padding-bottom: ${theme.spacings.sm};
+    }
+
+    .${nonInteractiveListItemClass} {
+      padding-left: 30px;
+    }
+    .mantine-Accordion-root {
+      .${nonInteractiveListItemClass} {
+        padding-left: 0;
+      }
+    }
   `,
 );
+
 type Props = PropsWithChildren<{
   className?: string;
   value?: string[];

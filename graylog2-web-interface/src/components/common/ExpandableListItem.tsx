@@ -2,6 +2,18 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { Accordion } from '@mantine/core';
 
+export const nonInteractiveListItemClass = 'non-interactive-expandable-list-item';
+
+const NonInteractiveItem = styled.div(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.xs};
+    padding-bottom: ${theme.spacings.xs};
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+  `,
+);
+
 const ContentContainer = styled.div(
   ({ theme }) => css`
     border-left: 1px ${theme.colors.gray[90]} solid;
@@ -17,23 +29,41 @@ const Subheader = styled.span(
   `,
 );
 
-type Props = {
+type Props = React.PropsWithChildren<{
   header: React.ReactNode;
   value: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  expandable?: boolean;
   subheader?: React.ReactNode;
-};
+}>;
 
-const ExpandableListItem = ({ header, children, value, subheader = undefined }: Props) => (
-  <Accordion.Item value={value}>
-    <Accordion.Control>
-      {header}
-      {subheader && <Subheader>{subheader}</Subheader>}
-    </Accordion.Control>
-    <Accordion.Panel>
-      <ContentContainer>{children}</ContentContainer>
-    </Accordion.Panel>
-  </Accordion.Item>
-);
+const ExpandableListItem = ({
+  header,
+  children = undefined,
+  value,
+  subheader = undefined,
+  expandable = true,
+}: Props) => {
+  if (!expandable) {
+    return (
+      <NonInteractiveItem className={nonInteractiveListItemClass}>
+        {header}
+        {subheader && <Subheader>{subheader}</Subheader>}
+      </NonInteractiveItem>
+    );
+  }
+
+  return (
+    <Accordion.Item value={value}>
+      <Accordion.Control>
+        {header}
+        {subheader && <Subheader>{subheader}</Subheader>}
+      </Accordion.Control>
+      <Accordion.Panel>
+        <ContentContainer>{children}</ContentContainer>
+      </Accordion.Panel>
+    </Accordion.Item>
+  );
+};
 
 export default ExpandableListItem;
