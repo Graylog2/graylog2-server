@@ -69,16 +69,15 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         Class<?> paramType = parameterContext.getParameter().getType();
         final var store = extensionContext.getStore(NAMESPACE);
+        final var rootStore = extensionContext.getRoot().getStore(NAMESPACE);
         final var lifecycle = store.get(BACKEND_LIFECYCLE_KEY, Lifecycle.class);
         if (lifecycle == null) {
             throw new ParameterResolutionException("backend_lifecycle store not found");
         }
 
         final var backend = switch (lifecycle) {
-            case VM ->
-                    extensionContext.getRoot().getStore(NAMESPACE).get(VM_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
-            case CLASS ->
-                    extensionContext.getRoot().getStore(NAMESPACE).get(CLASS_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
+            case VM -> rootStore.get(VM_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
+            case CLASS -> store.get(CLASS_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
         };
         if (paramType.equals(SearchServerInstance.class)) {
             if (backend != null) {
@@ -116,13 +115,15 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
         // check if we have to create the VM lifecycle backend
         if (config.serverLifecycle() == Lifecycle.VM && rootStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
             // this backend will be re-used and only shut down at the very end
+            LOG.info("Creating VM-lifecycle backend");
             final ContainerizedGraylogBackend graylogBackend = createBackend(config);
-            LOG.info("Created VM lifecycle Graylog backend: {}", graylogBackend);
+            LOG.info("Created VM-lifecycle Graylog backend: {}", graylogBackend);
             rootStore.put(VM_LIFECYCLE_BACKEND_KEY, graylogBackend);
         } else if (config.serverLifecycle() == Lifecycle.CLASS) {
             // class lifecycle means we have to create a new backend
+            LOG.info("Creating class-lifecycle backend");
             var graylogBackend = createBackend(config);
-            LOG.info("Creating class lifecyle graylog backend: {}", graylogBackend);
+            LOG.info("Created class-lifecyle graylog backend for class {}", context.getRequiredTestClass().getName());
             store.put(CLASS_LIFECYCLE_BACKEND_KEY, graylogBackend);
         }
     }

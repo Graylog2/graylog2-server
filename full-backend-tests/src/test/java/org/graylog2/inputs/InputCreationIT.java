@@ -28,14 +28,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class InputCreationIT {
 
-    private final GraylogApis apis;
-
-    public InputCreationIT(GraylogApis apis) {
-        this.apis = apis;
-    }
-
     @ContainerMatrixTest
-    void testHttpRandomInputCreation() {
+    void testHttpRandomInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.random.FakeHttpMessageInput",
                 Map.of("sleep", 30,
@@ -55,7 +49,7 @@ public class InputCreationIT {
      * Test to make sure configuration encryption serialization/deserialization works
      */
     @ContainerMatrixTest
-    void testFailingAwsCloudTrailInputCreation() {
+    void testFailingAwsCloudTrailInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog.aws.inputs.cloudtrail.CloudTrailInput",
                 Map.of("aws_sqs_region", "us-east-1",
