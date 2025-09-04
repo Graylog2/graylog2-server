@@ -142,7 +142,7 @@ function Preview({
     show && (
       <Container $height={height} $maxHeight={maxHeight} $noBackground={noBackground} $noBorder={noBorder}>
         <MarkdownStyles $noPadding={noPadding}>
-          <Markdown text={value} />
+          <Markdown text={value} augment />
         </MarkdownStyles>
         {withFullView && (
           <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />

@@ -319,16 +319,20 @@ type AssetInformationComponentProps = {
 };
 
 type EventProcedureFormProps = {
-  eventProcedureID: string | undefined;
-  remediationSteps: string;
-  onClose: () => void;
-  onSave: (eventProcedureId: string) => void;
+  eventProcedureId: string | undefined;
+  remediationSteps?: string;
+  onClose?: () => void;
+  onSave?: (eventProcedureId: string) => void;
+  onRemove?: (eventProcedureId: string) => void;
 };
 
 type EventProcedureSummaryProps = {
-  eventProcedureId: string | undefined;
+  eventProcedureId: string;
   eventId?: string;
   event?: Event;
+  canEdit?: boolean;
+  onRemove?: () => void;
+  onEdit?: () => void;
 };
 
 type SearchAction = {
