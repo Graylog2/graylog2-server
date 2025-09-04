@@ -247,7 +247,6 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
 
-
     @Override
     public Set<Permission> getObjectPermissions() {
         return getPermissions().stream().map(p -> {
@@ -290,7 +289,7 @@ public class UserImpl extends PersistedImpl implements User {
             final String type = obj.get("type");
             final String id = obj.get("id");
 
-            if (type != null && id != null) {
+            if (type != null) {
                 return Startpage.create(type, id);
             }
         }
@@ -408,7 +407,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public void setStartpage(final String type, final String id) {
-        final Startpage nextStartpage = type != null && id != null ? Startpage.create(type, id) : null;
+        final Startpage nextStartpage = type != null ? Startpage.create(type, id) : null;
         this.setStartpage(nextStartpage);
     }
 
@@ -417,7 +416,9 @@ public class UserImpl extends PersistedImpl implements User {
         final HashMap<String, String> startpageMap = new HashMap<>();
         if (startpage != null) {
             startpageMap.put("type", startpage.type());
-            startpageMap.put("id", startpage.id());
+            if (startpage.id() != null) {
+                startpageMap.put("id", startpage.id());
+            }
         }
         this.fields.put(STARTPAGE, startpageMap);
     }
@@ -459,7 +460,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public boolean isServiceAccount()  {
+    public boolean isServiceAccount() {
         return Boolean.valueOf(String.valueOf(fields.get(SERVICE_ACCOUNT)));
     }
 

@@ -24,6 +24,7 @@ import org.apache.shiro.authz.permission.AllPermission;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
@@ -49,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -217,4 +219,15 @@ class UserImplTest {
                 .extracting("class").containsOnlyOnce(AllPermission.class);
     }
 
+    @Test
+    void testStartPage() {
+        user = createUserImpl(null, null, null);
+        user.setStartpage(Startpage.create("dashboard", "id"));
+        assertEquals("dashboard", user.getStartpage().type());
+        assertEquals("id", user.getStartpage().id());
+
+        user.setStartpage(Startpage.create("custom", null));
+        assertEquals("custom", user.getStartpage().type());
+        assertNull(user.getStartpage().id());
+    }
 }
