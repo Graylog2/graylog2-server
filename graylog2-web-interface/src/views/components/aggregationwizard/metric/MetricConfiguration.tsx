@@ -86,7 +86,7 @@ const Metric = ({ index }: Props) => {
   );
 
   const {
-    values: { metrics },
+    values: { metrics, visualization },
     errors: { metrics: metricsError },
     setFieldValue,
   } = useFormikContext<WidgetConfigFormValues>();
@@ -146,6 +146,8 @@ const Metric = ({ index }: Props) => {
   const addThresholds = () => {
     setFieldValue(`metrics.${index}.thresholds`, [...currentMetric.thresholds, createThreshold()]);
   };
+
+  const showThresholdSettings = ['bar', 'area', 'line', 'scatter'].includes(visualization?.type);
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
@@ -315,29 +317,33 @@ const Metric = ({ index }: Props) => {
           )}
         </Field>
       </Col>
-      {currentMetric.showThresholds && (
-        <Col sm={1}>
-          <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
-        </Col>
-      )}
-      {currentMetric.showThresholds && (
-        <FieldArray
-          name={`metrics.${index}.thresholds`}
-          validateOnChange={false}
-          render={({ remove }) => (
-            <ThresholdsContainer>
-              {metrics?.[index]?.thresholds?.map((_, tIndex) => (
-                <ThresholdFormItem
-                  remove={remove}
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`${index}-${tIndex}`}
-                  thresholdIndex={tIndex}
-                  metricIndex={index}
-                />
-              ))}
-            </ThresholdsContainer>
+      {showThresholdSettings && (
+        <>
+          {currentMetric.showThresholds && (
+            <Col sm={1}>
+              <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
+            </Col>
           )}
-        />
+          {currentMetric.showThresholds && (
+            <FieldArray
+              name={`metrics.${index}.thresholds`}
+              validateOnChange={false}
+              render={({ remove }) => (
+                <ThresholdsContainer>
+                  {metrics?.[index]?.thresholds?.map((_, tIndex) => (
+                    <ThresholdFormItem
+                      remove={remove}
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${index}-${tIndex}`}
+                      thresholdIndex={tIndex}
+                      metricIndex={index}
+                    />
+                  ))}
+                </ThresholdsContainer>
+              )}
+            />
+          )}
+        </>
       )}
     </Wrapper>
   );
