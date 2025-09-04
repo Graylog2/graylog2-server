@@ -66,26 +66,18 @@ const IndexSetRotationRetentionConfigurationSection = ({
     { value: 'legacy', label: 'Legacy (Deprecated)' },
   ];
 
-  const legacyRenderable = (): boolean => {
-    if (hiddenFields.includes('legacy') && !hasFieldRestrictionPermission) return false;
-
-    if (
-      hiddenFields.includes('legacy.rotation_strategy') &&
-      hiddenFields.includes('legacy.retention_strategy') &&
+  const legacyRenderable = (): boolean =>
+    !(
+      ((hiddenFields.includes('legacy.rotation_strategy') && hiddenFields.includes('legacy.retention_strategy')) ||
+        hiddenFields.includes('legacy')) &&
       !hasFieldRestrictionPermission
-    )
-      return false;
+    );
 
-    return true;
-  };
-
-  const dataTieringRenderable = (): boolean => {
-    if (hiddenFields.includes('data_tiering') && !hasFieldRestrictionPermission) return false;
-
-    if (isCloud && !enableDataTieringCloud) return false;
-
-    return true;
-  };
+  const dataTieringRenderable = (): boolean =>
+    !(
+      (hiddenFields.includes('data_tiering') && !hasFieldRestrictionPermission) ||
+      (isCloud && !enableDataTieringCloud)
+    );
 
   if (!dataTieringRenderable() && !legacyRenderable()) return null;
 

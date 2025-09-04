@@ -212,7 +212,6 @@ const IndexSetConfigurationForm = ({
 
   const detailsSectionRenderable = (): boolean => {
     if (create) return true;
-    let tmp = false;
 
     const detailsFieldsEdit = [
       'shards',
@@ -222,11 +221,7 @@ const IndexSetConfigurationForm = ({
       'field_type_refresh_interval',
     ];
 
-    detailsFieldsEdit.forEach((field) => {
-      if (!hiddenFields.includes(field)) tmp = true;
-    });
-
-    return tmp;
+    return detailsFieldsEdit.filter((fieldName: string) => !hiddenFields.includes(fieldName)).length > 0;
   };
 
   if (!indexSet) return null;

@@ -51,7 +51,7 @@ const IndexSetReadOnlyConfiguration = ({
   );
 
   return (
-    <span>
+    <>
       <FormikInput
         type="text"
         id="index-prefix"
@@ -72,7 +72,7 @@ const IndexSetReadOnlyConfiguration = ({
           disabled={immutableFields.includes('index_analyzer') && !hasFieldRestrictionPermission}
         />
       )}
-    </span>
+    </>
   );
 };
 
