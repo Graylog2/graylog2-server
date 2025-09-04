@@ -59,6 +59,20 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
         return Builder.create();
     }
 
+    public static InputCreateRequest create(String title,
+                                            String type,
+                                            boolean global,
+                                            Map<String, Object> configuration,
+                                            @Nullable String node) {
+        return builder()
+                .title(title)
+                .type(type)
+                .global(global)
+                .configuration(configuration)
+                .node(node)
+                .build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
