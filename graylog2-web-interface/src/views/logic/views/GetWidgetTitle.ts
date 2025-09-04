@@ -14,22 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import type { WidgetId } from 'views/logic/views/types';
+import type { QueryId } from 'views/logic/queries/Query';
+import type View from 'views/logic/views/View';
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import DefaultProviders from './DefaultProviders';
+const GetWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null =>
+  view.state.get(queryId).titles.getIn(['widget', widgetId]);
 
-type Props = {
-  children: React.ReactNode;
-};
-
-const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultProviders env="test">{children}</DefaultProviders>
-    </MemoryRouter>
-  </DefaultQueryClientProvider>
-);
-
-export default WrappingContainer;
+export default GetWidgetTitle;

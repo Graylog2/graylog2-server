@@ -14,22 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { Map } from 'immutable';
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import DefaultProviders from './DefaultProviders';
+import type { TitlesMap } from 'views/stores/TitleTypes';
+import TitleTypes from 'views/stores/TitleTypes';
+import type Widget from 'views/logic/widgets/Widget';
 
-type Props = {
-  children: React.ReactNode;
+const SetWidgetTitle = (titlesMap: TitlesMap, widget: Widget, title: string) => {
+  if (!title) {
+    return titlesMap;
+  }
+
+  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
+  const newWidgetTitles = widgetTitles.set(widget.id, title);
+
+  return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
 };
 
-const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultProviders env="test">{children}</DefaultProviders>
-    </MemoryRouter>
-  </DefaultQueryClientProvider>
-);
-
-export default WrappingContainer;
+export default SetWidgetTitle;

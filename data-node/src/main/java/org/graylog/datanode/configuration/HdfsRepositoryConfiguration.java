@@ -14,22 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+package org.graylog.datanode.configuration;
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import DefaultProviders from './DefaultProviders';
+import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.configuration.Documentation;
 
-type Props = {
-  children: React.ReactNode;
-};
+public class HdfsRepositoryConfiguration {
 
-const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultProviders env="test">{children}</DefaultProviders>
-    </MemoryRouter>
-  </DefaultQueryClientProvider>
-);
+    @Documentation("Should HDFS repository be enabled? This will also add the search role and activate search cache.")
+    @Parameter(value = "hdfs_repository_enabled")
+    private boolean enabled = false;
 
-export default WrappingContainer;
+    public boolean isRepositoryEnabled() {
+        return enabled;
+    }
+}
