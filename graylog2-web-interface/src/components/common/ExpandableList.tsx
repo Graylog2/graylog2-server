@@ -20,17 +20,31 @@ import { Accordion } from '@mantine/core';
 
 type Props = PropsWithChildren<{
   className?: string;
+  value?: string[];
+  defaultValue?: string[];
+  onChange?: (value: string[]) => void;
 }>;
 
 /**
  * The ExpandableList will take an array or one of ExpandableListItem to render
  * in list. This list can be expanded or flattened to give the user an overview
- * of categories. Inside the categories the user has the possibility of doing a selection.
- * The ExpandableList can be used nested.
+ * of categories. The ExpandableList can be used nested.
  */
-const ExpandableList = ({ children = undefined, ...props }: Props) => (
-  // <ul className={className ? `${style.list} ${className}` : style.list}>{children}</ul>
-  <Accordion chevronPosition="left" multiple variant="unstyled" {...props}>
+const ExpandableList = ({
+  children = undefined,
+  value = undefined,
+  defaultValue = undefined,
+  className = undefined,
+  onChange = undefined,
+}: Props) => (
+  <Accordion
+    chevronPosition="left"
+    multiple
+    variant="unstyled"
+    onChange={onChange}
+    value={value}
+    defaultValue={defaultValue}
+    className={className}>
     {children}
   </Accordion>
 );
