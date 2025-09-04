@@ -44,13 +44,6 @@ type Props = {
   index: number;
 };
 
-const StyledCheckbox = styled(Checkbox)`
-  input[type='checkbox'] {
-    // margin-right: 0;
-    // right: 0;
-  }
-`;
-
 const Wrapper = styled.div``;
 
 export const ActionWrapper = styled.div`
@@ -304,7 +297,7 @@ const Metric = ({ index }: Props) => {
         <Field name={`metrics.${index}.showThresholds`}>
           {({ field: { name, value = false }, meta: { error } }) => (
             <Input id={`${name}-input`} error={error} wrapperClassName="col-sm-12">
-              <StyledCheckbox
+              <Checkbox
                 title="Show line threshholds"
                 id={`${name}-input`}
                 name={name}
@@ -317,7 +310,7 @@ const Metric = ({ index }: Props) => {
                 }}
                 checked={value}>
                 Show line thresholds
-              </StyledCheckbox>
+              </Checkbox>
             </Input>
           )}
         </Field>
