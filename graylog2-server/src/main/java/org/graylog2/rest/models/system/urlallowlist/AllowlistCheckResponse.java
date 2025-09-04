@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.urlwhitelist;
+package org.graylog2.rest.models.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -22,18 +22,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import jakarta.validation.constraints.NotEmpty;
-
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class WhitelistCheckRequest {
-    @NotEmpty
-    @JsonProperty("url")
+public abstract class AllowlistCheckResponse {
+    static final String FIELD_URL = "url";
+    static final String FIELD_IS_ALLOWLISTED = "is_allowlisted";
+
+    @JsonProperty(FIELD_URL)
     public abstract String url();
 
+    @JsonProperty(FIELD_IS_ALLOWLISTED)
+    public abstract boolean isAllowlisted();
+
     @JsonCreator
-    public static WhitelistCheckRequest create(@JsonProperty("url") @NotEmpty String url) {
-        return new AutoValue_WhitelistCheckRequest(url);
+    public static AllowlistCheckResponse create(@JsonProperty(FIELD_URL) String url,
+                                                @JsonProperty(FIELD_IS_ALLOWLISTED) boolean isAllowlisted) {
+        return new AutoValue_AllowlistCheckResponse(url, isAllowlisted);
     }
 }

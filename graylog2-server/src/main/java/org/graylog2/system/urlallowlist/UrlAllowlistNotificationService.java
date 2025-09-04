@@ -14,36 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
-
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
+package org.graylog2.system.urlallowlist;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 
 @Singleton
-public class UrlWhitelistNotificationService {
+public class UrlAllowlistNotificationService {
 
     private final NotificationService notificationService;
 
     @Inject
-    public UrlWhitelistNotificationService(NotificationService notificationService) {
+    public UrlAllowlistNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
     /**
-     * Publish a system notification indicating that there was an attempt to access a URL which is not whitelisted.
+     * Publish a system notification indicating that there was an attempt to access a URL which is not allowlisted.
      *
      * <p>This method is synchronized to reduce the chance of emitting multiple notifications at the same time</p>
      *
      * @param description The description of the notification.
      */
-    synchronized public void publishWhitelistFailure(String description) {
+    synchronized public void publishAllowlistFailure(String description) {
         final Notification notification = notificationService.buildNow()
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.NORMAL)
-                .addDetail("title", "URL not whitelisted.")
+                .addDetail("title", "URL not allowlisted.")
                 .addDetail("description", description);
         notificationService.publishIfFirst(notification);
     }
