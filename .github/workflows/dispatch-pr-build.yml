@@ -2,7 +2,7 @@ name: Request dispatched PR Build
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize, edited ]
+    types: [ opened, reopened, synchronize, edited, labeled ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,8 +33,28 @@ jobs:
           OLD_PR_BODY: "${{ github.event.changes.body.from }}"
           NEW_PR_BODY: "${{ github.event.pull_request.body }}"
 
+      - name: Check if PR got labeled for e2e-tests
+        if: "${{ github.event.action == 'labeled' && github.event.label.name == 'e2e-tests' }}"
+        id: e2e-tests-labeled
+        run: |
+          echo "triggered=true" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check e2e-tests label
+        id: e2e-tests
+        run: |
+          has_label="$(jq -r '.labels[].name | select(. == "e2e-tests")' <<< "$PR_EVENT")"
+          {
+            if [ -n "$has_label" ]; then
+              echo "run=true"
+            else
+              echo "run=false"
+            fi
+          } | tee -a "$GITHUB_OUTPUT"
+        env:
+          PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
+
       - name: Dispatch job to graylog-project-internal
-        if: ${{ github.event.action != 'edited' || steps.pr-string-changed.outcome == 'success' }}
+        if: ${{ (github.event.action != 'edited' && github.event.action != 'labeled') || steps.pr-string-changed.outcome == 'success' || steps.e2e-tests-labeled.outputs.triggered == 'true' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
@@ -43,6 +63,7 @@ jobs:
           -f caller_head_branch=${{ github.head_ref }}
           -f head_sha=${{ github.event.pull_request.head.sha }}
           -f initial_actor="${{ github.actor }}/${{ github.triggering_actor }}"
+          -f e2e_tests=${{ steps.e2e-tests.outputs.run }}
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
 
