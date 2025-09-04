@@ -115,27 +115,27 @@ const IndexSetConfigurationForm = ({
 
   const parseFieldRestrictions = (field_restrictions: IndexSetFieldRestriction[]) => {
     const getHidden = () =>
-      field_restrictions
-        ?.filter((restriction: IndexSetFieldRestriction) => restriction.type === 'immutable_and_hidden')
-        .map((restriction: IndexSetFieldRestriction) => restriction.field_name) || [];
+      Object.keys(field_restrictions).filter(
+        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'hidden').length > 0,
+      );
 
     const getImmutable = () =>
-      field_restrictions
-        ?.filter((restriction: IndexSetFieldRestriction) => restriction.type === 'immutable')
-        .map((restriction: IndexSetFieldRestriction) => restriction.field_name) || [];
+      Object.keys(field_restrictions).filter(
+        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
+      );
 
-    return [getImmutable(), getHidden()];
+    if (field_restrictions) return [getImmutable(), getHidden()];
+
+    return [[], []];
   };
 
   useEffect(() => {
-    if (hiddenFields.includes('data_tiering')) setSelectedRetentionSegment('legacy');
-
     if (indexSet?.use_legacy_rotation) {
       setSelectedRetentionSegment('legacy');
     } else {
       setSelectedRetentionSegment('data_tiering');
     }
-  }, [indexSet, hiddenFields]);
+  }, [indexSet]);
 
   useEffect(() => {
     const [tmpImmutable, tmpHidden] = parseFieldRestrictions(indexSet?.field_restrictions);
