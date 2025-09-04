@@ -5,9 +5,7 @@ import { Accordion } from '@mantine/core';
 const ContentContainer = styled.div(
   ({ theme }) => css`
     border-left: 1px ${theme.colors.gray[90]} solid;
-    margin-left: 7px;
-    margin-top: 0;
-    padding-left: 25px;
+    padding-left: 18px;
   `,
 );
 
