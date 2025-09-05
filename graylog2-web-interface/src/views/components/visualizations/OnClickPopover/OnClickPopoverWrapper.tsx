@@ -44,4 +44,5 @@ const OnClickPopoverWrapper = (
     </Popover>
   </OverflowingComponentsContextProvider>
 );
+
 export default React.forwardRef(OnClickPopoverWrapper);

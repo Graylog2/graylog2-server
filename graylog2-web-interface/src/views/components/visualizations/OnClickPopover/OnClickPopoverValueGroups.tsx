@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
 import type { ValueGroupItem, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
+import ValueRenderer from 'views/components/visualizations/OnClickPopover/ValueRenderer';
 
 type Props = ValueGroups;
 
@@ -30,23 +31,6 @@ const DivContainer = styled.div(
   `,
 );
 
-const ValueBox = styled.span<{ $bgColor: string | number }>(
-  ({ theme, $bgColor }) => css`
-    background-color: ${$bgColor ?? 'inherit'};
-    color: ${$bgColor ? theme.utils.contrastingColor(String($bgColor)) : 'inherit'};
-    padding: ${theme.spacings.xxs};
-  `,
-);
-
-const Container = styled.span(
-  ({ theme }) => css`
-    display: inline-flex;
-    align-items: center;
-    gap: ${theme.spacings.xxs};
-    font-size: ${theme.fonts.size.tiny};
-  `,
-);
-
 const Group = ({ group, keyPrefix }: { group: Array<ValueGroupItem>; keyPrefix: string }) => {
   if (!group?.length) return null;
 
@@ -55,12 +39,7 @@ const Group = ({ group, keyPrefix }: { group: Array<ValueGroupItem>; keyPrefix: 
       key={`${keyPrefix}-${value}-${field}`}
       field={field}
       value={value}
-      render={() => (
-        <Container>
-          <ValueBox $bgColor={traceColor}>{text}</ValueBox>
-          <span>{field}</span>
-        </Container>
-      )}
+      render={() => <ValueRenderer value={text} label={field} traceColor={traceColor} />}
     />
   ));
 };
