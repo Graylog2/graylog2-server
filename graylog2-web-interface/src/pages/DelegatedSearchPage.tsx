@@ -22,9 +22,8 @@ export default () => {
   const [Component] = useMemo(
     () =>
       PluginStore.exports('pages')
-        .map((c) => c.search || {})
-        .map((c) => c.component)
-        .filter((c) => c) ?? [],
+        .map((c) => c.search?.component)
+        .filter((c) => !!c) ?? [],
     [],
   );
 
