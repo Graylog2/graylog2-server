@@ -40,7 +40,7 @@ const DropdownSwitcher = ({
   component: Component,
   clickPoint,
   config,
-  clickPointsInRadius,
+  clickPointsInRadius = [],
   metricMapper = defaultMetricMapper,
 }: Props) => {
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
