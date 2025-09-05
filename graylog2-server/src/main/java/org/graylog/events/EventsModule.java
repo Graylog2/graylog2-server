@@ -45,6 +45,8 @@ import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfigV2;
 import org.graylog.events.notifications.types.HTTPEventNotificationV2;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
+import org.graylog.events.procedures.DefaultEventProcedureProvider;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -186,5 +188,8 @@ public class EventsModule extends PluginModule {
 
         eventModifierBinder(); // Initialize event modifier binding to avoid errors when no modifiers are bound.
         eventQuerySearchTypeSupplierBinder(); // Initialize binder to avoid errors when no suppliers are bound.
+
+        OptionalBinder.newOptionalBinder(binder(), EventProcedureProvider.class)
+                .setDefault().to(DefaultEventProcedureProvider.class);
     }
 }
