@@ -150,7 +150,7 @@ const dataToPagePx = (
 };
 
 /** ---------- Anchors ---------- */
-type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint; pointsInRadius?: Array<ClickPoint> };
+type ElementAnchor = { el: Element; rel: Rel; pt: ClickPoint; pointsInRadius?: Array<ClickPoint> };
 type Anchor = ElementAnchor;
 
 /** ---------- nearest element anchor ---------- */
@@ -190,7 +190,7 @@ const pickNearestElementAnchor = (
     y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', el, rel, pt, pointsInRadius: rPts };
+  return { el, rel, pt, pointsInRadius: rPts };
 };
 
 /** ---------- bar/pie anchors ---------- */
@@ -307,7 +307,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
     y: clamp01((valuePy - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', rel, el, pt, pointsInRadius };
+  return { rel, el, pt, pointsInRadius };
 };
 
 type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap';
