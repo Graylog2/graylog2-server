@@ -22,7 +22,7 @@ import * as Immutable from 'immutable';
 import random from 'lodash/random';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Col, Input, Checkbox } from 'components/bootstrap';
+import { Col, Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/common';
@@ -297,23 +297,21 @@ const Metric = ({ index }: Props) => {
       </Col>
       <Col sm={11}>
         <Field name={`metrics.${index}.showThresholds`}>
-          {({ field: { name, value = false }, meta: { error } }) => (
-            <Input id={`${name}-input`} error={error} wrapperClassName="col-sm-12">
-              <Checkbox
-                title="Show line threshholds"
-                id={`${name}-input`}
-                name={name}
-                onChange={() => {
-                  const newVal = !value;
-                  setFieldValue(name, newVal);
-                  if (newVal && !currentMetric.thresholds?.length) {
-                    setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
-                  }
-                }}
-                checked={value}>
-                Show line thresholds
-              </Checkbox>
-            </Input>
+          {({ field: { name, value = false } }) => (
+            <FormikInput
+              type="checkbox"
+              wrapperClassName="col-sm-12"
+              label="Show line thresholds"
+              id={`${name}-input`}
+              name={name}
+              onChange={() => {
+                const newVal = !value;
+                setFieldValue(name, newVal);
+                if (newVal && !currentMetric.thresholds?.length) {
+                  setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
+                }
+              }}
+            />
           )}
         </Field>
       </Col>
