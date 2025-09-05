@@ -27,7 +27,7 @@ type Props = {
   }>;
   clickPoint: ClickPoint;
   config: AggregationWidgetConfig;
-  clickPointsInRadius: Array<ClickPoint>;
+  clickPointsInRadius?: Array<ClickPoint>;
   metricMapper?: (clickPoint: ClickPoint) => { value: string; metric: string };
 };
 
