@@ -18,7 +18,7 @@ import React, { useCallback, useMemo } from 'react';
 import mapValues from 'lodash/mapValues';
 
 import type { Checked } from 'views/logic/valueactions/createEventDefinition/types';
-import { ExpandableList, ExpandableCheckboxListItem } from 'components/common';
+import { ExpandableCheckboxListItem } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 const CHECKBOX_STATES = {

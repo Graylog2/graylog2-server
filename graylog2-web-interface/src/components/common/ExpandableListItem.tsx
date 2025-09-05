@@ -29,6 +29,24 @@ const Subheader = styled.span(
   `,
 );
 
+const StyledAccordionItem = styled(Accordion.Item)(
+  ({ theme }) => css`
+    .mantine-Accordion-chevron {
+      margin-left: ${theme.spacings.xxs};
+      margin-right: ${theme.spacings.sm};
+    }
+
+    .mantine-Accordion-content {
+      padding-left: 11px;
+    }
+
+    .mantine-Accordion-label {
+      padding-top: ${theme.spacings.xs};
+      padding-bottom: ${theme.spacings.xs};
+    }
+  `,
+);
+
 type Props = React.PropsWithChildren<{
   header: React.ReactNode;
   value: string;
@@ -54,7 +72,7 @@ const ExpandableListItem = ({
   }
 
   return (
-    <Accordion.Item value={value}>
+    <StyledAccordionItem value={value}>
       <Accordion.Control>
         {header}
         {subheader && <Subheader>{subheader}</Subheader>}
@@ -62,7 +80,7 @@ const ExpandableListItem = ({
       <Accordion.Panel>
         <ContentContainer>{children}</ContentContainer>
       </Accordion.Panel>
-    </Accordion.Item>
+    </StyledAccordionItem>
   );
 };
 

@@ -131,6 +131,7 @@ const List = ({
 
                   return (
                     <Input
+                      key={entity.id}
                       type="checkbox"
                       formGroupClassName="form-group no-bm"
                       label={header}
