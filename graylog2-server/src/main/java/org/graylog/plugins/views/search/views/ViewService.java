@@ -29,6 +29,7 @@ import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -57,6 +58,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
     private final ViewRequirements.Factory viewRequirementsFactory;
     private final EntityRegistrar entityRegistrar;
     private final ViewSummaryService viewSummaryService;
+    private final EntitySourceService entitySourceService;
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
     private final MongoUtils<ViewDTO> mongoUtils;
@@ -66,11 +68,13 @@ public class ViewService implements ViewUtils<ViewDTO> {
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityRegistrar entityRegistrar,
                           ViewSummaryService viewSummaryService,
+                          EntitySourceService entitySourceService,
                           MongoCollections mongoCollections) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityRegistrar = entityRegistrar;
         this.viewSummaryService = viewSummaryService;
+        this.entitySourceService = entitySourceService;
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
@@ -247,6 +251,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
             }
         });
         mongoUtils.deleteById(id);
+        entitySourceService.deleteByEntityId(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {
