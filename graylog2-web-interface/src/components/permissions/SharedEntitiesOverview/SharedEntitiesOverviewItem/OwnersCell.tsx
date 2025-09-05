@@ -16,18 +16,29 @@
  */
 
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { isPermitted } from 'util/PermissionsMixin';
+import { createGRN } from 'logic/permissions/GRN';
 import type Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
+import { RestrictedAccessTooltip } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 
 type Props = {
   owners: GranteesList;
 };
+
+const OwnerList = styled.div`
+  display: flex;
+`;
+
+const OwnerTitleWrapper = styled.span`
+  display: flex;
+  align-items: center;
+`;
 
 const TitleWithLink = ({ title, entityId }: { title: string; entityId: string }) => {
   const entityRoute = useShowRouteFromGRN(entityId);
@@ -44,17 +55,28 @@ type OwnerTitleProps = {
 };
 
 const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
-  const currentUser = useCurrentUser();
+  const grn = createGRN(type, id);
+  const hasEditPermission = useHasEntityPermissionByGRN(grn, 'edit');
 
   switch (type) {
     case 'user':
-      if (!isPermitted(currentUser.permissions, 'users:list')) return <span>{title}</span>;
+      if (!hasEditPermission)
+        return (
+          <OwnerTitleWrapper>
+            {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
+          </OwnerTitleWrapper>
+        );
 
-      return <TitleWithLink entityId={id} title={title} />;
+      return <TitleWithLink title={title} entityId={id} />;
     case 'team':
-      if (!isPermitted(currentUser.permissions, 'teams:list')) return <span>{title}</span>;
+      if (!hasEditPermission)
+        return (
+          <OwnerTitleWrapper>
+            {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
+          </OwnerTitleWrapper>
+        );
 
-      return <TitleWithLink entityId={id} title={title} />;
+      return <TitleWithLink title={title} entityId={id} />;
     case 'global':
       return <span>Everyone</span>;
     default:
@@ -67,18 +89,20 @@ const OwnersCell = ({ owners }: Props) => {
 
   return (
     <td className="limited">
-      {sortedOwners
-        .map((owner, index) => {
-          const isLast = index >= owners.size - 1;
+      <OwnerList>
+        {sortedOwners
+          .map((owner, index) => {
+            const isLast = index >= owners.size - 1;
 
-          return (
-            <React.Fragment key={owner.id}>
-              <OwnerTitle owner={owner} />
-              {!isLast && ', '}
-            </React.Fragment>
-          );
-        })
-        .toArray()}
+            return (
+              <React.Fragment key={owner.id}>
+                <OwnerTitle owner={owner} />
+                {!isLast && ', '}
+              </React.Fragment>
+            );
+          })
+          .toArray()}
+      </OwnerList>
     </td>
   );
 };

@@ -61,7 +61,7 @@ const UserDetails = ({ user }: Props) => {
             <IfPermitted permissions={`users:rolesedit:${user.username}`}>
               <RolesSection user={user} />
             </IfPermitted>
-            <IfPermitted permissions={`teams:edit:${user.username}`}>
+            <IfPermitted permissions={`team:edit:${user.username}`}>
               <TeamsSection user={user} />
             </IfPermitted>
             {currentUser.id === user.id && !isLocalAdmin && (
