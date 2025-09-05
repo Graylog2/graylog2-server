@@ -1,29 +1,53 @@
-```js
-import { ExpandableListItem } from 'components/common';
+Simple usage
+
+```tsx
+import { ExpandableListItem, ExpandableCheckboxListItem } from 'components/common';
 
 const ExpandableListExample = () => (
   <ExpandableList>
-    <ExpandableListItem selectable expanded header="Wheel of Time Character">
+    <ExpandableListItem header="Wheel of Time Character" value="character">
       <ExpandableList>
-        <ExpandableListItem selectable header="Andor">
+        <ExpandableCheckboxListItem header="Andor" value="andor">
           <ExpandableList>
-            <ExpandableListItem selectable expandable={false} header="Elayne" />
-            <ExpandableListItem selectable expandable={false} header="Morgase" />
+            <ExpandableListItem header="Elayne" value="elayne">The content</ExpandableListItem>
+            <ExpandableListItem expandable={false} header="Morgase" value="morgase" />
           </ExpandableList>
-        </ExpandableListItem>
-        <ExpandableListItem selectable header="Edmonds Field">
+        </ExpandableCheckboxListItem>
+        <ExpandableListItem header="Edmonds Field" value="edmonds"> 
           <ExpandableList>
-            <ExpandableListItem selectable expandable={false} header="Rand" />
-            <ExpandableListItem selectable expandable={false} header="Perrin" />
-            <ExpandableListItem selectable expandable={false} header="Egwene" />
-            <ExpandableListItem checked expandable={false} header="Mat" />
-            <ExpandableListItem expandable={false} selectable header="Nynaeve" />
+            <ExpandableListItem header="Rand" value="rand" expandable={false}/>
+            <ExpandableListItem header="Perrin" value="perrin" expandable={false}/>
+            <ExpandableListItem header="Egwene" value="egwene">
+              The content
+            </ExpandableListItem>
+            <ExpandableListItem  header="Mat" value="mat" expandable={false} />
+            <ExpandableListItem header="Nynaeve" value="nynaeve" expandable={false} />
           </ExpandableList>
         </ExpandableListItem>
       </ExpandableList>
     </ExpandableListItem>
   </ExpandableList>
 );
+
+<ExpandableListExample />
+```
+
+Control which sections are expanded by default.
+
+```tsx
+import { useState } from 'react';
+import { ExpandableListItem } from 'components/common';
+
+const ExpandableListExample = () => {
+  const [expandedSection, setExpandedSection] = useState(['fred', 'morgase']);
+  return (
+    <ExpandableList value={expandedSection} onChange={(newExpandedSections) => setExpandedSection(newExpandedSections)}>
+      <ExpandableListItem header="Elayne" value="elayne">The content</ExpandableListItem>
+      <ExpandableListItem header="Fred" value="fred">The content</ExpandableListItem>
+      <ExpandableListItem header="Morgase" value="morgase">The content</ExpandableListItem>
+    </ExpandableList>
+  );
+};
 
 <ExpandableListExample />;
 ```
