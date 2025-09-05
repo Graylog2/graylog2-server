@@ -131,7 +131,8 @@ import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
-import static org.graylog2.users.PasswordComplexityConfig.VALID_SPECIAL_CHARACTERS;
+import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS;
+import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_CODEPOINTS;
 
 @RequiresAuthentication
 @Path("/users")
@@ -351,7 +352,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
-        validatePasswordComplexity(cr.password(), clusterConfigService);
+        validatePasswordComplexity(cr.password());
 
         // Create user.
         User user = userManagementService.create();
@@ -387,30 +388,34 @@ public class UsersResource extends RestResource {
         return Response.created(userUri).build();
     }
 
-    private void validatePasswordComplexity(String password, ClusterConfigService clusterConfigService) {
-        final PasswordComplexityConfig config = clusterConfigService.get(PasswordComplexityConfig.class);
-        if (config == null) {
-            String msg = "No password complexity configuration found - unable to validate password security.";
+    private void validatePasswordComplexity(String password) {
+        PasswordComplexityConfig config = clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT);
+
+        StringBuilder errorMessages = new StringBuilder();
+        if (password == null || password.isBlank()) {
+            errorMessages.append("Password cannot be empty.");
+        } else {
+            if (password.length() < config.minLength()) {
+                errorMessages.append("Password must be at least ").append(config.minLength()).append(" characters long.\n");
+            }
+            if (config.requireUppercase() && password.chars().noneMatch(Character::isUpperCase)) {
+                errorMessages.append("Password must contain at least one uppercase letter.\n");
+            }
+            if (config.requireLowercase() && password.chars().noneMatch(Character::isLowerCase)) {
+                errorMessages.append("Password must contain at least one lowercase letter.\n");
+            }
+            if (config.requireNumbers() && password.chars().noneMatch(Character::isDigit)) {
+                errorMessages.append("Password must contain at least one number.\n");
+            }
+            if (config.requireSpecialCharacters() && password.chars().noneMatch(SPECIAL_CHARACTERS_CODEPOINTS::contains)) {
+                errorMessages.append("Password must contain at least one special character from: ").append(SPECIAL_CHARACTERS).append("\n");
+            }
+        }
+
+        if (!errorMessages.isEmpty()) {
+            String msg = errorMessages.toString();
             LOG.error(msg);
             throw new BadRequestException(msg);
-        }
-        if (password == null || password.isBlank()) {
-            throw new BadRequestException("Password cannot be empty.");
-        }
-        if (password.length() < config.minLength()) {
-            throw new BadRequestException("Password must be at least " + config.minLength() + " characters long.");
-        }
-        if (config.requireUppercase() && password.chars().noneMatch(Character::isUpperCase)) {
-            throw new BadRequestException("Password must contain at least one uppercase letter.");
-        }
-        if (config.requireLowercase() && password.chars().noneMatch(Character::isLowerCase)) {
-            throw new BadRequestException("Password must contain at least one lowercase letter.");
-        }
-        if (config.requireNumbers() && password.chars().noneMatch(Character::isDigit)) {
-            throw new BadRequestException("Password must contain at least one number.");
-        }
-        if (config.requireSpecialCharacters() && password.chars().noneMatch(ch -> VALID_SPECIAL_CHARACTERS.indexOf(ch) >= 0)) {
-            throw new BadRequestException("Password must contain at least one special character from: " + VALID_SPECIAL_CHARACTERS);
         }
     }
 
@@ -605,7 +610,7 @@ public class UsersResource extends RestResource {
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
         final User user = userManagementService.load(username);
-        checkPermission(RestPermissions.USERS_EDIT, username);
+        checkPermission(USERS_EDIT, username);
 
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
@@ -684,7 +689,7 @@ public class UsersResource extends RestResource {
         }
 
         if (changeAllowed) {
-            validatePasswordComplexity(cr.password(), clusterConfigService);
+            validatePasswordComplexity(cr.password());
             if (checkOldPassword) {
                 userManagementService.changePassword(user, cr.oldPassword(), cr.password());
             } else {
@@ -714,7 +719,7 @@ public class UsersResource extends RestResource {
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);
-        checkPermission(RestPermissions.USERS_EDIT, user.getName());
+        checkPermission(USERS_EDIT, user.getName());
         final User.AccountStatus oldStatus = user.getAccountStatus();
 
         if (oldStatus.equals(newStatus)) {

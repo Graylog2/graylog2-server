@@ -18,6 +18,9 @@ package org.graylog2.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public record PasswordComplexityConfig(
         @JsonProperty("min_length") int minLength,
         @JsonProperty("require_uppercase") boolean requireUppercase,
@@ -25,7 +28,8 @@ public record PasswordComplexityConfig(
         @JsonProperty("require_numbers") boolean requireNumbers,
         @JsonProperty("require_special_chars") boolean requireSpecialCharacters
 ) {
-    public static final String VALID_SPECIAL_CHARACTERS = "!@#$%^&*()-_=+[]{}|;:,.<>?/";
+    public static final String SPECIAL_CHARACTERS = "!@#$%^&*()-_=+[]{}|;:,.<>?/";
+    public static final Set<Integer> SPECIAL_CHARACTERS_CODEPOINTS = SPECIAL_CHARACTERS.chars().boxed().collect(Collectors.toSet());
     public static final PasswordComplexityConfig DEFAULT =
             new PasswordComplexityConfig(6, false, false, false, false);
 }
