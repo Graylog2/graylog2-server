@@ -48,7 +48,7 @@ describe('<ContentPackSelection />', () => {
       .v('1')
       .type({ name: 'spaceship', version: '1' })
       .id('beef123')
-      .data({ title: { value: 'breq', type: 'string' } })
+      .data({ title: { '@value': 'breq', '@type': 'string' } })
       .build();
 
     const entities = { spaceship: [entity] };
