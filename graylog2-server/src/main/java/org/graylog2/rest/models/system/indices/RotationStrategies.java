@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class RotationStrategies {
     @JsonProperty

@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ProcessStats {
     @JsonProperty
     public abstract long pid();
@@ -62,7 +60,6 @@ public abstract class ProcessStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Cpu {
         @JsonProperty
         public abstract short percent();
@@ -87,7 +84,6 @@ public abstract class ProcessStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Memory {
         @JsonProperty
         public abstract long totalVirtual();

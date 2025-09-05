@@ -31,7 +31,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import okhttp3.HttpUrl;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dsvhttp.DSVParser;
 import org.graylog2.lookup.adapters.dsvhttp.HTTPFileRetriever;
 import org.graylog2.plugin.lookup.LookupCachePurge;
@@ -221,7 +220,6 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_DSVHTTPDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

@@ -19,7 +19,6 @@ package org.graylog2.system.stats.mongo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
@@ -28,7 +27,6 @@ import javax.annotation.Nullable;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class DatabaseStats {
     @JsonProperty
     public abstract String db();
@@ -93,7 +91,6 @@ public abstract class DatabaseStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
     public abstract static class ExtentFreeList {
         @JsonProperty
         public abstract int num();
@@ -109,7 +106,6 @@ public abstract class DatabaseStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
     public abstract static class DataFileVersion {
         @JsonProperty
         public abstract int major();

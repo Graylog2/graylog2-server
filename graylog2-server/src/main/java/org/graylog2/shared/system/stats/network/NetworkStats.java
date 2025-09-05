@@ -19,7 +19,6 @@ package org.graylog2.shared.system.stats.network;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -27,7 +26,6 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class NetworkStats {
     @JsonProperty
     @Nullable
@@ -48,7 +46,6 @@ public abstract class NetworkStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Interface {
         @JsonProperty
         public abstract String name();
@@ -77,7 +74,6 @@ public abstract class NetworkStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class InterfaceStats {
         @JsonProperty
         public abstract long rxPackets();
@@ -140,7 +136,6 @@ public abstract class NetworkStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class TcpStats {
         @JsonProperty
         public abstract long activeOpens();

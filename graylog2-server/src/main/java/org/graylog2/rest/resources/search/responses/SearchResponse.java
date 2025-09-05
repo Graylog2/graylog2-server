@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.search.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.joda.time.DateTime;
@@ -30,7 +29,6 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SearchResponse {
     @JsonProperty
     public abstract String query();
@@ -79,30 +77,40 @@ public abstract class SearchResponse {
                                         DateTime from,
                                         DateTime to) {
         return builder()
-            .query(query)
-            .builtQuery(builtQuery)
-            .usedIndices(usedIndices)
-            .messages(messages)
-            .fields(fields)
-            .time(time)
-            .totalResults(totalResults)
-            .from(from)
-            .to(to)
-            .build();
+                .query(query)
+                .builtQuery(builtQuery)
+                .usedIndices(usedIndices)
+                .messages(messages)
+                .fields(fields)
+                .time(time)
+                .totalResults(totalResults)
+                .from(from)
+                .to(to)
+                .build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder query(String query);
+
         public abstract Builder builtQuery(String builtQuery);
+
         public abstract Builder usedIndices(Set<IndexRangeSummary> usedIndices);
+
         public abstract Builder messages(List<ResultMessageSummary> messages);
+
         public abstract Builder fields(Set<String> fields);
+
         public abstract Builder time(long time);
+
         public abstract Builder totalResults(long totalResults);
+
         public abstract Builder from(DateTime from);
+
         public abstract Builder to(DateTime to);
+
         public abstract Builder decorationStats(SearchDecorationStats searchDecorationStats);
+
         public abstract SearchResponse build();
     }
 }

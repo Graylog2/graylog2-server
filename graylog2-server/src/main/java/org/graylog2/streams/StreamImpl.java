@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.indexer.IndexSet;
@@ -47,7 +46,6 @@ import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamImpl.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)

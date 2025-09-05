@@ -24,7 +24,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -79,7 +78,6 @@ public class V20190805115800_RemoveDashboardStateFromViews extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("modified_views_count")
         public abstract long modifiedViewsCount();

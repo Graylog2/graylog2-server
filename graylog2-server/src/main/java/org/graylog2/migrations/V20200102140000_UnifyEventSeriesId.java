@@ -23,7 +23,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -127,7 +126,6 @@ public class V20200102140000_UnifyEventSeriesId extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonCreator
         public static MigrationCompleted create() {

@@ -18,7 +18,6 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@WithBeanGetter
 public abstract class ViewState {
     private static final String FIELD_SELECTED_FIELDS = "selected_fields";
     private static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";
@@ -64,9 +62,9 @@ public abstract class ViewState {
     }
 
     public static ViewState create(Titles titles,
-                            Set<ViewWidget> widgets,
-                            Map<String, Set<String>> widgetMapping,
-                            Map<String, ViewWidgetPosition> widgetPositions) {
+                                   Set<ViewWidget> widgets,
+                                   Map<String, Set<String>> widgetMapping,
+                                   Map<String, ViewWidgetPosition> widgetPositions) {
         return new AutoValue_ViewState(titles, widgets, widgetMapping, widgetPositions);
     }
 }

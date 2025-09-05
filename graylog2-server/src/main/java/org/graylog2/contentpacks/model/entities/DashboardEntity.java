@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class DashboardEntity {
     @JsonProperty("title")

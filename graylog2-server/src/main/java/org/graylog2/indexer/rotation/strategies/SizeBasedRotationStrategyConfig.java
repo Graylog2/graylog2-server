@@ -22,12 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.Min;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SizeBasedRotationStrategyConfig implements RotationStrategyConfig {
     private static final long DEFAULT_MAX_SIZE = Size.gigabytes(1L).toBytes();
 

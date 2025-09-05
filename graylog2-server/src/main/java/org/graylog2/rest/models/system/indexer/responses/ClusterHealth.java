@@ -20,11 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ClusterHealth {
     @JsonProperty
     public abstract String status();
@@ -40,7 +38,6 @@ public abstract class ClusterHealth {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class ShardStatus {
         @JsonProperty
         public abstract int active();

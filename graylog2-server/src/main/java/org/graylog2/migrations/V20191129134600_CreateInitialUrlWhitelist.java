@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -169,7 +168,6 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("created_whitelist")
         public abstract String createdWhitelist();

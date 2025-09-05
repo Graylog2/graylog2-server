@@ -25,7 +25,6 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -216,7 +215,6 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("viewIds")
         public abstract List<String> viewIds();

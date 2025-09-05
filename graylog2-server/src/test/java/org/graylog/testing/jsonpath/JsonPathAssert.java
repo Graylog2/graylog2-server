@@ -30,11 +30,13 @@ import org.assertj.core.api.BigDecimalAssert;
 import org.assertj.core.api.BooleanAssert;
 import org.assertj.core.api.IntegerAssert;
 import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.StringAssert;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Assertions for {@link DocumentContext}.
@@ -81,11 +83,26 @@ public class JsonPathAssert extends AbstractAssert<JsonPathAssert, DocumentConte
      *
      * @param path JsonPath to extract the array
      * @param type The type to cast the content of the array, i.e.: {@link String}, {@link Integer}
-     * @param <T> The generic type of the type field
+     * @param <T>  The generic type of the type field
      * @return an instance of {@link ListAssert}
      */
     public <T> AbstractListAssert<?, ? extends List<? extends T>, T, ? extends AbstractAssert<?, T>> jsonPathAsListOf(String path, Class<T> type) {
         return Assertions.assertThat(actual.read(path, new TypeRef<List<T>>() {
+        }));
+    }
+
+    /**
+     * Extracts a JSON object using a JsonPath expression and wrap it in a {@link MapAssert}. This method requires
+     * the JsonPath to be <a href="https://github.com/jayway/JsonPath#jsonprovider-spi">configured with Jackson or
+     * Gson</a>.
+     *
+     * @param path JsonPath to extract the object
+     * @param <K>  The type of the map keys
+     * @param <V>  The type of the map values
+     * @return an instance of {@link MapAssert}
+     */
+    public <K, V> MapAssert<K, V> jsonPathAsMap(String path) {
+        return Assertions.assertThat(actual.read(path, new TypeRef<Map<K, V>>() {
         }));
     }
 

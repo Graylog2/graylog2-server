@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
@@ -33,7 +32,6 @@ import jakarta.validation.constraints.NotNull;
 
 @AutoValue
 @JsonAutoDetect
-@WithBeanGetter
 @JsonDeserialize(builder = AutoValue_CacheApi.Builder.class)
 public abstract class CacheApi implements ScopedResponse {
 
