@@ -108,11 +108,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         try {
             var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
-
-            // ensure that all containers and networks will be removed after all tests finish
-            // We can't close the resources in an afterAll callback, as the instances are cached and reused
-            // so we need a solution that will be triggered only once after all test classes
-            Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         } catch (Exception ex) {
             // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
             LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
