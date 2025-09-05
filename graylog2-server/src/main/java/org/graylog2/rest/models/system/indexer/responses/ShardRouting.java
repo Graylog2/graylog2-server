@@ -19,13 +19,11 @@ package org.graylog2.rest.models.system.indexer.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
-@JsonDeserialize(builder = ShardRouting.Builder.class)
 @AutoValue
 public abstract class ShardRouting {
     @JsonProperty("id")
