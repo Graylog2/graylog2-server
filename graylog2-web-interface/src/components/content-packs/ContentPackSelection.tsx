@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
+import { ExpandableList, Icon, SearchForm, ExpandableCheckboxListItem } from 'components/common';
 import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
@@ -34,7 +35,6 @@ const HeaderText = styled.span`
 
 const HeaderIcon = styled(Icon)(
   ({ theme }) => `
-  padding-top: ${theme.spacings.xxs};
   padding-right: ${theme.spacings.xxs};
 `,
 );
@@ -52,6 +52,98 @@ const _entityItemHeader = (entity) => {
     <>
       <HeaderIcon name="dns" /> <HeaderText>{entity.title}</HeaderText>
     </>
+  );
+};
+
+const List = ({
+  isFiltered,
+  entities,
+  selectedEntities,
+  isGroupSelected,
+  updateSelectionGroup,
+  updateSelectionEntity,
+}: {
+  isFiltered: boolean;
+  entities: { [key: string]: Array<{ title: string }> };
+  selectedEntities: { [key: string]: Array<{ id: string }> };
+  isGroupSelected: (group: unknown) => boolean;
+  updateSelectionGroup: (group: unknown) => void;
+  updateSelectionEntity: (entity: unknown) => void;
+}) => {
+  const [expandedSections, setExpandedSections] = React.useState<Array<string>>(
+    isFiltered ? Object.keys(entities) : [],
+  );
+
+  useEffect(() => {
+    setExpandedSections(isFiltered ? Object.keys(entities) : []);
+  }, [isFiltered, entities]);
+
+  const isSelected = (entity) => {
+    const typeName = entity.type.name;
+
+    if (!selectedEntities[typeName]) {
+      return false;
+    }
+
+    return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
+  };
+
+  const _isUndetermined = (type) => {
+    if (!selectedEntities[type]) {
+      return false;
+    }
+
+    return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
+  };
+
+  const toDisplayTitle = (title) => {
+    const newTitle = title.split('_').join(' ');
+
+    return newTitle[0].toUpperCase() + newTitle.substr(1);
+  };
+
+  return (
+    <ExpandableList
+      value={expandedSections}
+      onChange={(newExpandedSections) => setExpandedSections(newExpandedSections)}>
+      {Object.keys(entities)
+        .sort((a, b) => naturalSort(a, b))
+        .map((entityType) => {
+          const group = entities[entityType];
+
+          if (group.length <= 0) {
+            return null;
+          }
+
+          return (
+            <ExpandableCheckboxListItem
+              key={entityType}
+              value={entityType}
+              onChange={() => updateSelectionGroup(entityType)}
+              indeterminate={_isUndetermined(entityType)}
+              checked={isGroupSelected(entityType)}
+              header={toDisplayTitle(entityType)}>
+              {group
+                .sort((a, b) => naturalSort(a.title, b.title))
+                .map((entity) => {
+                  const checked = isSelected(entity);
+                  const header = _entityItemHeader(entity);
+
+                  return (
+                    <Input
+                      key={entity.id}
+                      type="checkbox"
+                      formGroupClassName="form-group no-bm"
+                      label={header}
+                      checked={checked}
+                      onChange={() => updateSelectionEntity(entity)}
+                    />
+                  );
+                })}
+            </ExpandableCheckboxListItem>
+          );
+        })}
+    </ExpandableList>
   );
 };
 
@@ -75,12 +167,6 @@ class ContentPackSelection extends React.Component<
     entities: {},
     selectedEntities: {},
   };
-
-  static _toDisplayTitle(title) {
-    const newTitle = title.split('_').join(' ');
-
-    return newTitle[0].toUpperCase() + newTitle.substr(1);
-  }
 
   constructor(props) {
     super(props);
@@ -189,7 +275,7 @@ class ContentPackSelection extends React.Component<
     onStateChange({ selectedEntities: newSelection });
   };
 
-  _updateSelectionGroup = (type) => {
+  _updateSelectionGroup = (type: string) => {
     const { selectedEntities, entities, onStateChange } = this.props;
     const { isFiltered, filteredEntities } = this.state;
 
@@ -210,27 +296,6 @@ class ContentPackSelection extends React.Component<
     this._handleTouched('selection');
     this._validate(newSelection);
     onStateChange({ selectedEntities: newSelection });
-  };
-
-  _isUndetermined = (type) => {
-    const { selectedEntities, entities } = this.props;
-
-    if (!selectedEntities[type]) {
-      return false;
-    }
-
-    return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
-  };
-
-  _isSelected = (entity) => {
-    const { selectedEntities } = this.props;
-    const typeName = entity.type.name;
-
-    if (!selectedEntities[typeName]) {
-      return false;
-    }
-
-    return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
   };
 
   _isGroupSelected = (type) => {
@@ -278,48 +343,7 @@ class ContentPackSelection extends React.Component<
 
   render() {
     const { filteredEntities = {}, errors, touched, isFiltered, contentPack } = this.state;
-    const { edit } = this.props;
-
-    const entitiesComponent = Object.keys(filteredEntities)
-      .sort((a, b) => naturalSort(a, b))
-      .map((entityType) => {
-        const group = filteredEntities[entityType];
-        const entities = group
-          .sort((a, b) => naturalSort(a.title, b.title))
-          .map((entity) => {
-            const checked = this._isSelected(entity);
-            const header = _entityItemHeader(entity);
-
-            return (
-              <ExpandableListItem
-                onChange={() => this._updateSelectionEntity(entity)}
-                key={entity.id}
-                checked={checked}
-                expandable={false}
-                padded={false}
-                header={header}
-              />
-            );
-          });
-
-        if (group.length <= 0) {
-          return null;
-        }
-
-        return (
-          <ExpandableListItem
-            key={entityType}
-            onChange={() => this._updateSelectionGroup(entityType)}
-            indetermined={this._isUndetermined(entityType)}
-            checked={this._isGroupSelected(entityType)}
-            stayExpanded={isFiltered}
-            expanded={isFiltered}
-            padded={false}
-            header={ContentPackSelection._toDisplayTitle(entityType)}>
-            <ExpandableList>{entities}</ExpandableList>
-          </ExpandableListItem>
-        );
-      });
+    const { edit, selectedEntities } = this.props;
 
     return (
       <div>
@@ -420,7 +444,14 @@ class ContentPackSelection extends React.Component<
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
             {touched.selection && errors.selection && <InputDescription error={errors.selection} />}
-            <ExpandableList>{entitiesComponent}</ExpandableList>
+            <List
+              entities={filteredEntities}
+              selectedEntities={selectedEntities}
+              isFiltered={isFiltered}
+              isGroupSelected={this._isGroupSelected}
+              updateSelectionEntity={this._updateSelectionEntity}
+              updateSelectionGroup={this._updateSelectionGroup}
+            />
           </Col>
         </Row>
       </div>
