@@ -43,6 +43,7 @@ public class ElasticsearchConfigurationTest {
         assertEquals(0, configuration.getReplicas());
         assertFalse(configuration.isDisableIndexOptimization());
         assertEquals(1, configuration.getIndexOptimizationMaxNumSegments());
+        assertEquals(Duration.seconds(5), configuration.getIndexFieldTypeRefreshInterval());
         assertEquals(Duration.minutes(5), configuration.getIndexFieldTypePeriodicalFullRefreshInterval());
         assertEquals("delete", configuration.getRetentionStrategy());
         assertEquals("time-size-optimizing", configuration.getRotationStrategy());

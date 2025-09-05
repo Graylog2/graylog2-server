@@ -87,8 +87,6 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
         value={stateConfig.expire_after_access}
         unit={stateConfig.expire_after_access_unit || 'SECONDS'}
         defaultEnabled={config.expire_after_access > 0}
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
       />
       <TimeUnitInput
         label="Expire after write"
@@ -99,8 +97,6 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
         value={stateConfig.expire_after_write}
         unit={stateConfig.expire_after_write_unit || 'SECONDS'}
         defaultEnabled={config.expire_after_write > 0}
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
       />
       <Input
         type="checkbox"
@@ -122,8 +118,6 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
         unit={stateConfig.ttl_empty_unit || 'SECONDS'}
         enabled={!stateConfig.ignore_null}
         hideCheckbox
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
       />
     </fieldset>
   );
