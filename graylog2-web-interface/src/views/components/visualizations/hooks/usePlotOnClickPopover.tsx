@@ -290,7 +290,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
     .filter((candidate) => !!candidate);
   const best = minBy(lineCandidates, 'd');
   // we need unique pt because in this case one pt can have several related lines
-  const rPts = uniqBy(
+  const pointsInRadius = uniqBy(
     lineCandidates
       .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
       .sort((a, b) => a.d - b.d)
@@ -307,7 +307,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
     y: clamp01((valuePy - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', rel, el, pt, pointsInRadius: rPts };
+  return { kind: 'element', rel, el, pt, pointsInRadius };
 };
 
 type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap';
