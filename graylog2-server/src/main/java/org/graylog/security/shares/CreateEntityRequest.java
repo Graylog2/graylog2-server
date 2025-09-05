@@ -19,27 +19,55 @@ package org.graylog.security.shares;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 
-import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 
-@AutoValue
 @JsonAutoDetect
-public abstract class CreateEntityRequest<T> {
-    // Avoids error: "HV000131: A method return value must not be marked for cascaded validation more than once in a class hierarchy"
-    @AutoValue.CopyAnnotations(exclude = Valid.class)
+public class CreateEntityRequest<T> {
+    @Valid
+    private final T entity;
+    @Nullable
+    private final EntityShareRequest shareRequest;
+
+    private CreateEntityRequest(T entity, @Nullable EntityShareRequest shareRequest) {
+        this.entity = entity;
+        this.shareRequest = shareRequest;
+    }
+
     @Valid
     @JsonProperty("entity")
-    public abstract T entity();
+    public T entity() {
+        return entity;
+    }
 
     @JsonProperty("share_request")
-    public abstract Optional<EntityShareRequest> shareRequest();
+    public Optional<EntityShareRequest> shareRequest() {
+        return Optional.ofNullable(shareRequest);
+    }
 
     @JsonCreator
     public static <T> CreateEntityRequest<T> create(@JsonProperty("entity") T entity,
                                                     @JsonProperty("share_request") @Nullable EntityShareRequest shareRequest) {
-        return new AutoValue_CreateEntityRequest<>(entity, Optional.ofNullable(shareRequest));
+        return new CreateEntityRequest<>(entity, shareRequest);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        final CreateEntityRequest<?> that = (CreateEntityRequest<?>) o;
+        return Objects.equals(entity, that.entity) && Objects.equals(shareRequest, that.shareRequest);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entity, shareRequest);
+    }
+
+    @Override
+    public String toString() {
+        return "CreateEntityRequest{entity=" + entity + ", shareRequest=" + shareRequest + '}';
     }
 }
