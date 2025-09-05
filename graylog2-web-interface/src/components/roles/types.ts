@@ -29,7 +29,11 @@ interface UserTeamsAssignmentProps {
   readOnly?: boolean;
 }
 
-interface TeamsPlugin {
+type UserFromTeam = { id: string; username: string };
+type TeamUsersPerRole = { [roleId: string]: Array<UserFromTeam> };
+
+export interface TeamsPlugin {
+  useTeamMembersByRole?: () => { isLoading: boolean; users: TeamUsersPerRole };
   RoleTeamsAssignment?: React.ComponentType<RoleTeamsAssignmentProps>;
   UserTeamsAssignment?: React.ComponentType<UserTeamsAssignmentProps>;
 }
