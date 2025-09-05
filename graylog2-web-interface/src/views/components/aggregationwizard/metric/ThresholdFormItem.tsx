@@ -93,6 +93,7 @@ const ThresholdFormItem = ({ metricIndex, remove, thresholdIndex }: Props) => {
           id="thresholdValue"
           label="Value"
           bsSize="small"
+          type="number"
           placeholder="Specify threshold value"
           name={`metrics.${metricIndex}.thresholds.${thresholdIndex}.value`}
           labelClassName="col-sm-3"
