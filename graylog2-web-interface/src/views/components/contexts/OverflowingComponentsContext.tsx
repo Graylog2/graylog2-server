@@ -21,7 +21,7 @@ import type { ActionComponents } from 'views/components/actions/ActionHandler';
 
 export type OverflowingComponentsContextType = {
   overflowingComponents: ActionComponents;
-  setOverflowingComponents: React.Dispatch<React.SetStateAction<ActionComponents>>;
+  setOverflowingComponents: (newComponents: ActionComponents) => void;
 };
 
 const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
