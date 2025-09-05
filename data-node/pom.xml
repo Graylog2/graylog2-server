@@ -627,6 +627,23 @@
                             </sha512>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-repository-hdfs-plugin</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.version}/repository-hdfs-${opensearch.version}.zip
+                            </url>
+                            <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                b1d961d168bd2a36d31a22b85478b1024650fe464fe7ed642b7fd5f30bc2bdf686f6ec6b53cac93e18f13a4621b22bd121f1ebf06a9975e524f34524e059d955
+                            </sha512>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -725,6 +742,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -740,6 +758,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
