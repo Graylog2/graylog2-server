@@ -27,6 +27,7 @@ import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.storage.SearchVersion;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -41,7 +42,11 @@ import java.util.stream.Collectors;
 
 import static org.graylog.testing.graylognode.NodeContainerConfig.flagFromEnvVar;
 
-public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
+/**
+ * This backend implements {@link ExtensionContext.Store.CloseableResource} because then we can rely on junit's extension
+ * stores to clean it up automatically without relying on VM shutdown hooks.
+ */
+public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable, ExtensionContext.Store.CloseableResource {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
     public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
     public static final String ROOT_PASSWORD_PLAINTEXT = "admin";

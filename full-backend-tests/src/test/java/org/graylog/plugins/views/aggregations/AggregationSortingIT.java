@@ -47,16 +47,13 @@ public class AggregationSortingIT {
     private static final String numericField = "numeric_field";
     private static final String nonNumericField = "non_numeric_field";
 
-    private final GraylogApis api;
-    private PortBoundGelfInputApi gelfInput;
-
-    public AggregationSortingIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
+    private static PortBoundGelfInputApi gelfInput;
 
     @BeforeAll
-    void setUp() {
-        this.gelfInput = api.gelf().createGelfHttpInput();
+    static void setUp(GraylogApis api) {
+        AggregationSortingIT.api = api;
+        gelfInput = api.gelf().createGelfHttpInput();
     }
 
     @ContainerMatrixTest

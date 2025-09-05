@@ -24,9 +24,7 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -41,21 +39,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
+public class GraylogBackendExtension implements BeforeAllCallback, ParameterResolver {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
 
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
+    private static final Set<Class<?>> SUPPORTED_TYPES = ImmutableSet.of(SearchServerInstance.class, GraylogApis.class);
     public static final String VM_LIFECYCLE_BACKEND_KEY = "vm_lifecycle_backend";
     public static final String CLASS_LIFECYCLE_BACKEND_KEY = "class_lifecycle_backend";
     public static final String BACKEND_LIFECYCLE_KEY = "backend_lifecycle";
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(SearchServerInstance.class, GraylogApis.class);
-
-        if (supportedTypes.contains(parameterContext.getParameter().getType())) {
+        if (SUPPORTED_TYPES.contains(parameterContext.getParameter().getType())) {
             if (parameterContext.getDeclaringExecutable() instanceof Constructor) {
                 LOG.error("Do not use constructor injection for SearchServerInstance or GraylogApis, instead use static lifecycle methods");
                 throw new ParameterResolutionException("SearchServerInstance or GraylogApis must not use constructor injection");
@@ -67,7 +65,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        Class<?> paramType = parameterContext.getParameter().getType();
+        final var paramType = parameterContext.getParameter().getType();
         final var store = extensionContext.getStore(NAMESPACE);
         final var rootStore = extensionContext.getRoot().getStore(NAMESPACE);
         final var lifecycle = store.get(BACKEND_LIFECYCLE_KEY, Lifecycle.class);
@@ -79,16 +77,13 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
             case VM -> rootStore.get(VM_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
             case CLASS -> store.get(CLASS_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
         };
+        if (backend == null) {
+            throw new ParameterResolutionException("Unable to find backend in lifecycle " + lifecycle.name() + " store");
+        }
         if (paramType.equals(SearchServerInstance.class)) {
-            if (backend != null) {
-                return backend.searchServerInstance();
-            }
-            throw new ParameterResolutionException("No Containerized Graylog backend found, cannot return search server instance");
+            return backend.searchServerInstance();
         } else if (paramType.equals(GraylogApis.class)) {
-            if (backend != null) {
-                return new GraylogApis(backend);
-            }
-            throw new ParameterResolutionException("No Containerized Graylog backend found, cannot return graylog apis instance");
+            return new GraylogApis(backend);
         }
         throw new RuntimeException("Unsupported parameter type: " + paramType);
     }
@@ -113,6 +108,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
         // we should push all of them out of the annotation and into the test lifecycle
 
         // check if we have to create the VM lifecycle backend
+        // note that ContainerizedGraylogBackend implements CloseableResource so junit will properly close the instances
+        // as their contexts go out of scope.
         if (config.serverLifecycle() == Lifecycle.VM && rootStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
             // this backend will be re-used and only shut down at the very end
             LOG.info("Creating VM-lifecycle backend");
@@ -158,20 +155,5 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
                 configParams,
                 datanodePluginJarsProvider
         );
-    }
-
-    @Override
-    public void afterAll(ExtensionContext context) throws Exception {
-        final Class<?> testClass = context
-                .getTestClass()
-                .orElseThrow(() -> new ExtensionConfigurationException("GraylogBackendExtension only supports classes"));
-
-        // remove the backend from the local store and close it. this way any subsequent use will fail early
-        // and the backend won't be in a usable state anyway
-        final ContainerizedGraylogBackend backend = context.getStore(NAMESPACE).remove(CLASS_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
-        if (backend != null) {
-            LOG.info("Closing backend for: {}", testClass.getName());
-            backend.close();
-        }
     }
 }
