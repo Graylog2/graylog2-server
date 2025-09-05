@@ -55,15 +55,16 @@ public abstract class ShardRouting {
     @Nullable
     public abstract String relocatingTo();
 
-    public static ShardRouting create(int id,
-                                      String state,
-                                      boolean active,
-                                      boolean primary,
-                                      String nodeId,
-                                      @Nullable String nodeName,
-                                      @Nullable String nodeHostname,
-                                      @Nullable String relocatingTo) {
-        return Builder.create()
+    @JsonCreator
+    public static ShardRouting create(@JsonProperty("id") int id,
+                                      @JsonProperty("state") String state,
+                                      @JsonProperty("active") boolean active,
+                                      @JsonProperty("primary") boolean primary,
+                                      @JsonProperty("node_id") String nodeId,
+                                      @JsonProperty("node_name") @Nullable String nodeName,
+                                      @JsonProperty("node_hostname") @Nullable String nodeHostname,
+                                      @JsonProperty("relocating_to") @Nullable String relocatingTo) {
+        return builder()
                 .id(id)
                 .state(state)
                 .active(active)
@@ -76,7 +77,7 @@ public abstract class ShardRouting {
     }
 
     public static Builder builder() {
-        return Builder.create();
+        return new AutoValue_ShardRouting.Builder();
     }
 
     public ShardRouting withNodeDetails(String nodeName, String nodeHostname) {
@@ -90,34 +91,21 @@ public abstract class ShardRouting {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonCreator
-        public static Builder create() {
-            return new AutoValue_ShardRouting.Builder();
-        }
-
-        @JsonProperty("id")
         public abstract Builder id(int id);
 
-        @JsonProperty("state")
         public abstract Builder state(String state);
 
-        @JsonProperty("active")
         public abstract Builder active(boolean active);
 
-        @JsonProperty("primary")
         public abstract Builder primary(boolean primary);
 
-        @JsonProperty("node_id")
         public abstract Builder nodeId(String nodeId);
 
-        @JsonProperty("node_name")
-        public abstract Builder nodeName(@Nullable String nodeName);
+        public abstract Builder nodeName(String nodeName);
 
-        @JsonProperty("node_hostname")
-        public abstract Builder nodeHostname(@Nullable String nodeHostname);
+        public abstract Builder nodeHostname(String nodeHostname);
 
-        @JsonProperty("relocating_to")
-        public abstract Builder relocatingTo(@Nullable String relocatingTo);
+        public abstract Builder relocatingTo(String relocatingTo);
 
         abstract ShardRouting build();
     }

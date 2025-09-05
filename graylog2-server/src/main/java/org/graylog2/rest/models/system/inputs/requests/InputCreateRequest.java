@@ -19,7 +19,6 @@ package org.graylog2.rest.models.system.inputs.requests;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.inputs.WithInputConfiguration;
 
@@ -27,7 +26,6 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
-@JsonDeserialize(builder = InputCreateRequest.Builder.class)
 @AutoValue
 public abstract class InputCreateRequest implements WithInputConfiguration<InputCreateRequest> {
     @JsonProperty
@@ -56,14 +54,15 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
     }
 
     public static Builder builder() {
-        return Builder.create();
+        return new AutoValue_InputCreateRequest.Builder();
     }
 
-    public static InputCreateRequest create(String title,
-                                            String type,
-                                            boolean global,
-                                            Map<String, Object> configuration,
-                                            @Nullable String node) {
+    @JsonCreator
+    public static InputCreateRequest create(@JsonProperty("title") String title,
+                                            @JsonProperty("type") String type,
+                                            @JsonProperty("global") boolean global,
+                                            @JsonProperty("configuration") Map<String, Object> configuration,
+                                            @JsonProperty("node") String node) {
         return builder()
                 .title(title)
                 .type(type)
@@ -75,11 +74,6 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonCreator
-        public static Builder create() {
-            return new AutoValue_InputCreateRequest.Builder();
-        }
-
         @JsonProperty("title")
         public abstract Builder title(String title);
 
