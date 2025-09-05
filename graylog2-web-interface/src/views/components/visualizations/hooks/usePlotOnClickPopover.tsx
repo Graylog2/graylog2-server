@@ -51,17 +51,14 @@ const getBarElement = (
 
 const listSubplotOrder = (gd: HTMLElement): string[] => {
   const subplots = gd.querySelectorAll<SVGGElement>('.cartesianlayer g.subplot');
-  const out: string[] = [];
 
-  subplots.forEach((node) => {
+  return Array.from(subplots).map((node) => {
     // Each subplot node has classes like "subplot xy" or "subplot x2y3"
     // We want the specific id class (not the generic "subplot")
     const idClass = Array.from(node.classList).find((cls) => cls !== 'subplot');
-    if (idClass) out.push(idClass);
-    else out.push(''); // fallback to empty string if somehow missing
-  });
 
-  return out;
+    return idClass ?? '';
+  });
 };
 
 const createBarElementGetter = (gd: PlotlyHTMLElement & { _fullData: Array<any> }) => {
