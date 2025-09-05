@@ -14,6 +14,17 @@ The following environment variables can be set to configure local execution:
 - GRAYLOG_TEST_WITH_RUNNING_ES_AND_MONGODB
     `true`|`false` if you want to start the test against your current dev instance of graylog&mongodb&elasticsearch. 
 
+# Properties
+
+To control which versions of the search and mongodb containers are used the following JVM system properties are available:
+ - `test.integration.searchversion`
+
+  Its value corresponds to the values of the `org.graylog.testing.containermatrix.SearchServer` enum. The default is `DATANODE_DEV`.
+
+ - `test.integration.mongodbversion`
+
+  Its value corresponds to the values of the `org.graylog.testing.containermatrix.MongodbServer` enum. The default is `MONGO5`.
+
 # Local Execution
 
 Running `mvn verify` locally should execute the tests in the same way as on a CI server. 

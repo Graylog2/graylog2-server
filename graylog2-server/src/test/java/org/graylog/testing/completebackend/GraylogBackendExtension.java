@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -50,13 +51,18 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     public static final String VM_LIFECYCLE_BACKEND_KEY = "vm_lifecycle_backend";
     public static final String CLASS_LIFECYCLE_BACKEND_KEY = "class_lifecycle_backend";
     public static final String BACKEND_LIFECYCLE_KEY = "backend_lifecycle";
+    public static final String SEARCHVERSION_JVM_PROPERTY = "test.integration.searchversion";
+    public static final String MONGODBVERSION_JVM_PROPERTY = "test.integration.mongodbversion";
 
     @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public boolean supportsParameter(ParameterContext parameterContext,
+                                     ExtensionContext extensionContext) throws ParameterResolutionException {
         if (SUPPORTED_TYPES.contains(parameterContext.getParameter().getType())) {
             if (parameterContext.getDeclaringExecutable() instanceof Constructor) {
-                LOG.error("Do not use constructor injection for SearchServerInstance or GraylogApis, instead use static lifecycle methods");
-                throw new ParameterResolutionException("SearchServerInstance or GraylogApis must not use constructor injection");
+                LOG.error(
+                        "Do not use constructor injection for SearchServerInstance or GraylogApis, instead use static lifecycle methods");
+                throw new ParameterResolutionException(
+                        "SearchServerInstance or GraylogApis must not use constructor injection");
             }
             return true;
         }
@@ -64,7 +70,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     }
 
     @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public Object resolveParameter(ParameterContext parameterContext,
+                                   ExtensionContext extensionContext) throws ParameterResolutionException {
         final var paramType = parameterContext.getParameter().getType();
         final var store = extensionContext.getStore(NAMESPACE);
         final var rootStore = extensionContext.getRoot().getStore(NAMESPACE);
@@ -126,20 +133,22 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     }
 
     private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config) {
-        // TODO make overridable
-        SearchVersion searchVersion = SearchServer.DATANODE_DEV.getSearchVersion();
-        MongodbServer mongoVersion = MongodbServer.DEFAULT_VERSION;
+        final SearchVersion searchVersion = getSearchVersion();
+        final MongodbServer mongoVersion = getMongoVersion();
         // List<URL> mongoDBFixtures = config.getMongoDBFixtures();
         // List<String> enabledFeatureFlags = config.getEnabledFeatureFlags();
         PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
-        PluginJarsProvider datanodePluginJarsProvider = FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider()).create();
-        MavenProjectDirProvider mavenProjectDirProvider = FactoryUtils.instantiateFactory(config.mavenProjectDirProvider()).create();
+        PluginJarsProvider datanodePluginJarsProvider = FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider())
+                                                                    .create();
+        MavenProjectDirProvider mavenProjectDirProvider = FactoryUtils.instantiateFactory(config.mavenProjectDirProvider())
+                                                                      .create();
         boolean withEnabledMailServer = config.withMailServerEnabled();
         boolean withEnabledWebhookServer = config.withWebhookServerEnabled();
-        final Map<String, String> configParams = Arrays.stream(config.additionalConfigurationParameters()).collect(Collectors.toMap(
-                GraylogBackendConfiguration.ConfigurationParameter::key,
-                GraylogBackendConfiguration.ConfigurationParameter::value
-        ));
+        final Map<String, String> configParams = Arrays.stream(config.additionalConfigurationParameters())
+                                                       .collect(Collectors.toMap(
+                                                               GraylogBackendConfiguration.ConfigurationParameter::key,
+                                                               GraylogBackendConfiguration.ConfigurationParameter::value
+                                                       ));
 
         return ContainerizedGraylogBackend.createStarted(
                 new ContainerizedGraylogBackendServicesProvider(),
@@ -155,5 +164,35 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 configParams,
                 datanodePluginJarsProvider
         );
+    }
+
+    private static SearchVersion getSearchVersion() {
+        String searchVersionProperty = System.getProperty(SEARCHVERSION_JVM_PROPERTY);
+        if (searchVersionProperty != null) {
+            try {
+                return SearchServer.valueOf(searchVersionProperty.toUpperCase(Locale.ENGLISH)).getSearchVersion();
+            }  catch (IllegalArgumentException e) {
+                LOG.error("Invalid search version property: {}. Valid values are: {}",
+                          searchVersionProperty,
+                          Arrays.toString(SearchServer.values()));
+                throw e;
+            }
+        }
+        return SearchServer.DEFAULT_VERSION.getSearchVersion();
+    }
+
+    private static MongodbServer getMongoVersion() {
+        String mongodbVersionProperty = System.getProperty(MONGODBVERSION_JVM_PROPERTY);
+        if (mongodbVersionProperty != null) {
+            try {
+                return MongodbServer.valueOf(mongodbVersionProperty);
+            } catch (IllegalArgumentException e) {
+                LOG.error("Invalid mongodb version property: {}. Valid values are: {}",
+                          mongodbVersionProperty,
+                          Arrays.toString(MongodbServer.values()));
+                throw e;
+            }
+        }
+        return MongodbServer.DEFAULT_VERSION;
     }
 }
