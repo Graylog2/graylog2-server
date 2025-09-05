@@ -33,7 +33,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
-import org.graylog2.rest.models.users.requests.Startpage;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.security.AccessToken;
@@ -115,8 +115,6 @@ public class UsersResourceTest {
     private RoleService roleService;
     @Mock
     private MongoDBSessionService sessionService;
-    @Mock
-    private Startpage startPage;
     @Mock
     private Subject subject;
     @Mock
@@ -277,7 +275,7 @@ public class UsersResourceTest {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                 TIMEZONE, SESSION_TIMEOUT,
-                startPage, roles, false);
+                new DashboardStartPage("dashboard-id"), roles, false);
     }
 
     private Token createTokenAndPrepareMocks(Map<String, Object> owningUser, Map<String, Object> callingUser, boolean isAdmin) {
