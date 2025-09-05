@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import minBy from 'lodash/minBy';
 import { useFloating } from '@floating-ui/react';
@@ -349,17 +349,13 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     gdRef.current = gd;
   };
 
-  const applyAnchor = useCallback((a: ElementAnchor) => {
-    setAnchor(a);
-  }, []);
-
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
     const a = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
     if (!a) return;
-    applyAnchor(a);
+    setAnchor(a);
   };
 
   const onPopoverChange = (isOpen: boolean) => {
