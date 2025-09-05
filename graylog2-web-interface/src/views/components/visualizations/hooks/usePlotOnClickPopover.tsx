@@ -177,7 +177,7 @@ const pickNearestElementAnchor = (
     return { d, candidate };
   });
 
-  const rPts = candidatesWithDistances
+  const pointsInRadius = candidatesWithDistances
     .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
     .sort((a, b) => a.d - b.d)
     .map(({ candidate }) => candidate.pt);
@@ -190,7 +190,7 @@ const pickNearestElementAnchor = (
     y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { el, rel, pt, pointsInRadius: rPts };
+  return { el, rel, pt, pointsInRadius };
 };
 
 /** ---------- bar/pie anchors ---------- */
