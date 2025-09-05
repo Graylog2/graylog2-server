@@ -1,4 +1,4 @@
-Simple usage
+Simple usage. You can use `ExpandableCheckboxListItem` to have checkboxes in the list.
 
 ```tsx
 import { ExpandableListItem, ExpandableCheckboxListItem } from 'components/common';

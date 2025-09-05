@@ -4,6 +4,10 @@ import { useEffect, useRef } from 'react';
 import { ExpandableListItem } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 
+/*
+ * This component is useful, when you want to render the `ExpandableListItem` with a checkbox in the header.
+ * If the children of this component are also selectable but not expandable, use simple checkboxes instead of an implementing another expandable list.
+ */
 const Header = ({ checked, readOnly, onChange, children, indeterminate }) => {
   const checkboxRef = useRef<HTMLInputElement>();
 
