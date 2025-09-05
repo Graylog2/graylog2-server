@@ -43,10 +43,26 @@ describe('GenerateNextPosition', () => {
     );
   });
 
-  it('should add a new widget to the first row and column to other widgets', () => {
+  it('should add a new widget next to other widgets in last row', () => {
     const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
     const oldMessageList = Widget.builder().id('foo').type('MESSAGES').build();
     const oldWidgetPosition = WidgetPosition.builder().col(1).row(1).width(3).height(8).build();
+    const widgets = [newMessageList, oldMessageList];
+    const positions = Immutable.Map({ foo: oldWidgetPosition });
+    const newPositions = GenerateNextPosition(positions, widgets);
+
+    expect(newPositions).toEqual(
+      Immutable.Map({
+        'foo-1': WidgetPosition.builder().col(6).row(1).height(5).width(6).build(),
+        foo: oldWidgetPosition,
+      }),
+    );
+  });
+
+  it('should add a new widget in last row', () => {
+    const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
+    const oldMessageList = Widget.builder().id('foo').type('MESSAGES').build();
+    const oldWidgetPosition = WidgetPosition.builder().col(1).row(1).width(12).height(8).build();
     const widgets = [newMessageList, oldMessageList];
     const positions = Immutable.Map({ foo: oldWidgetPosition });
     const newPositions = GenerateNextPosition(positions, widgets);
