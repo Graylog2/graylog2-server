@@ -138,7 +138,8 @@
       "entity_id": {
         "$oid": "6890b706dc8217538b763006"
       },
-      "source": "ILLUMINATE"
+      "source": "ILLUMINATE",
+      "entity_type": "view"
     },
     {
       "_id": {
@@ -148,7 +149,8 @@
         "$oid": "6824a95255eb3731adc1e552"
       },
       "source": "USER_DEFINED",
-      "parent_id": "0a05ab4d-c0d0-4a4f-aab3-e0c300991c10"
+      "parent_id": "0a05ab4d-c0d0-4a4f-aab3-e0c300991c10",
+      "entity_type": "view"
     }
   ]
 }
