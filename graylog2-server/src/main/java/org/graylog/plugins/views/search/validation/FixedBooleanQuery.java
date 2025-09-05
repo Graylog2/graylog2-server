@@ -76,8 +76,8 @@ public class FixedBooleanQuery extends Query implements Iterable<BooleanClause> 
     @Override
     public void visit(QueryVisitor visitor) {
         delegate.clauses().forEach(c -> {
-            final QueryVisitor sub = visitor.getSubVisitor(c.getOccur(), delegate);
-            c.getQuery().visit(sub);
+            final QueryVisitor sub = visitor.getSubVisitor(c.occur(), delegate);
+            c.query().visit(sub);
         });
     }
 }
