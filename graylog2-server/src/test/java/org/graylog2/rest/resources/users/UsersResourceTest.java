@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
@@ -42,6 +43,7 @@ import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -368,22 +370,24 @@ public class UsersResourceTest {
         private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
         private final ClusterConfigService configService;
+        private final ObjectMapper objectMapper;
 
         public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
             this.permissions = permissions;
             this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
+            this.objectMapper = new ObjectMapperProvider().get();
         }
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, id, fields);
         }
 
         // Not used.
