@@ -533,7 +533,7 @@ public class IndexSetsResourceTest {
                 readOnlyIndexSetId,
                 "title",
                 "description",
-                false, true,
+                false, null,
                 "prefix",
                 1,
                 0,
