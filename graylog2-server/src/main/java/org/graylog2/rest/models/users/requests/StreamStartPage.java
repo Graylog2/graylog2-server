@@ -16,12 +16,14 @@
  */
 package org.graylog2.rest.models.users.requests;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+@JsonTypeName(StreamStartPage.TYPE)
+public record StreamStartPage(String id) implements Startpage {
+    public static final String TYPE = "stream";
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
-              include = JsonTypeInfo.As.PROPERTY,
-              property = "type")
-public interface Startpage {
-    String type();
+    @Override
+    public String type() {
+        return TYPE;
+    }
 }

@@ -369,7 +369,7 @@ public class UsersResource extends RestResource {
 
         final Startpage startpage = cr.startpage();
         if (startpage != null) {
-            user.setStartpage(startpage.type(), startpage.id());
+            user.setStartpage(startpage);
         }
 
         final String id = userManagementService.create(user, getCurrentUser());
@@ -463,7 +463,7 @@ public class UsersResource extends RestResource {
 
         final Startpage startpage = cr.startpage();
         if (startpage != null) {
-            user.setStartpage(startpage.type(), startpage.id());
+            user.setStartpage(startpage);
         }
 
         if (isPermitted("*")) {

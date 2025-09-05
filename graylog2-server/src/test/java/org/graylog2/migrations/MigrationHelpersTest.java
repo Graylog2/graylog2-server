@@ -31,6 +31,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
@@ -303,6 +304,6 @@ public class MigrationHelpersTest {
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(10);
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(), passwordAlgorithm);
 
-        return new UserImpl(passwordAlgorithmFactory, permissions, configService, ImmutableMap.of());
+        return new UserImpl(passwordAlgorithmFactory, permissions, configService, new ObjectMapperProvider().get(), ImmutableMap.of());
     }
 }

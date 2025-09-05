@@ -16,12 +16,14 @@
  */
 package org.graylog2.rest.models.users.requests;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+@JsonTypeName(DashboardStartPage.TYPE)
+public record DashboardStartPage(String id) implements Startpage {
+    public static final String TYPE = "dashboard";
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
-              include = JsonTypeInfo.As.PROPERTY,
-              property = "type")
-public interface Startpage {
-    String type();
+    @Override
+    public String type() {
+        return TYPE;
+    }
 }

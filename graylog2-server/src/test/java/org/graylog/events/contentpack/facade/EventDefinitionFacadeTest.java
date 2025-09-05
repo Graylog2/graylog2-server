@@ -274,7 +274,7 @@ public class EventDefinitionFacadeTest {
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
         final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
 

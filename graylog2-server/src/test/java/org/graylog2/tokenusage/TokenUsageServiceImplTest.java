@@ -16,6 +16,7 @@
  */
 package org.graylog2.tokenusage;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
@@ -33,6 +34,7 @@ import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -260,21 +262,23 @@ class TokenUsageServiceImplTest {
     public static class UserFactory implements UserImpl.Factory {
         private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
+        private final ObjectMapper objectMapper;
 
         public UserFactory(Permissions permissions) {
             this.permissions = permissions;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
+            this.objectMapper = new ObjectMapperProvider().get();
         }
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), objectMapper, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), objectMapper, id, fields);
         }
 
         // Not used.
