@@ -16,6 +16,8 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
@@ -71,7 +73,10 @@ class UserImplTest {
     private UserImpl createUserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                                     Permissions permissions,
                                     Map<String, Object> fields) {
-        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, new ObjectMapperProvider().get(), fields);
+        // Copy to avoid modifying the global instance
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get().copy();
+        objectMapper.registerSubtypes(new NamedType(DashboardStartPage.class, DashboardStartPage.TYPE));
+        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, objectMapper, fields);
     }
 
     @Test
