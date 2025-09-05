@@ -35,7 +35,7 @@ const StyledDrawer = styled(MantineDrawer)(
     }
 
     .mantine-Drawer-title {
-      max-width: 94%;
+      width: 94%;
     }
   `,
 );
@@ -45,6 +45,7 @@ const TitleWrapper = styled.div`
   align-items: center;
   flex: 1 1 auto;
   overflow: hidden;
+  width: 100%;
 `;
 
 const Title = styled.div(
@@ -53,6 +54,7 @@ const Title = styled.div(
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 100%;
   `,
 );
 type Props = Pick<
