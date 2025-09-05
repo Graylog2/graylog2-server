@@ -253,6 +253,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         entitySourceService.create(EntitySource.builder()
                 .entityId(dto.id())
                 .parentId(existingViewId)
+                .entityType(EntitySource.VIEW_TYPE)
                 .build()
         );
         return dto;

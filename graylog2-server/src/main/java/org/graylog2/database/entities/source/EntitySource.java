@@ -33,11 +33,15 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = EntitySource.Builder.class)
 public abstract class EntitySource implements MongoEntity {
+    // Source types
     public static final String USER_DEFINED = "USER_DEFINED";
+    // Entity types
+    public static final String VIEW_TYPE = "view";
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_SOURCE = "source";
     public static final String FIELD_ENTITY_ID = "entity_id";
+    public static final String FIELD_ENTITY_TYPE = "entity_type";
     public static final String FIELD_PARENT_ID = "parent_id";
 
     @Nullable
@@ -47,6 +51,11 @@ public abstract class EntitySource implements MongoEntity {
 
     @JsonProperty(FIELD_SOURCE)
     public abstract String source();
+
+    // Since entity source objects can represent multiple types of entities, we specify the type only to simplify any
+    // potential future migrations. Outside of that use case, this field should not be referenced in application logic.
+    @JsonProperty(FIELD_ENTITY_TYPE)
+    public abstract String entityType();
 
     @JsonProperty(FIELD_PARENT_ID)
     public abstract Optional<String> parentId();
@@ -81,6 +90,9 @@ public abstract class EntitySource implements MongoEntity {
 
         @JsonProperty(FIELD_SOURCE)
         public abstract Builder source(String source);
+
+        @JsonProperty(FIELD_ENTITY_TYPE)
+        public abstract Builder entityType(String entityType);
 
         @JsonProperty(FIELD_PARENT_ID)
         public abstract Builder parentId(@Nullable String parentId);

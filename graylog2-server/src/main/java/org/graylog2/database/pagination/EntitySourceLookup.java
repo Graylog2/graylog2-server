@@ -38,7 +38,8 @@ import static com.mongodb.client.model.Projections.include;
 public class EntitySourceLookup {
     private static final List<Bson> LOOKUP_PIPELINE = List.of(
             match(Filters.expr(new Document("$eq", List.of("$" + EntitySource.FIELD_ENTITY_ID, "$$vid")))),
-            project(Projections.fields(excludeId(), include(EntitySource.FIELD_SOURCE, EntitySource.FIELD_PARENT_ID))),
+            project(Projections.fields(excludeId(),
+                    include(EntitySource.FIELD_SOURCE, EntitySource.FIELD_PARENT_ID, EntitySource.FIELD_ENTITY_TYPE))),
             limit(1)
     );
 
