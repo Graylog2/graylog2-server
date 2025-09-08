@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
@@ -31,7 +30,6 @@ import java.util.List;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class StreamResponse {
     @JsonProperty("id")

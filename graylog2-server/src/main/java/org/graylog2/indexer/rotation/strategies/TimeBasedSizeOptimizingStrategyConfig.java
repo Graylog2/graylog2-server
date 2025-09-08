@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
@@ -32,7 +31,6 @@ import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = TimeBasedSizeOptimizingStrategyConfig.Builder.class)
 public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationStrategyConfig {
 

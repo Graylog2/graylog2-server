@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -99,7 +98,6 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("content_pack_id")
         public abstract String contentPackId();

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
@@ -45,7 +44,6 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamE
 
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
-@WithBeanGetter
 public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSearchFilters {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";

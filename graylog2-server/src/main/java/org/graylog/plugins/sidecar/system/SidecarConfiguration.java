@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.PluginConfigBean;
 import org.joda.time.Period;
 
@@ -30,7 +29,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SidecarConfiguration implements PluginConfigBean {
 
     private static final Period DEFAULT_EXPIRATION_PERIOD = Period.days(14);

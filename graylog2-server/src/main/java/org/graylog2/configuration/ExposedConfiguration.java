@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.joda.time.Period;
@@ -36,7 +35,6 @@ import java.nio.file.Path;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ExposedConfiguration {
     @JsonProperty("inputbuffer_processors")
     public abstract int inputBufferProcessors();

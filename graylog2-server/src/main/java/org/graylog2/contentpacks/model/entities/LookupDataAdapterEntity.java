@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class LookupDataAdapterEntity extends ScopedContentPackEntity {
     @JsonProperty("name")

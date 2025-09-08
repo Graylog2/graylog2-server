@@ -21,14 +21,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.joda.time.Duration;
 
 import java.nio.file.Path;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class KafkaJournalConfigurationSummary {
     private static final String FIELD_DIRECTORY = "directory";

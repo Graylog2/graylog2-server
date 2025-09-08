@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Map;
 
@@ -29,16 +28,19 @@ import java.util.Map;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class InputTypeInfo {
     @JsonProperty
     public abstract String type();
+
     @JsonProperty
     public abstract String name();
+
     @JsonProperty("is_exclusive")
     public abstract boolean isExclusive();
+
     @JsonProperty
     public abstract Map<String, Map<String, Object>> requestedConfiguration();
+
     @JsonProperty
     public abstract String linkToDocs();
 

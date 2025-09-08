@@ -19,7 +19,6 @@ package org.graylog2.system.stats.mongo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -29,7 +28,6 @@ import javax.annotation.Nullable;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ServerStatus {
     @JsonProperty
     public abstract String host();
@@ -85,7 +83,6 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Connections {
         @JsonProperty
         public abstract int current();
@@ -106,7 +103,6 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Network {
         @JsonProperty
         public abstract int bytesIn();
@@ -126,7 +122,6 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Memory {
         @JsonProperty
         public abstract int bits();
@@ -158,7 +153,6 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class StorageEngine {
         public static final StorageEngine DEFAULT = create("mmapv1");
 

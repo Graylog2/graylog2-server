@@ -20,11 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.DescriptorWithHumanName;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class ConfigurableTypeInfo {
     private static final String FIELD_TYPE = "type";
@@ -35,12 +33,16 @@ public abstract class ConfigurableTypeInfo {
 
     @JsonProperty(FIELD_TYPE)
     public abstract String type();
+
     @JsonProperty(FIELD_NAME)
     public abstract String name();
+
     @JsonProperty(FIELD_HUMAN_NAME)
     public abstract String humanName();
+
     @JsonProperty(FIELD_REQUESTED_CONFIGURATION)
     public abstract ConfigurationRequest requestedConfiguration();
+
     @JsonProperty(FIELD_LINK_TO_DOCS)
     public abstract String linkToDocs();
 

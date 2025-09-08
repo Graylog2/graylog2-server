@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Date;
@@ -30,7 +29,6 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class AlertConditionSummary {
     @JsonProperty("id")
