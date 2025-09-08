@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import last from 'lodash/last';
 import isInteger from 'lodash/isInteger';
 import moment from 'moment';
@@ -117,6 +117,8 @@ type Props = {
   unit?: string;
   units?: string[];
   unitName?: string;
+  labelClassName?: string;
+  wrapperClassName?: string;
 };
 
 const TimeUnitInput = ({
@@ -136,6 +138,8 @@ const TimeUnitInput = ({
   hideCheckbox = false,
   units = defaultUnits,
   unitName = null,
+  wrapperClassName = '',
+  labelClassName = '',
 }: Props) => {
   const [unitOptions, setUnitOptions] = useState<UnitOption[]>([]);
   const [checked, setChecked] = useState<boolean>(enabled ?? defaultEnabled);
@@ -167,22 +171,20 @@ const TimeUnitInput = ({
     propagateChange({ checked: e.target.checked });
   };
 
-  useEffect(() => {
-    const parseUnitOptions = () => {
-      setUnitOptions(
-        unitValues
-          .filter((option) => units.includes(option))
-          .map((option) => ({ value: option, label: option.toLowerCase() })),
-      );
-    };
-
-    parseUnitOptions();
+  const parseUnitOptions = useCallback(() => {
+    setUnitOptions(
+      unitValues
+        .filter((option) => units.includes(option))
+        .map((option) => ({ value: option, label: option.toLowerCase() })),
+    );
   }, [units]);
+
+  useEffect(() => parseUnitOptions(), [parseUnitOptions]);
 
   return (
     <FormGroup>
-      {label && <ControlLabel>{label}</ControlLabel>}
-      <InputWrapper>
+      {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
+      <InputWrapper className={wrapperClassName}>
         <StyledInputGroup>
           {!required && !hideCheckbox && !disabled && (
             <InputGroupAddon>
@@ -190,7 +192,7 @@ const TimeUnitInput = ({
             </InputGroupAddon>
           )}
           <FormControl
-            type="number"
+            type={typeof value === 'string' ? 'string' : 'number'}
             name={name}
             disabled={!getCheckedValue() || disabled}
             aria-label={label || 'Time unit input'}

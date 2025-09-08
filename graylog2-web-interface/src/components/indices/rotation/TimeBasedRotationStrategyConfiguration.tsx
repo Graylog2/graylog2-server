@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react';
+import moment from 'moment/moment';
 
-import { Input } from 'components/bootstrap';
 import type { IndexRotationConfigComponentProps } from 'components/indices/rotation/types';
-
-const _validationLimit = (durationInMilliseconds, rotationLimit) =>
-  durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
+import { Input } from 'components/bootstrap';
 
 type Config = {
   rotation_period: string;
@@ -29,139 +26,101 @@ type Config = {
   rotate_empty_index_set: boolean;
 };
 
-class TimeBasedRotationStrategyConfiguration extends React.Component<
-  IndexRotationConfigComponentProps<Config>,
-  {
-    [key: string]: any;
-  }
-> {
-  private inputs: {
-    rotation_period?: Input;
-    rotate_empty_index_set?: Input;
-  } = {};
+const TimeBasedRotationStrategyConfiguration: React.FC<IndexRotationConfigComponentProps<Config>> = ({
+  config,
+  updateConfig,
+  disabled = false,
+}) => {
+  const { max_rotation_period } = config;
 
-  constructor(props) {
-    super(props);
-    const {
-      config: {
-        rotation_period: rotationPeriod,
-        max_rotation_period: rotationLimit,
-        rotate_empty_index_set: rotateEmptyIndexSet,
-      },
-    } = this.props;
+  const [rotationPeriod, setRotationPeriod] = useState<string>(config.rotation_period);
+  const [rotateEmptyIndexSet, setRotateEmptyIndexSet] = useState<boolean>(config.rotate_empty_index_set);
 
-    this.state = {
-      rotation_period: rotationPeriod,
-      rotationLimit,
-      rotate_empty_index_set: rotateEmptyIndexSet,
-    };
-  }
+  const validationLimit = (durationInMilliseconds: number) =>
+    durationInMilliseconds <= moment.duration(max_rotation_period).asMilliseconds();
 
-  _onPeriodUpdate = (field) => {
-    const { updateConfig } = this.props;
-
-    return () => {
-      const update = {};
-      let period = this.inputs[field].getValue().toUpperCase();
-
-      if (!period.startsWith('P')) {
-        period = `P${period}`;
-      }
-
-      update[field] = period;
-
-      this.setState(update);
-
-      if (this._isValidPeriod(update[field])) {
-        // Only propagate state if the config is valid.
-        updateConfig({
-          rotation_period: period,
-          rotate_empty_index_set: this.state.rotate_empty_index_set,
-        });
-      }
-    };
-  };
-
-  _onRotateEmptyIndexSetUpdate = (field) => {
-    const { updateConfig } = this.props;
-
-    return () => {
-      const update = {};
-      const rotateEmptyIndexSet = this.inputs[field].getValue();
-
-      update[field] = rotateEmptyIndexSet;
-      this.setState(update);
-
-      updateConfig({
-        rotation_period: this.state.rotation_period,
-        rotate_empty_index_set: rotateEmptyIndexSet,
-      });
-    };
-  };
-
-  _isValidPeriod = (duration?) => {
-    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
+  const isValidPeriod = (duration?: string) => {
     const check = duration || rotationPeriod;
     const checkInMilliseconds = moment.duration(check).asMilliseconds();
 
-    return (
-      checkInMilliseconds >= 3600000 && (rotationLimit ? _validationLimit(checkInMilliseconds, rotationLimit) : true)
-    );
+    return checkInMilliseconds >= 3600000 && (max_rotation_period ? validationLimit(checkInMilliseconds) : true);
   };
 
-  _validationState = () => {
-    if (this._isValidPeriod()) {
+  const validationState = () => {
+    if (isValidPeriod()) {
       return undefined;
     }
 
     return 'error' as const;
   };
 
-  _formatDuration = () => {
-    const { rotation_period: rotationPeriod, rotationLimit } = this.state;
-    const maxRotationPeriodErrorMessage = rotationLimit ? ` and max ${moment.duration(rotationLimit).humanize()}` : '';
+  const formatDuration = () => {
+    const maxRotationPeriodErrorMessage = max_rotation_period
+      ? ` and max ${moment.duration(max_rotation_period).humanize()}`
+      : '';
 
-    return this._isValidPeriod()
+    return isValidPeriod()
       ? moment.duration(rotationPeriod).humanize()
       : `invalid (min 1 hour${maxRotationPeriodErrorMessage})`;
   };
 
-  render() {
-    const { rotation_period: rotationPeriod, rotate_empty_index_set: rotateEmptyIndexSet, rotationLimit } = this.state;
-    const maxRotationPeriodHelpText = rotationLimit
-      ? ` The max rotation period is set to ${moment.duration(rotationLimit).humanize()} by Administrator.`
-      : '';
+  const handlePeriodUpdate = (e) => {
+    let period = e.target.value.toUpperCase();
 
-    return (
-      <div>
-        <Input
-          id="rotation-period"
-          type="text"
-          ref={(rotationPeriodRef) => {
-            this.inputs.rotation_period = rotationPeriodRef;
-          }}
-          label="Rotation period (ISO8601 Duration)"
-          onChange={this._onPeriodUpdate('rotation_period')}
-          value={rotationPeriod}
-          help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${maxRotationPeriodHelpText}`}
-          addonAfter={this._formatDuration()}
-          bsStyle={this._validationState()}
-          required
-        />
-        <Input
-          id="rotate-empty-index-sets-checkbox"
-          type="checkbox"
-          ref={(rotateEmptyIndexSetRef) => {
-            this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef;
-          }}
-          label="Rotate empty index set"
-          onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
-          checked={rotateEmptyIndexSet}
-          help="Apply the rotation strategy even when the index set is empty (not recommended)."
-        />
-      </div>
-    );
-  }
-}
+    if (!period.startsWith('P')) period = `P${period}`;
+
+    setRotationPeriod(period);
+
+    if (isValidPeriod(period)) {
+      updateConfig({
+        ...config,
+        rotation_period: period,
+      });
+    }
+  };
+
+  const handleRotateEmptyIndexSetUpdate = (e) => {
+    setRotateEmptyIndexSet(e.target.checked);
+
+    updateConfig({
+      ...config,
+      rotate_empty_index_set: e.target.checked,
+    });
+  };
+
+  useEffect(() => {
+    console.log(config);
+  }, [config]);
+
+  return (
+    <div>
+      <Input
+        disabled={disabled}
+        id="rotation-period"
+        type="text"
+        label="Rotation period (ISO8601 Duration)"
+        value={rotationPeriod}
+        onChange={handlePeriodUpdate}
+        help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${
+          max_rotation_period
+            ? ` The max rotation period is set to ${moment.duration(max_rotation_period).humanize()} by Administrator.`
+            : ''
+        }`}
+        addonAfter={formatDuration()}
+        bsStyle={validationState()}
+        required
+      />
+      <Input
+        disabled={disabled}
+        id="rotate-empty-index-sets-checkbox"
+        type="checkbox"
+        label="Rotate empty index set"
+        onChange={handleRotateEmptyIndexSetUpdate}
+        checked={rotateEmptyIndexSet}
+        help="Apply the rotation strategy even when the index set is empty (not recommended)."
+      />
+    </div>
+  );
+};
 
 export default TimeBasedRotationStrategyConfiguration;

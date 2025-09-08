@@ -55,6 +55,7 @@ interface ConfigComponentProps extends SystemConfigurationComponentProps {
   jsonSchema: JsonSchema;
   updateConfig: (update: StrategyConfig) => void;
   useMaxNumberOfIndices?: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>];
+  disabled?: boolean;
 }
 
 type Props = {
@@ -160,6 +161,7 @@ const getConfigurationComponent = (
   config: StrategyConfig,
   onConfigUpdate: (update: StrategyConfig) => void,
   useMaxNumberOfIndices: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>],
+  disabled: boolean = false,
 ) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
@@ -179,6 +181,7 @@ const getConfigurationComponent = (
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
+    disabled: disabled,
   };
 
   if (selectedStrategy === ARCHIVE_RETENTION_STRATEGY) {
@@ -374,6 +377,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               rotationStrategy,
               _onIndexTimeSizeOptimizingUpdate,
               () => [maxNumberOfIndices, setMaxNumberOfIndices],
+              disabled,
             )}
           {shouldShowNormalRetentionForm &&
             getConfigurationComponent(
@@ -385,6 +389,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               config,
               _onConfigUpdate,
               () => [maxNumberOfIndices, setMaxNumberOfIndices],
+              disabled,
             )}
         </Col>
       </Row>

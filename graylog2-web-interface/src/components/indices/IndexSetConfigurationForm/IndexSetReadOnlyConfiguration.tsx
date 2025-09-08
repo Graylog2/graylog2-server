@@ -37,11 +37,11 @@ const _validateIndexPrefix = (value: string) => {
 const IndexSetReadOnlyConfiguration = ({
   hiddenFields,
   immutableFields,
-  hasFieldRestrictionPermission,
+  ignoreFieldRestrictions,
 }: {
   hiddenFields: string[];
   immutableFields: string[];
-  hasFieldRestrictionPermission: boolean;
+  ignoreFieldRestrictions: boolean;
 }) => {
   const indexPrefixHelp = (
     <span>
@@ -61,7 +61,7 @@ const IndexSetReadOnlyConfiguration = ({
         validate={_validateIndexPrefix}
         required
       />
-      {(!hiddenFields.includes('index_analyzer') || hasFieldRestrictionPermission) && (
+      {(!hiddenFields.includes('index_analyzer') || ignoreFieldRestrictions) && (
         <FormikInput
           type="text"
           id="index-analyzer"
@@ -69,7 +69,7 @@ const IndexSetReadOnlyConfiguration = ({
           name="index_analyzer"
           help="Elasticsearch analyzer for this index set."
           required
-          disabled={immutableFields.includes('index_analyzer') && !hasFieldRestrictionPermission}
+          disabled={immutableFields.includes('index_analyzer') && !ignoreFieldRestrictions}
         />
       )}
     </>

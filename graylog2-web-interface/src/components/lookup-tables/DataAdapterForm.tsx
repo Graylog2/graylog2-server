@@ -264,6 +264,8 @@ const DataAdapterForm = ({
                       unit={values.custom_error_ttl_unit || 'MINUTES'}
                       units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
                       enabled={values.custom_error_ttl_enabled}
+                      labelClassName="col-sm-3"
+                      wrapperClassName="col-sm-9"
                     />
                     {configFieldSet}
                   </fieldset>

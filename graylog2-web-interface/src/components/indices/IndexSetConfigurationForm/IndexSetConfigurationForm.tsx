@@ -90,7 +90,7 @@ const IndexSetConfigurationForm = ({
 }: Props) => {
   const history = useHistory();
   const productName = useProductName();
-  const hasFieldRestrictionPermission = isPermitted(useCurrentUser().permissions, 'indexsets_field_restrictions:edit');
+  const ignoreFieldRestrictions = isPermitted(useCurrentUser().permissions, 'indexsets_field_restrictions:edit');
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
@@ -270,11 +270,13 @@ const IndexSetConfigurationForm = ({
                         <IndexSetReadOnlyConfiguration
                           hiddenFields={hiddenFields}
                           immutableFields={immutableFields}
-                          hasFieldRestrictionPermission={hasFieldRestrictionPermission}
+                          ignoreFieldRestrictions={ignoreFieldRestrictions}
                         />
                       )}
                       <HideOnCloud>
-                        <HiddenFieldWrapper hiddenFields={hiddenFields} isPermitted={hasFieldRestrictionPermission}>
+                        <HiddenFieldWrapper
+                          hiddenFields={hiddenFields}
+                          ignoreFieldRestrictions={ignoreFieldRestrictions}>
                           <FormikInput
                             type="number"
                             id="shards"
@@ -282,7 +284,7 @@ const IndexSetConfigurationForm = ({
                             name="shards"
                             help="Number of search cluster Shards used per index in this Index Set. Increasing the Index Shards improves the search cluster write speed of data stored to this Index Set by distributing the active write Index over multiple search nodes. Increasing the Index Shards can degrade search performance and increases the memory footprint of the Index. This value should not be set higher than the number of search nodes."
                             required
-                            disabled={immutableFields?.includes('shards') && !hasFieldRestrictionPermission}
+                            disabled={immutableFields?.includes('shards') && !ignoreFieldRestrictions}
                           />
                           <FormikInput
                             type="number"
@@ -291,7 +293,7 @@ const IndexSetConfigurationForm = ({
                             name="replicas"
                             help="Number of search cluster Replica Shards used per Index in this Index Set. Adding Replica Shards improves search performance during parallel reads of the index, such as occurs on dashboards, and is a component of HA and backup strategy. Each Replica Shard set multiplies the storage requirement and memory footprint of the index. This value should not be set higher than the number of search nodes, and typically not higher than 1.                                   "
                             required
-                            disabled={immutableFields?.includes('replicas') && !hasFieldRestrictionPermission}
+                            disabled={immutableFields?.includes('replicas') && !ignoreFieldRestrictions}
                           />
                           <FormikInput
                             type="number"
@@ -309,7 +311,7 @@ const IndexSetConfigurationForm = ({
                             required
                             disabled={
                               immutableFields?.includes('index_optimization_max_num_segments') &&
-                              !hasFieldRestrictionPermission
+                              !ignoreFieldRestrictions
                             }
                           />
                           <FormikInput
@@ -327,7 +329,7 @@ const IndexSetConfigurationForm = ({
                               </>
                             }
                             disabled={
-                              immutableFields?.includes('index_optimization_disabled') && !hasFieldRestrictionPermission
+                              immutableFields?.includes('index_optimization_disabled') && !ignoreFieldRestrictions
                             }
                           />
                           <Field name="field_type_refresh_interval">
@@ -350,8 +352,7 @@ const IndexSetConfigurationForm = ({
                                 }
                                 required
                                 disabled={
-                                  immutableFields?.includes('field_type_refresh_interval') &&
-                                  !hasFieldRestrictionPermission
+                                  immutableFields?.includes('field_type_refresh_interval') && !ignoreFieldRestrictions
                                 }
                               />
                             )}
@@ -368,7 +369,7 @@ const IndexSetConfigurationForm = ({
                     rotationStrategies={rotationStrategies}
                     hiddenFields={hiddenFields}
                     immutableFields={immutableFields}
-                    hasFieldRestrictionPermission={hasFieldRestrictionPermission}
+                    ignoreFieldRestrictions={ignoreFieldRestrictions}
                     isCloud={isCloud}
                     enableDataTieringCloud={enableDataTieringCloud}
                     selectedRetentionSegment={selectedRetentionSegment}

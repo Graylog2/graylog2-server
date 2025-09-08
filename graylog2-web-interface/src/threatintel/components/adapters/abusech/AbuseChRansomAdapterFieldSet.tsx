@@ -87,6 +87,8 @@ class AbuseChRansomAdapterFieldSet extends React.Component<
           value={config.refresh_interval}
           unit={config.refresh_interval_unit || 'MINUTES'}
           defaultEnabled={config.refresh_interval > 0}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
         />
       </fieldset>
     );

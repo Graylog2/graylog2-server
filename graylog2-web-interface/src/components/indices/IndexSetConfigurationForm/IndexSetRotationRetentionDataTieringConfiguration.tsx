@@ -23,14 +23,14 @@ type Props = {
   values: IndexSetFormValues;
   hiddenFields?: string[];
   immutableFields?: string[];
-  hasFieldRestrictionPermission: boolean;
+  ignoreFieldRestrictions: boolean;
 };
 
 const IndexSetRotationRetentionDataTieringConfiguration = ({
   values,
   hiddenFields = [],
   immutableFields = [],
-  hasFieldRestrictionPermission,
+  ignoreFieldRestrictions,
 }: Props) => (
   <>
     <DataTieringVisualisation
@@ -40,11 +40,13 @@ const IndexSetRotationRetentionDataTieringConfiguration = ({
       warmTierEnabled={values.data_tiering?.warm_tier_enabled}
       archiveData={values.data_tiering?.archive_before_deletion}
     />
-    <DataTieringConfiguration
-      hiddenFields={hiddenFields}
-      immutableFields={immutableFields}
-      hasFieldRestrictionPermission={hasFieldRestrictionPermission}
-    />
+    {(!hiddenFields.includes('data_tiering') || ignoreFieldRestrictions) && (
+      <DataTieringConfiguration
+        hiddenFields={hiddenFields}
+        immutableFields={immutableFields}
+        ignoreFieldRestrictions={ignoreFieldRestrictions}
+      />
+    )}
   </>
 );
 export default IndexSetRotationRetentionDataTieringConfiguration;

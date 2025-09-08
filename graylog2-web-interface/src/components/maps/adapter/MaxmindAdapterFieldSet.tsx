@@ -131,6 +131,8 @@ const MaxmindAdapterFieldSet = ({
         value={config.check_interval}
         unit={config.check_interval_unit || 'MINUTES'}
         defaultEnabled={config.check_interval > 0}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
       />
     </fieldset>
   );

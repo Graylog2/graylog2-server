@@ -35,7 +35,7 @@ type Props = {
   rotationStrategies: Strategies;
   hiddenFields: string[];
   immutableFields: string[];
-  hasFieldRestrictionPermission: boolean;
+  ignoreFieldRestrictions: boolean;
 };
 
 type RotationStrategiesProps = {
@@ -127,31 +127,30 @@ const IndexSetRotationRetentionLegacyConfiguration = ({
   retentionStrategiesContext,
   hiddenFields,
   immutableFields,
-  hasFieldRestrictionPermission,
+  ignoreFieldRestrictions,
 }: Props) => {
   const sectionDisabled: boolean = immutableFields.includes('legacy');
 
   return (
     <>
-      {indexSet.writable && (!hiddenFields?.includes('legacy.rotation_strategy') || hasFieldRestrictionPermission) && (
+      {indexSet.writable && (!hiddenFields?.includes('legacy.rotation_strategy') || ignoreFieldRestrictions) && (
         <RotationStrategies
           rotationStrategies={rotationStrategies}
           indexSetRotationStrategy={values.rotation_strategy}
           indexSetRotationStrategyClass={values.rotation_strategy_class}
           disabled={
-            (immutableFields?.includes('legacy.rotation_strategy') || sectionDisabled) && !hasFieldRestrictionPermission
+            (immutableFields?.includes('legacy.rotation_strategy') || sectionDisabled) && !ignoreFieldRestrictions
           }
         />
       )}
-      {indexSet.writable && (!hiddenFields?.includes('legacy.retention_strategy') || hasFieldRestrictionPermission) && (
+      {indexSet.writable && (!hiddenFields?.includes('legacy.retention_strategy') || ignoreFieldRestrictions) && (
         <RetentionConfig
           retentionStrategies={retentionStrategies}
           retentionStrategiesContext={retentionStrategiesContext}
           indexSetRetentionStrategy={values.retention_strategy}
           IndexSetRetentionStrategyClass={values.retention_strategy_class}
           disabled={
-            (immutableFields?.includes('legacy.retention_strategy') || sectionDisabled) &&
-            !hasFieldRestrictionPermission
+            (immutableFields?.includes('legacy.retention_strategy') || sectionDisabled) && !ignoreFieldRestrictions
           }
         />
       )}

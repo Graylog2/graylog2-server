@@ -107,12 +107,12 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
   valuesPrefix = undefined,
   hiddenFields = [],
   immutableFields = [],
-  hasFieldRestrictionPermission,
+  ignoreFieldRestrictions,
 }: {
   valuesPrefix?: ValuesPrefix;
   hiddenFields?: string[];
   immutableFields?: string[];
-  hasFieldRestrictionPermission: boolean;
+  ignoreFieldRestrictions: boolean;
 }) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
@@ -168,7 +168,7 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
 
   return (
     <>
-      {(!hiddenFields.includes('data_tiering.index_lifetime_max') || hasFieldRestrictionPermission) && (
+      {(!hiddenFields.includes('data_tiering.index_lifetime_max') || ignoreFieldRestrictions) && (
         <FormikInput
           type="number"
           id="data-tiering-index-lifetime-max"
@@ -179,12 +179,11 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
           validate={validateMaxDaysInStorage}
           required
           disabled={
-            (immutableFields.includes('data_tiering.index_lifetime_max') || sectionDisabled) &&
-            !hasFieldRestrictionPermission
+            (immutableFields.includes('data_tiering.index_lifetime_max') || sectionDisabled) && !ignoreFieldRestrictions
           }
         />
       )}
-      {(!hiddenFields.includes('data_tiering.index_lifetime_min') || hasFieldRestrictionPermission) && (
+      {(!hiddenFields.includes('data_tiering.index_lifetime_min') || ignoreFieldRestrictions) && (
         <FormikInput
           type="number"
           id="data-tiering-index-lifetime-min"
@@ -196,15 +195,14 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
           help="How many days at minimum your data should be stored."
           required
           disabled={
-            (immutableFields.includes('data_tiering.index_lifetime_min') || sectionDisabled) &&
-            !hasFieldRestrictionPermission
+            (immutableFields.includes('data_tiering.index_lifetime_min') || sectionDisabled) && !ignoreFieldRestrictions
           }
         />
       )}
 
-      {dataTieringPlugin &&
-        (!hiddenFields.includes('data_tiering.archive_before_deletion') || hasFieldRestrictionPermission) && (
-          <>
+      {dataTieringPlugin && (
+        <>
+          {(!hiddenFields.includes('data_tiering.archive_before_deletion') || ignoreFieldRestrictions) && (
             <FormikInput
               type="checkbox"
               id="data_tiering-archive-before-deletion"
@@ -213,12 +211,18 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
               help="Archive this index before it is deleted?"
               disabled={
                 (immutableFields.includes('data_tiering.archive_before_deletion') || sectionDisabled) &&
-                !hasFieldRestrictionPermission
+                !ignoreFieldRestrictions
               }
             />
-            <dataTieringPlugin.TiersConfigurationFields valuesPrefix={valuesPrefix} />
-          </>
-        )}
+          )}
+          <dataTieringPlugin.TiersConfigurationFields
+            valuesPrefix={valuesPrefix}
+            hiddenFields={hiddenFields}
+            immutableFields={immutableFields}
+            ignoreFieldRestrictions={ignoreFieldRestrictions}
+          />
+        </>
+      )}
     </>
   );
 };

@@ -34,7 +34,7 @@ type Props = {
   rotationStrategies: Strategies;
   hiddenFields: string[];
   immutableFields: string[];
-  hasFieldRestrictionPermission: boolean;
+  ignoreFieldRestrictions: boolean;
   isCloud: boolean;
   enableDataTieringCloud: boolean;
   selectedRetentionSegment: RetentionConfigSegment;
@@ -55,7 +55,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
   retentionStrategiesContext,
   hiddenFields,
   immutableFields,
-  hasFieldRestrictionPermission,
+  ignoreFieldRestrictions,
   isCloud,
   enableDataTieringCloud,
   selectedRetentionSegment,
@@ -66,22 +66,26 @@ const IndexSetRotationRetentionConfigurationSection = ({
     { value: 'legacy', label: 'Legacy (Deprecated)' },
   ];
 
-  const legacyRenderable = (): boolean =>
-    !(
-      ((hiddenFields.includes('legacy.rotation_strategy') && hiddenFields.includes('legacy.retention_strategy')) ||
-        hiddenFields.includes('legacy')) &&
-      !hasFieldRestrictionPermission
-    );
+  const legacyRenderable = (): boolean => {
+    if (ignoreFieldRestrictions) return true;
+    if (
+      hiddenFields.includes('legacy') ||
+      (hiddenFields.includes('legacy.rotation_strategy') && hiddenFields.includes('legacy.retention_strategy'))
+    )
+      return false;
 
-  const dataTieringRenderable = (): boolean =>
-    !(
-      (hiddenFields.includes('data_tiering') && !hasFieldRestrictionPermission) ||
-      (isCloud && !enableDataTieringCloud)
-    );
+    return true;
+  };
 
-  if (!dataTieringRenderable() && !legacyRenderable()) return null;
+  const dataTieringFieldsRenderable = (): boolean => {
+    if (isCloud && !enableDataTieringCloud) return false;
 
-  if (!dataTieringRenderable())
+    return true;
+  };
+
+  if (!dataTieringFieldsRenderable() && !legacyRenderable()) return null;
+
+  if (!dataTieringFieldsRenderable())
     return (
       <Section title="Rotation & Retention">
         <IndexSetRotationRetentionLegacyConfiguration
@@ -92,7 +96,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
           retentionStrategiesContext={retentionStrategiesContext}
           hiddenFields={hiddenFields}
           immutableFields={immutableFields}
-          hasFieldRestrictionPermission={hasFieldRestrictionPermission}
+          ignoreFieldRestrictions={ignoreFieldRestrictions}
         />
       </Section>
     );
@@ -104,7 +108,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
           values={values}
           hiddenFields={hiddenFields}
           immutableFields={immutableFields}
-          hasFieldRestrictionPermission={hasFieldRestrictionPermission}
+          ignoreFieldRestrictions={ignoreFieldRestrictions}
         />
       </Section>
     );
@@ -122,7 +126,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
             values={values}
             hiddenFields={hiddenFields}
             immutableFields={immutableFields}
-            hasFieldRestrictionPermission={hasFieldRestrictionPermission}
+            ignoreFieldRestrictions={ignoreFieldRestrictions}
           />
         ) : (
           <ConfigSegment>
@@ -134,7 +138,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
               retentionStrategiesContext={retentionStrategiesContext}
               hiddenFields={hiddenFields}
               immutableFields={immutableFields}
-              hasFieldRestrictionPermission={hasFieldRestrictionPermission}
+              ignoreFieldRestrictions={ignoreFieldRestrictions}
             />
           </ConfigSegment>
         )}
