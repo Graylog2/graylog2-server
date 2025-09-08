@@ -54,7 +54,6 @@ describe('WidgetErrorBoundary', () => {
   });
 
   it('passes own props to its children', async () => {
-    // eslint-disable-next-line react/require-default-props
     const Component = ({ extraProp = undefined }: { extraProp?: string }) => <div>{extraProp}</div>;
     const { findByText } = render(
       <WidgetErrorBoundary extraProp="The extra prop">

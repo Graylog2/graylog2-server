@@ -14,25 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
+
 import usePluginEntities from 'hooks/usePluginEntities';
-import { type WidgetActionType } from 'views/components/widgets/Types';
+import { isWidgetMenuAction } from 'views/components/widgets/Types';
 import type Widget from 'views/logic/widgets/Widget';
 
 const useWidgetExportActionComponent = (widget: Widget) => {
   const exportActions = usePluginEntities('views.widgets.exportAction');
 
-  const widgetExportAction =
-    exportActions &&
-    exportActions
-      .filter(
-        ({ action, useCondition }) =>
-          typeof useCondition === 'function' &&
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useCondition() &&
-          action &&
-          (typeof action.isHidden !== 'function' || !action.isHidden(widget)),
-      )
-      .map(({ action }: { action: WidgetActionType }) => action);
+  const widgetExportAction = useMemo(
+    () =>
+      exportActions
+        ?.filter(
+          ({ action, useCondition }) =>
+            typeof useCondition === 'function' &&
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            useCondition() &&
+            action &&
+            (typeof action.isHidden !== 'function' || !action.isHidden(widget)),
+        )
+        .map(({ action }) => action)
+        .filter(isWidgetMenuAction),
+    [exportActions, widget],
+  );
 
   return widgetExportAction?.[0]?.component;
 };

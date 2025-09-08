@@ -16,46 +16,50 @@
  */
 package org.graylog2.streams;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.DateValidator;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.MapValidator;
-import org.graylog2.database.validators.OptionalStringValidator;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
+import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.joda.time.DateTime;
+import org.mongojack.Id;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
-/**
- * Representing a single stream from the streams collection. Also provides method
- * to get all streams of this collection.
- */
-@DbEntity(collection = "streams",
-          readPermission = STREAMS_READ)
-public class StreamImpl extends PersistedImpl implements Stream {
+@AutoValue
+@WithBeanGetter
+@JsonAutoDetect
+@JsonDeserialize(builder = StreamImpl.Builder.class)
+@DbEntity(collection = "streams", readPermission = STREAMS_READ)
+public abstract class StreamImpl implements Stream {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
     public static final String FIELD_OUTPUTS = "outputs";
+    public static final String FIELD_OUTPUT_OBJECTS = "output_objects";
     public static final String FIELD_CONTENT_PACK = "content_pack";
+    public static final String FIELD_ALERT_RECEIVERS = "alert_receivers";
     public static final String FIELD_DISABLED = "disabled";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
@@ -63,223 +67,352 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
-    public static final String FIELD_CATEGORIES = "categories";
+    public static final String FIELD_INDEX_SET = "index_set";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
+    public static final String FIELD_IS_EDITABLE = "is_editable";
+    public static final String FIELD_CATEGORIES = "categories";
+    public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
-    private final List<StreamRule> streamRules;
-    private final Set<Output> outputs;
-    private final IndexSet indexSet;
+    @Id
+    @JsonProperty("id")
+    public abstract String id();
 
-    public StreamImpl(Map<String, Object> fields) {
-        super(fields);
-        this.streamRules = null;
-        this.outputs = null;
-        this.indexSet = null;
+    @JsonProperty(FIELD_SCOPE)
+    public abstract String scope();
+
+    @JsonProperty(FIELD_CREATOR_USER_ID)
+    public abstract String creatorUserId();
+
+    @JsonProperty(FIELD_OUTPUTS)
+    @Nullable
+    public abstract Set<ObjectId> outputIds();
+
+    @JsonProperty(FIELD_MATCHING_TYPE)
+    public abstract MatchingType matchingType();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_CREATED_AT)
+    public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_DISABLED)
+    public abstract boolean disabled();
+
+    @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
+    @Nullable
+    @Deprecated
+    public abstract Collection<AlertConditionSummary> alertConditions();
+
+    @JsonProperty(FIELD_ALERT_RECEIVERS)
+    @Nullable
+    @Deprecated
+    public abstract AlertReceivers alertReceivers();
+
+    @JsonProperty(FIELD_TITLE)
+    public abstract String title();
+
+    @JsonProperty(FIELD_CONTENT_PACK)
+    @Nullable
+    public abstract String contentPack();
+
+    @JsonProperty(FIELD_DEFAULT_STREAM)
+    @Nullable
+    public abstract Boolean isDefault();
+
+    @JsonProperty(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM)
+    @Nullable
+    public abstract Boolean removeMatchesFromDefaultStream();
+
+    @JsonProperty(FIELD_INDEX_SET_ID)
+    public abstract String indexSetId();
+
+    @JsonProperty(FIELD_IS_EDITABLE)
+    public abstract boolean isEditable();
+
+    @JsonProperty(FIELD_CATEGORIES)
+    @Nullable
+    public abstract List<String> categories();
+
+    public abstract Builder toBuilder();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
-    public StreamImpl(Map<String, Object> fields, IndexSet indexSet) {
-        super(fields);
-        this.streamRules = null;
-        this.outputs = null;
-        this.indexSet = indexSet;
-    }
+    // The following fields are not saved to the DB and are loaded afterward from their own collections.
+    @JsonProperty(FIELD_OUTPUT_OBJECTS)
+    @Nullable
+    public abstract Set<Output> outputObjects();
 
-    protected StreamImpl(ObjectId id, Map<String, Object> fields) {
-        super(id, fields);
-        this.streamRules = null;
-        this.outputs = null;
-        this.indexSet = null;
-    }
+    @JsonProperty(FIELD_RULES)
+    @Nullable
+    public abstract Collection<StreamRule> rules();
 
-    public StreamImpl(ObjectId id, Map<String, Object> fields, List<StreamRule> streamRules, Set<Output> outputs, @Nullable IndexSet indexSet) {
-        super(id, fields);
+    @JsonProperty(FIELD_INDEX_SET)
+    @Nullable
+    public abstract IndexSet indexSet();
 
-        this.streamRules = streamRules;
-        this.outputs = outputs;
-        this.indexSet = indexSet;
-    }
-
-    @Override
-    public String toString() {
-        return this.id.toString() + ": \"" + this.getTitle() + "\"";
-    }
-
-    @Override
-    public List<StreamRule> getStreamRules() {
-        return this.streamRules;
-    }
-
-    @Override
-    public Set<Output> getOutputs() {
-        return this.outputs;
-    }
-
-    @Override
-    public String getTitle() {
-        return (String) fields.get(FIELD_TITLE);
-    }
-
-    @Override
-    public String getDescription() {
-        return (String) fields.get(FIELD_DESCRIPTION);
-    }
-
-    @Override
-    public void setTitle(String title) {
-        fields.put(FIELD_TITLE, title);
-    }
-
-    @Override
-    public void setDescription(String description) {
-        fields.put(FIELD_DESCRIPTION, description);
-    }
-
-    @Override
-    public Boolean getDisabled() {
-        return (Boolean) fields.getOrDefault(FIELD_DISABLED, false);
-    }
-
-    @Override
-    public void setDisabled(Boolean disabled) {
-        fields.put(FIELD_DISABLED, disabled);
-    }
-
-    @Override
-    public String getContentPack() {
-        return (String) fields.get(FIELD_CONTENT_PACK);
-    }
-
-    @Override
-    public void setContentPack(String contentPack) {
-        fields.put(FIELD_CONTENT_PACK, contentPack);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<String> getCategories() {
-        return (List<String>) fields.get(FIELD_CATEGORIES);
-    }
-
-    @Override
-    public void setCategories(List<String> categories) {
-        fields.put(FIELD_CATEGORIES, categories);
-    }
-
-    @Override
-    public Boolean isPaused() {
-        Boolean disabled = getDisabled();
-        return disabled != null && disabled;
-    }
-
-    @Override
-    public Map<String, Object> asMap(List<StreamRule> streamRules) {
-        Map<String, Object> result = asMap();
-
-        List<Map<String, Object>> streamRulesMap = Lists.newArrayList();
-
-        for (StreamRule streamRule : streamRules) {
-            streamRulesMap.add(streamRule.asMap());
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_StreamImpl.Builder()
+                    .scope(DefaultEntityScope.NAME)
+                    .matchingType(DEFAULT_MATCHING_TYPE)
+                    .isDefault(false)
+                    .isEditable(true)
+                    .removeMatchesFromDefaultStream(false)
+                    .categories(List.of())
+                    .outputIds(Set.of())
+                    .outputObjects(Set.of());
         }
 
-        result.put(FIELD_RULES, streamRulesMap);
+        @JsonProperty("id")
+        public abstract Builder id(String id);
 
-        return result;
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
+
+        @JsonProperty(FIELD_CREATOR_USER_ID)
+        public abstract Builder creatorUserId(String creatorUserId);
+
+        @JsonProperty(FIELD_OUTPUTS)
+        public abstract Builder outputIds(Set<ObjectId> outputIds);
+
+        @JsonProperty(FIELD_OUTPUT_OBJECTS)
+        public abstract Builder outputObjects(Set<Output> outputObjects);
+
+        @JsonProperty(FIELD_MATCHING_TYPE)
+        public abstract Builder matchingType(MatchingType matchingType);
+
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(String description);
+
+        @JsonProperty(FIELD_CREATED_AT)
+        public abstract Builder createdAt(DateTime createdAt);
+
+        @JsonProperty(FIELD_CONTENT_PACK)
+        public abstract Builder contentPack(String contentPack);
+
+        @JsonProperty(FIELD_DISABLED)
+        public abstract Builder disabled(boolean disabled);
+
+        @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
+        @Deprecated
+        public abstract Builder alertConditions(Collection<AlertConditionSummary> alertConditions);
+
+        @JsonProperty(FIELD_RULES)
+        public abstract Builder rules(Collection<StreamRule> rules);
+
+        @JsonProperty(FIELD_ALERT_RECEIVERS)
+        @Deprecated
+        public abstract Builder alertReceivers(AlertReceivers receivers);
+
+        @JsonProperty(FIELD_TITLE)
+        public abstract Builder title(String title);
+
+        @JsonProperty(FIELD_DEFAULT_STREAM)
+        public abstract Builder isDefault(Boolean isDefault);
+
+        @JsonProperty(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM)
+        public abstract Builder removeMatchesFromDefaultStream(Boolean removeMatchesFromDefaultStream);
+
+        @JsonProperty(FIELD_INDEX_SET_ID)
+        public abstract Builder indexSetId(String indexSetId);
+
+        @JsonProperty(FIELD_INDEX_SET)
+        public abstract Builder indexSet(IndexSet indexSet);
+
+        @JsonProperty(FIELD_IS_EDITABLE)
+        public abstract Builder isEditable(boolean isEditable);
+
+        @JsonProperty(FIELD_CATEGORIES)
+        public abstract Builder categories(List<String> categories);
+
+        public abstract StreamImpl autoBuild();
+
+        public StreamImpl build() {
+            return autoBuild();
+        }
     }
 
-    @JsonValue
     @Override
-    public Map<String, Object> asMap() {
-        // We work on the result a bit to allow correct JSON serializing.
-        Map<String, Object> result = Maps.newHashMap(fields);
-        result.remove(FIELD_ID);
-        result.put("id", ((ObjectId) fields.get(FIELD_ID)).toHexString());
-        result.remove(FIELD_CREATED_AT);
-        result.put(FIELD_CREATED_AT, Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT)));
-        result.put(FIELD_RULES, streamRules);
-        result.put(FIELD_OUTPUTS, outputs);
-        result.put(FIELD_MATCHING_TYPE, getMatchingType());
-        result.put(FIELD_DEFAULT_STREAM, isDefaultStream());
-        result.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, getRemoveMatchesFromDefaultStream());
-        result.put(FIELD_INDEX_SET_ID, getIndexSetId());
-        result.put(FIELD_CATEGORIES, getCategories());
-        return result;
+    @JsonIgnore
+    public String getId() {
+        return id();
     }
 
     @Override
-    public Map<String, Validator> getValidations() {
-        return ImmutableMap.<String, Validator>builder()
-                .put(FIELD_TITLE, new FilledStringValidator())
-                .put(FIELD_CREATOR_USER_ID, new FilledStringValidator())
-                .put(FIELD_CREATED_AT, new DateValidator())
-                .put(FIELD_CONTENT_PACK, new OptionalStringValidator())
-                .put(FIELD_INDEX_SET_ID, new FilledStringValidator())
+    @JsonIgnore
+    public String getScope() {
+        return scope();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTitle() {
+        return title();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getDescription() {
+        return description();
+    }
+
+    @Override
+    @JsonIgnore
+    public Boolean getDisabled() {
+        return disabled();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getContentPack() {
+        return contentPack();
+    }
+
+    @Override
+    @JsonIgnore
+    public List<String> getCategories() {
+        return categories();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getCreatorUserId() {
+        return creatorUserId();
+    }
+
+    @Override
+    @JsonIgnore
+    public DateTime getCreatedAt() {
+        return createdAt();
+    }
+
+    @Override
+    @JsonIgnore
+    public Set<ObjectId> getOutputIds() {
+        final Set<ObjectId> outputs = new HashSet<>();
+        if (outputIds() != null) {
+            outputs.addAll(outputIds());
+        }
+        return outputs;
+    }
+
+    @Override
+    @JsonIgnore
+    public Set<Output> getOutputs() {
+        final Set<Output> outputs = new HashSet<>();
+        if (outputObjects() != null) {
+            outputs.addAll(outputObjects());
+        }
+        return outputs;
+    }
+
+    @Override
+    @JsonIgnore
+    public IndexSet getIndexSet() {
+        return indexSet();
+    }
+
+    @Override
+    @JsonIgnore
+    public Boolean isPaused() {
+        return disabled();
+    }
+
+    @Override
+    @JsonIgnore
+    public List<StreamRule> getStreamRules() {
+        final List<StreamRule> rules = new ArrayList<>();
+        if (rules() != null) {
+            rules.addAll(rules());
+        }
+        return rules;
+    }
+
+    @Override
+    @JsonIgnore
+    public MatchingType getMatchingType() {
+        if (matchingType() == null) {
+            return MatchingType.AND;
+        } else {
+            return matchingType();
+        }
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isDefaultStream() {
+        return Boolean.TRUE.equals(isDefault());
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean getRemoveMatchesFromDefaultStream() {
+        return Boolean.TRUE.equals(removeMatchesFromDefaultStream());
+    }
+
+    @Override
+    @JsonIgnore
+    public String getIndexSetId() {
+        return indexSetId();
+    }
+
+    // Package-private to prevent usage outside the streams package.
+    @JsonIgnore
+    StreamDTO toDTO() {
+        return StreamDTO.builder()
+                .creatorUserId(creatorUserId())
+                .outputIds(outputIds())
+                .matchingType(matchingType())
+                .description(description())
+                .createdAt(createdAt())
+                .contentPack(contentPack())
+                .disabled(disabled())
+                .alertConditions(alertConditions())
+                .alertReceivers(alertReceivers())
+                .title(title())
+                .isDefault(isDefault())
+                .removeMatchesFromDefaultStream(removeMatchesFromDefaultStream())
+                .indexSetId(indexSetId())
+                .isEditable(isEditable())
+                .categories(categories())
+                .scope(scope())
+                .id(id())
+                .build();
+    }
+
+    @JsonIgnore
+    // Package-private to prevent usage outside the streams package.
+    static StreamImpl fromDTO(StreamDTO dto) {
+        return StreamImpl.builder()
+                .scope(dto.scope())
+                .creatorUserId(dto.creatorUserId())
+                .outputIds(dto.outputIds())
+                .matchingType(dto.matchingType())
+                .description(dto.description())
+                .createdAt(dto.createdAt())
+                .contentPack(dto.contentPack())
+                .disabled(dto.disabled())
+                .alertConditions(dto.alertConditions())
+                .alertReceivers(dto.alertReceivers())
+                .title(dto.title())
+                .isDefault(dto.isDefault())
+                .removeMatchesFromDefaultStream(dto.removeMatchesFromDefaultStream())
+                .indexSetId(dto.indexSetId())
+                .isEditable(dto.isEditable())
+                .categories(dto.categories())
+                .id(dto.id())
                 .build();
     }
 
     @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        if (EMBEDDED_ALERT_CONDITIONS.equals(key)) {
-            return ImmutableMap.of(
-                    "id", new FilledStringValidator(),
-                    "parameters", new MapValidator());
-        }
-
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public MatchingType getMatchingType() {
-        final String matchingTypeString = (String) fields.get(FIELD_MATCHING_TYPE);
-
-        if (matchingTypeString == null) {
-            return MatchingType.AND;
-        } else {
-            return MatchingType.valueOf(matchingTypeString);
-        }
-    }
-
-    @Override
-    public void setMatchingType(MatchingType matchingType) {
-        fields.put(FIELD_MATCHING_TYPE, matchingType.toString());
-    }
-
-    @Override
-    public boolean isDefaultStream() {
-        return (boolean) fields.getOrDefault(FIELD_DEFAULT_STREAM, false);
-    }
-
-    @Override
-    public void setDefaultStream(boolean defaultStream) {
-        fields.put(FIELD_DEFAULT_STREAM, defaultStream);
-    }
-
-    @Override
-    public boolean getRemoveMatchesFromDefaultStream() {
-        return (boolean) fields.getOrDefault(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
-    }
-
-    @Override
-    public void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream) {
-        fields.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, removeMatchesFromDefaultStream);
-    }
-
-    @Override
-    public IndexSet getIndexSet() {
-        // The indexSet might be null because of backwards compatibility but it shouldn't be for regular streams.
-        // Throw an exception if indexSet is not set to avoid losing messages!
-        if (indexSet == null) {
-            throw new IllegalStateException("index set must not be null! (stream id=" + getId() + " title=\"" + getTitle() + "\")");
-        }
-        return indexSet;
-    }
-
-    @Override
-    public String getIndexSetId() {
-        return (String) fields.get(FIELD_INDEX_SET_ID);
-    }
-
-    @Override
-    public void setIndexSetId(String indexSetId) {
-        fields.put(FIELD_INDEX_SET_ID, indexSetId);
+    public int getFingerprint() {
+        return Objects.hash(id(), creatorUserId(), matchingType().toString(), description(),
+                contentPack(), disabled(), title(), isDefault(), removeMatchesFromDefaultStream(), indexSetId());
     }
 }

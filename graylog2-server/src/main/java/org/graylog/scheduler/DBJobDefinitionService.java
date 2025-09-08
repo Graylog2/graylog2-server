@@ -18,12 +18,13 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import one.util.streamex.StreamEx;
 import org.bson.conversions.Bson;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -68,6 +69,7 @@ public class DBJobDefinitionService {
      * @param value       the value of the config field
      * @return a stream of job definitions with the given config field.
      */
+    @MustBeClosed
     public Stream<JobDefinitionDto> streamByConfigField(String configField, Object value) {
         return MongoUtils.stream(collection.find(buildConfigFieldQuery(configField, value)));
     }
@@ -112,11 +114,12 @@ public class DBJobDefinitionService {
         return mongoUtils.getById(id);
     }
 
+    @MustBeClosed
     public Stream<JobDefinitionDto> streamAll() {
-        return mongoUtils.stream(collection.find());
+        return MongoUtils.stream(collection.find());
     }
 
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
-        return mongoUtils.getOrCreate(dto);
+        return collection.getOrCreate(dto);
     }
 }

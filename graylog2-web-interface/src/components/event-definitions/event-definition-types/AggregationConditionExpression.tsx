@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 
 import { Icon } from 'components/common';
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/bootstrap';
@@ -91,7 +90,7 @@ class AggregationConditionExpression extends React.Component<
 
     const key = expression.expr === 'group' ? 'operator' : 'expr';
 
-    return get(expression, key, defaultOperator) === '&&' ? '&&' : '||';
+    return (expression?.[key] ?? defaultOperator) === '&&' ? '&&' : '||';
   };
 
   handleAddExpression = () => {
@@ -174,7 +173,7 @@ class AggregationConditionExpression extends React.Component<
 
     switch (expression.expr) {
       case 'number-ref':
-        expressionComponent = <NumberRefExpression {...this.props} renderLabel={renderLabel ?? true} parent={parent} />;
+        expressionComponent = <NumberRefExpression {...this.props} renderLabel={renderLabel ?? true} />;
         break;
       case 'number':
         expressionComponent = <NumberExpression {...this.props} renderLabel={renderLabel ?? true} />;
@@ -237,6 +236,7 @@ class AggregationConditionExpression extends React.Component<
         <>
           <BooleanOperatorSelector
             initialText="Messages must meet"
+            placeholder="Global boolean operator"
             operator={this.getEffectiveGlobalGroupOperator()}
             onOperatorChange={this.handleOperatorChange}
           />

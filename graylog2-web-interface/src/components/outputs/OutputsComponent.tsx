@@ -27,8 +27,8 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useOutputTypes from 'components/outputs/useOutputTypes';
 import { isPermitted } from 'util/PermissionsMixin';
+import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
 
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
@@ -42,7 +42,7 @@ type Props = {
 const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const { types } = useOutputTypes();
+  const { data: types } = useAvailableOutputTypes();
   const [outputs, setOutputs] = useState();
   const [assignableOutputs, setAssignableOutputs] = useState();
 

@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import debounce from 'lodash/debounce';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
@@ -44,35 +45,40 @@ type Props = {
   paginationQueryParameter: PaginationQueryParameterResult;
 };
 
-const CollectorsAdministrationContainer = (props: Props) => {
+const SEARCH_DEBOUNCE_THRESHOLD = 500;
+
+const CollectorsAdministrationContainer = ({ ...props }: Props) => {
   const collectors = useStore(CollectorsStore);
   const sidecars = useStore(SidecarsAdministrationStore);
   const configurations = useStore(CollectorConfigurationsStore);
 
-  const reloadSidecars = () => {
+  const reloadSidecars = useCallback(() => {
     if (sidecars) {
       SidecarsAdministrationActions.refreshList();
     }
-  };
+  }, [sidecars]);
 
-  const loadData = (nodeId: string) => {
-    const { page, pageSize } = props.paginationQueryParameter;
-    const query = nodeId ? `node_id:${nodeId}` : '';
+  const loadData = useCallback(
+    (nodeId: string) => {
+      const { page, pageSize } = props.paginationQueryParameter;
+      const query = nodeId ? `node_id:${nodeId}` : '';
 
-    CollectorsActions.all();
-    SidecarsAdministrationActions.list({ query, page, pageSize });
-    CollectorConfigurationsActions.all();
-  };
+      CollectorsActions.all();
+      SidecarsAdministrationActions.list({ query, page, pageSize });
+      CollectorConfigurationsActions.all();
+    },
+    [props.paginationQueryParameter],
+  );
 
   useEffect(() => {
     loadData(props.nodeId);
-  }, [props?.nodeId]);
+  }, [loadData, props.nodeId]);
 
   useEffect(() => {
     const interval = setInterval(reloadSidecars, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [reloadSidecars]);
 
   const handlePageChange = (page: number, pageSize: number) => {
     const { filters, query } = sidecars;
@@ -97,14 +103,12 @@ const CollectorsAdministrationContainer = (props: Props) => {
     SidecarsAdministrationActions.list({ query, filters: newFilters, pageSize, page: 1 });
   };
 
-  const handleQueryChange = (query = '', callback = () => {}) => {
-    const { resetPage, pageSize } = props.paginationQueryParameter;
+  const handleQueryChange = debounce((query = '', callback = () => {}) => {
+    const { pageSize } = props.paginationQueryParameter;
     const { filters } = sidecars;
 
-    resetPage();
-
     SidecarsAdministrationActions.list({ query, filters, pageSize, page: 1 }).finally(callback);
-  };
+  }, SEARCH_DEBOUNCE_THRESHOLD);
 
   const handleConfigurationChange = (
     selectedSidecars: SidecarCollectorPairType[],

@@ -18,37 +18,24 @@ import React from 'react';
 
 import RelativeTime from 'components/common/RelativeTime';
 
-type IndexRangeSummaryProps = {
-  indexRange?: any;
+type Props = {
+  indexRange: { calculated_at: string; took_ms: number } | undefined;
 };
 
-class IndexRangeSummary extends React.Component<
-  IndexRangeSummaryProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    indexRange: undefined,
-  };
-
-  render() {
-    const { indexRange } = this.props;
-
-    if (!indexRange) {
-      return (
-        <span>
-          <i>No index range available.</i>
-        </span>
-      );
-    }
-
+const IndexRangeSummary = ({ indexRange }: Props) => {
+  if (!indexRange) {
     return (
       <span>
-        Range re-calculated <RelativeTime dateTime={indexRange.calculated_at} /> in {indexRange.took_ms}ms.
+        <i>No index range available.</i>
       </span>
     );
   }
-}
+
+  return (
+    <span>
+      Range re-calculated <RelativeTime dateTime={indexRange.calculated_at} /> in {indexRange.took_ms}ms.
+    </span>
+  );
+};
 
 export default IndexRangeSummary;

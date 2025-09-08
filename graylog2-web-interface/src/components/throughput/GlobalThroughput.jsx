@@ -36,7 +36,7 @@ const ContentWrap = styled.strong`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 1fr;
-  grid-gap: 0;
+  gap: 0;
   height: 30px;
 
   @media (width <= 991px) {
@@ -63,8 +63,8 @@ const ThroughputData = styled.span(
     display: grid;
     grid-template-columns: 1fr 1.75em;
     grid-template-rows: 1fr 1px;
-    grid-gap: 0 3px;
-    color: ${theme.colors.global.textDefault};
+    gap: 0 3px;
+    color: ${theme.colors.text.primary};
 
     > span {
       grid-area: 1 / 1 / 2 / 2;

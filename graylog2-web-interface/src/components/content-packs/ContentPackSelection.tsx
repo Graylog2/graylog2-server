@@ -136,7 +136,7 @@ class ContentPackSelection extends React.Component<
         if (!hasAcceptedProtocol(contentPack.url)) {
           errors.url = 'Must use a URL starting with http or https.';
         }
-      } catch (e) {
+      } catch (_e) {
         errors.url = 'Invalid URL';
       }
     }
@@ -339,7 +339,7 @@ class ContentPackSelection extends React.Component<
                   id="name"
                   type="text"
                   maxLength={250}
-                  value={contentPack.name}
+                  value={contentPack.name ?? ''}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('name')}
                   label="Name"
@@ -352,7 +352,7 @@ class ContentPackSelection extends React.Component<
                   id="summary"
                   type="text"
                   maxLength={250}
-                  value={contentPack.summary}
+                  value={contentPack.summary ?? ''}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('summary')}
                   label="Summary"
@@ -376,7 +376,7 @@ class ContentPackSelection extends React.Component<
                   id="vendor"
                   type="text"
                   maxLength={250}
-                  value={contentPack.vendor}
+                  value={contentPack.vendor ?? ''}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('vendor')}
                   label="Vendor"

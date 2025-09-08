@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Remove actions menu from events list if the user is not allowed to access the underlying event definition."
+
+issues = ["graylog-plugin-enterprise#10878"]
+pulls = ["22759"]

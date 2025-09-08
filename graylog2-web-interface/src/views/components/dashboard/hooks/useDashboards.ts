@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -76,19 +76,18 @@ const useDashboards = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(searchParams),
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
+
+    queryFn: () =>
       defaultOnError(
         fetchDashboards(searchParams),
         'Loading dashboards failed with status',
         'Could not load dashboards',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

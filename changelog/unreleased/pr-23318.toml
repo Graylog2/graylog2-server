@@ -1,0 +1,5 @@
+type = "a"
+message = 'API browser is now only visible to users with the role "Admin" or "API Browser Reader".'
+
+issues = ["graylog-plugin-enterprise#10625"]
+pulls = ["23318"]

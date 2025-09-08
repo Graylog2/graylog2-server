@@ -24,10 +24,14 @@ import type EntityShareState from 'logic/permissions/EntityShareState';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type {
+  SelectionRequest,
+  FormValues as GranteesSelectFormValues,
+} from 'components/permissions/Grantee/GranteesSelector';
+import GranteesSelector from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
+import usePluggableEntityCollectionGranteeList from 'hooks/usePluggableEntityCollectionGranteeList';
 
-import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
-import GranteesSelector from './GranteesSelector';
-import GranteesList from './GranteesList';
 import ShareableEntityURL from './ShareableEntityURL';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
@@ -37,7 +41,7 @@ type Props = {
   entityType: SharedEntity['type'];
   entityTitle: SharedEntity['title'];
   entityShareState: EntityShareState;
-  setDisableSubmit: (boolean) => void;
+  setDisableSubmit: (disabled: boolean) => void;
   granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>;
   showShareableEntityURL?: boolean;
   entityTypeTitle?: string | null | undefined;
@@ -82,6 +86,8 @@ const EntityShareSettings = ({
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
+  const CollectionGranteeList = usePluggableEntityCollectionGranteeList();
+
   useEffect(() => {
     setDisableSubmit(validationResults?.failed);
   }, [validationResults, setDisableSubmit]);
@@ -122,18 +128,24 @@ const EntityShareSettings = ({
           formRef={granteesSelectFormRef}
         />
       </Section>
-      <Section>
-        <GranteesList
-          activeShares={activeShares}
-          availableCapabilities={availableCapabilities}
+      <GranteesList
+        activeShares={activeShares}
+        availableCapabilities={availableCapabilities}
+        entityType={entityType}
+        entityTypeTitle={entityTypeTitle}
+        onDelete={_handleDeletion}
+        onCapabilityChange={_handleSelection}
+        selectedGrantees={selectedGrantees}
+        title="Direct Collaborators"
+      />
+      {CollectionGranteeList && (
+        <CollectionGranteeList
+          title="Shared via Collections"
           entityType={entityType}
           entityTypeTitle={entityTypeTitle}
-          onDelete={_handleDeletion}
-          onCapabilityChange={_handleSelection}
-          selectedGrantees={selectedGrantees}
-          title="Collaborators"
+          entityGRN={entityGRN}
         />
-      </Section>
+      )}
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}
         validationResults={validationResults}

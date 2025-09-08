@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-parent</artifactId>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-plugin-web-parent</artifactId>
@@ -30,7 +30,22 @@
 
     <name>Graylog Plugin with Web support Parent POM</name>
 
+    <properties>
+        <skip.web.tests>false</skip.web.tests>
+    </properties>
+
     <profiles>
+        <profile>
+            <id>skip-web-interface-tests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <skip.web.tests>true</skip.web.tests>
+            </properties>
+        </profile>
         <profile>
             <id>web-interface-build</id>
             <activation>

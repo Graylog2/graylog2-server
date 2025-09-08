@@ -89,21 +89,13 @@ describe('StreamModal', () => {
       name: /description/i,
     });
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
     expect(title).toHaveValue(exampleStream.title);
     expect(description).toHaveValue(exampleStream.description);
 
     await userEvent.type(title, ' and further title');
     await userEvent.type(description, ' and further description');
 
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(indexSetSelect, 'Example Index Set');
-    });
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
 
     await screen.findByText('Example Index Set');
 
@@ -146,35 +138,9 @@ describe('StreamModal', () => {
     await userEvent.type(title, 'New title');
     await userEvent.type(description, 'New description');
 
-    const indexSetSelect = await screen.findByLabelText('Index Set');
-
-    await act(async () => {
-      await selectEvent.openMenu(indexSetSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(indexSetSelect, 'Example Index Set');
-    });
-
-    const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-    await act(async () => {
-      await selectEvent.openMenu(granteesSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(granteesSelect, everyone.title);
-    });
-
-    const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-    await act(async () => {
-      await selectEvent.openMenu(capabilitySelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(capabilitySelect, viewer.title);
-    });
+    await selectEvent.chooseOption('Index Set', 'Example Index Set');
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
+    await selectEvent.chooseOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,

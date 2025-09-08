@@ -235,7 +235,7 @@ describe('EventDefinitionFormContainer', () => {
         ({
           'views.components.eventProcedureSummary': [],
           'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
-        })[entityKey],
+        })[entityKey] ?? [],
     );
   });
 
@@ -350,5 +350,14 @@ describe('EventDefinitionFormContainer', () => {
     await userEvent.click(screen.getByRole('button', { name: /add notification/i }));
 
     await screen.findByText(/mock-notification-title/i);
+  });
+
+  it('should show summary with update action on edit', async () => {
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /summary/i });
+    userEvent.click(tab);
+
+    expect(screen.getByRole('button', { name: /update event definition/i })).toBeVisible();
   });
 });

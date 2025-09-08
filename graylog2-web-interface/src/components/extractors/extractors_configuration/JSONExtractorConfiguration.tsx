@@ -19,7 +19,7 @@ import React from 'react';
 import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 type Configuration = {
@@ -74,20 +74,6 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   }
 
-  _getEffectiveConfiguration(configuration) {
-    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
-  }
-
-  _onChange(key) {
-    return (event) => {
-      this.props.onExtractorPreviewLoad(undefined);
-      const newConfig = this.state.configuration;
-
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
-      this.props.onChange(newConfig);
-    };
-  }
-
   _onTryClick = () => {
     this.setState({ trying: true });
 
@@ -124,6 +110,20 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
 
     promise.finally(() => this.setState({ trying: false }));
   };
+
+  _getEffectiveConfiguration(configuration) {
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+  }
+
+  _onChange(key) {
+    return (event) => {
+      this.props.onExtractorPreviewLoad(undefined);
+      const newConfig = this.state.configuration;
+
+      newConfig[key] = getValueFromInput(event.target);
+      this.props.onChange(newConfig);
+    };
+  }
 
   _isTryButtonDisabled() {
     return this.state.trying || !this.props.exampleMessage;

@@ -18,13 +18,24 @@ import React from 'react';
 
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
+
+const StaticField = ({ label, text }: { label: string; text: string }) => (
+  <FormGroup>
+    <Col componentClass={ControlLabel} md={2}>
+      {label}
+    </Col>
+    <Col md={10}>
+      <FormControl.Static>{text}</FormControl.Static>
+    </Col>
+  </FormGroup>
+);
 
 type EditExtractorProps = {
   action: 'create' | 'edit';
@@ -85,7 +96,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     const nextState: EditExtractorState = {};
     const { updatedExtractor } = this.state;
 
-    updatedExtractor[key] = FormUtils.getValueFromInput(event.target);
+    updatedExtractor[key] = getValueFromInput(event.target);
     nextState.updatedExtractor = updatedExtractor;
 
     // Reset result of testing condition after a change in the input
@@ -204,17 +215,6 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     ExtractorsActions.save.triggerPromise(inputId, updatedExtractor).then(() => onSave());
   };
 
-  _staticField = (label, text) => (
-    <FormGroup>
-      <Col componentClass={ControlLabel} md={2}>
-        {label}
-      </Col>
-      <Col md={10}>
-        <FormControl.Static>{text}</FormControl.Static>
-      </Col>
-    </FormGroup>
-  );
-
   render() {
     const { updatedExtractor, exampleMessage } = this.state;
     const { action } = this.props;
@@ -279,11 +279,11 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             <Row>
               <Col md={8}>
                 <form className="extractor-form form-horizontal" method="POST" onSubmit={this._saveExtractor}>
-                  {this._staticField(
-                    'Extractor type',
-                    ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type),
-                  )}
-                  {this._staticField('Source field', updatedExtractor.source_field)}
+                  <StaticField
+                    label="Extractor type"
+                    text={ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type)}
+                  />
+                  <StaticField label="Source field" text={updatedExtractor.source_field} />
 
                   <EditExtractorConfiguration
                     extractorType={updatedExtractor.type}

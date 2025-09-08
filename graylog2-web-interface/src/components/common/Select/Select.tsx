@@ -240,7 +240,7 @@ export type Props<OptionValue> = {
   ignoreAccents?: boolean;
   inputId?: string;
   inputProps?: { [key: string]: any };
-  matchProp?: 'any' | 'label' | 'value';
+  isLoading?: boolean;
   multi?: boolean;
   maxMenuHeight?: number;
   menuPlacement?: 'bottom' | 'auto' | 'top';
@@ -323,7 +323,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     inputId: undefined,
     onBlur: undefined,
     inputProps: undefined,
-    matchProp: 'any',
+    isLoading: undefined,
     multi: false,
     menuIsOpen: undefined,
     name: undefined,
@@ -464,11 +464,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     };
   };
 
-  createCustomFilter = (stringify: (any) => string) => {
-    const { matchProp, ignoreAccents } = this.props;
-    const options = { ignoreAccents };
+  createCustomFilter = () => {
+    const { ignoreAccents } = this.props;
 
-    return matchProp === 'any' ? createFilter(options) : createFilter({ ...options, stringify });
+    return createFilter({ ignoreAccents, stringify: (option: { label: unknown }) => String(option.label) });
   };
 
   render() {
@@ -483,7 +482,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       clearable: isClearable,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       inputProps, // Do not pass down prop
-      matchProp,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -496,9 +494,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       placeholder,
       ...rest
     } = this.props;
-
-    const stringify = (option) => option[matchProp];
-    const customFilter = this.createCustomFilter(stringify);
+    const customFilter = this.createCustomFilter();
 
     const mergedComponents = {
       ..._components,

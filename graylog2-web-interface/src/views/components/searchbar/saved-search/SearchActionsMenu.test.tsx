@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
@@ -272,7 +272,8 @@ describe('SearchActionsMenu', () => {
         .build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
-      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
+
+      expect(screen.queryByText('Pluggable component!')).not.toBeInTheDocument();
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {

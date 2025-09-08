@@ -16,11 +16,11 @@
  */
 package org.graylog.datanode;
 
+import org.apache.commons.exec.OS;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public record OpensearchDistribution(Path directory, String version, @Nullable String platform,
                                      @Nullable OpensearchArchitecture architecture) {
@@ -38,6 +38,10 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
     }
 
     public Path getOpensearchJavaHome() {
-        return directory.resolve("jdk");
+        if (OS.isFamilyMac()) {
+            return directory.resolve("jdk-mac");
+        } else {
+            return directory.resolve("jdk");
+        }
     }
 }

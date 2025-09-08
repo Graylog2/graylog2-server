@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToDecimalConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -115,6 +116,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -148,6 +150,7 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConvers
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
+import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
@@ -233,6 +236,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());
@@ -242,6 +246,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
+        functions.put(RemoveStringFieldsByValue.NAME, new RemoveStringFieldsByValue());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -938,6 +943,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
         assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
         assertThat(message.getField("authority")).isEqualTo("admin:s3cr31@some.host.with.lots.of.subdomains.com:9999");
+        assertThat(message.getField("invalid_default_specified")).isNull();
+        assertThat(message.getField("default_null")).isNull();
+        // When an invalid default URL is specified, an exception should be thrown, since that is a pipeline coding error
+        final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        assertThat(context.evaluationErrors().size()).isEqualTo(1);
+        assertThat(context.evaluationErrors().get(0).toString()).contains("Could not parse a valid URL from: not-a-url");
     }
 
     @Test
@@ -1081,6 +1092,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("string_5")).isEqualTo("false");
         assertThat(message.getField("string_6")).isEqualTo("42");
         assertThat(message.getField("string_7")).isEqualTo("23.42");
+        assertThat(message.getField("string_default_null")).isNull();
+        assertThat(message.getField("string_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("long_1")).isEqualTo(1L);
         assertThat(message.getField("long_2")).isEqualTo(2L);
@@ -1093,6 +1106,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("long_min2")).isEqualTo(1L);
         assertThat(message.getField("long_max1")).isEqualTo(Long.MAX_VALUE);
         assertThat(message.getField("long_max2")).isEqualTo(1L);
+        assertThat(message.getField("long_default_null")).isNull();
+        assertThat(message.getField("long_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("double_1")).isEqualTo(1d);
         assertThat(message.getField("double_2")).isEqualTo(2d);
@@ -1108,17 +1123,23 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("double_inf2")).isEqualTo(Double.NEGATIVE_INFINITY);
         assertThat(message.getField("double_inf3")).isEqualTo(Double.POSITIVE_INFINITY);
         assertThat(message.getField("double_inf4")).isEqualTo(Double.NEGATIVE_INFINITY);
+        assertThat(message.getField("double_default_null")).isNull();
+        assertThat(message.getField("double_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("bool_1")).isEqualTo(true);
         assertThat(message.getField("bool_2")).isEqualTo(false);
         assertThat(message.getField("bool_3")).isEqualTo(false);
         assertThat(message.getField("bool_4")).isEqualTo(true);
+        assertThat(message.getField("bool_default_null")).isNull();
+        assertThat(message.getField("bool_default_null_set_single_field")).isNull();
 
         // the is wrapped in our own class for safety in rules
         assertThat(message.getField("ip_1")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_2")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
         assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
+        assertThat(message.getField("ip_default_null")).isNull();
+        assertThat(message.getField("ip_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("map_1")).isEqualTo(Collections.singletonMap("foo", "bar"));
         assertThat(message.getField("map_2")).isEqualTo(Collections.emptyMap());
@@ -1126,6 +1147,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_4")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_5")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_default_null")).isNull();
+        assertThat(message.getField("map_default_null_set_single_field")).isNull();
     }
 
     @Test
@@ -1528,6 +1551,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Long manilaHour = (Long) message.getField("manilaHour");
         assertThat(utcHour).isEqualTo(10);
         assertThat(manilaHour).isEqualTo(18);
+        assertThat(message.getField("null_value")).isNull();
     }
 
     @Test
@@ -1671,6 +1695,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void removeStringFieldsByValue() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull(); // match regex
+        assertThat(message.getField("f2")).isNull(); // match regex
+        assertThat(message.getField("f3")).isEqualTo("stay in message");
+        assertThat(message.getField("f4")).isNull(); // match values
+        assertThat(message.getField("f5")).isEqualTo("stay in message");
+        assertThat(message.getField("f6")).isNull(); // match values
+        assertThat(message.getField("f7")).isEqualTo("f-7");
+        assertThat(message.getField("number_field")).isEqualTo(3L);
+        assertThat(message.getField("boolean_field")).isEqualTo(true);
+        assertThat(message.getField("array_field")).satisfies(value -> {
+            assertThat(value instanceof List<?>).isTrue();
+            assertThat(((List<String>) value)).containsAll(List.of("a", "b", "c"));
+        });
+    }
+
+    @Test
     void setField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
@@ -1779,5 +1824,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    void hexToDecimalConversion() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("0x17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("0x117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("not_hex")).isEqualTo(null);
     }
 }

@@ -49,7 +49,7 @@ const defaultProps = {
 } as const;
 
 // eslint-disable-next-line react/require-default-props
-const TimeRangePicker = (props: React.ComponentProps<typeof OriginalTimeRangePicker>) => (
+const TimeRangePicker = ({ ...props }: React.ComponentProps<typeof OriginalTimeRangePicker>) => (
   <OriginalTimeRangePicker {...props}>
     <button type="button">Open</button>
   </OriginalTimeRangePicker>

@@ -18,7 +18,7 @@ package org.graylog.plugins.sidecar.services;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.IndexOptions;
@@ -37,6 +37,7 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
@@ -149,6 +150,7 @@ public class SidecarService {
         }
     }
 
+    @MustBeClosed
     private Stream<Sidecar> streamAll() {
         return MongoUtils.stream(collection.find());
     }
@@ -313,6 +315,7 @@ public class SidecarService {
                 .collect(Collectors.toList());
     }
 
+    @MustBeClosed
     public Stream<Sidecar> findByTagsAndOS(Collection<String> tags, String os) {
         return MongoUtils.stream(collection.find(
                 and(

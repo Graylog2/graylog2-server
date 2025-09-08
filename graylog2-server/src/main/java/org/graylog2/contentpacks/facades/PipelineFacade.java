@@ -59,7 +59,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -167,7 +166,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             if (stream instanceof Stream) {
                 streams.add((Stream) stream);
             } else {
-                if (EntityDescriptorIds.isSystemStreamDescriptor(descriptor)) {
+                if (ModelTypes.STREAM_V1.equals(descriptor.type()) && streamService.getSystemStreamIds(true).contains(descriptor.id().id())) {
                     try {
                         streams.add(streamService.load(descriptor.id().id()));
                     } catch (NotFoundException e) {

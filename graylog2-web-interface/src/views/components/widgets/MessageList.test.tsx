@@ -19,6 +19,7 @@ import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
+import useSearchResult from 'views/hooks/useSearchResult';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
@@ -33,7 +34,6 @@ import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
-import type { SearchErrorResponse } from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
@@ -55,6 +55,7 @@ jest.mock('stores/inputs/InputsStore', () => ({
 }));
 
 jest.mock('views/hooks/useAutoRefresh');
+jest.mock('views/hooks/useSearchResult');
 
 const searchTypeResults = {
   'search-type-id': {
@@ -70,7 +71,13 @@ const dummySearchJobResults = {
   id: 'foo',
   owner: 'me',
   search_id: 'bar',
-  results: {},
+  results: {
+    'deadbeef': {
+      query: { search_types: [{ id: 'search-type-id', limit: 10000 }] },
+      execution_stats: {},
+      errors: [],
+    },
+  },
 };
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
@@ -235,28 +242,28 @@ describe('MessageList', () => {
     await waitFor(() => expect(stopAutoRefresh).toHaveBeenCalledTimes(1));
   });
 
-  it('displays error description, when using pagination throws an error', async () => {
-    const dispatch = jest.fn().mockResolvedValue(
-      finishedLoading({
-        result: new SearchResult({
-          ...dummySearchJobResults,
-          errors: [
-            {
-              description: 'Error description',
-            } as SearchErrorResponse,
-          ],
-        }),
+  it('displays search result limit errors', async () => {
+    asMock(useSearchResult).mockReturnValue({
+      result: new SearchResult({
+        ...dummySearchJobResults,
+        errors: [
+          {
+            query_id: 'deadbeef',
+            search_type_id: 'search-type-id',
+            description: 'Error description',
+            backtrace: undefined,
+            type: 'result_window_limit',
+            result_window_limit: 10000,
+          },
+        ],
       }),
+    });
+
+    render(<SimpleMessageList />);
+
+    await screen.findByText(
+      'Elasticsearch limits the search result to 10000 messages. With a page size of 10000 messages, you can use the first 1 pages. Error description',
     );
-    asMock(useViewsDispatch).mockReturnValue(dispatch);
-
-    const secondPageSize = 10;
-
-    render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
-
-    await clickNextPageButton();
-
-    await screen.findByText('Error description');
   });
 
   it('calls render completion callback after first render', async () => {

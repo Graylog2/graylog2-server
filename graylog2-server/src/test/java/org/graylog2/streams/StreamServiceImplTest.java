@@ -18,15 +18,21 @@ package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,14 +64,15 @@ public class StreamServiceImplTest {
     @Mock
     private MongoIndexSet.Factory factory;
     @Mock
-    private EntityOwnershipService entityOwnershipService;
+    private EntityRegistrar entityRegistrar;
 
     private StreamService streamService;
 
     @Before
-    public void setUp() {
-        this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
-                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
+    public void setUp() throws Exception {
+        final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
+        this.streamService = new StreamServiceImpl(mc, streamRuleService,
+                outputService, indexSetService, factory, entityRegistrar, new ClusterEventBus(), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
     }
 
     @Test
@@ -115,8 +122,8 @@ public class StreamServiceImplTest {
 
         when(output1.getId()).thenReturn(output1Id.toHexString());
         when(output2.getId()).thenReturn(output2Id.toHexString());
-        when(outputService.load(output1Id.toHexString())).thenReturn(output1);
-        when(outputService.load(output2Id.toHexString())).thenReturn(output2);
+        when(outputService.loadByIds(Set.of(output1Id.toHexString(), output2Id.toHexString())))
+                .thenReturn(Set.of(output1, output2));
 
         streamService.addOutputs(streamId, ImmutableSet.of(output1Id, output2Id));
 

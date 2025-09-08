@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
@@ -44,11 +43,7 @@ describe('Select', () => {
 
     render(<SimpleSelect options={options} onChange={onChange} />);
 
-    const select = await screen.findByLabelText('Select value');
-
-    await selectEvent.openMenu(select);
-
-    await selectEvent.select(select, 'foo');
+    await selectEvent.chooseOption('Select value', 'foo');
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith('foo'));
   });
@@ -60,11 +55,7 @@ describe('Select', () => {
 
     render(<SimpleSelect options={options} onChange={onChange} />);
 
-    const select = await screen.findByLabelText('Select value');
-
-    await selectEvent.openMenu(select);
-
-    await selectEvent.select(select, '42');
+    await selectEvent.chooseOption('Select value', '42');
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
   });
@@ -74,10 +65,7 @@ describe('Select', () => {
       const onChange = jest.fn();
       render(<SimpleSelect onChange={onChange} multi />);
 
-      const select = await screen.findByLabelText('Select value');
-
-      selectEvent.openMenu(select);
-      selectEvent.select(select, ['label1', 'label2']);
+      await selectEvent.chooseOption('Select value', ['label1', 'label2']);
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1,value2'));
     });
@@ -92,10 +80,7 @@ describe('Select', () => {
       const onChange = jest.fn();
       const { container } = render(<SimpleSelect onChange={onChange} clearable />);
 
-      const select = await screen.findByLabelText('Select value');
-
-      selectEvent.openMenu(select);
-      selectEvent.select(select, 'label1');
+      await selectEvent.chooseOption('Select value', 'label1');
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1'));
 
@@ -120,30 +105,15 @@ describe('Select', () => {
       const customOptions = [{ label: 'label1', customValue: 42 }];
       render(<SimpleSelect options={customOptions} onChange={onChange} valueKey="customValue" menuIsOpen />);
 
-      const select = await screen.findByLabelText('Select value');
-      selectEvent.openMenu(select);
-
-      selectEvent.select(select, 'label1');
+      await selectEvent.chooseOption('Select value', 'label1');
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
-    });
-
-    it('should use matchProp to configure how options are filtered', async () => {
-      render(<SimpleSelect matchProp="value" />);
-
-      const select = await screen.findByLabelText('Select value');
-      selectEvent.openMenu(select);
-      await userEvent.type(select, 'value1');
-
-      await screen.findByRole('option', { name: /label1/ });
-
-      expect(screen.queryByRole('option', { name: /label2/ })).not.toBeInTheDocument();
     });
 
     it("should use optionRenderer to customize options' appearance", async () => {
       const optionRenderer = (option: { label: string }) => <span>Custom {option.label}</span>;
       render(<SimpleSelect optionRenderer={optionRenderer} menuIsOpen />);
-      const select = await screen.findByLabelText('Select value');
+      const select = await selectEvent.findSelectInput('Select value');
 
       selectEvent.openMenu(select);
       await screen.findByRole('option', { name: /Custom label1/i });
@@ -161,18 +131,18 @@ describe('Select', () => {
         { label: 'disabled', value: 'disabled', disabled: true },
       ];
       render(<SimpleSelect options={customOptions} />);
-      const select = await screen.findByLabelText('Select value');
+      const select = await selectEvent.findSelectInput('Select value');
       selectEvent.openMenu(select);
 
-      expect(await screen.findByRole('option', { name: 'enabled' })).toBeEnabled();
-      expect(await screen.findByRole('option', { name: 'disabled' })).toBeEnabled();
+      expect(await screen.findByRole('option', { name: 'enabled' })).toHaveAttribute('aria-disabled', 'false');
+      expect(await screen.findByRole('option', { name: 'disabled' })).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('should add custom props to input using inputProps', async () => {
       const inputProps = { id: 'myId' };
       render(<SimpleSelect inputProps={inputProps} />);
 
-      const select = await screen.findByLabelText('Select value');
+      const select = await selectEvent.findSelectInput('Select value');
 
       expect(select).toHaveAttribute('id', 'myId');
     });

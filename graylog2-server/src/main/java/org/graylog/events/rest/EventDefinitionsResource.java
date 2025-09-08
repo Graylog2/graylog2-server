@@ -66,8 +66,8 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -268,11 +268,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Get multiple event definitions by id")
     @NoAuditEvent("Bulk retrieval, no data is changed.")
     public List<EventDefinitionDto> getById(@ApiParam(name = "JSON body") @Valid GetByIdRequest request) {
-        for (String id : request.eventDefinitionIds()) {
-            checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, id);
-        }
+        final Set<String> permittedIds = request.eventDefinitionIds().stream()
+                .filter(id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id))
+                .collect(Collectors.toSet());
 
-        return dbService.getByIds(request.eventDefinitionIds());
+        return dbService.getByIds(permittedIds);
     }
 
     @POST
@@ -281,11 +281,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") UnwrappedCreateEntityRequest<EventDefinitionDto> unwrappedCreateEntityRequest, @Context UserContext userContext) {
-        final EventDefinitionDto dto = unwrappedCreateEntityRequest.getEntity();
+                           @ApiParam(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
+        final EventDefinitionDto dto = createEntityRequest.entity();
         checkEventDefinitionPermissions(dto, "create");
 
-        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -293,7 +293,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
                 eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
-        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest -> {
+        createEntityRequest.shareRequest().ifPresent(shareRequest -> {
             entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, entity.id(), shareRequest, userContext.getUser());
         });
 
@@ -314,7 +314,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
-        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -473,9 +473,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull EventDefinitionDto toValidate) {
+                                         @Valid @NotNull EventDefinitionDto toValidate,
+                                     @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
-        ValidationResult validationResult = toValidate.config().validate();
+        ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }

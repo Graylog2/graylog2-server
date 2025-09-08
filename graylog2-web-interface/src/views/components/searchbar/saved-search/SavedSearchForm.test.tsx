@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { act, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
@@ -39,25 +39,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 const shareWithCollaborator = async () => {
-  const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-  await act(async () => {
-    await selectEvent.openMenu(granteesSelect);
-  });
-
-  await act(async () => {
-    await selectEvent.select(granteesSelect, everyone.title);
-  });
-
-  const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-  await act(async () => {
-    await selectEvent.openMenu(capabilitySelect);
-  });
-
-  await act(async () => {
-    await selectEvent.select(capabilitySelect, viewer.title);
-  });
+  await selectEvent.chooseOption('Search for users and teams', everyone.title);
+  await selectEvent.chooseOption('Select a capability', viewer.title);
 
   const addCollaborator = await screen.findByRole('button', {
     name: /add collaborator/i,

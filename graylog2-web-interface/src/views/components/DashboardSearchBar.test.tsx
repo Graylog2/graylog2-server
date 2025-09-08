@@ -26,6 +26,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import suppressConsole from 'helpers/suppressConsole';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
@@ -66,7 +67,7 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 
 const DashboardSearchBar = () => (
   <TestStoreProvider>
-    <OriginalDashboardSearchBar />
+    <OriginalDashboardSearchBar scrollContainer={{ current: null }} />
   </TestStoreProvider>
 );
 
@@ -111,7 +112,9 @@ describe('DashboardSearchBar', () => {
 
       const timeRangeFilter = await screen.findByText(/no override/i);
 
-      await userEvent.click(timeRangeFilter);
+      // TODO: Fix nested `form`-elements and remove `suppressConsole` here.
+      await suppressConsole(() => userEvent.click(timeRangeFilter));
+
       await userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
       const timeRangePickerSubmitButton = await screen.findByRole('button', { name: 'Update time range' });
       await waitFor(() => expect(timeRangePickerSubmitButton).toBeEnabled());

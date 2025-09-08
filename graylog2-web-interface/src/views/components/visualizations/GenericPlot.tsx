@@ -18,7 +18,8 @@ import * as React from 'react';
 import { useContext, useMemo, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import type { Layout } from 'plotly.js';
+import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
+import type Plotly from 'plotly.js/lib/core';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -46,7 +47,7 @@ const StyledPlot = styled(Plot)(
       }
 
       .name {
-        fill: ${theme.colors.global.textDefault} !important;
+        fill: ${theme.colors.text.primary} !important;
       }
 
       path {
@@ -96,10 +97,11 @@ type Props = {
   layout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string) => void;
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
-  onClickMarker?: (event: OnClickMarkerEvent) => void;
+  onClickMarker?: (markerEvent: OnClickMarkerEvent, event?: PlotMouseEvent) => void;
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
+  onInitialized?: (figure: unknown, graphDiv: PlotlyHTMLElement) => void;
 };
 
 type Axis = {
@@ -123,7 +125,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
 
   return useMemo(() => {
     const fontSettings = {
-      color: theme.colors.global.textDefault,
+      color: theme.colors.text.primary,
       size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
       family: theme.fonts.family.body,
     };
@@ -185,7 +187,7 @@ const usePlotChartData = (
         if (setChartColor && colors) {
           const conf = setChartColor(chart, colors);
 
-          conf.outsidetextfont = { color: theme.colors.global.textDefault };
+          conf.outsidetextfont = { color: theme.colors.text.primary };
 
           if (chart?.name === eventsDisplayName) {
             const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
@@ -202,7 +204,7 @@ const usePlotChartData = (
 
         return chart;
       }),
-    [chartData, colors, setChartColor, theme.colors.global.textDefault],
+    [chartData, colors, setChartColor, theme.colors.text.primary],
   );
 };
 
@@ -215,6 +217,7 @@ const GenericPlot = ({
   onUnhoverMarker = () => {},
   onZoom = () => {},
   onAfterPlot = () => {},
+  onInitialized = () => {},
 }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
@@ -248,11 +251,14 @@ const GenericPlot = ({
   );
 
   const _onMarkerClick = useCallback(
-    ({ points }: Readonly<Plotly.PlotMouseEvent>) => {
-      onClickMarker?.({
-        x: points[0].x as string,
-        y: points[0].y as string,
-      });
+    (e: Readonly<Plotly.PlotMouseEvent>) => {
+      onClickMarker?.(
+        {
+          x: e.points[0].x as string,
+          y: e.points[0].y as string,
+        },
+        e,
+      );
     },
     [onClickMarker],
   );
@@ -274,6 +280,7 @@ const GenericPlot = ({
       onUnhover={onUnhoverMarker}
       onRelayout={interactive ? _onRelayout : () => {}}
       config={config}
+      onInitialized={onInitialized}
     />
   );
 };

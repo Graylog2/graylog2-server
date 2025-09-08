@@ -24,11 +24,14 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +75,7 @@ public class EventsSearchService {
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
         final var eventStreams = allowedEventStreams(subject);
-        if(eventStreams.isEmpty()) {
+        if (eventStreams.isEmpty()) {
             return EventsSearchResult.empty();
         }
 
@@ -94,8 +97,8 @@ public class EventsSearchService {
                 }).collect(Collectors.toList());
 
         final EventsSearchResult.Context context = EventsSearchResult.Context.create(
-                lookupEventDefinitions(eventDefinitionIdsBuilder.build()),
-                lookupStreams(streamIdsBuilder.build())
+                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
+                lookupStreams(streamIdsBuilder.build(), subject)
         );
 
         return EventsSearchResult.builder()
@@ -110,7 +113,7 @@ public class EventsSearchService {
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
         final var eventStreams = allowedEventStreams(subject);
-        if(eventStreams.isEmpty()) {
+        if (eventStreams.isEmpty()) {
             return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
         }
 
@@ -118,6 +121,23 @@ public class EventsSearchService {
         final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
+    }
+
+    public EventsSearchResult searchByIds(Collection<String> eventIds, Subject subject) {
+        final var query = eventIds.stream()
+                .map(eventId -> EventDto.FIELD_ID + ":" + eventId)
+                .collect(Collectors.joining(" OR "));
+        final EventsSearchParameters parameters = EventsSearchParameters.builder()
+                .page(1)
+                .perPage(eventIds.size())
+                .timerange(RelativeRange.allTime())
+                .query(query)
+                .filter(EventsSearchFilter.empty())
+                .sortBy(Message.FIELD_TIMESTAMP)
+                .sortDirection(EventsSearchParameters.SortDirection.DESC)
+                .build();
+
+        return search(parameters, subject);
     }
 
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
@@ -130,21 +150,26 @@ public class EventsSearchService {
             return Collections.emptySet();
         }
 
-        return streamService.loadAll().stream()
-                .map(Persisted::getId)
-                // Select all streams the user is NOT permitted to access
-                .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                .collect(Collectors.toSet());
+        try (var stream = streamService.streamAllIds()) {
+            return stream
+                    // Select all streams the user is NOT permitted to access
+                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                    .collect(Collectors.toSet());
+        }
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
-        return streamService.loadByIds(streams)
+    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams, final Subject subject) {
+        final var allowedStreams = streams.stream().filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId))).collect(Collectors.toSet());
+
+        return streamService.loadByIds(allowedStreams)
                 .stream()
-                .collect(Collectors.toMap(Persisted::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
+                .collect(Collectors.toMap(Stream::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions) {
-        return eventDefinitionService.getByIds(eventDefinitions)
+    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions, final Subject subject) {
+        final var allowedEventDefinitions = eventDefinitions.stream().filter(eventDefinitionId -> subject.isPermitted(String.join(":", RestPermissions.EVENT_DEFINITIONS_READ, eventDefinitionId))).collect(Collectors.toSet());
+
+        return eventDefinitionService.getByIds(allowedEventDefinitions)
                 .stream()
                 .collect(Collectors.toMap(EventDefinitionDto::id,
                         d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
