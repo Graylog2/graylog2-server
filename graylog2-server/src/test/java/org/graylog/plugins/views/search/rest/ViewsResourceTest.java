@@ -49,6 +49,7 @@ import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
@@ -448,7 +449,7 @@ public class ViewsResourceTest {
 
         return new ViewsResource(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain,
                 viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper,
-                mock(AuditEventSender.class), mock(ObjectMapper.class), mock(EntitySharesService.class)) {
+                mock(AuditEventSender.class), mock(ObjectMapper.class), mock(EntitySharesService.class), mock(EntitySourceService.class)) {
             @Override
             protected Subject getSubject() {
                 return mock(Subject.class);
