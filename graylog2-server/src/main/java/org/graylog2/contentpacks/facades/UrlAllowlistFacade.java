@@ -47,8 +47,8 @@ import static org.graylog2.contentpacks.model.ModelTypes.URL_ALLOWLIST_ENTRY_V1;
 public class UrlAllowlistFacade implements EntityFacade<AllowlistEntry> {
     public static final ModelType TYPE_V1 = URL_ALLOWLIST_ENTRY_V1;
 
-    private final ObjectMapper objectMapper;
-    private final UrlAllowlistService urlAllowlistService;
+    protected final ObjectMapper objectMapper;
+    protected final UrlAllowlistService urlAllowlistService;
 
     @Inject
     public UrlAllowlistFacade(ObjectMapper objectMapper, UrlAllowlistService urlAllowlistService) {
@@ -116,7 +116,7 @@ public class UrlAllowlistFacade implements EntityFacade<AllowlistEntry> {
                 .collect(Collectors.toSet());
     }
 
-    private String createTitle(AllowlistEntry entry) {
+    protected String createTitle(AllowlistEntry entry) {
         return entry.title() + " [" + entry.value() + "]";
     }
 

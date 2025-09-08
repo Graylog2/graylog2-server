@@ -122,11 +122,6 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     @Override
-    public ClusterConfig getRaw(String key) {
-        return findClusterConfig(key);
-    }
-
-    @Override
     public <T> T getOrDefault(Class<T> type, T defaultValue) {
         return firstNonNull(get(type), defaultValue);
     }
