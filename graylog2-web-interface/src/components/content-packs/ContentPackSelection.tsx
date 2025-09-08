@@ -64,7 +64,7 @@ const List = ({
   updateSelectionEntity,
 }: {
   isFiltered: boolean;
-  entities: { [key: string]: Array<{ title: string }> };
+  entities: { [key: string]: Array<{ title: string; id: string }> };
   selectedEntities: { [key: string]: Array<{ id: string }> };
   isGroupSelected: (group: unknown) => boolean;
   updateSelectionGroup: (group: unknown) => void;

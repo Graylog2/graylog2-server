@@ -17,7 +17,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { Accordion } from '@mantine/core';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { nonInteractiveListItemClass } from 'components/common/ExpandableListItem';
 
