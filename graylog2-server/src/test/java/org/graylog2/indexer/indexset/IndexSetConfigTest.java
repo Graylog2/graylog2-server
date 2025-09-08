@@ -210,57 +210,6 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                true, false,
-                "regular_index_test",
-                4,
-                1,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(10),
-                ZonedDateTime.now(ZoneOffset.UTC),
-                "standard",
-                "graylog3-template",
-                EVENT_TEMPLATE_TYPE,
-                1,
-                false
-        );
-
-        assertThat(config.isRegular()).contains(false);
-        assertThat(config.isRegularIndex()).isFalse();
-    }
-
-    @Test
-    public void nonWritableIndex_isNotRegularIndex() {
-        final IndexSetConfig config = IndexSetConfig.create(
-                "57f3d721a43c2d59cb750001",
-                "Test Regular Index",
-                "Test Regular Index",
-                false, null,
-                "regular_index_test",
-                4,
-                1,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(10),
-                ZonedDateTime.now(ZoneOffset.UTC),
-                "standard",
-                "graylog3-template",
-                MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE,
-                1,
-                false
-        );
-
-        assertThat(config.isRegularIndex()).isFalse();
-    }
-
-    @Test
-    public void missingIsRegularField_defaultsToFalse() {
-        final IndexSetConfig config = IndexSetConfig.create(
-                "57f3d721a43c2d59cb750001",
-                "Test Regular Index",
-                "Test Regular Index",
                 true, null,
                 "regular_index_test",
                 4,
@@ -278,6 +227,31 @@ public class IndexSetConfigTest {
         );
 
         assertThat(config.isRegular()).isEmpty();
+        assertThat(config.isRegularIndex()).isFalse();
+    }
+
+    @Test
+    public void nonWritableIndex_isNotRegularIndex() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Regular Index",
+                "Test Regular Index",
+                false, true,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog3-template",
+                MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
         assertThat(config.isRegularIndex()).isFalse();
     }
 
@@ -306,6 +280,33 @@ public class IndexSetConfigTest {
         assertThat(config.isRegular()).isPresent();
         assertThat(config.isRegular().get()).isTrue();
         assertThat(config.isRegularIndex()).isTrue();
+    }
+
+    @Test
+    public void isWritableButNotRegular_isNotRegular() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Writable Non-regular Index",
+                "This is an index marked as writable with the default template, but marked not regular.",
+                true, false,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "not-default-template",
+                null,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).isPresent();
+        assertThat(config.isRegular().get()).isFalse();
+        assertThat(config.isRegularIndex()).isFalse();
     }
 
     @Test
