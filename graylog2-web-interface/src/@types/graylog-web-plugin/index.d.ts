@@ -289,9 +289,10 @@ declare module 'graylog-web-plugin/plugin' {
     new (json: {}, exports: PluginExports): PluginManifest;
   }
 
+  type WrapWithArray<T> = T extends Array<any> ? T : Array<T>;
   interface PluginStore {
     register: (manifest: PluginRegistration) => void;
-    exports: <T extends keyof PluginExports>(key: T) => PluginExports[T];
+    exports: <T extends keyof PluginExports>(key: T) => WrapWithArray<PluginExports[T]>;
     unregister: (manifest: PluginRegistration) => void;
     get: () => Array<PluginRegistration>;
   }
