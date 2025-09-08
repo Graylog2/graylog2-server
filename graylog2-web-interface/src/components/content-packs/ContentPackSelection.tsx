@@ -15,137 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import styled from 'styled-components';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { ExpandableList, Icon, SearchForm, ExpandableCheckboxListItem } from 'components/common';
+import { Icon, SearchForm } from 'components/common';
 import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
+import ContentPackSelectionList from 'components/content-packs/ContentPackSelectionList';
 
 import style from './ContentPackSelection.css';
-
-const HeaderText = styled.span`
-  overflow-wrap: anywhere;
-`;
-
-const HeaderIcon = styled(Icon)(
-  ({ theme }) => `
-  padding-right: ${theme.spacings.xxs};
-`,
-);
-
-const _entityItemHeader = (entity) => {
-  if (entity instanceof Entity) {
-    return (
-      <>
-        <HeaderIcon name="archive" className={style.contentPackEntity} /> <span>{entity.title}</span>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <HeaderIcon name="dns" /> <HeaderText>{entity.title}</HeaderText>
-    </>
-  );
-};
-
-const List = ({
-  isFiltered,
-  entities,
-  selectedEntities,
-  isGroupSelected,
-  updateSelectionGroup,
-  updateSelectionEntity,
-}: {
-  isFiltered: boolean;
-  entities: { [key: string]: Array<{ title: string; id: string }> };
-  selectedEntities: { [key: string]: Array<{ id: string }> };
-  isGroupSelected: (group: unknown) => boolean;
-  updateSelectionGroup: (group: unknown) => void;
-  updateSelectionEntity: (entity: unknown) => void;
-}) => {
-  const [expandedSections, setExpandedSections] = React.useState<Array<string>>(
-    isFiltered ? Object.keys(entities) : [],
-  );
-
-  useEffect(() => {
-    setExpandedSections(isFiltered ? Object.keys(entities) : []);
-  }, [isFiltered, entities]);
-
-  const isSelected = (entity) => {
-    const typeName = entity.type.name;
-
-    if (!selectedEntities[typeName]) {
-      return false;
-    }
-
-    return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
-  };
-
-  const _isUndetermined = (type) => {
-    if (!selectedEntities[type]) {
-      return false;
-    }
-
-    return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
-  };
-
-  const toDisplayTitle = (title) => {
-    const newTitle = title.split('_').join(' ');
-
-    return newTitle[0].toUpperCase() + newTitle.substr(1);
-  };
-
-  return (
-    <ExpandableList
-      value={expandedSections}
-      onChange={(newExpandedSections) => setExpandedSections(newExpandedSections)}>
-      {Object.keys(entities)
-        .sort((a, b) => naturalSort(a, b))
-        .map((entityType) => {
-          const group = entities[entityType];
-
-          if (group.length <= 0) {
-            return null;
-          }
-
-          return (
-            <ExpandableCheckboxListItem
-              key={entityType}
-              value={entityType}
-              onChange={() => updateSelectionGroup(entityType)}
-              indeterminate={_isUndetermined(entityType)}
-              checked={isGroupSelected(entityType)}
-              header={toDisplayTitle(entityType)}>
-              {group
-                .sort((a, b) => naturalSort(a.title, b.title))
-                .map((entity) => {
-                  const checked = isSelected(entity);
-                  const header = _entityItemHeader(entity);
-
-                  return (
-                    <Input
-                      key={entity.id}
-                      type="checkbox"
-                      formGroupClassName="form-group no-bm"
-                      label={header}
-                      checked={checked}
-                      onChange={() => updateSelectionEntity(entity)}
-                    />
-                  );
-                })}
-            </ExpandableCheckboxListItem>
-          );
-        })}
-    </ExpandableList>
-  );
-};
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -444,7 +323,7 @@ class ContentPackSelection extends React.Component<
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
             {touched.selection && errors.selection && <InputDescription error={errors.selection} />}
-            <List
+            <ContentPackSelectionList
               entities={filteredEntities}
               selectedEntities={selectedEntities}
               isFiltered={isFiltered}
