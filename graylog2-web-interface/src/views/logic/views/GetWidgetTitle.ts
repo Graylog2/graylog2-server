@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { WidgetId } from 'views/logic/views/types';
+import type { QueryId } from 'views/logic/queries/Query';
+import type View from 'views/logic/views/View';
 
-import { singleton } from 'logic/singleton';
-import type { ActionComponents } from 'views/components/actions/ActionHandler';
+const GetWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null =>
+  view.state.get(queryId).titles.getIn(['widget', widgetId]);
 
-export type OverflowingComponentsContextType = {
-  overflowingComponents: ActionComponents;
-  setOverflowingComponents: (newComponents: ActionComponents) => void;
-};
-
-const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
-
-export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);
+export default GetWidgetTitle;
