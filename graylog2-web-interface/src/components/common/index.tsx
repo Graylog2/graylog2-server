@@ -56,6 +56,7 @@ export { default as EntityListItem } from './EntityListItem';
 export { default as ErrorAlert } from './ErrorAlert';
 export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
+export { default as ExpandableCheckboxListItem } from './ExpandableCheckboxListItem';
 export { default as ExternalLink } from './ExternalLink';
 export { default as ExternalLinkButton } from './ExternalLinkButton';
 export { default as FlatContentRow } from './FlatContentRow';
