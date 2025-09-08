@@ -282,6 +282,33 @@ public class IndexSetConfigTest {
     }
 
     @Test
+    public void isRegularAndWritable() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Writable Regular Index",
+                "This is an index explicitly marked as writable and regular but given a non-default template type.",
+                true, true,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "not-default-template",
+                EVENT_TEMPLATE_TYPE,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).isPresent();
+        assertThat(config.isRegular().get()).isTrue();
+        assertThat(config.isRegularIndex()).isTrue();
+    }
+
+    @Test
     public void testEventIndexWithChangedFieldMappingsIsIllegal() {
         assertFalse(testIndexSetConfig(EVENT_TEMPLATE_TYPE,
                 new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
