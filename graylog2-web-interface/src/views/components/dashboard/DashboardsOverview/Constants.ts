@@ -27,7 +27,14 @@ const getDashboardTableElements = (pluggableAttributes?: {
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
     defaultDisplayedAttributes: isEvidenceModal
       ? ['title', 'description', 'summary']
-      : ['title', 'description', 'summary', 'favorite', ...(pluggableAttributes?.attributeNames || [])],
+      : [
+          'title',
+          'description',
+          'summary',
+          'favorite',
+          'last_updated_at',
+          ...(pluggableAttributes?.attributeNames || []),
+        ],
   });
 
   const columnOrder = [
