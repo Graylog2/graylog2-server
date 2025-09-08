@@ -24,6 +24,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import { defaultOnError } from 'util/conditional/onError';
 import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -50,6 +51,7 @@ export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {
     sort: searchParams.sort.attributeId,
     order: searchParams.sort.direction,
     scope: searchParams.scope,
+    filters: FiltersForQueryParams(searchParams.filters),
   });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
