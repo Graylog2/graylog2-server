@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -52,6 +52,12 @@ const _entityItemHeader = (entity) => {
   );
 };
 
+const toDisplayTitle = (title) => {
+  const newTitle = title.split('_').join(' ');
+
+  return newTitle[0].toUpperCase() + newTitle.substr(1);
+};
+
 const ContentPackSelectionList = ({
   isFiltered,
   entities,
@@ -75,29 +81,29 @@ const ContentPackSelectionList = ({
     setExpandedSections(isFiltered ? Object.keys(entities) : []);
   }, [isFiltered, entities]);
 
-  const isSelected = (entity) => {
-    const typeName = entity.type.name;
+  const isSelected = useCallback(
+    (entity) => {
+      const typeName = entity.type.name;
 
-    if (!selectedEntities[typeName]) {
-      return false;
-    }
+      if (!selectedEntities[typeName]) {
+        return false;
+      }
 
-    return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
-  };
+      return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
+    },
+    [selectedEntities],
+  );
 
-  const _isUndetermined = (type) => {
-    if (!selectedEntities[type]) {
-      return false;
-    }
+  const _isUndetermined = useCallback(
+    (type) => {
+      if (!selectedEntities[type]) {
+        return false;
+      }
 
-    return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
-  };
-
-  const toDisplayTitle = (title) => {
-    const newTitle = title.split('_').join(' ');
-
-    return newTitle[0].toUpperCase() + newTitle.substr(1);
-  };
+      return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
+    },
+    [entities, selectedEntities],
+  );
 
   return (
     <ExpandableList
