@@ -144,7 +144,8 @@ const DashboardActions = ({ dashboard, isEvidenceModal = false }: Props) => {
           onClick={() => setShowShareModal(true)}
         />
       )}
-      {!!moreActions.length && isEvidenceModal ? moreActions[0] : <MoreActions>{moreActions}</MoreActions>}
+      {!!moreActions.length && isEvidenceModal ? <MoreActions>{moreActions[0]}</MoreActions> : <MoreActions>{moreActions}</MoreActions>}
+
       {showShareModal && (
         <EntityShareModal
           entityId={dashboard.id}
