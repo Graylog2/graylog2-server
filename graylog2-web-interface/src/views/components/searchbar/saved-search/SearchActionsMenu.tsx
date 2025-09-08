@@ -173,7 +173,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView, entityShare)
+      ViewManagementActions.create(newView, entityShare, view.id)
         .then((createdView) => {
           toggleFormModal();
 
