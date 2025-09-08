@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { singleton } from 'logic/singleton';
-import type { ActionComponents } from 'views/components/actions/ActionHandler';
+export default () => {
+  const [Component] = useMemo(
+    () =>
+      PluginStore.exports('pages')
+        .map((c) => c.search?.component)
+        .filter((c) => !!c) ?? [],
+    [],
+  );
 
-export type OverflowingComponentsContextType = {
-  overflowingComponents: ActionComponents;
-  setOverflowingComponents: (newComponents: ActionComponents) => void;
+  return <Component />;
 };
-
-const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
-
-export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);

@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+package org.graylog.events.procedures;
 
-export default () => {
-  const [Component] = useMemo(
-    () =>
-      PluginStore.exports('pages')
-        .map((c) => c.search || {})
-        .map((c) => c.component)
-        .filter((c) => c) ?? [],
-    [],
-  );
+import org.graylog.events.event.EventDto;
 
-  return <Component />;
-};
+import java.util.Optional;
+
+public class DefaultEventProcedureProvider implements EventProcedureProvider {
+
+    @Override
+    public Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event) {
+        return Optional.empty();
+    }
+}

@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.datanode.configuration;
 
-import { singleton } from 'logic/singleton';
-import type { ActionComponents } from 'views/components/actions/ActionHandler';
+import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.configuration.Documentation;
 
-export type OverflowingComponentsContextType = {
-  overflowingComponents: ActionComponents;
-  setOverflowingComponents: (newComponents: ActionComponents) => void;
-};
+public class HdfsRepositoryConfiguration {
 
-const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
+    @Documentation("Should HDFS repository be enabled? This will also add the search role and activate search cache.")
+    @Parameter(value = "hdfs_repository_enabled")
+    private boolean enabled = false;
 
-export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);
+    public boolean isRepositoryEnabled() {
+        return enabled;
+    }
+}
