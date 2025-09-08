@@ -34,9 +34,11 @@ const Container = styled.span(
   `,
 );
 
-const ValueRenderer = ({ value, label, traceColor, }) => <Container>
+const ValueRenderer = ({ value, label, traceColor }) => (
+  <Container>
     <ValueBox $bgColor={traceColor}>{value}</ValueBox>
     <span>{label}</span>
-  </Container>;
+  </Container>
+);
 
 export default ValueRenderer;
