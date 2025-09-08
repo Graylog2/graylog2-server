@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.events.event.EventDto;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -32,9 +33,23 @@ public interface ActionConfig {
     @JsonProperty(TYPE_FIELD)
     String type();
 
+    String toText(EventDto event);
+
+    String toHtml(EventDto event);
+
     class FallbackConfig implements ActionConfig {
         @Override
         public String type() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String toText(EventDto event) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String toHtml(EventDto event) {
             throw new UnsupportedOperationException();
         }
     }

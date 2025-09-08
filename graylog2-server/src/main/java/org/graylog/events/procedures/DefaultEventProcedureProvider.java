@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.events.procedures;
 
-import { singleton } from 'logic/singleton';
-import type { ActionComponents } from 'views/components/actions/ActionHandler';
+import org.graylog.events.event.EventDto;
 
-export type OverflowingComponentsContextType = {
-  overflowingComponents: ActionComponents;
-  setOverflowingComponents: (newComponents: ActionComponents) => void;
-};
+import java.util.Optional;
 
-const OverflowingComponentsContext = React.createContext<OverflowingComponentsContextType | null>(null);
+public class DefaultEventProcedureProvider implements EventProcedureProvider {
 
-export default singleton('contexts.OverflowingComponentsContext', () => OverflowingComponentsContext);
+    @Override
+    public Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event) {
+        return Optional.empty();
+    }
+}
