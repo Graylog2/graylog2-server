@@ -14,17 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { Map } from 'immutable';
 
-import { SystemOutputs } from '@graylog/server-api';
+import type { TitlesMap } from 'views/stores/TitleTypes';
+import TitleTypes from 'views/stores/TitleTypes';
+import type Widget from 'views/logic/widgets/Widget';
 
-const useOutputTypes = () => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['outputs', 'types'],
-    queryFn: () => SystemOutputs.available(),
-  });
+const SetWidgetTitle = (titlesMap: TitlesMap, widget: Widget, title: string) => {
+  if (!title) {
+    return titlesMap;
+  }
 
-  return { types: data?.types, isLoading: isInitialLoading };
+  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
+  const newWidgetTitles = widgetTitles.set(widget.id, title);
+
+  return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
 };
 
-export default useOutputTypes;
+export default SetWidgetTitle;

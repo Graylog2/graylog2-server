@@ -16,84 +16,32 @@
  */
 import { List, Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import * as Immutable from 'immutable';
 
-import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import type Query from 'views/logic/queries/Query';
-import { ConcatPositions } from 'views/logic/views/GenerateNextPosition';
-import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TitleTypes from 'views/stores/TitleTypes';
+import AddWidgetToDashboardTab from 'views/logic/views/AddWidgetToDashboardTab';
+import type { QueryId } from 'views/logic/queries/Query';
+import GetWidgetTitle from 'views/logic/views/GetWidgetTitle';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
-type QueryId = string;
-
-const _newPositionsMap = (oldPosition, widgetPositions, widget): Immutable.Map<string, WidgetPosition> => {
-  const newWidgetPositions: Immutable.Map<string, WidgetPosition> = oldPosition
-    ? ConcatPositions(
-        Immutable.Map({ [widget.id]: oldPosition.toBuilder().row(1).col(1).build() }),
-        Immutable.Map(widgetPositions),
-      )
-    : Immutable.Map(widgetPositions);
-
-  return newWidgetPositions;
-};
-
-const _newTitlesMap = (titlesMap, widget, title) => {
-  if (!title) {
-    return titlesMap;
-  }
-
-  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
-  const newWidgetTitles = widgetTitles.set(widget.id, title);
-
-  return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
-};
-
-const _addWidgetToDashboard = (
-  widget: Widget,
-  dashboard: View,
-  oldPosition: WidgetPosition,
-  title: string | undefined | null,
-): View => {
-  const dashboardQueryId = dashboard.search.queries.first().id;
-  const viewState = dashboard.state.get(dashboardQueryId);
-  const widgets = viewState.widgets.push(widget);
-
-  const { widgetPositions } = viewState;
-  const newWidgetPositions: Map<string, WidgetPosition> = _newPositionsMap(oldPosition, widgetPositions, widget);
-
-  const titlesMap = viewState.titles;
-  const newTitlesMap = _newTitlesMap(titlesMap, widget, title);
-
-  const newViewState = viewState
-    .toBuilder()
-    .widgets(widgets)
-    .titles(newTitlesMap)
-    .widgetPositions(newWidgetPositions)
-    .build();
-
-  return dashboard.toBuilder().state(dashboard.state.set(dashboardQueryId, newViewState)).build();
-};
-
-const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View): View | undefined | null => {
-  if (dashboard.type !== View.Type.Dashboard) {
-    return undefined;
+const CopyWidgetToDashboard = (widgetId: string, source: View, destination: View): View | undefined | null => {
+  if (destination.type !== View.Type.Dashboard) {
+    throw new Error(`Unexpected type ${destination.type} expected ${View.Type.Dashboard}`);
   }
 
   const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard');
 
-  const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
-  const match: [Widget, QueryId] | undefined | null = FindWidgetAndQueryIdInView(widgetId, search);
+  const queryMap: Map<QueryId, Query> = Map(source.search.queries.map((q) => [q.id, q]));
+  const match = FindWidgetAndQueryIdInView(widgetId, source);
 
   if (match) {
     const [widget, queryId] = match;
     const { timerange, query, filter = Map(), filters } = queryMap.get(queryId);
-    const { widgetPositions } = search.state.get(queryId);
+    const { widgetPositions } = source.state.get(queryId);
     const oldPositions = widgetPositions[widgetId];
-    const title = search.state.get(queryId).titles.get(TitleTypes.Widget).get(widgetId);
+    const title = GetWidgetTitle(widgetId, queryId, source);
 
     const streams = (filter ? filter.get('filters', List.of()) : List.of())
       .filter((value) => Map.isMap(value) && value.get('type') === 'stream')
@@ -110,9 +58,11 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .filters(filters)
       .build();
 
-    const updatedView = UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));
+    const updatedView = UpdateSearchForWidgets(
+      AddWidgetToDashboardTab(dashboardWidget, undefined, destination, oldPositions, title),
+    );
 
-    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(search, previousDashboard), updatedView);
+    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(source, previousDashboard), updatedView);
   }
 
   return undefined;
