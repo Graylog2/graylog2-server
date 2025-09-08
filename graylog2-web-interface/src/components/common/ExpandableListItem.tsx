@@ -14,72 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { Accordion } from '@mantine/core';
 
-import { Checkbox } from 'components/bootstrap';
+export const nonInteractiveListItemClass = 'non-interactive-expandable-list-item';
 
-import Icon from './Icon';
-
-const ItemWrap = styled.li<{ $padded: boolean }>(
-  ({ $padded }) => css`
-    padding: ${$padded ? '10px 5px' : ''};
-  `,
-);
-
-const Container = styled.div(
+const NonInteractiveItem = styled.div(
   ({ theme }) => css`
+    padding-top: ${theme.spacings.xs};
+    padding-bottom: ${theme.spacings.xs};
+    min-height: 34px;
     display: flex;
-    font-size: ${theme.fonts.size.body};
-    line-height: 20px;
-
-    label {
-      min-height: 20px;
-      margin-bottom: 2px;
-      margin-right: 5px;
-
-      * {
-        cursor: pointer;
-      }
-    }
+    align-items: center;
   `,
 );
 
-const Toggle = styled.div`
-  display: inline-block;
-  width: 20px;
-  margin-right: 5px;
-`;
-
-const IconContainer = styled.div(
+const ContentContainer = styled.div(
   ({ theme }) => css`
-    cursor: pointer;
-    font-size: ${theme.fonts.size.large};
-    line-height: 20px;
-    width: 1em;
-    height: 1em;
-    vertical-align: text-top;
-
-    &:hover {
-      color: ${theme.colors.variant.primary};
-      opacity: 1;
-    }
+    border-left: 1px ${theme.colors.gray[90]} solid;
+    padding-left: 18px;
   `,
 );
-
-const HeaderWrap = styled.span(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.large};
-  `,
-);
-
-const Header = styled.button`
-  display: flex;
-  border: 0;
-  padding: 0;
-  text-align: left;
-  background: transparent;
-`;
 
 const Subheader = styled.span(
   ({ theme }) => css`
@@ -89,159 +46,59 @@ const Subheader = styled.span(
   `,
 );
 
-const ExpandableContent = styled.div(
+const StyledAccordionItem = styled(Accordion.Item)(
   ({ theme }) => css`
-    border-left: 1px ${theme.colors.gray[90]} solid;
-    margin-left: 35px;
-    margin-top: 10px;
-    padding-left: 5px;
+    .mantine-Accordion-chevron {
+      margin-left: ${theme.spacings.xxs};
+      margin-right: ${theme.spacings.sm};
+    }
+
+    .mantine-Accordion-content {
+      padding-left: 11px;
+    }
+
+    .mantine-Accordion-label {
+      padding-top: ${theme.spacings.xs};
+      padding-bottom: ${theme.spacings.xs};
+    }
   `,
 );
 
-const _filterInputProps = (props) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
-
-  return inputProps;
-};
-
-type Props = React.ComponentProps<typeof Checkbox> & {
+type Props = React.PropsWithChildren<{
   header: React.ReactNode;
-  checked?: boolean;
-  indetermined?: boolean;
-  selectable?: boolean;
-  expandable?: boolean;
-  expanded?: boolean;
-  stayExpanded?: boolean;
-  subheader?: React.ReactNode;
+  value: string;
   children?: React.ReactNode;
-  padded?: boolean;
-  readOnly?: boolean;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+  expandable?: boolean;
+  subheader?: React.ReactNode;
+}>;
 
-type State = {
-  expanded: boolean;
-};
-
-interface CheckboxInstance {
-  indeterminate: boolean;
-  click: () => void;
-}
-
-/**
- * The ExpandableListItem is needed to render a ExpandableList.
- */
-class ExpandableListItem extends React.Component<Props, State> {
-  private _checkbox: CheckboxInstance | undefined;
-
-  static defaultProps = {
-    checked: false,
-    indetermined: false,
-    expandable: true,
-    expanded: false,
-    selectable: true,
-    children: [],
-    subheader: undefined,
-    stayExpanded: false,
-    padded: true,
-    readOnly: false,
-    onChange: () => undefined,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      expanded: props.expanded,
-    };
-  }
-
-  componentDidMount() {
-    const { indetermined } = this.props;
-
-    if (indetermined && this._checkbox) {
-      this._checkbox.indeterminate = indetermined;
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const { expanded, indetermined } = this.props;
-
-    if (prevProps.expanded !== expanded) {
-      this._toggleExpand();
-    }
-
-    if (this._checkbox) {
-      this._checkbox.indeterminate = indetermined;
-    }
-  }
-
-  _toggleExpand = () => {
-    const { stayExpanded } = this.props;
-    const { expanded } = this.state;
-
-    if (stayExpanded) {
-      this.setState({ expanded: true });
-    } else {
-      this.setState({ expanded: !expanded });
-    }
-  };
-
-  _clickOnHeader = () => {
-    if (this._checkbox) {
-      this._checkbox.click();
-    }
-  };
-
-  render() {
-    const { expanded } = this.state;
-    const { padded } = this.props;
-    const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
-    const headerToRender = selectable ? (
-      <Header type="button" tabIndex={0} onClick={this._clickOnHeader}>
-        {header}
-      </Header>
-    ) : (
-      header
-    );
-    const inputProps = _filterInputProps(otherProps);
-
+const ExpandableListItem = ({
+  header,
+  children = undefined,
+  value,
+  subheader = undefined,
+  expandable = true,
+}: Props) => {
+  if (!expandable) {
     return (
-      <ItemWrap $padded={padded}>
-        <Container>
-          {selectable && (
-            <Checkbox
-              inputRef={(ref) => {
-                this._checkbox = ref;
-              }}
-              inline
-              title="Select item"
-              checked={checked}
-              {...inputProps}
-            />
-          )}
-          {expandable && (
-            <Toggle
-              role="button"
-              tabIndex={0}
-              onClick={this._toggleExpand}
-              title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
-              <IconContainer>
-                <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
-              </IconContainer>
-            </Toggle>
-          )}
-          <HeaderWrap className="header">
-            {headerToRender}
-            {subheader && <Subheader>{subheader}</Subheader>}
-          </HeaderWrap>
-        </Container>
-
-        <ExpandableContent>{expanded && children}</ExpandableContent>
-      </ItemWrap>
+      <NonInteractiveItem className={nonInteractiveListItemClass}>
+        {header}
+        {subheader && <Subheader>{subheader}</Subheader>}
+      </NonInteractiveItem>
     );
   }
-}
+
+  return (
+    <StyledAccordionItem value={value}>
+      <Accordion.Control>
+        {header}
+        {subheader && <Subheader>{subheader}</Subheader>}
+      </Accordion.Control>
+      <Accordion.Panel>
+        <ContentContainer>{children}</ContentContainer>
+      </Accordion.Panel>
+    </StyledAccordionItem>
+  );
+};
 
 export default ExpandableListItem;

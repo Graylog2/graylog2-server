@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,9 +26,12 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Redirects the frontend to an existing dashboard.
@@ -68,6 +72,28 @@ public class GoToDashboard extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @JsonIgnore
+        @Override
+        public String toText(EventDto event) {
+            return getLink();
+        }
+
+        @JsonIgnore
+        @Override
+        public String toHtml(EventDto event) {
+            return f("""
+                    <td><a href="%s" target="_blank">Go to Dashboard</a></td>
+                    """, getLink());
+        }
+
+        @JsonIgnore
+        private String getLink() {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("dashboards/" + dashboardId());
+            uriBuilder.setParameters(parameters());
+            return uriBuilder.build().getLink();
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {
