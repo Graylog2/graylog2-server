@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
-public class ScopedEntityMongoUtils<T extends ScopedEntity> {
+public class ScopedEntityMongoUtils<T extends ScopedEntity<?>> {
     private final MongoCollection<T> collection;
     private final EntityScopeService entityScopeService;
 
@@ -144,7 +144,9 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
         }
         return current
                 .map(t -> entityScopeService.isMutable(t, scopedEntity))
-                .orElseGet(() -> entityScopeService.isMutable(scopedEntity));
+                // If no current entity exists, this isn't a mutation it's a creation so we just confirm
+                // the scope is valid.
+                .orElseGet(() -> entityScopeService.hasValidScope(scopedEntity));
     }
 
     public final boolean isDeletable(T scopedEntity) {

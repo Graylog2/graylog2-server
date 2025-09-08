@@ -56,7 +56,7 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)
-public abstract class IndexSetConfig extends ScopedEntity implements Comparable<IndexSetConfig>, SimpleIndexSetConfig {
+public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, SimpleIndexSetConfig, ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
@@ -292,8 +292,10 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 
