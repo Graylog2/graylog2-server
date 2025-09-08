@@ -49,8 +49,7 @@ public class DBEntitySourceService {
         collection.updateMany(filterByParentId, updateParentId);
     }
 
-
     public void deleteByEntityId(String entityId) {
-        collection.deleteMany(objectIdEq(EntitySource.FIELD_ENTITY_ID, entityId));
+        collection.deleteOne(objectIdEq(EntitySource.FIELD_ENTITY_ID, entityId));
     }
 }

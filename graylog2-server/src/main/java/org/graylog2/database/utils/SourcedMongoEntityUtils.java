@@ -16,8 +16,13 @@
  */
 package org.graylog2.database.utils;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.entities.SourcedScopedEntity;
 import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +32,7 @@ import static org.graylog2.database.filtering.inmemory.SingleFilterParser.FIELD_
 import static org.graylog2.database.filtering.inmemory.SingleFilterParser.WRONG_FILTER_EXPR_FORMAT_ERROR_MSG;
 
 public class SourcedMongoEntityUtils {
+    public static String SEARCH_QUERY_TITLE = EntitySource.FIELD_SOURCE;
     public static String FILTERABLE_FIELD = SourcedMongoEntity.FIELD_ENTITY_SOURCE + "." + EntitySource.FIELD_SOURCE;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -39,6 +45,26 @@ public class SourcedMongoEntityUtils {
             filters = removeEntitySourceFilter(filters);
         }
         return new FilterPredicate<>(filters, predicate);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T extends SourcedScopedEntity> QueryPredicate<T> handleScopedEntitySourceFilter(SearchQuery searchQuery, Predicate<T> predicate) {
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+        if (queryMap.containsKey(FILTERABLE_FIELD)) {
+            final Optional<SearchQueryParser.FieldValue> fieldValue = queryMap.get(FILTERABLE_FIELD).stream().findFirst();
+            if (fieldValue.isPresent()) {
+                final String source = fieldValue.get().getValue().toString();
+                predicate = predicate.and(entity -> sourceMatches(entity.entitySource().orElse(null), source));
+                final Multimap<String, SearchQueryParser.FieldValue> updatedQueryMap = HashMultimap.create();
+                queryMap.entries().forEach(entry -> {
+                    if (!FILTERABLE_FIELD.equals(entry.getKey())) {
+                        updatedQueryMap.put(entry.getKey(), entry.getValue());
+                    }
+                });
+                searchQuery = new SearchQuery(searchQuery.getQueryString(), updatedQueryMap, searchQuery.getDisallowedKeys());
+            }
+        }
+        return new QueryPredicate<>(searchQuery, predicate);
     }
 
     private static Optional<String> filterValue(List<String> filters) {
@@ -74,4 +100,6 @@ public class SourcedMongoEntityUtils {
     }
 
     public record FilterPredicate<T>(List<String> filters, Predicate<T> predicate) {}
+
+    public record QueryPredicate<T>(SearchQuery query, Predicate<T> predicate) {}
 }
