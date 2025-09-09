@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import moment from 'moment/moment';
 
 import type { IndexRotationConfigComponentProps } from 'components/indices/rotation/types';
