@@ -133,8 +133,8 @@ const Metric = ({ index }: Props) => {
   const showUnitType = unitFeatureEnabled && isFunctionAllowsUnit(currentFunction);
 
   const createThreshold = () => {
-    const pallet = colors[random(0, colors.length - 1)];
-    const randomColor = pallet[random(0, pallet.length - 1)];
+    const palette = colors[random(0, colors.length - 1)];
+    const randomColor = palette[random(0, palette.length - 1)];
 
     return {
       color: randomColor,
