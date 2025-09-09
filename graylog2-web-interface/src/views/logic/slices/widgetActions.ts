@@ -80,7 +80,7 @@ export const addWidget =
     const activeViewState = selectActiveViewState(getState());
     const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).widgets(newWidgets).build();
 
-    const result = dispatch(updateViewState(activeQuery, newViewState));
+    const result = dispatch(updateViewState(activeQuery, newViewState)).then(() => widget.id);
     dispatch(setNewWidget(widget.id));
 
     return result;
