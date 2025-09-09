@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import minBy from 'lodash/minBy';
 import { useFloating } from '@floating-ui/react';
+import uniqBy from 'lodash/uniqBy';
 
 import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
@@ -27,17 +28,56 @@ import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnC
 import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/HeatmapOnClickPopover';
 import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
+import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
 /** ---------- DOM getters ---------- */
-const getBarElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
+const getBarElement = (
+  graphDiv: HTMLElement,
+  pt: ClickPoint,
+  curveNumberRenderIndexMapper: Record<number, number>,
+): Element | null => {
   const { curveNumber, pointIndex } = pt;
-  const trace = graphDiv.querySelectorAll('.barlayer .trace')[curveNumber] as HTMLElement | undefined;
+  const traceIndex = curveNumberRenderIndexMapper[curveNumber];
+  const trace = graphDiv.querySelectorAll('.cartesianlayer .trace')[traceIndex] as HTMLElement | undefined;
+
   if (!trace) return null;
   const point = trace.querySelectorAll('.point')[pointIndex!] as HTMLElement | undefined;
 
   return point?.querySelector('rect') ?? point?.querySelector('path') ?? null;
+};
+
+const listSubplotOrder = (gd: HTMLElement): string[] => {
+  const subplots = gd.querySelectorAll<SVGGElement>('.cartesianlayer g.subplot');
+
+  return Array.from(subplots).map((node) => {
+    // Each subplot node has classes like "subplot xy" or "subplot x2y3"
+    // We want the specific id class (not the generic "subplot")
+    const idClass = Array.from(node.classList).find((cls) => cls !== 'subplot');
+
+    return idClass ?? '';
+  });
+};
+
+const createBarElementGetter = (gd: PlotlyHTMLElement & { _fullData: Array<any> }) => {
+  const fullData = gd._fullData;
+  const curveNumberGroupedBySubPlot = fullData.reduce(
+    (acc, { xaxis, yaxis }, curveNumber) => {
+      const subplot = `${xaxis ?? 'x'}${yaxis ?? 'y'}`;
+      (acc[subplot] ||= []).push(curveNumber);
+
+      return acc;
+    },
+    {} as Record<string, number[]>,
+  );
+  const subPlotDOMOrder = listSubplotOrder(gd);
+
+  const curveNumberRenderIndexArray = subPlotDOMOrder.flatMap((subPlotId) => curveNumberGroupedBySubPlot[subPlotId]);
+  const curveNumberRenderIndexMapper = Object.fromEntries(curveNumberRenderIndexArray.map((v, i) => [v, i]));
+
+  return (graphDiv: HTMLElement, pt: ClickPoint) => getBarElement(graphDiv, pt, curveNumberRenderIndexMapper);
 };
 
 const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
@@ -107,7 +147,7 @@ const dataToPagePx = (
 };
 
 /** ---------- Anchors ---------- */
-type ElementAnchor = { kind: 'element'; el: Element; rel: Rel; pt: ClickPoint };
+type ElementAnchor = { el: Element; rel: Rel; pt: ClickPoint; pointsInRadius?: Array<ClickPoint> };
 type Anchor = ElementAnchor;
 
 /** ---------- nearest element anchor ---------- */
@@ -121,8 +161,6 @@ const pickNearestElementAnchor = (
     ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
 
-  // TODO: add extra candidates to if distance is not so big
-  /*
   const candidatesWithDistances = candidates.map((candidate) => {
     const rect = candidate.rect as DOMRect;
     let dx = 0;
@@ -135,28 +173,21 @@ const pickNearestElementAnchor = (
 
     return { d, candidate };
   });
-  */
 
-  const picked =
-    inside ??
-    minBy(candidates, ({ rect }) => {
-      let dx = 0;
-      if (clientX < rect.left) dx = rect.left - clientX;
-      else if (clientX > rect.right) dx = clientX - rect.right;
-      let dy = 0;
-      if (clientY < rect.top) dy = rect.top - clientY;
-      else if (clientY > rect.bottom) dy = clientY - rect.bottom;
+  const pointsInRadius = candidatesWithDistances
+    .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
+    .sort((a, b) => a.d - b.d)
+    .map(({ candidate }) => candidate.pt);
 
-      return Math.hypot(dx, dy);
-    });
-  if (!picked) return null;
-  const { el, rect, pt } = picked;
+  const closest = inside ?? minBy(candidatesWithDistances, 'd').candidate;
+  if (!closest) return null;
+  const { el, rect, pt } = closest;
   const rel: Rel = {
     x: clamp01((clientX - rect.left) / Math.max(rect.width, 1)),
     y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', el, rel, pt };
+  return { el, rel, pt, pointsInRadius };
 };
 
 /** ---------- bar/pie anchors ---------- */
@@ -165,11 +196,14 @@ const makeElementAnchor = (
   gd: PlotlyHTMLElement,
   chartType: 'bar' | 'pie' | 'heatmap',
 ): ElementAnchor | null => {
-  const getEl = chartType === 'bar' ? getBarElement : getPieSliceElement;
-  const graphDiv = gd;
+  const getEl =
+    chartType === 'bar'
+      ? createBarElementGetter(gd as PlotlyHTMLElement & { _fullData: Array<any> })
+      : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
+  const graphDiv = gd as unknown as HTMLElement;
   const targetEl = (e.event?.target as Element) || graphDiv;
-  const candidates = (e.points as ClickPoint[])
-    .map((pt) => {
+  const candidates = e.points
+    .map((pt: ClickPoint) => {
       const el = getEl(graphDiv, pt, targetEl);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
@@ -243,14 +277,24 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
     })
     .filter((candidate) => !!candidate);
+
   const bestMarker = pickNearestElementAnchor(e, markerCandidates);
   if (bestMarker) return bestMarker;
   const { clientX, clientY } = e.event as MouseEvent;
   const click: Px = { x: clientX, y: clientY };
-  const lineCandidates = (e.points as ClickPoint[])
-    .flatMap((pt) => getScatterLineElements(graphDiv, click, pt))
+  const lineCandidates = e.points
+    .flatMap((pt: ClickPoint) => getScatterLineElements(graphDiv, click, pt))
     .filter((candidate) => !!candidate);
   const best = minBy(lineCandidates, 'd');
+  // we need unique pt because in this case one pt can have several related lines
+  const pointsInRadius = uniqBy(
+    lineCandidates
+      .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
+      .sort((a, b) => a.d - b.d)
+      .map(({ pt }) => pt),
+    'pointIndex',
+  );
+
   if (!best) return null;
   const { el, pt, valuePx, valuePy } = best;
   if (!el) return null;
@@ -260,7 +304,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
     y: clamp01((valuePy - rect.top) / Math.max(rect.height, 1)),
   };
 
-  return { kind: 'element', rel, el, pt };
+  return { rel, el, pt, pointsInRadius };
 };
 
 type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap';
@@ -289,7 +333,6 @@ const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
 const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
-  const [clickPoint, setClickPoint] = useState<ClickPoint | null>(null);
   const { refs, floatingStyles } = useFloating({
     placement: 'top-start',
     elements: {
@@ -303,18 +346,13 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     gdRef.current = gd;
   };
 
-  const applyAnchor = useCallback((a: ElementAnchor) => {
-    setAnchor(a);
-    setClickPoint(a.pt);
-  }, []);
-
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
     const a = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
     if (!a) return;
-    applyAnchor(a);
+    setAnchor(a);
   };
 
   const onPopoverChange = (isOpen: boolean) => {
@@ -331,7 +369,12 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
       onPopoverChange={onPopoverChange}
       ref={refs.setFloating}
       style={floatingStyles}>
-      <PopoverComponent clickPoint={clickPoint} config={config} />
+      <DropdownSwitcher
+        component={PopoverComponent}
+        clickPoint={anchor?.pt}
+        config={config}
+        clickPointsInRadius={anchor?.pointsInRadius}
+      />
     </OnClickPopoverWrapper>
   );
 
