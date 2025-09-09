@@ -28,6 +28,7 @@ import OriginalValue from './Value';
 import InteractiveContext from './contexts/InteractiveContext';
 
 jest.mock('views/hooks/useExternalValueActions');
+// eslint-disable-next-line react/require-default-props
 const Value = ({ ...props }: React.ComponentProps<typeof OriginalValue>) => (
   <TestStoreProvider>
     <OriginalValue {...props} />
@@ -36,7 +37,7 @@ const Value = ({ ...props }: React.ComponentProps<typeof OriginalValue>) => (
 
 describe('Value', () => {
   const openActionsMenu = async (value: string | RegExp) => {
-    userEvent.click(screen.getByText(value));
+    await userEvent.click(screen.getByText(value));
     await screen.findByRole('menu');
   };
 
@@ -165,6 +166,7 @@ describe('Value', () => {
   );
 
   describe('handles value action menu depending on interactive context', () => {
+    // eslint-disable-next-line react/require-default-props
     const component =
       (interactive: boolean) =>
       ({ ...props }: React.ComponentProps<typeof Value>) => (
@@ -178,7 +180,7 @@ describe('Value', () => {
 
       render(<NoninteractiveComponent field="foo" value={{ foo: 23 }} type={FieldType.Unknown} />);
 
-      userEvent.click(screen.getByText('{"foo":23}'));
+      await userEvent.click(screen.getByText('{"foo":23}'));
 
       expect(screen.queryByText('foo = {"foo":23}')).not.toBeInTheDocument();
     });

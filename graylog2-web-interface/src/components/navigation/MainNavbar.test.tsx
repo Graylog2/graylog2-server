@@ -210,7 +210,7 @@ describe('MainNavbar', () => {
     it('should merge navigation dropdowns when their description is equal', async () => {
       render(<SUT />);
 
-      userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
 
       await screen.findByRole('menuitem', { name: /Menu item for general perspective/i });
       await screen.findByRole('menuitem', { name: /Merged item for general perspective/i });
@@ -219,7 +219,7 @@ describe('MainNavbar', () => {
     it('should not merge navigation dropdowns when their assigned perspective varies', async () => {
       render(<SUT />);
 
-      userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
 
       await screen.findByRole('menuitem', { name: /Menu item for general perspective/i });
 

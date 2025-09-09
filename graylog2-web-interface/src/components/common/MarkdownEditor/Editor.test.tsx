@@ -18,6 +18,8 @@ import * as React from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import paste from 'helpers/user-event/paste';
+
 import Editor from './Editor';
 
 describe('MarkdownEditor', () => {
@@ -55,7 +57,7 @@ describe('MarkdownEditor', () => {
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
-      await userEvent.paste(editor, '# this would be a title');
+      await paste(editor, '# this would be a title');
     });
 
     expect(onChange).toHaveBeenLastCalledWith('# this would be a title');

@@ -24,9 +24,9 @@ import { screen, within } from 'wrappedTestingLibrary';
  * They are useful when interacting with the `react-select` select component.
  */
 
-const clearAll = (container: HTMLElement, selectClassName: string) => {
+const clearAll = async (container: HTMLElement, selectClassName: string) => {
   const clearIcons = container.querySelectorAll(`.${selectClassName} svg[aria-hidden="true"]`);
-  userEvent.click(clearIcons[clearIcons.length - 1]);
+  await userEvent.click(clearIcons[clearIcons.length - 1]);
 };
 
 const customCreate = (element: HTMLElement, option: string) =>

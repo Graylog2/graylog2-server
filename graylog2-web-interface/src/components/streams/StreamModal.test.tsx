@@ -135,8 +135,8 @@ describe('StreamModal', () => {
       name: /description/i,
     });
 
-    userEvent.type(title, 'New title');
-    userEvent.type(description, 'New description');
+    await userEvent.type(title, 'New title');
+    await userEvent.type(description, 'New description');
 
     await selectEvent.chooseOption('Index Set', 'Example Index Set');
     await selectEvent.chooseOption('Search for users and teams', everyone.title);

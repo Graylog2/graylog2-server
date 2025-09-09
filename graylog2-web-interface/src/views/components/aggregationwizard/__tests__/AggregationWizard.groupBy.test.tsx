@@ -295,7 +295,7 @@ describe('AggregationWizard', () => {
 
       const deleteFieldButton = await screen.findByRole('button', { name: /remove timestamp field/i });
 
-      userEvent.click(deleteFieldButton);
+      await userEvent.click(deleteFieldButton);
 
       await screen.findByLabelText('Limit');
     },
@@ -326,7 +326,7 @@ describe('AggregationWizard', () => {
       renderSUT({ config, onChange: onChangeMock });
 
       const removeGroupingElementButton = screen.getByRole('button', { name: 'Remove Grouping' });
-      userEvent.click(removeGroupingElementButton);
+      await userEvent.click(removeGroupingElementButton);
 
       await submitWidgetConfigForm();
 

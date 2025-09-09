@@ -105,7 +105,7 @@ describe('InputList Component', () => {
     expect(screen.getByText(/option dir4, selected/i)).toBeVisible();
   });
 
-  it('should clear all values when clicking the clear trigger "X"', () => {
+  it('should clear all values when clicking the clear trigger "X"', async () => {
     renderComponent(() => {}, ['dir5', 'dir6', 'dir7']);
     const clearAll = screen.getByText(/clear\s*all/i);
 
@@ -113,7 +113,7 @@ describe('InputList Component', () => {
     expect(screen.getByText(/dir6/i)).toBeVisible();
     expect(screen.getByText(/dir7/i)).toBeVisible();
 
-    userEvent.click(clearAll);
+    await userEvent.click(clearAll);
 
     expect(screen.queryByText(/dir5/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/dir6/i)).not.toBeInTheDocument();

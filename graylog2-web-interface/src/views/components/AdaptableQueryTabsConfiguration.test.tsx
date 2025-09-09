@@ -68,7 +68,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
   it('should run setOrder and patchQueriesTitle with correct tab order and titles on submit', async () => {
     renderConfiguration();
     const submitButton = await screen.findByTitle('Update configuration');
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await expect(setQueriesOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1', 'queryId-2']));
 

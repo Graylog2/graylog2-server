@@ -143,7 +143,7 @@ describe('SavedSearchesModal', () => {
 
       const cancel = getByText('Cancel');
 
-      userEvent.click(cancel);
+      await userEvent.click(cancel);
 
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
@@ -158,7 +158,7 @@ describe('SavedSearchesModal', () => {
       await screen.findByText('search-title-0');
       const deleteBtn = screen.getByTitle('Delete search search-title-0');
 
-      userEvent.click(deleteBtn);
+      await userEvent.click(deleteBtn);
 
       expect(window.confirm).toHaveBeenCalledTimes(1);
 
@@ -180,7 +180,7 @@ describe('SavedSearchesModal', () => {
 
       const listItem = await screen.findByText('search-title-0');
 
-      userEvent.click(listItem);
+      await userEvent.click(listItem);
 
       expect(onLoad).toHaveBeenCalledTimes(1);
     });
@@ -220,13 +220,13 @@ describe('SavedSearchesModal', () => {
         name: /configure page size/i,
       });
 
-      userEvent.click(pageSizeDropdown);
+      await userEvent.click(pageSizeDropdown);
 
       const pageSizeOption = await screen.findByRole('menuitem', {
         name: /100/i,
       });
 
-      userEvent.click(pageSizeOption);
+      await userEvent.click(pageSizeOption);
 
       expect(updateTableLayout).toHaveBeenCalledTimes(1);
       expect(updateTableLayout).toHaveBeenCalledWith({ perPage: 100 });

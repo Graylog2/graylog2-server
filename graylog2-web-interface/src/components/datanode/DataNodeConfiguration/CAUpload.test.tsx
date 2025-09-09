@@ -59,8 +59,8 @@ describe('CAUpload', () => {
     render(<CAUpload />);
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
-    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
+    await userEvent.upload(dropzone, files);
+    await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() =>
       expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/ca/upload'), formData(), false),
@@ -79,9 +79,9 @@ describe('CAUpload', () => {
     );
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
+    await userEvent.upload(dropzone, files);
 
-    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() =>
       expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/ca/upload'), formData(), false),

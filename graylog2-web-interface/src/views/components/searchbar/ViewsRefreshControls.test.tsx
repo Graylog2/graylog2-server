@@ -135,7 +135,7 @@ describe('RefreshControls', () => {
 
     render(<SUT />);
 
-    userEvent.click(await screen.findByTitle(/start refresh/i));
+    await userEvent.click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(1000));
   });
@@ -151,7 +151,7 @@ describe('RefreshControls', () => {
 
     render(<SUT />);
 
-    userEvent.click(await screen.findByTitle(/pause refresh/i));
+    await userEvent.click(await screen.findByTitle(/pause refresh/i));
 
     expect(stopAutoRefresh).toHaveBeenCalled();
   });
@@ -165,8 +165,8 @@ describe('RefreshControls', () => {
       </SUT>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
-    userEvent.click(await screen.findByTitle(/start refresh/i));
+    await userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+    await userEvent.click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
   });

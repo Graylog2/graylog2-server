@@ -48,6 +48,7 @@ const defaultProps = {
   position: 'bottom',
 } as const;
 
+// eslint-disable-next-line react/require-default-props
 const TimeRangePicker = ({ ...props }: React.ComponentProps<typeof OriginalTimeRangePicker>) => (
   <OriginalTimeRangePicker {...props}>
     <button type="button">Open</button>
@@ -164,7 +165,7 @@ describe('TimeRangePicker', () => {
       name: /update time range/i,
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(setCurrentTimeRange).toHaveBeenCalledTimes(1));
 

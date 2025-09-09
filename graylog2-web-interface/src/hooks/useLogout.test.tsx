@@ -55,7 +55,7 @@ describe('useLogout', () => {
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
-      userEvent.click(logoutButton);
+      await userEvent.click(logoutButton);
 
       await screen.findByText('Logged out');
     });
@@ -70,7 +70,7 @@ describe('useLogout', () => {
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
-      userEvent.click(logoutButton);
+      await userEvent.click(logoutButton);
 
       await screen.findByText('Logged out');
 
@@ -91,8 +91,8 @@ describe('useLogout', () => {
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
 
-      suppressConsole(() => {
-        userEvent.click(logoutButton);
+      await suppressConsole(async () => {
+        await userEvent.click(logoutButton);
       });
 
       await screen.findByText('Logged out');

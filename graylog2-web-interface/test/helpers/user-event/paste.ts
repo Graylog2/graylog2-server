@@ -14,25 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
-import { stream } from 'fixtures/streams';
+const paste = (elem: HTMLElement, text: string) => userEvent.paste(elem, text);
 
-jest.useFakeTimers();
-
-jest.mock('components/streams/hooks/useStreamRuleTypes', () => () => ({ data: [] }));
-
-describe('ExpandedRulesActions', () => {
-  it('should open add rule modal', async () => {
-    render(<ExpandedRulesActions stream={stream} />);
-
-    await userEvent.click(await screen.findByRole('button', { name: /quick add rule/i }));
-
-    await screen.findByRole('heading', {
-      name: /new stream rule/i,
-    });
-  });
-});
+export default paste;

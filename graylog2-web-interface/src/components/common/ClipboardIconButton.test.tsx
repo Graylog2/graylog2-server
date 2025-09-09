@@ -29,7 +29,7 @@ describe('ClipboardIconButton', () => {
     const text = 'Text to copy';
     render(<ClipboardIconButton text={text} buttonTitle="Click here to copy" />);
 
-    userEvent.click(await screen.findByRole('button', { name: /click here to copy/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /click here to copy/i }));
 
     expect(copyToClipboard).toHaveBeenCalledWith(text);
 

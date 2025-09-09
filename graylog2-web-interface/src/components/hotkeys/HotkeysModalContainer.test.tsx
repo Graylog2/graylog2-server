@@ -30,8 +30,8 @@ describe('HotkeysModalContainer', () => {
     );
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
-    act(() => {
-      userEvent.keyboard('{Shift>}?{/Shift}');
+    await act(async () => {
+      await userEvent.keyboard('{Shift>}?{/Shift}');
     });
 
     await screen.findByRole('heading', {

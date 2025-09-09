@@ -61,7 +61,7 @@ describe('StreamsOverview BulkActionsRow', () => {
     );
 
   const assignIndexSet = async () => {
-    userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
 
     await screen.findByRole('heading', { name: /assign index set to 2 streams/i });
 
@@ -201,7 +201,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
   describe('start action', () => {
     const startStreams = async () => {
-      userEvent.click(await screen.findByRole('menuitem', { name: /start streams/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /start streams/i }));
     };
 
     it('should start selected streams', async () => {
@@ -266,7 +266,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
   describe('stop action', () => {
     const stopStreams = async () => {
-      userEvent.click(await screen.findByRole('menuitem', { name: /stop streams/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /stop streams/i }));
     };
 
     it('should stop selected streams', async () => {

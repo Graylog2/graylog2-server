@@ -18,6 +18,8 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import paste from 'helpers/user-event/paste';
+
 import TimeUnitInput from './TimeUnitInput';
 
 describe('<TimeUnitInput />', () => {
@@ -38,7 +40,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'SECONDS', true));
   });
@@ -55,7 +57,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', false));
   });
@@ -72,7 +74,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown('days');
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'DAYS', false));
   });
@@ -89,7 +91,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(124, 'SECONDS', true));
   });
@@ -103,8 +105,8 @@ describe('<TimeUnitInput />', () => {
 
     const timeInput = await findTimeInput();
 
-    userEvent.clear(timeInput);
-    userEvent.paste(timeInput, '42');
+    await userEvent.clear(timeInput);
+    await paste(timeInput, '42');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
@@ -143,7 +145,7 @@ describe('<TimeUnitInput />', () => {
 
     render(<TimeUnitInput update={onUpdate} defaultEnabled value={9} defaultValue={42} />);
 
-    userEvent.type(await findTimeInput(), '{backspace}');
+    await userEvent.type(await findTimeInput(), '{backspace}');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
@@ -152,7 +154,7 @@ describe('<TimeUnitInput />', () => {
     const onUpdate = jest.fn();
     render(<TimeUnitInput update={onUpdate} defaultEnabled value={9} defaultValue={42} />);
     const timeInput = await findTimeInput();
-    userEvent.type(timeInput, '{backspace}adsasd');
+    await userEvent.type(timeInput, '{backspace}adsasd');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
@@ -163,7 +165,7 @@ describe('<TimeUnitInput />', () => {
 
       render(<TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />);
 
-      userEvent.type(await findTimeInput(), '{backspace}');
+      await userEvent.type(await findTimeInput(), '{backspace}');
       await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 
@@ -172,7 +174,7 @@ describe('<TimeUnitInput />', () => {
 
       render(<TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />);
 
-      userEvent.type(await findTimeInput(), '{backspace}adasd');
+      await userEvent.type(await findTimeInput(), '{backspace}adasd');
       await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 

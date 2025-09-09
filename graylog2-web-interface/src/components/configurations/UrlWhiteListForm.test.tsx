@@ -88,8 +88,8 @@ describe('UrlWhitelistForm', () => {
 
     const titleInput = screen.getByDisplayValue(config.entries[0].title);
 
-    userEvent.clear(titleInput);
-    userEvent.type(titleInput, nextValue);
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, nextValue);
 
     const numberCalls = 2; // First render + debounce
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -141,7 +141,7 @@ describe('UrlWhitelistForm', () => {
 
     expect(button).toBeInTheDocument();
 
-    userEvent.click(button);
+    await userEvent.click(button);
 
     expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
 
@@ -162,7 +162,7 @@ describe('UrlWhitelistForm', () => {
 
     expect(deleteButton).toBeInTheDocument();
 
-    userEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
 
@@ -185,8 +185,8 @@ describe('UrlWhitelistForm', () => {
 
       const urlInput = screen.getByDisplayValue(config.entries[0].value);
 
-      userEvent.clear(urlInput);
-      userEvent.type(urlInput, nextValue);
+      await userEvent.clear(urlInput);
+      await userEvent.type(urlInput, nextValue);
 
       const numberCalls = 2; // First render + debounce
       await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -215,7 +215,7 @@ describe('UrlWhitelistForm', () => {
 
       expect(titleInput).toBeInTheDocument();
 
-      userEvent.clear(titleInput);
+      await userEvent.clear(titleInput);
 
       await screen.findByText(/Required field/i);
 
