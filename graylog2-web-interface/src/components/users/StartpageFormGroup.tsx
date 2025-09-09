@@ -31,14 +31,17 @@ import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
 import { hasAdminPermission } from 'util/PermissionsMixin';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const Container = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const TypeSelect = styled(Select)`
-  width: 200px;
+  flex: 1;
+  min-width: 200px;
   margin-right: 3px;
 `;
 
@@ -146,7 +149,11 @@ const useStartPageOptions = (userId, permissions) => {
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
   const { options, isLoading } = useStartPageOptions(userId, permissions);
+  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Security Overview' };
 
   if (isLoading) {
     return <Spinner />;
@@ -177,17 +184,17 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
             <>
               <Container>
                 <TypeSelect
-                  options={typeOptions}
+                  options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
                   placeholder="Select type"
                   onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
                   value={value?.type}
                 />
-                <ValueSelect
+                {value?.type !== 'graylog_security_welcome' && <ValueSelect
                   options={options}
                   placeholder={`Select ${value?.type ?? 'entity'}`}
                   onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
                   value={value?.id}
-                />
+                />}
                 {resetBtn}
               </Container>
               {error}
