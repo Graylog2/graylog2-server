@@ -19,6 +19,7 @@ import { useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
+import groupBy from 'lodash/groupBy';
 
 import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
@@ -187,7 +188,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
     generic,
     events: eventsCreator,
     investigations: investigationsCreator,
-  } = useMemo(() => Object.groupBy(creators, (creator) => creator.type), [creators]);
+  } = useMemo(() => groupBy(creators, (creator) => creator.type), [creators]);
   const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   return (
