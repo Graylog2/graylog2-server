@@ -50,6 +50,7 @@ type RetentionConfigProps = {
   retentionStrategiesContext: RetentionStrategyContext;
   indexSetRetentionStrategy: RetentionStrategyConfig;
   IndexSetRetentionStrategyClass: string;
+  immutableFields?: string[];
   disabled?: boolean;
 };
 
@@ -96,6 +97,7 @@ const RetentionConfig = ({
   indexSetRetentionStrategy,
   IndexSetRetentionStrategyClass,
   disabled = false,
+  immutableFields = [],
 }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
 
@@ -115,6 +117,7 @@ const RetentionConfig = ({
       }}
       getState={_getRetentionConfigState}
       disabled={disabled}
+      immutableFields={immutableFields}
     />
   );
 };
@@ -152,6 +155,7 @@ const IndexSetRotationRetentionLegacyConfiguration = ({
           disabled={
             (immutableFields?.includes('legacy.retention_strategy') || sectionDisabled) && !ignoreFieldRestrictions
           }
+          immutableFields={immutableFields}
         />
       )}
     </>

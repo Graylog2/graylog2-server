@@ -64,6 +64,7 @@ type Props = {
   description?: string;
   selectPlaceholder: string;
   label: string;
+  immutableFields?: string[];
   disabled?: boolean;
   pluginExports: Array<{
     type: string;
@@ -204,6 +205,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   label,
   pluginExports,
   strategies,
+  immutableFields = [],
   disabled = false,
 
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod } = {
@@ -377,7 +379,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               rotationStrategy,
               _onIndexTimeSizeOptimizingUpdate,
               () => [maxNumberOfIndices, setMaxNumberOfIndices],
-              disabled,
+              immutableFields.includes('legacy.rotation_strategy'),
             )}
           {shouldShowNormalRetentionForm &&
             getConfigurationComponent(
