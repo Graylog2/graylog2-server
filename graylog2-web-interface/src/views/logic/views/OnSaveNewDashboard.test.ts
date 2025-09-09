@@ -73,7 +73,7 @@ describe('OnSaveNewDashboard', () => {
     await dispatch(OnSaveNewDashboard(view));
 
     expect(ViewManagementActions.create).toHaveBeenCalled();
-    expect(ViewManagementActions.create).toHaveBeenCalledWith(view, undefined);
+    expect(ViewManagementActions.create).toHaveBeenCalledWith(view, undefined, undefined);
   });
 
   it('loads saved view', async () => {

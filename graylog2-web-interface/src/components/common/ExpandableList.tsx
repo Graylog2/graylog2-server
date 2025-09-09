@@ -25,6 +25,7 @@ const StyledAccordion = styled(Accordion)`
   .${nonInteractiveListItemClass} {
     padding-left: 30px;
   }
+
   .mantine-Accordion-root {
     .${nonInteractiveListItemClass} {
       padding-left: 0;
