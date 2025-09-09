@@ -29,6 +29,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.SortOrder;
@@ -75,6 +76,7 @@ public class ViewServiceTest {
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
+                mock(EntitySourceService.class),
                 mongoCollections);
         this.searchUser = TestSearchUser.builder().build();
     }
