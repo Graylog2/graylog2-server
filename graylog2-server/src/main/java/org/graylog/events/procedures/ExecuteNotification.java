@@ -64,23 +64,24 @@ public class ExecuteNotification extends Action {
 
         @JsonIgnore
         @Override
-        public String toText(EventDto event) {
-            return getLink(event);
+        public String toText() {
+            return getLink();
         }
 
         @JsonIgnore
         @Override
-        public String toHtml(EventDto event) {
+        public String toHtml() {
             return f("""
                     <td><a href="%s" target="_blank">View Event to Execute Notification</a></td>
-                    """, getLink(event));
+                    """, getLink());
         }
 
         @JsonIgnore
-        private String getLink(EventDto event) {
+        @Override
+        public String getLink() {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("security/security-events/alerts");
-            uriBuilder.addParameter("query", "id:" + event.id());
+            uriBuilder.addParameter("query", "id:{event.id}");
             return uriBuilder.build().getLink();
         }
 

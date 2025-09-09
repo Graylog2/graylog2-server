@@ -99,20 +99,21 @@ public class PerformSearch extends Action {
 
         @JsonIgnore
         @Override
-        public String toText(EventDto event) {
-            return getLink(event);
+        public String toText() {
+            return getLink();
         }
 
         @JsonIgnore
         @Override
-        public String toHtml(EventDto event) {
+        public String toHtml() {
             return f("""
                     <td><a href="%s" target="_blank">Perform Search</a></td>
-                    """, getLink(event));
+                    """, getLink());
         }
 
         @JsonIgnore
-        private String getLink(EventDto event) {
+        @Override
+        public String getLink() {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             if (Boolean.TRUE.equals(useSavedSearch())) {
                 uriBuilder.setPath("views/" + savedSearch());
@@ -121,15 +122,9 @@ public class PerformSearch extends Action {
                 uriBuilder.setPath("search");
                 uriBuilder.addParameter("q", query());
             }
-            if (event.replayInfo().isPresent()
-                    && event.replayInfo().get().timerangeStart() != null
-                    && event.replayInfo().get().timerangeEnd() != null) {
-                uriBuilder.addParameter("rangetype", "absolute");
-                uriBuilder.addParameter("from", event.replayInfo().get().timerangeStart().toString());
-                uriBuilder.addParameter("to", event.replayInfo().get().timerangeEnd().toString());
-            }
 
-            return uriBuilder.build().getLink();
+            return uriBuilder.build().getLink()
+                    + "${if event.timerange_start}${if event.timerange_end}?rangetype=absolute&from=${event.timerange_start}&to=${event.timerange_end}${end}${end}";
         }
 
         @AutoValue.Builder
