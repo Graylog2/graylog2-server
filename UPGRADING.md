@@ -10,6 +10,10 @@ Graylog now requires Java 21 to run. Earlier versions are no longer supported.
 Our operating system packages and container images are shipping with the
 correct Java version.
 
+### Mongo DB 7.0
+
+Graylog now requires at least Mongo DB version 7.0. Earlier versions are no longer supported.
+
 ### Kafka Inputs
 
 The `kafka-clients` library was updated to 4.x which removes support for Kafka
