@@ -81,7 +81,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const widgetButtons = useMemo(
     () =>
       creators.map(({ title, func, icon: WidgetIcon }) => {
-        const onClick = () => {
+        const onClick = async () => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
             app_pathname: getPathnameWithoutId(location.pathname),
             app_section: 'search-widget',
