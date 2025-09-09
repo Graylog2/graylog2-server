@@ -47,7 +47,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
     () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
     [config.series, widgetUnits],
   );
-  const thresholdAnnotations = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
+  const thresholdShapes = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
 
   return useCallback(() => {
     if (!unitFeatureEnabled)
@@ -68,7 +68,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
 
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
-      shapes: thresholdAnnotations,
+      shapes: thresholdShapes,
       hovermode: 'x',
       xaxis: {
         domain: generateDomain(Object.keys(unitTypeMapper)?.length),
@@ -83,7 +83,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
     config,
     theme,
     ticksConfig,
-    thresholdAnnotations,
+    thresholdShapes,
     unitFeatureEnabled,
     unitTypeMapper,
     widgetUnits,
