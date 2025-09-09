@@ -68,7 +68,7 @@ const DataAdapterPicker = ({ onCreateClick, dataAdapters = [] }: Props) => {
             clearable={false}
             options={sortedAdapters}
             onBlur={() => setTouched(true)}
-            onChange={(value) => setValue(value)}
+            onChange={(v) => setValue(v)}
             value={value}
           />
 
