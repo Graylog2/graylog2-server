@@ -79,6 +79,7 @@ declare module 'graylog-web-plugin/plugin' {
         entityGRN: string;
         entityTypeTitle?: string | null | undefined;
       }>;
+      UserCollections: React.ComponentType<{ userId: string }>;
     };
   }
 }

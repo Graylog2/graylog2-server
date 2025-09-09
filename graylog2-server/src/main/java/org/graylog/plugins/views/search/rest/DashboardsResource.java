@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -121,10 +122,14 @@ public class DashboardsResource extends RestResource {
                                                             allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
-        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+        Predicate<ViewSummaryDTO> predicate = switch (scope) {
             case READ -> searchUser::canReadView;
             case UPDATE -> searchUser::canUpdateView;
         };
+
+        final SourcedMongoEntityUtils.FilterPredicate<ViewSummaryDTO> filterPredicate = SourcedMongoEntityUtils.handleEntitySourceFilter(filters, predicate);
+        filters = filterPredicate.filters();
+        predicate = filterPredicate.predicate();
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;

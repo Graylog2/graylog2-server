@@ -381,6 +381,7 @@ public abstract class StreamImpl implements Stream {
                 .indexSetId(indexSetId())
                 .isEditable(isEditable())
                 .categories(categories())
+                .scope(scope())
                 .id(id())
                 .build();
     }

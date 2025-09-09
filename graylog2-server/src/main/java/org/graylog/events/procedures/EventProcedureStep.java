@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.events.event.EventDto;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
@@ -52,6 +53,14 @@ public abstract class EventProcedureStep implements ScopedEntity<EventProcedureS
     }
 
     public abstract Builder toBuilder();
+
+    public String toText(EventDto event) {
+        return action() != null ? action().config().toText(event) : "";
+    }
+
+    public String toHtml(EventDto event) {
+        return action() != null ? action().config().toHtml(event) : "";
+    }
 
     @AutoValue.Builder
     public abstract static class Builder implements ScopedEntity.Builder<Builder> {
