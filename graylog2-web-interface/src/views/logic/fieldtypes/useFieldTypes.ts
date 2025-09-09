@@ -17,20 +17,22 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { FieldTypes } from '@graylog/server-api';
-
 import type { TimeRange } from 'views/logic/queries/Query';
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
 import type { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { singleton } from 'logic/singleton';
 
+const fieldTypesUrl = qualifyUrl('/views/fields');
+
 type FieldTypesResponse = Array<FieldTypeMappingJSON>;
 
 type FieldTypesRequest = {
   streams?: Array<string>;
-  timerange: TimeRange;
+  timerange?: TimeRange;
 };
 
 const _deserializeFieldTypes = (response: FieldTypesResponse) =>
@@ -50,8 +52,8 @@ const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): F
   return request;
 };
 
-const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange) =>
-  FieldTypes.byStreams(createFieldTypeRequest(streams, timerange)).then(_deserializeFieldTypes);
+const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> =>
+  fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange)).then(_deserializeFieldTypes);
 
 const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => {
   switch (timerange?.type) {
