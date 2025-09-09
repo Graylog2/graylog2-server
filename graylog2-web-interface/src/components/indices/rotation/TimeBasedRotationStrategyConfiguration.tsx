@@ -88,10 +88,6 @@ const TimeBasedRotationStrategyConfiguration: React.FC<IndexRotationConfigCompon
     });
   };
 
-  useEffect(() => {
-    console.log(config);
-  }, [config]);
-
   return (
     <div>
       <Input
