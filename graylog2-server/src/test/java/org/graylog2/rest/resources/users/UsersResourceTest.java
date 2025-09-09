@@ -151,8 +151,9 @@ public class UsersResourceTest {
         Role role = mock(Role.class);
         when(role.getId()).thenReturn(new ObjectId().toHexString());
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
-        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
 
         final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
         when(userService.loadById("creator")).thenReturn(creator);
@@ -167,19 +168,20 @@ public class UsersResourceTest {
     public void createFailureOnMissingRoleAssignPermission() {
         String testRole = "forbiddenRole";
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
     }
 
     @Test
     public void createFailurePasswordLength() {
-        when(clusterConfigService.get(PasswordComplexityConfig.class)).thenReturn(PasswordComplexityConfig.DEFAULT);
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "pW1&")));
     }
 
     @Test
     public void createFailurePasswordCasing() {
-        when(clusterConfigService.get(PasswordComplexityConfig.class)).thenReturn(new PasswordComplexityConfig(
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
                 6, true, false, false, false
         ));
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "lowercase1&")));
@@ -187,7 +189,7 @@ public class UsersResourceTest {
 
     @Test
     public void createFailurePasswordSpecialChars() {
-        when(clusterConfigService.get(PasswordComplexityConfig.class)).thenReturn(new PasswordComplexityConfig(
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
                 6, false, false, false, true
         ));
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "passWORD123")));
