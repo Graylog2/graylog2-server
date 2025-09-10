@@ -51,7 +51,7 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   ];
   const fullPluginName = getPluginFullName(fqcn);
 
-  const config = merge.smart(
+  const config = merge(
     {
       name: fullPluginName,
       dependencies: ['vendor'],
@@ -70,7 +70,7 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   );
 
   if (additionalConfig) {
-    return merge.smart(config, additionalConfig);
+    return merge(config, additionalConfig);
   }
 
   return config;

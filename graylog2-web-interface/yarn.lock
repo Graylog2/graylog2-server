@@ -7250,7 +7250,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-prettier "10.1.5"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "6.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-e7054411-6f4d-49a7-ba67-206176d8f74b-1757491654879/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-bbbcb263-51e8-438c-8fa7-8cba5ab631be-1757500269723/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "29.0.1"
     eslint-plugin-jest-dom "5.5.0"
@@ -8741,12 +8741,12 @@ graphemer@^1.4.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.87.1"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-516d5308-5ee4-4113-b3cc-31bb836301ef-1757491654834/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-516d5308-5ee4-4113-b3cc-31bb836301ef-1757491654834/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-32269fa1-2df0-4771-9de2-4280d061a2d5-1757500269683/node_modules/babel-preset-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-32269fa1-2df0-4771-9de2-4280d061a2d5-1757500269683/node_modules/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-516d5308-5ee4-4113-b3cc-31bb836301ef-1757491654834/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-32269fa1-2df0-4771-9de2-4280d061a2d5-1757500269683/node_modules/jest-preset-graylog"
     moment "2.30.1"
     moment-timezone "0.6.0"
     react "18.3.1"
@@ -8761,7 +8761,7 @@ graphemer@^1.4.0:
     use-query-params "^2.2.0"
     webpack "5.101.3"
     webpack-cli "6.0.1"
-    webpack-merge "4.2.2"
+    webpack-merge "^6.0.1"
 
 grid-index@^1.1.0:
   version "1.1.0"
@@ -15710,13 +15710,6 @@ webpack-dev-server@^5.2.2:
     spdy "^4.0.2"
     webpack-dev-middleware "^7.4.2"
     ws "^8.18.0"
-
-webpack-merge@4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-4.2.2.tgz#a27c52ea783d1398afd2087f547d7b9d2f43634d"
-  integrity sha512-TUE1UGoTX2Cd42j3krGYqObZbOD+xF7u28WB7tfUordytSjbWTIjK/8V0amkBfTYN4/pB/GIDlJZZ657BGG19g==
-  dependencies:
-    lodash "^4.17.15"
 
 webpack-merge@^6.0.1:
   version "6.0.1"
