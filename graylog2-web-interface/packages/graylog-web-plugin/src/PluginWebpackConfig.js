@@ -17,7 +17,7 @@
 const path = require('path');
 
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
@@ -43,25 +43,30 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
 
   const plugins = [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
-    new HtmlWebpackPlugin({ filename: `${getPluginFullName(fqcn)}.module.json`, inject: false, template: path.resolve(options.web_src_path, 'templates', 'module.json.template') }),
+    new HtmlWebpackPlugin({
+      filename: `${getPluginFullName(fqcn)}.module.json`,
+      inject: false,
+      template: path.resolve(options.web_src_path, 'templates', 'module.json.template'),
+    }),
   ];
   const fullPluginName = getPluginFullName(fqcn);
 
-  const config = merge.smart({
-    name: fullPluginName,
-    dependencies: ['vendor'],
-    entry: {
-      [fullPluginName]: options.entry_path,
+  const config = merge.smart(
+    {
+      name: fullPluginName,
+      dependencies: ['vendor'],
+      entry: {
+        [fullPluginName]: options.entry_path,
+      },
+      output: {
+        path: options.build_path,
+      },
+      plugins: plugins,
+      resolve: {
+        modules: [path.resolve(options.web_src_path, 'src'), path.resolve(options.web_src_path, 'node_modules')],
+      },
     },
-    output: {
-      path: options.build_path,
-    },
-    plugins: plugins,
-    resolve: {
-      modules: [path.resolve(options.web_src_path, 'src'), path.resolve(options.web_src_path, 'node_modules')],
-    },
-  },
-  core.config(TARGET, options.src_path, options.root_path, options.web_src_path, supportedBrowsers),
+    core.config(TARGET, options.src_path, options.root_path, options.web_src_path, supportedBrowsers),
   );
 
   if (additionalConfig) {
