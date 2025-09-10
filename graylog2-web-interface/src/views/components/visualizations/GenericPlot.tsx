@@ -252,6 +252,8 @@ const GenericPlot = ({
 
   const _onMarkerClick = useCallback(
     (e: Readonly<Plotly.PlotMouseEvent>) => {
+      console.log({ e });
+
       onClickMarker?.(
         {
           x: e.points[0].x as string,
@@ -268,6 +270,18 @@ const GenericPlot = ({
     onAfterPlot();
   }, [onRenderComplete, onAfterPlot]);
 
+  const onClickAnnotation = (...rest) => {
+    console.log({
+      rest,
+    });
+  };
+
+  const onDoubleClick = (...rest) => {
+    console.log('DOUBLE', {
+      rest,
+    });
+  };
+
   return (
     <StyledPlot
       data={plotChartData}
@@ -281,6 +295,8 @@ const GenericPlot = ({
       onRelayout={interactive ? _onRelayout : () => {}}
       config={config}
       onInitialized={onInitialized}
+      onClickAnnotation={onClickAnnotation}
+      onDoubleClick={onDoubleClick}
     />
   );
 };

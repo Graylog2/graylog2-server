@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import merge from 'lodash/merge';
 import type Plotly from 'plotly.js/lib/core';
+import type { PlotlyHTMLElement } from 'plotly.js';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -127,15 +128,55 @@ const XYPlot = ({
     });
   }
 
+  function wrapAnnoTextWithTspan(gd: Plotly.PlotlyHTMLElement, cls = 'material-symbols-rounded') {
+    if (!gd) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    gd.querySelectorAll<SVGTextElement>('g.annotation g.annotation-text-g text').forEach((textEl) => {
+      // If Plotly already split lines into tspans, just add the class
+      console.log({ textEl });
+      const existing = textEl.querySelectorAll<SVGTSpanElement>('tspan');
+      if (existing.length) {
+        existing.forEach((ts) => ts.classList.add(cls));
+
+        return;
+      }
+
+      if (textEl.querySelector('tspan.__wrapped')) return; // avoid double-wrap
+      const raw = textEl.textContent || '';
+      console.log({ raw });
+      if (!raw) return;
+      textEl.textContent = '';
+      const tspan = document.createElementNS(NS, 'tspan');
+      tspan.textContent = raw;
+      tspan.setAttribute('class', `${cls} __wrapped`);
+      textEl.appendChild(tspan);
+      console.log({ textEl });
+    });
+  }
+
+  const gdRef = useRef<Plotly.PlotlyHTMLElement | null>(null);
+
+  const apply = useCallback((...rest) => {
+    console.log({ rest });
+    // if (gdRef.current) wrapAnnoTextWithTspan(gdRef.current);
+  }, []);
+
+  const _onInitialized = (_: unknown, gd: PlotlyHTMLElement) => {
+    gdRef.current = gd;
+
+    return onInitialized(_, gd);
+  };
+
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
       <GenericPlot
         chartData={chartData}
         layout={layout}
         onZoom={_onZoom}
+        onAfterPlot={apply}
         setChartColor={setChartColor}
         onClickMarker={onClickMarker}
-        onInitialized={onInitialized}
+        onInitialized={_onInitialized}
       />
     </PlotLegend>
   );

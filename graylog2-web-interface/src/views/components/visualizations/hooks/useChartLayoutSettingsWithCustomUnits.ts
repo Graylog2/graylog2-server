@@ -66,9 +66,57 @@ const useChartLayoutSettingsWithCustomUnits = ({
       theme,
     });
 
+    const xA = 0.8 ?? '2025-09-09T02:25:30.000-07:00';
+    const yA = 0.8 ?? 10;
+
+    console.log({ chartData });
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
-      shapes: thresholdShapes,
+      annotations: [
+        {
+          x: xA,
+          y: yA,
+          text: 'Label',
+          xref: 'paper',
+          yref: 'paper',
+          ax: 0,
+          ay: -20,
+          font: { size: 12, color: 'orange' },
+          captureevents: true,
+          showarrow: true,
+          arrowhead: 4,
+          arrowcolor: 'orange', // ← color of the square head + shaft
+          hovertext: 'Some other text<br>Some text', // ← shows a popover on hover
+          hoverlabel: { bgcolor: '#222', font: { color: '#fff' } },
+        },
+      ],
+      shapes: [
+        ...thresholdShapes,
+        {
+          type: 'line',
+          x0: xA,
+          x1: xA,
+          y0: 0, // adjust to your actual axis min if not 0
+          y1: yA,
+          // xref: 'x',
+          // yref: 'y',
+          layer: 'above',
+          line: { width: 2, dash: 'dot', color: 'orange' },
+        },
+        // horizontal dashed line to y-axis
+        {
+          type: 'line',
+          x0: 0, // or use current x-axis min dynamically
+          x1: xA,
+          y0: yA,
+          y1: yA,
+          // xref: 'x',
+          // yref: 'y',
+          layer: 'above',
+          line: { width: 2, dash: 'dot', color: 'orange' },
+        },
+      ],
+
       hovermode: 'x',
       xaxis: {
         domain: generateDomain(Object.keys(unitTypeMapper)?.length),
