@@ -22,7 +22,7 @@ import Grantee from 'logic/permissions/Grantee';
 
 import OwnersCell from './OwnersCell';
 
-const everyone = Grantee.builder().type('global').id('grn::::global:everyone').title('grn::::global:everyone').build();
+const everyone = Grantee.builder().type('user').id('grn::::user:snape').title('Snape').build();
 
 const SUT = ({ ...props }: React.ComponentProps<typeof OwnersCell>) => (
   <table>
@@ -35,8 +35,8 @@ const SUT = ({ ...props }: React.ComponentProps<typeof OwnersCell>) => (
 );
 
 describe('OwnersCell', () => {
-  it('renders global share as Everyone', async () => {
+  it('renders owner', async () => {
     render(<SUT owners={Immutable.List([everyone])} />);
-    await screen.findByText('Everyone');
+    await screen.findByText('Snape');
   });
 });
