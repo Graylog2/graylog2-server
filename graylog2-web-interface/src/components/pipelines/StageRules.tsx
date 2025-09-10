@@ -23,6 +23,7 @@ import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 
 const TitleTd = styled.td`
   width: 400px;
@@ -35,7 +36,7 @@ type Props = {
 };
 
 const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
-  const headers = ['Title', 'Description', 'Throughput', 'Errors'];
+  const headers = ['Title', '', 'Description', 'Throughput', 'Errors'];
 
   const _ruleRowFormatter = (ruleArg, ruleIdx) => {
     let rule = ruleArg;
@@ -63,6 +64,9 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
     return (
       <tr key={rule.id}>
         <TitleTd>{ruleTitle}</TitleTd>
+        <td>
+          <RuleDeprecationInfo rule={rule} />
+        </td>
         <td>{rule.description}</td>
         <td>
           <MetricContainer
