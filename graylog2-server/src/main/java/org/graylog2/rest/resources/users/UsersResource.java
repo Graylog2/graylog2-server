@@ -95,6 +95,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PasswordComplexityConfig;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserConfiguration;
@@ -133,6 +134,8 @@ import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
+import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS;
+import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_CODEPOINTS;
 
 @RequiresAuthentication
 @Path("/users")
@@ -140,13 +143,8 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "Users", description = "User accounts", tags = {CLOUD_VISIBLE})
 public class UsersResource extends RestResource {
-    protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
-            .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
-            .put(UserOverviewDTO.FIELD_EMAIL, SearchQueryField.create(UserOverviewDTO.FIELD_EMAIL))
-            .build();
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
+
     private final UserManagementService userManagementService;
     private final PaginatedUserService paginatedUserService;
     private final AccessTokenService accessTokenService;
@@ -158,14 +156,23 @@ public class UsersResource extends RestResource {
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
 
+    protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
+            .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
+            .put(UserOverviewDTO.FIELD_EMAIL, SearchQueryField.create(UserOverviewDTO.FIELD_EMAIL))
+            .build();
+
     @Inject
     public UsersResource(UserManagementService userManagementService,
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
                          MongoDBSessionService sessionService,
-                         UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager,
-                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService) {
+                         UserSessionTerminationService sessionTerminationService,
+                         DefaultSecurityManager securityManager,
+                         GlobalAuthServiceConfig globalAuthServiceConfig,
+                         ClusterConfigService clusterConfigService) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -358,6 +365,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
+        validatePasswordComplexity(cr.password());
 
         // Create user.
         User user = userManagementService.create();
@@ -380,7 +388,7 @@ public class UsersResource extends RestResource {
 
         final Startpage startpage = cr.startpage();
         if (startpage != null) {
-            user.setStartpage(startpage.type(), startpage.id());
+            user.setStartpage(startpage);
         }
 
         final String id = userManagementService.create(user, getCurrentUser());
@@ -404,6 +412,37 @@ public class UsersResource extends RestResource {
 
     private boolean isUserNameInUse(String username) {
         return userManagementService.load(username) != null;
+    }
+
+    private void validatePasswordComplexity(String password) {
+        PasswordComplexityConfig config = clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT);
+
+        StringBuilder errorMessages = new StringBuilder();
+        if (password == null || password.isBlank()) {
+            errorMessages.append("Password cannot be empty.");
+        } else {
+            if (password.length() < config.minLength()) {
+                errorMessages.append("Password must be at least ").append(config.minLength()).append(" characters long.\n");
+            }
+            if (config.requireUppercase() && password.chars().noneMatch(Character::isUpperCase)) {
+                errorMessages.append("Password must contain at least one uppercase letter.\n");
+            }
+            if (config.requireLowercase() && password.chars().noneMatch(Character::isLowerCase)) {
+                errorMessages.append("Password must contain at least one lowercase letter.\n");
+            }
+            if (config.requireNumbers() && password.chars().noneMatch(Character::isDigit)) {
+                errorMessages.append("Password must contain at least one number.\n");
+            }
+            if (config.requireSpecialCharacters() && password.chars().noneMatch(SPECIAL_CHARACTERS_CODEPOINTS::contains)) {
+                errorMessages.append("Password must contain at least one special character from: ").append(SPECIAL_CHARACTERS).append("\n");
+            }
+        }
+
+        if (!errorMessages.isEmpty()) {
+            String msg = errorMessages.toString();
+            LOG.error(msg);
+            throw new BadRequestException(msg);
+        }
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
@@ -487,7 +526,7 @@ public class UsersResource extends RestResource {
 
         final Startpage startpage = cr.startpage();
         if (startpage != null) {
-            user.setStartpage(startpage.type(), startpage.id());
+            user.setStartpage(startpage);
         }
 
         if (isPermitted("*")) {
@@ -600,7 +639,7 @@ public class UsersResource extends RestResource {
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
         final User user = userManagementService.load(username);
-        checkPermission(RestPermissions.USERS_EDIT, username);
+        checkPermission(USERS_EDIT, username);
 
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
@@ -679,6 +718,7 @@ public class UsersResource extends RestResource {
         }
 
         if (changeAllowed) {
+            validatePasswordComplexity(cr.password());
             if (checkOldPassword) {
                 userManagementService.changePassword(user, cr.oldPassword(), cr.password());
             } else {
@@ -698,7 +738,7 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true)
             @PathParam("userId") @NotBlank String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
-                    defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
+                      defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
             @PathParam("newStatus") @NotBlank String newStatusString,
             @Context UserContext userContext) throws ValidationException {
 
@@ -708,7 +748,7 @@ public class UsersResource extends RestResource {
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);
-        checkPermission(RestPermissions.USERS_EDIT, user.getName());
+        checkPermission(USERS_EDIT, user.getName());
         final User.AccountStatus oldStatus = user.getAccountStatus();
 
         if (oldStatus.equals(newStatus)) {
