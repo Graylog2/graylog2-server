@@ -25,12 +25,13 @@ import org.graylog.autovalue.WithBeanGetter;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 @JsonDeserialize(builder = SeriesConfigDTO.Builder.class)
 @WithBeanGetter
 public abstract class SeriesConfigDTO {
     static final String FIELD_NAME = "name";
-    static final String FIELD_SHOW_THRESHOLDS = "show_thresholds";
     static final String FIELD_THRESHOLDS = "thresholds";
 
     public static SeriesConfigDTO empty() {
@@ -41,9 +42,6 @@ public abstract class SeriesConfigDTO {
     @Nullable
     public abstract String name();
 
-    @JsonProperty(FIELD_SHOW_THRESHOLDS)
-    public abstract boolean showThresholds();
-
     @JsonProperty(FIELD_THRESHOLDS)
     public abstract List<ThresholdConfigDTO> thresholds();
 
@@ -52,18 +50,18 @@ public abstract class SeriesConfigDTO {
         @JsonProperty(FIELD_NAME)
         public abstract Builder name(@Nullable String name);
 
-        @JsonProperty(FIELD_SHOW_THRESHOLDS)
-        public abstract Builder showThresholds(boolean showThresholds);
-
         @JsonProperty(FIELD_THRESHOLDS)
-        public abstract Builder thresholds(List<ThresholdConfigDTO> thresholds);
+        public Builder safeThresholds(List<ThresholdConfigDTO> thresholds) {
+            return thresholds(firstNonNull(thresholds, List.of()));
+        }
+
+        abstract Builder thresholds(List<ThresholdConfigDTO> thresholds);
 
         public abstract SeriesConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_SeriesConfigDTO.Builder()
-                    .showThresholds(false)
                     .thresholds(List.of());
         }
     }
