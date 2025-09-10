@@ -19,7 +19,6 @@ package org.graylog2.database.utils;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.entities.SourcedMongoEntity;
 import org.graylog2.database.entities.source.EntitySource;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -114,7 +113,6 @@ class SourcedMongoEntityUtilsTest {
             return null;
         }
 
-        @Nullable
         @Override
         public String id() {
             return "id";
