@@ -96,17 +96,20 @@ const clearIndicator = (base) => ({
 
 const multiValue =
   ({ theme }) =>
-  (base) => ({
+    (base, state) => ({
     ...base,
-    border: `1px solid ${theme.colors.variant.lighter.info}`,
+    border: `1px solid ${ state.option?.[state.data?.value]?.isFixed ? theme.colors.variant.lightest.default :  theme.colors.variant.lighter.info}`,
+    background: state.option?.[state.data?.value]?.isFixed ? theme.colors.input.background : theme.colors.variant.lightest.info,
+    color: state.option?.[state.data?.value]?.isFixed ? theme.colors.input.colorDisabled : theme.colors.text.secondary,
   });
 
 const multiValueLabel =
   ({ theme }) =>
-  (base) => ({
+    (base, state) => ({
     ...base,
     padding: '2px 5px',
     fontSize: theme.fonts.size.small,
+    color: state.data?.isFixed ? theme.colors.text.secondary : theme.colors.text.primary,
   });
 
 const multiValueRemove =
