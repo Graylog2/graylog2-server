@@ -45,7 +45,8 @@ const _extractErrorMessage = (error: FetchError) =>
 
 type Props = {
   dashboard: View;
-  isEvidenceModal?: boolean;
+  hideDelete?: boolean;
+  hideShare?: boolean;
 };
 
 const usePluggableDashboardActions = (dashboard: View) => {
@@ -81,11 +82,11 @@ const usePluggableDashboardActions = (dashboard: View) => {
 const DashboardDeleteAction = ({
   dashboard,
   refetchDashboards,
-  isEvidenceModal = false,
+  hideDelete = false,
 }: {
   dashboard: View;
   refetchDashboards: () => void;
-  isEvidenceModal?: boolean;
+  hideDelete?: boolean;
 }) => {
   const { deselectEntity } = useSelectedEntities();
   const paginationQueryParameter = usePaginationQueryParameter();
@@ -112,10 +113,10 @@ const DashboardDeleteAction = ({
     }
   }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
-  return isEvidenceModal ? null : <DeleteMenuItem onClick={onDashboardDelete} />;
+  return hideDelete ? null : <DeleteMenuItem onClick={onDashboardDelete} />;
 };
 
-const DashboardActions = ({ dashboard, isEvidenceModal = false }: Props) => {
+const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
   const currentUser = useCurrentUser();
@@ -123,20 +124,20 @@ const DashboardActions = ({ dashboard, isEvidenceModal = false }: Props) => {
 
   const moreActions = [
     pluggableActions.length ? pluggableActions : null,
-    pluggableActions.length && !isEvidenceModal ? <MenuItem divider key="divider" /> : null,
+    pluggableActions.length && !hideDelete ? <MenuItem divider key="divider" /> : null,
     isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit']) ? (
       <DashboardDeleteAction
         dashboard={dashboard}
         refetchDashboards={refetch}
         key="delete-action"
-        isEvidenceModal={isEvidenceModal}
+        hideDelete={hideDelete}
       />
     ) : null,
   ].filter(Boolean);
 
   return (
     <>
-      {isEvidenceModal || (
+      {hideShare || (
         <ShareButton
           bsSize="xsmall"
           entityId={dashboard.id}
@@ -144,7 +145,7 @@ const DashboardActions = ({ dashboard, isEvidenceModal = false }: Props) => {
           onClick={() => setShowShareModal(true)}
         />
       )}
-      {!!moreActions.length && isEvidenceModal ? <MoreActions>{moreActions[0]}</MoreActions> : <MoreActions>{moreActions}</MoreActions>}
+      {!!moreActions.length ? <MoreActions>{moreActions[0]}</MoreActions> : <MoreActions>{moreActions}</MoreActions>}
 
       {showShareModal && (
         <EntityShareModal

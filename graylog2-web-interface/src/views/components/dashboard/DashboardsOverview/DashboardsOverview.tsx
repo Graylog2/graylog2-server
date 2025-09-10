@@ -28,18 +28,20 @@ import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElemen
 import BulkActions from './BulkActions';
 
 type Props = {
-  isEvidenceModal?: boolean;
+  hideShare?: boolean;
+  hideAdditionalColumns?: boolean;
+  hideDelete?: boolean;
 };
 
-const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
+const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, hideDelete = false }: Props) => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<View>(null, 'dashboard');
   const { getDefaultLayout, columnOrder, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
   const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
 
   const renderDashboardActions = useCallback(
-    (dashboard: View) => <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />,
-    [isEvidenceModal],
+    (dashboard: View) => <DashboardActions dashboard={dashboard} hideDelete={hideDelete} hideShare={hideShare} />,
+    [hideDelete],
   );
   const expandedSections = useMemo(
     () => ({
@@ -56,7 +58,7 @@ const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
         <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
       }
       entityActions={renderDashboardActions}
-      tableLayout={getDefaultLayout(isEvidenceModal)}
+      tableLayout={getDefaultLayout(hideAdditionalColumns)}
       fetchEntities={fetchDashboards}
       additionalAttributes={additionalAttributes}
       expandedSectionsRenderer={expandedSections}
