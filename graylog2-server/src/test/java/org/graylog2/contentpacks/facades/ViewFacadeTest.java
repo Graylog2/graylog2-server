@@ -235,7 +235,7 @@ public class ViewFacadeTest {
         final Entity viewEntity = createViewEntity();
         final Map<EntityDescriptor, Object> nativeEntities = Map.of(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(viewEntity,
                 Collections.emptyMap(), nativeEntities, "testuser");
