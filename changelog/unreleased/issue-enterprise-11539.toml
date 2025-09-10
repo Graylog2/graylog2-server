@@ -1,0 +1,5 @@
+type = "added"
+message = "Add option to select Security Overview page on startup with valid security license."
+
+issues = ["Graylog2/graylog-plugin-enterprise#11539"]
+pulls = ["23582"]
