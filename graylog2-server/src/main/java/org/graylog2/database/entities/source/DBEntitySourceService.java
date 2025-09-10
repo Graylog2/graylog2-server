@@ -20,12 +20,17 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.set;
-import static org.graylog2.database.utils.MongoUtils.objectIdEq;
 
 public class DBEntitySourceService {
 
@@ -50,6 +55,16 @@ public class DBEntitySourceService {
     }
 
     public void deleteByEntityId(String entityId) {
-        collection.deleteOne(objectIdEq(EntitySource.FIELD_ENTITY_ID, entityId));
+        bulkDeleteByEntityId(Set.of(entityId));
+    }
+
+    public void bulkDeleteByEntityId(Set<String> entityIds) {
+        // Delete all EntitySource documents where entity_id or parent_id matches one of the given entity IDs
+        final Set<ObjectId> entityObjectIds = entityIds.stream().map(ObjectId::new).collect(Collectors.toSet());
+        final Bson filter = or(
+                in(EntitySource.FIELD_ENTITY_ID, entityObjectIds),
+                in(EntitySource.FIELD_PARENT_ID, entityObjectIds)
+        );
+        collection.deleteMany(filter);
     }
 }
