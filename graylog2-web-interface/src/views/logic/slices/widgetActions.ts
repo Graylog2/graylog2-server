@@ -34,6 +34,7 @@ import { setTitle } from 'views/logic/slices/titlesActions';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import normalizeViewState from 'views/logic/views/normalizeViewState';
+import { setNewWidget } from 'views/logic/slices/widgetsSlice';
 
 export const updateWidgetPositions =
   (newWidgetPositions: WidgetPositions) => (dispatch: ViewsDispatch, getState: GetState) => {
@@ -63,7 +64,7 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
 };
 
 export const addWidget =
-  (widget: Widget, position?: WidgetPosition) => (dispatch: ViewsDispatch, getState: GetState) => {
+  (widget: Widget, position?: WidgetPosition) => async (dispatch: ViewsDispatch, getState: GetState) => {
     if (widget.id === undefined) {
       throw new Error('Unable to add widget without id to query.');
     }
@@ -79,7 +80,10 @@ export const addWidget =
     const activeViewState = selectActiveViewState(getState());
     const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).widgets(newWidgets).build();
 
-    return dispatch(updateViewState(activeQuery, newViewState));
+    const result = dispatch(updateViewState(activeQuery, newViewState)).then(() => widget.id);
+    dispatch(setNewWidget(widget.id));
+
+    return result;
   };
 
 export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: ViewsDispatch, getState: GetState) => {
