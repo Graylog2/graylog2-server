@@ -289,7 +289,8 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public Startpage getStartpage() {
-        if (fields.containsKey(STARTPAGE)) {
+        final var rawStartpage = fields.get(STARTPAGE);
+        if (rawStartpage != null && rawStartpage instanceof Map dbObject && !dbObject.isEmpty()) {
             return objectMapper.convertValue(fields.get(STARTPAGE), Startpage.class);
         }
 
