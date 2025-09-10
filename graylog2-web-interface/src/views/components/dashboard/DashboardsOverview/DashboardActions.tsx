@@ -145,7 +145,7 @@ const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: 
           onClick={() => setShowShareModal(true)}
         />
       )}
-      {!!moreActions.length ? <MoreActions>{moreActions[0]}</MoreActions> : <MoreActions>{moreActions}</MoreActions>}
+      <MoreActions>{moreActions}</MoreActions>
 
       {showShareModal && (
         <EntityShareModal

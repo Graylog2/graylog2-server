@@ -41,7 +41,7 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
 
   const renderDashboardActions = useCallback(
     (dashboard: View) => <DashboardActions dashboard={dashboard} hideDelete={hideDelete} hideShare={hideShare} />,
-    [hideDelete],
+    [hideDelete, hideShare],
   );
   const expandedSections = useMemo(
     () => ({
