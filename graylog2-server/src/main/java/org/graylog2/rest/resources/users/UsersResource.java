@@ -273,7 +273,9 @@ public class UsersResource extends RestResource {
         );
 
         for (User user : users) {
-            resultUsers.add(toUserResponse(user, includePermissions, optSessions));
+            if (isPermitted(USERS_READ, user.getName())) {
+                resultUsers.add(toUserResponse(user, includePermissions, optSessions));
+            }
         }
 
         return UserList.create(resultUsers);
@@ -303,13 +305,7 @@ public class UsersResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
-        final Predicate<String> userNamePermissionPredicate;
-        if (isPermitted(RestPermissions.USERS_LIST)) {
-            userNamePermissionPredicate = username -> true;
-        } else {
-            userNamePermissionPredicate = username -> isPermitted(USERS_READ, username);
-        }
-
+        final Predicate<String> userNamePermissionPredicate = username -> isPermitted(USERS_READ, username);
         final PaginatedList<UserOverviewDTO> result = paginatedUserService
                 .findPaginated(userNamePermissionPredicate, searchQuery, page, perPage, sort, order);
         final Set<String> allRoleIds = result.stream().flatMap(userDTO -> {
