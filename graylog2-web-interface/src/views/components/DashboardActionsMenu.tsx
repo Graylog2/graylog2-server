@@ -119,21 +119,19 @@ const DashboardActionsMenu = () => {
         app_action_value: 'dashboard-save-new',
       });
 
-      const isViewDuplication = !!view.id;
-
-      if (isViewDuplication) {
+      if (!isNewView) {
         const dashboardWithPluginData = await executePluggableDuplicationHandler(
           newDashboard,
           currentUser.permissions,
           pluggableSaveViewControls,
         );
 
-        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare));
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id));
       }
 
       return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));
     },
-    [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id],
+    [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id, isNewView],
   );
 
   const _onUpdateView = useCallback(

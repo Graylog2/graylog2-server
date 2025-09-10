@@ -50,9 +50,10 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
     private final Bson grandTotalFilter;
     private final Collation collation;
     private final List<Bson> pipeline;
+    private final boolean includeSourceMetadata;
 
     public DefaultMongoPaginationHelper(MongoCollection<T> collection) {
-        this(collection, null, null, null, 0, false, null, null, List.of());
+        this(collection, null, null, null, 0, false, null, null, List.of(), false);
     }
 
     private DefaultMongoPaginationHelper(MongoCollection<T> collection,
@@ -63,7 +64,8 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
                                          boolean includeGrandTotal,
                                          Bson grandTotalFilter,
                                          Collation collation,
-                                         List<Bson> pipeline) {
+                                         List<Bson> pipeline,
+                                         boolean includeSourceMetadata) {
         this.collection = collection;
         this.filter = filter;
         this.sort = sort;
@@ -73,55 +75,62 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         this.grandTotalFilter = grandTotalFilter;
         this.collation = collation;
         this.pipeline = pipeline;
+        this.includeSourceMetadata = includeSourceMetadata;
     }
 
     @Override
     public MongoPaginationHelper<T> filter(Bson filter) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> sort(Bson sort) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> projection(Bson projection) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> perPage(int perPage) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> collation(Collation collation) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
     public MongoPaginationHelper<T> pipeline(List<Bson> pipeline) {
         checkArgument(pipeline != null && !pipeline.isEmpty(), "Pipeline must be non-null and not empty.");
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline);
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
+    }
+
+    @Override
+    public MongoPaginationHelper<T> includeSourceMetadata(boolean includeSourceMetadata) {
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
+                grandTotalFilter, collation, pipeline, includeSourceMetadata);
     }
 
     @Override
@@ -193,6 +202,9 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
                 .addAll(pipeline);
         if (filter != null) {
             finalPipeline.add(Aggregates.match(filter));
+        }
+        if (includeSourceMetadata) {
+            finalPipeline.addAll(EntitySourceLookup.ENTITY_SOURCE_LOOKUP);
         }
         if (sort != null) {
             finalPipeline.add(Aggregates.sort(sort));
