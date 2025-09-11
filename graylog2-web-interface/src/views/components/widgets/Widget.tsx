@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
+import isEqual from 'lodash/isEqual';
 
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -47,6 +48,8 @@ import {
   useSendWidgetConfigUpdateTelemetry,
 } from 'views/components/widgets/telemety';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -233,10 +236,12 @@ const WidgetDescription = ({ text }: { text: string }) => <TextOverflowEllipsis>
 
 const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
   const viewType = useViewType();
+  const globalOverride = useGlobalOverride();
   const fields = useQueryFieldTypes();
   const { stopAutoRefresh } = useAutoRefresh();
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
+  const [oldGlobalOverride, setOldGlobalOverride] = useState(editing ? globalOverride : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
   const sendWidgetEditTelemetry = useSendWidgetEditTelemetry();
@@ -250,13 +255,15 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
     if (editing) {
       unsetWidgetEditing();
       setOldWidget(undefined);
+      setOldGlobalOverride(undefined);
     } else {
       sendWidgetEditTelemetry();
       stopAutoRefresh();
       setWidgetEditing(widget.id);
       setOldWidget(widget);
+      setOldGlobalOverride(globalOverride);
     }
-  }, [editing, sendWidgetEditTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
+  }, [editing, globalOverride, sendWidgetEditTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     sendWidgetEditCancelTelemetry();
 
@@ -264,8 +271,25 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
       dispatch(updateWidget(id, oldWidget));
     }
 
+    if (oldGlobalOverride && !isEqual(oldGlobalOverride.timerange, globalOverride.timerange)) {
+      dispatch(setGlobalOverrideTimerange(oldGlobalOverride.timerange));
+    }
+
+    if (oldGlobalOverride && !isEqual(oldGlobalOverride.query, globalOverride.query)) {
+      dispatch(setGlobalOverrideQuery(oldGlobalOverride.query.query_string));
+    }
+
     onToggleEdit();
-  }, [dispatch, id, oldWidget, onToggleEdit, sendWidgetEditCancelTelemetry]);
+  }, [
+    dispatch,
+    globalOverride.query,
+    globalOverride.timerange,
+    id,
+    oldGlobalOverride,
+    oldWidget,
+    onToggleEdit,
+    sendWidgetEditCancelTelemetry,
+  ]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
   const onUpdateDescription = useCallback(
     (newDescription: string) => dispatch(updateDescription(widget, newDescription)),
