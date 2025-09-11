@@ -87,7 +87,7 @@ const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="
 // eslint-disable-next-line no-template-curly-in-string
 const LOOKUP_KEY_PLACEHOLDER_TEXT = '${event.group_by_fields.group_by_field}';
 
-const EventProcedureCheckbox = ({checked, onChange}) => {
+const EventProcedureCheckbox = ({ checked, onChange }) => {
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
@@ -306,7 +306,8 @@ class EmailNotificationForm extends React.Component<
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
         help={
-          validation?.errors?.recipients_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.recipients_lut_key?.[0] ||
+          'Event Field name whose value will be used as Lookup Table Key.'
         }
         value={config.recipients_lut_key || ''}
         onChange={this.handleChange}
@@ -346,7 +347,8 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {validation?.errors?.cc_emails?.[0] || 'Add email addresses that will be on the CC line of this Notification.'}
+          {validation?.errors?.cc_emails?.[0] ||
+            'Add email addresses that will be on the CC line of this Notification.'}
         </HelpBlock>
       </FormGroup>
     );
@@ -423,7 +425,8 @@ class EmailNotificationForm extends React.Component<
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.bcc_emails_lut_key ? 'error' : null}
         help={
-          validation?.errors?.bcc_emails_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.bcc_emails_lut_key?.[0] ||
+          'Event Field name whose value will be used as Lookup Table Key.'
         }
         value={config.bcc_emails_lut_key || ''}
         onChange={this.handleChange}
@@ -480,7 +483,9 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.sender_lut_key ? 'error' : null}
-        help={validation?.errors?.sender_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'}
+        help={
+          validation?.errors?.sender_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+        }
         value={config.sender_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -724,10 +729,7 @@ class EmailNotificationForm extends React.Component<
             {validation?.errors?.body?.[0] || 'The template that will be used to generate the email HTML body.'}
           </HelpBlock>
         </FormGroup>
-        <EventProcedureCheckbox
-          checked={config.include_event_procedure}
-          onChange={this.handleChange}
-        />
+        <EventProcedureCheckbox checked={config.include_event_procedure} onChange={this.handleChange} />
       </>
     );
   }
