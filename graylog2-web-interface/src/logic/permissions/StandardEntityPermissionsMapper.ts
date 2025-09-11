@@ -30,6 +30,7 @@ const supportedTypes = new Set([
   'output',
   'collection',
   'collection_entities',
+  'builtin-team',
 ]);
 
 const typePrefixCornerCasesMap = {

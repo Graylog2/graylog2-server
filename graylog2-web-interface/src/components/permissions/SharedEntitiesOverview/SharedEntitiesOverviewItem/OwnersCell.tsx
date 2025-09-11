@@ -55,8 +55,7 @@ type OwnerTitleProps = {
 };
 
 const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
-  const grn = createGRN(type, id);
-  const hasEditPermission = useHasEntityPermissionByGRN(grn, 'edit');
+  const hasEditPermission = useHasEntityPermissionByGRN(id, 'edit');
 
   switch (type) {
     case 'user':
