@@ -72,6 +72,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationFailureException;
@@ -86,6 +87,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -126,7 +128,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build()
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
+            EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
+                    .type(SearchQueryField.Type.STRING).sortable(false).filterable(true).filterOptions(Set.of(
+                            FilterOption.create(EntitySource.USER_DEFINED, "User Defined"),
+                            FilterOption.create("ILLUMINATE", "Illuminate")
+                    )).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -179,6 +186,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                         @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                        @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                         @ApiParam(name = "sort",
                                                                   value = "The field to sort the result on",
                                                                   required = true,
@@ -198,8 +206,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        final SourcedMongoEntityUtils.QueryPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(searchQuery, predicate);
-        searchQuery = filterPredicate.query();
+        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
+        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
+        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
+        final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
@@ -223,7 +233,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),
-                result.grandTotal().orElse(0L), sort, order, eventDefinitionDtos, attributes, settings);
+                definitionDtos.pagination().total(), sort, order, eventDefinitionDtos, attributes, settings);
     }
 
     @GET
@@ -238,14 +248,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-
-        final SourcedMongoEntityUtils.QueryPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(searchQuery, predicate);
-        searchQuery = filterPredicate.query();
-        predicate = filterPredicate.predicate();
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,
-                predicate,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
                 SortOrder.ASCENDING.toBsonSort("title"),
                 page,
                 perPage);

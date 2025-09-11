@@ -16,13 +16,10 @@
  */
 package org.graylog2.database.utils;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import org.graylog2.database.entities.SourcedMongoEntity;
 import org.graylog2.database.entities.SourcedScopedEntity;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.search.SearchQuery;
-import org.graylog2.search.SearchQueryParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,24 +45,17 @@ public class SourcedMongoEntityUtils {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T extends SourcedScopedEntity> QueryPredicate<T> handleScopedEntitySourceFilter(SearchQuery searchQuery, Predicate<T> predicate) {
-        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
-        if (queryMap.containsKey(FILTERABLE_FIELD)) {
-            final Optional<SearchQueryParser.FieldValue> fieldValue = queryMap.get(FILTERABLE_FIELD).stream().findFirst();
-            if (fieldValue.isPresent()) {
-                final String source = fieldValue.get().getValue().toString();
-                predicate = predicate.and(entity -> sourceMatches(entity.entitySource().orElse(null), source));
-                final Multimap<String, SearchQueryParser.FieldValue> updatedQueryMap = HashMultimap.create();
-                queryMap.entries().forEach(entry -> {
-                    if (!FILTERABLE_FIELD.equals(entry.getKey())) {
-                        updatedQueryMap.put(entry.getKey(), entry.getValue());
-                    }
-                });
-                searchQuery = new SearchQuery(searchQuery.getQueryString(), updatedQueryMap, searchQuery.getDisallowedKeys());
-            }
+    public static <T extends SourcedScopedEntity> FilterPredicate<T> handleScopedEntitySourceFilter(List<String> filters,
+                                                                                                    Predicate<T> predicate) {
+        final Optional<String> entitySourceFilter = filterValue(filters);
+        if (entitySourceFilter.isPresent()) {
+            final String source = entitySourceFilter.get();
+            predicate = predicate.and(entity -> sourceMatches(entity.entitySource().orElse(null), source));
+            filters = removeEntitySourceFilter(filters);
         }
-        return new QueryPredicate<>(searchQuery, predicate);
+        return new FilterPredicate<>(filters, predicate);
     }
+
 
     private static Optional<String> filterValue(List<String> filters) {
         final Optional<String> filter = filters.stream()

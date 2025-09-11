@@ -152,9 +152,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
     @Override
     public PaginatedList<T> page(int pageNumber, Predicate<T> selector) {
         final int total;
-        try (final var stream = stream(collection.find()
-                .filter(filter)
-                .sort(sort))) {
+        try (final var stream = stream(getIterableForAllDocuments())) {
             total = Ints.saturatedCast(stream.filter(selector).count());
         }
 
