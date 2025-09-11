@@ -55,7 +55,7 @@ const UsersOverviewItem = ({
   },
   isActive,
 }: Props) => {
-  const grn = createGRN('user', id);
+  const grn = createGRN('user', username);
   const hasEditPermissions = useHasEntityPermissionByGRN(grn, 'edit');
 
   return (
