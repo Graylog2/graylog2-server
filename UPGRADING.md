@@ -89,3 +89,8 @@ The following REST API changes have been made.
 |-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | `GET /<endpoint>`                                                     | description                                                                             |
 | `GET /<endpoint>`                                                     | description                                                                             |
+
+## Other Changes
+- The deprecated pipeline function `remove_field` no longer allows regex-matching or an inversion parameter. It has been
+reverted back to its original functionality of removing a single field by its exact name, prior to removing the function
+completely in a future major release. Use the `remove_multiple_fields` function to remove multiple fields.

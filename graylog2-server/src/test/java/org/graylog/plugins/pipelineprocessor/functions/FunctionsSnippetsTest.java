@@ -150,7 +150,6 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConvers
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
-import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
@@ -1652,8 +1651,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule, message);
 
         assertThat(message.getField("f1")).isNull();
-        assertThat(message.getField("i1")).isNull();
-        assertThat(message.getField("i2")).isNull();
         assertThat(message.getField("f2")).isEqualTo("f2");
         assertThat(message.getField("f3")).isEqualTo("f3");
     }
