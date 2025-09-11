@@ -170,7 +170,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     @Test
     public void isHealthy_returns_true_with_no_indices() {
         when(indexSetRegistry.isUp()).thenReturn(true);
-        assertThat(cluster.isHealthy()).isTrue();
+        assertThat(cluster.isHealthy())
+                .withFailMessage("Cluster is in %s state, not healthy", cluster.health().map(Enum::toString).orElse("unknown"))
+                .isTrue();
     }
 
     @Test
