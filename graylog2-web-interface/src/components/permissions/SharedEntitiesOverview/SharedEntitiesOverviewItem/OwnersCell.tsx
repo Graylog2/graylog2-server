@@ -18,7 +18,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { createGRN } from 'logic/permissions/GRN';
 import type Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
 import { RestrictedAccessTooltip } from 'components/common';
