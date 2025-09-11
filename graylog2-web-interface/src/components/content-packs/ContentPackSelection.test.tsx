@@ -29,7 +29,7 @@ jest.useFakeTimers();
 
 describe('<ContentPackSelection />', () => {
   it('renders with empty content pack', () => {
-    const contentPack = new ContentPack.builder().build();
+    const contentPack = ContentPack.builder().build();
     render(<ContentPackSelection contentPack={contentPack} />);
 
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe('<ContentPackSelection />', () => {
       .v('1')
       .type({ name: 'spaceship', version: '1' })
       .id('beef123')
-      .data({ title: { value: 'breq', type: 'string' } })
+      .data({ title: { '@value': 'breq', '@type': 'string' } })
       .build();
 
     const entities = { spaceship: [entity] };
@@ -64,7 +64,7 @@ describe('<ContentPackSelection />', () => {
       resultedState = state;
     });
 
-    const contentPack = new ContentPack.builder().build();
+    const contentPack = ContentPack.builder().build();
     render(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
 
     await userEvent.paste(screen.getByLabelText(/name/i), 'name');
@@ -140,9 +140,7 @@ describe('<ContentPackSelection />', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByText(/expand_circle_down/i));
-
-      const checkboxes = screen.getAllByRole('checkbox');
+      const checkboxes = screen.getAllByRole('checkbox', { hidden: true });
       await userEvent.click(checkboxes[1]);
 
       expect(changeFn).toHaveBeenCalledWith(
@@ -163,17 +161,15 @@ describe('<ContentPackSelection />', () => {
         jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
       });
 
-      await screen.findByRole('button', { name: /falcon/i });
+      await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
 
       expect(screen.queryByRole('button', { name: /breq/i })).not.toBeInTheDocument();
 
-      const resetButton = screen.getByRole('button', { name: /reset search/i });
+      const resetButton = screen.getByRole('button', { name: /reset search/i, hidden: true });
       await userEvent.click(resetButton);
 
-      await userEvent.click(await screen.findByText(/expand_circle_down/i));
-
-      await screen.findByRole('button', { name: /falcon/i });
-      await screen.findByRole('button', { name: /breq/i });
+      await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
+      await screen.findByRole('checkbox', { name: /breq/i, hidden: true });
     });
 
     it('validates that all fields are filled out', async () => {

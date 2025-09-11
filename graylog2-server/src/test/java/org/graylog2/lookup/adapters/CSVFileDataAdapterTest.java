@@ -21,6 +21,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.Rule;
 import org.junit.Test;
@@ -237,6 +238,30 @@ public class CSVFileDataAdapterTest {
     }
 
     @Test
+    public void testGetPreview() throws Exception {
+        final Config config = baseConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+
+        LookupPreview previewResult = csvFileDataAdapter.getPreview(1);
+        assertThat(previewResult).satisfies(r -> {
+            assertThat(r.supported()).isTrue();
+            assertThat(r.total()).isEqualTo(2);
+            assertThat(r.results()).hasSize(1);
+        });
+
+        previewResult = csvFileDataAdapter.getPreview(3);
+        assertThat(previewResult).satisfies(r -> {
+            assertThat(r.supported()).isTrue();
+            assertThat(r.total()).isEqualTo(2);
+            assertThat(r.results()).hasSize(2);
+            assertThat(r.results().get("foo")).isEqualTo("23");
+            assertThat(r.results().get("bar")).isEqualTo("42");
+        });
+    }
+
+    @Test
     public void testCIDRLookups() throws Exception {
         final Config config = cidrLookupConfig();
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
@@ -293,6 +318,23 @@ public class CSVFileDataAdapterTest {
     }
 
     @Test
+    public void refreshMultiValueSuccess() throws Exception {
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueConfig(), new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+        csvFileDataAdapter.doRefresh(cachePurge);
+        assertFalse(csvFileDataAdapter.getError().isPresent());
+
+        LookupResult result1 = csvFileDataAdapter.doGet("000001");
+        assertThat(result1.multiValue())
+                .containsEntry("first_name", "Adam")
+                .containsEntry("last_name", "Alpha")
+                .containsEntry("username", "aalpha")
+                .containsEntry("phone", "123-4567")
+                .containsEntry("address", "123 Sleepy Hollow Lane");
+    }
+
+    @Test
     public void testMultiValueCIDRLookups() throws Exception {
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueCidrConfig(), new MetricRegistry(), pathChecker));
         when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
@@ -323,6 +365,27 @@ public class CSVFileDataAdapterTest {
                 .doesNotContainKey("vlan_id");
 
         assertThat(csvFileDataAdapter.doGet("8.8.8.8")).isEqualTo(LookupResult.empty());
+    }
+
+    @Test
+    public void testMultiValuePreview() throws Exception {
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", multiValueConfig(), new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+
+        LookupPreview previewResult = csvFileDataAdapter.getPreview(3);
+        assertThat(previewResult).satisfies(r -> {
+            assertThat(r.supported()).isTrue();
+            assertThat(r.total()).isEqualTo(10);
+            assertThat(r.results()).hasSize(3);
+        });
+
+        previewResult = csvFileDataAdapter.getPreview(15);
+        assertThat(previewResult).satisfies(r -> {
+            assertThat(r.supported()).isTrue();
+            assertThat(r.total()).isEqualTo(10);
+            assertThat(r.results()).hasSize(10);
+        });
     }
 
     private Config baseConfig() {

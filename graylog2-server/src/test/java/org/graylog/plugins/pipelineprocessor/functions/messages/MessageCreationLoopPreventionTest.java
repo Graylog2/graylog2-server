@@ -79,6 +79,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final RuleService ruleService = mock(RuleService.class);
         when(ruleService.loadAll()).thenReturn(Collections.singleton(
                 RuleDao.create("r1",
+                        null,
                         "title",
                         "description",
                         ruleForTest(),

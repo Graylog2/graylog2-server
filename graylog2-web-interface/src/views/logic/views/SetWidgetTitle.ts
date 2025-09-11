@@ -14,31 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const ContentPackUtils = {
-  convertToString(parameter) {
-    switch (parameter.type) {
-      case 'integer':
-      case 'double':
-        return parameter.default_value.toString();
-      case 'boolean':
-        return parameter.default_value ? 'true' : 'false';
-      default:
-        return parameter.default_value;
-    }
-  },
+import { Map } from 'immutable';
 
-  convertValue(type, value) {
-    switch (type) {
-      case 'integer':
-        return parseInt(value, 10);
-      case 'double':
-        return parseFloat(value);
-      case 'boolean':
-        return value === 'true';
-      default:
-        return value;
-    }
-  },
+import type { TitlesMap } from 'views/stores/TitleTypes';
+import TitleTypes from 'views/stores/TitleTypes';
+import type Widget from 'views/logic/widgets/Widget';
+
+const SetWidgetTitle = (titlesMap: TitlesMap, widget: Widget, title: string) => {
+  if (!title) {
+    return titlesMap;
+  }
+
+  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
+  const newWidgetTitles = widgetTitles.set(widget.id, title);
+
+  return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
 };
 
-export default ContentPackUtils;
+export default SetWidgetTitle;

@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+package org.graylog2.rest.models.users.requests;
 
-import { SystemOutputs } from '@graylog/server-api';
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-const useOutputTypes = () => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['outputs', 'types'],
-    queryFn: () => SystemOutputs.available(),
-  });
+@JsonTypeName(SearchStartPage.TYPE)
+public record SearchStartPage(String id) implements Startpage {
+    public static final String TYPE = "search";
 
-  return { types: data?.types, isLoading: isInitialLoading };
-};
-
-export default useOutputTypes;
+    @Override
+    public String type() {
+        return TYPE;
+    }
+}

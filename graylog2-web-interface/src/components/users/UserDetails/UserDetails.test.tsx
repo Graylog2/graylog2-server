@@ -126,7 +126,7 @@ describe('UserDetails', () => {
     it('should display info if license is not present', async () => {
       render(<UserDetails user={user} />);
 
-      await screen.findByText(/Enterprise Feature/);
+      await screen.findAllByText(/Enterprise Feature/);
     });
   });
 });

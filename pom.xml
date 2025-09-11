@@ -89,6 +89,12 @@
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
+        <!-- See: "Explicitly setting up instrumentation for inline mocking (Java 21+)" at
+             https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+             We use the "@{}" property syntax to delay property resolution for the argLine config in surefire. -->
+        <common.surefire.args>-javaagent:@{org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</common.surefire.args>
+        <common.failsafe.args>-Djava.awt.headless=true</common.failsafe.args>
+
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <airline.version>3.1.0</airline.version>
@@ -121,11 +127,11 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.41.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.55.0</gcs.version>
+        <gcs.version>2.56.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
-        <geoip2.version>4.3.1</geoip2.version>
+        <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.74.0</grpc.version>
+        <grpc.version>1.75.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -133,7 +139,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.18.3</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
         <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -150,20 +156,20 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250517</json-org.version>
         <json-path.version>2.9.0</json-path.version>
-        <jsoup.version>1.21.1</jsoup.version>
-        <kafka.version>4.0.0</kafka.version>
+        <jsoup.version>1.21.2</jsoup.version>
+        <kafka.version>4.1.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.1</log4j.version>
         <lucene.version>9.12.2</lucene.version>
-        <metrics.version>4.2.33</metrics.version>
+        <metrics.version>4.2.36</metrics.version>
         <mongodb-driver.version>5.5.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.121.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>4.12.0</okhttp.version>
+        <netty.version>4.2.4.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.73.Final</netty-tcnative-boringssl-static.version>
+        <okhttp.version>5.1.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.52.0</opentelemetry.version>
+        <opentelemetry.version>1.54.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.19.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -173,7 +179,7 @@
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>2.0.5</shiro.version>
-        <snakeyaml.version>2.4</snakeyaml.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
         <oshi.version>6.8.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
@@ -189,7 +195,7 @@
         <zstd.version>1.5.7-4</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <jjwt.version>0.12.7</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
 
@@ -198,15 +204,15 @@
         <assertj-core.version>3.27.4</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.0.7</equalsverifier.version>
+        <equalsverifier.version>4.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <mockito.version>5.19.0</mockito.version>
-        <restassured.version>5.5.5</restassured.version>
+        <restassured.version>5.5.6</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <testcontainers.opensearch.version>2.1.3</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>3.0.2</testcontainers.opensearch.version>
         <graalvm.version>24.2.2</graalvm.version>
 
         <!-- Nodejs dependencies -->
@@ -301,6 +307,11 @@
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-classes</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
                 <artifactId>netty-tcnative-boringssl-static</artifactId>
                 <version>${netty-tcnative-boringssl-static.version}</version>
                 <classifier>osx-x86_64</classifier>
@@ -344,7 +355,7 @@
             <dependency>
                 <groupId>net.minidev</groupId>
                 <artifactId>json-smart</artifactId>
-                <version>2.5.2</version>
+                <version>2.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.ow2.asm</groupId>
@@ -421,12 +432,14 @@
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
+                <artifactId>okhttp-bom</artifactId>
                 <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-tls</artifactId>
+                <artifactId>okhttp-jvm</artifactId><!-- This one is not in the bom as of 5.0.0 -->
                 <version>${okhttp.version}</version>
             </dependency>
             <dependency>
@@ -657,12 +670,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.18.0</version>
+                    <version>2.19.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.3.2</version>
+                    <version>4.9.4.2</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -710,10 +723,42 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <!-- Required to get Mockito's JAR path for the surefire argLine. -->
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>${common.surefire.args}</argLine>
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                    <includes>
+                        <include>**/*Spec.class</include>
+                        <include>**/*Test.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <forkCount>1</forkCount>
                     <skip>false</skip>
+                    <argLine>${common.failsafe.args}</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -807,7 +852,7 @@
                     <dependency>
                         <groupId>de.skuzzle.enforcer</groupId>
                         <artifactId>restrict-imports-enforcer-rule</artifactId>
-                        <version>2.6.1</version>
+                        <version>3.0.0</version>
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>
@@ -939,7 +984,7 @@
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
                             io.trino.hadoop.$internal.**
-                            autovalue.shaded.org.**
+                            autovalue.shaded.**
 
                             @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject

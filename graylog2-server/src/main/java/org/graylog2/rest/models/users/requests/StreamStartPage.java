@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+package org.graylog2.rest.models.users.requests;
 
-export default () => {
-  const [Component] = useMemo(
-    () =>
-      PluginStore.exports('pages')
-        .map((c) => c.search || {})
-        .map((c) => c.component)
-        .filter((c) => c) ?? [],
-    [],
-  );
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-  return <Component />;
-};
+@JsonTypeName(StreamStartPage.TYPE)
+public record StreamStartPage(String id) implements Startpage {
+    public static final String TYPE = "stream";
+
+    @Override
+    public String type() {
+        return TYPE;
+    }
+}
