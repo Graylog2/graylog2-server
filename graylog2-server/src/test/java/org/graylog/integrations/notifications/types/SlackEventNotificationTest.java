@@ -362,8 +362,6 @@ public class SlackEventNotificationTest {
 
     @Test
     public void testAlertWithoutEventProcedure() throws EventNotificationException {
-        when(mockEventProcedure.toText(eventNotificationContext.event())).thenReturn("procedure_text");
-        when(mockEventProcedureProvider.getDecoratedForEvent(any(), eq(eventNotificationContext.event()))).thenReturn(Optional.ofNullable(mockEventProcedure));
         SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
                 .customMessage("A custom message")
                 .iconEmoji("")
