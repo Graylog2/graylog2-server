@@ -55,6 +55,7 @@ type ListItemProps = {
   item: { id: string; title: string };
   onChange: (fieldName: string) => void;
   onRemove: () => void;
+  renderFieldName: (fieldName: string, defaultTitle: React.ReactNode) => React.ReactNode;
   selectSize: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit: boolean;
@@ -75,6 +76,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
       item,
       onChange,
       onRemove,
+      renderFieldName,
       selectSize,
       selectedFields,
       showUnit,
@@ -88,6 +90,8 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
       onChange(newFieldName);
       setIsEditing(false);
     };
+
+    const defaultTitle = <FieldTitle>{item.title}</FieldTitle>;
 
     return (
       <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
@@ -114,7 +118,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
             <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
               <Icon name="drag_indicator" />
             </DragHandle>
-            <FieldTitle>{item.title}</FieldTitle>
+            {typeof renderFieldName === 'function' ? renderFieldName(item.title, defaultTitle) : defaultTitle}
             <Actions>
               {showUnit && <FieldUnit field={item.title} />}
               <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
@@ -131,6 +135,7 @@ type Props = {
   displayOverlayInPortal?: boolean;
   fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
   onChange: (newSelectedFields: Array<string>) => void;
+  renderFieldName?: (fieldName: string, defaultTitle: React.ReactNode) => React.ReactNode;
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit?: boolean;
@@ -138,13 +143,14 @@ type Props = {
 };
 
 const SelectedFieldsList = ({
-  testPrefix = undefined,
-  selectedFields,
-  onChange,
-  selectSize = undefined,
   displayOverlayInPortal = false,
-  showUnit = false,
   fieldSelect = undefined,
+  onChange,
+  renderFieldName = undefined,
+  selectSize = undefined,
+  selectedFields,
+  showUnit = false,
+  testPrefix = undefined,
 }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
@@ -176,6 +182,7 @@ const SelectedFieldsList = ({
         item={item}
         fieldSelect={fieldSelect}
         testIdPrefix={`${testPrefix}-field-${index}`}
+        renderFieldName={renderFieldName}
         dragHandleProps={dragHandleProps}
         draggableProps={draggableProps}
         className={className}
@@ -183,7 +190,7 @@ const SelectedFieldsList = ({
         showUnit={showUnit}
       />
     ),
-    [selectSize, selectedFields, fieldSelect, testPrefix, showUnit, onChangeField, onRemoveField],
+    [selectSize, selectedFields, fieldSelect, testPrefix, renderFieldName, showUnit, onChangeField, onRemoveField],
   );
 
   const onSortChange = useCallback(

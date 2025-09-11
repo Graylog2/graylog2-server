@@ -40,31 +40,33 @@ const ToggleIcon = styled(Icon)`
 type Props = {
   createSelectPlaceholder?: string;
   displaySortableListOverlayInPortal?: boolean;
-  onChange: (newFields: Array<string>) => void;
+  fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
   isFieldQualified?: (field: FieldTypeMapping) => boolean;
+  onChange: (newFields: Array<string>) => void;
+  renderFieldName?: (fieldName: string, defaultTitle: React.ReactNode) => React.ReactNode;
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
-  testPrefix?: string;
-  showSelectAllRest?: boolean;
   showDeSelectAll?: boolean;
   showListCollapseButton?: boolean;
+  showSelectAllRest?: boolean;
   showUnit?: boolean;
-  fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
+  testPrefix?: string;
 };
 
 const FieldsConfiguration = ({
   createSelectPlaceholder = 'Add a field',
   displaySortableListOverlayInPortal = false,
-  onChange,
+  fieldSelect: FieldSelectComponent = FieldSelect,
   isFieldQualified = undefined,
+  onChange,
+  renderFieldName = undefined,
   selectSize = undefined,
   selectedFields,
-  testPrefix = '',
-  showSelectAllRest = false,
   showDeSelectAll = false,
   showListCollapseButton = false,
+  showSelectAllRest = false,
   showUnit = false,
-  fieldSelect: FieldSelectComponent = FieldSelect,
+  testPrefix = '',
 }: Props) => {
   const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback(
@@ -105,13 +107,14 @@ const FieldsConfiguration = ({
       )}
       {showSelectedList && (
         <SelectedFieldsList
-          testPrefix={testPrefix}
-          selectedFields={selectedFields}
-          selectSize={selectSize}
           displayOverlayInPortal={displaySortableListOverlayInPortal}
-          onChange={onChange}
           fieldSelect={FieldSelectComponent}
+          onChange={onChange}
+          renderFieldName={renderFieldName}
+          selectSize={selectSize}
+          selectedFields={selectedFields}
           showUnit={showUnit}
+          testPrefix={testPrefix}
         />
       )}
       <FieldSelectComponent
