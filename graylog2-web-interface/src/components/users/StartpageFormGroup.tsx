@@ -189,12 +189,14 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                   onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
                   value={value?.type}
                 />
-                {value?.type !== 'graylog_security_welcome' && <ValueSelect
-                  options={options}
-                  placeholder={`Select ${value?.type ?? 'entity'}`}
-                  onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
-                  value={value?.id}
-                />}
+                {value?.type !== 'graylog_security_welcome' && (
+                  <ValueSelect
+                    options={options}
+                    placeholder={`Select ${value?.type ?? 'entity'}`}
+                    onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
+                    value={value?.id}
+                  />
+                )}
                 {resetBtn}
               </Container>
               {error}
