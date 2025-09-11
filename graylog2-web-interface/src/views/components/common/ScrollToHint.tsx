@@ -86,8 +86,9 @@ const ScrollToHint = ({
     ) {
       if (autoScroll) {
         scrollToTarget();
+      } else {
+        setShowHint(true);
       }
-      setShowHint(true);
     }
   }, [ifTrue, ifValueChanges, setShowHint, scrollContainer, scrollToTarget, autoScroll]);
 

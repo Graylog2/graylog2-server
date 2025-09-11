@@ -93,10 +93,7 @@ const EventDefinitionSummary = ({
                 <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
                 <dd>
                   {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
-                    <PluggableEventProcedureSummary
-                      eventDefinitionEventProcedure={eventDefinition?.event_procedure}
-                      key={key}
-                    />
+                    <PluggableEventProcedureSummary eventProcedureId={eventDefinition?.event_procedure} key={key} />
                   ))}
                 </dd>
               </>
