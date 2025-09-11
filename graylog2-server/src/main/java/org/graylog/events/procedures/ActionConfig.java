@@ -33,9 +33,11 @@ public interface ActionConfig {
     @JsonProperty(TYPE_FIELD)
     String type();
 
-    String toText(EventDto event);
+    String toText();
 
-    String toHtml(EventDto event);
+    String toHtml();
+
+    String getLink();
 
     class FallbackConfig implements ActionConfig {
         @Override
@@ -44,12 +46,17 @@ public interface ActionConfig {
         }
 
         @Override
-        public String toText(EventDto event) {
+        public String toText() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public String toHtml(EventDto event) {
+        public String toHtml() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getLink() {
             throw new UnsupportedOperationException();
         }
     }
