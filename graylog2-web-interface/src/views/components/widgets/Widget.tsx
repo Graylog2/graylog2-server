@@ -241,7 +241,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const { stopAutoRefresh } = useAutoRefresh();
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
-  const [oldGlobalOverride, setOldGlobalOverride] = useState(null);
+  const [oldGlobalOverride, setOldGlobalOverride] = useState(editing ? globalOverride : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
   const sendWidgetEditTelemetry = useSendWidgetEditTelemetry();
@@ -255,7 +255,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
     if (editing) {
       unsetWidgetEditing();
       setOldWidget(undefined);
-      setOldGlobalOverride(null);
+      setOldGlobalOverride(undefined);
     } else {
       sendWidgetEditTelemetry();
       stopAutoRefresh();
