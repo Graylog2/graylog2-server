@@ -76,7 +76,7 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
         <FormikInput
           key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-name`}
           id="thresholdName"
-          label="Name"
+          label="Title"
           bsSize="small"
           placeholder="Specify threshold name"
           name={`metrics.${metricIndex}.thresholds.${thresholdIndex}.name`}
