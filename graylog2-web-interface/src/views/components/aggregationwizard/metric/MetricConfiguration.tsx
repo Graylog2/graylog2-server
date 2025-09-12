@@ -326,11 +326,10 @@ const Metric = ({ index }: Props) => {
             <FieldArray
               name={`metrics.${index}.thresholds`}
               validateOnChange={false}
-              render={({ remove }) => (
+              render={() => (
                 <ThresholdsContainer>
                   {metrics?.[index]?.thresholds?.map((_, tIndex) => (
                     <ThresholdFormItem
-                      remove={remove}
                       // eslint-disable-next-line react/no-array-index-key
                       key={`${index}-${tIndex}`}
                       thresholdIndex={tIndex}

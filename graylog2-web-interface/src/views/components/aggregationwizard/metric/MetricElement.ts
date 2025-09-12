@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import isNumber from 'lodash/isNumber';
+
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
@@ -24,11 +26,12 @@ import MetricsConfiguration from './MetricsConfiguration';
 import type { AggregationElement } from '../AggregationElementType';
 import type { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
 
-type MetricError = {
+export type MetricError = {
   function?: string;
   field?: string;
   percentile?: string;
   name?: string;
+  thresholds?: Array<{ value: string }>;
 };
 
 const hasErrors = <T extends {}>(errors: Array<T>): boolean =>
@@ -61,6 +64,16 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
 
     if (metric.name && values.metrics.filter(({ name }) => name === metric.name).length > 1) {
       metricError.name = 'Name must be unique.';
+    }
+
+    const thresholdErrors: MetricError['thresholds'] = metric?.thresholds?.map((threshold) => {
+      if (!isNumber(threshold?.value)) return { value: 'Threshold value is required.' };
+
+      return undefined;
+    });
+
+    if (thresholdErrors?.filter((thresholdError) => !!thresholdError?.value).length) {
+      metricError.thresholds = thresholdErrors;
     }
 
     return metricError;
