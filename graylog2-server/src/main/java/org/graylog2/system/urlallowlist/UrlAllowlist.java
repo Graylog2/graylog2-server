@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
+package org.graylog2.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -29,23 +29,23 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class UrlWhitelist {
+public abstract class UrlAllowlist {
 
     @JsonProperty("entries")
-    public abstract List<WhitelistEntry> entries();
+    public abstract List<AllowlistEntry> entries();
 
     @JsonProperty("disabled")
     public abstract boolean disabled();
 
     @JsonCreator
-    public static UrlWhitelist create(@JsonProperty("entries") List<WhitelistEntry> entries,
-            @JsonProperty("disabled") boolean disabled) {
+    public static UrlAllowlist create(@JsonProperty("entries") List<AllowlistEntry> entries,
+                                      @JsonProperty("disabled") boolean disabled) {
         return builder().entries(entries)
                 .disabled(disabled)
                 .build();
     }
 
-    public static UrlWhitelist createEnabled(List<WhitelistEntry> entries) {
+    public static UrlAllowlist createEnabled(List<AllowlistEntry> entries) {
         return builder().entries(entries)
                 .disabled(false)
                 .build();
@@ -54,44 +54,44 @@ public abstract class UrlWhitelist {
     public abstract Builder toBuilder();
 
     /**
-     * Checks if a URL is whitelisted by looking for a whitelist entry matching the given url.
+     * Checks if a URL is allowlisted by looking for an allowlist entry matching the given url.
      *
      * @param url The URL to check.
-     * @return {@code false} if the whitelist is enabled and no whitelist entry matches the given url. {@code true} if
-     *         there is a whitelist entry matching the given url or if the whitelist is disabled.
+     * @return {@code false} if the allowlist is enabled and no allowlist entry matches the given url. {@code true} if
+     *         there is an allowlist entry matching the given url or if the allowlist is disabled.
      */
-    public boolean isWhitelisted(String url) {
+    public boolean isAllowlisted(String url) {
         if (disabled()) {
             return true;
         }
         return entries().stream()
-                .anyMatch(e -> e.isWhitelisted(url));
+                .anyMatch(e -> e.isAllowlisted(url));
     }
 
     public static Builder builder() {
-        return new AutoValue_UrlWhitelist.Builder();
+        return new AutoValue_UrlAllowlist.Builder();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder entries(List<WhitelistEntry> entries);
+        public abstract Builder entries(List<AllowlistEntry> entries);
 
         public abstract Builder disabled(boolean disabled);
 
-        public abstract UrlWhitelist autoBuild();
+        public abstract UrlAllowlist autoBuild();
 
-        public UrlWhitelist build() {
-            final UrlWhitelist whitelist = autoBuild();
-            checkForDuplicateIds(whitelist.entries());
-            return whitelist;
+        public UrlAllowlist build() {
+            final UrlAllowlist allowlist = autoBuild();
+            checkForDuplicateIds(allowlist.entries());
+            return allowlist;
         }
 
-        private void checkForDuplicateIds(List<WhitelistEntry> entries) {
+        private void checkForDuplicateIds(List<AllowlistEntry> entries) {
             Set<String> ids = new HashSet<>();
             entries.forEach(entry -> {
                 if (ids.contains(entry.id())) {
                     throw new IllegalArgumentException(
-                            "Found duplicate ID '" + entry.id() + "' in whitelist entries.");
+                            "Found duplicate ID '" + entry.id() + "' in allowlist entries.");
                 }
                 ids.add(entry.id());
             });

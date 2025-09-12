@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
+package org.graylog2.rest.models.system.urlallowlist;
 
-/**
- * Indicates that there was an attempt to access a URL which is not whitelisted.
- */
-public class UrlNotWhitelistedException extends Exception {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
-    /**
-     * Create an exception with a message stating that the given URL is not whitelisted.
-     */
-    public static UrlNotWhitelistedException forUrl(String url) {
-        return new UrlNotWhitelistedException("URL <" + url + "> is not whitelisted.");
-    }
+@AutoValue
+@WithBeanGetter
+@JsonAutoDetect
+public abstract class AllowlistRegexGenerationResponse {
+    @JsonProperty("regex")
+    public abstract String regex();
 
-    public UrlNotWhitelistedException(String message) {
-        super(message);
+    @JsonCreator
+    public static AllowlistRegexGenerationResponse create(@JsonProperty("regex") String regex) {
+        return new AutoValue_AllowlistRegexGenerationResponse(regex);
     }
 }

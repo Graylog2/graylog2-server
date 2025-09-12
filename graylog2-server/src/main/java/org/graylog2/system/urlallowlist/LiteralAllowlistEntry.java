@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.system.urlwhitelist;
+package org.graylog2.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -25,15 +25,15 @@ import org.graylog.autovalue.WithBeanGetter;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class LiteralWhitelistEntry implements WhitelistEntry {
+public abstract class LiteralAllowlistEntry implements AllowlistEntry {
     @JsonCreator
-    public static LiteralWhitelistEntry create(@JsonProperty("id") String id, @JsonProperty("title") String title,
-            @JsonProperty("value") String value) {
-        return new AutoValue_LiteralWhitelistEntry(id, Type.LITERAL, title, value);
+    public static LiteralAllowlistEntry create(@JsonProperty("id") String id, @JsonProperty("title") String title,
+                                               @JsonProperty("value") String value) {
+        return new AutoValue_LiteralAllowlistEntry(id, Type.LITERAL, title, value);
     }
 
     @Override
-    public boolean isWhitelisted(String url) {
+    public boolean isAllowlisted(String url) {
         return value().equals(url);
     }
 }
