@@ -58,6 +58,7 @@ type Props = {
   placeholder?: string;
   selectRef?: SelectRef;
   size?: 'normal' | 'small';
+  valueRenderer?: (option: unknown) => React.ReactElement;
   value: string | undefined;
   onSelectAllRest?: (fieldNames: Array<string>) => void;
   showSelectAllRest?: boolean;
@@ -115,6 +116,7 @@ const FieldSelect = ({
   selectRef = undefined,
   size = 'small',
   value,
+  valueRenderer = undefined,
   onSelectAllRest = undefined,
   showSelectAllRest = false,
   onDeSelectAll = undefined,
@@ -162,6 +164,7 @@ const FieldSelect = ({
         aria-label={ariaLabel}
         optionRenderer={OptionRenderer}
         size={size}
+        valueRenderer={valueRenderer}
         autoFocus={autoFocus}
         onChange={onChange}
         isLoading={isLoading}
