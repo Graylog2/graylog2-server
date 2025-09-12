@@ -41,7 +41,7 @@ const defaultInitialValues = {
 };
 
 const renderComponent = (
-  props: { metricIndex: number; thresholdIndex: number; remove: (index?: number) => unknown },
+  props: { metricIndex: number; thresholdIndex: number; onRemove: () => void },
   formValues = defaultInitialValues,
 ) =>
   render(
@@ -54,13 +54,13 @@ const renderComponent = (
 
 describe('ThresholdFormItem', () => {
   it('renders name and value fields', async () => {
-    renderComponent({ metricIndex: 0, thresholdIndex: 0, remove: () => {} });
+    renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: () => {} });
     await screen.findByLabelText(/Name/i);
     await screen.findByLabelText(/Value/i);
   });
 
   it('renders color hint and opens color picker popover', async () => {
-    renderComponent({ metricIndex: 0, thresholdIndex: 0, remove: () => {} });
+    renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: () => {} });
     const colorHint = await screen.findByLabelText(/Color Hint/i);
     fireEvent.click(colorHint);
     await screen.findByText(/Color configuration for threshold/i);
@@ -68,7 +68,7 @@ describe('ThresholdFormItem', () => {
 
   it('calls remove callback when delete button is clicked', async () => {
     const removeMock = jest.fn();
-    renderComponent({ metricIndex: 0, thresholdIndex: 0, remove: removeMock });
+    renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: removeMock });
     const deleteButton = await screen.findByTitle(/Remove threshold/i);
     fireEvent.click(deleteButton);
 
@@ -76,7 +76,7 @@ describe('ThresholdFormItem', () => {
   });
 
   it('shows correct help text for unit', async () => {
-    renderComponent({ metricIndex: 0, thresholdIndex: 0, remove: () => {} });
+    renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: () => {} });
     await screen.findByText(/Value is in seconds/i);
   });
 });

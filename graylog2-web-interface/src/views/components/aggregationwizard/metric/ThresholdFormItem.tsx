@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -43,9 +43,9 @@ const ColorHint = styled.div(
   `,
 );
 
-type Props = { metricIndex: number; thresholdIndex: number };
+type Props = { metricIndex: number; thresholdIndex: number; onRemove: () => void };
 
-const ThresholdFormItem = ({ metricIndex, thresholdIndex }: Props) => {
+const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => {
   const {
     values: { metrics, units },
     setFieldValue,
@@ -70,13 +70,6 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex }: Props) => {
     return mappedUnitsFromJSON[unit.unitType].find(({ abbrev }) => abbrev === unit?.abbrev).name;
   }, [metricIndex, metrics, units]);
 
-  const onRemoveItem = useCallback(() => {
-    setFieldValue(
-      `metrics.${metricIndex}.thresholds`,
-      metrics[metricIndex].thresholds.filter((_, i) => i !== thresholdIndex),
-    );
-  }, [metricIndex, metrics, setFieldValue, thresholdIndex]);
-
   return (
     <>
       <Col sm={11}>
@@ -92,7 +85,7 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex }: Props) => {
         />
       </Col>
       <Col sm={1}>
-        <IconButton size="sm" onClick={onRemoveItem} name="delete" title="Remove threshold" />
+        <IconButton size="sm" onClick={onRemove} name="delete" title="Remove threshold" />
       </Col>
       <Col sm={11}>
         <FormikInput

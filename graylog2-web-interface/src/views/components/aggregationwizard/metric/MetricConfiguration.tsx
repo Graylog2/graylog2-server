@@ -29,7 +29,7 @@ import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/co
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
-import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
+import { percentileOptions, percentageStrategyOptions, thresholdsSupportedVisualizations } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
@@ -147,7 +147,17 @@ const Metric = ({ index }: Props) => {
     setFieldValue(`metrics.${index}.thresholds`, [...currentMetric.thresholds, createThreshold()]);
   };
 
-  const showThresholdSettings = ['bar', 'area', 'line', 'scatter'].includes(visualization?.type);
+  const showThresholdSettings = thresholdsSupportedVisualizations.includes(visualization?.type);
+
+  const onRemoveThreshold = useCallback(
+    (thresholdIndex: number) => {
+      setFieldValue(
+        `metrics.${index}.thresholds`,
+        metrics[index].thresholds.filter((_, i) => i !== thresholdIndex),
+      );
+    },
+    [index, metrics, setFieldValue],
+  );
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
@@ -334,6 +344,7 @@ const Metric = ({ index }: Props) => {
                       key={`${index}-${tIndex}`}
                       thresholdIndex={tIndex}
                       metricIndex={index}
+                      onRemove={() => onRemoveThreshold(tIndex)}
                     />
                   ))}
                 </ThresholdsContainer>
