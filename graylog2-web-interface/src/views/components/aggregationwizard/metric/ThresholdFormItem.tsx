@@ -85,7 +85,7 @@ const ThresholdFormItem = ({ metricIndex, remove, thresholdIndex }: Props) => {
         />
       </Col>
       <Col sm={1}>
-        <IconButton size="sm" onClick={() => remove()} name="delete" title="Remove threshold" />
+        <IconButton size="sm" onClick={() => remove(thresholdIndex)} name="delete" title="Remove threshold" />
       </Col>
       <Col sm={11}>
         <FormikInput
