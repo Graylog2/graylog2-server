@@ -100,6 +100,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     public void health_returns_green_with_no_indices() {
         final Optional<HealthStatus> health = cluster.health();
         assertThat(health).contains(HealthStatus.Green);
+        System.out.println("**SearchServerLogs** Start");
+        System.out.println(searchServer().getLogs());
+        System.out.println("**SearchServerLogs** End");
     }
 
     @Test
