@@ -99,7 +99,7 @@
     "react-sortable-hoc": "^1.7.1",
     "react-sticky-el": "^2.0.9",
     "react-ultimate-pagination": "^1.2.0",
-    "react-window": "^1.8.2",
+    "react-window": "^2.1.0",
     "react-window-infinite-loader": "^1.0.8",
     "twix": "^1.1.4",
     "urijs": "^1.19.6",
