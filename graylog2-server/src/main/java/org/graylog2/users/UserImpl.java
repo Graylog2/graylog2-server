@@ -289,7 +289,8 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public Startpage getStartpage() {
-        if (fields.containsKey(STARTPAGE)) {
+        final var rawStartpage = fields.get(STARTPAGE);
+        if (rawStartpage != null && rawStartpage instanceof Map dbObject && !dbObject.isEmpty()) {
             return objectMapper.convertValue(fields.get(STARTPAGE), Startpage.class);
         }
 
@@ -406,6 +407,10 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public void setStartpage(Startpage startpage) {
+        if (startpage == null) {
+            this.fields.remove(STARTPAGE);
+            return;
+        }
         Map<String, Object> map = objectMapper.convertValue(startpage, new TypeReference<>() {});
         this.fields.put(STARTPAGE, map);
     }
