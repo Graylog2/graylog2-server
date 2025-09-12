@@ -1,0 +1,5 @@
+type = "a"
+message = "Add support for custom preflight web password in server (preflight_web_password configuration option)"
+
+issues = []
+pulls = ["23607"]
