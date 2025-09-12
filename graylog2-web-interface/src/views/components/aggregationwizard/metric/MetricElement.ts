@@ -20,11 +20,12 @@ import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuil
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import { thresholdsSupportedVisualizations } from 'views/Constants';
 
 import MetricsConfiguration from './MetricsConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
-import type { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues, MetricFormValues, VisualizationFormValues } from '../WidgetConfigForm';
 
 export type MetricError = {
   function?: string;
@@ -95,7 +96,7 @@ const parameterForMetric = (metric: MetricFormValues) => {
 
 const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
 
-const metricsToSeries = (formMetrics: Array<MetricFormValues>) =>
+const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: VisualizationFormValues) =>
   formMetrics.map((metric) =>
     Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
       .toBuilder()
@@ -103,7 +104,11 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) =>
         SeriesConfig.empty()
           .toBuilder()
           .name(metric.name)
-          .thresholds(metric?.showThresholds ? metric.thresholds : null)
+          .thresholds(
+            metric?.showThresholds && thresholdsSupportedVisualizations.includes(visualization.type)
+              ? metric.thresholds
+              : null,
+          )
           .build(),
       )
       .build(),
@@ -150,7 +155,7 @@ const MetricElement: AggregationElement<'metrics'> = {
     metrics: seriesToMetrics(config.series),
   }),
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
-    configBuilder.series(metricsToSeries(formValues.metrics)),
+    configBuilder.series(metricsToSeries(formValues.metrics, formValues.visualization)),
   onRemove: (index, formValues) => ({
     ...formValues,
     metrics: formValues.metrics.filter((_value, i) => index !== i),
