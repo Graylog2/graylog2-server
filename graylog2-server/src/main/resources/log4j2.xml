@@ -13,6 +13,7 @@
     </Appenders>
     <Loggers>
         <!-- Application Loggers -->
+        <Logger name="io.modelcontextprotocol" level="debug"/>
         <Logger name="org.graylog2" level="info"/>
         <Logger name="com.github.joschi.jadconfig" level="warn"/>
         <!-- Prevent DEBUG message about Lucene Expressions not found. -->
