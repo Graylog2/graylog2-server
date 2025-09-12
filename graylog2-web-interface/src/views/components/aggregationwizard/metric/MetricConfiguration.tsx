@@ -295,28 +295,28 @@ const Metric = ({ index }: Props) => {
           wrapperClassName="col-sm-9"
         />
       </Col>
-      <Col sm={11}>
-        <Field name={`metrics.${index}.showThresholds`}>
-          {({ field: { name, value = false } }) => (
-            <FormikInput
-              type="checkbox"
-              wrapperClassName="col-sm-12"
-              label="Show line thresholds"
-              id={`${name}-input`}
-              name={name}
-              onChange={() => {
-                const newVal = !value;
-                setFieldValue(name, newVal);
-                if (newVal && !currentMetric.thresholds?.length) {
-                  setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
-                }
-              }}
-            />
-          )}
-        </Field>
-      </Col>
       {showThresholdSettings && (
         <>
+          <Col sm={11}>
+            <Field name={`metrics.${index}.showThresholds`}>
+              {({ field: { name, value = false } }) => (
+                <FormikInput
+                  type="checkbox"
+                  wrapperClassName="col-sm-12"
+                  label="Show line thresholds"
+                  id={`${name}-input`}
+                  name={name}
+                  onChange={() => {
+                    const newVal = !value;
+                    setFieldValue(name, newVal);
+                    if (newVal && !currentMetric.thresholds?.length) {
+                      setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
+                    }
+                  }}
+                />
+              )}
+            </Field>
+          </Col>
           {currentMetric.showThresholds && (
             <Col sm={1}>
               <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
