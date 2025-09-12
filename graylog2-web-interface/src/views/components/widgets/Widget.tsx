@@ -271,19 +271,19 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
       dispatch(updateWidget(id, oldWidget));
     }
 
-    if (oldGlobalOverride && !isEqual(oldGlobalOverride.timerange, globalOverride.timerange)) {
+    if (oldGlobalOverride && !isEqual(oldGlobalOverride?.timerange, globalOverride?.timerange)) {
       dispatch(setGlobalOverrideTimerange(oldGlobalOverride.timerange));
     }
 
-    if (oldGlobalOverride && !isEqual(oldGlobalOverride.query, globalOverride.query)) {
+    if (oldGlobalOverride && !isEqual(oldGlobalOverride?.query, globalOverride?.query)) {
       dispatch(setGlobalOverrideQuery(oldGlobalOverride.query.query_string));
     }
 
     onToggleEdit();
   }, [
     dispatch,
-    globalOverride.query,
-    globalOverride.timerange,
+    globalOverride?.query,
+    globalOverride?.timerange,
     id,
     oldGlobalOverride,
     oldWidget,

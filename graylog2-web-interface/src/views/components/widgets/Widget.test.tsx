@@ -17,6 +17,7 @@
 import React from 'react';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { act } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -185,7 +186,7 @@ describe('<Widget />', () => {
 
   beforeEach(() => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
-    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(globalTimerange, globalSearch));
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
   it('should render with empty props', async () => {
@@ -372,13 +373,17 @@ describe('<Widget />', () => {
   });
 
   it('restores original global override when clicking cancel after changes were made', () => {
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(globalTimerange, globalSearch));
     const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
-    render(<DummyWidget editing widget={widgetWithConfig} />);
+    const { rerender } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
     const cancelButton = screen.getByText('Cancel');
 
     // reset overrides
-    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
+    act(() => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
+      rerender(<DummyWidget editing widget={widgetWithConfig} />);
+    });
 
     fireEvent.click(cancelButton);
 
