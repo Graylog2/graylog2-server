@@ -57,6 +57,7 @@ const Title = styled.div(
     width: 100%;
   `,
 );
+
 type Props = Pick<
   React.ComponentProps<typeof MantineDrawer>,
   | 'opened'
@@ -73,6 +74,7 @@ type Props = Pick<
   | 'styles'
   | 'transitionProps'
 >;
+
 const Drawer = ({ title, ...props }: Props) => (
   <StyledDrawer
     offset={15}

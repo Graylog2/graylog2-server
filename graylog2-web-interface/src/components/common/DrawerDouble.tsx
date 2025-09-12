@@ -16,19 +16,24 @@
  */
 import * as React from 'react';
 
-import DrawerDouble from 'components/common/DrawerDouble';
+import { Row } from 'components/lookup-tables/layout-componets';
 
-type Props = {
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
+import Drawer from './Drawer';
+
+type Props = React.ComponentProps<typeof Drawer> & {
   double?: boolean;
 };
 
-const LUTDrawer = ({ onClose, title, double = false, children }: Props) => (
-  <DrawerDouble opened double={double} onClose={onClose} position="right" title={title}>
-    {children}
-  </DrawerDouble>
+const DrawerDouble = ({ double = false, ...props }: Props) => (
+  <Drawer
+    opened={props.opened}
+    onClose={props.onClose}
+    position="right"
+    size={double ? 1260 : 'lg'}
+    overlayProps={{ zIndex: '1030' }}
+    title={props.title}>
+    <Row $align="stretch">{props.children}</Row>
+  </Drawer>
 );
 
-export default LUTDrawer;
+export default DrawerDouble;

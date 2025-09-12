@@ -334,6 +334,7 @@ type EventProcedureSummaryProps = {
   canEdit?: boolean;
   onRemove?: () => void;
   onEdit?: () => void;
+  row?: boolean;
 };
 
 type SearchAction = {
