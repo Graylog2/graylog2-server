@@ -29,6 +29,7 @@ import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
@@ -37,10 +38,11 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
@@ -62,7 +64,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.createIndexSetConfig;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -94,6 +98,8 @@ public class IndexSetsResourceTest {
     private SystemJobManager systemJobManager;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private IndexSetRestrictionsService indexSetRestrictionsService;
 
     public IndexSetsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -107,6 +113,15 @@ public class IndexSetsResourceTest {
     public void setUp() throws Exception {
         this.permitted = true;
         this.indexSetsResource = createIndexSetsResource(Set.of());
+        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean())).then(invocationOnMock -> {
+            IndexSetCreationRequest request = invocationOnMock.getArgument(0);
+            return request.toIndexSetConfig(true, null);
+        });
+        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean())).then(invocationOnMock -> {
+            IndexSetUpdateRequest request = invocationOnMock.getArgument(0);
+            IndexSetConfig config = invocationOnMock.getArgument(1 );
+            return request.toIndexSetConfig(config);
+        });
     }
 
     private void notPermitted() {
@@ -115,38 +130,38 @@ public class IndexSetsResourceTest {
 
     @Test
     public void list() {
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig();
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
 
         assertThat(list.total()).isEqualTo(1);
-        assertThat(list.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+        assertThat(list.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig, false, null));
     }
 
     @Test
     public void listWithOnlyOpenFilters() {
-        final IndexSetConfig indexA = createTestConfig("a", "title");
-        final IndexSetConfig indexB = createTestConfig("b", "title");
-        final IndexSetConfig indexC = createTestConfig("c", "title");
+        final IndexSetConfig indexA = createIndexSetConfig("a", "title");
+        final IndexSetConfig indexB = createIndexSetConfig("b", "title");
+        final IndexSetConfig indexC = createIndexSetConfig("c", "title");
         when(indexSetService.findAll()).thenReturn(List.of(indexA, indexB, indexC));
 
         indexSetsResource = createIndexSetsResource(Set.of(
                 () -> indexSetConfig -> !Objects.equals(indexSetConfig.id(), indexB.id()),
                 () -> indexSetConfig -> !Objects.equals(indexSetConfig.id(), indexC.id())
         ));
-        final IndexSetResponse filteredList = indexSetsResource.list(0, 0, false, true);
-        final IndexSetResponse unfilteredList = indexSetsResource.list(0, 0, false, false);
+        final IndexSetsResponse filteredList = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse unfilteredList = indexSetsResource.list(0, 0, false, false);
 
-        assertThat(filteredList.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexA, false));
+        assertThat(filteredList.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexA, false, null));
         assertThat(unfilteredList.indexSets()).containsExactly(
-                IndexSetSummary.fromIndexSetConfig(indexA, false),
-                IndexSetSummary.fromIndexSetConfig(indexB, false),
-                IndexSetSummary.fromIndexSetConfig(indexC, false)
+                IndexSetResponse.fromIndexSetConfig(indexA, false, null),
+                IndexSetResponse.fromIndexSetConfig(indexB, false, null),
+                IndexSetResponse.fromIndexSetConfig(indexC, false, null)
         );
     }
 
@@ -154,10 +169,10 @@ public class IndexSetsResourceTest {
     public void listDenied() {
         notPermitted();
 
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -171,7 +186,7 @@ public class IndexSetsResourceTest {
     public void list0() {
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -271,12 +286,13 @@ public class IndexSetsResourceTest {
 
         when(indexSetService.save(indexSetConfig)).thenReturn(savedIndexSetConfig);
 
-        final IndexSetSummary summary = indexSetsResource.save(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+        IndexSetResponse response = indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig));
+
 
         verify(indexSetService, times(1)).save(indexSetConfig);
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
-        assertThat(summary.toIndexSetConfig(true)).isEqualTo(savedIndexSetConfig);
+        assertThat(response).isEqualTo(IndexSetResponse.fromIndexSetConfig(savedIndexSetConfig, false, null));
     }
 
     @Test
@@ -307,7 +323,7 @@ public class IndexSetsResourceTest {
         expectedException.expectMessage("Not authorized to access resource id <id>");
 
         try {
-            indexSetsResource.save(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+            indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig));
         } finally {
             verifyNoMoreInteractions(indexSetService);
         }
@@ -316,13 +332,13 @@ public class IndexSetsResourceTest {
     @Test
     public void updateDenied() {
         notPermitted();
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id", "title");
 
         expectedException.expect(ForbiddenException.class);
         expectedException.expectMessage("Not authorized to access resource id <wrong-id>");
 
         try {
-            indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
+            indexSetsResource.update("wrong-id", IndexSetTestUtils.toUpdateRequest(indexSetConfig));
         } finally {
             verifyNoMoreInteractions(indexSetService);
         }
@@ -360,7 +376,7 @@ public class IndexSetsResourceTest {
         expectedException.expectMessage("Default index set must be writable.");
 
         try {
-            indexSetsResource.update("defaultIndexSet", IndexSetUpdateRequest.fromIndexSetConfig(defaultIndexSetConfigSetReadOnly));
+            indexSetsResource.update("defaultIndexSet", IndexSetTestUtils.toUpdateRequest(defaultIndexSetConfigSetReadOnly));
         } finally {
             verify(indexSetService, never()).save(any());
         }
@@ -601,50 +617,29 @@ public class IndexSetsResourceTest {
 
     @Test
     public void testSearchIndexSets() {
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id", "title");
         String searchTitle = "Title";
         when(indexSetService.searchByTitle(searchTitle)).thenReturn(Collections.singletonList(indexSetConfig));
-        final IndexSetResponse firstPage = indexSetsResource.search(searchTitle, 0, 0, false);
+        final IndexSetsResponse firstPage = indexSetsResource.search(searchTitle, 0, 0, false);
 
         verify(indexSetService, times(1)).searchByTitle(searchTitle);
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
 
         assertThat(firstPage.total()).isEqualTo(1);
-        assertThat(firstPage.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+        assertThat(firstPage.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig, false, null));
 
-        final IndexSetConfig indexSetConfig2 = createTestConfig("id2", "title2");
+        final IndexSetConfig indexSetConfig2 = createIndexSetConfig("id2", "title2");
         when(indexSetService.searchByTitle(searchTitle)).thenReturn(List.of(indexSetConfig, indexSetConfig2));
-        final IndexSetResponse secondPage = indexSetsResource.search(searchTitle, 1, 0, false);
+        final IndexSetsResponse secondPage = indexSetsResource.search(searchTitle, 1, 0, false);
 
-        assertThat(secondPage.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig2, false));
-    }
-
-    private IndexSetConfig createTestConfig(String id, String title) {
-        return IndexSetConfig.create(
-                id,
-                title,
-                "description",
-                true, true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
+        assertThat(secondPage.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig2, false, null));
     }
 
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
-                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories);
+                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories,
+                indexSetRestrictionsService);
     }
 
     private static class TestResource extends IndexSetsResource {
@@ -655,10 +650,10 @@ public class IndexSetsResourceTest {
                      IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
                      SystemJobManager systemJobManager, Provider<Boolean> permitted,
-                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
+                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
-                    openIndexSetFilterFactories);
+                    openIndexSetFilterFactories, indexSetRestrictionsService);
             this.permitted = permitted;
         }
 
