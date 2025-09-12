@@ -42,6 +42,7 @@ import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -211,5 +212,28 @@ public class StreamCatalogTest {
         assertThat(streamEntity.matchingType()).isEqualTo(ValueReference.of(Stream.MatchingType.AND));
         assertThat(streamEntity.streamRules()).hasSize(7);
         assertThat(streamEntity.outputs()).containsExactly(ValueReference.of(entityDescriptorIds.get(outputDescriptor).orElse(null)));
+    }
+
+    @Test
+    public void exportEntity_descriptionNull() {
+        Stream stream = StreamImpl.builder()
+                .id(Stream.DEFAULT_STREAM_ID)
+                .title("Stream Title")
+                .description(null)
+                .indexSetId(new ObjectId().toHexString())
+                .creatorUserId(new ObjectId().toHexString())
+                .createdAt(Tools.nowUTC())
+                .disabled(false)
+                .build();
+
+        final EntityDescriptor descriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
+        final Entity entity = facade.exportNativeEntity(stream, EntityDescriptorIds.of(descriptor));
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final StreamEntity streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntity.class);
+        assertThat(streamEntity.description()).isNull();
     }
 }
