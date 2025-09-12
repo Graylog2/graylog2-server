@@ -30,6 +30,7 @@ type Props = {
   queryId: QueryId;
   type?: FieldType;
   value: React.ReactNode;
+  withinPortal?: boolean;
 };
 
 const ValueActions = ({
@@ -40,6 +41,7 @@ const ValueActions = ({
   queryId,
   type = FieldType.Unknown,
   value,
+  withinPortal = true,
 }: Props) => {
   const actionContext = useContext(ActionContext);
   const handlerArgs = useMemo(
@@ -49,7 +51,12 @@ const ValueActions = ({
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
 
   return (
-    <Action element={elementWithStatus} handlerArgs={handlerArgs} menuContainer={menuContainer} type="value">
+    <Action
+      withinPortal={withinPortal}
+      element={elementWithStatus}
+      handlerArgs={handlerArgs}
+      menuContainer={menuContainer}
+      type="value">
       {children}
     </Action>
   );

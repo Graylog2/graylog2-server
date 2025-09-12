@@ -40,6 +40,7 @@ const Group = ({ group, keyPrefix }: { group: Array<ValueGroupItem>; keyPrefix: 
       field={field}
       value={value}
       render={() => <ValueRenderer value={text} label={field} traceColor={traceColor} />}
+      actionMenuWithinPortal={false}
     />
   ));
 };
