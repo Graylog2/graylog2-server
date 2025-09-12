@@ -17,7 +17,9 @@
 package org.graylog2.database.utils;
 
 import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.entities.SourcedScopedEntity;
 import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.search.SearchQuery;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,7 @@ import static org.graylog2.database.filtering.inmemory.SingleFilterParser.FIELD_
 import static org.graylog2.database.filtering.inmemory.SingleFilterParser.WRONG_FILTER_EXPR_FORMAT_ERROR_MSG;
 
 public class SourcedMongoEntityUtils {
+    public static String SEARCH_QUERY_TITLE = EntitySource.FIELD_SOURCE;
     public static String FILTERABLE_FIELD = SourcedMongoEntity.FIELD_ENTITY_SOURCE + "." + EntitySource.FIELD_SOURCE;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -40,6 +43,19 @@ public class SourcedMongoEntityUtils {
         }
         return new FilterPredicate<>(filters, predicate);
     }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T extends SourcedScopedEntity> FilterPredicate<T> handleScopedEntitySourceFilter(List<String> filters,
+                                                                                                    Predicate<T> predicate) {
+        final Optional<String> entitySourceFilter = filterValue(filters);
+        if (entitySourceFilter.isPresent()) {
+            final String source = entitySourceFilter.get();
+            predicate = predicate.and(entity -> sourceMatches(entity.entitySource().orElse(null), source));
+            filters = removeEntitySourceFilter(filters);
+        }
+        return new FilterPredicate<>(filters, predicate);
+    }
+
 
     private static Optional<String> filterValue(List<String> filters) {
         final Optional<String> filter = filters.stream()
@@ -74,4 +90,6 @@ public class SourcedMongoEntityUtils {
     }
 
     public record FilterPredicate<T>(List<String> filters, Predicate<T> predicate) {}
+
+    public record QueryPredicate<T>(SearchQuery query, Predicate<T> predicate) {}
 }

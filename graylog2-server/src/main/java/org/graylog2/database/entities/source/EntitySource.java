@@ -37,6 +37,7 @@ public abstract class EntitySource implements MongoEntity {
     public static final String USER_DEFINED = "USER_DEFINED";
     // Entity types
     public static final String VIEW_TYPE = "view";
+    public static final String EVENT_DEFINITION_TYPE = "event_definition";
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_SOURCE = "source";

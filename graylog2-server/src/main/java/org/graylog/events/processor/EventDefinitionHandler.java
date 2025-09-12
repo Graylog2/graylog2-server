@@ -32,6 +32,8 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.joda.time.DateTime;
@@ -61,6 +63,7 @@ public class EventDefinitionHandler {
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
     private final ClusterEventBus clusterEventBus;
+    private final EntitySourceService entitySourceService;
 
     // Provider to avoid circular dependency
     private final Provider<EntitySharesService> entitySharesServiceProvider;
@@ -73,13 +76,15 @@ public class EventDefinitionHandler {
                                   DBJobTriggerService jobTriggerService,
                                   Provider<EntitySharesService> entitySharesServiceProvider,
                                   JobSchedulerClock clock,
-                                  ClusterEventBus clusterEventBus) {
+                                  ClusterEventBus clusterEventBus,
+                                  EntitySourceService entitySourceService) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
         this.entitySharesServiceProvider = entitySharesServiceProvider;
         this.clock = clock;
         this.clusterEventBus = clusterEventBus;
+        this.entitySourceService = entitySourceService;
     }
 
     /**
@@ -125,7 +130,12 @@ public class EventDefinitionHandler {
 
         EventDefinitionDto copyDto = createWithoutSchedule(copy, Optional.of(user));
         entitySharesServiceProvider.get().cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), user);
-
+        entitySourceService.create(EntitySource.builder()
+                .source(EntitySource.USER_DEFINED)
+                .entityId(copyDto.id())
+                .parentId(eventDefinition.id())
+                .entityType(EntitySource.EVENT_DEFINITION_TYPE)
+                .build());
         return copyDto;
     }
 
@@ -206,7 +216,10 @@ public class EventDefinitionHandler {
      */
     public boolean delete(String eventDefinitionId) {
         return doDelete(eventDefinitionId,
-                () -> eventDefinitionService.deleteUnregister(eventDefinitionId) > 0);
+                () -> {
+                    entitySourceService.deleteByEntityId(eventDefinitionId);
+                    return eventDefinitionService.deleteUnregister(eventDefinitionId) > 0;
+                });
     }
 
     /**

@@ -44,7 +44,8 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.ScopedEntity;
+import org.graylog2.database.entities.SourcedScopedEntity;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.security.html.HTMLSanitizerConverter;
@@ -62,7 +63,7 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity>, ScopedEntity<EventDefinitionDto.Builder> {
+public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity>, SourcedScopedEntity<EventDefinitionDto.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
@@ -199,7 +200,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     }
 
     @AutoValue.Builder
-    public static abstract class Builder implements ScopedEntity.Builder<Builder> {
+    public static abstract class Builder implements SourcedScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
@@ -219,6 +220,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @Override
         @JsonProperty(FIELD_SCOPE)
         public abstract Builder scope(String scope);
+
+        @JsonProperty(FIELD_ENTITY_SOURCE)
+        public abstract Builder entitySource(Optional<EntitySource> source);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
