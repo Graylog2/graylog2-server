@@ -75,6 +75,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
     static final String FIELD_BACKLOG_SIZE = "backlog_size";
     static final String FIELD_TIME_ZONE = "time_zone";
     static final String FIELD_INCLUDE_TITLE = "include_title";
+    static final String FIELD_INCLUDE_EVENT_PROCEDURE = "include_event_procedure";
 
     @JsonProperty(FIELD_BACKLOG_SIZE)
     public abstract long backlogSize();
@@ -120,6 +121,9 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 
     @JsonProperty(FIELD_NOTIFY_HERE)
     public abstract Boolean notifyHere();
+
+    @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+    public abstract boolean includeEventProcedure();
 
     @Override
     @JsonIgnore
@@ -189,7 +193,8 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
                     .backlogSize(DEFAULT_BACKLOG_SIZE)
                     .linkNames(false)
                     .timeZone(DEFAULT_TIME_ZONE)
-                    .includeTitle(true);
+                    .includeTitle(true)
+                    .includeEventProcedure(false);
         }
 
         @JsonProperty(FIELD_COLOR)
@@ -231,6 +236,9 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_NOTIFY_HERE)
         public abstract Builder notifyHere(Boolean notifyHere);
 
+        @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+        public abstract Builder includeEventProcedure(boolean includeEventProcedure);
+
         public abstract SlackEventNotificationConfig build();
     }
 
@@ -248,6 +256,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
                 .iconEmoji(ValueReference.of(iconEmoji()))
                 .timeZone(ValueReference.of(timeZone().getID()))
                 .notifyHere(ValueReference.of(notifyHere()))
+                .includeEventProcedure(ValueReference.of(includeEventProcedure()))
                 .build();
     }
 }

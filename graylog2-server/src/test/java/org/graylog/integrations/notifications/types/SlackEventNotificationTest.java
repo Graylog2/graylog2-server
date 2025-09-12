@@ -31,6 +31,8 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.events.procedures.EventProcedure;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
@@ -56,10 +58,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -79,6 +83,12 @@ public class SlackEventNotificationTest {
 
     @Mock
     EventNotificationService notificationCallbackService;
+
+    @Mock
+    EventProcedureProvider mockEventProcedureProvider;
+
+    @Mock
+    EventProcedure mockEventProcedure;
 
     private SlackEventNotificationConfig slackEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
@@ -103,7 +113,8 @@ public class SlackEventNotificationTest {
                 mockNotificationService,
                 nodeId,
                 mockSlackClient,
-                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()),
+                mockEventProcedureProvider);
     }
 
     private void getDummySlackNotificationConfig() {
@@ -332,6 +343,37 @@ public class SlackEventNotificationTest {
         assertThat(message.attachments().iterator().next().text()).doesNotStartWith("@channel");
         assertThat(message.text()).startsWith("@channel");
     }
+
+    @Test
+    public void testAlertWithEventProcedure() throws EventNotificationException {
+        when(mockEventProcedure.toText(eventNotificationContext.event())).thenReturn("procedure_text");
+        when(mockEventProcedureProvider.getDecoratedForEvent(any(), eq(eventNotificationContext.event()))).thenReturn(Optional.ofNullable(mockEventProcedure));
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .customMessage("A custom message")
+                .iconEmoji("")
+                .iconUrl("")
+                .userName("")
+                .includeEventProcedure(true)
+                .build();
+
+        SlackMessage message = slackEventNotification.createSlackMessage(eventNotificationContext, slackConfig);
+        assertThat(message.attachments().iterator().next().text()).contains("procedure_text");
+    }
+
+    @Test
+    public void testAlertWithoutEventProcedure() throws EventNotificationException {
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .customMessage("A custom message")
+                .iconEmoji("")
+                .iconUrl("")
+                .userName("")
+                .includeEventProcedure(false)
+                .build();
+
+        SlackMessage message = slackEventNotification.createSlackMessage(eventNotificationContext, slackConfig);
+        assertThat(message.attachments().iterator().next().text()).doesNotContain("procedure_text");
+    }
+
 
     ImmutableList<MessageSummary> generateMessageSummaries(int size) {
         List<MessageSummary> messageSummaries = new ArrayList<>();

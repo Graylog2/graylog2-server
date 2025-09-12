@@ -27,6 +27,8 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
+import org.graylog.events.procedures.EventProcedure;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -41,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -55,19 +58,22 @@ public class SlackEventNotification implements EventNotification {
     private final NodeId nodeId;
     private final SlackClient slackClient;
     private final TemplateModelProvider templateModelProvider;
+    private final EventProcedureProvider eventProcedureProvider;
 
     @Inject
     public SlackEventNotification(EventNotificationService notificationCallbackService,
                                   Engine templateEngine,
                                   NotificationService notificationService,
                                   NodeId nodeId, SlackClient slackClient,
-                                  TemplateModelProvider templateModelProvider) {
+                                  TemplateModelProvider templateModelProvider,
+                                  EventProcedureProvider eventProcedureProvider) {
         this.notificationCallbackService = notificationCallbackService;
         this.templateEngine = requireNonNull(templateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
         this.slackClient = requireNonNull(slackClient);
         this.templateModelProvider = templateModelProvider;
+        this.eventProcedureProvider = eventProcedureProvider;
     }
 
     /**
@@ -129,6 +135,13 @@ public class SlackEventNotification implements EventNotification {
             if (!config.includeTitle() && (config.notifyChannel() || config.notifyHere())) {
                 String tag = config.notifyChannel() ? "channel" : "here";
                 template = StringUtils.f("@%s\n%s", tag, template);
+            }
+            if (config.includeEventProcedure() && ctx.eventDefinition().isPresent()) {
+                final Optional<EventProcedure> eventProcedure = eventProcedureProvider
+                        .getDecoratedForEvent(ctx.eventDefinition().get().eventProcedureId(), ctx.event());
+                if (eventProcedure.isPresent()) {
+                    template = template + eventProcedure.get().toText(ctx.event());
+                }
             }
             customMessage = buildCustomMessage(ctx, config, template);
         }
