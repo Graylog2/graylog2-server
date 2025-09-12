@@ -18,6 +18,7 @@ package org.graylog2.users;
 
 import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
@@ -53,14 +54,14 @@ public class PaginatedUserService {
         return collection.countDocuments();
     }
 
-    public PaginatedList<UserOverviewDTO> findPaginated(SearchQuery searchQuery, int page,
+    public PaginatedList<UserOverviewDTO> findPaginated(Predicate<String> userNamePermissionPredicate, SearchQuery searchQuery, int page,
                                                         int perPage, String sortField, SortOrder order) {
 
         return paginationHelper
                 .filter(searchQuery.toBson())
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
-                .page(page);
+                .page(page, user -> userNamePermissionPredicate.test(user.username()));
     }
 
     public PaginatedList<UserOverviewDTO> findPaginatedByUserId(SearchQuery searchQuery, int page,
@@ -74,7 +75,7 @@ public class PaginatedUserService {
                 .page(page);
     }
 
-    public PaginatedList<UserOverviewDTO> findPaginatedByRole(SearchQuery searchQuery, int page,
+    public PaginatedList<UserOverviewDTO> findPaginatedByRole(Predicate<String> userNamePermissionPredicate, SearchQuery searchQuery, int page,
                                                               int perPage, String sortField, SortOrder order,
                                                               Set<String> roleIds) {
 
@@ -84,7 +85,7 @@ public class PaginatedUserService {
                 .filter(and(searchQuery.toBson(), in(UserImpl.ROLES, roleObjectIds)))
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
-                .page(page);
+                .page(page,user -> userNamePermissionPredicate.test(user.username()));
     }
 
     public PaginatedList<UserOverviewDTO> findPaginatedByAuthServiceBackend(SearchQuery searchQuery,

@@ -223,7 +223,7 @@ export const UsersStore = singletonStore('core.Users', () =>
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
-        adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
+        adminUser: response.context?.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
         list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
         pagination: {
           page: response.page,
