@@ -108,7 +108,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
                 ValueReference.of(stream.getTitle()),
-                ValueReference.of(stream.getDescription()),
+                ValueReference.ofNullable(stream.getDescription()),
                 ValueReference.of(stream.getDisabled()),
                 ValueReference.of(stream.getMatchingType()),
                 streamRules,

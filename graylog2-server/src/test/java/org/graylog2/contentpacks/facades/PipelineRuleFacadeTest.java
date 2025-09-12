@@ -103,6 +103,26 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
+    public void exportEntity_descriptionNull() {
+        final RuleDao pipelineRule = RuleDao.builder()
+                .id("id")
+                .title("title")
+                .description(null)
+                .source("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")
+                .build();
+
+        final EntityDescriptor descriptor = EntityDescriptor.create("id", ModelTypes.PIPELINE_RULE_V1);
+        final Entity entity = facade.exportNativeEntity(pipelineRule, EntityDescriptorIds.of(descriptor));
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineRuleEntity ruleEntity = objectMapper.convertValue(entityV1.data(), PipelineRuleEntity.class);
+        assertThat(ruleEntity.description()).isNull();
+    }
+
+    @Test
     @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
