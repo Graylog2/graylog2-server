@@ -79,7 +79,7 @@ export type ViewJson = {
   requires: Requirements;
   favorite: boolean;
   last_updated_at: string;
-  _entity_source: string;
+  _entity_source?: string;
 };
 
 export default class View {
