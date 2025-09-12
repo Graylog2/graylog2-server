@@ -97,6 +97,7 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build(),
             EntityAttribute.builder().id(FILTERABLE_FIELD).title("Source")
                     .filterable(true)
+                    .sortable(false)
                     .relatedCollection(DBEntitySourceService.COLLECTION_NAME)
                     .relatedProperty(EntitySource.FIELD_ENTITY_ID)
                     .filterOptions(FILTER_OPTIONS)
