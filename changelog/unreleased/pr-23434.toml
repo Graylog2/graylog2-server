@@ -1,4 +1,4 @@
 type = "added"
 message = "Added ability track which parent entity a dashboard was cloned from."
 
-pulls = ["23434"]
+pulls = ["23434", "23593"]

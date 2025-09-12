@@ -16,6 +16,7 @@
  */
 import React, { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import startCase from 'lodash/startCase';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -61,6 +62,11 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
         title: {
           renderCell: (_title: string, dashboard: View) => (
             <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />
+          ),
+        },
+        "_entity_source.source": {
+          renderCell: (_title: string, dashboard: View) => (
+            <span>{dashboard._value.entitySource ? startCase(dashboard._value.entitySource.source.toString().toLowerCase()) : 'User Defined'}</span>
           ),
         },
         favorite: {
