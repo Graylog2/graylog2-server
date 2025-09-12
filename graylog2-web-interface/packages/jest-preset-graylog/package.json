@@ -15,7 +15,7 @@
     "@testing-library/dom": "9.3.4",
     "@testing-library/jest-dom": "6.8.0",
     "@testing-library/react": "14.3.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "29.5.14",
     "babel-jest": "29.7.0",
     "identity-obj-proxy": "^3.0.0",
