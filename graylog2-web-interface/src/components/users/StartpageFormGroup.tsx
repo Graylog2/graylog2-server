@@ -130,6 +130,8 @@ const useStartPageOptions = (userId, permissions) => {
   }, [selectedUserIsAdmin, userId]);
 
   const prepareOptions = () => {
+    if (!startpage) return [];
+
     switch (startpage?.type) {
       case 'dashboard':
         return [...userDashboards, ...allDashboardsOptions];
@@ -162,7 +164,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
   return (
     <Field name="startpage">
       {({ field: { name, value, onChange }, meta }) => {
-        const type = value?.type ?? 'dashboard';
+        const type = value?.type;
 
         const error =
           value?.id && options.findIndex(({ value: v }) => v === value.id) < 0 ? (
@@ -170,7 +172,9 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
           ) : null;
 
         const resetBtn = value?.type ? (
-          <ResetBtn onClick={() => onChange({ target: { name, value: {} } })}>Reset</ResetBtn>
+          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>
+            Reset
+          </ResetBtn>
         ) : null;
 
         return (
@@ -186,7 +190,13 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                 <TypeSelect
                   options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
                   placeholder="Select type"
-                  onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
+                  onChange={(newType) => {
+                    if (!newType) {
+                      onChange({ target: { name, value: null } });
+                    } else {
+                      onChange({ target: { name, value: { type: newType, id: undefined } } });
+                    }
+                  }}
                   value={value?.type}
                 />
                 {value?.type !== 'graylog_security_welcome' && (
