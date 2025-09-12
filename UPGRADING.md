@@ -13,10 +13,13 @@ correct Java version.
 ### Mongo DB 7.0
 
 Graylog now requires at least Mongo DB version 7.0. Earlier versions are no longer supported.
-Refer to the Mongo DB upgrade documentation (
-[7.0](https://www.mongodb.com/docs/manual/release-notes/7.0-upgrade/),
-[8.0](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade/)
-) for details.
+
+In general, MongoDB upgrades must be done from one minor release to the next, going to the latest bug fix version 
+in that release. Please refer to the Mongo DB upgrade documentation for details:
+- [Upgrade tutorial](https://www.mongodb.com/docs/manual/tutorial/upgrade-revision/#std-label-upgrade-to-latest-revision/)
+- [6.0](https://www.mongodb.com/docs/manual/release-notes/6.0-upgrade/)
+- [7.0](https://www.mongodb.com/docs/manual/release-notes/7.0-upgrade/)
+- [8.0](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade/)
 
 ### Kafka Inputs
 
