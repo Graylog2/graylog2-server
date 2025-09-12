@@ -49,6 +49,7 @@ type Props = {
   placement?: Placement;
   show: boolean;
   toggleChild?: React.ReactNode;
+  withinPortal?: boolean;
 };
 
 const OverlayDropdown = ({
@@ -61,13 +62,14 @@ const OverlayDropdown = ({
   placement = 'bottom',
   show,
   toggleChild = 'Toggle',
+  withinPortal = true,
 }: Props) => {
   const toggleTarget = useRef<HTMLButtonElement>();
 
   return (
     <Menu
       opened={show}
-      withinPortal
+      withinPortal={withinPortal}
       position={placement}
       closeOnItemClick={closeOnSelect}
       onClose={onToggle}

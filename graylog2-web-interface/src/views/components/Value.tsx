@@ -34,6 +34,7 @@ type Props = {
   render?: ValueRenderer;
   type?: FieldType;
   unit?: FieldUnit;
+  actionMenuWithinPortal?: boolean;
 };
 
 const ValueActionTitle = styled.span`
@@ -67,6 +68,7 @@ const InteractiveValue = ({
   render = defaultRenderer,
   type = FieldType.Unknown,
   unit = undefined,
+  actionMenuWithinPortal = true,
 }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(
@@ -82,7 +84,13 @@ const InteractiveValue = ({
   );
 
   return (
-    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions
+      withinPortal={actionMenuWithinPortal}
+      element={element}
+      field={field}
+      queryId={queryId}
+      type={type}
+      value={value}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>
@@ -90,14 +98,28 @@ const InteractiveValue = ({
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = undefined, unit = undefined }: Props) => {
+const Value = ({
+  field,
+  value,
+  render = defaultRenderer,
+  type = undefined,
+  unit = undefined,
+  actionMenuWithinPortal = true,
+}: Props) => {
   const _type = type ?? FieldType.Unknown;
 
   return (
     <InteractiveContext.Consumer>
       {(interactive) =>
         interactive ? (
-          <InteractiveValue field={field} value={value} render={render} type={_type} unit={unit} />
+          <InteractiveValue
+            field={field}
+            value={value}
+            render={render}
+            type={_type}
+            unit={unit}
+            actionMenuWithinPortal={actionMenuWithinPortal}
+          />
         ) : (
           <span>
             <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={_type} unit={unit} />

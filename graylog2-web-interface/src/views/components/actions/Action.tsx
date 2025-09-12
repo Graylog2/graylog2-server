@@ -29,9 +29,10 @@ type Props = {
   handlerArgs: ActionHandlerArguments;
   menuContainer: HTMLElement | undefined | null;
   type: 'field' | 'value';
+  withinPortal?: boolean;
 };
 
-const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {
+const Action = ({ type, handlerArgs, menuContainer, element: Element, children, withinPortal = true }: Props) => {
   const [open, setOpen] = useState(false);
   const { overflowingComponents, setOverflowingComponents, isFromContext } = useOverflowingComponents();
 
@@ -52,7 +53,8 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         placement="right"
         onToggle={_onMenuToggle}
         menuContainer={menuContainer}
-        dropdownZIndex={1031}>
+        dropdownZIndex={1031}
+        withinPortal={withinPortal}>
         <ActionDropdown
           handlerArgs={handlerArgs}
           type={type}
