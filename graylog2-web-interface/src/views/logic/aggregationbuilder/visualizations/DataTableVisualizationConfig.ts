@@ -22,18 +22,20 @@ export type PinnedColumns = Array<string>;
 
 export type DataTableVisualizationConfigType = {
   pinnedColumns: PinnedColumns;
+  showRowNumbers: boolean;
 };
 
 export type DataTableVisualizationConfigTypeJSON = {
   pinned_columns: PinnedColumns;
+  show_row_numbers?: boolean | null;
 };
 
 export default class DataTableVisualizationConfig extends VisualizationConfig {
   _value: DataTableVisualizationConfigType;
 
-  constructor(pinnedColumns: PinnedColumns) {
+  constructor(pinnedColumns: PinnedColumns, showRowNumbers: boolean) {
     super();
-    this._value = { pinnedColumns: pinnedColumns || [] };
+    this._value = { pinnedColumns: pinnedColumns ?? [], showRowNumbers };
   }
 
   static empty() {
@@ -44,6 +46,10 @@ export default class DataTableVisualizationConfig extends VisualizationConfig {
     return Immutable.Set(this._value.pinnedColumns);
   }
 
+  get showRowNumbers() {
+    return this._value.showRowNumbers ?? true;
+  }
+
   toBuilder() {
     const { pinnedColumns } = this._value;
 
@@ -51,8 +57,8 @@ export default class DataTableVisualizationConfig extends VisualizationConfig {
     return new Builder(Immutable.Map({ pinnedColumns }));
   }
 
-  static create(pinnedColumns: PinnedColumns) {
-    return new DataTableVisualizationConfig(pinnedColumns);
+  static create(pinnedColumns: PinnedColumns, showRowNumbers: boolean = true) {
+    return new DataTableVisualizationConfig(pinnedColumns, showRowNumbers);
   }
 
   toJSON() {
@@ -84,8 +90,8 @@ class Builder {
   }
 
   build() {
-    const { pinnedColumns } = this.value.toObject();
+    const { pinnedColumns, showRowNumbers } = this.value.toObject();
 
-    return new DataTableVisualizationConfig(pinnedColumns);
+    return new DataTableVisualizationConfig(pinnedColumns, showRowNumbers);
   }
 }

@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 import flatten from 'lodash/flatten';
-import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
-import last from 'lodash/last';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
@@ -166,6 +164,17 @@ const HeaderFieldForValue = ({
 
 const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} />;
 
+const RowNumberHeader = styled(TableHeaderCell)(
+  ({ theme }) => css`
+    width: 20px;
+    color: ${theme.colors.text.secondary} !important;
+
+    && {
+      min-width: 20px;
+    }
+  `,
+);
+
 type ColumnHeadersProps = {
   borderedHeader: boolean;
   fields: FieldTypeMappingsList | Array<FieldTypeMapping>;
@@ -186,18 +195,18 @@ const ColumnPivotFieldsHeaders = ({
   const headerRows = pivots.map((columnPivot, idx) => {
     const actualValues = values.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
-      const lastKey = get(last(prev), 'key');
-      const lastPath = get(last(prev), 'path');
+      const lastItem = prev?.at(-1);
+      const lastKey = lastItem?.key;
+      const lastPath = lastItem?.path;
 
       if (lastKey === cur.key && isEqual(lastPath, cur.path)) {
-        const lastItem = last(prev);
         const remainder = prev.slice(0, -1);
         const newLastItem = { ...lastItem, count: lastItem.count + 1 };
 
-        return [].concat(remainder, [newLastItem]);
+        return [...remainder, newLastItem];
       }
 
-      return [].concat(prev, [cur]);
+      return [...prev, cur];
     }, []);
 
     const type = fieldTypeFor(columnPivot, fields);
@@ -237,6 +246,7 @@ type Props = {
   pinnedColumns?: Immutable.Set<string>;
   togglePin: (field: string) => void;
   setLoadingState: (loading: boolean) => void;
+  showRowNumbers?: boolean;
 };
 
 const Headers = ({
@@ -253,6 +263,7 @@ const Headers = ({
   pinnedColumns = Immutable.Set(),
   togglePin,
   setLoadingState,
+  showRowNumbers,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
@@ -330,6 +341,7 @@ const Headers = ({
         offset={offset}
       />
       <tr className="pivot-header-row">
+        {showRowNumbers && <RowNumberHeader $isNumeric>#</RowNumberHeader>}
         {rowPivotFields}
         {rollup && seriesFields}
         {columnPivotFields}

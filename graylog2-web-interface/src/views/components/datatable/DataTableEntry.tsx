@@ -19,6 +19,7 @@ import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
 import get from 'lodash/get';
+import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
@@ -42,11 +43,13 @@ type Field = {
   source: string;
 };
 type Props = {
+  index: number;
   columnPivots: Array<string>;
   columnPivotValues: Array<Array<string>>;
   fields: Immutable.Set<Field>;
   item: { [key: string]: any };
   series: Array<Series>;
+  showRowNumbers: boolean;
   types: FieldTypeMappingsList;
   valuePath: ValuePath;
   units: UnitsConfig;
@@ -97,7 +100,26 @@ const columnNameToField = (column: string, series: Series[] = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types, units }: Props) => {
+const LineNumber = styled.td(
+  ({ theme }) => css`
+    width: 20px;
+    text-align: right;
+    color: ${theme.colors.text.secondary} !important;
+  `,
+);
+
+const DataTableEntry = ({
+  index,
+  columnPivots,
+  fields,
+  series,
+  columnPivotValues,
+  valuePath,
+  item,
+  showRowNumbers,
+  types,
+  units,
+}: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 
@@ -127,6 +149,7 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
 
   return (
     <tr className={`fields-row ${classes}`}>
+      {showRowNumbers && <LineNumber>{index}</LineNumber>}
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
         const nameForField = columnNameToField(field, series);
