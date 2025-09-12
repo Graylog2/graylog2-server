@@ -23,12 +23,16 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
+import java.util.List;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonDeserialize(builder = SeriesConfigDTO.Builder.class)
 @WithBeanGetter
 public abstract class SeriesConfigDTO {
     static final String FIELD_NAME = "name";
+    static final String FIELD_THRESHOLDS = "thresholds";
 
     public static SeriesConfigDTO empty() {
         return Builder.builder().build();
@@ -38,17 +42,27 @@ public abstract class SeriesConfigDTO {
     @Nullable
     public abstract String name();
 
+    @JsonProperty(FIELD_THRESHOLDS)
+    public abstract List<ThresholdConfigDTO> thresholds();
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_NAME)
-        @Nullable
-        public abstract Builder name(String name);
+        public abstract Builder name(@Nullable String name);
+
+        @JsonProperty(FIELD_THRESHOLDS)
+        public Builder safeThresholds(List<ThresholdConfigDTO> thresholds) {
+            return thresholds(firstNonNull(thresholds, List.of()));
+        }
+
+        abstract Builder thresholds(List<ThresholdConfigDTO> thresholds);
 
         public abstract SeriesConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_SeriesConfigDTO.Builder();
+            return new AutoValue_SeriesConfigDTO.Builder()
+                    .thresholds(List.of());
         }
     }
 }

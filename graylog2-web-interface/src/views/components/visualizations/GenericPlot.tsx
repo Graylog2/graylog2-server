@@ -167,7 +167,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
 
     plotLayout.shapes = plotLayout.shapes.map((shape) => ({
       ...shape,
-      line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
+      line: { ...(shape?.line ?? {}), color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
     }));
 
     return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
