@@ -19,13 +19,12 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 
@@ -64,7 +63,7 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
     public JsonFlatten(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
-        arrayHandlerParam = ParameterDescriptor.string("array_handler").description("Determines how arrays are processed").build();
+        arrayHandlerParam = ParameterDescriptor.string("array_handler").description("Determines how arrays are processed. Valid arguments: json, flatten, ignore").build();
         stringifyParam = ParameterDescriptor.bool("stringify").optional().description("Convert all extracted values to strings").build();
     }
 
