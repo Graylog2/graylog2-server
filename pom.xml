@@ -162,7 +162,7 @@
         <log4j.version>2.25.1</log4j.version>
         <lucene.version>9.12.2</lucene.version>
         <metrics.version>4.2.36</metrics.version>
-        <mongodb-driver.version>5.5.1</mongodb-driver.version>
+        <mongodb-driver.version>5.6.0</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.4.Final</netty.version>
