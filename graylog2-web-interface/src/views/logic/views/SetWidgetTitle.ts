@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { Map } from 'immutable';
 
-export default () => {
-  const [Component] = useMemo(
-    () =>
-      PluginStore.exports('pages')
-        .map((c) => c.search || {})
-        .map((c) => c.component)
-        .filter((c) => c) ?? [],
-    [],
-  );
+import type { TitlesMap } from 'views/stores/TitleTypes';
+import TitleTypes from 'views/stores/TitleTypes';
+import type Widget from 'views/logic/widgets/Widget';
 
-  return <Component />;
+const SetWidgetTitle = (titlesMap: TitlesMap, widget: Widget, title: string) => {
+  if (!title) {
+    return titlesMap;
+  }
+
+  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
+  const newWidgetTitles = widgetTitles.set(widget.id, title);
+
+  return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
 };
+
+export default SetWidgetTitle;

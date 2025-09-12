@@ -57,7 +57,7 @@ const _validate = async (values) => {
 
   const { type, id } = values.startpage ?? {};
 
-  if (type && !id) {
+  if (type && type !== 'graylog_security_welcome' && !id) {
     errors = { startpage: 'Please select an entity.' };
   }
 
