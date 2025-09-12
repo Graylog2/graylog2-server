@@ -99,7 +99,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     @Test
     public void health_returns_green_with_no_indices() {
         final Optional<HealthStatus> health = cluster.health();
-        assertThat(health).contains(HealthStatus.Green);
+        assertThat(health)
+                .withFailMessage("Health status is not green. Logs follow:\n%s", searchServer().getLogs())
+                .contains(HealthStatus.Green);
     }
 
     @Test
@@ -170,7 +172,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     @Test
     public void isHealthy_returns_true_with_no_indices() {
         when(indexSetRegistry.isUp()).thenReturn(true);
-        assertThat(cluster.isHealthy()).isTrue();
+        assertThat(cluster.isHealthy())
+                .withFailMessage("Cluster is in %s state, not healthy", cluster.health().map(Enum::toString).orElse("unknown"))
+                .isTrue();
     }
 
     @Test
