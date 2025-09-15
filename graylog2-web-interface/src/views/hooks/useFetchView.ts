@@ -17,12 +17,13 @@
 import { useMemo } from 'react';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
+import type { ViewJson } from 'views/logic/views/View';
+import { getView } from 'views/api/views';
 
 const useFetchView = (viewId: string) => {
-  const viewJsonPromise = useMemo(() => ViewManagementActions.get(viewId), [viewId]);
+  const viewJsonPromise = useMemo((): Promise<ViewJson> => getView(viewId), [viewId]);
 
   return useMemo(
     () =>

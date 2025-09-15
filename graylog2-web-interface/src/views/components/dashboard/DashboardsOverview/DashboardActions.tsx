@@ -24,7 +24,6 @@ import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -33,6 +32,7 @@ import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { deleteView } from 'views/api/views';
 
 const defaultDashboardDeletionHook = async (view: View) =>
   // eslint-disable-next-line no-alert
@@ -99,7 +99,7 @@ const DashboardDeleteAction = ({
     );
 
     if (result) {
-      ViewManagementActions.delete(dashboard)
+      deleteView(dashboard)
         .then(() => {
           UserNotification.success(`Deleting dashboard "${dashboard.title}" was successful!`, 'Success!');
           deselectEntity(dashboard.id);
