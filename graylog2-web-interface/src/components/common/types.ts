@@ -18,6 +18,9 @@ export type ValidationState = 'error' | 'success' | 'warning';
 export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
 
 export type EntitySource = {
+  id?: string;
   source: string;
+  entity_type: string;
   parent_id?: string;
+  entity_id?: string;
 };

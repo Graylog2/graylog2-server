@@ -30,6 +30,7 @@ const eventDefinition: EventDefinition = {
   _scope: 'test',
   _entity_source: {
     source: 'USER_DEFINED',
+    entity_type: 'event_definition',
   },
   priority: 1,
   alert: true,

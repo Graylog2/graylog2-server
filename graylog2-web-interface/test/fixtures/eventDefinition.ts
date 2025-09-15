@@ -55,6 +55,7 @@ export const simpleEventDefinition: EventDefinition = {
   _scope: 'DEFAULT',
   _entity_source: {
     source: 'USER_DEFINED',
+    entity_type: 'event_definition',
   },
   state: 'ENABLED',
   remediation_steps: '',

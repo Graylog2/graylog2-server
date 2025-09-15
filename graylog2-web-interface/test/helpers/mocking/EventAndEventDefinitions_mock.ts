@@ -71,6 +71,7 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
   _scope: 'DEFAULT',
   _entity_source: {
     source: 'USER_DEFINED',
+    entity_type: 'event_definition',
   },
   id: 'event-definition-id-1',
   title: 'Event Definition Title',
