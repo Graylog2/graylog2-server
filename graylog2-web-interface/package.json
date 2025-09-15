@@ -82,7 +82,7 @@
     "react-ace": "14.0.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.19.3",
-    "react-day-picker": "^7.4.8",
+    "react-day-picker": "^9.10.0",
     "react-error-boundary": "^5.0.0",
     "react-fast-compare": "^3.2.0",
     "react-grid-layout": "^1.5.2",
