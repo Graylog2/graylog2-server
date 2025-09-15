@@ -76,7 +76,7 @@ public class EventDefinitions implements GraylogRestApi {
                       "field_spec": {},
                       "key_spec": [],
                       "notification_settings": {
-                        "grace_period_ms": 300000,
+                        "grace_period_ms": 30000,
                         "backlog_size": null
                       },
                       "notifications": [{
