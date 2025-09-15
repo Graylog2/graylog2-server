@@ -21,13 +21,13 @@ import type Widget from 'views/logic/widgets/Widget';
 import defaultTitle from 'views/components/defaultTitle';
 import generateObjectId from 'logic/generateObjectId';
 
+import type {ViewStateJson} from './ViewState';
 import ViewState from './ViewState';
-import type { WidgetMapping } from './types';
-import type { ViewStateJson } from './ViewState';
+import type {WidgetMapping} from './types';
 
 import type Search from '../search/Search';
-import type { SearchType as QuerySearchType } from '../queries/SearchType';
-import type { QueryId } from '../queries/Query';
+import type {SearchType as QuerySearchType} from '../queries/SearchType';
+import type {QueryId} from '../queries/Query';
 
 export type Properties = Immutable.List<any>;
 
@@ -56,7 +56,14 @@ type InternalState = {
   requires: Requirements;
   favorite: boolean;
   lastUpdatedAt: Date;
+  entitySource?: EntitySource;
 };
+
+type EntitySource = {
+  source: String,
+  entityType: String,
+  parentId?: String,
+}
 
 export type ViewJson = {
   id: string;
@@ -72,6 +79,7 @@ export type ViewJson = {
   requires: Requirements;
   favorite: boolean;
   last_updated_at: string;
+  _entity_source?: string;
 };
 
 export default class View {
@@ -96,6 +104,7 @@ export default class View {
     requires: Requirements,
     favorite: boolean,
     lastUpdatedAt: Date,
+    entitySource: EntitySource,
   ) {
     this._value = {
       id,
@@ -111,6 +120,7 @@ export default class View {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     };
   }
 
@@ -176,6 +186,10 @@ export default class View {
 
   get lastUpdatedAt(): Date {
     return this._value.lastUpdatedAt;
+  }
+
+  get entitySource(): EntitySource {
+    return this._value.entitySource;
   }
 
   getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
@@ -252,6 +266,7 @@ export default class View {
       requires,
       favorite,
       last_updated_at,
+      _entity_source,
     } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
@@ -271,6 +286,7 @@ export default class View {
       .requires(requires)
       .favorite(favorite)
       .lastUpdatedAt(lastUpdatedAtDate)
+      .entitySource(_entity_source)
       .build();
   }
 
@@ -337,6 +353,10 @@ class Builder {
     return new Builder(this.value.set('lastUpdatedAt', value));
   }
 
+  entitySource(value: String): Builder {
+    return new Builder(this.value.set('entitySource', value));
+  }
+
   owner(value: string): Builder {
     return new Builder(this.value.set('owner', value));
   }
@@ -364,6 +384,7 @@ class Builder {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     } = this.value.toObject();
 
     return new View(
@@ -380,6 +401,7 @@ class Builder {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     );
   }
 }
