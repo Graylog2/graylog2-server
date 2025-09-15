@@ -23,6 +23,9 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.rest.resources.entities.FilterOption;
+
+import java.util.Set;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,11 +34,16 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog2.database.entities.source.EntitySource.USER_DEFINED;
+import static org.graylog2.database.utils.MongoUtils.objectIdEq;
 
 public class DBEntitySourceService {
 
     public static final String COLLECTION_NAME = "entity_source";
     private final MongoCollection<EntitySource> collection;
+    public static final Set<FilterOption> FILTER_OPTIONS = Set.of(
+            FilterOption.create(USER_DEFINED, "User Defined"),
+            FilterOption.create("ILLUMINATE", "Illuminate"));
 
     @Inject
     public DBEntitySourceService(MongoCollections mongoCollections) {
