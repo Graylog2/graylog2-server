@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import jakarta.annotation.Nonnull;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -60,7 +61,6 @@ import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
-import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -292,7 +292,7 @@ class PipelineRuleParserTest extends BaseParserTest {
 
         assertEquals(Stage.Match.ALL, stage1.match());
         assertEquals(1, stage1.stage());
-        assertArrayEquals(new Object[]{"check_ip_whitelist", "cisco_device"}, stage1.ruleReferences().toArray());
+        assertArrayEquals(new Object[]{"check_ip_allowlist", "cisco_device"}, stage1.ruleReferences().toArray());
 
         assertEquals(Stage.Match.EITHER, stage2.match());
         assertEquals(2, stage2.stage());

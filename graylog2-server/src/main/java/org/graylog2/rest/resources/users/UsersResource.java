@@ -497,11 +497,7 @@ public class UsersResource extends RestResource {
                 LOG.error("Invalid timezone '{}', ignoring it for user {}.", timezone, username);
             }
         }
-
-        final Startpage startpage = cr.startpage();
-        if (startpage != null) {
-            user.setStartpage(startpage);
-        }
+        user.setStartpage(cr.startpage());
 
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
