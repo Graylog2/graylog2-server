@@ -172,9 +172,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
           ) : null;
 
         const resetBtn = value?.type ? (
-          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>
-            Reset
-          </ResetBtn>
+          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>Reset</ResetBtn>
         ) : null;
 
         return (
