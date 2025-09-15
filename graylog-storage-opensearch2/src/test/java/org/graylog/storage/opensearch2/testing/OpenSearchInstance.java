@@ -26,16 +26,13 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -151,12 +148,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     private void fixDefaultNumberOfReplicasForIsmConfigs() {
-        PutComposableIndexTemplateRequest request = new PutComposableIndexTemplateRequest();
-        request.name("ism-zero-replica-template");
-        request.indexTemplate(new ComposableIndexTemplate(List.of(".opendistro-ism-config"),
-                new Template(Settings.builder().put("number_of_replicas", 0).build(), null, null),
-                null, Long.MAX_VALUE, null, null));
-        openSearchClient().execute((client, requestOptions) -> client.indices().putIndexTemplate(request, requestOptions));
+        // changes default number of replicas for some system managed indices in 2.19
+        // (see http://github.com/opensearch-project/OpenSearch/issues/9438)
+        openSearchClient().execute((client, requestOptions) -> {
+            final ClusterUpdateSettingsRequest req = new ClusterUpdateSettingsRequest();
+            req.persistentSettings(Map.of("cluster.default_number_of_replicas", "0"));
+            return client.cluster().putSettings(req, requestOptions);
+        });
     }
 
     /**
