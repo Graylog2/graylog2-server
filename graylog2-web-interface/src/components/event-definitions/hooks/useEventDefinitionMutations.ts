@@ -52,6 +52,7 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
 
 const useEventDefinitionMutations = () => {
   const createMutation = useMutation({
+    // @ts-ignore
     mutationFn: createEventDefinition,
     onError: (errorThrown) => {
       UserNotification.error(
