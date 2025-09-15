@@ -26,7 +26,7 @@ type Props = {
 };
 
 const LUTDrawer = ({ onClose, title, double = false, children }: Props) => (
-  <DrawerDouble opened double={double} onClose={onClose} position="right" title={title}>
+  <DrawerDouble opened size="lg" double={double} onClose={onClose} position="right" title={title}>
     {children}
   </DrawerDouble>
 );

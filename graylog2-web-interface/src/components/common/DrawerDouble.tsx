@@ -29,7 +29,7 @@ const DrawerDouble = ({ double = false, ...props }: Props) => (
     opened={props.opened}
     onClose={props.onClose}
     position="right"
-    size={double ? 1260 : 'lg'}
+    size={double ? 1260 : props.size}
     overlayProps={{ zIndex: '1030' }}
     title={props.title}>
     <Row $align="stretch">{props.children}</Row>
