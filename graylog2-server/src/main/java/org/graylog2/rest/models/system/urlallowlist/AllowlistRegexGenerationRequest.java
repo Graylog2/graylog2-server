@@ -14,22 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.urlwhitelist;
+package org.graylog2.rest.models.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
-import jakarta.validation.constraints.NotEmpty;
-
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class WhitelistRegexGenerationRequest {
+public abstract class AllowlistRegexGenerationRequest {
     @NotEmpty
     @JsonProperty("url_template")
     public abstract String urlTemplate();
@@ -39,8 +38,8 @@ public abstract class WhitelistRegexGenerationRequest {
     public abstract String placeholder();
 
     @JsonCreator
-    public static WhitelistRegexGenerationRequest create(@JsonProperty("url_template") @NotEmpty String urlTemplate,
+    public static AllowlistRegexGenerationRequest create(@JsonProperty("url_template") @NotEmpty String urlTemplate,
                                                          @JsonProperty("placeholder") @Nullable String placeholder) {
-        return new AutoValue_WhitelistRegexGenerationRequest(urlTemplate, placeholder);
+        return new AutoValue_AllowlistRegexGenerationRequest(urlTemplate, placeholder);
     }
 }
