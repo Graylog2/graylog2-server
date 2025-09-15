@@ -20,7 +20,7 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Input } from 'components/bootstrap';
 import { isValidURL } from 'util/URLUtils';
 // Explicit import to fix eslint import/no-cycle
-import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
+import URLAllowListFormModal from 'components/common/URLAllowListFormModal';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { triggerInput } from 'util/FormsUtils';
 import type { ValidationState } from 'components/common/types';
@@ -34,11 +34,11 @@ type Props = {
   onValidationChange?: (validationState: string) => void;
   labelClassName?: string;
   wrapperClassName?: string;
-  urlType?: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'];
+  urlType?: React.ComponentProps<typeof URLAllowListFormModal>['urlType'];
   autofocus?: boolean;
 };
 
-const URLWhiteListInput = ({
+const URLAllowListInput = ({
   label,
   onChange,
   validationMessage = '',
@@ -50,32 +50,32 @@ const URLWhiteListInput = ({
   urlType = 'literal',
   autofocus = true,
 }: Props) => {
-  const [isWhitelisted, setIsWhitelisted] = useState(false);
+  const [isAllowlisted, setIsAllowlisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
 
-  const suggestRegexWhitelistUrl = (typedUrl: string, type: string): string | Promise<any> => {
+  const suggestRegexAllowlistUrl = (typedUrl: string, type: string): string | Promise<any> => {
     // eslint-disable-next-line no-template-curly-in-string
     const keyWildcard = '${key}';
 
     return type && type === 'regex' && isValidURL(typedUrl)
-      ? ToolsStore.urlWhiteListGenerateRegex(typedUrl, keyWildcard)
+      ? ToolsStore.urlAllowListGenerateRegex(typedUrl, keyWildcard)
       : typedUrl;
   };
 
   const [suggestedUrl, setSuggestedUrl] = useState(url);
-  const isWhitelistError = () => currentValidationState === 'error' && isValidURL(url);
+  const isAllowlistError = () => currentValidationState === 'error' && isValidURL(url);
   const urlInputRef = useRef<Input>();
 
-  const checkIsWhitelisted = useCallback(() => {
+  const checkIsAllowlisted = useCallback(() => {
     if (url) {
-      const promise = ToolsStore.urlWhiteListCheck(url);
+      const promise = ToolsStore.urlAllowListCheck(url);
 
       promise.then((result) => {
-        if (!result.is_whitelisted && validationState === null) {
+        if (!result.is_allowlisted && validationState === null) {
           setCurrentValidationState('error');
           onValidationChange('error');
-          const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not a valid URL.`;
+          const message = isValidURL(url) ? `URL ${url} is not allowlisted` : `URL ${url} is not a valid URL.`;
 
           setOwnValidationMessage(message);
         } else {
@@ -84,20 +84,20 @@ const URLWhiteListInput = ({
           onValidationChange(validationState);
         }
 
-        setIsWhitelisted(result.is_whitelisted);
+        setIsAllowlisted(result.is_allowlisted);
       });
     }
   }, [url, validationMessage, validationState, onValidationChange]);
 
   const onUpdate = () => {
     triggerInput(urlInputRef.current.getInputDOMNode());
-    checkIsWhitelisted();
+    checkIsAllowlisted();
   };
 
   useEffect(() => {
     const checkSuggestion = () => {
       if (url) {
-        const suggestion = suggestRegexWhitelistUrl(url, urlType);
+        const suggestion = suggestRegexAllowlistUrl(url, urlType);
 
         if (typeof suggestion === 'object') {
           suggestion.then((result) => {
@@ -115,14 +115,14 @@ const URLWhiteListInput = ({
   }, [url, urlType]);
 
   useEffect(() => {
-    const timer = setTimeout(() => checkIsWhitelisted(), 250);
+    const timer = setTimeout(() => checkIsAllowlisted(), 250);
 
     return () => clearTimeout(timer);
-  }, [url, validationState, checkIsWhitelisted]);
+  }, [url, validationState, checkIsAllowlisted]);
 
   const addButton =
-    isWhitelistError() && !isWhitelisted ? (
-      <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} />
+    isAllowlistError() && !isAllowlisted ? (
+      <URLAllowListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} />
     ) : (
       ''
     );
@@ -151,4 +151,4 @@ const URLWhiteListInput = ({
   );
 };
 
-export default URLWhiteListInput;
+export default URLAllowListInput;
