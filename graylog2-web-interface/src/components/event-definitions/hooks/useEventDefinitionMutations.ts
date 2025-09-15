@@ -47,12 +47,11 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
       selected_collections: share_request?.selected_collections,
       selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS(),
     },
-  });
+  }) as Promise<EventDefinition>;
 };
 
 const useEventDefinitionMutations = () => {
   const createMutation = useMutation({
-    // @ts-ignore
     mutationFn: createEventDefinition,
     onError: (errorThrown) => {
       UserNotification.error(
