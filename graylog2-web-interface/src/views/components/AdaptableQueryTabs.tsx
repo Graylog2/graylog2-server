@@ -46,9 +46,9 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
+import { updateView, getView } from 'views/api/views';
 
 import type { QueryTabsProps } from './QueryTabs';
-import { updateView, getView } from 'views/api/views';
 
 interface Props extends QueryTabsProps {
   maxWidth: number;
