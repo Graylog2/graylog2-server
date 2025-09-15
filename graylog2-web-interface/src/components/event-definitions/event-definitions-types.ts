@@ -86,6 +86,7 @@ export type EventProcessorConfig = {
 };
 export type EventDefinition = {
   _scope: string;
+  _entity_source?: any;
   id: string;
   title: string;
   description: string;
