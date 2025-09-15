@@ -19,6 +19,7 @@ package org.graylog.events.notifications.types;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -37,12 +38,10 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 
@@ -65,14 +64,14 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-                                 UrlWhitelistService whitelistService,
-                                 UrlWhitelistNotificationService urlWhitelistNotificationService,
+                                 UrlAllowlistService allowlistService,
+                                 UrlAllowlistNotificationService urlAllowlistNotificationService,
                                  EncryptedValueService encryptedValueService,
                                  EventsConfigurationProvider configurationProvider,
                                  NotificationService notificationService,
                                  NodeId nodeId,
                                  final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
-        super(whitelistService, urlWhitelistNotificationService, encryptedValueService, notificationService, nodeId);
+        super(allowlistService, urlAllowlistNotificationService, encryptedValueService, notificationService, nodeId);
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.configurationProvider = configurationProvider;
