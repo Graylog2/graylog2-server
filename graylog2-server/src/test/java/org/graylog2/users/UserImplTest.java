@@ -53,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -230,5 +231,12 @@ class UserImplTest {
         user.setStartpage(new DashboardStartPage("id"));
         assertEquals("dashboard", user.getStartpage().type());
         assertEquals("id", ((DashboardStartPage)user.getStartpage()).id());
+    }
+
+    @Test
+    void testNullStartPage() {
+        user = createUserImpl(null, null, null);
+        user.setStartpage(null);
+        assertNull(user.getStartpage());
     }
 }

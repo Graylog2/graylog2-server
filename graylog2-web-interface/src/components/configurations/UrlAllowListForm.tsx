@@ -26,7 +26,7 @@ import Select from 'components/common/Select';
 import Icon from 'components/common/Icon';
 import { Button, Table } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import type { Url, AllowListConfig } from 'stores/configurations/ConfigurationsStore';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { isValidURL } from 'util/URLUtils';
 import generateId from 'logic/generateId';
@@ -75,11 +75,11 @@ const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 type Props = {
   urls?: Array<Url>;
   disabled?: boolean;
-  onUpdate?: (config: WhiteListConfig, valid: boolean) => void;
+  onUpdate?: (config: AllowListConfig, valid: boolean) => void;
   newEntryId?: string;
 };
 
-const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
+const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
   const productName = useProductName();
   const literal = 'literal';
   const regex = 'regex';
@@ -89,7 +89,7 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
   ];
   // eslint-disable-next-line prefer-const
   let inputs = {};
-  const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });
+  const [config, setConfig] = useState<AllowListConfig>({ entries: urls, disabled });
   const [validationState, setValidationState] = useState({ errors: [] });
   const isInitialRender = useRef<boolean>(false);
 
@@ -267,11 +267,11 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
     <>
       <Input
         type="checkbox"
-        id="whitelist-disabled"
-        label="Disable Whitelist"
+        id="allowlist-disabled"
+        label="Disable Allowlist"
         checked={config.disabled}
         onChange={() => setConfig({ ...config, disabled: !config.disabled })}
-        help={`Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in ${productName} entities, which may pose a security risk.`}
+        help={`Disable the allowlist functionality. Warning: Disabling this option will allow users to enter any URL in ${productName} entities, which may pose a security risk.`}
       />
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
         Add Url
@@ -295,4 +295,4 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
   );
 };
 
-export default UrlWhiteListForm;
+export default UrlAllowListForm;

@@ -34,12 +34,12 @@ import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
-import org.graylog2.system.urlwhitelist.LiteralWhitelistEntry;
-import org.graylog2.system.urlwhitelist.RegexHelper;
-import org.graylog2.system.urlwhitelist.RegexWhitelistEntry;
-import org.graylog2.system.urlwhitelist.UrlWhitelist;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
-import org.graylog2.system.urlwhitelist.WhitelistEntry;
+import org.graylog2.system.urlallowlist.AllowlistEntry;
+import org.graylog2.system.urlallowlist.LiteralAllowlistEntry;
+import org.graylog2.system.urlallowlist.RegexAllowlistEntry;
+import org.graylog2.system.urlallowlist.RegexHelper;
+import org.graylog2.system.urlallowlist.UrlAllowlist;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,25 +53,29 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
- * Creates an initial URL whitelist. If there are services configured which use URLs that are required to be whitelisted
- * in order to be reachable, these URLs are added to the whitelist to ensure that the service will still run properly.
- * <p>If no such services are configured yet, an empty whitelist is created.</p>
+ * Creates an initial URL allowlist. If a legacy whitelist entry exists, copy the entries from that.
+ * If there are services configured which use URLs that are required to be allowlisted
+ * in order to be reachable, these URLs are added to the allowlist to ensure that the service will still run properly.
+ * <p>If no such services are configured yet, an empty allowlist is created.</p>
+ *
  */
-public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
-    private static final Logger log = LoggerFactory.getLogger(V20191129134600_CreateInitialUrlWhitelist.class);
+public class V20191129134600_CreateInitialUrlAllowlist extends Migration {
+    private static final Logger log = LoggerFactory.getLogger(V20191129134600_CreateInitialUrlAllowlist.class);
+
+    private static final String LEGACY_ALLOWLIST = "org.graylog2.system.urlwhitelist.UrlWhitelist";
 
     private final ClusterConfigService configService;
-    private final UrlWhitelistService whitelistService;
+    private final UrlAllowlistService allowlistService;
     private final DBDataAdapterService dataAdapterService;
     private final DBNotificationService notificationService;
     private final RegexHelper regexHelper;
 
     @Inject
-    public V20191129134600_CreateInitialUrlWhitelist(final ClusterConfigService clusterConfigService,
-                                                     UrlWhitelistService whitelistService, DBDataAdapterService dataAdapterService,
+    public V20191129134600_CreateInitialUrlAllowlist(final ClusterConfigService clusterConfigService,
+                                                     UrlAllowlistService allowlistService, DBDataAdapterService dataAdapterService,
                                                      DBNotificationService notificationService, RegexHelper regexHelper) {
         this.configService = clusterConfigService;
-        this.whitelistService = whitelistService;
+        this.allowlistService = allowlistService;
         this.dataAdapterService = dataAdapterService;
         this.notificationService = notificationService;
         this.regexHelper = regexHelper;
@@ -91,13 +95,19 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
             return;
         }
 
-        UrlWhitelist whitelist = createWhitelist();
-        whitelistService.saveWhitelist(whitelist);
-        configService.write(MigrationCompleted.create(whitelist.toString()));
+        UrlAllowlist allowlist = createAllowlist();
+        UrlAllowlist legacyAllowList = configService.get(LEGACY_ALLOWLIST, UrlAllowlist.class);
+        if (legacyAllowList != null) {
+            allowlist.entries().addAll(legacyAllowList.entries());
+            log.debug("Added legacy allowlist: {}", legacyAllowList);
+        }
+
+        allowlistService.saveAllowlist(allowlist);
+        configService.write(MigrationCompleted.create(allowlist.toString()));
     }
 
-    private UrlWhitelist createWhitelist() {
-        final Set<WhitelistEntry> entries = new HashSet<>();
+    private UrlAllowlist createAllowlist() {
+        final Set<AllowlistEntry> entries = new HashSet<>();
 
         try (Stream<DataAdapterDto> dataAdapterStream = dataAdapterService.streamAll()) {
             dataAdapterStream
@@ -110,16 +120,16 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
                     .forEach(e -> e.ifPresent(entries::add));
         }
 
-        log.info("Created {} whitelist entries from URLs configured in data adapters and event notifications.",
+        log.info("Created {} allowlist entries from URLs configured in data adapters and event notifications.",
                 entries.size());
 
-        final UrlWhitelist whitelist = UrlWhitelist.createEnabled(new ArrayList<>(entries));
-        log.debug("Resulting whitelist: {}.", whitelist);
+        final UrlAllowlist allowlist = UrlAllowlist.createEnabled(new ArrayList<>(entries));
+        log.debug("Resulting allowlist: {}.", allowlist);
 
-        return whitelist;
+        return allowlist;
     }
 
-    private Optional<WhitelistEntry> extractFromNotification(NotificationDto notificationDto) {
+    private Optional<AllowlistEntry> extractFromNotification(NotificationDto notificationDto) {
         final EventNotificationConfig config = notificationDto.config();
 
         String url = "";
@@ -132,36 +142,36 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         }
 
         if (StringUtils.isNotBlank(url)) {
-            return defaultIfNotMatching(LiteralWhitelistEntry.create(UUID.randomUUID().toString(),
+            return defaultIfNotMatching(LiteralAllowlistEntry.create(UUID.randomUUID().toString(),
                     "\"" + notificationDto.title() + "\" alert notification", url), url);
         } else {
             return Optional.empty();
         }
     }
 
-    private Optional<WhitelistEntry> extractFromDataAdapter(DataAdapterDto dataAdapterDto) {
+    private Optional<AllowlistEntry> extractFromDataAdapter(DataAdapterDto dataAdapterDto) {
         final LookupDataAdapterConfiguration config = dataAdapterDto.config();
 
         if (config instanceof DSVHTTPDataAdapter.Config) {
             final String url = ((DSVHTTPDataAdapter.Config) config).url();
-            return defaultIfNotMatching(LiteralWhitelistEntry.create(UUID.randomUUID().toString(),
+            return defaultIfNotMatching(LiteralAllowlistEntry.create(UUID.randomUUID().toString(),
                     "\"" + dataAdapterDto.title() + "\" data adapter", url), url);
         } else if (config instanceof HTTPJSONPathDataAdapter.Config) {
             final String url = StringUtils.strip(((HTTPJSONPathDataAdapter.Config) config).url());
             // Quote all parts around the ${key} template parameter( and replace the ${key} template param with a
             // wildcard match
             String regex = regexHelper.createRegexForUrlTemplate(url, "${key}");
-            return defaultIfNotMatching(RegexWhitelistEntry.create(UUID.randomUUID().toString(),
+            return defaultIfNotMatching(RegexAllowlistEntry.create(UUID.randomUUID().toString(),
                     "\"" + dataAdapterDto.title() + "\" data adapter", regex), url);
         }
 
         return Optional.empty();
     }
 
-    private Optional<WhitelistEntry> defaultIfNotMatching(WhitelistEntry entry, String url) {
-        if (!entry.isWhitelisted(url)) {
-            log.error("Unable to create matching URL whitelist entry for URL <{}>. Please configure your URL " +
-                    "whitelist manually.", url);
+    private Optional<AllowlistEntry> defaultIfNotMatching(AllowlistEntry entry, String url) {
+        if (!entry.isAllowlisted(url)) {
+            log.error("Unable to create matching URL allowlist entry for URL <{}>. Please configure your URL " +
+                    "allowlist manually.", url);
             return Optional.empty();
         }
         return Optional.of(entry);
@@ -171,12 +181,12 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
     @AutoValue
     @WithBeanGetter
     public static abstract class MigrationCompleted {
-        @JsonProperty("created_whitelist")
-        public abstract String createdWhitelist();
+        @JsonProperty("created_allowlist")
+        public abstract String createdAllowlist();
 
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty("created_whitelist") String createdWhitelist) {
-            return new AutoValue_V20191129134600_CreateInitialUrlWhitelist_MigrationCompleted(createdWhitelist);
+        public static MigrationCompleted create(@JsonProperty("created_allowlist") String createdAllowlist) {
+            return new AutoValue_V20191129134600_CreateInitialUrlAllowlist_MigrationCompleted(createdAllowlist);
         }
     }
 
