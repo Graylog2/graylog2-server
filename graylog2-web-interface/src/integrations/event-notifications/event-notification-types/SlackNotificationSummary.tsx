@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 
+import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
@@ -46,7 +46,7 @@ function SlackNotificationSummary({ notification, ...restProps }: SlackNotificat
       {usePluggableLicenseCheck('/license/security')?.data?.valid && (
         <tr>
           <td>Include Event Procedure in Email Body</td>
-          <td>{notification.config.include_event_procedure ? 'Yes' : 'No'}</td>
+          <td>{notification.config.include_event_procedure}</td>
         </tr>
       )}
       <tr>

@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 
+import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -45,7 +45,7 @@ const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType
     {usePluggableLicenseCheck('/license/security')?.data?.valid && (
       <ReadOnlyFormGroup
         label="Include Event Procedure in Email Body"
-        value={notification.config.include_event_procedure ? 'Yes' : 'No'}
+        value={notification.config.include_event_procedure}
       />
     )}
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />

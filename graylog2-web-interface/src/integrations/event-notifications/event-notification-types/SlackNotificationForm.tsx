@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import { getValueFromInput } from 'util/FormsUtils';
-
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import camelCase from 'lodash/camelCase';
-import type { SlackConfigType, SlackValidationType } from 'integrations/event-notifications/types';
 
+import { getValueFromInput } from 'util/FormsUtils';
+import type { SlackConfigType, SlackValidationType } from 'integrations/event-notifications/types';
 import {
   Col,
   Input,
@@ -58,7 +56,7 @@ function EventProcedureCheckbox({ checked, onChange, validation }: EventProcedur
       label="Include Event Procedure"
       help={
         validation?.errors?.include_event_procedure?.[0] ||
-        'Include event procedure in the notification'
+        'Append a formatted version of the event definition\'s event procedure to the end of the notification body.'
       }
       type="checkbox"
       checked={checked}
