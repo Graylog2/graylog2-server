@@ -55,7 +55,7 @@ const renderComponent = (
 describe('ThresholdFormItem', () => {
   it('renders name and value fields', async () => {
     renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: () => {} });
-    await screen.findByLabelText(/Name/i);
+    await screen.findByLabelText(/Title/i);
     await screen.findByLabelText(/Value/i);
   });
 
