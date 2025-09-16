@@ -128,20 +128,19 @@ const getWidgetAnnotations = (
           {
             x: formattedXCoordinate,
             y,
-            bgcolor: 'rgba(0,0,0,0)', // hide label box
+            // bgcolor: 'rgba(0,0,0,0)', // hide label box
             borderwidth: 0,
             xanchor: 'center',
             yanchor: 'middle',
-            text: ' ',
+            text: '     ',
             // text: note,
-            // bgcolor: color,
-            // font: { size: 12, color: theme.utils.contrastingColor(color) },
+            bgcolor: color,
+            font: { size: 4 },
             xref: 'x',
 
             yref,
             ax: 0,
-            ay: -15,
-            standoff: -2,
+            ay: -7,
             captureevents: true,
             showarrow: true,
             arrowhead: 4,
