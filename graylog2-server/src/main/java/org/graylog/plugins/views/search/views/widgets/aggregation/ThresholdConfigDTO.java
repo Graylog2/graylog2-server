@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PluginManifest } from 'graylog-web-plugin/plugin';
+package org.graylog.plugins.views.search.views.widgets.aggregation;
 
-import viewsBindings from 'views/bindings';
-import { usePlugin } from 'views/test/testPlugins';
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 
-const useViewsPlugin = () => usePlugin(new PluginManifest({}, viewsBindings));
+import java.util.Optional;
 
-export default useViewsPlugin;
+public record ThresholdConfigDTO(@JsonProperty @NotBlank String color,
+                                 @JsonProperty Optional<String> name,
+                                 @JsonProperty double value) {
+}
