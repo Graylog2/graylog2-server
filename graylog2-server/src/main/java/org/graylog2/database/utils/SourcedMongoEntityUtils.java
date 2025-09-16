@@ -47,10 +47,10 @@ public class SourcedMongoEntityUtils {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T extends SourcedScopedEntity> FilterPredicate<T> handleScopedEntitySourceFilter(List<String> filters,
                                                                                                     Predicate<T> predicate) {
-        final Optional<String> entitySourceFilter = filterValue(filters);
-        if (entitySourceFilter.isPresent()) {
-            final String source = entitySourceFilter.get();
-            predicate = predicate.and(entity -> sourceMatches(entity.entitySource().orElse(null), source));
+        final List<String> entitySourceFilters = filterValues(filters);
+        if (!entitySourceFilters.isEmpty()) {
+            predicate = predicate.and(entity -> entitySourceFilters.stream()
+                    .anyMatch(source -> sourceMatches(entity.entitySource().orElse(null), source)));
             filters = removeEntitySourceFilter(filters);
         }
         return new FilterPredicate<>(filters, predicate);
