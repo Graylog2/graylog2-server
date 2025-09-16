@@ -22,10 +22,17 @@ import { SystemMessagesList } from 'components/systemmessages';
 import { SystemMessagesStore } from 'stores/systemmessages/SystemMessagesStore';
 import ProductName from 'brand-customization/ProductName';
 
-class SystemMessagesComponent extends React.Component {
+type Props = {};
+type State = {
+  currentPage: number;
+  total?: number;
+  messages?: Array<{}>;
+};
+class SystemMessagesComponent extends React.Component<Props, State> {
+  private interval: NodeJS.Timeout;
   PER_PAGE = 30;
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     this.state = { currentPage: 1 };
@@ -46,36 +53,35 @@ class SystemMessagesComponent extends React.Component {
     clearInterval(this.interval);
   }
 
-  loadMessages = (page) => {
+  loadMessages = (page: number) => {
     SystemMessagesStore.all(page).then((response) => {
       this.setState(response);
     });
   };
 
-  _onSelected = (selectedPage) => {
+  _onSelected = (selectedPage: number) => {
     this.setState({ currentPage: selectedPage });
     this.loadMessages(selectedPage);
   };
 
   render() {
     const { currentPage, messages, total } = this.state;
-    let content;
-
-    if (total && messages) {
-      const numberPages = Math.ceil(total / this.PER_PAGE);
-
-      content = (
+    const content =
+      total && messages ? (
         <div>
           <SystemMessagesList messages={messages} />
 
           <nav style={{ textAlign: 'center' }}>
-            <Pagination totalPages={numberPages} currentPage={currentPage} onChange={this._onSelected} />
+            <Pagination
+              totalPages={Math.ceil(total / this.PER_PAGE)}
+              currentPage={currentPage}
+              onChange={this._onSelected}
+            />
           </nav>
         </div>
+      ) : (
+        <Spinner />
       );
-    } else {
-      content = <Spinner />;
-    }
 
     return (
       <Row className="content">
