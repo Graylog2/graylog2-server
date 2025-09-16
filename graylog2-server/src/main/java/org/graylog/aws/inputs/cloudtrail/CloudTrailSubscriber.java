@@ -13,7 +13,8 @@
  * You should have received a copy of the Server Side Public License
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
+ *//*
+
 package org.graylog.aws.inputs.cloudtrail;
 
 import com.amazonaws.regions.Region;
@@ -25,6 +26,7 @@ import org.graylog.aws.inputs.cloudtrail.json.CloudTrailRecord;
 import org.graylog.aws.inputs.cloudtrail.messages.TreeReader;
 import org.graylog.aws.inputs.cloudtrail.notifications.CloudtrailSNSNotification;
 import org.graylog.aws.inputs.cloudtrail.notifications.CloudtrailSQSClient;
+import org.graylog.aws.inputs.cloudtrail.sqs.CloudTrailSQSReader;
 import org.graylog.aws.s3.S3Reader;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -35,20 +37,31 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class CloudTrailSubscriber extends Thread {
+*/
+/**
+ * @deprecated This class is deprecated in favor of the new ScheduledExecutorService pattern.
+ * Use CloudTrailPollerTask with CloudTrailTransport instead.
+ * This class is kept for backward compatibility but will be removed in future versions.
+ *//*
+
+@Deprecated
+public class CloudTrailSubscriber implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailSubscriber.class);
 
     public static final int SLEEP_INTERVAL_SECS = 5;
 
-    private volatile boolean stopped = false;
+    private static final int BATCH_SIZE = 10;
+
+    private final AtomicBoolean interrupt;
     private volatile boolean paused = false;
     private volatile CountDownLatch pausedLatch = new CountDownLatch(0);
 
     private final MessageInput sourceInput;
-
     private final Region sqsRegion;
     private final Region s3Region;
     private final String queueName;
@@ -56,6 +69,7 @@ public class CloudTrailSubscriber extends Thread {
     private final HttpUrl proxyUrl;
     private final ObjectMapper objectMapper;
     private final InputFailureRecorder inputFailureRecorder;
+    private final AtomicInteger processedRecords;
 
     public CloudTrailSubscriber(Region sqsRegion, Region s3Region, String queueName, MessageInput sourceInput,
                                 AWSAuthProvider authProvider, HttpUrl proxyUrl, ObjectMapper objectMapper,
@@ -68,6 +82,8 @@ public class CloudTrailSubscriber extends Thread {
         this.proxyUrl = proxyUrl;
         this.objectMapper = objectMapper;
         this.inputFailureRecorder = inputFailureRecorder;
+        this.interrupt = new AtomicBoolean(false);
+        this.processedRecords = new AtomicInteger(0);
     }
 
     public void pause() {
@@ -115,11 +131,13 @@ public class CloudTrailSubscriber extends Thread {
                 }
                 LOG.debug("Subscriber returned [{}] notifications.", notifications.size());
 
-                /*
+                */
+/*
                  * Break out and wait a few seconds until next attempt to avoid hammering AWS with SQS
                  * read requests while still being able to read lots of queued notifications without
                  * the sleep() between each.
-                 */
+                 *//*
+
                 if (notifications.size() == 0) {
                     LOG.debug("No more messages to read from SQS. Going into sleep loop.");
                     break;
@@ -141,7 +159,8 @@ public class CloudTrailSubscriber extends Thread {
 
                             LOG.debug("Processing message content.");
 
-                            /*
+                            */
+/*
                              * We are using process and not processFailFast here even though we are using a
                              * queue system (SQS) that could just deliver the message again when we are out of
                              * internal Graylog2 capacity.
@@ -154,7 +173,8 @@ public class CloudTrailSubscriber extends Thread {
                              * write attempts.
                              *
                              * lol computers.
-                             */
+                             *//*
+
 
                             if (LOG.isTraceEnabled()) {
                                 LOG.trace("Processing cloud trail record: {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(record));
@@ -180,8 +200,8 @@ public class CloudTrailSubscriber extends Thread {
     }
 
     public void terminate() {
-        stopped = true;
+        interrupt.set(true);
         paused = false;
         pausedLatch.countDown();
     }
-}
+}*/

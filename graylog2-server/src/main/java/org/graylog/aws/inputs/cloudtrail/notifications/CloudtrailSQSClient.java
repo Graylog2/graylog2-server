@@ -13,7 +13,8 @@
  * You should have received a copy of the Server Side Public License
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
+ *//*
+
 package org.graylog.aws.inputs.cloudtrail.notifications;
 
 import com.amazonaws.regions.Region;
@@ -83,4 +84,4 @@ public class CloudtrailSQSClient {
                 .withQueueUrl(queueName)
                 .withReceiptHandle(notification.getReceiptHandle()));
     }
-}
+}*/

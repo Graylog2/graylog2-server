@@ -22,6 +22,7 @@ import org.graylog.aws.config.AWSConfigurationResource;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailTransport;
+import org.graylog.aws.inputs.cloudtrail.api.CloudTrailResource;
 import org.graylog.aws.migrations.V20200505121200_EncryptAWSSecretKey;
 import org.graylog.aws.processors.instancelookup.AWSInstanceNameLookupProcessor;
 import org.graylog.aws.processors.instancelookup.InstanceLookupTable;
@@ -44,6 +45,8 @@ public class AWSModule extends PluginModule {
             addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
             addMessageInput(CloudTrailInput.class);
             bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
+
+            addRestResource(CloudTrailResource.class);
         }
         if (!(configuration.isCloud() || isForwarder())) {
             // Instance name lookup
