@@ -18,7 +18,8 @@ import * as React from 'react';
 import { useContext, useMemo, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import type { Layout } from 'plotly.js';
+import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
+import type Plotly from 'plotly.js/lib/core';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -96,10 +97,11 @@ type Props = {
   layout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string) => void;
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
-  onClickMarker?: (event: OnClickMarkerEvent) => void;
+  onClickMarker?: (markerEvent: OnClickMarkerEvent, event?: PlotMouseEvent) => void;
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
+  onInitialized?: (figure: unknown, graphDiv: PlotlyHTMLElement) => void;
 };
 
 type Axis = {
@@ -165,7 +167,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
 
     plotLayout.shapes = plotLayout.shapes.map((shape) => ({
       ...shape,
-      line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
+      line: { ...(shape?.line ?? {}), color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
     }));
 
     return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
@@ -215,6 +217,7 @@ const GenericPlot = ({
   onUnhoverMarker = () => {},
   onZoom = () => {},
   onAfterPlot = () => {},
+  onInitialized = () => {},
 }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
@@ -248,11 +251,14 @@ const GenericPlot = ({
   );
 
   const _onMarkerClick = useCallback(
-    ({ points }: Readonly<Plotly.PlotMouseEvent>) => {
-      onClickMarker?.({
-        x: points[0].x as string,
-        y: points[0].y as string,
-      });
+    (e: Readonly<Plotly.PlotMouseEvent>) => {
+      onClickMarker?.(
+        {
+          x: e.points[0].x as string,
+          y: e.points[0].y as string,
+        },
+        e,
+      );
     },
     [onClickMarker],
   );
@@ -274,6 +280,7 @@ const GenericPlot = ({
       onUnhover={onUnhoverMarker}
       onRelayout={interactive ? _onRelayout : () => {}}
       config={config}
+      onInitialized={onInitialized}
     />
   );
 };

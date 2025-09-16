@@ -40,6 +40,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
@@ -209,7 +210,7 @@ class ViewSharingToGrantsMigrationTest {
                                EntityRegistrar entityRegistrar, MongoCollections mongoCollections) {
             super(clusterConfigService,
                     view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar,
-                    mock(ViewSummaryService.class), mongoCollections);
+                    mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections);
         }
     }
 }

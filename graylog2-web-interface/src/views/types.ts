@@ -64,6 +64,7 @@ import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
+import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -319,16 +320,20 @@ type AssetInformationComponentProps = {
 };
 
 type EventProcedureFormProps = {
-  eventProcedureID: string | undefined;
-  remediationSteps: string;
-  onClose: () => void;
-  onSave: (eventProcedureId: string) => void;
+  eventProcedureId: string | undefined;
+  remediationSteps?: string;
+  onClose?: () => void;
+  onSave?: (eventProcedureId: string) => void;
+  onRemove?: (eventProcedureId: string) => void;
 };
 
 type EventProcedureSummaryProps = {
-  eventDefinitionEventProcedure: string | undefined;
+  eventProcedureId: string;
   eventId?: string;
   event?: Event;
+  canEdit?: boolean;
+  onRemove?: () => void;
+  onEdit?: () => void;
 };
 
 type SearchAction = {
@@ -498,6 +503,7 @@ export interface RootState {
   searchExecution: SearchExecution;
   searchMetadata: SearchMetadataState;
   undoRedo: UndoRedoState;
+  widgets: WidgetsState;
 }
 
 export interface ExtraArguments {

@@ -56,7 +56,7 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)
-public abstract class IndexSetConfig extends ScopedEntity implements Comparable<IndexSetConfig>, SimpleIndexSetConfig {
+public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, SimpleIndexSetConfig, ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
@@ -265,9 +265,18 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
 
     @JsonIgnore
     public boolean isRegularIndex() {
+        // Non-writable means the index has been restored and cannot be used as default, no matter if it was explicitly
+        // marked as regular.
+        if (!isWritable()) {
+            return false;
+        }
+        // If the index is writable and the regular flag is explicitly set, return its value.
+        if (isRegular().isPresent()) {
+            return isRegular().get();
+        }
+        // Otherwise, rely on the indexTemplate type to determine if this is a regular index set.
         final String indexTemplate = indexTemplateType().orElse(null);
-        return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate) ||
-                isRegular().orElse(false));
+        return indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate);
     }
 
     @JsonIgnore
@@ -292,8 +301,10 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 
