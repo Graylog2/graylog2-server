@@ -26,13 +26,14 @@ import org.bson.conversions.Bson;
 import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.database.MongoCollection;
-import org.graylog2.database.MongoEntity;
+import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.pagination.EntitySourceLookup;
 
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface ViewUtils<T extends MongoEntity> {
+public interface ViewUtils<T extends SourcedMongoEntity> {
     MongoCollection<T> collection();
 
     default Stream<T> findViews(SearchUser searchUser,
@@ -66,6 +67,8 @@ public interface ViewUtils<T extends MongoEntity> {
                         ),
                         Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),
                         Aggregates.unset("favorites"),
+                EntitySourceLookup.LOOKUP,
+                EntitySourceLookup.UNWIND,
                         Aggregates.sort(sort)
                 )
         ).collation(Collation.builder().locale("en").build());

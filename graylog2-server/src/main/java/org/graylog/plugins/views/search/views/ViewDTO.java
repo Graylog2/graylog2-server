@@ -31,7 +31,8 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.MongoEntity;
+import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -54,7 +55,7 @@ import java.util.stream.Collectors;
    only documents which have the corresponding type.
  */
 @DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ)
-public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, MongoEntity {
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";
 
     public enum Type {
@@ -182,11 +183,14 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SourcedMongoEntity.Builder<ViewDTO, Builder> {
         @ObjectId
         @Id
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_ENTITY_SOURCE)
+        public abstract Builder entitySource(Optional<EntitySource> source);
 
         @JsonProperty(FIELD_TYPE)
         public abstract Builder type(Type type);

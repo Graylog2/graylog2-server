@@ -30,7 +30,7 @@ import java.nio.file.Path;
 /**
  * List of configuration values that are safe to return, i.e. do not include any sensitive
  * information. Building a list manually because we need to guarantee never to return any
- * sensitive variables like passwords etc. - See this as a whitelist approach.
+ * sensitive variables like passwords etc. - See this as an allowlist approach.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect

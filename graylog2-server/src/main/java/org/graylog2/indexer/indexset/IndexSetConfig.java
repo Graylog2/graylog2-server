@@ -263,9 +263,18 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
 
     @JsonIgnore
     public boolean isRegularIndex() {
+        // Non-writable means the index has been restored and cannot be used as default, no matter if it was explicitly
+        // marked as regular.
+        if (!isWritable()) {
+            return false;
+        }
+        // If the index is writable and the regular flag is explicitly set, return its value.
+        if (isRegular().isPresent()) {
+            return isRegular().get();
+        }
+        // Otherwise, rely on the indexTemplate type to determine if this is a regular index set.
         final String indexTemplate = indexTemplateType().orElse(null);
-        return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate) ||
-                isRegular().orElse(false));
+        return indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate);
     }
 
     @JsonIgnore
