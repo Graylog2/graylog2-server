@@ -22,11 +22,44 @@ The logic for generating color shades based on custom-defined color variants (er
 has been slightly adjusted. This change ensures that the exact color specified in the customization settings
 is now used as the primary color for elements like buttons and badges in the UI.
 
+### Renaming "Data Warehouse" to "Data Lake"
+The feature previously known as "Data Warehouse" is now completely renamed to "Data Lake". That includes not only text
+visible to the user, but with version 7.0 also a lot of places being usually invisible to the regular user, such as API
+endpoints, the content of the database, permissions and much more.
+
+#### API Endpoints and permissions
+All endpoints related to data lake have changed their URLs accordingly. As also noted in
+the [REST API endpoint Changes](#rest-api-endpoint-changes), all endpoints previously accessible at
+`/api/plugins/org.graylog.plugins.datawarehouse/data_warehouse/...` are now moved to
+`/api/plugins/org.graylog.plugins.datalake/data_lake/...`. Similarly, all permissions regarding data lake are renamed
+from `data_warehouse...` to `data_lake...`.
+
+#### Database content
+Three entire collections are renamed: 
+- `data_warehouse_archive_config` to `data_lake_archive_config`
+- `data_warehouse_backends` to `data_lake_backends`
+- `data_warehouse_catalog` to `data_lake_catalog`
+
+Also, documents of the following collections are updated to reflect the change in names:
+- `cluster_config` for migrations related to data lake
+- `enterprise_traffic`
+- `scheduler_job_definitions`
+- `scheduler_triggers`, in case a data lake optimization job is already scheduled.
+
+#### Audit logs
+Audit logs having been written before the update are not changed. However, all audit logs from after the update contain
+the term "Data Lake" instead of "Data Warehouse".
+
+#### Metrics
+Just like audit logs, metrics from before the update to version 7.0 are not changed. Starting with version 7.0, the
+names of data lake related metrics change accordingly.
+
+
 ## Configuration File Changes
 
-| Option        | Action     | Description                                    |
-|---------------|------------|------------------------------------------------|
-| `tbd`         | **added**  |                                                |
+| Option | Action    | Description |
+|--------|-----------|-------------|
+| `tbd`  | **added** |             |
 
 ## Default Configuration Changes
 
@@ -44,51 +77,53 @@ is now used as the primary color for elements like buttons and badges in the UI.
 
 ## General REST API Changes
 
-- In Graylog 7.0, an issue was fixed that previously allowed additional unknown JSON properties to be accepted 
-  (and ignored) in API requests on the Graylog leader node. Now that the issue has been fixed, API requests on the 
+- In Graylog 7.0, an issue was fixed that previously allowed additional unknown JSON properties to be accepted
+  (and ignored) in API requests on the Graylog leader node. Now that the issue has been fixed, API requests on the
   leader node will once again only accept JSON payloads that contain explicitly mapped/supported properties.
-- APIs for entity creation now use a parameter `CreateEntityRequest` to keep entity fields separated from sharing 
+- APIs for entity creation now use a parameter `CreateEntityRequest` to keep entity fields separated from sharing
   information. This is a breaking change for all API requests that create entities, such as streams, dashboards, etc.
-  <br> Affected entities: 
-  - Search / Dashboard 
-  - Search Filter 
-  - Report
-  - Event Definition
-  - Stream
-  - Notifications
-  - Sigma rules
-  - Event procedure
-  - Event step
-  - Content Pack installation
-  
+  <br> Affected entities:
+    - Search / Dashboard
+    - Search Filter
+    - Report
+    - Event Definition
+    - Stream
+    - Notifications
+    - Sigma rules
+    - Event procedure
+    - Event step
+    - Content Pack installation
+
   <br> For example, the request payload to create a stream might now look like this:
 
 ```json
 {
-    "entity":{
-        "index_set_id":"65b7ba138cdb8c534a953fef",
-        "description":"An example stream",
-        "title":"My Stream",
-        "remove_matches_from_default_stream":false
-    },
-    "share_request":{
-        "selected_grantee_capabilities":{
-            "grn::::search:684158906442150b2eefb78c":"own"
-        }
+  "entity": {
+    "index_set_id": "65b7ba138cdb8c534a953fef",
+    "description": "An example stream",
+    "title": "My Stream",
+    "remove_matches_from_default_stream": false
+  },
+  "share_request": {
+    "selected_grantee_capabilities": {
+      "grn::::search:684158906442150b2eefb78c": "own"
     }
+  }
 }
 ```
-- Access to the API browser now requires the `api_browser:read` permission. This permission can be granted by assigning 
+
+- Access to the API browser now requires the `api_browser:read` permission. This permission can be granted by assigning
   the new “API Browser Reader” role to a user.
 
 ## REST API Endpoint Changes
 
 The following REST API changes have been made.
 
-| Endpoint                          | Description                                                                                                                                                                                |
-|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/urlallowlist`        | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                                                          |
-| `PUT /system/urlallowlist`        | Renamed from `PUT /system/urlwhitelist`                                                                         . The corresponding REST API permission is renamed to `urlallowlist:write` |
-| `POST /system/urlallowlist/check` | Renamed from `POST /system/urlwhitelist/check`                                                                                                                                             |
-| `POST /system/urlallowlist/generate_regex` | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                                                                    |
-| `GET /<endpoint>`                 | description                                                                                                                                                                                |
+| Endpoint                                                      | Description                                                                                                                                        |
+|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/urlallowlist`                                    | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                  |
+| `PUT /system/urlallowlist`                                    | Renamed from `PUT /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:write`                                  |
+| `POST /system/urlallowlist/check`                             | Renamed from `POST /system/urlwhitelist/check`                                                                                                     |
+| `POST /system/urlallowlist/generate_regex`                    | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                            |
+| All `/api/plugins/org.graylog.plugins.datalake/data_lake/...` | Renamed from `/api/plugins/org.graylog.plugins.datawarehouse/data_warehouse/...`. The corresponding permissions are also renamed to `data_lake...` |
+| `GET /<endpoint>`                                             | description                                                                                                                                        |
