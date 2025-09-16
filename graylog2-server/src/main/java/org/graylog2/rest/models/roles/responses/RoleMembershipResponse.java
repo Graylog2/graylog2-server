@@ -20,10 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.models.users.responses.UserSummary;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.rest.models.users.responses.UserSummary;
 
 import java.util.Collection;
 
@@ -31,11 +30,11 @@ import java.util.Collection;
 @JsonAutoDetect
 public abstract class RoleMembershipResponse {
 
-    @JsonProperty
+    @JsonProperty("role")
     @NotBlank
     public abstract String role();
 
-    @JsonProperty
+    @JsonProperty("users")
     @NotNull
     public abstract Collection<UserSummary> users();
 

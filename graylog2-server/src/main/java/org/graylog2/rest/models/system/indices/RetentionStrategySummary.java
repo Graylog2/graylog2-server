@@ -20,19 +20,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class RetentionStrategySummary {
-    @JsonProperty
+    @JsonProperty("strategy")
     public abstract String strategy();
 
-    @JsonProperty
+    @JsonProperty("config")
     public abstract RetentionStrategyConfig config();
 
     @JsonCreator

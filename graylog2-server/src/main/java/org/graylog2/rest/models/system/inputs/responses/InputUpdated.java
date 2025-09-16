@@ -24,7 +24,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class InputUpdated {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
     @JsonCreator

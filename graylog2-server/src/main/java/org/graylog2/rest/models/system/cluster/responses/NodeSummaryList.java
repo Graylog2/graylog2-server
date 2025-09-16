@@ -26,10 +26,10 @@ import java.util.List;
 @AutoValue
 @JsonAutoDetect
 public abstract class NodeSummaryList {
-    @JsonProperty
+    @JsonProperty("nodes")
     public abstract List<NodeSummary> nodes();
 
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
     @JsonCreator

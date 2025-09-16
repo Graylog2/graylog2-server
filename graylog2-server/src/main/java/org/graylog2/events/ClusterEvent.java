@@ -40,22 +40,22 @@ public abstract class ClusterEvent implements MongoEntity {
     @Nullable
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("timestamp")
     public abstract long timestamp();
 
-    @JsonProperty
+    @JsonProperty("producer")
     @Nullable
     public abstract String producer();
 
-    @JsonProperty
+    @JsonProperty("consumers")
     @Nullable
     public abstract Set<String> consumers();
 
-    @JsonProperty
+    @JsonProperty("event_class")
     @Nullable
     public abstract String eventClass();
 
-    @JsonProperty
+    @JsonProperty("payload")
     @Nullable
     public abstract Object payload();
 

@@ -25,10 +25,10 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class TestMatchResponse {
-    @JsonProperty
+    @JsonProperty("matches")
     public abstract boolean matches();
 
-    @JsonProperty
+    @JsonProperty("rules")
     public abstract Map<String, Boolean> rules();
 
     public static TestMatchResponse create(boolean matches, Map<String, Boolean> rules) {

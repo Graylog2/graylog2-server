@@ -26,10 +26,10 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 public abstract class ClosedIndices {
-    @JsonProperty
+    @JsonProperty("indices")
     public abstract Set<String> indices();
 
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
     @JsonCreator

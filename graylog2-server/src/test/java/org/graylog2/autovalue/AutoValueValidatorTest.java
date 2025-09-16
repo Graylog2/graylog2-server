@@ -64,11 +64,11 @@ public class AutoValueValidatorTest {
 
     @AutoValue
     static abstract class TestValue {
-        @JsonProperty
+        @JsonProperty("text")
         @NotBlank
         public abstract String text();
 
-        @JsonProperty
+        @JsonProperty("number")
         @Min(1)
         @Max(10)
         public abstract int number();

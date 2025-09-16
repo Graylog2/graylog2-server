@@ -27,16 +27,16 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class MessageParseRequest {
-    @JsonProperty
+    @JsonProperty("message")
     public abstract String message();
 
-    @JsonProperty
+    @JsonProperty("codec")
     public abstract String codec();
 
-    @JsonProperty
+    @JsonProperty("remote_address")
     public abstract String remoteAddress();
 
-    @JsonProperty
+    @JsonProperty("configuration")
     @Nullable
     public abstract Map<String, Object> configuration();
 

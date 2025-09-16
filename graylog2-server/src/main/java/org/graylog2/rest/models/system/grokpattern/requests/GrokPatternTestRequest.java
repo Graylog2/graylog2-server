@@ -26,10 +26,10 @@ import org.graylog2.grok.GrokPattern;
 @JsonAutoDetect
 public abstract class GrokPatternTestRequest {
 
-    @JsonProperty
+    @JsonProperty("grok_pattern")
     public abstract GrokPattern grokPattern();
 
-    @JsonProperty
+    @JsonProperty("sampleData")
     public abstract String sampleData();
 
     @JsonCreator

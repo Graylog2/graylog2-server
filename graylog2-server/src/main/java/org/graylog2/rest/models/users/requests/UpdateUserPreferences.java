@@ -27,7 +27,7 @@ import java.util.Map;
 @AutoValue
 public abstract class UpdateUserPreferences {
 
-    @JsonProperty
+    @JsonProperty("preferences")
     public abstract Map<String, Object> preferences();
 
     @JsonCreator

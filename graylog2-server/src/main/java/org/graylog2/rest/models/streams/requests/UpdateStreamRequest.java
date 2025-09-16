@@ -29,11 +29,11 @@ import java.util.List;
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class UpdateStreamRequest {
-    @JsonProperty
+    @JsonProperty("title")
     @Nullable
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("description")
     @Nullable
     public abstract String description();
 

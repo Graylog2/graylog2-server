@@ -29,7 +29,7 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class InputTypesSummary {
-    @JsonProperty
+    @JsonProperty("types")
     public abstract Map<String, String> types();
 
     @JsonCreator

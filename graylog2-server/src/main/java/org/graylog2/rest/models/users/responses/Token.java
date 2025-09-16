@@ -25,16 +25,16 @@ import org.joda.time.DateTime;
 @JsonAutoDetect
 @AutoValue
 public abstract class Token {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("token")
     public abstract String token();
 
-    @JsonProperty
+    @JsonProperty("last_access")
     public abstract DateTime lastAccess();
 
     @JsonCreator

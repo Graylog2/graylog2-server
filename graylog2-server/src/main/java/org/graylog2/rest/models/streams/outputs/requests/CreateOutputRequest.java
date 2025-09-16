@@ -28,20 +28,20 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateOutputRequest {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("configuration")
     public abstract Map<String, Object> configuration();
 
-    @JsonProperty
+    @JsonProperty("streams")
     @Nullable
     public abstract Set<String> streams();
 
-    @JsonProperty
+    @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
 

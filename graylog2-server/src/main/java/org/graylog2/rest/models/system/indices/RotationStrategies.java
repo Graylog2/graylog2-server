@@ -28,15 +28,15 @@ import java.util.List;
 @AutoValue
 @JsonAutoDetect
 public abstract class RotationStrategies {
-    @JsonProperty
+    @JsonProperty("total")
     public int total() {
         return strategies().size();
     }
 
-    @JsonProperty
+    @JsonProperty("strategies")
     public abstract List<RotationStrategyDescription> strategies();
 
-    @JsonProperty
+    @JsonProperty("context")
     public abstract RotationStrategies.Context context();
 
     @JsonCreator

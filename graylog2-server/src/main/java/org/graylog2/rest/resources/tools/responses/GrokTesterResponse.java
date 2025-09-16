@@ -72,10 +72,10 @@ public abstract class GrokTesterResponse {
     @JsonAutoDetect
     @AutoValue
     public static abstract class Match {
-        @JsonProperty
+        @JsonProperty("name")
         public abstract String name();
 
-        @JsonProperty
+        @JsonProperty("match")
         public abstract String match();
 
         @JsonCreator

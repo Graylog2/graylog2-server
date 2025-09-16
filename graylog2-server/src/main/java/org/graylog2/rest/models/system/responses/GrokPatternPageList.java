@@ -30,25 +30,25 @@ import java.util.Collection;
 @JsonAutoDetect
 public abstract class GrokPatternPageList {
     @Nullable
-    @JsonProperty
+    @JsonProperty("query")
     public abstract String query();
 
 
     @JsonProperty("pagination")
     public abstract PaginatedList.PaginationInfo paginationInfo();
 
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
     @Nullable
-    @JsonProperty
+    @JsonProperty("sort")
     public abstract String sort();
 
     @Nullable
-    @JsonProperty
+    @JsonProperty("order")
     public abstract String order();
 
-    @JsonProperty
+    @JsonProperty("patterns")
     public abstract Collection<GrokPattern> patterns();
 
 

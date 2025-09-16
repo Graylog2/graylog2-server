@@ -26,20 +26,20 @@ import com.google.auto.value.AutoValue;
 public abstract class OsStats {
     public static final double[] EMPTY_LOAD = new double[0];
 
-    @JsonProperty
+    @JsonProperty("load_average")
     @SuppressWarnings("mutable")
     public abstract double[] loadAverage();
 
-    @JsonProperty
+    @JsonProperty("uptime")
     public abstract long uptime();
 
-    @JsonProperty
+    @JsonProperty("processor")
     public abstract Processor processor();
 
-    @JsonProperty
+    @JsonProperty("memory")
     public abstract Memory memory();
 
-    @JsonProperty
+    @JsonProperty("swap")
     public abstract Swap swap();
 
     @JsonCreator

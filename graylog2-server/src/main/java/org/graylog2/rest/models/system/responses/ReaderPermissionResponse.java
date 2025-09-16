@@ -26,7 +26,7 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class ReaderPermissionResponse {
-    @JsonProperty
+    @JsonProperty("permissions")
     public abstract List<String> permissions();
 
     @JsonCreator

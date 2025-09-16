@@ -26,13 +26,13 @@ import org.joda.time.DateTimeZone;
 @JsonAutoDetect
 @AutoValue
 public abstract class DebugEvent {
-    @JsonProperty
+    @JsonProperty("node_id")
     public abstract String nodeId();
 
-    @JsonProperty
+    @JsonProperty("date")
     public abstract DateTime date();
 
-    @JsonProperty
+    @JsonProperty("text")
     public abstract String text();
 
     @JsonCreator

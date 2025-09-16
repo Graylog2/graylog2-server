@@ -27,7 +27,7 @@ import java.util.List;
 
 @AutoValue
 public abstract class UserList {
-    @JsonProperty
+    @JsonProperty("users")
     public abstract List<UserSummary> users();
 
     @JsonCreator

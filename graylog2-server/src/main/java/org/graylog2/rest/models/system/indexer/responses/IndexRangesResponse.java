@@ -26,10 +26,10 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class IndexRangesResponse {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("ranges")
     public abstract List<IndexRangeSummary> ranges();
 
     @JsonCreator

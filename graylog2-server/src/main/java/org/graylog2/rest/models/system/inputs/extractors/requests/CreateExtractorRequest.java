@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateExtractorRequest {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
     @JsonProperty("cursor_strategy")
@@ -47,7 +46,7 @@ public abstract class CreateExtractorRequest {
     @JsonProperty("extractor_config")
     public abstract Map<String, Object> extractorConfig();
 
-    @JsonProperty
+    @JsonProperty("converters")
     public abstract List<Map<String, Object>> converters();
 
     @JsonProperty("condition_type")
@@ -56,7 +55,7 @@ public abstract class CreateExtractorRequest {
     @JsonProperty("condition_value")
     public abstract String conditionValue();
 
-    @JsonProperty
+    @JsonProperty("order")
     public abstract long order();
 
     @JsonCreator

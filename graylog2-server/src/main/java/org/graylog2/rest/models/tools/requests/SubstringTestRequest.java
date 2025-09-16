@@ -24,13 +24,13 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class SubstringTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("start")
     public abstract int start();
 
-    @JsonProperty
+    @JsonProperty("end")
     public abstract int end();
 
     @JsonCreator

@@ -26,10 +26,10 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class LoggersSummary {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("loggers")
     public abstract Map<String, SingleLoggerSummary> loggers();
 
     @JsonCreator

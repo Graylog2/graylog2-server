@@ -26,10 +26,10 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class SplitAndIndexTesterResponse {
-    @JsonProperty
+    @JsonProperty("successful")
     public abstract boolean successful();
 
-    @JsonProperty
+    @JsonProperty("cut")
     @Nullable
     public abstract String cut();
 
@@ -40,7 +40,7 @@ public abstract class SplitAndIndexTesterResponse {
     public abstract int endIndex();
 
     @JsonCreator
-    public static SplitAndIndexTesterResponse create(@JsonProperty("total") boolean successful,
+    public static SplitAndIndexTesterResponse create(@JsonProperty("successful") boolean successful,
                                                      @JsonProperty("cut") @Nullable String cut,
                                                      @JsonProperty("begin_index") int beginIndex,
                                                      @JsonProperty("end_index") int endIndex) {

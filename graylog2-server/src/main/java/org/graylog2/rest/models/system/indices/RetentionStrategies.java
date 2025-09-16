@@ -28,13 +28,13 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class RetentionStrategies {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("strategies")
     public abstract Set<RetentionStrategyDescription> strategies();
 
-    @JsonProperty
+    @JsonProperty("context")
     public abstract Context context();
 
     @JsonCreator

@@ -23,16 +23,16 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class IndicesStats {
-    @JsonProperty
+    @JsonProperty("index_count")
     public abstract int indexCount();
 
-    @JsonProperty
+    @JsonProperty("store_size")
     public abstract long storeSize();
 
-    @JsonProperty
+    @JsonProperty("field_data_size")
     public abstract long fieldDataSize();
 
-    @JsonProperty
+    @JsonProperty("id_cache_size")
     public abstract long idCacheSize();
 
     @Deprecated

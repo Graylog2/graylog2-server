@@ -24,10 +24,10 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class RegexTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("regex")
     public abstract String regex();
 
     @JsonCreator

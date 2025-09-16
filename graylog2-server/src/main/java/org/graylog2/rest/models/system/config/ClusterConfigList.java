@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 @AutoValue
 public abstract class ClusterConfigList {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("classes")
     public abstract Set<String> classes();
 
     public static ClusterConfigList create(Collection<String> classes) {

@@ -29,13 +29,13 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class HostInfo {
-    @JsonProperty
+    @JsonProperty("system")
     public abstract System system();
 
-    @JsonProperty
+    @JsonProperty("os")
     public abstract Os os();
 
-    @JsonProperty
+    @JsonProperty("extra")
     public abstract Extra extra();
 
     public static HostInfo create(System system,
@@ -48,25 +48,25 @@ public abstract class HostInfo {
     @AutoValue
     @SuppressWarnings("JavaLangClash")
     public abstract static class System {
-        @JsonProperty
+        @JsonProperty("current_time")
         public abstract DateTime currentTime();
 
-        @JsonProperty
+        @JsonProperty("hostname")
         public abstract String hostname();
 
-        @JsonProperty
+        @JsonProperty("cpu_addr_size")
         public abstract int cpuAddrSize();
 
-        @JsonProperty
+        @JsonProperty("mem_size_mb")
         public abstract long memSizeMB();
 
-        @JsonProperty
+        @JsonProperty("num_cores")
         public abstract int numCores();
 
-        @JsonProperty
+        @JsonProperty("cpu_arch")
         public abstract String cpuArch();
 
-        @JsonProperty
+        @JsonProperty("numa_enabled")
         public abstract boolean numaEnabled();
 
         public static System create(DateTime currentTime,
@@ -83,13 +83,13 @@ public abstract class HostInfo {
     @JsonAutoDetect
     @AutoValue
     public abstract static class Os {
-        @JsonProperty
+        @JsonProperty("type")
         public abstract String type();
 
-        @JsonProperty
+        @JsonProperty("name")
         public abstract String name();
 
-        @JsonProperty
+        @JsonProperty("version")
         public abstract String version();
 
         public static Os create(String type,
@@ -102,38 +102,38 @@ public abstract class HostInfo {
     @JsonAutoDetect
     @AutoValue
     public abstract static class Extra {
-        @JsonProperty
+        @JsonProperty("version_string")
         @Nullable
         public abstract String versionString();
 
-        @JsonProperty
+        @JsonProperty("libc_version")
         @Nullable
         public abstract String libcVersion();
 
-        @JsonProperty
+        @JsonProperty("kernel_version")
         @Nullable
         public abstract String kernelVersion();
 
-        @JsonProperty
+        @JsonProperty("cpu_frequency_mhz")
         @Nullable
         public abstract String cpuFrequencyMHz();
 
-        @JsonProperty
+        @JsonProperty("cpu_features")
         @Nullable
         public abstract String cpuFeatures();
 
-        @JsonProperty
+        @JsonProperty("scheduler")
         @Nullable
         public abstract String scheduler();
 
-        @JsonProperty
+        @JsonProperty("page_size")
         public abstract Long pageSize();
 
-        @JsonProperty
+        @JsonProperty("num_pages")
         @Nullable
         public abstract Long numPages();
 
-        @JsonProperty
+        @JsonProperty("max_open_files")
         @Nullable
         public abstract Long maxOpenFiles();
 

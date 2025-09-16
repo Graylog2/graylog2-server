@@ -24,7 +24,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class ClusterId {
-    @JsonProperty
+    @JsonProperty("cluster_id")
     public abstract String clusterId();
 
     @JsonCreator

@@ -24,13 +24,13 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class Swap {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
-    @JsonProperty
+    @JsonProperty("free")
     public abstract long free();
 
-    @JsonProperty
+    @JsonProperty("used")
     public abstract long used();
 
     @JsonCreator

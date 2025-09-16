@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
 import jakarta.validation.Valid;
 
 @AutoValue
@@ -30,7 +29,7 @@ public abstract class DataNodeLifecycleEvent {
     @JsonProperty("node_id")
     public abstract String nodeId();
 
-    @JsonProperty
+    @JsonProperty("trigger")
     public abstract DataNodeLifecycleTrigger trigger();
 
     @JsonCreator

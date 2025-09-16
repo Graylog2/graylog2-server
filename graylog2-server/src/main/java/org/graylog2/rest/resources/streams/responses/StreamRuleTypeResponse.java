@@ -24,10 +24,10 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonAutoDetect
 public abstract class StreamRuleTypeResponse {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract int id();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
     @JsonProperty("short_desc")

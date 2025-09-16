@@ -24,37 +24,37 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonAutoDetect
 public abstract class SystemOverviewResponse {
-    @JsonProperty
+    @JsonProperty("facility")
     public abstract String facility();
 
-    @JsonProperty
+    @JsonProperty("codename")
     public abstract String codename();
 
-    @JsonProperty
+    @JsonProperty("node_id")
     public abstract String nodeId();
 
-    @JsonProperty
+    @JsonProperty("cluster_id")
     public abstract String clusterId();
 
-    @JsonProperty
+    @JsonProperty("version")
     public abstract String version();
 
-    @JsonProperty
+    @JsonProperty("started_at")
     public abstract String startedAt();
 
     @JsonProperty("is_processing")
     public abstract boolean isProcessing();
 
-    @JsonProperty
+    @JsonProperty("hostname")
     public abstract String hostname();
 
-    @JsonProperty
+    @JsonProperty("lifecycle")
     public abstract String lifecycle();
 
-    @JsonProperty
+    @JsonProperty("lb_status")
     public abstract String lbStatus();
 
-    @JsonProperty
+    @JsonProperty("timezone")
     public abstract String timezone();
 
     @JsonProperty("operating_system")

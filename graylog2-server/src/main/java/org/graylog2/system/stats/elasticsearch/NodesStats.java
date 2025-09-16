@@ -23,19 +23,19 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class NodesStats {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("master_only")
     public abstract int masterOnly();
 
-    @JsonProperty
+    @JsonProperty("data_only")
     public abstract int dataOnly();
 
-    @JsonProperty
+    @JsonProperty("master_data")
     public abstract int masterData();
 
-    @JsonProperty
+    @JsonProperty("client")
     public abstract int client();
 
     public static NodesStats create(int total,

@@ -28,21 +28,21 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class InputCreateRequest implements WithInputConfiguration<InputCreateRequest> {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
     @Override
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("global")
     public abstract boolean global();
 
     @Override
-    @JsonProperty
+    @JsonProperty("configuration")
     public abstract Map<String, Object> configuration();
 
-    @JsonProperty
+    @JsonProperty("node")
     @Nullable
     public abstract String node();
 

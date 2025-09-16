@@ -42,13 +42,13 @@ public abstract class GrokPattern implements MongoEntity, BuildableMongoEntity<G
     @ObjectId
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty(FIELD_NAME)
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty(FIELD_PATTERN)
     public abstract String pattern();
 
-    @JsonProperty
+    @JsonProperty(FIELD_CONTENT_PACK)
     @Nullable
     public abstract String contentPack();
 

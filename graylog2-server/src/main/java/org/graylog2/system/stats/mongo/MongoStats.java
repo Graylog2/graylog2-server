@@ -27,21 +27,21 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class MongoStats {
-    @JsonProperty
+    @JsonProperty("servers")
     public abstract List<HostAndPort> servers();
 
-    @JsonProperty
+    @JsonProperty("build_info")
     public abstract BuildInfo buildInfo();
 
-    @JsonProperty
+    @JsonProperty("host_info")
     @Nullable
     public abstract HostInfo hostInfo();
 
-    @JsonProperty
+    @JsonProperty("server_status")
     @Nullable
     public abstract ServerStatus serverStatus();
 
-    @JsonProperty
+    @JsonProperty("database_stats")
     @Nullable
     public abstract DatabaseStats databaseStats();
 

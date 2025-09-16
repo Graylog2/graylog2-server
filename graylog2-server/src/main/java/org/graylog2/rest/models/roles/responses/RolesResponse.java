@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
@@ -29,11 +28,11 @@ import java.util.Set;
 @JsonAutoDetect
 public abstract class RolesResponse {
 
-    @JsonProperty
+    @JsonProperty("roles")
     @NotNull
     public abstract Set<RoleResponse> roles();
 
-    @JsonProperty
+    @JsonProperty("total")
     public int total() {
         return roles().size();
     }

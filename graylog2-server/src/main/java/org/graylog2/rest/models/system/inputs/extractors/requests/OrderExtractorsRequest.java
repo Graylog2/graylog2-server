@@ -26,7 +26,7 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class OrderExtractorsRequest {
-    @JsonProperty
+    @JsonProperty("order")
     public abstract Map<Integer, String> order();
 
     @JsonCreator

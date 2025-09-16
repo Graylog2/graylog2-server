@@ -33,21 +33,21 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateStreamRequest {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("description")
     @Nullable
     public abstract String description();
 
-    @JsonProperty
+    @JsonProperty("rules")
     public abstract List<CreateStreamRuleRequest> rules();
 
-    @JsonProperty
+    @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
 
-    @JsonProperty
+    @JsonProperty("matching_type")
     public abstract Stream.MatchingType matchingType();
 
     @JsonProperty("remove_matches_from_default_stream")

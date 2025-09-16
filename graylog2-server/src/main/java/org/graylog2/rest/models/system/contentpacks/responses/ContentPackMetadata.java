@@ -25,7 +25,7 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class ContentPackMetadata {
-    @JsonProperty
+    @JsonProperty("installation_count")
     public abstract int installationCount();
 
     @JsonCreator

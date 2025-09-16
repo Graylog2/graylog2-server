@@ -26,7 +26,7 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class MetricNamesResponse {
-    @JsonProperty
+    @JsonProperty("names")
     public abstract Set<String> names();
 
     @JsonCreator

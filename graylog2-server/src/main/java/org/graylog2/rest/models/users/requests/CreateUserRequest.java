@@ -20,55 +20,53 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
-import javax.annotation.Nullable;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateUserRequest {
 
-    @JsonProperty
+    @JsonProperty("username")
     public abstract String username();
 
-    @JsonProperty
+    @JsonProperty("password")
     public abstract String password();
 
-    @JsonProperty
+    @JsonProperty("email")
     public abstract String email();
 
-    @JsonProperty
+    @JsonProperty("first_name")
     public abstract String firstName();
 
-    @JsonProperty
+    @JsonProperty("last_name")
     public abstract String lastName();
 
-    @JsonProperty
+    @JsonProperty("permissions")
     public abstract List<String> permissions();
 
-    @JsonProperty
+    @JsonProperty("timezone")
     @Nullable
     public abstract String timezone();
 
-    @JsonProperty
+    @JsonProperty("session_timeout_ms")
     @Nullable
     public abstract Long sessionTimeoutMs();
 
-    @JsonProperty
+    @JsonProperty("startpage")
     @Nullable
     public abstract Startpage startpage();
 
-    @JsonProperty
+    @JsonProperty("roles")
     @Nullable
     public abstract List<String> roles();
 
-    @JsonProperty
+    @JsonProperty("service_account")
     public abstract boolean isServiceAccount();
 
     @JsonCreator

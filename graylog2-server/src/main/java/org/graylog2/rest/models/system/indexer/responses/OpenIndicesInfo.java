@@ -26,7 +26,7 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class OpenIndicesInfo {
-    @JsonProperty
+    @JsonProperty("indices")
     public abstract List<IndexInfo> indices();
 
     @JsonCreator

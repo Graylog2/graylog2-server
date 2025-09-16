@@ -28,23 +28,23 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class RegexReplaceTesterResponse {
-    @JsonProperty
+    @JsonProperty("matched")
     public abstract boolean matched();
 
-    @JsonProperty
+    @JsonProperty("match")
     @Nullable
     public abstract Match match();
 
-    @JsonProperty
+    @JsonProperty("regex")
     public abstract String regex();
 
-    @JsonProperty
+    @JsonProperty("replacement")
     public abstract String replacement();
 
     @JsonProperty("replace_all")
     public abstract boolean replaceAll();
 
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
     @JsonCreator
@@ -60,13 +60,13 @@ public abstract class RegexReplaceTesterResponse {
     @JsonAutoDetect
     @AutoValue
     public static abstract class Match {
-        @JsonProperty
+        @JsonProperty("match")
         public abstract String match();
 
-        @JsonProperty
+        @JsonProperty("start")
         public abstract int start();
 
-        @JsonProperty
+        @JsonProperty("end")
         public abstract int end();
 
         @JsonCreator

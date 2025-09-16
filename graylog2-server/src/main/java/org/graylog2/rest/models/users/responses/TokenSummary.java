@@ -27,20 +27,20 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class TokenSummary {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("last_access")
     public abstract DateTime lastAccess();
 
-    @JsonProperty
+    @JsonProperty("created_at")
     @Nullable
     public abstract DateTime createdAt();
 
-    @JsonProperty
+    @JsonProperty("expires_at")
     @Nullable
     public abstract DateTime expiresAt();
 

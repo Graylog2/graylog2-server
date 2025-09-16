@@ -27,10 +27,10 @@ import java.util.Collection;
 @JsonAutoDetect
 @AutoValue
 public abstract class OutputListResponse {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
-    @JsonProperty
+    @JsonProperty("outputs")
     public abstract Collection<OutputSummary> outputs();
 
     @JsonCreator

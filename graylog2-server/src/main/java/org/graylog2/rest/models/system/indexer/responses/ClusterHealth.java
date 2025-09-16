@@ -24,10 +24,10 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class ClusterHealth {
-    @JsonProperty
+    @JsonProperty("status")
     public abstract String status();
 
-    @JsonProperty
+    @JsonProperty("shards")
     public abstract ShardStatus shards();
 
     @JsonCreator
@@ -39,16 +39,16 @@ public abstract class ClusterHealth {
     @JsonAutoDetect
     @AutoValue
     public static abstract class ShardStatus {
-        @JsonProperty
+        @JsonProperty("active")
         public abstract int active();
 
-        @JsonProperty
+        @JsonProperty("initializing")
         public abstract int initializing();
 
-        @JsonProperty
+        @JsonProperty("relocating")
         public abstract int relocating();
 
-        @JsonProperty
+        @JsonProperty("unassigned")
         public abstract int unassigned();
 
         @JsonCreator

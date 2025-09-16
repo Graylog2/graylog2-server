@@ -24,10 +24,10 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class GrokTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("pattern")
     public abstract String pattern();
 
     @JsonProperty("named_captures_only")

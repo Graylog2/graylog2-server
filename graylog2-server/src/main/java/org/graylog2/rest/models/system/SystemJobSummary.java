@@ -30,16 +30,16 @@ import java.time.Duration;
 @JsonAutoDetect
 @AutoValue
 public abstract class SystemJobSummary {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract String description();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("info")
     public abstract String info();
 
     @JsonProperty("node_id")

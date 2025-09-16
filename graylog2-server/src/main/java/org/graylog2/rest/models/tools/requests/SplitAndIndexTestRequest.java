@@ -24,13 +24,13 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class SplitAndIndexTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
     @JsonProperty("split_by")
     public abstract String splitBy();
 
-    @JsonProperty
+    @JsonProperty("index")
     public abstract int index();
 
     @JsonCreator

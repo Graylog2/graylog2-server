@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class InputStateSummary extends IOStateSummary {
-    @JsonProperty
+    @JsonProperty("message_input")
     public abstract InputSummary messageInput();
 
     @JsonCreator

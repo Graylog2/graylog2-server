@@ -26,7 +26,7 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class MetricsReadRequest {
-    @JsonProperty
+    @JsonProperty("metrics")
     public abstract List<String> metrics();
 
     @JsonCreator

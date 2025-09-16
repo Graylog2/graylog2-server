@@ -26,10 +26,10 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class SubstringTesterResponse {
-    @JsonProperty
+    @JsonProperty("successful")
     public abstract boolean successful();
 
-    @JsonProperty
+    @JsonProperty("cut")
     @Nullable
     public abstract String cut();
 

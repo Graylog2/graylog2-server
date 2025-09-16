@@ -20,19 +20,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotEmpty;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class ChangePasswordRequest {
-    @JsonProperty
+    @JsonProperty("old_password")
     @Nullable
     public abstract String oldPassword();
 
-    @JsonProperty
+    @JsonProperty("password")
     public abstract String password();
 
     @JsonCreator

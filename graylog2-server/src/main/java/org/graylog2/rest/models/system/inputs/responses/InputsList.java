@@ -26,10 +26,10 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 public abstract class InputsList {
-    @JsonProperty
+    @JsonProperty("inputs")
     public abstract Set<InputSummary> inputs();
 
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
     @JsonCreator

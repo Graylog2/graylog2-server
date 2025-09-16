@@ -26,7 +26,7 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class TokenList {
-    @JsonProperty
+    @JsonProperty("tokens")
     public abstract List<TokenSummary> tokens();
 
     @JsonCreator

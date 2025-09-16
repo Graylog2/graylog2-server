@@ -24,7 +24,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonAutoDetect
 public abstract class SingleLoggerSummary {
-    @JsonProperty
+    @JsonProperty("level")
     public abstract String level();
 
     @JsonProperty("level_syslog")

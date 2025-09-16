@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class MessageCountResponse {
-    @JsonProperty
+    @JsonProperty("events")
     public abstract long events();
 
     public static MessageCountResponse create(long events) {

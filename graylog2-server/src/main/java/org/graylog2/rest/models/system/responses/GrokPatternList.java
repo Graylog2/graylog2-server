@@ -28,7 +28,7 @@ import java.util.Collection;
 @JsonAutoDetect
 public abstract class GrokPatternList {
 
-    @JsonProperty
+    @JsonProperty("patterns")
     public abstract Collection<GrokPattern> patterns();
 
     @JsonCreator

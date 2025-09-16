@@ -24,22 +24,22 @@ import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 @AutoValue
 @JsonAutoDetect
 public abstract class ExtractorMetrics {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract TimerRateMetricsResponse total();
 
-    @JsonProperty
+    @JsonProperty("condition")
     public abstract TimerRateMetricsResponse condition();
 
-    @JsonProperty
+    @JsonProperty("execution")
     public abstract TimerRateMetricsResponse execution();
 
-    @JsonProperty
+    @JsonProperty("converters")
     public abstract TimerRateMetricsResponse converters();
 
-    @JsonProperty
+    @JsonProperty("condition_hits")
     public abstract long conditionHits();
 
-    @JsonProperty
+    @JsonProperty("condition_misses")
     public abstract long conditionMisses();
 
     public static ExtractorMetrics create(TimerRateMetricsResponse total,

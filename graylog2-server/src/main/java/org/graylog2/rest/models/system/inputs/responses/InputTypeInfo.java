@@ -29,19 +29,19 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class InputTypeInfo {
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
     @JsonProperty("is_exclusive")
     public abstract boolean isExclusive();
 
-    @JsonProperty
+    @JsonProperty("requested_configuration")
     public abstract Map<String, Map<String, Object>> requestedConfiguration();
 
-    @JsonProperty
+    @JsonProperty("link_to_docs")
     public abstract String linkToDocs();
 
     @JsonCreator

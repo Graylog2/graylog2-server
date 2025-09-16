@@ -26,7 +26,7 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class SubsystemSummary {
-    @JsonProperty
+    @JsonProperty("subsystems")
     public abstract Map<String, SingleSubsystemSummary> subsystems();
 
     @JsonCreator

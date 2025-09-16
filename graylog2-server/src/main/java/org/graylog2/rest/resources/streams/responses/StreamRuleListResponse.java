@@ -26,7 +26,7 @@ import java.util.Collection;
 @JsonAutoDetect
 @AutoValue
 public abstract class StreamRuleListResponse {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
     @JsonProperty(value = "stream_rules")

@@ -27,10 +27,10 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class MetricsSummaryResponse {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("metrics")
     public abstract List<Map<String, Object>> metrics();
 
     @JsonCreator

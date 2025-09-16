@@ -25,7 +25,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class UserPermissionMigrationState {
 
-    @JsonProperty
+    @JsonProperty("migration_done")
     public abstract boolean migrationDone();
 
     @JsonCreator

@@ -30,19 +30,19 @@ public abstract class PluginMetaDataValue {
     @JsonProperty("unique_id")
     public abstract String uniqueId();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("author")
     public abstract String author();
 
-    @JsonProperty
+    @JsonProperty("url")
     public abstract URI url();
 
-    @JsonProperty
+    @JsonProperty("version")
     public abstract String version();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("required_version")

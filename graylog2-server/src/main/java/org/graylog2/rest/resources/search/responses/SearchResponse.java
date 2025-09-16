@@ -30,34 +30,34 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 public abstract class SearchResponse {
-    @JsonProperty
+    @JsonProperty("query")
     public abstract String query();
 
-    @JsonProperty
+    @JsonProperty("built_query")
     public abstract String builtQuery();
 
-    @JsonProperty
+    @JsonProperty("used_indices")
     public abstract Set<IndexRangeSummary> usedIndices();
 
-    @JsonProperty
+    @JsonProperty("messages")
     public abstract List<ResultMessageSummary> messages();
 
-    @JsonProperty
+    @JsonProperty("fields")
     public abstract Set<String> fields();
 
-    @JsonProperty
+    @JsonProperty("time")
     public abstract long time();
 
-    @JsonProperty
+    @JsonProperty("total_results")
     public abstract long totalResults();
 
-    @JsonProperty
+    @JsonProperty("from")
     public abstract DateTime from();
 
-    @JsonProperty
+    @JsonProperty("to")
     public abstract DateTime to();
 
-    @JsonProperty
+    @JsonProperty("decoration_stats")
     @Nullable
     public abstract SearchDecorationStats decorationStats();
 

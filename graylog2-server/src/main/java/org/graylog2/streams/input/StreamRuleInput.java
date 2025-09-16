@@ -22,13 +22,13 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class StreamRuleInput {
 
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
     public static Builder builder() {

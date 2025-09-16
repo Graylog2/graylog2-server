@@ -26,10 +26,10 @@ import java.util.List;
 @AutoValue
 @JsonAutoDetect
 public abstract class PluginList {
-    @JsonProperty
+    @JsonProperty("plugins")
     public abstract List<PluginMetaDataValue> plugins();
 
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
     @JsonCreator

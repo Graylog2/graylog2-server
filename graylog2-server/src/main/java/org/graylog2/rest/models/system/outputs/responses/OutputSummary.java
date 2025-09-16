@@ -28,25 +28,25 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class OutputSummary {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("creator_user_id")
     public abstract String creatorUserId();
 
-    @JsonProperty
+    @JsonProperty("created_at")
     public abstract DateTime createdAt();
 
-    @JsonProperty
+    @JsonProperty("configuration")
     public abstract Map<String, Object> configuration();
 
-    @JsonProperty
+    @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
 

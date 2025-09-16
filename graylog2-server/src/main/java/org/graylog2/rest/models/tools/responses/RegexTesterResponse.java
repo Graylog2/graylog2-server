@@ -28,17 +28,17 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class RegexTesterResponse {
-    @JsonProperty
+    @JsonProperty("matched")
     public abstract boolean matched();
 
-    @JsonProperty
+    @JsonProperty("match")
     @Nullable
     public abstract Match match();
 
-    @JsonProperty
+    @JsonProperty("regex")
     public abstract String regex();
 
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
     @JsonCreator
@@ -52,14 +52,14 @@ public abstract class RegexTesterResponse {
     @JsonAutoDetect
     @AutoValue
     public static abstract class Match {
-        @JsonProperty
+        @JsonProperty("match")
         @Nullable
         public abstract String match();
 
-        @JsonProperty
+        @JsonProperty("start")
         public abstract int start();
 
-        @JsonProperty
+        @JsonProperty("end")
         public abstract int end();
 
         @JsonCreator

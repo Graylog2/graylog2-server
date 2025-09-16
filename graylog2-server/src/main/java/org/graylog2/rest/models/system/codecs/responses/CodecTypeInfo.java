@@ -27,13 +27,13 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class CodecTypeInfo {
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("requested_configuration")
     public abstract Map<String, Map<String, Object>> requestedConfiguration();
 
     @JsonCreator

@@ -24,10 +24,10 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class CloneStreamRequest {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("remove_matches_from_default_stream")

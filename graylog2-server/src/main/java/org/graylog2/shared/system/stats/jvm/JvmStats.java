@@ -88,49 +88,49 @@ public abstract class JvmStats {
         INSTANCE = JvmStats.create(version, vmName, vmVersion, vmVendor, specName, specVersion, specVendor, startTime, memory, inputArguments, bootClassPath, classPath, systemProperties, garbageCollectors, memoryPools);
     }
 
-    @JsonProperty
+    @JsonProperty("version")
     public abstract String version();
 
-    @JsonProperty
+    @JsonProperty("vm_name")
     public abstract String vmName();
 
-    @JsonProperty
+    @JsonProperty("vm_version")
     public abstract String vmVersion();
 
-    @JsonProperty
+    @JsonProperty("vm_vendor")
     public abstract String vmVendor();
 
-    @JsonProperty
+    @JsonProperty("spec_name")
     public abstract String specName();
 
-    @JsonProperty
+    @JsonProperty("spec_version")
     public abstract String specVersion();
 
-    @JsonProperty
+    @JsonProperty("spec_vendor")
     public abstract String specVendor();
 
-    @JsonProperty
+    @JsonProperty("start_time")
     public abstract long startTime();
 
-    @JsonProperty
+    @JsonProperty("mem")
     public abstract Memory mem();
 
-    @JsonProperty
+    @JsonProperty("input_arguments")
     public abstract List<String> inputArguments();
 
-    @JsonProperty
+    @JsonProperty("boot_class_path")
     public abstract String bootClassPath();
 
-    @JsonProperty
+    @JsonProperty("class_path")
     public abstract String classPath();
 
-    @JsonProperty
+    @JsonProperty("system_properties")
     public abstract Map<String, String> systemProperties();
 
-    @JsonProperty
+    @JsonProperty("garbage_collectors")
     public abstract List<String> garbageCollectors();
 
-    @JsonProperty
+    @JsonProperty("memory_pools")
     public abstract List<String> memoryPools();
 
 
@@ -159,19 +159,19 @@ public abstract class JvmStats {
     @JsonAutoDetect
     @AutoValue
     public abstract static class Memory {
-        @JsonProperty
+        @JsonProperty("heap_init")
         public abstract long heapInit();
 
-        @JsonProperty
+        @JsonProperty("heap_max")
         public abstract long heapMax();
 
-        @JsonProperty
+        @JsonProperty("non_heap_init")
         public abstract long nonHeapInit();
 
-        @JsonProperty
+        @JsonProperty("non_heap_max")
         public abstract long nonHeapMax();
 
-        @JsonProperty
+        @JsonProperty("direct_memory_max")
         public abstract long directMemoryMax();
 
         @JsonCreator

@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class Throughput {
-    @JsonProperty
+    @JsonProperty("throughput")
     public abstract long throughput();
 
     public static Throughput create(long throughput) {

@@ -24,37 +24,37 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class Processor {
-    @JsonProperty
+    @JsonProperty("model")
     public abstract String model();
 
-    @JsonProperty
+    @JsonProperty("vendor")
     public abstract String vendor();
 
-    @JsonProperty
+    @JsonProperty("mhz")
     public abstract int mhz();
 
-    @JsonProperty
+    @JsonProperty("total_cores")
     public abstract int totalCores();
 
-    @JsonProperty
+    @JsonProperty("total_sockets")
     public abstract int totalSockets();
 
-    @JsonProperty
+    @JsonProperty("cores_per_socket")
     public abstract int coresPerSocket();
 
-    @JsonProperty
+    @JsonProperty("cache_size")
     public abstract long cacheSize();
 
-    @JsonProperty
+    @JsonProperty("sys")
     public abstract short sys();
 
-    @JsonProperty
+    @JsonProperty("user")
     public abstract short user();
 
-    @JsonProperty
+    @JsonProperty("idle")
     public abstract short idle();
 
-    @JsonProperty
+    @JsonProperty("stolen")
     public abstract short stolen();
 
     @JsonCreator

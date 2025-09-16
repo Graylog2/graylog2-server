@@ -26,16 +26,16 @@ import java.util.List;
 @AutoValue
 @JsonAutoDetect
 public abstract class SingleSubsystemSummary {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("categories")
     public abstract List<String> categories();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract String description();
 
-    @JsonProperty
+    @JsonProperty("level")
     public abstract String level();
 
     @JsonProperty("level_syslog")

@@ -26,19 +26,19 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateStreamRuleRequest {
-    @JsonProperty
+    @JsonProperty("type")
     public abstract int type();
 
-    @JsonProperty
+    @JsonProperty("value")
     public abstract String value();
 
-    @JsonProperty
+    @JsonProperty("field")
     public abstract String field();
 
-    @JsonProperty
+    @JsonProperty("inverted")
     public abstract boolean inverted();
 
-    @JsonProperty
+    @JsonProperty("description")
     @Nullable
     public abstract String description();
 

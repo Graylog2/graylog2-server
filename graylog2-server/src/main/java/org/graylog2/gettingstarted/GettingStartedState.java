@@ -34,7 +34,7 @@ public abstract class GettingStartedState {
      *
      * @return dismissal state of getting started pages across all stored versions
      */
-    @JsonProperty
+    @JsonProperty("dismissed_in_versions")
     public abstract Set<String> dismissedInVersions();
 
     @JsonCreator

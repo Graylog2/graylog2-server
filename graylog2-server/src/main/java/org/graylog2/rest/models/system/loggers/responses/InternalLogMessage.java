@@ -21,19 +21,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
 import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class InternalLogMessage {
-    @JsonProperty
+    @JsonProperty("message")
     @NotEmpty
     public abstract String message();
 
@@ -41,19 +39,19 @@ public abstract class InternalLogMessage {
     @Nullable
     public abstract String className();
 
-    @JsonProperty
+    @JsonProperty("level")
     @NotEmpty
     public abstract String level();
 
-    @JsonProperty
+    @JsonProperty("marker")
     @Nullable
     public abstract String marker();
 
-    @JsonProperty
+    @JsonProperty("timestamp")
     @NotNull
     public abstract DateTime timestamp();
 
-    @JsonProperty
+    @JsonProperty("throwable")
     @Nullable
     public abstract String throwable();
 
@@ -61,7 +59,7 @@ public abstract class InternalLogMessage {
     @NotEmpty
     public abstract String threadName();
 
-    @JsonProperty
+    @JsonProperty("context")
     @NotNull
     public abstract Map<String, String> context();
 

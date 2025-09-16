@@ -25,10 +25,10 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class ConstraintCheckResult {
-    @JsonProperty
+    @JsonProperty("constraint")
     public abstract Constraint constraint();
 
-    @JsonProperty
+    @JsonProperty("fulfilled")
     public abstract boolean fulfilled();
 
     @JsonCreator

@@ -34,40 +34,40 @@ public abstract class ClusterStats {
     @JsonProperty("mongo")
     public abstract MongoStats mongoStats();
 
-    @JsonProperty
+    @JsonProperty("stream_count")
     public abstract long streamCount();
 
-    @JsonProperty
+    @JsonProperty("stream_rule_count")
     public abstract long streamRuleCount();
 
-    @JsonProperty
+    @JsonProperty("stream_rule_count_by_stream")
     public abstract Map<String, Long> streamRuleCountByStream();
 
-    @JsonProperty
+    @JsonProperty("user_count")
     public abstract long userCount();
 
-    @JsonProperty
+    @JsonProperty("output_count")
     public abstract long outputCount();
 
-    @JsonProperty
+    @JsonProperty("output_count_by_type")
     public abstract Map<String, Long> outputCountByType();
 
-    @JsonProperty
+    @JsonProperty("dashboard_count")
     public abstract long dashboardCount();
 
-    @JsonProperty
+    @JsonProperty("input_count")
     public abstract long inputCount();
 
-    @JsonProperty
+    @JsonProperty("global_input_count")
     public abstract long globalInputCount();
 
-    @JsonProperty
+    @JsonProperty("input_count_by_type")
     public abstract Map<String, Long> inputCountByType();
 
-    @JsonProperty
+    @JsonProperty("extractor_count")
     public abstract long extractorCount();
 
-    @JsonProperty
+    @JsonProperty("extractor_count_by_type")
     public abstract Map<Extractor.Type, Long> extractorCountByType();
 
     public static ClusterStats create(ElasticsearchStats elasticsearchStats,

@@ -25,7 +25,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class FailureCount {
-    @JsonProperty
+    @JsonProperty("count")
     public abstract long count();
 
     @JsonCreator

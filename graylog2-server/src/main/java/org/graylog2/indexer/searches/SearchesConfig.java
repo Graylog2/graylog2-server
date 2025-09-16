@@ -28,27 +28,27 @@ import java.util.List;
 public abstract class SearchesConfig {
     public final static int DEFAULT_LIMIT = 150;
 
-    @JsonProperty
+    @JsonProperty("query")
     public abstract String query();
 
-    @JsonProperty
+    @JsonProperty("filter")
     @Nullable
     public abstract String filter();
 
-    @JsonProperty
+    @JsonProperty("fields")
     @Nullable
     public abstract List<String> fields();
 
-    @JsonProperty
+    @JsonProperty("range")
     public abstract TimeRange range();
 
-    @JsonProperty
+    @JsonProperty("limit")
     public abstract int limit();
 
-    @JsonProperty
+    @JsonProperty("offset")
     public abstract int offset();
 
-    @JsonProperty
+    @JsonProperty("sorting")
     @Nullable
     public abstract Sorting sorting();
 

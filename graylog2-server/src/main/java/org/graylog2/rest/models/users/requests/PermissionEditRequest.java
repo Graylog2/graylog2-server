@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 public abstract class PermissionEditRequest {
-    @JsonProperty
+    @JsonProperty("permissions")
     public abstract List<String> permissions();
 
     @JsonCreator

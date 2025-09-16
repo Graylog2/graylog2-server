@@ -20,22 +20,21 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class RegexReplaceTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     @NotNull
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("regex")
     @NotEmpty
     public abstract String regex();
 
-    @JsonProperty
+    @JsonProperty("replacement")
     @NotNull
     public abstract String replacement();
 

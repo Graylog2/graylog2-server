@@ -27,14 +27,14 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 public abstract class NetworkStats {
-    @JsonProperty
+    @JsonProperty("primary_interface")
     @Nullable
     public abstract String primaryInterface();
 
-    @JsonProperty
+    @JsonProperty("interfaces")
     public abstract Map<String, Interface> interfaces();
 
-    @JsonProperty
+    @JsonProperty("tcp")
     @Nullable
     public abstract TcpStats tcp();
 
@@ -47,19 +47,19 @@ public abstract class NetworkStats {
     @JsonAutoDetect
     @AutoValue
     public abstract static class Interface {
-        @JsonProperty
+        @JsonProperty("name")
         public abstract String name();
 
-        @JsonProperty
+        @JsonProperty("addresses")
         public abstract Set<String> addresses();
 
-        @JsonProperty
+        @JsonProperty("mac_address")
         public abstract String macAddress();
 
-        @JsonProperty
+        @JsonProperty("mtu")
         public abstract long mtu();
 
-        @JsonProperty
+        @JsonProperty("interface_stats")
         @Nullable
         public abstract InterfaceStats interfaceStats();
 
@@ -75,43 +75,43 @@ public abstract class NetworkStats {
     @JsonAutoDetect
     @AutoValue
     public abstract static class InterfaceStats {
-        @JsonProperty
+        @JsonProperty("rx_packets")
         public abstract long rxPackets();
 
-        @JsonProperty
+        @JsonProperty("rx_errors")
         public abstract long rxErrors();
 
-        @JsonProperty
+        @JsonProperty("rx_dropped")
         public abstract long rxDropped();
 
-        @JsonProperty
+        @JsonProperty("rx_overruns")
         public abstract long rxOverruns();
 
-        @JsonProperty
+        @JsonProperty("rx_frame")
         public abstract long rxFrame();
 
-        @JsonProperty
+        @JsonProperty("tx_packets")
         public abstract long txPackets();
 
-        @JsonProperty
+        @JsonProperty("tx_errors")
         public abstract long txErrors();
 
-        @JsonProperty
+        @JsonProperty("tx_dropped")
         public abstract long txDropped();
 
-        @JsonProperty
+        @JsonProperty("tx_overruns")
         public abstract long txOverruns();
 
-        @JsonProperty
+        @JsonProperty("tx_carrier")
         public abstract long txCarrier();
 
-        @JsonProperty
+        @JsonProperty("tx_collisions")
         public abstract long txCollisions();
 
-        @JsonProperty
+        @JsonProperty("rx_bytes")
         public abstract long rxBytes();
 
-        @JsonProperty
+        @JsonProperty("tx_bytes")
         public abstract long txBytes();
 
         public static InterfaceStats create(long rxPackets,
@@ -137,34 +137,34 @@ public abstract class NetworkStats {
     @JsonAutoDetect
     @AutoValue
     public abstract static class TcpStats {
-        @JsonProperty
+        @JsonProperty("active_opens")
         public abstract long activeOpens();
 
-        @JsonProperty
+        @JsonProperty("passive_opens")
         public abstract long passiveOpens();
 
-        @JsonProperty
+        @JsonProperty("attempt_fails")
         public abstract long attemptFails();
 
-        @JsonProperty
+        @JsonProperty("estab_resets")
         public abstract long estabResets();
 
-        @JsonProperty
+        @JsonProperty("curr_estab")
         public abstract long currEstab();
 
-        @JsonProperty
+        @JsonProperty("in_segs")
         public abstract long inSegs();
 
-        @JsonProperty
+        @JsonProperty("out_segs")
         public abstract long outSegs();
 
-        @JsonProperty
+        @JsonProperty("retrans_segs")
         public abstract long retransSegs();
 
-        @JsonProperty
+        @JsonProperty("in_errs")
         public abstract long inErrs();
 
-        @JsonProperty
+        @JsonProperty("out_rsts")
         public abstract long outRsts();
 
         public static TcpStats create(long activeOpens,

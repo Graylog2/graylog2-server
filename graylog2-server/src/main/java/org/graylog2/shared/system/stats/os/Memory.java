@@ -24,25 +24,25 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class Memory {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
-    @JsonProperty
+    @JsonProperty("free")
     public abstract long free();
 
-    @JsonProperty
+    @JsonProperty("free_percent")
     public abstract short freePercent();
 
-    @JsonProperty
+    @JsonProperty("used")
     public abstract long used();
 
-    @JsonProperty
+    @JsonProperty("used_percent")
     public abstract short usedPercent();
 
-    @JsonProperty
+    @JsonProperty("actual_free")
     public abstract long actualFree();
 
-    @JsonProperty
+    @JsonProperty("actual_used")
     public abstract long actualUsed();
 
     @JsonCreator

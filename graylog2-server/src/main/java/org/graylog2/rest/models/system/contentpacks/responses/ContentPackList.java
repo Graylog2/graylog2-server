@@ -30,13 +30,13 @@ import java.util.Set;
 
 @AutoValue
 public abstract class ContentPackList {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
-    @JsonProperty
+    @JsonProperty("content_packs")
     public abstract Set<ContentPack> contentPacks();
 
-    @JsonProperty
+    @JsonProperty("content_pack_metadata")
     public abstract Map<ModelId, Map<Integer, ContentPackMetadata>> contentPacksMetadata();
 
     @JsonCreator
