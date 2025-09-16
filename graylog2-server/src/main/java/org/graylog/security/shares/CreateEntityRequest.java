@@ -25,6 +25,8 @@ import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 @JsonAutoDetect
 public class CreateEntityRequest<T> {
     @Valid
@@ -33,7 +35,7 @@ public class CreateEntityRequest<T> {
     private final EntityShareRequest shareRequest;
 
     private CreateEntityRequest(T entity, @Nullable EntityShareRequest shareRequest) {
-        this.entity = entity;
+        this.entity = requireNonNull(entity, "entity cannot be null");
         this.shareRequest = shareRequest;
     }
 
