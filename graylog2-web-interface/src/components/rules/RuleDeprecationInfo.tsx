@@ -30,10 +30,9 @@ type Props = {
 const DeprecatedLabel = styled(Label)(
   ({ theme }) => css`
     display: inline-flex;
-    margin-left: ${theme.spacings.sm};
-    font-size: ${theme.fonts.size.small};
+    margin-left: ${theme.spacings.xs};
+    vertical-align: inherit;
     gap: ${theme.spacings.xxs};
-    align-items: center;
   `,
 );
 
@@ -53,25 +52,21 @@ const RuleDeprecationInfo = ({ rule }: Props) => {
 
   const findDeprecatedFunctions = useCallback(() => {
     setDeprecatedFunctions(
-      rule.rule_builder.actions
-        .filter((act) => DEPRECATED_PIPELINE_FUNCTIONS.includes(act.function))
+      rule?.rule_builder?.actions
+        ?.filter((act) => DEPRECATED_PIPELINE_FUNCTIONS.includes(act.function))
         .map((act) => act.function),
     );
   }, [rule]);
 
   useEffect(() => findDeprecatedFunctions(), [findDeprecatedFunctions]);
 
-  if (deprecatedFunctions.length === 0) return null;
+  if (deprecatedFunctions?.length === 0) return null;
 
   return (
     <DeprecatedLabel bsStyle="warning">
       <span>Deprecated Function</span>
       <HoverForHelp trigger="hover" type="info" title="This rule contains at least one deprecated function:">
-        <StyledList>
-          {deprecatedFunctions.map((func) => (
-            <li>{func}</li>
-          ))}
-        </StyledList>
+        <StyledList>{deprecatedFunctions?.map((func) => <li>{func}</li>)}</StyledList>
       </HoverForHelp>
     </DeprecatedLabel>
   );

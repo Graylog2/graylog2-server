@@ -97,8 +97,6 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
             Managed by Application
           </DefaultLabel>
         )}
-      </td>
-      <td>
         <RuleDeprecationInfo rule={rule} />
       </td>
       <td className="limited">{description}</td>
