@@ -27,7 +27,7 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class UrlWhitelist {
+public abstract class UrlAllowlist {
 
     @JsonProperty("entries")
     public abstract List<AllowlistEntry> entries();
