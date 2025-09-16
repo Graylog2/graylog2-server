@@ -76,7 +76,7 @@ import org.graylog2.rest.resources.system.SystemFieldsResource;
 import org.graylog2.rest.resources.system.SystemProcessingResource;
 import org.graylog2.rest.resources.system.SystemShutdownResource;
 import org.graylog2.rest.resources.system.TrafficResource;
-import org.graylog2.rest.resources.system.UrlWhitelistResource;
+import org.graylog2.rest.resources.system.UrlAllowlistResource;
 import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
@@ -249,7 +249,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(SystemProcessingResource.class);
         addSystemRestResource(ClusterProcessingStatusResource.class);
         addSystemRestResource(SystemProcessingStatusResource.class);
-        addSystemRestResource(UrlWhitelistResource.class);
+        addSystemRestResource(UrlAllowlistResource.class);
         addSystemRestResource(ContainsStringTesterResource.class);
         addSystemRestResource(GrokTesterResource.class);
         addSystemRestResource(JsonTesterResource.class);

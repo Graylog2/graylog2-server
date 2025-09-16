@@ -180,8 +180,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEX_SET_TEMPLATES_DELETE = "indexset_templates:delete";
     public static final String INDEX_SET_TEMPLATES_EDIT = "indexset_templates:edit";
     public static final String INDEX_SET_TEMPLATES_READ = "indexset_templates:read";
-    public static final String URL_WHITELIST_READ = "urlwhitelist:read";
-    public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
+    public static final String URL_ALLOWLIST_READ = "urlallowlist:read";
+    public static final String URL_ALLOWLIST_WRITE = "urlallowlist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
     public static final String USERS_READ = "users:read";
@@ -322,8 +322,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(THREADS_DUMP, ""))
             .add(create(PROCESSBUFFER_DUMP, ""))
             .add(create(THROUGHPUT_READ, ""))
-            .add(create(URL_WHITELIST_READ, ""))
-            .add(create(URL_WHITELIST_WRITE, ""))
+            .add(create(URL_ALLOWLIST_READ, ""))
+            .add(create(URL_ALLOWLIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
             .add(create(USERS_EDIT, "").withManageCapabilityFor(GRNTypes.USER))
             .add(create(USERS_READ, "").withViewCapabilityFor(GRNTypes.USER))
