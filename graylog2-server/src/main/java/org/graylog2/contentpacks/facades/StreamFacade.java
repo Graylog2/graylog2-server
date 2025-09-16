@@ -155,7 +155,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
-                streamEntity.description().asString(parameters),
+                streamEntity.description() == null ? null : streamEntity.description().asString(parameters),
                 null, // ignored
                 null,
                 streamEntity.matchingType().asString(parameters),
