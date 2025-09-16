@@ -70,7 +70,7 @@ public class Search implements GraylogRestApi {
         try {
           waitFor(() -> searchMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", WAIT_FOR_MESSAGES_TIMEOUT);
        } catch (AssertionError error) {
-            final var results = searchAllMessages();
+            final var results = searchMessages(timeRange, streams);
             LOG.error("Messages we're waiting for: {}", String.join(", ", messages));
             LOG.error("Messages found: {}", String.join(", ", results));
             throw error;
