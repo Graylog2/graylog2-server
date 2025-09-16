@@ -1,4 +1,4 @@
 type = "s"
 message = "Update Netty to 4.1.127 to fix [GHSA-fghv-69vj-qj49](https://github.com/netty/netty/security/advisories/GHSA-fghv-69vj-qj49) and [GHSA-3p8m-j85q-pgmj](https://github.com/netty/netty/security/advisories/GHSA-3p8m-j85q-pgmj)."
 
-pulls = ["23576"]
+pulls = ["23642"]
