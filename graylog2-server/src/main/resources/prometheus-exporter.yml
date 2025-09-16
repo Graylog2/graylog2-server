@@ -1311,7 +1311,6 @@ metric_mappings:
     wildcard_extract_labels:
       - "read"
 
-# FIXME: The classname has changed already!
   - metric_name: "data_lake_journal_writer_written_messages"
     match_pattern: "org.graylog.plugins.datalake.output.DataLakeJournalWriter.written-messages"
 
