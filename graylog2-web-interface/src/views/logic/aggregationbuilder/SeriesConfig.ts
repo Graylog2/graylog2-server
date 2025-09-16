@@ -22,21 +22,35 @@ export type SeriesThreshold = {
   value: number;
 };
 
+export type SeriesAnnotation = {
+  note: string;
+  color: string;
+  x: string;
+  y: string;
+  showReferenceLines: boolean;
+};
+
 export type SeriesConfigJson = {
   name: string;
   thresholds: Array<SeriesThreshold>;
+  annotations: Array<SeriesAnnotation>;
 };
 
 type InternalState = {
   name: string | undefined | null;
   thresholds?: Array<SeriesThreshold> | undefined | null;
+  annotations?: Array<SeriesAnnotation> | undefined | null;
 };
 
 export default class SeriesConfig {
   private readonly _value: InternalState;
 
-  constructor(name: string | undefined | null, thresholds: Array<SeriesThreshold> | undefined | null = undefined) {
-    this._value = { name, thresholds };
+  constructor(
+    name: string | undefined | null,
+    thresholds: Array<SeriesThreshold> | undefined | null = undefined,
+    annotations: Array<SeriesAnnotation> | undefined | null = undefined,
+  ) {
+    this._value = { name, thresholds, annotations };
   }
 
   get name() {
@@ -47,16 +61,20 @@ export default class SeriesConfig {
     return this._value.thresholds;
   }
 
-  toJSON() {
-    const { name, thresholds } = this._value;
+  get annotations() {
+    return this._value.annotations;
+  }
 
-    return { name, thresholds };
+  toJSON() {
+    const { name, thresholds, annotations } = this._value;
+
+    return { name, thresholds, annotations };
   }
 
   static fromJSON(value: SeriesConfigJson) {
-    const { name, thresholds } = value;
+    const { name, thresholds, annotations } = value;
 
-    return new SeriesConfig(name, thresholds);
+    return new SeriesConfig(name, thresholds, annotations);
   }
 
   static empty() {
@@ -86,9 +104,13 @@ class Builder {
     return new Builder(this.value.set('thresholds', thresholds));
   }
 
-  build() {
-    const { name, thresholds } = this.value.toObject();
+  annotations(annotations: Array<SeriesAnnotation>) {
+    return new Builder(this.value.set('annotations', annotations));
+  }
 
-    return new SeriesConfig(name, thresholds);
+  build() {
+    const { name, thresholds, annotations } = this.value.toObject();
+
+    return new SeriesConfig(name, thresholds, annotations);
   }
 }
