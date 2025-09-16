@@ -21,13 +21,13 @@ import type Widget from 'views/logic/widgets/Widget';
 import defaultTitle from 'views/components/defaultTitle';
 import generateObjectId from 'logic/generateObjectId';
 
-import type {ViewStateJson} from './ViewState';
+import type { ViewStateJson } from './ViewState';
 import ViewState from './ViewState';
-import type {WidgetMapping} from './types';
+import type { WidgetMapping } from './types';
 
 import type Search from '../search/Search';
-import type {SearchType as QuerySearchType} from '../queries/SearchType';
-import type {QueryId} from '../queries/Query';
+import type { SearchType as QuerySearchType } from '../queries/SearchType';
+import type { QueryId } from '../queries/Query';
 
 export type Properties = Immutable.List<any>;
 
@@ -60,10 +60,10 @@ type InternalState = {
 };
 
 type EntitySource = {
-  source: String,
-  entityType: String,
-  parentId?: String,
-}
+  source: String;
+  entityType: String;
+  parentId?: String;
+};
 
 export type ViewJson = {
   id: string;
