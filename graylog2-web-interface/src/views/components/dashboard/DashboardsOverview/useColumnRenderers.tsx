@@ -64,9 +64,13 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
             <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />
           ),
         },
-        "_entity_source.source": {
+        '_entity_source.source': {
           renderCell: (_title: string, dashboard: View) => (
-            <span>{dashboard._value.entitySource ? startCase(dashboard._value.entitySource.source.toString().toLowerCase()) : 'User Defined'}</span>
+            <span>
+              {dashboard._value.entitySource
+                ? startCase(dashboard._value.entitySource.source.toString().toLowerCase())
+                : 'User Defined'}
+            </span>
           ),
         },
         favorite: {
