@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import DrawerDouble from 'components/common/DrawerDouble';
+import { Drawer } from 'components/common';
 
 type Props = {
   onClose: () => void;
@@ -26,9 +26,9 @@ type Props = {
 };
 
 const LUTDrawer = ({ onClose, title, double = false, children }: Props) => (
-  <DrawerDouble opened size="lg" double={double} onClose={onClose} position="right" title={title}>
+  <Drawer opened size="lg" double={double} onClose={onClose} position="right" title={title}>
     {children}
-  </DrawerDouble>
+  </Drawer>
 );
 
 export default LUTDrawer;

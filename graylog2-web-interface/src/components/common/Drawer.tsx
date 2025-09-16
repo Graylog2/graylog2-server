@@ -73,9 +73,11 @@ type Props = Pick<
   | 'overlayProps'
   | 'styles'
   | 'transitionProps'
->;
+> & {
+  double?: boolean;
+};
 
-const Drawer = ({ title, ...props }: Props) => (
+const Drawer = ({ title, double = false, ...props }: Props) => (
   <StyledDrawer
     offset={15}
     padding="lg"
@@ -87,6 +89,7 @@ const Drawer = ({ title, ...props }: Props) => (
       </TitleWrapper>
     }
     {...props}
+    size={double ? 1260 : props.size}
   />
 );
 
