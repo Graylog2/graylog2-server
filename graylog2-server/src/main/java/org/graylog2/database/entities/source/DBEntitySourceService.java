@@ -26,8 +26,6 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.FilterOption;
 
 import java.util.Set;
-
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -35,7 +33,6 @@ import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.set;
 import static org.graylog2.database.entities.source.EntitySource.USER_DEFINED;
-import static org.graylog2.database.utils.MongoUtils.objectIdEq;
 
 public class DBEntitySourceService {
 
