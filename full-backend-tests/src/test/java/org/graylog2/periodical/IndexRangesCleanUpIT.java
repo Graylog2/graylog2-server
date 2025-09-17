@@ -45,7 +45,6 @@ public class IndexRangesCleanUpIT {
     @ContainerMatrixTest
     void testCleanUp() throws ExecutionException, RetryException {
         String indexSetId = api.indices().createIndexSet("Range clean up", "test index range clean up", RANGE_CLEANUP_PREFIX);
-        api.indices().waitForIndexNames(indexSetId);
 
         //Rotate to create indices 0 & 1
         api.indices().rotateIndexSet(indexSetId);
