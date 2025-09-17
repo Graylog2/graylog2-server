@@ -27,8 +27,10 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.elasticsearch.Client;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,26 +38,32 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV},
+                             withWebhookServerEnabled = true)
 public class PivotAggregationSearchIT {
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearchIT.class);
     private static final String indexSetPrefix = "pivot-search-test";
 
-    private final GraylogApis apis;
-    private final WebhookServerInstance webhookTester;
+    private static GraylogApis apis;
+    private static WebhookServerInstance webhookTester;
+    private static Client client;
     private String indexSetId;
     private String streamId;
     private String isolatedStreamId;
 
-    public PivotAggregationSearchIT(GraylogApis apis) {
-        this.apis = apis;
-        this.webhookTester = apis.backend().getWebhookServerInstance().orElseThrow(() -> new IllegalStateException("Webhook tester not found!"));
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
+        //noinspection resource we don't want to close the server here
+        client = apis.backend().searchServerInstance().client();
+        webhookTester = graylogApis.backend().getWebhookServerInstance().orElseThrow(() -> new IllegalStateException("Webhook tester not found!"));
     }
 
     @BeforeEach
     void setUp() {
         this.indexSetId = apis.indices().createIndexSet("Pivot Aggregation Search Test", "", indexSetPrefix);
-        apis.indices().waitFor(() -> apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0", indexSetPrefix + "_deflector"),
+        apis.indices().waitFor(() -> client.indicesExists(indexSetPrefix + "_0", indexSetPrefix + "_deflector"),
                 "Timed out waiting for index/deflector to be created.");
         this.streamId = apis.streams().createStream(
                 "Stream for Pivot Aggregation Search Test",
@@ -74,8 +82,8 @@ public class PivotAggregationSearchIT {
             this.isolatedStreamId = null;
         }
         apis.indices().deleteIndexSet(this.indexSetId, true);
-        apis.indices().waitFor(() -> !apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0")
-                        && !apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_deflector"),
+        apis.indices().waitFor(() -> !client.indicesExists(indexSetPrefix + "_0")
+                        && !client.indicesExists(indexSetPrefix + "_deflector"),
                 "Timed out waiting for index/deflector to be deleted.");
     }
 
@@ -199,7 +207,7 @@ public class PivotAggregationSearchIT {
                     });
 
         } catch (ExecutionException | RetryException e) {
-            LOG.error(this.apis.backend().getLogs());
+            LOG.error(apis.backend().getLogs());
             throw e;
         }
     }
@@ -234,7 +242,7 @@ public class PivotAggregationSearchIT {
                         "resource": "posts"
                         }""");
         apis.search().waitForMessagesCount(3);
-        apis.backend().searchServerInstance().client().refreshNode();
+        client.refreshNode();
     }
 
     private void postMessagesToOtherStream() {
@@ -250,6 +258,6 @@ public class PivotAggregationSearchIT {
                         "facility": "stream_isolation_test"
                         }""");
         apis.search().waitForMessagesCount(1);
-        apis.backend().searchServerInstance().client().refreshNode();
+        client.refreshNode();
     }
 }
