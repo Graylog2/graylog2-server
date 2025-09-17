@@ -29,7 +29,7 @@ public enum SearchServer {
     OS2(OPENSEARCH, "2.0.1"),
     OS2_4(OPENSEARCH, "2.4.1"),
     OS2_LATEST(OPENSEARCH, "2.17.0"),
-    DATANODE_DEV(DATANODE, org.graylog2.plugin.Version.CURRENT_CLASSPATH.toString());
+    DATANODE_DEV(DATANODE, "6.3.3"); // This has to be a released docker image that we are using as a base. Freshly built jar will be added to it
 
     public static final SearchServer DEFAULT_VERSION = DATANODE_DEV;
     public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2_LATEST;
