@@ -330,7 +330,6 @@ type EventProcedureFormProps = {
 type EventProcedureSummaryProps = {
   eventProcedureId: string;
   eventId?: string;
-  event?: Event;
   canEdit?: boolean;
   onRemove?: () => void;
   onEdit?: () => void;
