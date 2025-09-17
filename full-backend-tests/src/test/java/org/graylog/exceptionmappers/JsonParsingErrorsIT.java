@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
@@ -32,10 +33,11 @@ public class JsonParsingErrorsIT {
     private static final String SYNC_SEARCH = "/views/search/sync";
     private static final String STREAMS = "/streams";
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public JsonParsingErrorsIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest
@@ -56,7 +58,7 @@ public class JsonParsingErrorsIT {
                          		}
                          	]
                          }
-                                                """)
+                        """)
                 .body("path", equalTo("queries.[0].timerange.from"))
                 .body("line", equalTo(11))
                 .body("column", equalTo(14))
@@ -86,7 +88,7 @@ public class JsonParsingErrorsIT {
                          		}
                          	]
                          }
-                                                """)
+                        """)
                 .body("path", equalTo("queries.[0].timerange"))
                 .body("line", equalTo(12))
                 .body("column", equalTo(5))
