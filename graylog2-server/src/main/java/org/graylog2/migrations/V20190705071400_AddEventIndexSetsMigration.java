@@ -208,6 +208,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void ensureSystemNotificationEventsDefinition() {
+        // This migration installs a system-provided event definition. Its related entry in the entity_source
+        // collection is installed via a different migration (V20250917184400_AddSystemEntitySource). Any future
+        // migrations that install system-provided entities should take care of adding the entity_source entry as well.
         try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
             if (eventDefinitionStream.findAny().isEmpty()) {
                 EventDefinitionDto eventDto =
