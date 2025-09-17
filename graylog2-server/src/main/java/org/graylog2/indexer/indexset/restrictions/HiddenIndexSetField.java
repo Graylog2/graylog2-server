@@ -25,7 +25,7 @@ import org.graylog.autovalue.WithBeanGetter;
 @AutoValue
 @WithBeanGetter
 @JsonDeserialize(builder = HiddenIndexSetField.Builder.class)
-public abstract class HiddenIndexSetField implements IndexSetFieldRestriction, FieldRestrictionValidator {
+public abstract class HiddenIndexSetField implements IndexSetFieldRestriction {
 
     public static final String TYPE_NAME = "hidden";
 

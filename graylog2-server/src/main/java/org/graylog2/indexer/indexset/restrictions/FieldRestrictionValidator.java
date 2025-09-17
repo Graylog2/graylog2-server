@@ -21,7 +21,5 @@ import com.jayway.jsonpath.DocumentContext;
 public interface FieldRestrictionValidator {
 
     // Default validation is NOOP
-    default boolean validate(String fieldName, DocumentContext doc1, DocumentContext doc2) {
-        return true;
-    }
+    boolean validate(String fieldName, DocumentContext doc1, DocumentContext doc2);
 }
