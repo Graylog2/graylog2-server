@@ -34,12 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -47,50 +45,27 @@ import static org.hamcrest.Matchers.notNullValue;
 
 
 public class Search implements GraylogRestApi {
-
-    public List<String> searchForAllMessages() {
-        List<String> messages = new ArrayList<>();
-
-        waitFor(() -> captureMessages(messages::addAll), "Timed out waiting for messages to be present");
-
-        return messages;
-    }
+    private static final Duration WAIT_FOR_MESSAGES_TIMEOUT = Duration.ofSeconds(300);
 
     public Search waitForMessage(String message) {
-        waitFor(() -> captureMessage(message), "Timed out waiting for message to be present");
-        return this;
+        return waitForMessages(message);
     }
-
 
     public Search waitForMessages(String... messages) {
         return waitForMessages(Arrays.asList(messages));
     }
 
     public Search waitForMessages(Collection<String> messages) {
-        waitFor(() -> searchAllMessages().containsAll(messages), "Timed out waiting for messages to be present");
-        return this;
+        return waitForMessages(messages, RelativeRange.allTime(), Set.of());
     }
 
     public Search waitForMessages(Collection<String> messages, TimeRange timeRange, Set<String> streams) {
-        waitFor(() -> searchAllMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", Duration.ofSeconds(300));
+        waitFor(() -> searchMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", WAIT_FOR_MESSAGES_TIMEOUT);
         return this;
     }
 
-    private boolean captureMessage(String message) {
-        return searchAllMessages().contains(message);
-    }
-
-    private boolean captureMessages(Consumer<List<String>> messagesCaptor) {
-        List<String> messages = searchAllMessages();
-        if (!messages.isEmpty()) {
-            messagesCaptor.accept(messages);
-            return true;
-        }
-        return false;
-    }
-
     public void waitForMessagesCount(int count) {
-        waitFor(() -> searchForAllMessages().size() >= count, "Failed to wait for messages count:" + count);
+        waitFor(() -> searchMessages().size() >= count, "Failed to wait for messages count:" + count);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(Search.class);
@@ -103,15 +78,15 @@ public class Search implements GraylogRestApi {
     /**
      * @return all messages' "message" field as List<String>
      */
-    public List<String> searchAllMessages() {
-        return searchAllMessagesInTimeRange(RelativeRange.allTime());
+    public List<String> searchMessages() {
+        return searchMessages(RelativeRange.allTime());
     }
 
-    public List<String> searchAllMessagesInTimeRange(TimeRange timeRange) {
-        return searchAllMessages(timeRange, Set.of());
+    public List<String> searchMessages(TimeRange timeRange) {
+        return searchMessages(timeRange, Set.of());
     }
 
-    public List<String> searchAllMessages(TimeRange timeRange, Set<String> streams) {
+    public List<String> searchMessages(TimeRange timeRange, Set<String> streams) {
         String queryId = "query-id";
         String messageListId = "message-list-id";
 
