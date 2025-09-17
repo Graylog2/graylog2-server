@@ -44,6 +44,8 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -56,6 +58,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -94,6 +97,8 @@ public class EventDefinitionHandlerTest {
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
     @Mock
     private ClusterEventBus clusterEventBus;
+    @Mock
+    private EntitySourceService entitySourceService;
 
     @Mock
     Provider<EntitySharesService> entitySharesServiceProvider;
@@ -124,7 +129,7 @@ public class EventDefinitionHandlerTest {
         this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
-        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock, clusterEventBus);
+        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock, clusterEventBus, entitySourceService);
     }
 
     @Test
@@ -208,6 +213,14 @@ public class EventDefinitionHandlerTest {
         assertThat(saved.state()).isEqualTo(EventDefinition.State.DISABLED);
 
         assertThat(jobDefinitionService.getByConfigField("event_definition_id", saved.id())).isNotPresent();
+
+        // Validate that the source information with the parentId is saved.
+        ArgumentCaptor<EntitySource> captor = ArgumentCaptor.forClass(EntitySource.class);
+        verify(entitySourceService, times(1)).create(captor.capture());
+        EntitySource captured = captor.getValue();
+        assertThat(captured.entityType()).isEqualTo(EntitySource.EVENT_DEFINITION_TYPE);
+        assertThat(captured.entityId()).isEqualTo(duplicated.id());
+        assertThat(captured.parentId()).contains(existingEvent.id());
     }
 
     @Test
@@ -448,6 +461,7 @@ public class EventDefinitionHandlerTest {
 
         assertThat(handler.delete("54e3deadbeefdeadbeef0000")).isTrue();
         verify(clusterEventBus, times(1)).post(new EventDefinitionDeleted("54e3deadbeefdeadbeef0000"));
+        verify(entitySourceService, times(1)).deleteByEntityId("54e3deadbeefdeadbeef0000");
 
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isNotPresent();
         assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isNotPresent();

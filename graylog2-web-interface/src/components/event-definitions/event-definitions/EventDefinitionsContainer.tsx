@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import startCase from 'lodash/startCase';
 
 import { QueryHelper, RelativeTime, PaginatedEntityTable } from 'components/common';
 import { Link } from 'components/common/router';
@@ -57,6 +58,15 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
     },
     priority: {
       staticWidth: 100,
+    },
+    '_entity_source.source': {
+      renderCell: (_title: string, eventDefinition: EventDefinition) => (
+        <span>
+          {eventDefinition._entity_source
+            ? startCase(eventDefinition._entity_source.source.toString().toLowerCase())
+            : 'User Defined'}
+        </span>
+      ),
     },
     ...(pluggableColumnRenderers || {}),
   },

@@ -18,6 +18,8 @@ package org.graylog2.database.entities.source;
 
 import jakarta.inject.Inject;
 
+import java.util.Set;
+
 public class EntitySourceService {
 
     private final DBEntitySourceService dbEntitySourceService;
@@ -37,5 +39,9 @@ public class EntitySourceService {
 
     public void handleEntityIdChange(String oldEntityId, String newEntityId) {
         dbEntitySourceService.updateParentId(oldEntityId, newEntityId);
+    }
+
+    public void bulkDeleteByEntityId(Set<String> entityIds) {
+        dbEntitySourceService.bulkDeleteByEntityId(entityIds);
     }
 }
