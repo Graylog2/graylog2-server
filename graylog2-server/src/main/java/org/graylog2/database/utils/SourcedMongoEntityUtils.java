@@ -32,29 +32,28 @@ public class SourcedMongoEntityUtils {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T extends SourcedMongoEntity> FilterPredicate<T> handleEntitySourceFilter(List<String> filters,
                                                                                              Predicate<T> predicate) {
-        final Optional<String> entitySourceFilter = filterValue(filters);
-        if (entitySourceFilter.isPresent()) {
-            final String source = entitySourceFilter.get();
-            predicate = predicate.and(entity -> sourceMatches(entity.entitySource().orElse(null), source));
+        final List<String> entitySourceFilters = filterValues(filters);
+        if (!entitySourceFilters.isEmpty()) {
+            predicate = predicate.and(entity -> entitySourceFilters.stream()
+                    .anyMatch(source -> sourceMatches(entity.entitySource().orElse(null), source)));
             filters = removeEntitySourceFilter(filters);
         }
         return new FilterPredicate<>(filters, predicate);
     }
 
-    private static Optional<String> filterValue(List<String> filters) {
-        final Optional<String> filter = filters.stream()
+    private static List<String> filterValues(List<String> filters) {
+        return filters.stream()
                 .filter(f -> f.startsWith(FILTERABLE_FIELD + FIELD_AND_VALUE_SEPARATOR))
-                .findFirst();
-        String value = null;
-        if (filter.isPresent()) {
-            final String[] split = filter.get().split(FIELD_AND_VALUE_SEPARATOR, 2);
-
-            value = split[1];
-            if (value == null || value.isEmpty()) {
-                throw new IllegalArgumentException(WRONG_FILTER_EXPR_FORMAT_ERROR_MSG);
-            }
-        }
-        return Optional.ofNullable(value);
+                .map(f -> {
+                    String[] split = f.split(FIELD_AND_VALUE_SEPARATOR, 2);
+                    String value = (split.length > 1) ? split[1] : null;
+                    if (value == null || value.isEmpty()) {
+                        throw new IllegalArgumentException(WRONG_FILTER_EXPR_FORMAT_ERROR_MSG);
+                    }
+                    return Optional.of(value);
+                })
+                .map(Optional::get)
+                .toList();
     }
 
     private static List<String> removeEntitySourceFilter(List<String> filters) {

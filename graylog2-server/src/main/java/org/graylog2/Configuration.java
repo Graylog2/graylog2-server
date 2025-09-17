@@ -224,6 +224,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "enable_preflight_web")
     private boolean enablePreflightWeb = false;
 
+    @Parameter(value = "preflight_web_password")
+    private String preflightWebPassword = null;
+
     @Parameter(value = "query_latency_monitoring_enabled")
     private boolean queryLatencyMonitoringEnabled = false;
 
@@ -609,6 +612,10 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     public int searchQueryEngineDataLakeJobsQueueSize() {
         return searchQueryEngineDataLakeJobsQueueSize;
+    }
+
+    public String getPreflightWebPassword() {
+        return preflightWebPassword;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
