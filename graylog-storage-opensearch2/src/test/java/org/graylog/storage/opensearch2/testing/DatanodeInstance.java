@@ -33,16 +33,13 @@ import static java.util.Objects.isNull;
 
 public class DatanodeInstance extends OpenSearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
-    public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_PRE_52;
     private final String mongoDBUri;
     private final String passwordSecret;
-    private final String rootPasswordSha2;
 
-    public DatanodeInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+    public DatanodeInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String heapSize, final List<String> featureFlags) {
         super(version, hostname, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
-        this.rootPasswordSha2 = rootPasswordSha2;
     }
 
     @Override
@@ -53,12 +50,12 @@ public class DatanodeInstance extends OpenSearchInstance {
 
     @Override
     protected String imageName() {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "5.2-dev");
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", searchServer().getSearchVersion().version().toString());
     }
 
     @Override
     public SearchServer searchServer() {
-        return DATANODE_VERSION;
+        return SearchServer.DATANODE_DEV;
     }
 
     @Override
@@ -69,7 +66,6 @@ public class DatanodeInstance extends OpenSearchInstance {
                 .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
-                //.withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongoDBUri)
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")

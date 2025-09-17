@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.testing.containermatrix;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class DatanodeInstanceBuilder extends SearchServerBuilder<DatanodeInstance> {
-    public DatanodeInstanceBuilder(SearchVersion version) {
-        super(version);
-    }
+class SearchServerTest {
 
-    @Override
-    protected DatanodeInstance instantiate() {
-        return new DatanodeInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags()).init();
+    @Test
+    void testVersionParsing() {
+        Assertions.assertThat(SearchServer.values())
+                .extracting(SearchServer::getSearchVersion)
+                .allSatisfy(searchVersion -> Assertions.assertThat(searchVersion.version()).isNotNull());
     }
 }
