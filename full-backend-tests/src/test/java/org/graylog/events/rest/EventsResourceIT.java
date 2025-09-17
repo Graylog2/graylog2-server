@@ -21,6 +21,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Map;
 
@@ -29,10 +30,11 @@ import static java.net.HttpURLConnection.HTTP_OK;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST, SearchServer.ES7})
 public class EventsResourceIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public EventsResourceIT(GraylogApis graylogApis) {
-        this.api = graylogApis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest
