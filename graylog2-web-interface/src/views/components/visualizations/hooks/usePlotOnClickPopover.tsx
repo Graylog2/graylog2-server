@@ -330,7 +330,7 @@ const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
 });
 
 /** ---------- hook ---------- */
-const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
+const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig, widgetId: string) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const { refs, floatingStyles } = useFloating({
@@ -374,6 +374,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
         clickPoint={anchor?.pt}
         config={config}
         clickPointsInRadius={anchor?.pointsInRadius}
+        widgetId={widgetId}
       />
     </OnClickPopoverWrapper>
   );

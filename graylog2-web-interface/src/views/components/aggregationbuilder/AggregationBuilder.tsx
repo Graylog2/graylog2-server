@@ -57,6 +57,7 @@ export type VisualizationComponentProps = {
   setLoadingState: (loading: boolean) => void;
   toggleEdit: () => void;
   width: number;
+  id: string;
 };
 
 export type VisualizationComponent<T extends string> = {
@@ -100,6 +101,7 @@ const AggregationBuilder = ({
   setLoadingState,
   height,
   width,
+  id,
 }: WidgetComponentProps<AggregationWidgetConfig>) => {
   const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
@@ -128,6 +130,7 @@ const AggregationBuilder = ({
       width={width}
       toggleEdit={toggleEdit}
       onChange={onVisualizationConfigChange}
+      id={id}
     />
   );
 };

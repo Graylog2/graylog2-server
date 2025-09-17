@@ -61,9 +61,10 @@ const isXValueOnChart = (x: string, xValues: ChartDefinition['x'], isTimeline: b
 
   const [from, to] = getTimelineRange(xValues);
 
-  return moment(x).isBetween(from, to);
+  return moment(x).isBetween(from, to, undefined, '[]');
 };
 const isYValuesOnChart = (y: string, yValues: ChartDefinition['y']) => {
+  console.log({ yValues });
   const max = Math.max(...(yValues as Array<number>));
   const min = Math.min(...(yValues as Array<number>));
 
@@ -100,27 +101,27 @@ const getWidgetAnnotations = (
   const seriesAnnotations: Array<Array<AnnotationSettings>> = config.series.map((curSeries) => {
     const { field } = parseSeries(curSeries.function) ?? {};
     const yref: Shape['yref'] = fieldNameToAxisNameMapper?.[field ?? NO_FIELD_NAME_SERIES] ?? 'y';
-    const annotations: Array<SeriesAnnotation> = curSeries.config?.annotations ?? [
-      mockedTimeAnnotation,
-      mockedSimplAnnotation,
-    ];
+    const annotations: Array<SeriesAnnotation> = curSeries.config?.annotations ?? [];
+
+    console.log({ annotations });
 
     return annotations.map(({ x, showReferenceLines, y, color, note }) => {
       const formattedXCoordinate = config?.isTimeline ? formatTime(x, 'internal') : x;
 
       const isAnnotationOnChart =
-        isXValueOnChart(x, xValues, config.isTimeline) && isYValuesOnChart(y, yValuesByAxis[yref]);
+        isXValueOnChart(x, xValues, config.isTimeline) &&
+        yValuesByAxis?.[yref] &&
+        isYValuesOnChart(y, yValuesByAxis[yref]);
 
-      console.log(
-        {
-          x,
-          showReferenceLines,
-          y,
-          color,
-          note,
-        },
-        [isXValueOnChart(x, xValues, config.isTimeline), isYValuesOnChart(y, yValuesByAxis[yref])],
-      );
+      console.log({
+        isAnnotationOnChart,
+        'isXValueOnChart': isXValueOnChart(x, xValues, config.isTimeline),
+        'yValuesByAxis': yValuesByAxis?.[yref],
+        'isYValuesOnChart': isYValuesOnChart(y, yValuesByAxis[yref]),
+        annotation: { x, showReferenceLines, y, color, note },
+        xValues,
+      });
+
       if (!isAnnotationOnChart) return { annotations: [], shapes: [] };
 
       return {

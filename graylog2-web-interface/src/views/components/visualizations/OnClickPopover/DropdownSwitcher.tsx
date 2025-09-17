@@ -24,11 +24,13 @@ type Props = {
   component: React.ComponentType<{
     clickPoint: ClickPoint;
     config: AggregationWidgetConfig;
+    widgetId: string;
   }>;
   clickPoint: ClickPoint;
   config: AggregationWidgetConfig;
   clickPointsInRadius?: Array<ClickPoint>;
   metricMapper?: (clickPoint: ClickPoint) => { value: string; metric: string };
+  widgetId: string;
 };
 
 const defaultMetricMapper = (clickPoint: ClickPoint) => ({
@@ -42,6 +44,7 @@ const DropdownSwitcher = ({
   config,
   clickPointsInRadius = [],
   metricMapper = defaultMetricMapper,
+  widgetId,
 }: Props) => {
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
   const [showComponent, setShowComponent] = useState<boolean>();
@@ -60,7 +63,7 @@ const DropdownSwitcher = ({
   if (!selectedClickPoint) return null;
 
   return showComponent ? (
-    <Component clickPoint={selectedClickPoint} config={config} />
+    <Component clickPoint={selectedClickPoint} config={config} widgetId={widgetId} />
   ) : (
     <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
   );
