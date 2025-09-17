@@ -23,4 +23,8 @@ import java.util.Optional;
 public interface EventProcedureProvider {
 
     Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event);
+
+    String getAsText(String eventProcedureId, EventDto event);
+
+    String getAsHtml(String eventProcedureId, EventDto event);
 }

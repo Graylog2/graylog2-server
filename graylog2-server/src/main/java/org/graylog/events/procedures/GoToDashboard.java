@@ -83,8 +83,8 @@ public class GoToDashboard extends Action {
         @Override
         public String toHtml() {
             return f("""
-                    <td><a href="%s" target="_blank">Go to Dashboard</a></td>
-                    """, getLink());
+                        <td><a href="${action_button_uri}" target="_blank">Go to Dashboard</a></td>
+                    """);
         }
 
         @JsonIgnore
