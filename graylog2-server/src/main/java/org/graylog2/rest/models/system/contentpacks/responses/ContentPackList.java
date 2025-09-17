@@ -36,7 +36,7 @@ public abstract class ContentPackList {
     @JsonProperty("content_packs")
     public abstract Set<ContentPack> contentPacks();
 
-    @JsonProperty("content_pack_metadata")
+    @JsonProperty("content_packs_metadata")
     public abstract Map<ModelId, Map<Integer, ContentPackMetadata>> contentPacksMetadata();
 
     @JsonCreator
