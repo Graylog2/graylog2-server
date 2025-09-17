@@ -30,6 +30,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -41,15 +42,14 @@ import java.util.UUID;
 @Path("/mcp")
 public class McpResource extends RestResource {
 
+    @Inject
     ObjectMapper objectMapper;
 
+    @Inject
     McpService mcpService;
 
     @Inject
-    public McpResource(McpService mcpService, ObjectMapper objectMapper) {
-        this.mcpService = mcpService;
-        this.objectMapper = objectMapper;
-    }
+    SecurityContext securityContext;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -77,7 +77,7 @@ public class McpResource extends RestResource {
             // Simple one-shot JSON reply
             final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
             try {
-                final Optional<McpSchema.Result> result = mcpService.handle(request, sessionId);
+                final Optional<McpSchema.Result> result = mcpService.handle(securityContext, request, sessionId);
 
                 return Response.ok(new McpSchema.JSONRPCResponse("2.0",
                                 request.id(),

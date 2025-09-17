@@ -22,6 +22,9 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.core.SecurityContext;
+import org.graylog.grn.GRNType;
+import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.shared.ServerVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +39,18 @@ public class McpService {
 
     private final ObjectMapper objectMapper;
     private final Map<String, Tool<?, ?>> tools;
+    private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
 
     @Inject
-    protected McpService(ObjectMapper objectMapper, Map<String, Tool<?, ?>> tools) {
+    protected McpService(ObjectMapper objectMapper,
+                         Map<String, Tool<?, ?>> tools,
+                         Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
         this.tools = tools;
+        this.resourceProviders = resourceProviders;
     }
 
-    public Optional<McpSchema.Result> handle(McpSchema.JSONRPCRequest request, String sessionId) throws McpException {
+    public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId) throws McpException {
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
@@ -58,8 +65,8 @@ public class McpService {
                                 null,
                                 null,
                                 null,
-                                null,
-                                new McpSchema.ServerCapabilities.ToolCapabilities(true)
+                                new McpSchema.ServerCapabilities.ResourceCapabilities(false, false),
+                                new McpSchema.ServerCapabilities.ToolCapabilities(false)
                         ),
                         new McpSchema.Implementation("Graylog", ServerVersion.VERSION.toString()),
                         null,
@@ -69,7 +76,14 @@ public class McpService {
                 return Optional.empty();
             }
             case McpSchema.METHOD_RESOURCES_LIST -> {
-                return Optional.of(new McpSchema.ListResourcesResult(List.of(), null));
+                // TODO pagination needs to hold a cursor across _all_ resource types, which we don't have support for
+                // currently, so we need to skip it at the moment. MCP doesn't have any way to scope it to resource types
+                // so we are a bit dead in the water in the way we need to adapt it.
+                final List<McpSchema.Resource> resourceList = this.resourceProviders.values().stream()
+                        .map(resourceProvider -> resourceProvider.list(null))
+                        .flatMap(List::stream)
+                        .toList();
+                return Optional.of(new McpSchema.ListResourcesResult(resourceList, null));
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
                 final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
@@ -90,7 +104,7 @@ public class McpService {
                 LOG.info("Calling MCP tool: {}", callToolRequest);
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
-                    final Object result = tool.apply(callToolRequest.arguments());
+                    final Object result = tool.apply(new PermissionHelper(securityContext), callToolRequest.arguments());
                     return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
                 } else {
                     throw new McpException("Unknown tool named: " + callToolRequest.name());

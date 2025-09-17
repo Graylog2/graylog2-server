@@ -24,6 +24,9 @@ import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
 import com.github.victools.jsonschema.generator.SchemaVersion;
+import org.graylog.jsonschema.EmptyObjectAsObjectModule;
+import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog2.plugin.security.Permission;
 
 import java.util.Map;
 
@@ -85,10 +88,10 @@ public abstract class Tool<P, O> {
      * @param parameterMap raw parameter map
      * @return the return value of the tool call
      */
-    public O apply(Map<String, Object> parameterMap) {
+    public O apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
         final P p = objectMapper.convertValue(parameterMap, parameterType);
-        return apply(p);
+        return apply(permissionHelper, p);
     }
 
-    protected abstract O apply(P parameters);
+    protected abstract O apply(PermissionHelper permissionHelper, P parameters);
 }

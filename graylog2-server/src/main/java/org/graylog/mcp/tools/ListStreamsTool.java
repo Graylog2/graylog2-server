@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.mcp.server;
+package org.graylog.mcp.tools;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.mcp.server.Tool;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.io.StringWriter;
@@ -44,13 +46,14 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     }
 
     @Override
-    public String apply(ListStreamsTool.Parameters unused) {
+    public String apply(PermissionHelper permissionHelper, ListStreamsTool.Parameters unused) {
         final StringWriter writer = new StringWriter();
         final CSVWriter csvWriter = new CSVWriter(writer);
 
         csvWriter.writeNext(new String[]{"id", "name", "description", "index_set"});
         try (java.util.stream.Stream<Stream> dtos = streamService.streamAllDTOs()) {
-            dtos.forEach(stream -> csvWriter.writeNext(new String[]{
+            dtos.filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                    .forEach(stream -> csvWriter.writeNext(new String[]{
                     stream.getId(),
                     stream.getTitle(),
                     stream.getDescription(),

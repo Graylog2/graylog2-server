@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.mcp.server;
+package org.graylog.jsonschema;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.victools.jsonschema.generator.Module;
