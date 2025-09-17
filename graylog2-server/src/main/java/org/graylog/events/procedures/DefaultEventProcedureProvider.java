@@ -26,4 +26,14 @@ public class DefaultEventProcedureProvider implements EventProcedureProvider {
     public Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event) {
         return Optional.empty();
     }
+
+    @Override
+    public String getAsText(String eventProcedureId, EventDto event) {
+        return "";
+    }
+
+    @Override
+    public String getAsHtml(String eventProcedureId, EventDto event) {
+        return "";
+    }
 }

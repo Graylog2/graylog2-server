@@ -27,8 +27,6 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.events.event.EventDto;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 /**
  * Redirects the frontend to a link.
  */
@@ -67,20 +65,20 @@ public class Link extends Action {
         @JsonIgnore
         @Override
         public String toText() {
-            return getLink();
+            return "${action_button_uri}";
         }
 
         @JsonIgnore
         @Override
         public String toHtml() {
-            return f("""
-                    <td><a href="%s" target="_blank">Follow Link</a></td>
-                    """, getLink());
+            return """
+                    <td><a href="${action_button_uri}" target="_blank">Follow Link</a></td>
+                    """;
         }
 
         @JsonIgnore
         @Override
-        public String getLink() {
+        public String getLink(EventDto event) {
             return link();
         }
 

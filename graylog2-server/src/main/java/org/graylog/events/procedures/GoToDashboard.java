@@ -31,8 +31,6 @@ import org.graylog.events.event.EventDto;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 /**
  * Redirects the frontend to an existing dashboard.
  */
@@ -76,20 +74,20 @@ public class GoToDashboard extends Action {
         @JsonIgnore
         @Override
         public String toText() {
-            return getLink();
+            return "${action_button_uri}";
         }
 
         @JsonIgnore
         @Override
         public String toHtml() {
-            return f("""
-                        <td><a href="${action_button_uri}" target="_blank">Go to Dashboard</a></td>
-                    """);
+            return """
+                         <td><a href="${action_button_uri}" target="_blank">Go to Dashboard</a></td>
+                    """;
         }
 
         @JsonIgnore
         @Override
-        public String getLink() {
+        public String getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("dashboards/" + dashboardId());
             uriBuilder.setParameters(parameters());

@@ -100,11 +100,13 @@ public class EmailEventNotification implements EventNotification {
             if (eventProcedure.isPresent()) {
                 if (!isNullOrEmpty(config.htmlBodyTemplate())) {
                     config = config.toBuilder()
-                            .htmlBodyTemplate(config.htmlBodyTemplate() + eventProcedure.get().toHtml(ctx.event()))
+                            .htmlBodyTemplate(config.htmlBodyTemplate()
+                                    + eventProcedureProvider.getAsHtml(ctx.eventDefinition().get().eventProcedureId(), ctx.event()))
                             .build();
                 } else {
                     config = config.toBuilder()
-                            .bodyTemplate(config.bodyTemplate() + eventProcedure.get().toText(ctx.event()))
+                            .bodyTemplate(config.bodyTemplate()
+                                    + eventProcedureProvider.getAsText(ctx.eventDefinition().get().eventProcedureId(), ctx.event()))
                             .build();
                 }
             }

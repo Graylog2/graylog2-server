@@ -33,8 +33,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 /**
  * Redirects the frontend to either a saved search or a defined search via the URL field.
  */
@@ -100,20 +98,20 @@ public class PerformSearch extends Action {
         @JsonIgnore
         @Override
         public String toText() {
-            return getLink();
+            return "${action_button_uri}";
         }
 
         @JsonIgnore
         @Override
         public String toHtml() {
-            return f("""
-                    <td><a href="%s" target="_blank">Perform Search</a></td>
-                    """, getLink());
+            return """
+                    <td><a href="${action_button_uri}" target="_blank">Perform Search</a></td>
+                    """;
         }
 
         @JsonIgnore
         @Override
-        public String getLink() {
+        public String getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             if (Boolean.TRUE.equals(useSavedSearch())) {
                 uriBuilder.setPath("views/" + savedSearch());
@@ -122,9 +120,15 @@ public class PerformSearch extends Action {
                 uriBuilder.setPath("search");
                 uriBuilder.addParameter("q", query());
             }
+            if (event != null && event.replayInfo().isPresent()
+                    && event.replayInfo().get().timerangeStart() != null
+                    && event.replayInfo().get().timerangeEnd() != null) {
+                uriBuilder.addParameter("rangetype", "absolute");
+                uriBuilder.addParameter("from", event.replayInfo().get().timerangeStart().toString());
+                uriBuilder.addParameter("to", event.replayInfo().get().timerangeEnd().toString());
+            }
 
-            return uriBuilder.build().getLink()
-                    + "${if event.timerange_start}${if event.timerange_end}?rangetype=absolute&from=${event.timerange_start}&to=${event.timerange_end}${end}${end}";
+            return uriBuilder.build().getLink();
         }
 
         @AutoValue.Builder

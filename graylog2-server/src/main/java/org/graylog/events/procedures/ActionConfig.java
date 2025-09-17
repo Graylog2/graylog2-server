@@ -37,7 +37,7 @@ public interface ActionConfig {
 
     String toHtml();
 
-    String getLink();
+    String getLink(EventDto event);
 
     class FallbackConfig implements ActionConfig {
         @Override
@@ -56,7 +56,7 @@ public interface ActionConfig {
         }
 
         @Override
-        public String getLink() {
+        public String getLink(EventDto event) {
             throw new UnsupportedOperationException();
         }
     }
