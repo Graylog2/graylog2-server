@@ -25,6 +25,8 @@ import org.graylog.testing.containermatrix.annotations.GraylogBackendConfigurati
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -43,7 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class GraylogBackendExtension implements BeforeAllCallback, ParameterResolver {
+public class GraylogBackendExtension implements BeforeAllCallback, ParameterResolver, ExecutionCondition {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
 
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
@@ -194,5 +196,19 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             }
         }
         return MongodbServer.DEFAULT_VERSION;
+    }
+
+    @Override
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        final Optional<GraylogBackendConfiguration> backendConfiguration =
+                AnnotationSupport.findAnnotation(context.getRequiredTestClass(), GraylogBackendConfiguration.class);
+        if (backendConfiguration.isEmpty()) {
+            return ConditionEvaluationResult.enabled("No Graylog backend configuration found, enabling test");
+        }
+        final SearchVersion searchVersion = getSearchVersion();
+        if (searchVersion.isDataNode() && backendConfiguration.get().onlyOnDataNode()) {
+            return ConditionEvaluationResult.enabled("Data node present");
+        }
+        return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected: {}", searchVersion.toString());
     }
 }

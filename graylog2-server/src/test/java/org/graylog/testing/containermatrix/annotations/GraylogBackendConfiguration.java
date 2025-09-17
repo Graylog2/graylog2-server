@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @Testable
 public @interface GraylogBackendConfiguration {
 
+
     @interface ConfigurationParameter {
         String key();
 
@@ -70,6 +71,11 @@ public @interface GraylogBackendConfiguration {
      */
     @Deprecated(forRemoval = true)
     SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST};
+
+    /**
+     * Set this to true to only run the test if we are running against data node.
+     */
+    boolean onlyOnDataNode() default false;
 
     /**
      * matrix rule

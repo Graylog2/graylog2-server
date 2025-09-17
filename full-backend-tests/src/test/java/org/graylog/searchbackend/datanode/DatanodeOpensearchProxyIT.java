@@ -32,7 +32,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")})
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             searchVersions = SearchServer.DATANODE_DEV,
+                             onlyOnDataNode = true,
+                             additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")}
+)
 public class DatanodeOpensearchProxyIT {
 
     private GraylogApis apis;
