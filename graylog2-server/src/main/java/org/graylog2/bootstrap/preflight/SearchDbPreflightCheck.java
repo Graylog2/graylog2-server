@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.List;
 
-import static org.graylog2.configuration.validators.ElasticsearchVersionValidator.SUPPORTED_ES_VERSIONS;
+import static org.graylog2.configuration.validators.SearchServerVersionValidator.SUPPORTED_INDEXER_VERSIONS;
 
 public class SearchDbPreflightCheck implements PreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(SearchDbPreflightCheck.class);
@@ -50,9 +50,9 @@ public class SearchDbPreflightCheck implements PreflightCheck {
             final SearchVersion searchVersion = versionProbe.probe(elasticsearchHosts)
                     .orElseThrow(() -> new PreflightCheckException("Could not get Elasticsearch version"));
 
-            if (SUPPORTED_ES_VERSIONS.stream().noneMatch(searchVersion::satisfies)) {
+            if (SUPPORTED_INDEXER_VERSIONS.stream().noneMatch(searchVersion::satisfies)) {
                 throw new PreflightCheckException(StringUtils.f("Unsupported (Elastic/Open)Search version <%s>. Supported versions: <%s>",
-                        searchVersion, SUPPORTED_ES_VERSIONS));
+                        searchVersion, SUPPORTED_INDEXER_VERSIONS));
             }
 
             LOG.info("Connected to (Elastic/Open)Search version <{}>", searchVersion);

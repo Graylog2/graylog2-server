@@ -20,8 +20,6 @@ import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.datanode.DatanodeDevContainerInstanceProvider;
 import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
@@ -29,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DatanodeDevInstance extends OpenSearchInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevInstance.class);
+
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
     private final String mongoDBUri;
     private final String passwordSecret;

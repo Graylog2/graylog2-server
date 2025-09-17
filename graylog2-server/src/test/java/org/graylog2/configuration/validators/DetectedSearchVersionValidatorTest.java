@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DetectedSearchVersionValidatorTest {
 
-    private final Validator<SearchVersion> validator = new ElasticsearchVersionValidator();
+    private final Validator<SearchVersion> validator = new SearchServerVersionValidator();
 
     @Test
     void validateMajorVersion() {
