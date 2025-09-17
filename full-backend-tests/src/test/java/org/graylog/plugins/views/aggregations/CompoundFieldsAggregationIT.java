@@ -25,6 +25,7 @@ import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
@@ -39,10 +40,11 @@ import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 @GraylogBackendConfiguration(searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
 public class CompoundFieldsAggregationIT {
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public CompoundFieldsAggregationIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @BeforeEach
@@ -91,6 +93,6 @@ public class CompoundFieldsAggregationIT {
                         		}
                         	]
                         }
-                         """, 200));
+                        """, 200));
     }
 }
