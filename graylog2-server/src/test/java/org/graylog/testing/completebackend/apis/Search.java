@@ -45,7 +45,14 @@ import static org.hamcrest.Matchers.notNullValue;
 
 
 public class Search implements GraylogRestApi {
+    private static final Logger LOG = LoggerFactory.getLogger(Search.class);
     private static final Duration WAIT_FOR_MESSAGES_TIMEOUT = Duration.ofSeconds(300);
+
+    private final GraylogApis api;
+
+    public Search(GraylogApis api) {
+        this.api = api;
+    }
 
     public Search waitForMessage(String message) {
         return waitForMessages(message);
@@ -60,7 +67,14 @@ public class Search implements GraylogRestApi {
     }
 
     public Search waitForMessages(Collection<String> messages, TimeRange timeRange, Set<String> streams) {
-        waitFor(() -> searchMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", WAIT_FOR_MESSAGES_TIMEOUT);
+        try {
+          waitFor(() -> searchMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", WAIT_FOR_MESSAGES_TIMEOUT);
+       } catch (AssertionError error) {
+            final var results = searchMessages(timeRange, streams);
+            LOG.error("Messages we're waiting for: {}", String.join(", ", messages));
+            LOG.error("Messages found: {}", String.join(", ", results));
+            throw error;
+        }
         return this;
     }
 
@@ -68,14 +82,7 @@ public class Search implements GraylogRestApi {
         waitFor(() -> searchMessages().size() >= count, "Failed to wait for messages count:" + count);
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(Search.class);
-    private final GraylogApis api;
-
-    public Search(GraylogApis api) {
-        this.api = api;
-    }
-
-    /**
+   /**
      * @return all messages' "message" field as List<String>
      */
     public List<String> searchMessages() {
