@@ -28,8 +28,10 @@ type State = {
   total?: number;
   messages?: Array<{}>;
 };
+
 class SystemMessagesComponent extends React.Component<Props, State> {
   private interval: NodeJS.Timeout;
+
   PER_PAGE = 30;
 
   constructor(props: Props) {
