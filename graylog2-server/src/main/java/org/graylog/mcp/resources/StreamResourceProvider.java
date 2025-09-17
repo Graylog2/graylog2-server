@@ -28,7 +28,7 @@ import org.graylog.mcp.server.ResourceProvider;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-import org.jetbrains.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 import java.net.URI;
 import java.util.List;
