@@ -25,9 +25,7 @@ import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 public class DatanodeDevInstanceProvider implements SearchServerInterfaceProvider {
     @Override
     public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if(version.satisfies(DATANODE, "^5.2.0")) {
-            return new DatanodeDevInstanceBuilder(version);
-        }
-        return null;
+        // there is just one datanode version available, no checks needed here, just return the builder
+        return new DatanodeDevInstanceBuilder(version);
     }
 }
