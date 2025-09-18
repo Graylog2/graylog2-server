@@ -25,7 +25,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
+
+import java.net.URISyntaxException;
 
 /**
  * Redirects the frontend to a link.
@@ -64,8 +67,12 @@ public class Link extends Action {
 
         @JsonIgnore
         @Override
-        public String getLink(EventDto event) {
-            return link();
+        public URIBuilder getLink(EventDto event) {
+            try {
+                return new URIBuilder(link());
+            } catch (URISyntaxException e) {
+                return null;
+            }
         }
 
         @AutoValue.Builder

@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
@@ -73,11 +74,11 @@ public class GoToDashboard extends Action {
 
         @JsonIgnore
         @Override
-        public String getLink(EventDto event) {
+        public URIBuilder getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("dashboards/" + dashboardId());
             uriBuilder.setParameters(parameters());
-            return uriBuilder.build().getLink();
+            return uriBuilder.build().getLinkPath();
         }
 
         @AutoValue.Builder

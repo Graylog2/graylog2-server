@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
 /**
@@ -62,12 +63,12 @@ public class ExecuteNotification extends Action {
 
         @JsonIgnore
         @Override
-        public String getLink(EventDto event) {
+        public URIBuilder getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("security/security-events/alerts");
             uriBuilder.addParameter("query", "id:" + event.id());
             uriBuilder.addParameter("query", "id:${event.id}");
-            return uriBuilder.build().getLink();
+            return uriBuilder.build().getLinkPath();
         }
 
         @AutoValue.Builder
