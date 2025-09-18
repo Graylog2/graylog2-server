@@ -112,7 +112,7 @@
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
-        <bouncycastle.version>1.81</bouncycastle.version>
+        <bouncycastle.version>1.82</bouncycastle.version>
         <caffeine.version>3.2.2</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.181</classgraph.version>
@@ -133,7 +133,7 @@
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.75.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
@@ -161,11 +161,11 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.1</log4j.version>
         <lucene.version>9.12.2</lucene.version>
-        <metrics.version>4.2.36</metrics.version>
+        <metrics.version>4.2.37</metrics.version>
         <mongodb-driver.version>5.6.0</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.4.Final</netty.version>
+        <netty.version>4.2.6.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.73.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.1.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -213,10 +213,10 @@
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <testcontainers.opensearch.version>3.0.2</testcontainers.opensearch.version>
-        <graalvm.version>24.2.2</graalvm.version>
+        <graalvm.version>25.0.0</graalvm.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v20.17.0</nodejs.version>
+        <nodejs.version>v20.19.5</nodejs.version>
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
@@ -665,7 +665,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>3.5.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -675,7 +675,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.4.2</version>
+                    <version>4.9.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

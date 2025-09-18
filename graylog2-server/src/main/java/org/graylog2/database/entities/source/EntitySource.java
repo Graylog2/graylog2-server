@@ -35,8 +35,10 @@ import java.util.Optional;
 public abstract class EntitySource implements MongoEntity {
     // Source types
     public static final String USER_DEFINED = "USER_DEFINED";
+    public static final String SYSTEM = "SYSTEM";
     // Entity types
     public static final String VIEW_TYPE = "view";
+    public static final String EVENT_DEFINITION_TYPE = "event_definition";
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_SOURCE = "source";
