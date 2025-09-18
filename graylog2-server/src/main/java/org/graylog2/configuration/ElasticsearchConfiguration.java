@@ -59,6 +59,7 @@ public class ElasticsearchConfiguration {
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE = "time_size_optimizing_rotation_max_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
     public static final String ALLOW_FLEXIBLE_RETENTION_PERIOD = "allow_flexible_retention_period";
+    public static final String INDEX_FIELD_TYPE_REFRESH_INTERVAL = "index_field_type_refresh_interval";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String defaultIndexPrefix = "graylog";
@@ -86,6 +87,9 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "index_optimization_max_num_segments", validators = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
+
+    @Parameter(value = INDEX_FIELD_TYPE_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
+    private Duration indexFieldTypeRefreshInterval = Duration.seconds(5);
 
     @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
     private Duration indexFieldTypePeriodicalFullRefreshInterval = Duration.minutes(5);
@@ -214,6 +218,10 @@ public class ElasticsearchConfiguration {
         return disableIndexOptimization;
     }
 
+
+    public Duration getIndexFieldTypeRefreshInterval() {
+        return indexFieldTypeRefreshInterval;
+    }
 
     public Duration getIndexFieldTypePeriodicalFullRefreshInterval() {
         return indexFieldTypePeriodicalFullRefreshInterval;

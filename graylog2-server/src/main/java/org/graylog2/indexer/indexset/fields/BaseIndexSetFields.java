@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indexset;
+package org.graylog2.indexer.indexset.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
@@ -25,29 +25,18 @@ import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 
-public interface SimpleIndexSetConfig {
+public interface BaseIndexSetFields {
 
-    Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
-    String FIELD_TITLE = "title";
-    String FIELD_DESCRIPTION = "description";
-    String FIELD_WRITABLE = "writable";
     String FIELD_SHARDS = "shards";
     String FIELD_REPLICAS = "replicas";
     String FIELD_ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
     String FIELD_ROTATION_STRATEGY = "rotation_strategy";
     String FIELD_RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     String FIELD_RETENTION_STRATEGY = "retention_strategy";
-    String FIELD_INDEX_ANALYZER = "index_analyzer";
     String FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS = "index_optimization_max_num_segments";
     String FIELD_INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
     String FIELD_DATA_TIERING = "data_tiering";
-    String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
-    String FIELD_INDEX_PREFIX = "index_prefix";
-    String FIELD_CREATION_DATE = "creation_date";
-    String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
-    String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
-    String FIELD_PROFILE_ID = "field_type_profile";
 
     @Min(1)
     @JsonProperty(FIELD_SHARDS)
@@ -87,4 +76,37 @@ public interface SimpleIndexSetConfig {
     @JsonProperty(FIELD_DATA_TIERING)
     DataTieringConfig dataTieringConfig();
 
+    interface BaseIndexSetFieldsBuilder<T> {
+
+        @JsonProperty(FIELD_SHARDS)
+        T shards(@Min(1) int shards);
+
+        @JsonProperty(FIELD_REPLICAS)
+        T replicas(@Min(0) int replicas);
+
+        @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)
+        T indexOptimizationMaxNumSegments(@Min(1) int indexOptimizationMaxNumSegments);
+
+        @JsonProperty(FIELD_INDEX_OPTIMIZATION_DISABLED)
+        T indexOptimizationDisabled(boolean indexOptimizationDisabled);
+
+        @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
+        T fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
+
+        @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS)
+        T rotationStrategyClass(String rotationStrategyClass);
+
+        @JsonProperty(FIELD_ROTATION_STRATEGY)
+        T rotationStrategyConfig(RotationStrategyConfig rotationStrategyConfig);
+
+        @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
+        T retentionStrategyClass(String retentionStrategyClass);
+
+        @JsonProperty(FIELD_RETENTION_STRATEGY)
+        T retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
+
+        @JsonProperty(FIELD_DATA_TIERING)
+        T dataTieringConfig(DataTieringConfig dataTiering);
+
+    }
 }
