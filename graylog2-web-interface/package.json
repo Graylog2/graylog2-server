@@ -54,6 +54,7 @@
     "ace-builds": "1.43.3",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
+    "buffer": "^6.0.3",
     "chroma-js": "^2.0.3",
     "classnames": "^2.2.0",
     "core-js": "3.45.1",
