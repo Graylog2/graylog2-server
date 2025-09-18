@@ -137,6 +137,9 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                             """));
         }
 
+        // This migration installs a system-provided dashboard. The dashboard has an entry added in the entity_source
+        // collection via a different migration (V20250917184400_AddSystemEntitySource). Any future migrations that
+        // install system-provided entities should take care of adding the entity_source entry as well.
         configService.write(MigrationCompleted.create(pack.id().toString(), notPreviouslyInstalled || notLocallyModified, contentPackShouldBeUninstalled.isPresent()));
     }
 
