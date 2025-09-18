@@ -31,15 +31,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @GraylogBackendConfiguration(searchVersions = SearchServer.OS2)
 public class MessagesResourceIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public MessagesResourceIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @BeforeAll
     public void importMessages() {
-        this.api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
+        api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
     }
 
     @ContainerMatrixTest
@@ -57,7 +58,7 @@ public class MessagesResourceIT {
 
     @ContainerMatrixTest
     void testInvalidQueryResponse() {
-        this.api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
+        api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 
         String allMessagesTimeRange = "{\"timerange\": {\"type\": \"absolute\", \"from\": \"2015-01-01T00:00:00\", \"to\": \"2015-01-01T23:59:59\"}}";
 
@@ -88,7 +89,7 @@ public class MessagesResourceIT {
      */
     @ContainerMatrixTest
     void testTimeZone() {
-        this.api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
+        api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 
         String allMessagesTimeRange = """
                 {"timerange": {
