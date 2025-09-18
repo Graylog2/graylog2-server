@@ -407,6 +407,10 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public void setStartpage(Startpage startpage) {
+        if (startpage == null) {
+            this.fields.remove(STARTPAGE);
+            return;
+        }
         Map<String, Object> map = objectMapper.convertValue(startpage, new TypeReference<>() {});
         this.fields.put(STARTPAGE, map);
     }
