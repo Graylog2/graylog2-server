@@ -91,6 +91,7 @@ export interface SlackConfigType {
   color: string;
   time_zone: string;
   include_title: boolean;
+  include_event_procedure: boolean;
 }
 
 export type SlackValidationType = {
@@ -113,4 +114,5 @@ export interface SlackErrorType {
   color: string;
   time_zone: string;
   include_title?: string;
+  include_event_procedure?: string;
 }
