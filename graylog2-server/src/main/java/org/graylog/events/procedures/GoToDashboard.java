@@ -73,20 +73,6 @@ public class GoToDashboard extends Action {
 
         @JsonIgnore
         @Override
-        public String toText() {
-            return "${action_button_uri}";
-        }
-
-        @JsonIgnore
-        @Override
-        public String toHtml() {
-            return """
-                         <td><a href="${action_button_uri}" target="_blank">Go to Dashboard</a></td>
-                    """;
-        }
-
-        @JsonIgnore
-        @Override
         public String getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("dashboards/" + dashboardId());

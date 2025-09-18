@@ -29,8 +29,6 @@ import org.mongojack.Id;
 
 import java.util.List;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 @AutoValue
 @JsonDeserialize(builder = EventProcedure.Builder.class)
 public abstract class EventProcedure implements ScopedEntity<EventProcedure.Builder> {
@@ -83,57 +81,5 @@ public abstract class EventProcedure implements ScopedEntity<EventProcedure.Buil
         }
 
         public abstract EventProcedure build();
-    }
-
-    public String toText() {
-        final StringBuilder textBuilder = new StringBuilder();
-        textBuilder.append(f("""
-                --- [Event Procedure] ----------------------------
-                Title:       %s
-                Description: %s""", title(), description()));
-
-        if (steps() != null && !steps().isEmpty()) {
-            textBuilder.append("\n\n").append("Steps:");
-            for (int i = 0; i < steps().size(); i++) {
-                final EventProcedureStep step = steps().get(i);
-                textBuilder.append("\n")
-                        .append(f("%d. %s\n\t%s\n\t%s", i + 1, step.title(), step.description(), step.toText()));
-            }
-        }
-
-        return textBuilder.toString();
-    }
-
-    public String toHtml() {
-        final StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.append("""
-                <table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
-                <tr style="line-height:1.5"><th colspan="3" style="background-color:#e6e6e6">Event Procedure</th></tr>
-                """);
-        htmlBuilder.append(f("""
-                <tr><td width="200px">Title</td><td>%s</td></tr>
-                """, title()));
-        htmlBuilder.append(f("""
-                <tr><td>Description</td><td>%s</td></tr>
-                """, description()));
-
-        if (steps() != null && !steps().isEmpty()) {
-            htmlBuilder.append("""
-                    <tr><td><Strong>Steps</Strong></td>
-                    """);
-            for (int i = 0; i < steps().size(); i++) {
-                final EventProcedureStep step = steps().get(i);
-                htmlBuilder.append(f("""
-                        <tr><td>%d. %s</td><td>%s</td>
-                        """, i + 1, step.title(), step.description()));
-                htmlBuilder.append(step.toHtml());
-            }
-        }
-
-        htmlBuilder.append("""
-                </tbody></table>
-                """);
-
-        return htmlBuilder.toString();
     }
 }

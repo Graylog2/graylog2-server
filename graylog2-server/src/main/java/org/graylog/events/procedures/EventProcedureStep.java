@@ -54,14 +54,6 @@ public abstract class EventProcedureStep implements ScopedEntity<EventProcedureS
 
     public abstract Builder toBuilder();
 
-    public String toText() {
-        return action() != null ? action().config().toText() : "";
-    }
-
-    public String toHtml() {
-        return action() != null ? action().config().toHtml() : "";
-    }
-
     public String getLink(EventDto event) {
         return action() != null ? action().config().getLink(event) : "";
     }

@@ -95,19 +95,6 @@ public class PerformSearch extends Action {
 
         public abstract Builder toBuilder();
 
-        @JsonIgnore
-        @Override
-        public String toText() {
-            return "${action_button_uri}";
-        }
-
-        @JsonIgnore
-        @Override
-        public String toHtml() {
-            return """
-                    <td><a href="${action_button_uri}" target="_blank">Perform Search</a></td>
-                    """;
-        }
 
         @JsonIgnore
         @Override

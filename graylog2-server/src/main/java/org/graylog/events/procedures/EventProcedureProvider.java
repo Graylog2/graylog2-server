@@ -18,11 +18,7 @@ package org.graylog.events.procedures;
 
 import org.graylog.events.event.EventDto;
 
-import java.util.Optional;
-
 public interface EventProcedureProvider {
-
-    Optional<EventProcedure> getDecoratedForEvent(String eventProcedureId, EventDto event);
 
     String getAsText(String eventProcedureId, EventDto event);
 

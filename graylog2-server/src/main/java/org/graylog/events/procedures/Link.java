@@ -64,20 +64,6 @@ public class Link extends Action {
 
         @JsonIgnore
         @Override
-        public String toText() {
-            return "${action_button_uri}";
-        }
-
-        @JsonIgnore
-        @Override
-        public String toHtml() {
-            return """
-                    <td><a href="${action_button_uri}" target="_blank">Follow Link</a></td>
-                    """;
-        }
-
-        @JsonIgnore
-        @Override
         public String getLink(EventDto event) {
             return link();
         }

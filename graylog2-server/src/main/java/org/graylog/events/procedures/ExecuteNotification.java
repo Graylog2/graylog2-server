@@ -62,20 +62,6 @@ public class ExecuteNotification extends Action {
 
         @JsonIgnore
         @Override
-        public String toText() {
-            return "${action_button_uri}";
-        }
-
-        @JsonIgnore
-        @Override
-        public String toHtml() {
-            return """
-                    <td><a href="${action_button_uri}" target="_blank">View Event to Execute Notification</a></td>
-                    """;
-        }
-
-        @JsonIgnore
-        @Override
         public String getLink(EventDto event) {
             return "";
         }
