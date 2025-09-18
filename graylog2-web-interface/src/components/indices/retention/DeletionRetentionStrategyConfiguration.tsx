@@ -22,9 +22,13 @@ import { useIndexRetention } from 'components/indices/contexts/IndexRetentionCon
 
 type DeletionRetentionStrategyConfigurationProps = {
   updateConfig: (...args: any[]) => void;
+  disabled?: boolean;
 };
 
-const DeletionRetentionStrategyConfiguration = ({ updateConfig }: DeletionRetentionStrategyConfigurationProps) => {
+const DeletionRetentionStrategyConfiguration = ({
+  updateConfig,
+  disabled = false,
+}: DeletionRetentionStrategyConfigurationProps) => {
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
 
   const _onInputUpdate = (field) => (e) => {
@@ -39,6 +43,7 @@ const DeletionRetentionStrategyConfiguration = ({ updateConfig }: DeletionRetent
   return (
     <div>
       <Input
+        disabled={disabled}
         type="number"
         id="max-number-of-indices"
         label="Max number of indices"
