@@ -18,6 +18,7 @@ package org.graylog2.bindings;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Providers;
 import org.reflections.ReflectionUtils;
@@ -54,6 +55,10 @@ public class NamedConfigParametersOverrideModule extends AbstractModule {
     private final Set<Object> beans;
     private final boolean registerBeans;
 
+    /**
+     * Tracks keys we've already bound in this module to avoid duplicates.
+     */
+    private final Set<Key<?>> seenKeys =  new HashSet<>();
 
     public NamedConfigParametersOverrideModule(final Collection<?> beans, final boolean registerBeans) {
         this.beans = new HashSet<>(beans);
@@ -103,6 +108,12 @@ public class NamedConfigParametersOverrideModule extends AbstractModule {
                             ));
                         }
                         value = ReflectionUtils.invoke(method, bean);
+                    }
+
+                    Key<?> key = Key.get(typeLiteral, named(parameterName));
+                    if (!seenKeys.add(key)) {
+                        LOG.debug("Skipping duplicate binding for field '{}'", field.getName());
+                        continue;
                     }
 
                     if (value == null) {
