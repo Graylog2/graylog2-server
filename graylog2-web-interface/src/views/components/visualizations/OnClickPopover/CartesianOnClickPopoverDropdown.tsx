@@ -23,6 +23,9 @@ import { keySeparator } from 'views/Constants';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 import type { ValueGroups, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
+import Button from 'components/bootstrap/Button';
+import AddAnnotationAction from 'views/components/visualizations/OnClickPopover/AddAnnotationAction';
+import useUpdateAnnotation from 'views/components/visualizations/hooks/useUpdateAnnotation';
 
 const DivContainer = styled.div(
   ({ theme }) => css`
@@ -35,11 +38,14 @@ const DivContainer = styled.div(
 const CartesianOnClickPopoverDropdown = ({
   clickPoint,
   config,
+  widgetId,
 }: {
   clickPoint: ClickPoint;
   config: AggregationWidgetConfig;
+  widgetId: string;
 }) => {
   const traceColor = getHoverSwatchColor(clickPoint);
+
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
     const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
@@ -74,6 +80,13 @@ const CartesianOnClickPopoverDropdown = ({
     };
   }, [clickPoint, config, traceColor]);
 
+  const { onRemoveAnnotation, onAddAnnotation, hasAnnotation } = useUpdateAnnotation({
+    widgetId,
+    metric: metricValue.field,
+    config,
+    clickPoint,
+  });
+
   return (
     <Popover.Dropdown>
       <DivContainer>
@@ -82,6 +95,13 @@ const CartesianOnClickPopoverDropdown = ({
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
         />
+        {hasAnnotation ? (
+          <Button bsSize="xs" onClick={onRemoveAnnotation}>
+            Remove annotation
+          </Button>
+        ) : (
+          <AddAnnotationAction onAddAnnotation={onAddAnnotation} />
+        )}
       </DivContainer>
     </Popover.Dropdown>
   );

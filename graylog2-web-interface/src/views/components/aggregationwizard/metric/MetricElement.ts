@@ -109,6 +109,7 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: Vi
               ? metric.thresholds
               : null,
           )
+          .annotations(metric.annotations)
           .build(),
       )
       .build(),
@@ -124,6 +125,7 @@ export const seriesToMetrics = (series: Array<Series>) =>
       name: s.config?.name,
       thresholds: s.config.thresholds,
       showThresholds: !!s.config.thresholds?.length,
+      annotations: s.config.annotations,
     };
 
     if (percentile) {

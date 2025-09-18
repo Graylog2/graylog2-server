@@ -30,6 +30,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import useWidget from 'views/hooks/useWidget';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -80,7 +81,7 @@ const defineSingleDateBarWidth = (
 };
 
 const BarVisualization = makeVisualization(
-  ({ config, data, effectiveTimerange, height, width }: VisualizationComponentProps) => {
+  ({ id, config, data, effectiveTimerange, height, width }: VisualizationComponentProps) => {
     const visualizationConfig = (config.visualizationConfig ??
       BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
@@ -151,7 +152,7 @@ const BarVisualization = makeVisualization(
       return _layouts;
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
-    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config);
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config, id);
 
     return (
       <>

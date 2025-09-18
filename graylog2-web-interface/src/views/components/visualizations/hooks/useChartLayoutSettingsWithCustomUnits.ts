@@ -29,6 +29,8 @@ import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import generateDomain from 'views/components/visualizations/utils/generateDomain';
 import useXAxisTicks from 'views/components/visualizations/hooks/useXAxisTicks';
 import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
+import getWidgetAnnotations from 'views/components/visualizations/utils/getWidgetAnnotations';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const useChartLayoutSettingsWithCustomUnits = ({
   config,
@@ -40,6 +42,8 @@ const useChartLayoutSettingsWithCustomUnits = ({
   chartData: Array<ChartDefinition>;
 }) => {
   const theme = useTheme();
+  const { formatTime } = useUserDateTime();
+
   const ticksConfig = useXAxisTicks(config, chartData);
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
@@ -48,6 +52,13 @@ const useChartLayoutSettingsWithCustomUnits = ({
     [config.series, widgetUnits],
   );
   const thresholdShapes = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
+  const { widgetAnnotations, referenceLineShapes } = getWidgetAnnotations(
+    config,
+    fieldNameToAxisNameMapper,
+    theme,
+    chartData,
+    formatTime,
+  );
 
   return useCallback(() => {
     if (!unitFeatureEnabled)
@@ -66,9 +77,14 @@ const useChartLayoutSettingsWithCustomUnits = ({
       theme,
     });
 
+    console.log({
+      referenceLineShapes,
+      widgetAnnotations,
+    });
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
-      shapes: thresholdShapes,
+      shapes: [...thresholdShapes, ...referenceLineShapes],
+      annotations: widgetAnnotations,
       hovermode: 'x',
       xaxis: {
         domain: generateDomain(Object.keys(unitTypeMapper)?.length),
@@ -76,17 +92,21 @@ const useChartLayoutSettingsWithCustomUnits = ({
       },
     };
 
+    console.log({ _layouts });
+
     return _layouts;
   }, [
+    unitFeatureEnabled,
+    ticksConfig,
+    unitTypeMapper,
     barmode,
     chartData,
+    widgetUnits,
     config,
     theme,
-    ticksConfig,
+    referenceLineShapes,
+    widgetAnnotations,
     thresholdShapes,
-    unitFeatureEnabled,
-    unitTypeMapper,
-    widgetUnits,
   ]);
 };
 
