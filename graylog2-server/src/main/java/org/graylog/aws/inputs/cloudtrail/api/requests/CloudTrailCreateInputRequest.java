@@ -30,7 +30,7 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
     private static final String NAME = "name";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String POLLING_INTERVAL = "polling_interval";
-    private static final String STORE_FULL_MESSAGE = "store_full_message";
+    private static final String OVERRIDE_SOURCE = "override_source";
 
     @JsonProperty(NAME)
     public abstract String name();
@@ -41,8 +41,8 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
     @JsonProperty(POLLING_INTERVAL)
     public abstract long pollingInterval();
 
-    @JsonProperty(STORE_FULL_MESSAGE)
-    public abstract boolean storeFullMessage();
+    @JsonProperty(OVERRIDE_SOURCE)
+    public abstract String overrideSource();
 
     @AutoValue.Builder
     public static abstract class Builder implements CloudTrailRequest.Builder<Builder> {
@@ -61,8 +61,8 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
         @JsonProperty(POLLING_INTERVAL)
         public abstract Builder pollingInterval(long pollingInterval);
 
-        @JsonProperty(STORE_FULL_MESSAGE)
-        public abstract Builder storeFullMessage(boolean storeFullMessage);
+        @JsonProperty(OVERRIDE_SOURCE)
+        public abstract Builder overrideSource(String overrideSource);
 
         public abstract CloudTrailCreateInputRequest build();
     }

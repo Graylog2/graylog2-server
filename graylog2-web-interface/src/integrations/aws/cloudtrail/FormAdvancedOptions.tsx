@@ -30,7 +30,7 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { awsCloudTrailBatchSize, overrideSource, awsCloudTrailThrottleEnabled } =
+  const { overrideSource, awsCloudTrailThrottleEnabled } =
     formData;
 
   const handleToggle = (visible) => {
@@ -51,17 +51,9 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         value={overrideSource?.value}
         onChange={onChange}
         label="Override Source (optional)"
-        help="The message source is set to aws-kinesis-raw-logs by default. If desired, you may override it with a custom value."
+        help="The source is set to aws-cloudtrail by default.If desired, you may override it with a custom value."
       />
 
-      <Input
-        id="awsCloudTrailBatchSize"
-        type="number"
-        value={awsCloudTrailBatchSize.value || awsCloudTrailBatchSize.defaultValue}
-        onChange={onChange}
-        label="CloudTrail Record batch size"
-        help="The number of Cloudtrail records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time."
-      />
     </AdditionalFields>
   );
 };

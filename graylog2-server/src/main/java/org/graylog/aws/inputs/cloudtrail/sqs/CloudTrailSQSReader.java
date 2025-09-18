@@ -57,7 +57,7 @@ public class CloudTrailSQSReader {
             }
             try {
                 sqsNotifications = sqsClient.getNotifications(sqsMessageBatchSize);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 final String msg = f(
                         "Error fetching manifest for Logs: [%s]", e.getMessage(),
                         ExceptionUtils.getRootCauseMessage(e));

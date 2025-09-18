@@ -57,7 +57,6 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
   const { formData } = useContext(FormDataContext);
 
   const throttleEnabled = !!formData.awsCloudTrailThrottleEnabled?.value;
-  const storeFullMessage = !!formData.awsCloudTrailStoreFullMessage?.value;
 
   const [saveInput, setSaveInput] = useFetch(
     null,
@@ -93,7 +92,7 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
       buttonContent="Save and Start Input"
       loading={saveInput.loading}
       error={formError}
-      description="Check out everything below to make sure it's correct, then click the button below to complete your AWS Security Lake setup!">
+      description="Check out everything below to make sure it's correct, then click the button below to complete your AWS CloudTrail setup!">
       <Container>
         <Subheader>Input Configuration</Subheader>
         <ReviewItems>
@@ -123,12 +122,6 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
             <strong>Enable Throttling</strong>
             <span>
               <StatusIcon active={throttleEnabled} />
-            </span>
-          </li>
-          <li>
-            <strong>Store Full Message</strong>
-            <span>
-              <StatusIcon active={storeFullMessage} />
             </span>
           </li>
         </ReviewItems>

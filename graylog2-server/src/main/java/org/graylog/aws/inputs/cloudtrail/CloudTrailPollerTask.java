@@ -17,10 +17,10 @@
 package org.graylog.aws.inputs.cloudtrail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.aws.inputs.cloudtrail.external.CloudTrailS3Client;
 import org.graylog.aws.inputs.cloudtrail.json.CloudTrailRecord;
 import org.graylog.aws.inputs.cloudtrail.messages.TreeReader;
 import org.graylog.aws.inputs.cloudtrail.sqs.CloudTrailSQSReader;
-import org.graylog.aws.s3.S3Reader;
 import org.graylog.aws.notifications.SQSClient;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -42,26 +42,23 @@ public class CloudTrailPollerTask implements Runnable {
     private static final int BATCH_SIZE = 10;
     private final MessageInput input;
     private final CloudTrailTransport transport;
-    private final S3Reader s3Reader;
-    private final TreeReader treeReader;
+    private final CloudTrailS3Client cloudTrailS3Client;
     private final InputFailureRecorder failureRecorder;
     private final CloudTrailSQSReader sqsReader;
     private final ObjectMapper objectMapper;
 
     public CloudTrailPollerTask(MessageInput input,
                                 SQSClient sqsClient,
-                                TreeReader treeReader,
-                                S3Reader s3Reader,
+                                CloudTrailS3Client cloudTrailS3Client,
                                 CloudTrailTransport transport,
                                 InputFailureRecorder failureRecorder,
                                 ObjectMapper objectMapper,
                                 AtomicBoolean interrupt) {
         this.input = input;
-        this.treeReader = treeReader;
         this.transport = transport;
         this.failureRecorder = failureRecorder;
         this.objectMapper = objectMapper;
-        this.s3Reader = s3Reader;
+        this.cloudTrailS3Client = cloudTrailS3Client;
         this.sqsReader = new CloudTrailSQSReader(interrupt, sqsClient, failureRecorder, BATCH_SIZE);
     }
 
@@ -86,8 +83,9 @@ public class CloudTrailPollerTask implements Runnable {
             // Callback for reading S3 payload from SQS notification.
             try {
                 LOG.debug("Checking for CloudTrail notifications in SQS.");
+                TreeReader treeReader = new TreeReader(objectMapper);
                 List<CloudTrailRecord> records = treeReader.read(
-                        s3Reader.readCompressed(
+                        cloudTrailS3Client.readCompressed(
                                 notification.getS3Bucket(),
                                 notification.getS3ObjectKey()));
 

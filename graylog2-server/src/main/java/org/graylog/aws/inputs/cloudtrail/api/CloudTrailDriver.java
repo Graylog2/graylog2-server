@@ -18,7 +18,6 @@ package org.graylog.aws.inputs.cloudtrail.api;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
-import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequest;
@@ -57,10 +56,10 @@ public class CloudTrailDriver {
 
     @Inject
     public CloudTrailDriver(InputService inputService,
-                           MessageInputFactory messageInputFactory,
-                           NodeId nodeId,
-                           CloudTrailClientFactory cloudTrailClientFactory,
-                           AWSClientBuilderUtil awsUtils) {
+                            MessageInputFactory messageInputFactory,
+                            NodeId nodeId,
+                            CloudTrailClientFactory cloudTrailClientFactory,
+                            AWSClientBuilderUtil awsUtils) {
 
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
@@ -96,15 +95,14 @@ public class CloudTrailDriver {
     public Input saveInput(CloudTrailCreateInputRequest request, User user, boolean isSetupWizard) throws Exception {
 
         final HashMap<String, Object> configuration = new HashMap<>();
-        configuration.put(CloudTrailCodec.NAME, request.name());
         configuration.put(ThrottleableTransport.CK_THROTTLING_ALLOWED, request.throttlingAllowed());
         configuration.put(CloudTrailInput.CK_AWS_ACCESS_KEY, request.accessKeyId());
         configuration.put(CloudTrailInput.CK_AWS_SECRET_KEY, request.secretAccessKey());
         configuration.put(CloudTrailInput.CK_AWS_SQS_REGION, request.sqsRegion());
         configuration.put(CloudTrailInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
-        configuration.put(CloudTrailInput.CK_STORE_FULL_MESSAGE, request.storeFullMessage());
         configuration.put(CloudTrailInput.CK_CLOUDTRAIL_QUEUE_NAME, request.sqsQueueName());
         configuration.put(CloudTrailInput.CK_POLLING_INTERVAL, request.pollingInterval());
+        configuration.put(CloudTrailInput.CK_OVERRIDE_SOURCE, request.overrideSource());
 
         final InputCreateRequest inputCreateRequest = InputCreateRequest.create(request.name(),
                 CloudTrailInput.TYPE,

@@ -16,13 +16,7 @@
  */
 package org.graylog.aws;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.aws.config.AWSConfigurationResource;
-import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
-import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
-import org.graylog.aws.inputs.cloudtrail.CloudTrailTransport;
-import org.graylog.aws.inputs.cloudtrail.api.CloudTrailResource;
 import org.graylog.aws.migrations.V20200505121200_EncryptAWSSecretKey;
 import org.graylog.aws.processors.instancelookup.AWSInstanceNameLookupProcessor;
 import org.graylog.aws.processors.instancelookup.InstanceLookupTable;
@@ -39,15 +33,7 @@ public class AWSModule extends PluginModule {
 
     @Override
     protected void configure() {
-        if (!isForwarder()) {
-            // CloudTrail
-            addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
-            addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
-            addMessageInput(CloudTrailInput.class);
-            bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
 
-            addRestResource(CloudTrailResource.class);
-        }
         if (!(configuration.isCloud() || isForwarder())) {
             // Instance name lookup
             addMessageProcessor(AWSInstanceNameLookupProcessor.class, AWSInstanceNameLookupProcessor.Descriptor.class);
@@ -57,11 +43,6 @@ public class AWSModule extends PluginModule {
             addMigration(V20200505121200_EncryptAWSSecretKey.class);
             addRestResource(AWSConfigurationResource.class);
         }
-    }
-
-    private ObjectMapper createObjectMapper() {
-        return new ObjectMapper()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     /**

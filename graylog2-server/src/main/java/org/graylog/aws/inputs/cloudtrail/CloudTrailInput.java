@@ -35,7 +35,6 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @CloudCompatible
 public class CloudTrailInput extends MessageInput {
@@ -45,12 +44,10 @@ public class CloudTrailInput extends MessageInput {
     public static final String CK_AWS_SECRET_KEY = "aws_secret_key";
     public static final String CK_CLOUDTRAIL_QUEUE_NAME = "cloudtrail_queue_name";
     public static final String CK_AWS_SQS_REGION = "aws_region";
-    private static final String CK_AWS_S3_REGION = "aws_s3_region";
     public static final String CK_ASSUME_ROLE_ARN = "aws_assume_role_arn";
-    public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
     private static final Regions DEFAULT_REGION = Regions.US_EAST_1;
+    public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String CK_POLLING_INTERVAL = "polling_interval";
-    public static final String CK_POLLING_TIME_UNIT = "polling_time_unit";
 
     @Inject
     public CloudTrailInput(@Assisted Configuration configuration,
@@ -133,15 +130,6 @@ public class CloudTrailInput extends MessageInput {
                     "The AWS region the SQS queue is in.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
-
-            r.addField(new DropdownField(
-                    CK_AWS_S3_REGION,
-                    "AWS S3 Region",
-                    DEFAULT_REGION.getName(),
-                    regionChoices,
-                    "The AWS region the S3 bucket containing CloudTrail logs is in.",
-                    ConfigurationField.Optional.NOT_OPTIONAL
-            ));
             r.addField(new TextField(
                     CK_CLOUDTRAIL_QUEUE_NAME,
                     "CloudTrail SQS Queue name",
@@ -149,16 +137,10 @@ public class CloudTrailInput extends MessageInput {
                     "The name of the SQS Queue created by CloudTrail (cross account access)",
                     ConfigurationField.Optional.OPTIONAL
             ));
-            r.addField(new DropdownField(
-                    CK_POLLING_TIME_UNIT,
-                    "Interval time unit",
-                    TimeUnit.MINUTES.toString(),
-                    DropdownField.ValueTemplates.timeUnits(),
-                    ConfigurationField.Optional.NOT_OPTIONAL));
             r.addField(new NumberField(
                     CK_POLLING_INTERVAL,
                     "Polling interval",
-                    30,
+                    1,
                     "Determines how often Graylog will check for SQS notifications. The smallest allowable interval is 1 minute.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
             r.addField(new TextField(
@@ -168,8 +150,18 @@ public class CloudTrailInput extends MessageInput {
                     "The role ARN with required permissions (cross account access)",
                     ConfigurationField.Optional.OPTIONAL
             ));
+            r.addField(getOverrideSourceFieldDefinition());
 
             return r;
+        }
+
+        static TextField getOverrideSourceFieldDefinition() {
+            return new TextField(
+                    CK_OVERRIDE_SOURCE,
+                    "Override Source",
+                    "",
+                    "The source is set to aws-cloudtrail by default. If desired, you may override it with a custom value.",
+                    ConfigurationField.Optional.OPTIONAL);
         }
     }
 

@@ -16,6 +16,13 @@
  */
 package org.graylog.integrations;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.aws.AWSObjectMapper;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailTransport;
+import org.graylog.aws.inputs.cloudtrail.api.CloudTrailResource;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.codecs.AWSCodec;
@@ -178,6 +185,13 @@ public class IntegrationsModule extends PluginModule {
         addMessageInput(PaloAlto11xInput.class);
         addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
 
+        // CloudTrail
+        addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
+        addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
+        addMessageInput(CloudTrailInput.class);
+        addRestResource(CloudTrailResource.class);
+        bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
+
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);
         addCodec(KinesisCloudWatchFlowLogCodec.NAME, KinesisCloudWatchFlowLogCodec.class);
@@ -203,4 +217,10 @@ public class IntegrationsModule extends PluginModule {
     boolean isForwarder() {
         return Boolean.parseBoolean(System.getProperty("graylog.forwarder"));
     }
+
+    private ObjectMapper createObjectMapper() {
+        return new ObjectMapper()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
 }

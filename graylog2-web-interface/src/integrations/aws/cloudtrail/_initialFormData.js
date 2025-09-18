@@ -23,14 +23,14 @@ const DEFAULT_SETTINGS = {
   */
 
   /* Default Advanced Settings */
-  awsCloudTrailBatchSize: {
-    defaultValue: '10000',
-  },
   awsCloudTrailThrottleEnabled: {
     value: true, // We want to default to true on render, but never compare the default
   },
   overrideSource: {
     value: '',
+  },
+  pollingInterval: {
+    value: 1,
   },
 };
 

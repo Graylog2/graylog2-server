@@ -16,7 +16,9 @@
  */
 package org.graylog.aws.inputs.cloudtrail.external;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.ws.rs.BadRequestException;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,9 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+
+import javax.annotation.Nullable;
+import java.net.URI;
 
 /**
  * Factory for creating CloudTrail AWS clients.
@@ -57,5 +62,16 @@ public class CloudTrailClientFactory {
             LOG.error("AWS Cloudtrail credentials invalid {}", ExceptionUtils.getRootCauseMessage(e));
             throw new BadRequestException(ExceptionUtils.getRootCauseMessage(e));
         }
+    }
+
+    public CloudTrailS3Client getS3Client(String awsRegion, AwsCredentialsProvider credentialsProvider,
+                                          InputFailureRecorder inputFailureRecorder) {
+        return getS3Client(null, awsRegion, credentialsProvider, inputFailureRecorder);
+    }
+
+    @VisibleForTesting
+    CloudTrailS3Client getS3Client(@Nullable URI endpoint, String awsRegion, AwsCredentialsProvider credentialsProvider,
+                                   InputFailureRecorder inputFailureRecorder) {
+        return new CloudTrailS3Client(endpoint, awsRegion, credentialsProvider, inputFailureRecorder);
     }
 }

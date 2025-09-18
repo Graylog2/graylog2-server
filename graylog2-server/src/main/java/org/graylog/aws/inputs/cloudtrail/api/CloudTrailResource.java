@@ -53,7 +53,7 @@ import java.util.Objects;
  * Web endpoints for the AWS CloudTrail integration.
  */
 @Api(value = "AWSCloudTrail", description = "AWS CloudTrail")
-@Path("/awscloudtrail")
+@Path("/cloudtrail")
 @RequiresAuthentication
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

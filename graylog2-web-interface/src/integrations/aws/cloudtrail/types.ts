@@ -7,25 +7,25 @@ export type AWSCloudTrailGenericInputCreateRequest = {
   configuration: {
     polling_interval: number;
     throttling_allowed: boolean;
-    store_full_message: boolean;
     cloudtrail_queue_name: string;
     aws_access_key: string;
     aws_secret_key: string;
     aws_region: string;
     assume_role_arn: string;
+    override_source?: string;
   };
 };
 
 export type AWSCloudTrailInputCreateRequest = {
   name: string;
   enable_throttling: boolean;
-  store_full_message: boolean;
   polling_interval: number;
   cloudtrail_queue_name: string;
   aws_access_key: string;
   aws_secret_key: string;
   aws_region: string;
   assume_role_arn: string;
+  override_source?: string;
 };
 
 export type ErrorMessageType = {
