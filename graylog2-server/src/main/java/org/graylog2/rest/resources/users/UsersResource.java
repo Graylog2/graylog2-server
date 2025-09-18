@@ -915,7 +915,16 @@ public class UsersResource extends RestResource {
                 .map(rootUser -> {
                     final Set<String> adminRoles = userManagementService.getRoleNames(rootUser);
                     final Optional<MongoDbSession> lastSession = sessions.forUser(rootUser);
-                    return UserOverviewDTO.builder().username(rootUser.getName()).fullName(rootUser.getFullName()).email(rootUser.getEmail()).externalUser(rootUser.isExternalUser()).readOnly(rootUser.isReadOnly()).id(rootUser.getId()).fillSession(lastSession).roles(adminRoles).build();
+                    return UserOverviewDTO.builder()
+                            .username(rootUser.getName())
+                            .fullName(rootUser.getFullName())
+                            .email(rootUser.getEmail())
+                            .externalUser(rootUser.isExternalUser())
+                            .readOnly(rootUser.isReadOnly())
+                            .id(rootUser.getId())
+                            .fillSession(lastSession)
+                            .roles(adminRoles)
+                            .build();
                 });
     }
 
