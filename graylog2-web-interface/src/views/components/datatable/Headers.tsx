@@ -166,10 +166,9 @@ const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={
 
 const RowNumberHeader = styled(TableHeaderCell)(
   ({ theme }) => css`
-    width: 20px;
-    color: ${theme.colors.text.secondary} !important;
-
     && {
+      width: 20px;
+      color: ${theme.colors.text.secondary};
       min-width: 20px;
     }
   `,

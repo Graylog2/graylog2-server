@@ -102,9 +102,12 @@ const columnNameToField = (column: string, series: Series[] = []) => {
 
 const LineNumber = styled.td(
   ({ theme }) => css`
-    width: 20px;
-    text-align: right;
-    color: ${theme.colors.text.secondary} !important;
+    &&& {
+      width: 20px;
+      min-width: 20px;
+      text-align: right;
+      color: ${theme.colors.text.secondary};
+    }
   `,
 );
 
