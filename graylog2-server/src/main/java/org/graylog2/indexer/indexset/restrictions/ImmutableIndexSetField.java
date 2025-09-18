@@ -21,12 +21,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.jayway.jsonpath.DocumentContext;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Objects;
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = ImmutableIndexSetField.Builder.class)
 public abstract class ImmutableIndexSetField implements IndexSetFieldRestriction, FieldRestrictionValidator {
 
