@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -56,9 +57,10 @@ public class NamedConfigParametersOverrideModule extends AbstractModule {
     private final boolean registerBeans;
 
     /**
-     * Tracks keys we've already bound in this module to avoid duplicates.
+     * Tracks the declaring class for each binding key.
+     * Used to skip rebinding inherited keys.
      */
-    private final Set<Key<?>> seenKeys =  new HashSet<>();
+    private final Map<Key<?>, Class<?>> keyOwners =  new HashMap<>();
 
     public NamedConfigParametersOverrideModule(final Collection<?> beans, final boolean registerBeans) {
         this.beans = new HashSet<>(beans);
@@ -111,7 +113,11 @@ public class NamedConfigParametersOverrideModule extends AbstractModule {
                     }
 
                     Key<?> key = Key.get(typeLiteral, named(parameterName));
-                    if (!seenKeys.add(key)) {
+                    Class<?> declaringClass = field.getDeclaringClass();
+                    Class<?> previousClass = keyOwners.putIfAbsent(key, declaringClass);
+
+                    // Prevent re-binding inherited keys
+                    if (previousClass != null && previousClass == declaringClass) {
                         LOG.debug("Skipping duplicate binding for field '{}'", field.getName());
                         continue;
                     }
