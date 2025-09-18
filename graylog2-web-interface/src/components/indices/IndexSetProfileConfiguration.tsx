@@ -35,10 +35,12 @@ const IndexSetProfileConfiguration = ({
   value,
   onChange,
   name,
+  disabled = false,
 }: {
   name: string;
   value: string;
   onChange: (value: string | null) => void;
+  disabled?: boolean;
 }) => {
   const { isLoading, options } = useProfileOptions();
   const _onChange = (val: string) => onChange(val || null);
@@ -61,7 +63,7 @@ const IndexSetProfileConfiguration = ({
               inputId={name}
               options={options}
               value={value}
-              disabled={isLoading}
+              disabled={isLoading || disabled}
               onChange={_onChange}
             />
           </Input>

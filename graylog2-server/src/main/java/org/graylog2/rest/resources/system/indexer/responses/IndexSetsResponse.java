@@ -14,38 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.search.responses;
+package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
+import java.util.List;
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
-public abstract class HistogramResult {
-    @JsonProperty
-    public abstract String interval();
+public abstract class IndexSetsResponse {
+    @JsonProperty("total")
+    public abstract int total();
 
-    @JsonProperty
-    public abstract Map results();
+    @JsonProperty("index_sets")
+    public abstract List<IndexSetResponse> indexSets();
 
-    @JsonProperty
-    public abstract long time();
+    @JsonProperty("stats")
+    public abstract Map<String, IndexSetStats> stats();
 
-    @JsonProperty
-    public abstract String builtQuery();
-
-    @JsonProperty
-    public abstract TimeRange queriedTimerange();
-
-    public static HistogramResult create(String interval, Map results, long time, String builtQuery,
-                                         TimeRange queriedTimerange) {
-        return new AutoValue_HistogramResult(interval, results, time, builtQuery, queriedTimerange);
+    @JsonCreator
+    public static IndexSetsResponse create(@JsonProperty("total") int total,
+                                           @JsonProperty("index_sets") List<IndexSetResponse> ranges,
+                                           @JsonProperty("stats") Map<String, IndexSetStats> stats) {
+        return new AutoValue_IndexSetsResponse(total, ranges, stats);
     }
-
-
 }

@@ -14,27 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.dashboards.responses;
+package org.graylog2.indexer.indexset.fields;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.validation.ValidObjectId;
 
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
 
-@JsonAutoDetect
-@AutoValue
-@WithBeanGetter
-public abstract class DashboardList {
-    @JsonProperty
-    public abstract int total();
+public interface FieldTypeProfileField {
 
-    @JsonProperty
-    public abstract List<Map<String, Object>> dashboards();
+    String FIELD_PROFILE_ID = "field_type_profile";
 
-    public static DashboardList create(int total, List<Map<String, Object>> dashboards) {
-        return new AutoValue_DashboardList(total, dashboards);
+    @JsonProperty(FIELD_PROFILE_ID)
+    @Nullable
+    @ValidObjectId
+    String fieldTypeProfile();
+
+    interface FieldTypeProfileFieldBuilder<T> {
+
+        @JsonProperty(FieldTypeProfileField.FIELD_PROFILE_ID)
+        T fieldTypeProfile(@ValidObjectId String fieldTypeProfile);
     }
 }

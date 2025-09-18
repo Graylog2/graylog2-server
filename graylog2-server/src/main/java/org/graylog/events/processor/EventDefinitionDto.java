@@ -26,7 +26,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
@@ -62,7 +61,6 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
-@WithBeanGetter
 public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity>, SourcedScopedEntity<EventDefinitionDto.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";

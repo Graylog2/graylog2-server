@@ -14,27 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.search.responses;
+package org.graylog2.indexer.indexset.fields;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.joda.time.DateTime;
 
-@JsonAutoDetect
-@AutoValue
-@WithBeanGetter
-public abstract class TimeRange {
-    @JsonProperty
-    public abstract DateTime from();
+import javax.annotation.Nullable;
 
-    @JsonProperty
-    public abstract DateTime to();
+public interface UseLegacyRotationField {
 
-    @JsonCreator
-    public static TimeRange create(@JsonProperty("from") DateTime from, @JsonProperty("to") DateTime to) {
-        return new AutoValue_TimeRange(from, to);
+    String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
+
+    @Nullable
+    @JsonProperty(FIELD_USE_LEGACY_ROTATION)
+    Boolean useLegacyRotation();
+
+    interface UseLegacyRotationFieldBuilder<T> {
+
+        @JsonProperty(FIELD_USE_LEGACY_ROTATION)
+        T useLegacyRotation(Boolean useLegacyRotation);
     }
 }
