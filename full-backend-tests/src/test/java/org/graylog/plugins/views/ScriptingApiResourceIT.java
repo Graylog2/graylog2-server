@@ -49,7 +49,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.within;
+import static org.assertj.core.api.Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
@@ -59,17 +59,14 @@ import static org.hamcrest.Matchers.hasEntry;
 public class ScriptingApiResourceIT {
 
     public static final String DEFAULT_STREAM = "000000000000000000000001";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    private String stream1Id;
-    private String stream2Id;
-
-    public ScriptingApiResourceIT(GraylogApis apis) {
-        this.api = apis;
-    }
+    private static String stream1Id;
+    private static String stream2Id;
 
     @BeforeAll
-    public void beforeAll() {
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
 
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
 
@@ -78,8 +75,8 @@ public class ScriptingApiResourceIT {
         final String userId = user.getString("id");
 
 
-        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
-        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
+        stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
+        stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
 
         api.sharing().setSharing(new SharingRequest(
                 new SharingRequest.Entity(Sharing.ENTITY_STREAM, stream2Id),
@@ -119,7 +116,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """, 200);
+                        """, 200);
 
         validatableResponse.log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(3));
@@ -147,7 +144,7 @@ public class ScriptingApiResourceIT {
                         		}
                         	]
                         }
-                         """, 200));
+                        """, 200));
 
         responseDesc.validatableResponse().log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(2));
@@ -173,7 +170,7 @@ public class ScriptingApiResourceIT {
                         		}
                         	]
                         }
-                         """, 200));
+                        """, 200));
 
         List<Double> stddevAsc = responseAsc.properJSONPath().read("datarows.*[1]");
         org.assertj.core.api.Assertions.assertThat(stddevAsc)
@@ -197,7 +194,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """, 200);
+                        """, 200);
 
         validatableResponse.log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(3));
@@ -228,7 +225,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """)
+                        """)
                 .post("/search/aggregate")
                 .then()
                 .log().ifStatusCodeMatches(not(200))
@@ -388,11 +385,11 @@ public class ScriptingApiResourceIT {
         final List<String[]> lines = parseCsvLines(response);
 
         // headers
-        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+        Assertions.assertArrayEquals(new String[]{"grouping: facility", "metric: count(facility)"}, lines.get(0));
 
         //rows
-        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
-        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+        Assertions.assertArrayEquals(new String[]{"another-test", "2"}, lines.get(1));
+        Assertions.assertArrayEquals(new String[]{"test", "1"}, lines.get(2));
     }
 
     private List<String[]> parseCsvLines(InputStream inputStream) throws Exception {
@@ -425,11 +422,11 @@ public class ScriptingApiResourceIT {
         final List<String[]> lines = parseCsvLines(response);
 
         // headers
-        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+        Assertions.assertArrayEquals(new String[]{"grouping: facility", "metric: count(facility)"}, lines.get(0));
 
         //rows
-        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
-        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+        Assertions.assertArrayEquals(new String[]{"another-test", "2"}, lines.get(1));
+        Assertions.assertArrayEquals(new String[]{"test", "1"}, lines.get(2));
     }
 
     @ContainerMatrixTest
@@ -635,7 +632,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
-        Assertions.assertEquals(rows.size(), 2);
+        Assertions.assertEquals(2, rows.size());
         Assertions.assertEquals(Arrays.asList("test", (Object) 1), rows.get(0));
         Assertions.assertEquals(Arrays.asList("another-test", (Object) 2), rows.get(1));
     }
@@ -681,7 +678,7 @@ public class ScriptingApiResourceIT {
 
     @ContainerMatrixTest
     void testErrorHandling() {
-        final ValidatableResponse validatableResponse = given()
+        final ValidatableResponse ignored = given()
                 .spec(api.requestSpecification())
                 .when()
                 .body("""
@@ -750,7 +747,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
-        Assertions.assertEquals(rows.size(), 3);
+        Assertions.assertEquals(3, rows.size());
         assertThat(rows.get(0)).contains(3);
         assertThat(rows.get(1)).contains(2);
         assertThat(rows.get(2)).contains(1);
@@ -771,7 +768,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         rows = validatableResponse.extract().body().jsonPath().getList("datarows");
-        Assertions.assertEquals(rows.size(), 3);
+        Assertions.assertEquals(3, rows.size());
         assertThat(rows.get(0)).contains("another-test");
         assertThat(rows.get(1)).contains("another-test");
         assertThat(rows.get(2)).contains("test");
