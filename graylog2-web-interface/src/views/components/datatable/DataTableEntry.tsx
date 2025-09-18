@@ -105,6 +105,8 @@ const LineNumber = styled.td(
     &&& {
       width: 20px;
       min-width: 20px;
+      max-width: 200px;
+      white-space: nowrap;
       text-align: right;
       color: ${theme.colors.text.secondary};
     }

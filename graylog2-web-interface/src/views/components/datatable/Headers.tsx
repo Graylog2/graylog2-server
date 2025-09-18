@@ -168,8 +168,10 @@ const RowNumberHeader = styled(TableHeaderCell)(
   ({ theme }) => css`
     && {
       width: 20px;
-      color: ${theme.colors.text.secondary};
       min-width: 20px;
+      max-width: 200px;
+      white-space: nowrap;
+      color: ${theme.colors.text.secondary};
     }
   `,
 );
