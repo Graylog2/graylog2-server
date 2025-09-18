@@ -32,14 +32,11 @@ import static org.hamcrest.core.IsEqual.equalTo;
 @GraylogBackendConfiguration(serverLifecycle = CLASS, searchVersions = SearchServer.OS1)
 public class QueryValidationResourceIT {
 
-    private final GraylogApis api;
-
-    public QueryValidationResourceIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void importMessage() {
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
         api.gelf()
                 .createGelfHttpInput()
                 .postMessage(
