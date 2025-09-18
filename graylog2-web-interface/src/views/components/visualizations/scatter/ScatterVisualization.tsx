@@ -64,9 +64,12 @@ const ScatterVisualization = makeVisualization(
       chartData: chartDataResult,
     });
     const layout = useMemo<Partial<Layout>>(() => {
-      const _layouts = shapes ? { shapes } : {};
+      const _layouts: Partial<Layout> = getChartLayoutSettingsWithCustomUnits();
+      if (shapes) {
+        _layouts.shapes = [...(_layouts.shapes ?? []), ...shapes];
+      }
 
-      return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
+      return _layouts;
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
     const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
 
