@@ -40,6 +40,7 @@ public class McpService {
     private final ObjectMapper objectMapper;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
+    protected final List<String> supportedVersions = List.of(ProtocolVersions.MCP_2025_06_18);
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
@@ -50,16 +51,16 @@ public class McpService {
         this.resourceProviders = resourceProviders;
     }
 
-    public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId) throws McpException {
+    public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId) throws McpException, IllegalArgumentException {
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
                 final McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
-                if (!ProtocolVersions.MCP_2025_06_18.equals(initializeRequest.protocolVersion())) {
+                if (!supportedVersions.contains(initializeRequest.protocolVersion())) {
                     LOG.warn("Invalid protocol version {} for request {}", initializeRequest.protocolVersion(), request.params());
                     throw new IllegalArgumentException("Invalid protocol version " + initializeRequest.protocolVersion());
                 }
-                return Optional.of(new McpSchema.InitializeResult(ProtocolVersions.MCP_2025_06_18,
+                return Optional.of(new McpSchema.InitializeResult(initializeRequest.protocolVersion(),
                         new McpSchema.ServerCapabilities(
                                 null,
                                 null,

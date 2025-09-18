@@ -71,6 +71,16 @@ public class McpResource extends RestResource {
                 .filter(s -> !s.isBlank())
                 .orElse(UUID.randomUUID().toString());
 
+        // According to: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#protocol-version-header
+        // TODO: (mcpService.currentSessions.get(sessionId).negotiatedProtocol() != headers.getHeaderString("MCP-Protocol-Version"))
+        if (Optional.ofNullable(headers.getHeaderString("MCP-Protocol-Version"))
+                .map(mcpService.supportedVersions::contains)
+                .orElse(false)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(objectMapper.createObjectNode().put("error", "Invalid protocol version"))
+                    .build();
+        }
+
         // TODO: prefers non-streaming for now if the client is willing to go one-shot. we should still support SSE eventually.
         final boolean stream = accept.contains("text/event-stream") && !accept.contains("application/json");
         if (!stream) {
@@ -85,8 +95,22 @@ public class McpResource extends RestResource {
                                 null))
                         .header("Mcp-Session-Id", sessionId)
                         .build();
+            } catch (IllegalArgumentException e) {
+                JsonNode data = objectMapper.nullNode();
+                if (request.method().equals(McpSchema.METHOD_INITIALIZE)) {
+                    // Example: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#error-handling
+                    data = objectMapper.createObjectNode().set("supported", objectMapper.valueToTree(mcpService.supportedVersions));
+                }
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new McpSchema.JSONRPCResponse("2.0",
+                                request.id(),
+                                null,
+                                new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INVALID_PARAMS, e.getMessage(), data)))
+                        .header("Mcp-Session-Id", sessionId)
+                        .build();
             } catch (McpException e) {
-                return Response.ok(new McpSchema.JSONRPCResponse("2.0",
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new McpSchema.JSONRPCResponse("2.0",
                                 request.id(),
                                 null,
                                 new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INTERNAL_ERROR, e.getMessage(), null)))

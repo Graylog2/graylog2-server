@@ -30,7 +30,8 @@ import com.github.victools.jsonschema.generator.TypeScope;
  *   "type": "object",
  *   "properties": {}
  * }
- * instead of bare {} – which some MCP clients reject.
+ * instead of bare {} – which is non-compliant with the expected inputSchema/outputSchema according to
+ * the <a href="https://modelcontextprotocol.io/specification/2025-06-18/schema#tool">2025-06-18 MCP Tool schema</a>
  */
 public final class EmptyObjectAsObjectModule implements Module {
 
