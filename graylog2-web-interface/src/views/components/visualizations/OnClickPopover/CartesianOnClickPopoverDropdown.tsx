@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import Popover from 'components/common/Popover';
@@ -24,11 +24,8 @@ import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPo
 import type { ValueGroups, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
 import Button from 'components/bootstrap/Button';
-import useAppDispatch from 'stores/useAppDispatch';
-import useWidget from 'views/hooks/useWidget';
-import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
-import type { AddAnnotationFormValues } from 'views/components/visualizations/OnClickPopover/AddAnnotationAction';
 import AddAnnotationAction from 'views/components/visualizations/OnClickPopover/AddAnnotationAction';
+import useUpdateAnnotation from 'views/components/visualizations/hooks/useUpdateAnnotation';
 
 const DivContainer = styled.div(
   ({ theme }) => css`
@@ -48,7 +45,6 @@ const CartesianOnClickPopoverDropdown = ({
   widgetId: string;
 }) => {
   const traceColor = getHoverSwatchColor(clickPoint);
-  const dispatch = useAppDispatch();
 
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
@@ -84,36 +80,12 @@ const CartesianOnClickPopoverDropdown = ({
     };
   }, [clickPoint, config, traceColor]);
 
-  const onAddAnnotation = useCallback(
-    ({ note, showReferenceLines, color }: AddAnnotationFormValues) => {
-      const metric: string = metricValue.field;
-      const updatedSeries = config.series.map((s) => {
-        if (metric !== s.function) return s;
-
-        const curAnnotations = s.config.annotations ?? [];
-        const newAnnotations = [
-          ...curAnnotations,
-          {
-            note,
-            x: String(clickPoint.data.x[clickPoint.pointNumber]),
-            y: String(clickPoint.y),
-            color,
-            showReferenceLines,
-          },
-        ];
-        const seriesConfig = s.config.toBuilder().annotations(newAnnotations).build();
-
-        return s.toBuilder().config(seriesConfig).build();
-      });
-
-      const updatedWidgetConfig = config.toBuilder().series(updatedSeries).build();
-
-      console.log({ updatedWidgetConfig, widgetId });
-
-      return dispatch(updateWidgetConfig(widgetId, updatedWidgetConfig));
-    },
-    [clickPoint, config, dispatch, metricValue.field, widgetId],
-  );
+  const { onRemoveAnnotation, onAddAnnotation, hasAnnotation } = useUpdateAnnotation({
+    widgetId,
+    metric: metricValue.field,
+    config,
+    clickPoint,
+  });
 
   return (
     <Popover.Dropdown>
@@ -123,7 +95,13 @@ const CartesianOnClickPopoverDropdown = ({
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
         />
-        <AddAnnotationAction onAddAnnotation={onAddAnnotation} />
+        {hasAnnotation ? (
+          <Button bsSize="xs" onClick={onRemoveAnnotation}>
+            Remove annotation
+          </Button>
+        ) : (
+          <AddAnnotationAction onAddAnnotation={onAddAnnotation} />
+        )}
       </DivContainer>
     </Popover.Dropdown>
   );

@@ -20,12 +20,11 @@ import styled, { css } from 'styled-components';
 import random from 'lodash/random';
 
 import Popover from 'components/common/Popover';
-import { Button, Col } from 'components/bootstrap';
-import { ModalSubmit, FormikInput } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { FormikInput } from 'components/common';
 import { colors as defaultColors, colors } from 'views/components/visualizations/Colors';
 import ColorPicker from 'components/common/ColorPicker';
-
-import Annotation = module;
+import FormSubmit from 'components/common/FormSubmit';
 
 const ColorHintWrapper = styled.div`
   width: 25px;
@@ -43,6 +42,10 @@ const ColorHint = styled.div(
     height: ${theme.spacings.md};
   `,
 );
+
+const Container = styled.div`
+  width: 250px;
+`;
 
 const getInitialValues = () => {
   const palette = colors[random(0, colors.length - 1)];
@@ -81,58 +84,53 @@ const AddAnnotationAction = ({ onAddAnnotation }: Props) => {
         </Button>
       </Popover.Target>
       <Popover.Dropdown>
-        <Formik initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isValid, isSubmitting, setFieldValue, values }) => (
-            <Form>
-              <div>
-                <Col sm={11}>
-                  <FormikInput id="note" name="note" label="Note" type="textarea" />
-                </Col>
-                <Col sm={1}>
-                  <Popover position="top" withArrow opened={showColorPopover} withinPortal={false}>
-                    <Popover.Target>
-                      <ColorHintWrapper>
-                        <ColorHint aria-label="Color Hint" onClick={toggleColorPopoverPopover} color={values.color} />
-                      </ColorHintWrapper>
-                    </Popover.Target>
-                    <Popover.Dropdown title="Color configuration for threshold">
-                      <ColorPicker
-                        color={values.color}
-                        colors={defaultColors}
-                        onChange={(color) => {
-                          toggleColorPopoverPopover();
+        <Container>
+          <Formik initialValues={initialValues} onSubmit={onSubmit}>
+            {({ isValid, isSubmitting, setFieldValue, values }) => (
+              <Form>
+                <FormikInput id="note" name="note" label="Note" type="textarea" />
+                <Popover position="top" withArrow opened={showColorPopover} withinPortal={false}>
+                  <Popover.Target>
+                    <ColorHintWrapper>
+                      <ColorHint aria-label="Color Hint" onClick={toggleColorPopoverPopover} color={values.color} />
+                    </ColorHintWrapper>
+                  </Popover.Target>
+                  <Popover.Dropdown title="Color configuration for threshold">
+                    <ColorPicker
+                      color={values.color}
+                      colors={defaultColors}
+                      onChange={(color) => {
+                        toggleColorPopoverPopover();
 
-                          return setFieldValue('color', color);
-                        }}
-                      />
-                    </Popover.Dropdown>
-                  </Popover>
-                </Col>
-                <Col sm={11}>
-                  <Field name="showReferenceLines">
-                    {({ field: { name, value = false } }) => (
-                      <FormikInput
-                        type="checkbox"
-                        wrapperClassName="col-sm-12"
-                        label="Show reference lines"
-                        id={`${name}-input`}
-                        name={name}
-                        onChange={() => {
-                          const newVal = !value;
-                          setFieldValue(name, newVal);
-                        }}
-                      />
-                    )}
-                  </Field>
-                </Col>
-
-                <Button bsSize="xs" bsStyle="success" disabled={isSubmitting && !isValid} type="submit">
-                  Add annotation
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+                        return setFieldValue('color', color);
+                      }}
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+                <Field name="showReferenceLines">
+                  {({ field: { name, value = false } }) => (
+                    <FormikInput
+                      type="checkbox"
+                      label="Show reference lines"
+                      id={`${name}-input`}
+                      name={name}
+                      onChange={() => {
+                        const newVal = !value;
+                        setFieldValue(name, newVal);
+                      }}
+                    />
+                  )}
+                </Field>
+                <FormSubmit
+                  submitButtonText="Add annotation"
+                  bsSize="xsmall"
+                  disabledSubmit={isSubmitting && !isValid}
+                  onCancel={togglePopoverPopover}
+                />
+              </Form>
+            )}
+          </Formik>
+        </Container>
       </Popover.Dropdown>
     </Popover>
   );
