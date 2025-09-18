@@ -80,9 +80,11 @@ public class ActionTest {
 
     @Test
     public void testExecuteNotificationGetLink() {
+        when(event.id()).thenReturn(ID);
+
         String actionText = executeNotificationConfig().getLink(event);
 
-        assertThat(actionText).isEqualTo("");
+        assertThat(actionText).contains("${http_external_uri}security/security-events/alerts?query=id:" + ID);
     }
 
     private ExecuteNotification.Config executeNotificationConfig() {
