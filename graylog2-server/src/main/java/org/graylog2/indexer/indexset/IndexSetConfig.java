@@ -201,7 +201,7 @@ public abstract class IndexSetConfig implements
      * appropriate defaults.
      */
     public static Builder builder() {
-        return new $AutoValue_IndexSetConfig.Builder()
+        return new AutoValue_IndexSetConfig.Builder()
                 // Index sets are writable by default.
                 .isWritable(true)
                 .customFieldMappings(new CustomFieldMappings())
