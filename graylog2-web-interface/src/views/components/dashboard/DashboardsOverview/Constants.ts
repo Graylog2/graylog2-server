@@ -35,6 +35,7 @@ const getDashboardTableElements = (pluggableAttributes?: {
     'summary',
     'description',
     'owner',
+    '_entity_source.source',
     'created_at',
     'last_updated_at',
     'favorite',
