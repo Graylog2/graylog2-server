@@ -25,6 +25,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collections;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class SessionsResourceIT {
             "password", "wrongpassword"
     );
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
     private static RequestSpecification makeRequestSpec(GraylogApis api) {
         return new RequestSpecBuilder().build()
@@ -60,8 +61,9 @@ public class SessionsResourceIT {
                 .header("X-Requested-By", "peterchen");
     }
 
-    public SessionsResourceIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest
