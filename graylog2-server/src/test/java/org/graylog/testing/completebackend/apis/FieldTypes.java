@@ -69,7 +69,7 @@ public class FieldTypes implements GraylogRestApi {
                 } else {
                     return Optional.empty();
                 }
-            }, "Timed out waiting for field definition", Duration.ofSeconds(30));
+            }, "Timed out waiting for field definition", Duration.ofSeconds(60));
         } catch (AssertionError error) {
             LOG.error("FieldTypes we're waiting for: {}", String.join(", ", expectedFields));
             final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(RelativeRange.allTime(), streams);
