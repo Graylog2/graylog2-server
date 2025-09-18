@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class FsStats {
     @JsonProperty("filesystems")
     public abstract Map<String, Filesystem> filesystems();
@@ -39,70 +37,69 @@ public abstract class FsStats {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Filesystem {
-        @JsonProperty
+        @JsonProperty("path")
         public abstract String path();
 
-        @JsonProperty
+        @JsonProperty("mount")
         @Nullable
         public abstract String mount();
 
-        @JsonProperty
+        @JsonProperty("dev")
         @Nullable
         public abstract String dev();
 
-        @JsonProperty
+        @JsonProperty("type_name")
         @Nullable
-        public  abstract String typeName();
+        public abstract String typeName();
 
-        @JsonProperty
+        @JsonProperty("sys_type_name")
         @Nullable
-        public  abstract String sysTypeName();
+        public abstract String sysTypeName();
 
-        @JsonProperty
+        @JsonProperty("total")
         public abstract long total();
 
-        @JsonProperty
+        @JsonProperty("free")
         public abstract long free();
 
-        @JsonProperty
+        @JsonProperty("available")
         public abstract long available();
 
-        @JsonProperty
+        @JsonProperty("used")
         public abstract long used();
 
-        @JsonProperty
+        @JsonProperty("used_percent")
         public abstract short usedPercent();
 
-        @JsonProperty
+        @JsonProperty("inodes_total")
         public abstract long inodesTotal();
 
-        @JsonProperty
+        @JsonProperty("inodes_free")
         public abstract long inodesFree();
 
-        @JsonProperty
+        @JsonProperty("inodes_used")
         public abstract long inodesUsed();
 
-        @JsonProperty
+        @JsonProperty("inodes_used_percent")
         public abstract short inodesUsedPercent();
 
-        @JsonProperty
+        @JsonProperty("disk_reads")
         public abstract long diskReads();
 
-        @JsonProperty
+        @JsonProperty("disk_writes")
         public abstract long diskWrites();
 
-        @JsonProperty
+        @JsonProperty("disk_read_bytes")
         public abstract long diskReadBytes();
 
-        @JsonProperty
+        @JsonProperty("disk_write_bytes")
         public abstract long diskWriteBytes();
 
-        @JsonProperty
+        @JsonProperty("disk_queue")
         public abstract double diskQueue();
 
-        @JsonProperty
+        @JsonProperty("disk_service_time")
         public abstract double diskServiceTime();
 
         @JsonCreator

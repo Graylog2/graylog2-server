@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = IndexSetCreationRequest.Builder.class)
 public abstract class IndexSetCreationRequest implements
         ExtendedIndexSetFields,

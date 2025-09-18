@@ -19,20 +19,18 @@ package org.graylog2.datatiering;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotNull;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 
 
 @AutoValue
-@WithBeanGetter
 public abstract class DataTieringState {
 
     private final static String FIELD_TYPE = "type";
     private static final String FIELD_WARM_TIER_REQUIREMENTS = "warm_tier_requirements";
 
     public static Builder builder() {
-        return new $AutoValue_DataTieringState.Builder();
+        return new AutoValue_DataTieringState.Builder();
     }
 
     @NotNull
