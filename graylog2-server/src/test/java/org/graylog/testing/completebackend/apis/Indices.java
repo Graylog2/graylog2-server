@@ -54,8 +54,8 @@ public class Indices implements GraylogRestApi {
                 .extract().body().jsonPath().getString("index_sets.find { it.default == true }.id");
     }
 
-    public String createIndexSet(IndexSetCreationRequest indexSetCreationRequest) {
-        return given()
+    public String createIndexSet(IndexSetCreationRequest indexSetCreationRequest) throws ExecutionException, RetryException {
+        final var id = given()
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -67,9 +67,11 @@ public class Indices implements GraylogRestApi {
                 .statusCode(200)
                 .assertThat().body("id", notNullValue())
                 .extract().body().jsonPath().getString("id");
+        waitForIndexNames(id);
+        return id;
     }
 
-    public String createIndexSet(String title, String description, String prefix) {
+    public String createIndexSet(String title, String description, String prefix) throws ExecutionException, RetryException {
         var indexSetSummary = IndexSetCreationRequest.builder()
                 .title(title)
                 .description(description)

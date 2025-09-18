@@ -20,6 +20,8 @@ import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 import static io.restassured.RestAssured.given;
 
 public class FieldTypes implements GraylogRestApi {
+    private static final Logger LOG = LoggerFactory.getLogger(FieldTypes.class);
 
     private final GraylogApis api;
 
@@ -57,15 +60,22 @@ public class FieldTypes implements GraylogRestApi {
 
     public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(Set<String> streams, String... fieldName) {
         final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
-        return waitForObject(() -> {
+        try {
+            return waitForObject(() -> {
+                final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(RelativeRange.allTime(), streams);
+                final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
+                if (filtered.size() == expectedFields.size()) {
+                    return Optional.of(filtered);
+                } else {
+                    return Optional.empty();
+                }
+            }, "Timed out waiting for field definition", Duration.ofSeconds(30));
+        } catch (AssertionError error) {
+            LOG.error("FieldTypes we're waiting for: {}", String.join(", ", expectedFields));
             final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(RelativeRange.allTime(), streams);
-            final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
-            if (filtered.size() == expectedFields.size()) {
-                return Optional.of(filtered);
-            } else {
-                return Optional.empty();
-            }
-        }, "Timed out waiting for field definition", Duration.ofSeconds(30));
+            LOG.error("FieldTypes we found: {}", String.join(", ", knownTypes.stream().map(MappedFieldTypeDTO::name).collect(Collectors.toSet())));
+            throw error;
+        }
     }
 
     public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(String... fieldName) {
