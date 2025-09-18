@@ -32,15 +32,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @GraylogBackendConfiguration
 public class SearchMetadataIT {
-    private final GraylogApis api;
-
-    public SearchMetadataIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void importMongoFixtures() {
-        this.api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
     @ContainerMatrixTest
