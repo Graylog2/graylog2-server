@@ -72,7 +72,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationFailureException;
@@ -87,7 +87,6 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
-import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -130,10 +129,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
             EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
-                    .type(SearchQueryField.Type.STRING).sortable(false).filterable(true).filterOptions(Set.of(
-                            FilterOption.create(EntitySource.USER_DEFINED, "User Defined"),
-                            FilterOption.create("ILLUMINATE", "Illuminate")
-                    )).build()
+                    .type(SearchQueryField.Type.STRING)
+                    .sortable(false)
+                    .filterable(true)
+                    .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
+                    .build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
