@@ -50,15 +50,16 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     //use this fixtureType:474877 in all fixtures to assure this test isolation from the others
     private static final String FIXTURE_TYPE_FIELD_VALUE = "474877";
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public SearchWithAggregationsSupportingMissingBucketsIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @BeforeAll
     public void setUp() {
-        this.api.backend().importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
+        api.backend().importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
     }
 
     private ValidatableResponse execute(Pivot pivot) {
