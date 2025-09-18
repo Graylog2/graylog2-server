@@ -20,6 +20,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 import { defaultOnError } from 'util/conditional/onError';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 
 type Options = {
   enabled: boolean;
@@ -29,6 +30,7 @@ export const fetchEventDefinitions = (searchParams: SearchParams): Promise<Event
   EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
+    filters: FiltersForQueryParams(searchParams.filters),
   }).then(({ elements, pagination, attributes }) => ({
     list: elements,
     pagination,

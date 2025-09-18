@@ -86,7 +86,10 @@ is now used as the primary color for elements like buttons and badges in the UI.
 
 The following REST API changes have been made.
 
-| Endpoint                                                              | Description                                                                             |
-|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| `GET /<endpoint>`                                                     | description                                                                             |
-| `GET /<endpoint>`                                                     | description                                                                             |
+| Endpoint                          | Description                                                                                                                                                                                |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/urlallowlist`        | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                                                          |
+| `PUT /system/urlallowlist`        | Renamed from `PUT /system/urlwhitelist`                                                                         . The corresponding REST API permission is renamed to `urlallowlist:write` |
+| `POST /system/urlallowlist/check` | Renamed from `POST /system/urlwhitelist/check`                                                                                                                                             |
+| `POST /system/urlallowlist/generate_regex` | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                                                                    |
+| `GET /<endpoint>`                 | description                                                                                                                                                                                |
