@@ -42,19 +42,14 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @GraylogBackendConfiguration
 public class SearchSyncIT {
-    static final int GELF_HTTP_PORT = 12201;
-
-    private final GraylogApis api;
-
-    public SearchSyncIT(final GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void importMongoFixtures() {
-        this.api.backend().importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
+    static void importMongoFixtures(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
 
-        api.gelf().createGelfHttpInput(GELF_HTTP_PORT)
+        api.gelf().createGelfHttpInput()
                 .postMessage("{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}");
         api.search().waitForMessage("search-sync-test");
     }
