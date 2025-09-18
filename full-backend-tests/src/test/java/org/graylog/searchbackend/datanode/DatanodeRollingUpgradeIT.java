@@ -20,6 +20,7 @@ import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
@@ -27,10 +28,11 @@ import java.util.List;
 //@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),})
 public class DatanodeRollingUpgradeIT {
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    public DatanodeRollingUpgradeIT(GraylogApis apis) {
-        this.apis = apis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
    //@ContainerMatrixTest

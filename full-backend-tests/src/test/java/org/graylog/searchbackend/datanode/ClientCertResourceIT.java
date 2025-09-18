@@ -79,15 +79,12 @@ import java.util.Collections;
                                    })
 public class ClientCertResourceIT {
 
+    private static GraylogApis api;
+
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
         Security.addProvider(new BouncyCastleProvider());
-    }
-
-    private final GraylogApis api;
-
-    public ClientCertResourceIT(GraylogApis api) {
-        this.api = api;
     }
 
     @ContainerMatrixTest
@@ -120,10 +117,10 @@ public class ClientCertResourceIT {
         Assertions.assertThat(expires).isBetween(shouldExpire.minusDays(2), shouldExpire.plusDays(2));
 
         final SSLContext sslContext = createSslContext(
-                createKeystore(privateKey, certificate, caCertificate),
+                createKeystore(privateKey, certificate),
                 createTruststore(caCertificate));
 
-        final URL url = new URI("https://" + this.api.backend().searchServerInstance().getHttpHostAddress()).toURL();
+        final URL url = new URI("https://" + api.backend().searchServerInstance().getHttpHostAddress()).toURL();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (connection instanceof HttpsURLConnection) {
@@ -154,7 +151,7 @@ public class ClientCertResourceIT {
         return TruststoreCreator.newEmpty().addCertificates(Collections.singletonList(caCertificate)).getTruststore();
     }
 
-    private static KeystoreInformation createKeystore(PrivateKey privateKey, X509Certificate certificate, X509Certificate caCertificate) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+    private static KeystoreInformation createKeystore(PrivateKey privateKey, X509Certificate certificate) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore keystore = KeyStore.getInstance(CertConstants.PKCS12);
         keystore.load(null, null);
         final char[] password = "keystorepassword".toCharArray();

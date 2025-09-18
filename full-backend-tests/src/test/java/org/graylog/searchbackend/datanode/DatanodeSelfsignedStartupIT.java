@@ -23,7 +23,6 @@ import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
@@ -32,13 +31,15 @@ import org.graylog2.security.JwtSecret;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.concurrent.ExecutionException;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             onlyOnDataNode = true,
                              additionalConfigurationParameters = {
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
@@ -49,10 +50,11 @@ public class DatanodeSelfsignedStartupIT {
 
     private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    public DatanodeSelfsignedStartupIT(GraylogApis apis) {
-        this.apis = apis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
     @ContainerMatrixTest
@@ -77,7 +79,7 @@ public class DatanodeSelfsignedStartupIT {
 
             response.assertThat().body("status", Matchers.equalTo("green"));
         } catch (Exception e) {
-            log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
+            log.error("Could not connect to Opensearch\n{}", apis.backend().getSearchLogs());
             throw e;
         }
     }

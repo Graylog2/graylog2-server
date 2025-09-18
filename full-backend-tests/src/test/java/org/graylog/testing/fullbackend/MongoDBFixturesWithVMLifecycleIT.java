@@ -29,15 +29,12 @@ import static org.graylog.testing.completebackend.Lifecycle.VM;
 
 @GraylogBackendConfiguration(serverLifecycle = VM)
 class MongoDBFixturesWithVMLifecycleIT {
-    private final GraylogApis api;
-
-    public MongoDBFixturesWithVMLifecycleIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void importMongoFixtures() {
-        this.api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
+    static void importMongoFixtures(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
     }
 
     @ContainerMatrixTest

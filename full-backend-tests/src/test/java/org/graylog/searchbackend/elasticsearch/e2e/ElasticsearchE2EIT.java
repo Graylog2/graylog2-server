@@ -21,6 +21,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
@@ -28,16 +29,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT;
 
 @GraylogBackendConfiguration
-public class ElasticsearchE2E {
-    private final GraylogApis api;
+public class ElasticsearchE2EIT {
+    private static GraylogApis api;
 
-    public ElasticsearchE2E(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest
     void inputMessageCanBeSearched() {
-        int mappedPort = this.api.backend().mappedPortFor(GELF_HTTP_PORT);
+        int mappedPort = api.backend().mappedPortFor(GELF_HTTP_PORT);
 
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, api.requestSpecificationSupplier());
 
@@ -45,13 +47,13 @@ public class ElasticsearchE2E {
                 "{\"short_message\":\"kram\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 api.requestSpecificationSupplier());
 
-        List<String> messages = SearchUtils.searchForAllMessages(this.api.requestSpecificationSupplier());
+        List<String> messages = SearchUtils.searchForAllMessages(api.requestSpecificationSupplier());
         assertThat(messages).doesNotContain("Hello there");
 
         GelfInputUtils.postMessage(mappedPort,
                 "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 api.requestSpecificationSupplier());
 
-        assertThat(SearchUtils.waitForMessage(this.api.requestSpecificationSupplier(), "Hello there")).isTrue();
+        assertThat(SearchUtils.waitForMessage(api.requestSpecificationSupplier(), "Hello there")).isTrue();
     }
 }

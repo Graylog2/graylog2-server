@@ -19,15 +19,17 @@ package org.graylog.plugins.views;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @GraylogBackendConfiguration
 public class ViewsResourceIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public ViewsResourceIT(GraylogApis apis) {
-        this.api = apis;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest

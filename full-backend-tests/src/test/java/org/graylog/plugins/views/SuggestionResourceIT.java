@@ -38,14 +38,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @GraylogBackendConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
 public class SuggestionResourceIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    private String stream1Id;
-    private String stream2Id;
-
-    public SuggestionResourceIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static String stream1Id;
+    private static String stream2Id;
 
     record SuggestionsRequest(String field, String input,
                               @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Set<String> streams,
@@ -64,10 +60,11 @@ public class SuggestionResourceIT {
     }
 
     @BeforeAll
-    public void init() {
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
-        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
-        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
+        stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
+        stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
 
         api.gelf().createGelfHttpInput()
                 .postMessage(

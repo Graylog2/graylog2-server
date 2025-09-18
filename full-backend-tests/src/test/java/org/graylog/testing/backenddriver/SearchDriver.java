@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.utils.JsonUtils;
 import org.graylog.testing.utils.RangeUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -52,7 +51,7 @@ public class SearchDriver {
     private static final Logger LOG = LoggerFactory.getLogger(SearchDriver.class);
 
     /**
-     * @param Supplier to get the RequestSpecification from
+     * @param spec Supplier to get the RequestSpecification from
      * @return all messages' "message" field as List<String>
      */
     public static List<String> searchAllMessages(Supplier<RequestSpecification> spec) {
