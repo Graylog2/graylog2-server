@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Map;
 
@@ -30,10 +31,11 @@ import static org.hamcrest.core.StringContains.containsString;
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StartPageRecentActivityIT {
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public StartPageRecentActivityIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest
