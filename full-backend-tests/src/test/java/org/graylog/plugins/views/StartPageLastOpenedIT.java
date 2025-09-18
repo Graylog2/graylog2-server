@@ -32,7 +32,7 @@ import static org.hamcrest.core.StringContains.containsString;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StartPageLastOpenedIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
     private static final Users.User user = new Users.User(
             "john.doe2",
@@ -47,12 +47,9 @@ public class StartPageLastOpenedIT {
             List.of(RestPermissions.DASHBOARDS_CREATE)
     );
 
-    public StartPageLastOpenedIT(GraylogApis api) {
-        this.api = api;
-    }
-
     @BeforeAll
-    public void init() {
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
         api.users().createUser(user);
     }
 
