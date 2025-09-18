@@ -80,8 +80,6 @@ public class ActionTest {
 
     @Test
     public void testExecuteNotificationGetLink() {
-        when(event.id()).thenReturn(ID);
-
         String actionText = executeNotificationConfig().getLink(event);
 
         assertThat(actionText).isEqualTo("");
