@@ -56,15 +56,12 @@ public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
 
-    private final GraylogApis api;
-
-    public SearchAggregationsIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void setUp() {
-        this.api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
     }
 
     @ContainerMatrixTest
