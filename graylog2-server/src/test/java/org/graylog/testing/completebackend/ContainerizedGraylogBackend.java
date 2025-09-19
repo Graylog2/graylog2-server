@@ -107,7 +107,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         var searchServer = services.getSearchServerInstance();
         LOG.info("Running backend with SearchServer version {}", searchServer.version());
         try {
-            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
+            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), MongoDBInstance.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
         } catch (Exception ex) {
             // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
