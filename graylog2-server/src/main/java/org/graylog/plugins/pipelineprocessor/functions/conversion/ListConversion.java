@@ -47,16 +47,12 @@ public class ListConversion extends AbstractConversion<List> {
     public List evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
 
-        if (value == null) {
-            return Boolean.TRUE.equals(defaultToNull(args, context)) ? null : Collections.emptyList();
-        } else if (value instanceof List) {
-            return (List) value;
-        } else if (value instanceof JsonNode) {
-            final JsonNode jsonNode = (JsonNode) value;
-            return MAPPER.convertValue(jsonNode, List.class);
-        } else {
-            return Collections.emptyList();
-        }
+        return switch (value) {
+            case null -> Boolean.TRUE.equals(defaultToNull(args, context)) ? null : Collections.emptyList();
+            case List list -> list;
+            case JsonNode jsonNode -> MAPPER.convertValue(jsonNode, List.class);
+            default -> Collections.emptyList();
+        };
     }
 
     @Override
