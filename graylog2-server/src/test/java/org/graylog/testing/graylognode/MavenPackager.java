@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
+    private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip -Dassembly.skipAssembly ";
     private static final String EXCLUDE_FE = " -Dskip.web.build ";
 
     private static boolean jarHasBeenPackagedInThisRun = false;
