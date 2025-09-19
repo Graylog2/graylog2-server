@@ -31,7 +31,6 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
-import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.configuration.HttpConfiguration;
@@ -85,9 +84,6 @@ public class SlackEventNotificationTest {
 
     @Mock
     EventProcedureProvider mockEventProcedureProvider;
-
-    @Mock
-    EventProcedure mockEventProcedure;
 
     private SlackEventNotificationConfig slackEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
