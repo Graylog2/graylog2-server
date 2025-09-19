@@ -33,7 +33,6 @@ import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
 import org.graylog.testing.completebackend.apis.inputs.Inputs;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,7 +356,7 @@ public class GraylogApis implements GraylogRestApi {
         }
 
         public void waitForMessages(Collection<String> messages) {
-            search().waitForMessages(messages, RelativeRange.allTime(), Set.of(streamId));
+            search().waitForMessages(messages);
         }
 
         @Override
@@ -370,7 +369,6 @@ public class GraylogApis implements GraylogRestApi {
     public SearchEnvironment createEnvironment(PortBoundGelfInputApi gelfPort) throws ExecutionException, RetryException {
         final var randomId = RandomStringUtils.secure().next(8, false, true);
         final var indexSetId = this.indices().createIndexSet("Test Environment " + randomId, "An index set for tests", "searchenvironment" + randomId);
-        this.indices().waitForIndexNames(indexSetId);
         final var streamId = this.streams().createStream("Test Stream " + randomId, indexSetId, true, DefaultStreamMatches.REMOVE, Streams.StreamRule.exact(randomId, "test-environment", false));
 
         return new SearchEnvironment(randomId, streamId, indexSetId, gelfPort);

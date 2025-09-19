@@ -4,9 +4,14 @@ on:
   pull_request:
     types: [ opened, reopened, synchronize, edited, labeled ]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# The PR dispatch workflow runs should not cancel each other!
+# When opening a PR with labels (e.g., dependabot), we receive one "opened"
+# and one or more "labeled" events. If we would cancel the workflow run
+# for "opened" when receiving a "labeled", the PR build in
+# graylog-project-internal would not be triggered.
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
   dispatchedPR:
@@ -33,12 +38,6 @@ jobs:
           OLD_PR_BODY: "${{ github.event.changes.body.from }}"
           NEW_PR_BODY: "${{ github.event.pull_request.body }}"
 
-      - name: Check if PR got labeled for e2e-tests
-        if: "${{ github.event.action == 'labeled' && github.event.label.name == 'e2e-tests' }}"
-        id: e2e-tests-labeled
-        run: |
-          echo "triggered=true" | tee -a "$GITHUB_OUTPUT"
-
       - name: Check e2e-tests label
         id: e2e-tests
         run: |
@@ -54,7 +53,7 @@ jobs:
           PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
 
       - name: Dispatch job to graylog-project-internal
-        if: ${{ (github.event.action != 'edited' && github.event.action != 'labeled') || steps.pr-string-changed.outcome == 'success' || steps.e2e-tests-labeled.outputs.triggered == 'true' }}
+        if: ${{ (github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
