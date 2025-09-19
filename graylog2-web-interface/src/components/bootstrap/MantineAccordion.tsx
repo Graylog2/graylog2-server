@@ -16,17 +16,42 @@
  */
 import React from 'react';
 import { Accordion } from '@mantine/core';
+import { useTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+
+const getStyles = (theme: DefaultTheme, options: { noBackground?: boolean }) => ({
+  root: {
+    width: '100%',
+  },
+  item: {
+    backgroundColor: options.noBackground ? 'transparent' : theme.colors.background.body,
+    borderRadius: theme.spacings.xs,
+  },
+});
+
+export type ItemType = {
+  value: string;
+  label: React.ReactNode;
+  content: React.ReactNode;
+};
 
 type Props = {
-  accordionItems: {
-    value: string,
-    label: string,
-    content: any,
-  }[],
-  defaultValue: string,
-}
+  accordionItems: Array<ItemType>;
+  defaultValue: string;
+  chevronPosition?: 'left' | 'right';
+  variant?: 'default' | 'contained' | 'separated';
+  noBackground?: boolean;
+};
 
-const MantineAccordion = ({ accordionItems, defaultValue }: Props) => {
+const MantineAccordion = ({
+  accordionItems,
+  defaultValue,
+  chevronPosition = 'left',
+  variant = 'default',
+  noBackground = false,
+}: Props) => {
+  const theme = useTheme();
+  const styles = getStyles(theme, { noBackground });
   const items = accordionItems.map((item) => (
     <Accordion.Item key={item.value} value={item.value}>
       <Accordion.Control>{item.label}</Accordion.Control>
@@ -35,8 +60,10 @@ const MantineAccordion = ({ accordionItems, defaultValue }: Props) => {
   ));
 
   return (
-    <Accordion chevronPosition="left" defaultValue={defaultValue}>{items}</Accordion>
-  )
+    <Accordion styles={styles} variant={variant} chevronPosition={chevronPosition} defaultValue={defaultValue}>
+      {items}
+    </Accordion>
+  );
 };
 
 export default MantineAccordion;

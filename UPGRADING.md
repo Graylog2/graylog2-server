@@ -3,6 +3,13 @@ Upgrading to Graylog 7.0.x
 
 ## Breaking Changes
 
+### Java 21
+
+Graylog now requires Java 21 to run. Earlier versions are no longer supported.
+
+Our operating system packages and container images are shipping with the
+correct Java version.
+
 ### Kafka Inputs
 
 The `kafka-clients` library was updated to 4.x which removes support for Kafka
@@ -52,6 +59,7 @@ is now used as the primary color for elements like buttons and badges in the UI.
   - Sigma rules
   - Event procedure
   - Event step
+  - Content Pack installation
   
   <br> For example, the request payload to create a stream might now look like this:
 
@@ -77,7 +85,10 @@ is now used as the primary color for elements like buttons and badges in the UI.
 
 The following REST API changes have been made.
 
-| Endpoint                                                              | Description                                                                             |
-|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| `GET /<endpoint>`                                                     | description                                                                             |
-| `GET /<endpoint>`                                                     | description                                                                             |
+| Endpoint                          | Description                                                                                                                                                                                |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/urlallowlist`        | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                                                          |
+| `PUT /system/urlallowlist`        | Renamed from `PUT /system/urlwhitelist`                                                                         . The corresponding REST API permission is renamed to `urlallowlist:write` |
+| `POST /system/urlallowlist/check` | Renamed from `POST /system/urlwhitelist/check`                                                                                                                                             |
+| `POST /system/urlallowlist/generate_regex` | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                                                                    |
+| `GET /<endpoint>`                 | description                                                                                                                                                                                |

@@ -64,6 +64,7 @@ import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
+import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -319,16 +320,20 @@ type AssetInformationComponentProps = {
 };
 
 type EventProcedureFormProps = {
-  eventProcedureID: string | undefined;
-  remediationSteps: string;
-  onClose: () => void;
-  onSave: (eventProcedureId: string) => void;
+  eventProcedureId: string | undefined;
+  remediationSteps?: string;
+  onClose?: () => void;
+  onSave?: (eventProcedureId: string) => void;
+  onRemove?: (eventProcedureId: string) => void;
 };
 
 type EventProcedureSummaryProps = {
-  eventDefinitionEventProcedure: string | undefined;
+  eventProcedureId: string;
   eventId?: string;
   event?: Event;
+  canEdit?: boolean;
+  onRemove?: () => void;
+  onEdit?: () => void;
 };
 
 type SearchAction = {
@@ -372,6 +377,11 @@ type EventProcedureForm = {
 
 type EventProcedureSummary = {
   component: React.ComponentType<EventProcedureSummaryProps>;
+  key: string;
+};
+
+type SecurityEventsPage = {
+  component: React.ComponentType<{}>;
   key: string;
 };
 
@@ -493,6 +503,7 @@ export interface RootState {
   searchExecution: SearchExecution;
   searchMetadata: SearchMetadataState;
   undoRedo: UndoRedoState;
+  widgets: WidgetsState;
 }
 
 export interface ExtraArguments {
@@ -575,6 +586,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
     'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
+    'views.components.securityEventsPage'?: Array<SecurityEventsPage>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;

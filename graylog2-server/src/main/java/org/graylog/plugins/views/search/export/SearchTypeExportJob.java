@@ -24,6 +24,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import jakarta.validation.constraints.NotEmpty;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 @AutoValue
 @JsonAutoDetect
@@ -54,7 +56,7 @@ public abstract class SearchTypeExportJob implements ExportJob {
 
     @JsonCreator
     static SearchTypeExportJob create(
-            @JsonProperty(FIELD_ID) String id,
+            @JsonProperty(FIELD_ID) @Id @ObjectId String id,
             @JsonProperty(FIELD_SEARCH_ID) String searchId,
             @JsonProperty(FIELD_SEARCH_TYPE_ID) String searchTypeId,
             @JsonProperty(FIELD_RESULT_FORMAT) ResultFormat resultFormat

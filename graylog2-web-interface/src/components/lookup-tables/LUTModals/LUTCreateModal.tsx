@@ -31,7 +31,7 @@ type Props = {
   onClose: () => void;
   title?: string;
   lut?: LookupTableType;
-}
+};
 
 type Section = 'lookup' | 'cache' | 'adapter';
 
@@ -111,12 +111,19 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
   return (
     <Modal show fullScreen onHide={onClose}>
       <Modal.Header>
-        <Modal.Title>{title || "Create Lookup Table"}</Modal.Title>
+        <Modal.Title>{title || 'Create Lookup Table'}</Modal.Title>
         <Divider />
       </Modal.Header>
       <Stack>
         <div>
-          {(showCache || showAdapter) && <Header title="Lookup Table" section="lookup" activeSection={activeSection} handleSectionClick={handleSectionClick} />}
+          {(showCache || showAdapter) && (
+            <Header
+              title="Lookup Table"
+              section="lookup"
+              activeSection={activeSection}
+              handleSectionClick={handleSectionClick}
+            />
+          )}
           <Collapse in={activeSection === 'lookup'}>
             <LookupTableCreate
               create={!lut}
@@ -125,14 +132,20 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
               onCacheCreateClick={handleCacheCreateClick}
               onDataAdapterCreateClick={handleDataAdapterClick}
               dataAdapter={createdAdapterId}
-              cache={createdCacheId} />
+              cache={createdCacheId}
+            />
           </Collapse>
         </div>
 
         <Transition mounted={showCache} transition="slide-down" duration={300} timingFunction="ease">
           {(styles) => (
             <div style={styles}>
-              <Header title="Cache" section="cache" activeSection={activeSection} handleSectionClick={handleSectionClick} />
+              <Header
+                title="Cache"
+                section="cache"
+                activeSection={activeSection}
+                handleSectionClick={handleSectionClick}
+              />
             </div>
           )}
         </Transition>
@@ -145,7 +158,12 @@ const LUTCreateModal = ({ onClose, title = '', lut = undefined }: Props) => {
         <Transition mounted={showAdapter} transition="slide-down" duration={300} timingFunction="ease">
           {(styles) => (
             <div style={styles}>
-              <Header title="Data Adapter" section="adapter" activeSection={activeSection} handleSectionClick={handleSectionClick} />
+              <Header
+                title="Data Adapter"
+                section="adapter"
+                activeSection={activeSection}
+                handleSectionClick={handleSectionClick}
+              />
             </div>
           )}
         </Transition>

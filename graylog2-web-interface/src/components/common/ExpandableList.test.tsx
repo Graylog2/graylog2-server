@@ -22,76 +22,37 @@ import ExpandableList from 'components/common/ExpandableList';
 import ExpandableListItem from 'components/common/ExpandableListItem';
 
 describe('<ExpandableList />', () => {
-  it('should render with no children', async () => {
-    render(<ExpandableList />);
-
-    await screen.findByRole('list');
-  });
-
   it('should render with a Item', async () => {
     render(
       <ExpandableList>
-        <ExpandableListItem header="Wheel of time" onChange={() => {}}>
+        <ExpandableListItem header="Wheel of time" value="wheel-of-time">
           <span>Edmonds Field</span>
         </ExpandableListItem>
       </ExpandableList>,
     );
 
-    await screen.findByRole('list');
     await screen.findByRole('button', { name: /wheel of time/i });
 
-    expect(screen.queryByText('Edmonds Field')).not.toBeInTheDocument();
+    expect(await screen.findByText('Edmonds Field')).not.toBeVisible();
   });
 
   it('should render with a nested ExpandableList', async () => {
     render(
       <ExpandableList>
-        <ExpandableListItem expandable expanded header="Wheel of time" onChange={() => {}}>
+        <ExpandableListItem header="Wheel of time" value="parent-list-item">
           <ExpandableList>
-            <ExpandableListItem expandable expanded={false} header="Edmonds Field" onChange={() => {}} />
+            <ExpandableListItem header="Edmonds Field" value="child-list-item">
+              Child content
+            </ExpandableListItem>
           </ExpandableList>
         </ExpandableListItem>
       </ExpandableList>,
     );
 
-    await screen.findByRole('button', { name: /wheel of time/i });
+    const parentItem = await screen.findByRole('button', { name: /wheel of time/i });
 
-    expect(await screen.findAllByRole('list')).toHaveLength(2);
+    userEvent.click(parentItem);
 
     await screen.findByRole('button', { name: /edmonds field/i });
-  });
-
-  it('should expand a expandable list item', async () => {
-    render(
-      <ExpandableList>
-        <ExpandableListItem expandable header="Wheel of time" readOnly>
-          <ExpandableList>
-            <ExpandableListItem header="Edmonds Field" readOnly />
-          </ExpandableList>
-        </ExpandableListItem>
-      </ExpandableList>,
-    );
-
-    await userEvent.click(await screen.findByRole('button', { name: /expand list item/i }));
-
-    await screen.findByRole('button', { name: /edmonds field/i });
-  });
-
-  it('should select a selectable list item', async () => {
-    const checkFn = jest.fn();
-
-    render(
-      <ExpandableList>
-        <ExpandableListItem expanded header="Wheel of time" readOnly>
-          <ExpandableList>
-            <ExpandableListItem expanded selectable header="Edmonds Field" onChange={checkFn} />
-          </ExpandableList>
-        </ExpandableListItem>
-      </ExpandableList>,
-    );
-
-    await userEvent.click((await screen.findAllByRole('checkbox', { name: /select item/i }))[1]);
-
-    expect(checkFn).toHaveBeenCalledTimes(1);
   });
 });

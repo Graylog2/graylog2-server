@@ -287,6 +287,7 @@ public class IndexFieldTypeProfileServiceTest {
                 Duration.standardSeconds(5),
                 new CustomFieldMappings(),
                 profileId,
+                null,
                 null);
     }
 
