@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ * @jest-environment-options {"url":"https://something.foo:2342"}
+ */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -20,20 +24,14 @@ import AppConfig from 'util/AppConfig';
 
 jest.mock('util/AppConfig');
 
-const oldLocation = window.location.pathname;
-
-// eslint-disable-next-line compat/compat
-const mockLocation = (url: string): string & Location => new URL(url) as unknown as string & Location;
-
 describe('qualifyUrl', () => {
-  afterEach(() => {
-    window.location.pathname = oldLocation;
-  });
+  const setLocation = (pathname: string) => {
+    window.history.pushState({}, '', pathname);
+  };
 
   it('qualifies url with hostname/scheme from current location if server url is relative', () => {
     asMock(AppConfig.gl2ServerUrl).mockReturnValue('/api');
-    delete window.location;
-    window.location = mockLocation('https://something.foo:2342/gnarf/42?bar=23');
+    setLocation('/gnarf/42?bar=23');
 
     expect(qualifyUrl('/foo?baz=17')).toEqual('https://something.foo:2342/api/foo?baz=17');
   });
@@ -53,10 +51,6 @@ describe('qualifyUrl', () => {
   });
 
   describe('currentPathnameWithoutPrefix', () => {
-    const setLocation = (pathname: string) => {
-      window.location.pathname = pathname;
-    };
-
     const mockPathPrefix = (pathPrefix: string | undefined | null) =>
       asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
 
