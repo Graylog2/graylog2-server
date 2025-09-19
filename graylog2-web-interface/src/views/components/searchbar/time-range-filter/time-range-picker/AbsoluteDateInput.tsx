@@ -37,6 +37,7 @@ type Props = {
   value?: string | undefined;
   hasError?: boolean;
   className?: string;
+  label?: string;
 };
 
 const AbsoluteDateInput = ({
@@ -46,6 +47,7 @@ const AbsoluteDateInput = ({
   value = '',
   hasError = false,
   className = undefined,
+  label = undefined,
 }: Props) => {
   const { formatTime } = useUserDateTime();
   const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
@@ -57,6 +59,7 @@ const AbsoluteDateInput = ({
         type="text"
         id={`date-input-${name}`}
         name={name}
+        aria-label={label}
         autoComplete="off"
         disabled={disabled}
         onChange={_onChange}

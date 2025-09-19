@@ -26,6 +26,7 @@ type Props = {
   disabled?: boolean;
   range: 'to' | 'from';
   timeRange: AbsoluteTimeRange;
+  label: string;
 };
 
 const ErrorMessage = styled.span(
@@ -38,7 +39,7 @@ const ErrorMessage = styled.span(
   `,
 );
 
-const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
+const AbsoluteTimestamp = ({ disabled = false, timeRange, range, label }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => {
       const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
@@ -46,7 +47,7 @@ const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
 
       return (
         <>
-          <AbsoluteDateInput name={name} disabled={disabled} value={dateTime} onChange={_onChange} />
+          <AbsoluteDateInput name={name} disabled={disabled} value={dateTime} onChange={_onChange} label={label} />
 
           <ErrorMessage>{error}</ErrorMessage>
         </>

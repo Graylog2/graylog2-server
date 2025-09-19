@@ -117,7 +117,12 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
             </p>
             <FlexWrap>
               <RangeWrapper>
-                <AbsoluteTimestamp disabled={disabled} timeRange={activeTabTimeRange} range="from" />
+                <AbsoluteTimestamp
+                  disabled={disabled}
+                  timeRange={activeTabTimeRange}
+                  range="from"
+                  label="From timestamp"
+                />
               </RangeWrapper>
 
               <IconWrap>
@@ -125,7 +130,7 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
               </IconWrap>
 
               <RangeWrapper>
-                <AbsoluteTimestamp disabled={disabled} timeRange={activeTabTimeRange} range="to" />
+                <AbsoluteTimestamp disabled={disabled} timeRange={activeTabTimeRange} range="to" label="To timestamp" />
               </RangeWrapper>
             </FlexWrap>
           </TimestampContent>
