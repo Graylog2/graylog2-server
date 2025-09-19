@@ -17,21 +17,14 @@
 import React, { useMemo } from 'react';
 
 import Popover from 'components/common/Popover';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator } from 'views/Constants';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
-import type { ValueGroups, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
 
-const PieOnClickPopoverDropdown = ({
-  clickPoint,
-  config,
-}: {
-  clickPoint: ClickPoint;
-  config: AggregationWidgetConfig;
-}) => {
+const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
     const traceColor = getHoverSwatchColor(clickPoint);
@@ -80,6 +73,7 @@ const PieOnClickPopoverDropdown = ({
         rowPivotValues={rowPivotValues}
         columnPivotValues={columnPivotValues}
         metricValue={metricValue}
+        setFieldData={setFieldData}
       />
     </Popover.Dropdown>
   );

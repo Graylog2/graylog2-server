@@ -17,12 +17,11 @@
 import React, { useMemo } from 'react';
 
 import Popover from 'components/common/Popover';
-import type { ClickPoint, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
+import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
 import { keySeparator } from 'views/Constants';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 
-const HeatmapOnClickPopover = ({ clickPoint, config }: { config: AggregationWidgetConfig; clickPoint: ClickPoint }) => {
+const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
     const splitXValues: Array<string | number> = (clickPoint.x as string).split(keySeparator);
@@ -63,6 +62,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config }: { config: AggregationWidg
           columnPivotValues={columnPivotValues}
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
+          setFieldData={setFieldData}
         />
       </Popover.Dropdown>
     )
