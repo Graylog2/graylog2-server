@@ -17,6 +17,7 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
@@ -37,7 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -122,23 +126,23 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         if (config.serverLifecycle() == Lifecycle.VM && rootStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
             // this backend will be re-used and only shut down at the very end
             LOG.info("Creating VM-lifecycle backend");
-            final ContainerizedGraylogBackend graylogBackend = createBackend(config);
+            final ContainerizedGraylogBackend graylogBackend = createBackend(config, context.getRequiredTestClass());
             LOG.info("Created VM-lifecycle Graylog backend: {}", graylogBackend);
             rootStore.put(VM_LIFECYCLE_BACKEND_KEY, graylogBackend);
         } else if (config.serverLifecycle() == Lifecycle.CLASS) {
             // class lifecycle means we have to create a new backend
             LOG.info("Creating class-lifecycle backend");
-            var graylogBackend = createBackend(config);
+            var graylogBackend = createBackend(config, context.getRequiredTestClass());
             LOG.info("Created class-lifecyle graylog backend for class {}", context.getRequiredTestClass().getName());
             store.put(CLASS_LIFECYCLE_BACKEND_KEY, graylogBackend);
         }
     }
 
-    private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config) {
+    private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
         final SearchVersion searchVersion = getSearchVersion();
         final MongodbServer mongoVersion = getMongoVersion();
-        // List<URL> mongoDBFixtures = config.getMongoDBFixtures();
-        // List<String> enabledFeatureFlags = config.getEnabledFeatureFlags();
+        final List<URL> mongoDBFixtures = resolveFixtures(config.mongoDBFixtures(), testClass);
+        final List<String> enabledFeatureFlags = List.of(config.enabledFeatureFlags());
         PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
         PluginJarsProvider datanodePluginJarsProvider = FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider())
                                                                     .create();
@@ -156,16 +160,35 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 new ContainerizedGraylogBackendServicesProvider(),
                 searchVersion,
                 mongoVersion,
-                List.of(),
+                mongoDBFixtures,
                 pluginJarsProvider,
                 mavenProjectDirProvider,
-                List.of(),
+                enabledFeatureFlags,
                 config.importLicenses(),
                 withEnabledMailServer,
                 withEnabledWebhookServer,
                 configParams,
                 datanodePluginJarsProvider
         );
+    }
+
+    private static List<URL> resolveFixtures(final String[] fixtures, final Class<?> testClass) {
+        if (fixtures == null || fixtures.length == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(fixtures)
+                .map(resourceName -> {
+                    if (!Paths.get(resourceName).isAbsolute()) {
+                        try {
+                            return Resources.getResource(testClass, resourceName);
+                        } catch (IllegalArgumentException iae) {
+                            return Resources.getResource(resourceName);
+                        }
+                    } else {
+                        return Resources.getResource(resourceName);
+                    }
+                })
+                .toList();
     }
 
     private static SearchVersion getSearchVersion() {
