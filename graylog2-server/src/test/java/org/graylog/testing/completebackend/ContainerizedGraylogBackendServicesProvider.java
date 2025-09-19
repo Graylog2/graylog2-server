@@ -99,7 +99,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                     .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
                     .build());
 
-            final Future<MongoDBInstance> mongodbFuture = executorService.submit(withStopwatch(() -> MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion), "MongoDB"));
+            final Future<MongoDBInstance> mongodbFuture = executorService.submit(withStopwatch(() -> MongoDBInstance.createStarted(network, Lifecycle.VM, mongodbVersion), "MongoDB"));
             final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(withStopwatch(() -> withMailServerEnabled ? MailServerContainer.createStarted(network) : null, "Mailserver"));
             final Future<WebhookServerContainer> webhookServerContainerFuture = executorService.submit(withStopwatch(() -> withWebhookServerEnabled ? WebhookServerContainer.createStarted(network) : null, "WebhookTester"));
 
