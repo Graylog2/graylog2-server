@@ -25,6 +25,8 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
+import org.graylog.events.procedures.EventProcedure;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
@@ -41,9 +43,11 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -63,6 +67,7 @@ public class EmailEventNotification implements EventNotification {
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final Engine templateEngine;
     private final TemplateModelProvider templateModelProvider;
+    private final EventProcedureProvider eventProcedureProvider;
 
     @Inject
     public EmailEventNotification(EventNotificationService notificationCallbackService,
@@ -72,7 +77,8 @@ public class EmailEventNotification implements EventNotification {
                                   LookupTableService lookupTableService,
                                   EmailRecipients.Factory emailRecipientsFactory,
                                   Engine templateEngine,
-                                  TemplateModelProvider templateModelProvider) {
+                                  TemplateModelProvider templateModelProvider,
+                                  EventProcedureProvider eventProcedureProvider) {
         this.notificationCallbackService = notificationCallbackService;
         this.emailSender = emailSender;
         this.notificationService = notificationService;
@@ -81,11 +87,28 @@ public class EmailEventNotification implements EventNotification {
         this.emailRecipientsFactory = emailRecipientsFactory;
         this.templateEngine = templateEngine;
         this.templateModelProvider = templateModelProvider;
+        this.eventProcedureProvider = eventProcedureProvider;
     }
 
     @Override
     public void execute(EventNotificationContext ctx) throws TemporaryEventNotificationException, PermanentEventNotificationException {
-        final EmailEventNotificationConfig config = (EmailEventNotificationConfig) ctx.notificationConfig();
+        EmailEventNotificationConfig config = (EmailEventNotificationConfig) ctx.notificationConfig();
+
+        if (config.includeEventProcedure() && ctx.eventDefinition().isPresent()) {
+            final Optional<EventProcedure> eventProcedure = eventProcedureProvider
+                    .getDecoratedForEvent(ctx.eventDefinition().get().eventProcedureId(), ctx.event());
+            if (eventProcedure.isPresent()) {
+                if (!isNullOrEmpty(config.htmlBodyTemplate())) {
+                    config = config.toBuilder()
+                            .htmlBodyTemplate(config.htmlBodyTemplate() + eventProcedure.get().toHtml(ctx.event()))
+                            .build();
+                } else {
+                    config = config.toBuilder()
+                            .bodyTemplate(config.bodyTemplate() + eventProcedure.get().toText(ctx.event()))
+                            .build();
+                }
+            }
+        }
 
         try {
             ImmutableList<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);

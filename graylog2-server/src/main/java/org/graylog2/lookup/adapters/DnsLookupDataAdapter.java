@@ -33,7 +33,6 @@ import com.google.common.collect.Multimap;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dnslookup.ADnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.DnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.DnsClient;
@@ -422,9 +421,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
-    @JsonDeserialize(builder = DnsLookupDataAdapter.Config.Builder.class)
+    @JsonDeserialize(builder = Config.Builder.class)
     @JsonTypeName(NAME)
     public static abstract class Config implements LookupDataAdapterConfiguration {
 

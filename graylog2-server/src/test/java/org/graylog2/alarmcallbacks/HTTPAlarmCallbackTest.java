@@ -20,10 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.plugin.MessageFactory;
@@ -38,7 +39,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamMock;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -50,6 +51,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +70,7 @@ public class HTTPAlarmCallbackTest {
     private OkHttpClient httpClient;
     private ObjectMapper objectMapper;
     private HTTPAlarmCallback alarmCallback;
-    private UrlWhitelistService whitelistService;
+    private UrlAllowlistService allowlistService;
 
     private MockWebServer server;
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -77,8 +79,8 @@ public class HTTPAlarmCallbackTest {
     public void setUp() throws Exception {
         httpClient = new OkHttpClient();
         objectMapper = new ObjectMapperProvider().get();
-        whitelistService = mock(UrlWhitelistService.class);
-        alarmCallback = new HTTPAlarmCallback(httpClient, objectMapper, whitelistService);
+        allowlistService = mock(UrlAllowlistService.class);
+        alarmCallback = new HTTPAlarmCallback(httpClient, objectMapper, allowlistService);
 
         server = new MockWebServer();
     }
@@ -86,7 +88,7 @@ public class HTTPAlarmCallbackTest {
     @After
     public void shutDown() throws IOException {
         if (server != null) {
-            server.shutdown();
+            server.close();
         }
     }
 
@@ -101,9 +103,9 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void callSucceedsIfRemoteRequestSucceeds() throws Exception {
-        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+        when(allowlistService.isAllowlisted(anyString())).thenReturn(true);
 
-        server.enqueue(new MockResponse().setResponseCode(200));
+        server.enqueue(new MockResponse(200, Headers.of(), ""));
         server.start();
 
         final Configuration configuration = new Configuration(ImmutableMap.of("url", server.url("/").toString()));
@@ -140,11 +142,11 @@ public class HTTPAlarmCallbackTest {
         alarmCallback.call(stream, checkResult);
 
         final RecordedRequest request = server.takeRequest();
-        assertThat(request.getPath()).isEqualTo("/");
-        assertThat(request.getHeader("Content-Type")).isEqualTo("application/json");
+        assertThat(request.getUrl().encodedPath()).isEqualTo("/");
+        assertThat(request.getHeaders().get("Content-Type")).isEqualTo("application/json");
         assertThat(request.getBodySize()).isPositive();
 
-        final String requestBody = request.getBody().readUtf8();
+        final String requestBody = request.getBody().string(StandardCharsets.UTF_8);
         final JsonNode jsonNode = objectMapper.readTree(requestBody);
         assertThat(jsonNode.get("check_result").get("matching_messages").size()).isEqualTo(2);
         assertThat(jsonNode.get("check_result").get("triggered").asBoolean()).isTrue();
@@ -154,9 +156,9 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void callThrowsAlarmCallbackExceptionIfRemoteServerReturnsError() throws Exception {
-        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+        when(allowlistService.isAllowlisted(anyString())).thenReturn(true);
 
-        server.enqueue(new MockResponse().setResponseCode(500));
+        server.enqueue(new MockResponse(500, Headers.of(), ""));
         server.start();
 
         final Configuration configuration = new Configuration(ImmutableMap.of("url", server.url("/").toString()));
@@ -186,8 +188,8 @@ public class HTTPAlarmCallbackTest {
         alarmCallback.call(stream, checkResult);
 
         final RecordedRequest request = server.takeRequest();
-        assertThat(request.getPath()).isEqualTo("/");
-        assertThat(request.getHeader("Content-Type")).isEqualTo("application/json");
+        assertThat(request.getUrl().encodedPath()).isEqualTo("/");
+        assertThat(request.getHeaders().get("Content-Type")).isEqualTo("application/json");
         assertThat(request.getBodySize()).isPositive();
     }
 
@@ -220,14 +222,14 @@ public class HTTPAlarmCallbackTest {
     }
 
     @Test
-    public void callThrowsAlarmCallbackExceptionIfURLIsNotWhitelisted() throws Exception {
-        final Configuration configuration = new Configuration(ImmutableMap.of("url", "http://not-whitelisted"));
+    public void callThrowsAlarmCallbackExceptionIfURLIsNotAllowlisted() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of("url", "http://not-allowlisted"));
         alarmCallback.initialize(configuration);
 
         final Stream stream = new StreamMock(Collections.singletonMap("_id", "stream-id"));
 
         expectedException.expect(AlarmCallbackException.class);
-        expectedException.expectMessage("URL <http://not-whitelisted> is not whitelisted.");
+        expectedException.expectMessage("URL <http://not-allowlisted> is not allowlisted.");
 
         alarmCallback.call(stream, null);
     }
@@ -275,7 +277,7 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void checkConfigurationSucceedsWithValidConfiguration() throws Exception {
-        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+        when(allowlistService.isAllowlisted(anyString())).thenReturn(true);
 
         final Map<String, Object> configMap = ImmutableMap.of("url", "http://example.com/");
         final Configuration configuration = new Configuration(configMap);

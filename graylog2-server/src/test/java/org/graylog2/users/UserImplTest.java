@@ -16,6 +16,8 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +26,9 @@ import org.apache.shiro.authz.permission.AllPermission;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.Test;
@@ -49,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +74,10 @@ class UserImplTest {
     private UserImpl createUserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                                     Permissions permissions,
                                     Map<String, Object> fields) {
-        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, fields);
+        // Copy to avoid modifying the global instance
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get().copy();
+        objectMapper.registerSubtypes(new NamedType(DashboardStartPage.class, DashboardStartPage.TYPE));
+        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, objectMapper, fields);
     }
 
     @Test
@@ -217,4 +225,18 @@ class UserImplTest {
                 .extracting("class").containsOnlyOnce(AllPermission.class);
     }
 
+    @Test
+    void testStartPage() {
+        user = createUserImpl(null, null, null);
+        user.setStartpage(new DashboardStartPage("id"));
+        assertEquals("dashboard", user.getStartpage().type());
+        assertEquals("id", ((DashboardStartPage)user.getStartpage()).id());
+    }
+
+    @Test
+    void testNullStartPage() {
+        user = createUserImpl(null, null, null);
+        user.setStartpage(null);
+        assertNull(user.getStartpage());
+    }
 }

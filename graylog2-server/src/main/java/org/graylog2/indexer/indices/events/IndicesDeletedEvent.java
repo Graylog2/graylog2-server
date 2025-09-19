@@ -18,12 +18,10 @@ package org.graylog2.indexer.indices.events;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Set;
 
 @AutoValue
-@WithBeanGetter
 public abstract class IndicesDeletedEvent {
     public abstract Set<String> indices();
 

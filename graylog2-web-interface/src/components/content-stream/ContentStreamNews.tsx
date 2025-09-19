@@ -44,7 +44,9 @@ const ContentStreamNews = () => {
 
   return (
     <Carousel carouselId="content-stream-news">
-      {feedList?.map((feed) => <ContentStreamNewsItem key={feed?.guid['#text'] || feed?.title} feed={feed} />)}
+      {feedList?.map((feed) => (
+        <ContentStreamNewsItem key={feed?.guid['#text'] || feed?.title} feed={feed} />
+      ))}
     </Carousel>
   );
 };

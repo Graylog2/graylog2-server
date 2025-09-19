@@ -58,6 +58,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -77,34 +78,38 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PipelineInterpreterTest {
-    private static final RuleDao RULE_TRUE = RuleDao.create("true", "true", "true",
-            "rule \"true\"\n" +
-                    "when true\n" +
-                    "then\n" +
-                    "end", null, null, null, null);
-    private static final RuleDao RULE_FALSE = RuleDao.create("false", "false", "false",
-            "rule \"false\"\n" +
-                    "when false\n" +
-                    "then\n" +
-                    "end", null, null, null, null);
-    private static final RuleDao RULE_ADD_FOOBAR = RuleDao.create("add_foobar", "add_foobar", "add_foobar",
-            "rule \"add_foobar\"\n" +
-                    "when true\n" +
-                    "then\n" +
-                    "  set_field(\"foobar\", \"covfefe\");\n" +
-                    "end", null, null, null, null);
-    private static final java.util.function.Function<String, RuleDao> RULE_SET_FIELD = (name) -> RuleDao.create("false", "false", "false",
-            "rule \"" + name + "\"\n" +
-                    "when true\n" +
-                    "then\n" +
-                    "  set_field(\"" + name + "\", \"value\");" +
-                    "end", null, null, null, null);
-    private static final RuleDao RULE_DROP_MESSAGE = RuleDao.create("false", "false", "false",
-            "rule \"drop_message\"\n" +
-                    "when true\n" +
-                    "then\n" +
-                    "  drop_message();" +
-                    "end", null, null, null, null);
+    private static final RuleDao RULE_TRUE = RuleDao.create("true", null, "true", "true",
+            """
+                    rule "true"
+                    when true
+                    then
+                    end""", null, null, null, null);
+    private static final RuleDao RULE_FALSE = RuleDao.create("false", null, "false", "false",
+            """
+                    rule "false"
+                    when false
+                    then
+                    end""", null, null, null, null);
+    private static final RuleDao RULE_ADD_FOOBAR = RuleDao.create("add_foobar", null, "add_foobar", "add_foobar",
+            """
+                    rule "add_foobar"
+                    when true
+                    then
+                      set_field("foobar", "covfefe");
+                    end""", null, null, null, null);
+    private static final java.util.function.Function<String, RuleDao> RULE_SET_FIELD =
+            (name) -> RuleDao.create("false", null, "false", "false", "rule \"" + name + "\"\n" +
+                                                                      "when true\n" +
+                                                                      "then\n" +
+                                                                      "  set_field(\"" + name + "\", \"value\");" +
+                                                                      "end", null, null, null, null);
+    private static final RuleDao RULE_DROP_MESSAGE = RuleDao.create("false", null, "false", "false",
+            """
+                    rule "drop_message"
+                    when true
+                    then
+                      drop_message();\
+                    end""", null, null, null, null);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     private final RuleService ruleService = Mockito.mock(RuleService.class);
@@ -115,25 +120,24 @@ public class PipelineInterpreterTest {
     public void testCreateMessage() {
         final RuleService ruleService = mock(MongoDbRuleService.class);
         when(ruleService.loadAll()).thenReturn(Collections.singleton(
-                RuleDao.create("abc",
-                        "title",
-                        "description",
-                        "rule \"creates message\"\n" +
-                                "when to_string($message.message) == \"original message\"\n" +
-                                "then\n" +
-                                "  create_message(\"derived message\");\n" +
-                                "end",
-                        Tools.nowUTC(),
-                        null, null, null)
+                RuleDao.create("abc", null, "title", "description",
+                        """
+                                rule "creates message"
+                                when to_string($message.message) == "original message"
+                                then
+                                  create_message("derived message");
+                                end""", Tools.nowUTC(), null, null, null)
         ));
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"creates message\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match all
+                                    rule "creates message";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -159,12 +163,14 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"true\";\n" +
-                                "stage 1 match either\n" +
-                                "    rule \"add_foobar\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match all
+                                    rule "true";
+                                stage 1 match either
+                                    rule "add_foobar";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -189,13 +195,15 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"true\";\n" +
-                                "    rule \"false\";\n" +
-                                "stage 1 match either\n" +
-                                "    rule \"add_foobar\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match all
+                                    rule "true";
+                                    rule "false";
+                                stage 1 match either
+                                    rule "add_foobar";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -220,13 +228,15 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match either\n" +
-                                "    rule \"true\";\n" +
-                                "    rule \"false\";\n" +
-                                "stage 1 match either\n" +
-                                "    rule \"add_foobar\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match either
+                                    rule "true";
+                                    rule "false";
+                                stage 1 match either
+                                    rule "add_foobar";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -251,12 +261,14 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match either\n" +
-                                "    rule \"false\";\n" +
-                                "stage 1 match either\n" +
-                                "    rule \"add_foobar\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match either
+                                    rule "false";
+                                stage 1 match either
+                                    rule "add_foobar";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -281,13 +293,15 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match pass\n" +
-                                "    rule \"true\";\n" +
-                                "    rule \"false\";\n" +
-                                "stage 1 match pass\n" +
-                                "    rule \"add_foobar\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match pass
+                                    rule "true";
+                                    rule "false";
+                                stage 1 match pass
+                                    rule "add_foobar";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -312,12 +326,14 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match pass\n" +
-                                "    rule \"false\";\n" +
-                                "stage 1 match pass\n" +
-                                "    rule \"add_foobar\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match pass
+                                    rule "false";
+                                stage 1 match pass
+                                    rule "add_foobar";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -348,22 +364,26 @@ public class PipelineInterpreterTest {
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(ImmutableList.of(
                 PipelineDao.create("p1", null, "title1", "description",
-                        "pipeline \"pipeline1\"\n" +
-                                "stage 0 match pass\n" +
-                                "    rule \"1-a\";\n" +
-                                "    rule \"drop_message\";\n" +
-                                "stage 1 match pass\n" +
-                                "    rule \"1-b\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline1"
+                                stage 0 match pass
+                                    rule "1-a";
+                                    rule "drop_message";
+                                stage 1 match pass
+                                    rule "1-b";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null),
                 PipelineDao.create("p2", null, "title2", "description",
-                        "pipeline \"pipeline2\"\n" +
-                                "stage 0 match pass\n" +
-                                "    rule \"2-a\";\n" +
-                                "stage 1 match pass\n" +
-                                "    rule \"2-b\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline2"
+                                stage 0 match pass
+                                    rule "2-a";
+                                stage 1 match pass
+                                    rule "2-b";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -433,25 +453,25 @@ public class PipelineInterpreterTest {
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final RuleService ruleService = new InMemoryRuleService(clusterEventBus);
-        ruleService.save(RuleDao.create("abc",
-                "title",
-                "description",
-                "rule \"match_all\"\n" +
-                        "when true\n" +
-                        "then\n" +
-                        "end",
-                Tools.nowUTC(),
-                null, null, null)
+        DateTime createdAt = Tools.nowUTC();
+        ruleService.save(RuleDao.create("abc", null, "title", "description",
+                """
+                        rule "match_all"
+                        when true
+                        then
+                        end""", createdAt, null, null, null)
         );
 
         final PipelineService pipelineService = new InMemoryPipelineService(new ClusterEventBus());
         pipelineService.save(PipelineDao.create("cde", null, "title", "description",
-                "pipeline \"pipeline\"\n" +
-                        "stage 0 match all\n" +
-                        "    rule \"match_all\";\n" +
-                        "stage 1 match all\n" +
-                        "    rule \"match_all\";\n" +
-                        "end\n",
+                """
+                        pipeline "pipeline"
+                        stage 0 match all
+                            rule "match_all";
+                        stage 1 match all
+                            rule "match_all";
+                        end
+                        """,
                 Tools.nowUTC(),
                 null)
         );
@@ -528,21 +548,23 @@ public class PipelineInterpreterTest {
     @Test
     public void process_ruleConditionEvaluationErrorConvertedIntoMessageProcessingError() throws Exception {
         // given
-        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_condition", "broken_condition",
-                "broken_condition",
-                "rule \"broken_condition\"\n" +
-                        "when\n" +
-                        "    to_double($message.num * $message.num) > 0.0\n" +
-                        "then\n" +
-                        "    set_field(\"num_sqr\", $message.num * $message.num);\n" +
-                        "end", null, null, null, null)));
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_condition", null, "broken_condition", "broken_condition",
+                """
+                        rule "broken_condition"
+                        when
+                            to_double($message.num * $message.num) > 0.0
+                        then
+                            set_field("num_sqr", $message.num * $message.num);
+                        end""", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"broken_condition\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match all
+                                    rule "broken_condition";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -573,21 +595,23 @@ public class PipelineInterpreterTest {
     @Test
     public void process_ruleStatementEvaluationErrorConvertedIntoMessageProcessingError() throws Exception {
         // given
-        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_statement", "broken_statement",
-                "broken_statement",
-                "rule \"broken_statement\"\n" +
-                        "when\n" +
-                        "    has_field(\"num\")\n" +
-                        "then\n" +
-                        "    set_field(\"num_sqr\", $message.num * $message.num);\n" +
-                        "end", null, null, null, null)));
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_statement", null, "broken_statement", "broken_statement",
+                """
+                        rule "broken_statement"
+                        when
+                            has_field("num")
+                        then
+                            set_field("num_sqr", $message.num * $message.num);
+                        end""", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"broken_statement\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match all
+                                    rule "broken_statement";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));
@@ -619,21 +643,23 @@ public class PipelineInterpreterTest {
     @Test
     public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() {
         // given
-        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", "valid_rule",
-                "valid_rule",
-                "rule \"valid_rule\"\n" +
-                        "when\n" +
-                        "    has_field(\"num\")\n" +
-                        "then\n" +
-                        "    set_field(\"num_sqr\", to_double($message.num) * to_double($message.num));\n" +
-                        "end", null, null, null, null)));
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", null, "valid_rule", "valid_rule",
+                """
+                        rule "valid_rule"
+                        when
+                            has_field("num")
+                        then
+                            set_field("num_sqr", to_double($message.num) * to_double($message.num));
+                        end""", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", null, "title", "description",
-                        "pipeline \"pipeline\"\n" +
-                                "stage 0 match all\n" +
-                                "    rule \"valid_rule\";\n" +
-                                "end\n",
+                        """
+                                pipeline "pipeline"
+                                stage 0 match all
+                                    rule "valid_rule";
+                                end
+                                """,
                         Tools.nowUTC(),
                         null)
         ));

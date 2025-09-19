@@ -19,7 +19,6 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.timerangepresets.TimerangePreset;
 import org.graylog2.indexer.searches.timerangepresets.conversion.TimerangeOptionsToTimerangePresetsConversion;
@@ -88,7 +87,6 @@ public class V202305221200_MigrateTimerangeOptionsToTimerangePresets extends Mig
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
 
         @JsonCreator

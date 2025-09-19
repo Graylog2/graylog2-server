@@ -30,7 +30,6 @@ const AlertsPageComponent = () => {
   } = usePluggableLicenseCheck('/license/security');
   const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
 
-
   if (!validSecurityLicense) {
     return <EventsEntityTable />;
   }
@@ -42,7 +41,7 @@ const AlertsPageComponent = () => {
       ))}
     </>
   );
-}
+};
 
 const EventsPage = () => (
   <DocumentTitle title="Alerts &amp; Events">
@@ -60,9 +59,7 @@ const EventsPage = () => (
     </PageHeader>
 
     <Row className="content">
-      <Col md={12}>
-        {AlertsPageComponent()}
-      </Col>
+      <Col md={12}>{AlertsPageComponent()}</Col>
     </Row>
   </DocumentTitle>
 );
