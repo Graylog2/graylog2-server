@@ -20,10 +20,8 @@ package org.graylog2.indexer.indexset.restrictions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = HiddenIndexSetField.Builder.class)
 public abstract class HiddenIndexSetField implements IndexSetFieldRestriction {
 
