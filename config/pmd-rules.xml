@@ -28,4 +28,27 @@
         </properties>
     </rule>
 
+    <rule name="NoJsonPropertyWithoutValueInAutoValueClasses"
+          language="java"
+          message="Do not use @JsonProperty without an explicit value in @AutoValue classes."
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            Prohibits usage of @JsonProperty annotations without an explicit value in @AutoValue classes.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+                    <![CDATA[
+                    //ClassDeclaration[pmd-java:hasAnnotation("com.google.auto.value.AutoValue")]//Annotation[
+                      @SimpleName='JsonProperty' and (
+                        not(.//MemberValuePair[@Image='value']) or .//MemberValuePair[@Image='value']/StringLiteral[@Image='""']
+                      )
+                    ]
+                    ]]>
+                </value>
+            </property>
+        </properties>
+    </rule>
+
 </ruleset>

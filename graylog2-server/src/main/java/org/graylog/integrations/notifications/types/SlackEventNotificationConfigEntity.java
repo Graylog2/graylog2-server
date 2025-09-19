@@ -72,6 +72,9 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
     @JsonProperty(SlackEventNotificationConfig.FIELD_NOTIFY_HERE)
     public abstract ValueReference notifyHere();
 
+    @JsonProperty(SlackEventNotificationConfig.FIELD_INCLUDE_EVENT_PROCEDURE)
+    public abstract ValueReference includeEventProcedure();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -126,6 +129,9 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
         @JsonProperty(SlackEventNotificationConfig.FIELD_NOTIFY_HERE)
         public abstract Builder notifyHere(ValueReference notifyHere);
 
+        @JsonProperty(SlackEventNotificationConfig.FIELD_INCLUDE_EVENT_PROCEDURE)
+        public abstract Builder includeEventProcedure(ValueReference includeEventProcedure);
+
         public abstract SlackEventNotificationConfigEntity build();
     }
 
@@ -144,6 +150,7 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
                 .includeTitle(includeTitle().asBoolean(parameters))
                 .notifyHere(notifyHere().asBoolean(parameters))
+                .includeEventProcedure(includeEventProcedure().asBoolean(parameters))
                 .build();
     }
 }

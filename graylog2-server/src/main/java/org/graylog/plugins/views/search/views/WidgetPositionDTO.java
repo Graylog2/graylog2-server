@@ -20,11 +20,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetPositionDTO.Builder.class)
-@WithBeanGetter
 public abstract class WidgetPositionDTO {
     @JsonProperty("col")
     public abstract Position col();
@@ -55,6 +53,8 @@ public abstract class WidgetPositionDTO {
         public abstract WidgetPositionDTO build();
 
         @JsonCreator
-        public static Builder create() { return new AutoValue_WidgetPositionDTO.Builder(); }
+        public static Builder create() {
+            return new AutoValue_WidgetPositionDTO.Builder();
+        }
     }
 }
