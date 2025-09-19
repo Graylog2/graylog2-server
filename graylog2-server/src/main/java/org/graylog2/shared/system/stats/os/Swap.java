@@ -20,19 +20,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class Swap {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
-    @JsonProperty
+    @JsonProperty("free")
     public abstract long free();
 
-    @JsonProperty
+    @JsonProperty("used")
     public abstract long used();
 
     @JsonCreator

@@ -32,6 +32,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog2.database.entities.source.EntitySource.SYSTEM;
 import static org.graylog2.database.entities.source.EntitySource.USER_DEFINED;
 
 public class DBEntitySourceService {
@@ -40,6 +41,7 @@ public class DBEntitySourceService {
     private final MongoCollection<EntitySource> collection;
     public static final Set<FilterOption> FILTER_OPTIONS = Set.of(
             FilterOption.create(USER_DEFINED, "User Defined"),
+            FilterOption.create(SYSTEM, "System"),
             FilterOption.create("ILLUMINATE", "Illuminate"));
 
     @Inject
