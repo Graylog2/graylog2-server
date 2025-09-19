@@ -96,16 +96,18 @@ const clearIndicator = (base) => ({
 
 const multiValue =
   ({ theme }) =>
-    (base, state) => ({
+  (base, state) => ({
     ...base,
-    border: `1px solid ${ state.option?.[state.data?.value]?.isFixed ? theme.colors.variant.lightest.default :  theme.colors.variant.lighter.info}`,
-    background: state.option?.[state.data?.value]?.isFixed ? theme.colors.input.background : theme.colors.variant.lightest.info,
+    border: `1px solid ${state.option?.[state.data?.value]?.isFixed ? theme.colors.variant.lightest.default : theme.colors.variant.lighter.info}`,
+    background: state.option?.[state.data?.value]?.isFixed
+      ? theme.colors.input.background
+      : theme.colors.variant.lightest.info,
     color: state.option?.[state.data?.value]?.isFixed ? theme.colors.input.colorDisabled : theme.colors.text.secondary,
   });
 
 const multiValueLabel =
   ({ theme }) =>
-    (base, state) => ({
+  (base, state) => ({
     ...base,
     padding: '2px 5px',
     fontSize: theme.fonts.size.small,
@@ -537,7 +539,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       components: mergedComponents,
       menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
-      styles: {..._styles({ size, theme }), ...styles},
+      styles: { ..._styles({ size, theme }), ...styles },
       theme: this._selectTheme,
       total,
       value: formattedValue,
