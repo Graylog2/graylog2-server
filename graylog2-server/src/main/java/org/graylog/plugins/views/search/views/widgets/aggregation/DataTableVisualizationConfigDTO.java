@@ -31,9 +31,13 @@ public abstract class DataTableVisualizationConfigDTO implements VisualizationCo
     public static final String NAME = "table";
 
     private static final String FIELD_PINNED_COLUMNS = "pinned_columns";
+    private static final String FIELD_SHOW_ROW_NUMBERS = "show_row_numbers";
 
     @JsonProperty(FIELD_PINNED_COLUMNS)
     public abstract List<String> pinnedColumns();
+
+    @JsonProperty(FIELD_SHOW_ROW_NUMBERS)
+    public abstract boolean showRowNumbers();
 
     public static DataTableVisualizationConfigDTO.Builder builder() {
         return Builder.create();
@@ -45,13 +49,17 @@ public abstract class DataTableVisualizationConfigDTO implements VisualizationCo
     public static abstract class Builder {
 
         @JsonCreator
-        public static DataTableVisualizationConfigDTO.Builder create() {
+        public static Builder create() {
             return new AutoValue_DataTableVisualizationConfigDTO.Builder()
-                    .pinnedColumns(List.of());
+                    .pinnedColumns(List.of())
+                    .showRowNumbers(true);
         }
 
         @JsonProperty(FIELD_PINNED_COLUMNS)
-        public abstract DataTableVisualizationConfigDTO.Builder pinnedColumns(List<String> pinnedColumns);
+        public abstract Builder pinnedColumns(List<String> pinnedColumns);
+
+        @JsonProperty(FIELD_SHOW_ROW_NUMBERS)
+        public abstract Builder showRowNumbers(boolean showRowNumbers);
 
         public abstract DataTableVisualizationConfigDTO build();
     }

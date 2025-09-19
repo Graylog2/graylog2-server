@@ -216,7 +216,8 @@ const DataTable = ({
     [formContext?.dirty, editing, widget?.config, widget?.id, dispatch],
   );
 
-  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
+  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup, visualizationConfig } = config;
+  const showRowNumbers = (visualizationConfig as DataTableVisualizationConfig)?.showRowNumbers ?? true;
   const widgetUnits = useWidgetUnits(config);
 
   const rows = retrieveChartData(data) ?? [];
@@ -271,6 +272,7 @@ const DataTable = ({
 
     return (
       <DataTableEntry
+        index={idx + 1}
         key={key}
         fields={effectiveFields}
         item={reducedItem}
@@ -279,6 +281,7 @@ const DataTable = ({
         columnPivotValues={actualColumnPivotFields}
         types={fields}
         series={series}
+        showRowNumbers={showRowNumbers}
         units={widgetUnits}
       />
     );
@@ -308,6 +311,7 @@ const DataTable = ({
               setLoadingState={setLoadingState}
               pinnedColumns={pinnedColumns}
               togglePin={togglePin}
+              showRowNumbers={showRowNumbers}
             />
           </THead>
           <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>

@@ -23,6 +23,7 @@ import DataTable from './DataTable';
 
 type DataTableVisualizationConfigFormValues = {
   pinnedColumns: Array<string>;
+  showRowNumbers: boolean;
 };
 const dataTable: VisualizationType<typeof DataTable.type> = {
   type: DataTable.type,
@@ -31,10 +32,11 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
   config: {
     createConfig: () => ({ pinnedColumns: [] }),
     fromConfig: (config: DataTableVisualizationConfig | undefined) => ({
-      pinnedColumns: config?.pinnedColumns.toJS() ?? [],
+      pinnedColumns: config?.pinnedColumns.toArray() ?? [],
+      showRowNumbers: config?.showRowNumbers ?? true,
     }),
     toConfig: (formValues: DataTableVisualizationConfigFormValues) =>
-      DataTableVisualizationConfig.create(formValues.pinnedColumns),
+      DataTableVisualizationConfig.create(formValues.pinnedColumns, formValues.showRowNumbers),
     fields: [
       {
         name: 'pinnedColumns',
@@ -45,6 +47,11 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
             .filter((grouping) => grouping?.direction === 'row' && grouping?.fields)
             .flatMap((grouping) => grouping.fields) ?? [],
         required: false,
+      },
+      {
+        name: 'showRowNumbers',
+        title: 'Show Row Numbers',
+        type: 'boolean',
       },
     ],
   },
