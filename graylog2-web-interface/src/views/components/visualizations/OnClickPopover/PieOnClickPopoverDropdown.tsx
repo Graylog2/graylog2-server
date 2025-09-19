@@ -31,7 +31,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
     const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
       keySeparator,
     );
-    const metric = splitNames.pop() as string;
+    const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
