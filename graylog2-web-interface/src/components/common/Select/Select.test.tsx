@@ -45,7 +45,7 @@ describe('Select', () => {
 
     await selectEvent.chooseOption('Select value', 'foo');
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith('foo'));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith('foo', expect.any(Object)));
   });
 
   it('works with non-string options', async () => {
@@ -57,7 +57,7 @@ describe('Select', () => {
 
     await selectEvent.chooseOption('Select value', '42');
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(42, expect.any(Object)));
   });
 
   describe('Upgrade to react-select v2', () => {
@@ -67,7 +67,7 @@ describe('Select', () => {
 
       await selectEvent.chooseOption('Select value', ['label1', 'label2']);
 
-      await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1,value2'));
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1,value2', expect.any(Object)));
     });
 
     it('should disable select', async () => {
@@ -82,11 +82,11 @@ describe('Select', () => {
 
       await selectEvent.chooseOption('Select value', 'label1');
 
-      await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1'));
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1', expect.any(Object)));
 
       selectEvent.clearAll(container, 'simple-select');
 
-      expect(onChange).toHaveBeenCalledWith('');
+      expect(onChange).toHaveBeenCalledWith('', expect.any(Object));
     });
 
     it('should use displayKey to select the option label', async () => {
@@ -107,7 +107,7 @@ describe('Select', () => {
 
       await selectEvent.chooseOption('Select value', 'label1');
 
-      await waitFor(() => expect(onChange).toHaveBeenCalledWith(42));
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith(42, expect.any(Object)));
     });
 
     it("should use optionRenderer to customize options' appearance", async () => {
