@@ -59,6 +59,11 @@ then
         map_5: to_map(true),              // empty map
         map_6: to_map($message.not_there), // empty map
         map_default_null: to_bool(value: $message.not_there, defaultToNull:true)  // null
+
+        list_1: to_list(["foo"]),               // ["foo"]
+        list_2: to_list("abc"),                 // empty list
+        list_3: to_list($message.not_there),    // empty list
+        list_default_null: to_bool(value: $message.not_there, defaultToNull:true) // null
     });
     set_field("string_default_null_set_single_field", to_long(value: $message.not_there, defaultToNull:true)); // null
     set_field("long_default_null_set_single_field", to_long(value: $message.not_there, defaultToNull:true)); // null
@@ -66,4 +71,5 @@ then
     set_field("bool_default_null_set_single_field", to_bool(value: $message.not_there, defaultToNull:true)); // null
     set_field("ip_default_null_set_single_field", to_ip(ip: $message.not_there, defaultToNull:true)); // null
     set_field("map_default_null_set_single_field", to_map(value: $message.not_there, defaultToNull:true)); // null
+    set_field("list_default_null_set_single_field", to_list(value: $message.not_there, defaultToNull:true)); // null
 end
