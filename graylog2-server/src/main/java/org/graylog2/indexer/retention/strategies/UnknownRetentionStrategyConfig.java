@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 
 /**
@@ -31,7 +30,6 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class UnknownRetentionStrategyConfig implements RetentionStrategyConfig {
 

@@ -20,14 +20,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class SingleLoggerSummary {
-    @JsonProperty
+    @JsonProperty("level")
     public abstract String level();
+
     @JsonProperty("level_syslog")
     public abstract int levelSyslog();
 
