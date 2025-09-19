@@ -55,6 +55,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     private static final ConcurrentMap<String, MongoDBTestService> CACHED_SERVICE = new ConcurrentHashMap<>();
 
     private final Lifecycle lifecycle;
+    private final MongodbServer version;
     private final MongoDBTestService service;
 
     private MongoDBFixtureImporter fixtureImporter;
@@ -94,6 +95,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
 
     private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongodbServer version, Network network, final boolean closeNetwork) {
         this.lifecycle = lifecycle;
+        this.version = version;
         this.closeNetwork = closeNetwork;
         this.network = Optional.of(network);
 
@@ -173,7 +175,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public void close() {
         try {
             service.close();
-            if(closeNetwork) {
+            if (closeNetwork) {
                 network.ifPresent(Network::close);
             }
         } catch (Exception e) {
@@ -193,5 +195,9 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         } else {
             new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(resourceName))).importResources(service.mongoDatabase());
         }
+    }
+
+    public MongodbServer version() {
+        return version;
     }
 }

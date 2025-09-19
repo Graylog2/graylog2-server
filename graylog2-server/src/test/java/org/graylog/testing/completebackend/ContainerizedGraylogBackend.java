@@ -92,10 +92,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         this.services = services;
 
         var mongoDB = services.getMongoDBInstance();
+        LOG.info("Running backend with MongoDB version {}", mongoDB.version());
         mongoDB.importFixtures(mongoDBFixtures);
 
         var skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
-        if(!skipPackaging) {
+        if (!skipPackaging) {
             MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
         }
 
