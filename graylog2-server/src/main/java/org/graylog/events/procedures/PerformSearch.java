@@ -27,13 +27,12 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Redirects the frontend to either a saved search or a defined search via the URL field.
@@ -97,22 +96,10 @@ public class PerformSearch extends Action {
 
         public abstract Builder toBuilder();
 
-        @JsonIgnore
-        @Override
-        public String toText(EventDto event) {
-            return getLink(event);
-        }
 
         @JsonIgnore
         @Override
-        public String toHtml(EventDto event) {
-            return f("""
-                    <td><a href="%s" target="_blank">Perform Search</a></td>
-                    """, getLink(event));
-        }
-
-        @JsonIgnore
-        private String getLink(EventDto event) {
+        public URIBuilder getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             if (Boolean.TRUE.equals(useSavedSearch())) {
                 uriBuilder.setPath("views/" + savedSearch());
@@ -121,7 +108,7 @@ public class PerformSearch extends Action {
                 uriBuilder.setPath("search");
                 uriBuilder.addParameter("q", query());
             }
-            if (event.replayInfo().isPresent()
+            if (event != null && event.replayInfo().isPresent()
                     && event.replayInfo().get().timerangeStart() != null
                     && event.replayInfo().get().timerangeEnd() != null) {
                 uriBuilder.addParameter("rangetype", "absolute");
@@ -129,7 +116,7 @@ public class PerformSearch extends Action {
                 uriBuilder.addParameter("to", event.replayInfo().get().timerangeEnd().toString());
             }
 
-            return uriBuilder.build().getLink();
+            return uriBuilder.build().getLinkPath();
         }
 
         @AutoValue.Builder
