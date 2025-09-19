@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupCacheKey;
@@ -109,7 +108,6 @@ public class NullCache extends LookupCache {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     @JsonDeserialize(builder = AutoValue_NullCache_Config.Builder.class)
     @JsonTypeName(NAME)
     public abstract static class Config implements LookupCacheConfiguration {

@@ -52,8 +52,8 @@ import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_TEMPLATE_TYPE;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
@@ -208,6 +208,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void ensureSystemNotificationEventsDefinition() {
+        // This migration installs a system-provided event definition. Its related entry in the entity_source
+        // collection is installed via a different migration (V20250917184400_AddSystemEntitySource). Any future
+        // migrations that install system-provided entities should take care of adding the entity_source entry as well.
         try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
             if (eventDefinitionStream.findAny().isEmpty()) {
                 EventDefinitionDto eventDto =

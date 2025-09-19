@@ -42,7 +42,7 @@
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.15.0</opensearch.version>
+        <opensearch.version>2.19.3</opensearch.version>
         <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
         <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
 
@@ -76,11 +76,6 @@
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog.autovalue</groupId>
-            <artifactId>auto-value-javabean</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -556,7 +551,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                a72f218b581903b1ddf1072498560bc5304516ed57feb39735f920985740366c2779ed9174251a13b9a9dabdfc184119c325bb387dadf96485dc7964ecf32d54
+                                13c1df3bf6e8a46bff1e43d6ac664b82c3e839283b9a10c9fd549d1b44f9f039e24de91f51063d7d0a9945d6d6136e9d8a47588a7d9867405501274d4c943df3
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -580,7 +575,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                866c348ac39b7b35e671917349269383c75e1f9d10768742067807569180d1914fd09c6ae7e71d5e74bd77c8c8165ea17c19290b71f887f074dfe8e68dff66bb
+                                64929d121359ca8fc4291a3398914b6212998f1be678a516056b72b614656c604e50ded47273d5f376265d15c43b2d0b1883e40faeebb84b04205d623c065a6b
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -606,7 +601,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
+                                098a94a0a959caa70ed286d232f8d4d9a064aa70f85c6a1198f1fd030196721c232b9084efcad9aa27188ad10827b7f6a8f89f54573ad12098dc7053e965990d
                             </sha512>
                         </configuration>
                     </execution>
@@ -623,7 +618,7 @@
                             <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                b6e6039d002dba0184adb0e1992d2d26d58d06a57d167871e8b40802bcc1cb7ed12132fb3956e43c0dd91eb60eab7dc3e0d830926cdeb7574c53398c8d253cf9
+                                70a574d41f0269f7e91e1558960270a7dc98cc233653babd454d66f990ec4d8ee49f6fb6860a61c6760118c1ddc821c8f64ecb42b016ab4d57e89af7f6df00e1
                             </sha512>
                         </configuration>
                     </execution>
@@ -640,7 +635,7 @@
                             <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                b1d961d168bd2a36d31a22b85478b1024650fe464fe7ed642b7fd5f30bc2bdf686f6ec6b53cac93e18f13a4621b22bd121f1ebf06a9975e524f34524e059d955
+                                29167547c1d89ae5df44f9880f9fe8aa405d2518d1c7b4f29822b96ed18a0d6c4914b8c251a6b27553a6ccf43db3920addec23ee57e39a8345ce99f5748ca139
                             </sha512>
                         </configuration>
                     </execution>
@@ -688,6 +683,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
                                 <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
                                 and need to be removed in correct order-->
+                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-alerting</argument>
                                 <argument>opensearch-custom-codecs</argument>
                                 <argument>opensearch-geospatial</argument>
@@ -697,9 +693,9 @@
                                 <argument>opensearch-notifications-core</argument>
                                 <argument>opensearch-performance-analyzer</argument>
                                 <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-sql</argument>
                                 <argument>opensearch-observability</argument>
+                                <argument>query-insights</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -715,6 +711,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
                                 <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
                                 and need to be removed in correct order-->
+                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-alerting</argument>
                                 <argument>opensearch-custom-codecs</argument>
                                 <argument>opensearch-geospatial</argument>
@@ -724,9 +721,9 @@
                                 <argument>opensearch-notifications-core</argument>
                                 <argument>opensearch-performance-analyzer</argument>
                                 <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-security-analytics</argument>
                                 <argument>opensearch-sql</argument>
                                 <argument>opensearch-observability</argument>
+                                <argument>query-insights</argument>
                             </arguments>
                         </configuration>
                     </execution>
