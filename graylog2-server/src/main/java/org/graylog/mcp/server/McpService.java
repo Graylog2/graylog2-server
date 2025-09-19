@@ -23,12 +23,14 @@ import io.modelcontextprotocol.spec.ProtocolVersions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.SecurityContext;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.shared.ServerVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,7 +90,17 @@ public class McpService {
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
                 final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
-                return Optional.of(new McpSchema.ReadResourceResult(List.of()));
+                McpSchema.ResourceContents contents;
+                try {
+                    final McpSchema.Resource resource = this.resourceProviders
+                            .get(GRNRegistry.createWithBuiltinTypes().parse(readResourceRequest.uri()).grnType())
+                            .read(new URI(readResourceRequest.uri())
+                    );
+                    contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
+                } catch (Exception e) {
+                    throw new McpException("Failed to read resource: " + e.getMessage());
+                }
+                return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.info("Listing available tools");

@@ -67,7 +67,8 @@ public class StreamResourceProvider extends ResourceProvider {
         return McpSchema.Resource.builder()
                 .name(stream.getTitle())
                 .description(stream.getDescription())
-                .uri(URI.create(GRN.builder().grnType(GRNTypes.STREAM).entity(stream.getId()).build().toString()).toString())
+//                .uri(URI.create(GRN.builder().grnType(GRNTypes.STREAM).entity(stream.getId()).build().toString()).toString())  // <--- This throws a "Missing required properties: type" error
+                .uri(grn.toString())
                 .build();
     }
 
