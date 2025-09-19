@@ -23,6 +23,7 @@ import { ConfirmLeaveDialog } from 'components/common';
 import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import withHistory from 'routing/withHistory';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -98,6 +99,7 @@ class EventNotificationFormContainer extends React.Component {
   handleSubmit = () => {
     const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
+    const currentUser = CurrentUserStore.getInitialState();
 
     this.setState({ isDirty: false });
 
@@ -106,7 +108,11 @@ class EventNotificationFormContainer extends React.Component {
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
 
-      promise.then(
+      promise
+        .then(() => {
+          CurrentUserStore.update(currentUser.currentUser.username);
+        })
+        .then(
         () => {
           if (!embedded) {
             history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
