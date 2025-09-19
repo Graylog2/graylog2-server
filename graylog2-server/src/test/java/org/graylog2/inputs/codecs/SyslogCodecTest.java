@@ -460,7 +460,7 @@ public class SyslogCodecTest {
 
         assertThat(message).isNotNull();
         assertThat(message.getField("url")).isEqualTo("/p/AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM=w92-h92-n-k-no");
-        assertThat(message.getField("F1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM")).isNull();
+        assertThat(message.getField("AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM")).isNull();
         assertThat(message.getFields().containsValue("w92-h92-n-k-no")).isFalse();
     }
 
