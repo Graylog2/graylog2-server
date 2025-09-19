@@ -74,7 +74,7 @@ public class McpResource extends RestResource {
         // According to: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#protocol-version-header
         // TODO: (mcpService.currentSessions.get(sessionId).negotiatedProtocol() != headers.getHeaderString("MCP-Protocol-Version"))
         if (Optional.ofNullable(headers.getHeaderString("MCP-Protocol-Version"))
-                .map(mcpService.supportedVersions::contains)
+                .map(version -> !mcpService.supportedVersions.contains(version))
                 .orElse(false)) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(objectMapper.createObjectNode().put("error", "Invalid protocol version"))
