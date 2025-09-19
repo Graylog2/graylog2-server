@@ -16,14 +16,12 @@
  */
 
 import type { PlotData, PlotMouseEvent, Datum, Color } from 'plotly.js';
+import type React from 'react';
+
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 export type ValueGroupItem = { field: string; value: Datum; text: string; traceColor: string | number };
 
-export type ValueGroups = {
-  metricValue?: ValueGroupItem;
-  rowPivotValues?: Array<ValueGroupItem>;
-  columnPivotValues?: Array<ValueGroupItem>;
-};
 export type ExtraPlotData = {
   fullData: PlotData;
   data: {
@@ -39,3 +37,23 @@ export type ExtraPlotData = {
 };
 export type ClickPoint = PlotMouseEvent['points'][number] & ExtraPlotData;
 export type Rel = { x: number; y: number };
+export type FieldData = {
+  field: string;
+  value: Datum;
+};
+
+export type OnClickPopoverDropdownProps = {
+  clickPoint: ClickPoint;
+  config: AggregationWidgetConfig;
+  setFieldData: React.Dispatch<React.SetStateAction<FieldData>>;
+};
+
+export type OnClickPopoverDropdown = React.ComponentType<OnClickPopoverDropdownProps>;
+
+export type ValueGroups = {
+  metricValue?: ValueGroupItem;
+  rowPivotValues?: Array<ValueGroupItem>;
+  columnPivotValues?: Array<ValueGroupItem>;
+};
+
+export type ValueGroupsProps = ValueGroups & { setFieldData: React.Dispatch<React.SetStateAction<FieldData>> };
