@@ -16,6 +16,8 @@
  */
 package org.graylog.mcp.server;
 
+import org.graylog.mcp.resources.EventDefinitionResourceProvider;
+import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
 import org.graylog.mcp.tools.ListStreamsTool;
 import org.graylog2.plugin.PluginModule;
@@ -30,5 +32,7 @@ public class McpServerModule extends PluginModule {
         // ensure it's always there
         mcpResourceBinder();
         addMcpResource(StreamResourceProvider.GRN_TYPE, StreamResourceProvider.class);
+        addMcpResource(DashboardResourceProvider.GRN_TYPE, DashboardResourceProvider.class);
+        addMcpResource(EventDefinitionResourceProvider.GRN_TYPE, EventDefinitionResourceProvider.class);
     }
 }
