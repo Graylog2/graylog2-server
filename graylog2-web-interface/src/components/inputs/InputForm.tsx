@@ -133,9 +133,11 @@ const InputForm = ({
       submitAction={onSubmit}
       typeName={typeName}
       cancelAction={onCancel}>
-      <Alert bsStyle="info">
-        {description}
-      </Alert>
+      {description && (
+        <Alert bsStyle="info">
+          {description}
+        </Alert>
+      )}
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
       </HideOnCloud>
