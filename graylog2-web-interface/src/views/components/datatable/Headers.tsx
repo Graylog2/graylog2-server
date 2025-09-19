@@ -264,7 +264,7 @@ const Headers = ({
   pinnedColumns = Immutable.Set(),
   togglePin,
   setLoadingState,
-  showRowNumbers,
+  showRowNumbers = true,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
