@@ -27,7 +27,6 @@ import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
@@ -212,7 +211,6 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("content_pack_id")
         public abstract String contentPackId();

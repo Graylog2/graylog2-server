@@ -20,21 +20,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 
 @AutoValue
-@WithBeanGetter
 public abstract class ConstraintCheckResult {
-    @JsonProperty
+    @JsonProperty("constraint")
     public abstract Constraint constraint();
 
-    @JsonProperty
+    @JsonProperty("fulfilled")
     public abstract boolean fulfilled();
 
     @JsonCreator
     public static ConstraintCheckResult create(@JsonProperty("constraint") Constraint constraint, @JsonProperty("fulfilled") boolean fulfilled) {
-       return new AutoValue_ConstraintCheckResult(constraint, fulfilled);
+        return new AutoValue_ConstraintCheckResult(constraint, fulfilled);
     }
 }
