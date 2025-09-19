@@ -197,7 +197,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         }
     }
 
-    public MongodbServer version() {
-        return version;
+    public String version() {
+        return version.getVersion();
     }
 }
