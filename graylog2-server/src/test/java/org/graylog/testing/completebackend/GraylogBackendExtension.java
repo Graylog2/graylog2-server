@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.completebackend;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
@@ -131,9 +132,10 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             rootStore.put(VM_LIFECYCLE_BACKEND_KEY, graylogBackend);
         } else if (config.serverLifecycle() == Lifecycle.CLASS) {
             // class lifecycle means we have to create a new backend
-            LOG.info("Creating class-lifecycle backend");
+            LOG.info("Creating class-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
+            final var sw = Stopwatch.createStarted();
             var graylogBackend = createBackend(config, context.getRequiredTestClass());
-            LOG.info("Created class-lifecyle graylog backend for class {}", context.getRequiredTestClass().getName());
+            LOG.info("Created class-lifecycle server backend for class {} in {}", context.getRequiredTestClass().getName(), sw.stop().elapsed());
             store.put(CLASS_LIFECYCLE_BACKEND_KEY, graylogBackend);
         }
     }
@@ -145,16 +147,16 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         final List<String> enabledFeatureFlags = List.of(config.enabledFeatureFlags());
         PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
         PluginJarsProvider datanodePluginJarsProvider = FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider())
-                                                                    .create();
+                .create();
         MavenProjectDirProvider mavenProjectDirProvider = FactoryUtils.instantiateFactory(config.mavenProjectDirProvider())
-                                                                      .create();
+                .create();
         boolean withEnabledMailServer = config.withMailServerEnabled();
         boolean withEnabledWebhookServer = config.withWebhookServerEnabled();
         final Map<String, String> configParams = Arrays.stream(config.additionalConfigurationParameters())
-                                                       .collect(Collectors.toMap(
-                                                               GraylogBackendConfiguration.ConfigurationParameter::key,
-                                                               GraylogBackendConfiguration.ConfigurationParameter::value
-                                                       ));
+                .collect(Collectors.toMap(
+                        GraylogBackendConfiguration.ConfigurationParameter::key,
+                        GraylogBackendConfiguration.ConfigurationParameter::value
+                ));
 
         return ContainerizedGraylogBackend.createStarted(
                 new ContainerizedGraylogBackendServicesProvider(),
@@ -196,10 +198,10 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         if (searchVersionProperty != null) {
             try {
                 return SearchServer.valueOf(searchVersionProperty.toUpperCase(Locale.ENGLISH)).getSearchVersion();
-            }  catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 LOG.error("Invalid search version property: {}. Valid values are: {}",
-                          searchVersionProperty,
-                          Arrays.toString(SearchServer.values()));
+                        searchVersionProperty,
+                        Arrays.toString(SearchServer.values()));
                 throw e;
             }
         }
@@ -213,8 +215,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 return MongodbServer.valueOf(mongodbVersionProperty);
             } catch (IllegalArgumentException e) {
                 LOG.error("Invalid mongodb version property: {}. Valid values are: {}",
-                          mongodbVersionProperty,
-                          Arrays.toString(MongodbServer.values()));
+                        mongodbVersionProperty,
+                        Arrays.toString(MongodbServer.values()));
                 throw e;
             }
         }
@@ -231,7 +233,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         final SearchVersion actualSearchVersion = getSearchVersion();
         if (!actualSearchVersion.isDataNode() && backendConfiguration.get().onlyOnDataNode()) {
             return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected: {}",
-                                                      actualSearchVersion.toString());
+                    actualSearchVersion.toString());
         }
         return ConditionEvaluationResult.enabled(null);
     }
