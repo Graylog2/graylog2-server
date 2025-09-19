@@ -182,16 +182,17 @@ public class NodeContainerFactory {
 
     private static WaitAllStrategy getWaitStrategy(Map<String, String> env) {
         final WaitAllStrategy waitAllStrategy = new WaitAllStrategy().withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(
-                        List.of(
-                                ".*Graylog server up and running.*",
-                                ".*It seems you are starting Graylog for the first time. To set up a fresh install.*"
-                        ),
-                        List.of(
-                                ".*Exception while running migrations.*",
-                                ".*Graylog startup failed.*",
-                                ".*Guice/MissingImplementation.*"
-                        )));
-        if(indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
+                List.of(
+                        ".*Graylog server up and running.*",
+                        ".*It seems you are starting Graylog for the first time. To set up a fresh install.*"
+                ),
+                List.of(
+                        ".*Exception while running migrations.*",
+                        ".*Graylog startup failed.*",
+                        ".*Guice/MissingImplementation.*",
+                        ".*Unknown host.*"
+                )));
+        if (indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
             // To be able to search for data we need the index ranges to be computed. Since this is an async
             // background job, we need to wait until they have been created.
             final var baseUrl = Optional.ofNullable(env.get("GRAYLOG_HTTP_PUBLISH_URI"))
