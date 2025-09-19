@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.search.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.joda.time.DateTime;
@@ -30,36 +29,35 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SearchResponse {
-    @JsonProperty
+    @JsonProperty("query")
     public abstract String query();
 
-    @JsonProperty
+    @JsonProperty("built_query")
     public abstract String builtQuery();
 
-    @JsonProperty
+    @JsonProperty("used_indices")
     public abstract Set<IndexRangeSummary> usedIndices();
 
-    @JsonProperty
+    @JsonProperty("messages")
     public abstract List<ResultMessageSummary> messages();
 
-    @JsonProperty
+    @JsonProperty("fields")
     public abstract Set<String> fields();
 
-    @JsonProperty
+    @JsonProperty("time")
     public abstract long time();
 
-    @JsonProperty
+    @JsonProperty("total_results")
     public abstract long totalResults();
 
-    @JsonProperty
+    @JsonProperty("from")
     public abstract DateTime from();
 
-    @JsonProperty
+    @JsonProperty("to")
     public abstract DateTime to();
 
-    @JsonProperty
+    @JsonProperty("decoration_stats")
     @Nullable
     public abstract SearchDecorationStats decorationStats();
 
@@ -79,30 +77,40 @@ public abstract class SearchResponse {
                                         DateTime from,
                                         DateTime to) {
         return builder()
-            .query(query)
-            .builtQuery(builtQuery)
-            .usedIndices(usedIndices)
-            .messages(messages)
-            .fields(fields)
-            .time(time)
-            .totalResults(totalResults)
-            .from(from)
-            .to(to)
-            .build();
+                .query(query)
+                .builtQuery(builtQuery)
+                .usedIndices(usedIndices)
+                .messages(messages)
+                .fields(fields)
+                .time(time)
+                .totalResults(totalResults)
+                .from(from)
+                .to(to)
+                .build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder query(String query);
+
         public abstract Builder builtQuery(String builtQuery);
+
         public abstract Builder usedIndices(Set<IndexRangeSummary> usedIndices);
+
         public abstract Builder messages(List<ResultMessageSummary> messages);
+
         public abstract Builder fields(Set<String> fields);
+
         public abstract Builder time(long time);
+
         public abstract Builder totalResults(long totalResults);
+
         public abstract Builder from(DateTime from);
+
         public abstract Builder to(DateTime to);
+
         public abstract Builder decorationStats(SearchDecorationStats searchDecorationStats);
+
         public abstract SearchResponse build();
     }
 }
