@@ -17,6 +17,7 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -39,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.PASSWORD_SECRET;
@@ -77,6 +79,9 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
     }
 
     public static class Services implements AutoCloseable {
+        // We have to use the same network for all containers because we cache the MongoDB and SearchDB containers.
+        private static final Supplier<Network> NETWORK_SUPPLIER = Suppliers.memoize(Network::newNetwork);
+
         private final Network network;
         private final SearchServerInstance searchServerInstance;
         private final MongoDBInstance mongoDBInstance;
@@ -86,7 +91,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
 
 
         private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
-            final Network network = Network.newNetwork();
+            final Network network = NETWORK_SUPPLIER.get();
 
             final ExecutorService executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
                     .setNameFormat("container-startup-thread-%d")
