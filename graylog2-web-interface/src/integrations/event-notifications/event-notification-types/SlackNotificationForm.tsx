@@ -56,7 +56,7 @@ function EventProcedureCheckbox({ checked, onChange, validation }: EventProcedur
       label="Include Event Procedure"
       help={
         validation?.errors?.include_event_procedure?.[0] ||
-        'Append a formatted version of the event definition\'s event procedure to the end of the notification body.'
+        "Append a formatted version of the event definition's event procedure to the end of the notification body."
       }
       type="checkbox"
       checked={checked}
@@ -197,10 +197,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="Webhook URL"
           type="text"
           bsStyle={validation.errors.webhook_url ? 'error' : null}
-          help={
-            validation?.errors?.webhook_url?.[0] ||
-            'Slack "Incoming Webhook" URL'
-          }
+          help={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
           value={config.webhook_url || ''}
           onChange={this.handleChange}
           required
@@ -211,10 +208,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="Channel"
           type="text"
           bsStyle={validation.errors.channel ? 'error' : null}
-          help={
-            validation?.errors?.channel?.[0] ||
-            'Name of Slack #channel or @user for a direct message'
-          }
+          help={validation?.errors?.channel?.[0] || 'Name of Slack #channel or @user for a direct message'}
           value={config.channel || ''}
           onChange={this.handleChange}
           required
@@ -225,14 +219,15 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="Custom Message (optional)"
           type="textarea"
           bsStyle={validation.errors.custom_message ? 'error' : null}
-          help={
-            validation?.errors?.custom_message?.[0] ||
-            element
-          }
+          help={validation?.errors?.custom_message?.[0] || element}
           value={config.custom_message || ''}
           onChange={this.handleChange}
         />
-        <EventProcedureCheckbox checked={config.include_event_procedure} onChange={this.handleChange} validation={validation}/>
+        <EventProcedureCheckbox
+          checked={config.include_event_procedure}
+          onChange={this.handleChange}
+          validation={validation}
+        />
         <Input
           id="notification-time-zone"
           help="Time zone used for timestamps in the notification body."
@@ -278,10 +273,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="User Name (optional)"
           type="text"
           bsStyle={validation.errors.user_name ? 'error' : null}
-          help={
-            validation?.errors?.user_name?.[0] ||
-            'User name of the sender in Slack'
-          }
+          help={validation?.errors?.user_name?.[0] || 'User name of the sender in Slack'}
           value={config.user_name || ''}
           onChange={this.handleChange}
         />
@@ -324,8 +316,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
               type="checkbox"
               bsStyle={validation.errors.notify_here ? 'error' : null}
               help={
-                validation?.errors?.notify_here?.[0] ||
-                'Notify active users in channel by adding @here to the message'
+                validation?.errors?.notify_here?.[0] || 'Notify active users in channel by adding @here to the message'
               }
               checked={config.notify_here ?? false}
               onChange={this.handleChange}
@@ -338,10 +329,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="Link Names"
           type="checkbox"
           bsStyle={validation.errors.link_names ? 'error' : null}
-          help={
-            validation?.errors?.link_names?.[0] ||
-            'Find and link channel names and user names'
-          }
+          help={validation?.errors?.link_names?.[0] || 'Find and link channel names and user names'}
           checked={!!config.link_names}
           onChange={this.handleChange}
         />
@@ -351,10 +339,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="Icon URL (optional)"
           type="text"
           bsStyle={validation.errors.icon_url ? 'error' : null}
-          help={
-            validation?.errors?.icon_url?.[0] ||
-            'Image to use as the icon for this message'
-          }
+          help={validation?.errors?.icon_url?.[0] || 'Image to use as the icon for this message'}
           value={config.icon_url || ''}
           onChange={this.handleChange}
         />
@@ -364,10 +349,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
           label="Icon Emoji (optional)"
           type="text"
           bsStyle={validation.errors.icon_emoji ? 'error' : null}
-          help={
-            validation?.errors?.icon_emoji?.[0] ||
-            'Emoji to use as the icon for this message (overrides Icon URL)'
-          }
+          help={validation?.errors?.icon_emoji?.[0] || 'Emoji to use as the icon for this message (overrides Icon URL)'}
           value={config.icon_emoji || ''}
           onChange={this.handleChange}
         />
