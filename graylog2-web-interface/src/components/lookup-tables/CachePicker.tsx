@@ -68,7 +68,7 @@ const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
             clearable={false}
             options={sortedCaches}
             onBlur={() => setTouched(true)}
-            onChange={setValue}
+            onChange={(v) => setValue(v)}
             value={value}
           />
 
