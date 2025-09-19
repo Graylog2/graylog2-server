@@ -61,6 +61,6 @@ describe('<UsersSelectField>', () => {
 
     await selectEvent.chooseOption('select user', 'admin (Administrator)');
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith('admin'));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith('admin', expect.any(Object)));
   });
 });
