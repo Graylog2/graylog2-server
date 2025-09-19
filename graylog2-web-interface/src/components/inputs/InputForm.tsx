@@ -23,6 +23,7 @@ import { ConfigurationForm } from 'components/configurationforms';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import AppConfig from 'util/AppConfig';
 import type { Input } from 'components/messageloaders/Types';
+import { Alert } from 'components/bootstrap';
 
 type FormValues = Input['attributes'];
 
@@ -132,7 +133,9 @@ const InputForm = ({
       submitAction={onSubmit}
       typeName={typeName}
       cancelAction={onCancel}>
-      <span>{description}</span>
+      <Alert bsStyle="info">
+        {description}
+      </Alert>
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
       </HideOnCloud>
