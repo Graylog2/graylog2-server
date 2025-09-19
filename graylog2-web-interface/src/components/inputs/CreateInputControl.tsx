@@ -21,8 +21,8 @@ import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { InputsActions } from 'stores/inputs/InputsStore';
-import { InputTypesActions } from 'stores/inputs/InputTypesStore';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
+import { InputTypesActions } from 'stores/inputs/InputTypesStore';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -150,6 +150,7 @@ const CreateInputControl = () => {
                 key="configuration-form-input"
                 setShowModal={setShowConfigurationForm}
                 configFields={selectedInputDefinition.requested_configuration}
+                description={selectedInputDefinition.description}
                 title={
                   <span>
                     Launch new <em>{inputTypes[selectedInput] ?? ''}</em> input

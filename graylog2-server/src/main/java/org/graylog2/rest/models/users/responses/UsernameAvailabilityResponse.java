@@ -14,20 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix;
+package org.graylog2.rest.models.users.responses;
 
-public enum MongodbServer {
-    MONGO7("7.0");
-
-    public static final MongodbServer DEFAULT_VERSION = MONGO7;
-
-    private final String version;
-
-    MongodbServer(String version) {
-        this.version = version;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-}
+public record UsernameAvailabilityResponse(String username, boolean available) { }
