@@ -145,6 +145,27 @@ public class PipelineFacadeTest {
     }
 
     @Test
+    public void exportEntity_descriptionNull() {
+        final PipelineDao pipeline = PipelineDao.builder()
+                .id("pipeline-12345")
+                .title("title")
+                .description(null)
+                .source("pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nend")
+                .build();
+
+        final EntityDescriptor descriptor = EntityDescriptor.create(pipeline.id(), ModelTypes.PIPELINE_V1);
+        final EntityDescriptor streamDescriptor = EntityDescriptor.create("stream-12345", ModelTypes.STREAM_V1);
+        final Entity entity = facade.exportNativeEntity(pipeline, EntityDescriptorIds.of(descriptor, streamDescriptor));
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
+        assertThat(pipelineEntity.description()).isNull();
+    }
+
+    @Test
     @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);

@@ -19,7 +19,6 @@ package org.graylog2.system.stats.mongo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
@@ -28,49 +27,48 @@ import javax.annotation.Nullable;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class DatabaseStats {
-    @JsonProperty
+    @JsonProperty("db")
     public abstract String db();
 
-    @JsonProperty
+    @JsonProperty("collections")
     public abstract long collections();
 
-    @JsonProperty
+    @JsonProperty("objects")
     public abstract long objects();
 
-    @JsonProperty
+    @JsonProperty("avg_obj_size")
     public abstract double avgObjSize();
 
-    @JsonProperty
+    @JsonProperty("data_size")
     public abstract long dataSize();
 
-    @JsonProperty
+    @JsonProperty("storage_size")
     public abstract long storageSize();
 
-    @JsonProperty
+    @JsonProperty("num_extents")
     @Nullable
     public abstract Long numExtents();
 
-    @JsonProperty
+    @JsonProperty("indexes")
     public abstract long indexes();
 
-    @JsonProperty
+    @JsonProperty("index_size")
     public abstract long indexSize();
 
-    @JsonProperty
+    @JsonProperty("file_size")
     @Nullable
     public abstract Long fileSize();
 
-    @JsonProperty
+    @JsonProperty("ns_size_mb")
     @Nullable
     public abstract Long nsSizeMB();
 
-    @JsonProperty
+    @JsonProperty("extent_free_list")
     @Nullable
     public abstract ExtentFreeList extentFreeList();
 
-    @JsonProperty
+    @JsonProperty("data_file_version")
     @Nullable
     public abstract DataFileVersion dataFileVersion();
 
@@ -93,12 +91,11 @@ public abstract class DatabaseStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
     public abstract static class ExtentFreeList {
-        @JsonProperty
+        @JsonProperty("num")
         public abstract int num();
 
-        @JsonProperty
+        @JsonProperty("total_size")
         public abstract int totalSize();
 
         public static ExtentFreeList create(int num,
@@ -109,12 +106,11 @@ public abstract class DatabaseStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
     public abstract static class DataFileVersion {
-        @JsonProperty
+        @JsonProperty("major")
         public abstract int major();
 
-        @JsonProperty
+        @JsonProperty("minor")
         public abstract int minor();
 
         public static DataFileVersion create(int major,
