@@ -58,7 +58,7 @@ public abstract class Tool<P, O> {
         this.description = description;
 
         // we can precompute the schema for our parameters, it's statically known
-        this.inputSchema = GENERATOR.generateSchema(new TypeReference<P>() {}.getType()).toString();
+        this.inputSchema = GENERATOR.generateSchema(parameterType.getType()).toString();
     }
 
     @JsonProperty
