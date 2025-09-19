@@ -89,6 +89,10 @@ class Builder {
     return new Builder(this.value.set('pinnedColumns', value));
   }
 
+  showRowNumbers(value: boolean) {
+    return new Builder(this.value.set('showRowNumbers', value));
+  }
+
   build() {
     const { pinnedColumns, showRowNumbers } = this.value.toObject();
 
