@@ -232,7 +232,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         }
         final SearchVersion actualSearchVersion = getSearchVersion();
         if (!actualSearchVersion.isDataNode() && backendConfiguration.get().onlyOnDataNode()) {
-            return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected: {}",
+            return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected",
                     actualSearchVersion.toString());
         }
         return ConditionEvaluationResult.enabled(null);
