@@ -25,9 +25,6 @@ import org.graylog.testing.containermatrix.annotations.GraylogBackendConfigurati
 @GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
                              searchVersions = {SearchServer.DATANODE_DEV})
 public class WebInterfaceAssetsResourceIT extends WebInterfaceAssetsResourceBase {
-    public WebInterfaceAssetsResourceIT(GraylogApis graylogApis) {
-        super(graylogApis);
-    }
 
     @ContainerMatrixTest
     void testIndexHtml() {

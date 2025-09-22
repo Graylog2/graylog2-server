@@ -24,6 +24,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -36,10 +37,11 @@ public class IndexRangesCleanUpIT {
     public static final String RANGE_CLEANUP_PREFIX = "range-cleanup";
     public static final String INDEX_TWO = RANGE_CLEANUP_PREFIX + "_1";
     public static final String INDEX_ONE = RANGE_CLEANUP_PREFIX + "_0";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public IndexRangesCleanUpIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @ContainerMatrixTest

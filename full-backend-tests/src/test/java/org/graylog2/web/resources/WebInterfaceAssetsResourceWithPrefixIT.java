@@ -17,7 +17,6 @@
 package org.graylog2.web.resources;
 
 import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
-import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
@@ -28,9 +27,6 @@ import org.graylog.testing.containermatrix.annotations.GraylogBackendConfigurati
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
                                    })
 public class WebInterfaceAssetsResourceWithPrefixIT extends WebInterfaceAssetsResourceBase {
-    public WebInterfaceAssetsResourceWithPrefixIT(GraylogApis graylogApis) {
-        super(graylogApis);
-    }
 
     @ContainerMatrixTest
     void testIndexHtml() {

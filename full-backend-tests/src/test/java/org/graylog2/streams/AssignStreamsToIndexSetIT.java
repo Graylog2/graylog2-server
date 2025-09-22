@@ -34,11 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class AssignStreamsToIndexSetIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final GraylogApis api;
-
-    public AssignStreamsToIndexSetIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     private String defaultIndexSetId;
     private String newIndexSetId;
@@ -47,7 +43,8 @@ public class AssignStreamsToIndexSetIT {
     private String stream3Id;
 
     @BeforeAll
-    void beforeAll() {
+    void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
         this.defaultIndexSetId = IndexSetUtils.defaultIndexSetId(api.requestSpecificationSupplier());
         this.stream1Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream", defaultIndexSetId);
         this.stream2Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream 2", defaultIndexSetId);

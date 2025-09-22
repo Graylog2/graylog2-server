@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -34,10 +35,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @GraylogBackendConfiguration()
 public class FieldTypeMappingsIT {
     private static final String INDEX_PREFIX = "custom-mappings";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public FieldTypeMappingsIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     record FieldTypeChangeRequest(@JsonProperty("index_sets")

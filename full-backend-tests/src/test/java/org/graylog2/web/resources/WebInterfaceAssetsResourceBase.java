@@ -20,14 +20,17 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 
 public abstract class WebInterfaceAssetsResourceBase {
-    private final GraylogApis apis;
 
-    protected WebInterfaceAssetsResourceBase(GraylogApis apis) {
-        this.apis = apis;
+    private static GraylogApis apis;
+
+    @BeforeAll
+    public static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
     private RequestSpecification backend() {

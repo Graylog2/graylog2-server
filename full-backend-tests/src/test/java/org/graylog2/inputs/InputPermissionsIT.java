@@ -39,22 +39,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.VM, searchVersions = SearchServer.DATANODE_DEV)
 public class InputPermissionsIT {
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    private GraylogApiResponse roleInputsReader;
-    private GraylogApiResponse roleInputsCreator;
-    private GraylogApiResponse roleRestrictedInputsCreator;
+    private static GraylogApiResponse roleInputsReader;
+    private static GraylogApiResponse roleInputsCreator;
+    private static GraylogApiResponse roleRestrictedInputsCreator;
 
-    private Users.User inputsReader;
-    private Users.User inputsCreator;
-    private Users.User restrictedInputsCreator;
-
-    public InputPermissionsIT(GraylogApis apis) {
-        this.apis = apis;
-    }
+    private static Users.User inputsReader;
+    private static Users.User inputsCreator;
+    private static Users.User restrictedInputsCreator;
 
     @BeforeAll
-    void setUp() {
+    static void setUp(GraylogApis graylogApis) throws Exception {
+        apis = graylogApis;
         roleInputsReader = apis.roles().create("custom_inputs_reader", "inputs reader can only see inputs", Set.of(
                 RestPermissions.INPUTS_READ
         ), false);
@@ -98,7 +95,7 @@ public class InputPermissionsIT {
         }
     }
 
-    private Users.User createUser(String username, GraylogApiResponse... roles) {
+    private static Users.User createUser(String username, GraylogApiResponse... roles) {
         return new Users.User(username, RandomString.make(), "<Generated>", username,
                 username + "@graylog", false, 30_0000, "Europe/Vienna",
                 Arrays.stream(roles).map(role -> role.properJSONPath().read("name", String.class)).toList(), List.of());

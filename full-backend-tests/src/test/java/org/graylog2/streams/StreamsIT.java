@@ -36,18 +36,13 @@ import static org.hamcrest.Matchers.equalTo;
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final GraylogApis api;
-    private final List<String> createdStreamsIds;
-    private final List<String> createdIndexSetIds;
-
-    public StreamsIT(GraylogApis api) {
-        this.api = api;
-        this.createdStreamsIds = new ArrayList<>();
-        this.createdIndexSetIds = new ArrayList<>();
-    }
+    private static GraylogApis api;
+    private final List<String> createdStreamsIds = new ArrayList<>();
+    private final List<String> createdIndexSetIds = new ArrayList<>();
 
     @BeforeAll
-    void beforeAll() {
+    void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         final String newIndexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
         final String newIndexSetId2 = api.indices().createIndexSet("More Test Indices", "Some more test indices", "moretest");

@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class CustomizationConfigIT {
-    private static final Logger LOG = LoggerFactory.getLogger(CustomizationConfigIT.class);
     private static GraylogApis apis;
 
     @BeforeAll
