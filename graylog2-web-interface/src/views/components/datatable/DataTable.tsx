@@ -238,20 +238,21 @@ const DataTable = ({
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
   const pinnedColumns = useMemo(
-    () => widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set(),
+    () => widget?.config?.visualizationConfig?.pinnedColumns ?? Immutable.Set(),
     [widget?.config?.visualizationConfig?.pinnedColumns],
   );
 
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
     const res = [];
+    const lineNumberOffset = widget?.config?.visualizationConfig?.showRowNumbers === false ? 0 : 1;
 
     const rowPivotsFields = rowPivots.flatMap((rowPivot) => rowPivot.fields ?? []);
 
     rowPivotsFields.forEach((field, index) => {
       if (pinnedColumns.has(field)) {
         const column = field;
-        res.push({ index, column, leftMargin: prev });
+        res.push({ index: index + lineNumberOffset, column, leftMargin: prev });
         prev += rowPivotColumnsWidth[field];
       }
     });
@@ -259,13 +260,13 @@ const DataTable = ({
     series.forEach((row, index) => {
       if (pinnedColumns.has(row.function)) {
         const column = row.function;
-        res.push({ index: index + rowPivots.length, column, leftMargin: prev });
+        res.push({ index: index + rowPivots.length + lineNumberOffset, column, leftMargin: prev });
         prev += rowPivotColumnsWidth[row.function];
       }
     });
 
     return res;
-  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns, series]);
+  }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
     const key = `datatableentry-${idx}`;
