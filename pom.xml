@@ -107,7 +107,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.0</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.33.13</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.34.0</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -207,7 +207,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
@@ -614,7 +614,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.3</version>
+                    <version>3.12.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
