@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import FormDataContext from 'integrations/contexts/FormDataContext';
 
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { Input } from 'components/bootstrap';
 
 import FormAdvancedOptions from './FormAdvancedOptions';

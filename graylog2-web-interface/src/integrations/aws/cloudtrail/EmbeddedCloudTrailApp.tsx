@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+
 import FormDataProvider from 'integrations/contexts/FormDataProvider';
 
 import { toGenericInputCreateRequest } from './common/formDataAdapter';
+import CloudTrail from './CloudTrail';
+import INITIAL_FORMDATA from './_initialFormData';
 
 import { SidebarProvider } from '../context/Sidebar';
 import { StepsProvider } from '../context/Steps';
 import { AdvancedOptionsProvider } from '../context/AdvancedOptions';
-import CloudTrail from './CloudTrail';
-import INITIAL_FORMDATA from './_initialFormData';
 
 type Props = {
   onSubmit?: (InputCreateRequest) => void;

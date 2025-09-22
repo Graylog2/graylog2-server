@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { FormDataType } from 'integrations/types';
+import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 
 import type { AWSCloudTrailGenericInputCreateRequest, AWSCloudTrailInputCreateRequest } from '../types';
-import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 
 export const toAWSCloudTrailInputCreateRequest = ({
   awsCloudTrailName,

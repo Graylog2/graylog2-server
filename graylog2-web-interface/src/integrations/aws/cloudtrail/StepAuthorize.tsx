@@ -15,20 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useContext, useState } from 'react';
-import FormDataContext from 'integrations/contexts/FormDataContext';
 
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import formValidation from 'integrations/aws/utils/formValidation';
+import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 
 import { ApiRoutes } from './common/Routes';
-import formValidation from 'integrations/aws/utils/formValidation';
 import type { ErrorMessageType, HandleFieldUpdateType, HandleSubmitType } from './types';
 
 import { renderOptions } from '../common/Options';
 import FormWrap from '../common/FormWrap';
 import ValidatedInput from '../common/ValidatedInput';
 import AWSAuthenticationTypes from '../authentication/AWSAuthenticationTypes';
-import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
+
 
 type StepAuthorizeProps = {
   onSubmit: HandleSubmitType;

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
  import React, { useContext, useEffect, useMemo } from 'react';
+
  import FormDataContext from 'integrations/contexts/FormDataContext';
  import type { FormDataType } from 'integrations/types';
-
  import useHistory from 'routing/useHistory';
  import { getValueFromInput } from 'util/FormsUtils';
  import NumberUtils from 'util/NumberUtils';
@@ -27,9 +27,10 @@
  import StepSubscribe from './StepSubscribe';
  import StepReview from './StepReview';
  import StepAuthorize from './StepAuthorize';
+ import type { HandleFieldUpdateType, SidebarContextType, StepsContextType, HandleSubmitType } from './types';
+
  import { StepsContext } from '../context/Steps';
  import { SidebarContext } from '../context/Sidebar';
- import type { HandleFieldUpdateType, SidebarContextType, StepsContextType, HandleSubmitType } from './types';
 
  type Props = {
    onSubmit?: (formValues: FormDataType) => void;
