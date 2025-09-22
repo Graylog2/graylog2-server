@@ -16,23 +16,19 @@
  */
 package org.graylog.mcp.tools;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
-import org.graylog.grn.GRNTypes;
-import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.database.NotFoundException;
 
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Map;
 
 public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> {
@@ -56,7 +52,7 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
             GRN grn = GRNRegistry.createWithBuiltinTypes().parse(parameters.grn);
             return this.resourceProviders.get(grn.grnType()).read(new URI(parameters.grn)).description();
         } catch (NotFoundException | URISyntaxException e) {
-            return String.format("Unable to read resource %s", parameters.grn);
+            return String.format(Locale.US, "Unable to read resource %s", parameters.grn);
         }
     }
 
