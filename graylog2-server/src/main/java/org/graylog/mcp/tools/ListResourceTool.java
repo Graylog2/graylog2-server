@@ -16,7 +16,6 @@
  */
 package org.graylog.mcp.tools;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +27,6 @@ import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.Tool;
 
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,14 +41,20 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
         super(objectMapper,
                 new TypeReference<>() {},
                 NAME,
-                "List all Resources available in Graylog for a given resource type",
-                "A csv-formatted string listing each resource GRN and Name");
+                "List Graylog Resources",
+                """
+        List all Resources available in Graylog for one resource type out of the following: {stream,dashboard,event_definition}.
+        Returns: A paginated list of tuples with both the GRN (Graylog Resource Name) and name of each resource.
+        """);
+//        notification, search, search_filter, output,
+//        builtin-team, user, role, grant,
+//        favorite, last_opened, report
         this.resourceProviders = resourceProviders;
     }
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListResourceTool.Parameters parameters) {
-        final int pageSize = Math.min(Math.max(parameters.getPerPage(), 1), 20);
+        final int pageSize = Math.min(Math.max(parameters.getPerPage(), 5), 20);
 
         GRNType grnType = switch (parameters.type.toLowerCase(Locale.US).replace(' ', '_')) {
             case "streams", "stream" -> GRNTypes.STREAM;
