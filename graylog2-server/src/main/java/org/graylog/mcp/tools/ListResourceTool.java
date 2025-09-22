@@ -49,10 +49,10 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
     public String apply(PermissionHelper permissionHelper, ListResourceTool.Parameters parameters) {
         final StringWriter writer = new StringWriter();
         final CSVWriter csvWriter = new CSVWriter(writer);
-        GRNType grnType = switch (parameters.type) {
-            case ("streams") -> GRNTypes.STREAM;
-            case ("dashboards") -> GRNTypes.DASHBOARD;
-            case ("event_definitions") -> GRNTypes.EVENT_DEFINITION;
+        GRNType grnType = switch (parameters.type.toLowerCase().replace(' ', '_')) {
+            case "streams", "stream" -> GRNTypes.STREAM;
+            case "dashboards", "dashboard" -> GRNTypes.DASHBOARD;
+            case "event_definitions", "event_definition", "eventdefinitions", "eventdefinition"  -> GRNTypes.EVENT_DEFINITION;
             default -> throw new IllegalArgumentException("Unsupported type " + parameters.type);
         };
         csvWriter.writeNext(new String[]{"grn", "name"});
@@ -68,7 +68,15 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
     }
 
     public static class Parameters {
-        String type;
+        private String type;
 //        String cursor;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
     }
 }

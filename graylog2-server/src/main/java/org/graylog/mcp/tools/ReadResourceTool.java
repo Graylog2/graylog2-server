@@ -61,6 +61,14 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     }
 
     public static class Parameters {
-        String grn;
+        private String grn;
+
+        public String getGrn() {
+            return grn;
+        }
+
+        public void setGrn(String grn) {
+            this.grn = grn;
+        }
     }
 }
