@@ -34,9 +34,8 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
     const defaultIndexSet: IndexSet = {
       title: '',
       description: '',
-      index_prefix: indexSetTemplateDefaults.index_prefix,
+      index_prefix: '',
       writable: true,
-      can_be_default: true,
       shards: indexSetTemplateDefaults.shards,
       data_tiering: indexSetTemplateDefaults.data_tiering,
       replicas: indexSetTemplateDefaults.replicas,
@@ -48,6 +47,8 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
       index_optimization_max_num_segments: indexSetTemplateDefaults.index_optimization_max_num_segments,
       index_optimization_disabled: indexSetTemplateDefaults.index_optimization_disabled,
       field_type_refresh_interval: indexSetTemplateDefaults.field_type_refresh_interval,
+      field_restrictions: indexSetTemplateDefaults.field_restrictions,
+      index_set_template_id: null,
     };
 
     if (initialIndexSet) {
@@ -72,7 +73,11 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
         Object.entries(indexSetTemplateConfig).filter(([_, v]) => v != null),
       );
 
-      setIndexSet({ ...defaultIndexSet, ...indexSetTemplateConfigWithoutNullValues });
+      setIndexSet({
+        ...defaultIndexSet,
+        ...indexSetTemplateConfigWithoutNullValues,
+        index_set_template_id: selectedIndexSetTemplate.id,
+      });
     } else {
       setIndexSet({ ...defaultIndexSet });
     }

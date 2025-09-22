@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
  * Text (TXT) DNS lookup response from {@link DnsClient}.
  */
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = TxtDnsAnswer.Builder.class)
 @JsonPropertyOrder({TxtDnsAnswer.FIELD_VALUE, TxtDnsAnswer.FIELD_DNS_TTL})
