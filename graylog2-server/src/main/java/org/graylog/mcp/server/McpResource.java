@@ -31,6 +31,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiresAuthentication
 @Path("/mcp")
 public class McpResource extends RestResource {
 
