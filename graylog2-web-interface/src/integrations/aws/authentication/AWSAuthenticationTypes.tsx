@@ -46,7 +46,7 @@ type AWSAuthenticationTypesProps = {
   fieldConfig?: FieldConfig;
 };
 
-const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationTypesProps) => {
+const AWSAuthenticationTypes = ({ onChange, fieldConfig = {} }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
   // Default field configuration for CloudWatch (backward compatibility)
@@ -92,9 +92,9 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationType
   return (
     <>
       {AppConfig.isCloud() ? (
-        <KeySecret 
-          awsKey={awsKey} 
-          awsSecret={awsSecret} 
+        <KeySecret
+          awsKey={awsKey}
+          awsSecret={awsSecret}
           onChange={onChange}
           keyFieldId={config.keyField}
           secretFieldId={config.secretField}
@@ -119,9 +119,9 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationType
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret 
-                awsKey={awsKey} 
-                awsSecret={awsSecret} 
+              <KeySecret
+                awsKey={awsKey}
+                awsSecret={awsSecret}
                 onChange={onChange}
                 keyFieldId={config.keyField}
                 secretFieldId={config.secretField}
