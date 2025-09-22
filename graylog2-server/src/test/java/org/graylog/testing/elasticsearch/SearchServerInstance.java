@@ -39,6 +39,8 @@ public interface SearchServerInstance extends Closeable {
 
     SearchVersion version();
 
+    String instanceId();
+
     void importFixtureResource(String resourcePath, Class<?> testClass);
 
     String getHttpHostAddress();

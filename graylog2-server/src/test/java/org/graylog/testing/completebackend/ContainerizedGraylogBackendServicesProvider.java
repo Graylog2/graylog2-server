@@ -121,7 +121,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                         .env(envProperties)
                         .datanodePluginJarsProvider(datanodePluginJarsProvider)
                         .build();
-                LOG.debug("Startup of the search server {} took {}", searchVersion, searchServerSw.elapsed());
+                LOG.debug("Startup of the search server {} took {} (instance: {})", searchVersion, searchServerSw.elapsed(), searchServer.instanceId());
                 return new Services(network, searchServer, mongoDB, emailServerInstance, webhookServerInstance);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);

@@ -105,7 +105,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         }
 
         var searchServer = services.getSearchServerInstance();
-        LOG.info("Running backend with SearchServer version {}", searchServer.version());
+        LOG.info("Running backend with SearchServer version {} (instance: {})", searchServer.version(), searchServer.instanceId());
         try {
             var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), MongoDBInstance.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
