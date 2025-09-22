@@ -203,4 +203,17 @@ public class Indices implements GraylogRestApi {
                 .ifValidationFails()
                 .statusCode(202);
     }
+
+    public String getDeflectorIndex(String indexSetId) {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/overview/" + indexSetId);
+        if (response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("deflector.current_target", String.class);
+        } else {
+            return null;
+        }
+    }
 }

@@ -16,19 +16,12 @@
  */
 package org.graylog.plugins.views.aggregations;
 
-import com.github.rholder.retry.RetryException;
-import org.graylog.testing.completebackend.apis.DefaultStreamMatches;
-import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.plugin.streams.StreamRuleType;
-import org.junit.jupiter.api.BeforeEach;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
@@ -38,45 +31,30 @@ import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 
 @ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
 public class CompoundFieldsAggregationIT {
-
     private final GraylogApis api;
-
     public CompoundFieldsAggregationIT(GraylogApis api) {
         this.api = api;
     }
 
-    @BeforeEach
-    void setUp() throws ExecutionException, RetryException {
-        final String indexSetA = api.indices().createIndexSet("Compound field index A", "Compound field index A", "compound_a");
-        final String indexSetB = api.indices().createIndexSet("Compound field index B", "Compound field index B", "compound_b");
-
-        final String streamA = api.streams().createStream("Stream A", indexSetA, DefaultStreamMatches.REMOVE, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamA", "target_stream", false));
-        final String streamB = api.streams().createStream("Stream B", indexSetB, DefaultStreamMatches.REMOVE, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamB", "target_stream", false));
-
-        final List<String> indexNamesA = api.indices().waitForIndexNames(indexSetA);
-        final List<String> indexNamesB = api.indices().waitForIndexNames(indexSetB);
-
-        final String indexA = indexNamesA.iterator().next();
-        final String indexB = indexNamesB.iterator().next();
-
-        api.backend().searchServerInstance().client().putFieldMapping(indexA, "my_ip", "ip");
-        api.backend().searchServerInstance().client().putFieldMapping(indexB, "my_ip", "keyword");
-
-        final PortBoundGelfInputApi gelf = api.gelf().createGelfHttpInput();
-        gelf.postMessage("""
-                  {"short_message":"compound-field-test-a", "host":"example.org", "_my_ip":"192.168.1.1", "_target_stream": "streamA"}
-                """);
-        gelf.postMessage("""
-                  {"short_message":"compound-field-test-b", "host":"example.org", "_my_ip":"8.8.8.8", "_target_stream": "streamB"}
-                """);
-
-        api.search().waitForMessages("compound-field-test-a", "compound-field-test-b");
-    }
-
     @ContainerMatrixTest
-    void aggregate() {
-        final GraylogApiResponse responseAsc =
-                new GraylogApiResponse(api.post("/search/aggregate","""
+    void aggregate() throws Exception {
+        final PortBoundGelfInputApi gelf = api.gelf().createGelfHttpInput();
+        try (final var env1 = api.createEnvironment(gelf)) {
+            try (final var env2 = api.createEnvironment(gelf)) {
+                env1.putDeflectorFieldMapping("my_ip", "ip");
+                env2.putDeflectorFieldMapping("my_ip", "keyword");
+                env1.ingestMessage(Map.of(
+                        "short_message", "compound-field-test-a",
+                        "host", "example.org",
+                        "_my_ip", "192.168.1.1"
+                ));
+                env2.ingestMessage(Map.of(
+                        "short_message", "compound-field-test-a",
+                        "host", "example.org",
+                        "_my_ip", "192.168.1.1"
+                ));
+
+                api.post("/search/aggregate", """
                         {
                         	"group_by": [
                         		{
@@ -91,6 +69,9 @@ public class CompoundFieldsAggregationIT {
                         		}
                         	]
                         }
-                         """, 200));
+                        """, 200);
+            }
+        }
+
     }
 }

@@ -359,6 +359,11 @@ public class GraylogApis implements GraylogRestApi {
             search().waitForMessages(messages);
         }
 
+        public void putDeflectorFieldMapping(final String field, final String type) {
+            final var deflectorIndex = indices().getDeflectorIndex(this.indexSetId);
+            backend().searchServerInstance().client().putFieldMapping(deflectorIndex, field, type);
+        }
+
         @Override
         public void close() {
             streams().deleteStream(streamId);
