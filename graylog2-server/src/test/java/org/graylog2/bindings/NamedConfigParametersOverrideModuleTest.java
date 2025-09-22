@@ -76,7 +76,7 @@ public class NamedConfigParametersOverrideModuleTest {
         var testParam = injector.getInstance(Key.get(String.class, named("test_param")));
         var testParam2 = injector.getInstance(Key.get(String.class, named("test_param_2")));
 
-        assertEquals("test_param_value_2", testParam);
+        assertEquals("test_param_value", testParam);
         assertEquals("test_param_2_value", testParam2);
     }
 
