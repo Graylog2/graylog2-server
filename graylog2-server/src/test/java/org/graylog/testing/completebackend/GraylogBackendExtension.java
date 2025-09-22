@@ -159,7 +159,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 ));
 
         return ContainerizedGraylogBackend.createStarted(
-                new ContainerizedGraylogBackendServicesProvider(),
+                new ContainerizedGraylogBackendServicesProvider(config.serverLifecycle()),
                 searchVersion,
                 mongoVersion,
                 mongoDBFixtures,

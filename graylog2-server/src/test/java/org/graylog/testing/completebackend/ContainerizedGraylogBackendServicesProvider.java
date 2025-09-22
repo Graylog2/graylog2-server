@@ -17,7 +17,6 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -40,7 +39,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.PASSWORD_SECRET;
@@ -57,20 +55,29 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
 
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackendServicesProvider.class);
 
-    private final ConcurrentMap<String, Services> servicesCache;
+    private static final ConcurrentMap<String, Services> SERVICES_CACHE = new ConcurrentHashMap<>();
+    private final Lifecycle lifecycle;
 
+    @Deprecated(forRemoval = true) // use constructor with lifecycle parameter
     public ContainerizedGraylogBackendServicesProvider() {
-        servicesCache = new ConcurrentHashMap<>();
+        this(Lifecycle.CLASS);
+    }
+
+    public ContainerizedGraylogBackendServicesProvider(Lifecycle lifecycle) {
+        this.lifecycle = lifecycle;
     }
 
     public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, final boolean withMailServerEnabled, final boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
-        var lookupKey = Services.buildLookupKey(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
-        return servicesCache.computeIfAbsent(lookupKey, (k) -> Services.create(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams, datanodePluginJarsProvider));
+        var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
+        return SERVICES_CACHE.computeIfAbsent(lookupKey, (k) -> {
+            LOG.debug("No cached services found for key \"{}\", creating new ones.", k);
+            return Services.create(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
+        });
     }
 
     @Override
     public void close() throws Exception {
-        servicesCache.values().forEach(s -> {
+        SERVICES_CACHE.values().forEach(s -> {
             try {
                 s.close();
             } catch (Exception ignored) {
@@ -79,9 +86,6 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
     }
 
     public static class Services implements AutoCloseable {
-        // We have to use the same network for all containers because we cache the MongoDB and SearchDB containers.
-        private static final Supplier<Network> NETWORK_SUPPLIER = Suppliers.memoize(Network::newNetwork);
-
         private final Network network;
         private final SearchServerInstance searchServerInstance;
         private final MongoDBInstance mongoDBInstance;
@@ -91,7 +95,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
 
 
         private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
-            final Network network = NETWORK_SUPPLIER.get();
+            final Network network = Network.newNetwork();
 
             final ExecutorService executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
                     .setNameFormat("container-startup-thread-%d")
@@ -99,7 +103,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                     .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
                     .build());
 
-            final Future<MongoDBInstance> mongodbFuture = executorService.submit(withStopwatch(() -> MongoDBInstance.createStarted(network, Lifecycle.VM, mongodbVersion), "MongoDB"));
+            final Future<MongoDBInstance> mongodbFuture = executorService.submit(withStopwatch(() -> MongoDBInstance.createUncachedStarted(network, mongodbVersion), "MongoDB"));
             final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(withStopwatch(() -> withMailServerEnabled ? MailServerContainer.createStarted(network) : null, "Mailserver"));
             final Future<WebhookServerContainer> webhookServerContainerFuture = executorService.submit(withStopwatch(() -> withWebhookServerEnabled ? WebhookServerContainer.createStarted(network) : null, "WebhookTester"));
 
@@ -112,7 +116,9 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
 
                 final Stopwatch searchServerSw = Stopwatch.createStarted();
                 final var builder = SearchServerInstanceProvider.getBuilderFor(searchVersion).orElseThrow(() -> new UnsupportedOperationException("Search version " + searchVersion + " not supported."));
+                LOG.debug("Starting search server: {}", searchVersion);
                 SearchServerInstance searchServer = builder
+                        .cachedInstance(false) // This service layer caches OpenSearch instances itself
                         .network(network)
                         .mongoDbUri(mongoDB.internalUri())
                         .passwordSecret(PASSWORD_SECRET)
@@ -125,6 +131,8 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                 return new Services(network, searchServer, mongoDB, emailServerInstance, webhookServerInstance);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
+            } finally {
+                executorService.close();
             }
 
         }
@@ -148,8 +156,9 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             this.webhookServerInstance = webhookServerInstance;
         }
 
-        private static String buildLookupKey(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
             List<String> parts = new LinkedList<>();
+            parts.add(lifecycle.name());
             parts.add(searchVersion.toString());
             parts.add(mongodbVersion.toString());
             parts.add(withMailServerEnabled ? "mail" : "nomail");
