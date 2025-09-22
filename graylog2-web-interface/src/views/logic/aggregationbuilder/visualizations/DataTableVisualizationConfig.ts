@@ -62,17 +62,18 @@ export default class DataTableVisualizationConfig extends VisualizationConfig {
   }
 
   toJSON() {
-    const { pinnedColumns } = this._value;
+    const { pinnedColumns, showRowNumbers } = this._value;
 
     return {
       pinned_columns: pinnedColumns,
+      show_row_numbers: showRowNumbers,
     };
   }
 
   static fromJSON(_type: string, value: DataTableVisualizationConfigTypeJSON) {
-    const { pinned_columns } = value;
+    const { pinned_columns, show_row_numbers } = value;
 
-    return DataTableVisualizationConfig.create(pinned_columns);
+    return DataTableVisualizationConfig.create(pinned_columns, show_row_numbers);
   }
 }
 
