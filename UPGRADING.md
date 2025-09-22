@@ -10,6 +10,17 @@ Graylog now requires Java 21 to run. Earlier versions are no longer supported.
 Our operating system packages and container images are shipping with the
 correct Java version.
 
+### Mongo DB 7.0
+
+Graylog now requires at least Mongo DB version 7.0. Earlier versions are no longer supported.
+
+In general, MongoDB upgrades must be done from one minor release to the next, going to the latest bug fix version 
+in that release. Please refer to the Mongo DB upgrade documentation for details:
+- [Upgrade tutorial](https://www.mongodb.com/docs/manual/tutorial/upgrade-revision/#std-label-upgrade-to-latest-revision/)
+- [6.0](https://www.mongodb.com/docs/manual/release-notes/6.0-upgrade/)
+- [7.0](https://www.mongodb.com/docs/manual/release-notes/7.0-upgrade/)
+- [8.0](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade/)
+
 ### Kafka Inputs
 
 The `kafka-clients` library was updated to 4.x which removes support for Kafka
@@ -60,6 +71,7 @@ is now used as the primary color for elements like buttons and badges in the UI.
   - Event procedure
   - Event step
   - Content Pack installation
+  - Teams
   
   <br> For example, the request payload to create a stream might now look like this:
 

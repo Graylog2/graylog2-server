@@ -14,13 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.lock;
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import { Icon, Tooltip } from 'components/common';
 
-public class MongoLockServiceTest5 extends MongoLockServiceTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO5);
-}
+type Props = {
+  entityName: string;
+  capabilityName: string;
+};
+
+const StyledIcon = styled(Icon)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xxs};
+  `,
+);
+
+const RestrictedAccessTooltip = ({ entityName, capabilityName }: Props) => (
+  <Tooltip label={`You don't have permissions to ${capabilityName} this ${entityName}.`}>
+    <StyledIcon size="xs" name="lock" />
+  </Tooltip>
+);
+
+export default RestrictedAccessTooltip;

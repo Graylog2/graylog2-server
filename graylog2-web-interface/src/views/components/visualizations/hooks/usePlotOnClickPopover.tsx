@@ -25,7 +25,7 @@ import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPop
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
-import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/HeatmapOnClickPopover';
+import HeatmapOnClickPopover from 'views/components/visualizations/OnClickPopover/HeatmapOnClickPopover';
 import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
@@ -346,6 +346,8 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     gdRef.current = gd;
   };
 
+  const onPopoverClose = () => setAnchor(null);
+
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
@@ -356,7 +358,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
   };
 
   const onPopoverChange = (isOpen: boolean) => {
-    if (!isOpen) setAnchor(null);
+    if (!isOpen) onPopoverClose();
   };
 
   const isPopoverOpen = !!anchor;
@@ -374,6 +376,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
         clickPoint={anchor?.pt}
         config={config}
         clickPointsInRadius={anchor?.pointsInRadius}
+        onPopoverClose={onPopoverClose}
       />
     </OnClickPopoverWrapper>
   );
