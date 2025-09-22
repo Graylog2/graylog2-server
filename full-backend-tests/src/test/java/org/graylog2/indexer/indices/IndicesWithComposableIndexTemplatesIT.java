@@ -24,7 +24,4 @@ import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, enabledFeatureFlags = COMPOSABLE_INDEX_TEMPLATES_FEATURE)
 public class IndicesWithComposableIndexTemplatesIT extends IndicesIT {
-    public IndicesWithComposableIndexTemplatesIT(SearchServerInstance elasticsearch) {
-        super(elasticsearch);
-    }
 }

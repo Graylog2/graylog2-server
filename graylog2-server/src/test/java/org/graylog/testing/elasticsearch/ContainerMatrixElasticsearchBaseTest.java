@@ -30,30 +30,20 @@ import java.util.Map;
  * Check the {@link #importFixture(String)} method if you need to load fixture data from JSON files.
  */
 public abstract class ContainerMatrixElasticsearchBaseTest {
-    private final SearchServerInstance elasticsearch;
-
-    public ContainerMatrixElasticsearchBaseTest(SearchServerInstance elasticsearch) {
-        this.elasticsearch = elasticsearch;
-    }
+    private static SearchServerInstance elasticsearch;
 
     protected SearchServerInstance searchServer() {
-        return this.elasticsearch;
-    }
-
-    // override this in derived classes to skip import if the default template. See old ElasticsearchBaseTest + IndicesGetAllMessageFieldsIT
-    protected boolean skipTemplates() {
-        return false;
+        return elasticsearch;
     }
 
     @BeforeAll
-    public void before() {
-        if (!skipTemplates()) {
-            addGraylogDefaultIndexTemplate();
-        }
+    public static void before(SearchServerInstance searchServerInstance) {
+        elasticsearch = searchServerInstance;
+        addGraylogDefaultIndexTemplate();
     }
 
-    private void addGraylogDefaultIndexTemplate() {
-        addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer().version()));
+    private static void addGraylogDefaultIndexTemplate() {
+        addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch.version()));
     }
 
     private static Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
@@ -63,11 +53,11 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
         return Collections.singletonMap("graylog-test-internal", template);
     }
 
-    private void addIndexTemplates(Map<String, Template> templates) {
+    private static void addIndexTemplates(Map<String, Template> templates) {
         for (var template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            searchServer().client().putTemplate(templateName, template.getValue());
+            elasticsearch.client().putTemplate(templateName, template.getValue());
         }
     }
 
@@ -77,7 +67,7 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
      * @return the client
      */
     protected Client client() {
-        return searchServer().client();
+        return elasticsearch.client();
     }
 
     /**
@@ -89,6 +79,6 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
      * @param resourcePath the fixture resource path
      */
     protected void importFixture(String resourcePath) {
-        searchServer().importFixtureResource(resourcePath, getClass());
+        elasticsearch.importFixtureResource(resourcePath, getClass());
     }
 }

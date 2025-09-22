@@ -26,7 +26,6 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -105,10 +104,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     protected Indices indices;
     private EventBus eventBus;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-
-    public IndicesIT(SearchServerInstance elasticsearch) {
-        super(elasticsearch);
-    }
 
     @BeforeEach
     public void setUp() {

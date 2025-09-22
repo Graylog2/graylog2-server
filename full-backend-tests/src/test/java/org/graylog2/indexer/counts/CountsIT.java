@@ -63,10 +63,6 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
     private IndexSetConfig indexSetConfig2;
     private IndexSetConfig indexSetConfig3;
 
-    public CountsIT(SearchServerInstance elasticsearch) {
-        super(elasticsearch);
-    }
-
     @BeforeAll
     public void setUp() {
         // @TestInstance(PER_CLASS) and the MockitoExtension don't work together, initialization has to be done manually
