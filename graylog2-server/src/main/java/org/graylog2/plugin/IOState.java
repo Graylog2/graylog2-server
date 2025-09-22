@@ -17,16 +17,24 @@
 package org.graylog2.plugin;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
+import org.graylog.inputs.MessageInputFailure;
+import org.graylog.inputs.state.MessageInputStateMachine;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @JsonAutoDetect
 public class IOState<T extends Stoppable> {
+    private static final Logger LOG = LoggerFactory.getLogger(IOState.class);
+
     public interface Factory<T extends Stoppable> {
         IOState<T> create(T stoppable);
         IOState<T> create(T stoppable, Type state);
@@ -47,23 +55,28 @@ public class IOState<T extends Stoppable> {
         UNRECOGNIZED // not a real state, but this helps with forwarder compatibility (see StateReportHandler)
     }
 
+    public enum Trigger {
+        START, RUNNING, FAIL, STOP, STOPPED, TERMINATE, SETUP
+    }
+
     protected T stoppable;
-    final private EventBus eventbus;
-    protected Type state;
     protected DateTime startedAt;
     protected String detailedMessage;
+    private final ReentrantLock lock = new ReentrantLock(true);
+    private final Duration lockTimeout = Duration.ofMillis(100); // TODO: Make lock timeout configurable?
+    private final MessageInputStateMachine stateMachine;
 
     @AssistedInject
-    public IOState(EventBus eventbus, @Assisted T stoppable) {
-        this(eventbus, stoppable, Type.CREATED);
+    public IOState(MessageInputStateMachine.Factory stateMachineFactory, @Assisted T stoppable) {
+        this(stateMachineFactory, stoppable, Type.CREATED);
     }
 
     @AssistedInject
-    public IOState(EventBus eventbus, @Assisted T stoppable, @Assisted Type state) {
-        this.eventbus = eventbus;
-        this.state = state;
+    public IOState(MessageInputStateMachine.Factory stateMachineFactory, @Assisted T stoppable, @Assisted Type state) {
         this.stoppable = stoppable;
         this.startedAt = Tools.nowUTC();
+        //noinspection unchecked
+        this.stateMachine = stateMachineFactory.create(state, (IOState<MessageInput>) this, (MessageInput) stoppable);
     }
 
     public T getStoppable() {
@@ -75,7 +88,7 @@ public class IOState<T extends Stoppable> {
     }
 
     public Type getState() {
-        return state;
+        return stateMachine.getState();
     }
 
     public boolean canBeStarted() {
@@ -85,19 +98,50 @@ public class IOState<T extends Stoppable> {
         };
     }
 
-    public void setState(Type state, String detailedMessage) {
-        this.setDetailedMessage(detailedMessage);
-
-        if (this.state == state) {
-            return;
-        }
-        final IOStateChangedEvent<T> evt = IOStateChangedEvent.create(this.state, state, this);
-        this.state = state;
-        this.eventbus.post(evt);
+    public void triggerSetup() {
+        trigger(Trigger.SETUP);
     }
 
-    public void setState(Type state) {
-        setState(state, null);
+    public void triggerStart() {
+        trigger(Trigger.START);
+    }
+
+    public void triggerRunning() {
+        trigger(Trigger.RUNNING);
+    }
+
+    public void triggerStop() {
+        trigger(Trigger.STOP);
+    }
+
+    public void triggerStopped() {
+        trigger(Trigger.STOPPED);
+    }
+
+    public void triggerTerminate() {
+        trigger(Trigger.TERMINATE);
+    }
+
+    public void triggerFail(MessageInputFailure failure) {
+        withLock(stateMachine.failTrigger().getTrigger(), () -> stateMachine.fire(stateMachine.failTrigger(), failure));
+    }
+
+    private void trigger(Trigger trigger) {
+        withLock(trigger, () -> stateMachine.fire(trigger));
+    }
+
+    private void withLock(Trigger trigger, Runnable runnable) {
+        try {
+            if (!lock.tryLock(lockTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
+                LOG.warn("Couldn't acquire lock to fire trigger: {} (timeout: {})", trigger, lockTimeout);
+                return;
+            }
+            runnable.run();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public DateTime getStartedAt() {
@@ -118,11 +162,11 @@ public class IOState<T extends Stoppable> {
 
     @Override
     public String toString() {
-        return "InputState{" +
+        return "IOState{" +
                 "stoppable=" + stoppable +
-                ", state=" + state +
                 ", startedAt=" + startedAt +
                 ", detailedMessage='" + detailedMessage + '\'' +
+                ", stateMachine=" + stateMachine +
                 '}';
     }
 
