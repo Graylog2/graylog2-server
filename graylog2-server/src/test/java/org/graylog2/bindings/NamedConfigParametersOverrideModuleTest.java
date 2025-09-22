@@ -67,7 +67,7 @@ public class NamedConfigParametersOverrideModuleTest {
     @Test
     public void inheritedParameterBindsOnce() {
         var subConfigA = new SubConfigA("test_param_value");
-        var subConfigB = new SubConfigB("test_param_value_2", "test_param_2_value");
+        var subConfigB = new SubConfigB("test_param_value", "test_param_2_value");
 
         Injector injector = Guice.createInjector(
                 new NamedConfigParametersOverrideModule(List.of(subConfigA, subConfigB), false)
