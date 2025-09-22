@@ -29,8 +29,6 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.List;
 import java.util.Locale;
 
-import static java.util.Objects.isNull;
-
 public class DatanodeInstance extends OpenSearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_PRE_52;
@@ -38,8 +36,8 @@ public class DatanodeInstance extends OpenSearchInstance {
     private final String passwordSecret;
     private final String rootPasswordSha2;
 
-    public DatanodeInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
-        super(version, hostname, network, heapSize, featureFlags);
+    public DatanodeInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+        super(cachedInstance, version, hostname, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.rootPasswordSha2 = rootPasswordSha2;
@@ -65,8 +63,6 @@ public class DatanodeInstance extends OpenSearchInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new GenericContainer<>(DockerImageName.parse(image))
                 .withImagePullPolicy(PullPolicy.alwaysPull())
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
                 //.withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)

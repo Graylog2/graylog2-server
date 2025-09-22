@@ -26,6 +26,6 @@ public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevI
 
     @Override
     protected DatanodeDevInstance instantiate() {
-        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
+        return new DatanodeDevInstance(getCachedInstance(), getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
     }
 }

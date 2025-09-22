@@ -65,8 +65,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Objects.isNull;
-
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
@@ -78,12 +76,12 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        this(version, hostname, network, heapSize, featureFlags, Map.of());
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of());
     }
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
-        super(version, hostname, network, heapSize, env);
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(cachedInstance, version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;
     }
 
@@ -222,8 +220,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         var container = new OpenSearchContainer(DockerImageName.parse(image))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")

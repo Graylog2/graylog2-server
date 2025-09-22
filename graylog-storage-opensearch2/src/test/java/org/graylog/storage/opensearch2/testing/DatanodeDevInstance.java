@@ -35,8 +35,8 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     private final String passwordSecret;
     private final PluginJarsProvider datanodePluginJarsProvider;
 
-    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String heapSize, final List<String> featureFlags, Map<String, String> env, PluginJarsProvider datanodePluginJarsProvider) {
-        super(version, hostname, network, heapSize, featureFlags, env);
+    public DatanodeDevInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String heapSize, final List<String> featureFlags, Map<String, String> env, PluginJarsProvider datanodePluginJarsProvider) {
+        super(cachedInstance, version, hostname, network, heapSize, featureFlags, env);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.datanodePluginJarsProvider = datanodePluginJarsProvider;

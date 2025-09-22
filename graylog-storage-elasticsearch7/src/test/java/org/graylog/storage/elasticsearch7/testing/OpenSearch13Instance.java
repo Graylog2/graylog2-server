@@ -41,8 +41,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 
-import static java.util.Objects.isNull;
-
 public class OpenSearch13Instance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearch13Instance.class);
 
@@ -55,8 +53,8 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public OpenSearch13Instance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, hostname, network, heapSize);
+    public OpenSearch13Instance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(cachedInstance, version, hostname, network, heapSize);
         this.featureFlags = featureFlags;
     }
 
@@ -123,8 +121,6 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpenSearchContainer(DockerImageName.parse(image))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")

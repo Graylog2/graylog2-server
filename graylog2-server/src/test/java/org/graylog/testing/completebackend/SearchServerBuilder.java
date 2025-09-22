@@ -37,9 +37,19 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     private String passwordSecret;
     private String rootPasswordSha2;
     private PluginJarsProvider datanodePluginJarsProvider;
+    private boolean cachedInstance = true;
 
     public SearchServerBuilder(final SearchVersion version) {
         this.version = version;
+    }
+
+    public SearchServerBuilder<T> cachedInstance(final boolean cachedInstance) {
+        this.cachedInstance = cachedInstance;
+        return this;
+    }
+
+    public boolean getCachedInstance() {
+        return cachedInstance;
     }
 
     public SearchVersion getVersion() {
