@@ -19,12 +19,13 @@ import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import { Users } from '@graylog/server-api';
+
 import selectEvent from 'helpers/selectEvent';
 import { alice as existingUser } from 'fixtures/users';
 import { rolesList } from 'fixtures/roles';
 import { UsersActions } from 'stores/users/UsersStore';
 import { asMock } from 'helpers/mocking';
-import FetchError from 'logic/errors/FetchError';
 
 import UserCreate from './UserCreate';
 
@@ -42,7 +43,12 @@ const mockLoadRolesPromise = Promise.resolve({
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
-    loadByUsername: jest.fn(),
+  },
+}));
+
+jest.mock('@graylog/server-api', () => ({
+  Users: {
+    checkUsernameAvailability: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -60,7 +66,7 @@ describe('<UserCreate />', () => {
   const findSubmitButton = () => screen.findByRole('button', { name: /create user/i });
 
   beforeEach(() => {
-    asMock(UsersActions.loadByUsername).mockImplementation(() => Promise.reject(new FetchError('', 404, {})));
+    asMock(Users.checkUsernameAvailability).mockImplementation(() => Promise.resolve({ available: true }));
   });
 
   it(
@@ -161,7 +167,7 @@ describe('<UserCreate />', () => {
   it(
     'should display warning if username is already taken',
     async () => {
-      asMock(UsersActions.loadByUsername).mockReturnValue(Promise.resolve(existingUser));
+      asMock(Users.checkUsernameAvailability).mockReturnValue(Promise.resolve({ available: false }));
 
       render(<UserCreate />);
 

@@ -18,11 +18,12 @@ import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
+import type { ConfigurationField } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import AppConfig from 'util/AppConfig';
 import type { Input } from 'components/messageloaders/Types';
-import type { ConfigurationField } from 'components/configurationforms';
+import { Alert } from 'components/bootstrap';
 
 type FormValues = Input['attributes'];
 
@@ -40,6 +41,7 @@ type Props = {
   values?: FormValues;
   setShowModal: (show: boolean) => void;
   submitButtonText: string;
+  description?: string;
 };
 
 const InputForm = ({
@@ -49,6 +51,7 @@ const InputForm = ({
   titleValue = undefined,
   title,
   typeName,
+  description = undefined,
   includeTitleField = undefined,
   handleSubmit,
   values = undefined,
@@ -130,6 +133,11 @@ const InputForm = ({
       submitAction={onSubmit}
       typeName={typeName}
       cancelAction={onCancel}>
+      {description && (
+        <Alert bsStyle="info">
+          {description}
+        </Alert>
+      )}
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
       </HideOnCloud>

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotNull;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.joda.time.Period;
 
@@ -32,7 +31,6 @@ import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN;
 
 @AutoValue
-@WithBeanGetter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect
 public abstract class FallbackDataTieringConfig implements DataTieringConfig {

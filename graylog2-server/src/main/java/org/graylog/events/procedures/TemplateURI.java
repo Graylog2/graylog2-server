@@ -27,21 +27,15 @@ import java.util.Map;
 record TemplateURI(String path, Map<String, String> parameters) {
     private static final Logger LOG = LoggerFactory.getLogger(TemplateURI.class);
 
-    static final String HTTP_EXTERNAL_URI = "${http_external_uri}";
-
-    public String getLink() {
-        final StringBuilder linkBuilder = new StringBuilder(HTTP_EXTERNAL_URI);
-        linkBuilder.append(path);
+    public URIBuilder getLinkPath() {
+        //final StringBuilder linkBuilder = new StringBuilder();
+        final URIBuilder uriBuilder = new URIBuilder();
+        uriBuilder.setPath(path);
+        //linkBuilder.append(path);
         if (parameters != null && !parameters.isEmpty()) {
-            final URIBuilder uriBuilder = new URIBuilder();
             parameters.forEach(uriBuilder::addParameter);
-            try {
-                linkBuilder.append("?").append(uriBuilder.build().getQuery());
-            } catch (URISyntaxException e) {
-                LOG.warn("Unable to build link: ", e);
-            }
         }
-        return linkBuilder.toString();
+        return uriBuilder;
     }
 
     public static Builder builder() {

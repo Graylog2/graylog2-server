@@ -80,5 +80,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20250804104500_TightenTokenSecurity.class);
         addMigration(V20250815000000_CreateDefaultPasswordRequirements.class);
         addMigration(V20250820180000_ReapplyIndexSetScopeMigration.class);
+        addMigration(V20250917184400_AddSystemEntitySource.class);
     }
 }
