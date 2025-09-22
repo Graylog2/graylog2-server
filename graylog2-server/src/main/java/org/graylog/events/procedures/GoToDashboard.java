@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,6 +26,8 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
+import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
@@ -68,6 +71,15 @@ public class GoToDashboard extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(EventDto event) {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("dashboards/" + dashboardId());
+            uriBuilder.setParameters(parameters());
+            return uriBuilder.build().getLinkPath();
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {

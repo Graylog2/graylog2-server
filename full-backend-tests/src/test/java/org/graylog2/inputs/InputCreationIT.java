@@ -27,7 +27,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class InputCreationIT {
-
     private final GraylogApis apis;
 
     public InputCreationIT(GraylogApis apis) {

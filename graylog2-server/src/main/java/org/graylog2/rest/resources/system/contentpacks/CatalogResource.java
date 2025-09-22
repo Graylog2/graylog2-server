@@ -21,11 +21,21 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -38,19 +48,6 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-
 import java.util.Set;
 
 @RequiresAuthentication
@@ -58,14 +55,14 @@ import java.util.Set;
 @Path("/system/catalog")
 @Produces(MediaType.APPLICATION_JSON)
 public class CatalogResource extends RestResource {
-    private final ContentPackService contentPackService;
     private final EntityTitleService entityTitleService;
+    private final ContentPackEntityResolver contentPackEntityResolver;
 
     @Inject
-    public CatalogResource(final ContentPackService contentPackService,
-                           final EntityTitleService entityTitleService) {
-        this.contentPackService = contentPackService;
+    public CatalogResource(final EntityTitleService entityTitleService,
+                           final ContentPackEntityResolver contentPackEntityResolver) {
         this.entityTitleService = entityTitleService;
+        this.contentPackEntityResolver = contentPackEntityResolver;
     }
 
     @GET
@@ -73,7 +70,7 @@ public class CatalogResource extends RestResource {
     @ApiOperation(value = "List available entities in this Graylog cluster")
     @RequiresPermissions(RestPermissions.CATALOG_LIST)
     public CatalogIndexResponse showEntityIndex() {
-        final Set<EntityExcerpt> entities = contentPackService.listAllEntityExcerpts();
+        final Set<EntityExcerpt> entities = contentPackEntityResolver.listAllEntityExcerpts();
         return CatalogIndexResponse.create(entities);
     }
 
@@ -86,8 +83,8 @@ public class CatalogResource extends RestResource {
             @ApiParam(name = "JSON body", required = true)
             @Valid @NotNull CatalogResolveRequest request) {
         final Set<EntityDescriptor> requestedEntities = request.entities();
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(requestedEntities);
-        final ImmutableSet<Entity> entities = contentPackService.collectEntities(resolvedEntities);
+        final Set<EntityDescriptor> resolvedEntities = contentPackEntityResolver.resolveEntities(requestedEntities);
+        final ImmutableSet<Entity> entities = contentPackEntityResolver.collectEntities(resolvedEntities);
 
         return CatalogResolveResponse.create(entities);
     }

@@ -63,6 +63,7 @@ declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     'components.shared.entityActions'?: Array<EntitySharedAction<unknown, unknown>>;
     'components.shared.entityTableElements'?: Array<TableElement<EntityBase>>;
+    'components.permission.shared.entity.tableElements'?: Array<Partial<TableElement<EntityBase>>>;
     'components.collection'?: {
       AddCollectionFormGroup: React.ComponentType<{
         entityType?: string;
@@ -78,6 +79,7 @@ declare module 'graylog-web-plugin/plugin' {
         entityGRN: string;
         entityTypeTitle?: string | null | undefined;
       }>;
+      UserCollections: React.ComponentType<{ userId: string }>;
     };
   }
 }

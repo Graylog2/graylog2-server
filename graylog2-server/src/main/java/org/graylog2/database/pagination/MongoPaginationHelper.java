@@ -97,6 +97,17 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     MongoPaginationHelper<T> pipeline(List<Bson> pipeline);
 
     /**
+     * Specifies whether to include the entity source metadata in the result. For this to work properly when set to
+     * true, T must implement {@link org.graylog2.database.entities.SourcedMongoEntity}. Otherwise, there will never
+     * be any source metadata included in the result.
+     *
+     * @param includeSourceMetadata true if T should include the source metadata, false otherwise.
+     *                              By default, this is false.
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> includeSourceMetadata(boolean includeSourceMetadata);
+
+    /**
      * Perform the MongoDB request and return the specified page.
      *
      * @param pageNumber The number of the page to be returned.

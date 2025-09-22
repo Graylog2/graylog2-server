@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -35,35 +34,34 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ClusterEvent implements MongoEntity {
     @Id
     @ObjectId
     @Nullable
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("timestamp")
     public abstract long timestamp();
 
-    @JsonProperty
+    @JsonProperty("producer")
     @Nullable
     public abstract String producer();
 
-    @JsonProperty
+    @JsonProperty("consumers")
     @Nullable
     public abstract Set<String> consumers();
 
-    @JsonProperty
+    @JsonProperty("event_class")
     @Nullable
     public abstract String eventClass();
 
-    @JsonProperty
+    @JsonProperty("payload")
     @Nullable
     public abstract Object payload();
 
 
     @JsonCreator
-    public static ClusterEvent create(@Id @ObjectId @JsonProperty("id") @Nullable String id,
+    public static ClusterEvent create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                       @JsonProperty("timestamp") long timestamp,
                                       @JsonProperty("producer") @Nullable String producer,
                                       @JsonProperty("consumers") @Nullable Set<String> consumers,

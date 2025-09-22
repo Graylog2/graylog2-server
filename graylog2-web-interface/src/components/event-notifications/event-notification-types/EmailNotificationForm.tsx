@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 
 import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
 import { LookupTableFields } from 'components/lookup-tables';
@@ -24,6 +23,7 @@ import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
@@ -87,6 +87,29 @@ const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="
 // eslint-disable-next-line no-template-curly-in-string
 const LOOKUP_KEY_PLACEHOLDER_TEXT = '${event.group_by_fields.group_by_field}';
 
+const EventProcedureCheckbox = ({ checked, onChange }) => {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
+
+  if (!validSecurityLicense) {
+    return null;
+  }
+
+  return (
+    <FormGroup>
+      <Input
+        type="checkbox"
+        id="include_event_procedure"
+        name="include_event_procedure"
+        label="Include Event Procedure in Email Body"
+        onChange={onChange}
+        checked={checked}
+      />
+    </FormGroup>
+  );
+};
+
 type EmailNotificationFormProps = {
   config: any;
   validation: any;
@@ -129,6 +152,7 @@ class EmailNotificationForm extends React.Component<
     lookup_bcc_emails: false,
     bcc_emails_lut_name: null,
     bcc_emails_lut_key: null,
+    include_event_procedure: false,
   };
 
   propagateChange = (key, value) => {
@@ -264,7 +288,7 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
+          {validation?.errors?.recipients?.[0] || 'Add email addresses that will receive this Notification.'}
         </HelpBlock>
       </FormGroup>
     );
@@ -281,11 +305,10 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
-        help={get(
-          validation,
-          'errors.recipients_lut_key[0]',
-          'Event Field name whose value will be used as Lookup Table Key.',
-        )}
+        help={
+          validation?.errors?.recipients_lut_key?.[0] ||
+          'Event Field name whose value will be used as Lookup Table Key.'
+        }
         value={config.recipients_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -324,11 +347,8 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {get(
-            validation,
-            'errors.cc_emails[0]',
-            'Add email addresses that will be on the CC line of this Notification.',
-          )}
+          {validation?.errors?.cc_emails?.[0] ||
+            'Add email addresses that will be on the CC line of this Notification.'}
         </HelpBlock>
       </FormGroup>
     );
@@ -345,11 +365,9 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.cc_emails_lut_key ? 'error' : null}
-        help={get(
-          validation,
-          'errors.cc_emails_lut_key[0]',
-          'Event Field name whose value will be used as Lookup Table Key.',
-        )}
+        help={
+          validation?.errors?.cc_emails_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+        }
         value={config.cc_emails_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -388,11 +406,8 @@ class EmailNotificationForm extends React.Component<
           allowCreate
         />
         <HelpBlock>
-          {get(
-            validation,
-            'errors.bcc_emails[0]',
-            'Add email addresses that will be on the BCC line of this Notification.',
-          )}
+          {validation?.errors?.bcc_emails?.[0] ||
+            'Add email addresses that will be on the BCC line of this Notification.'}
         </HelpBlock>
       </FormGroup>
     );
@@ -409,11 +424,10 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.bcc_emails_lut_key ? 'error' : null}
-        help={get(
-          validation,
-          'errors.bcc_emails_lut_key[0]',
-          'Event Field name whose value will be used as Lookup Table Key.',
-        )}
+        help={
+          validation?.errors?.bcc_emails_lut_key?.[0] ||
+          'Event Field name whose value will be used as Lookup Table Key.'
+        }
         value={config.bcc_emails_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -448,11 +462,10 @@ class EmailNotificationForm extends React.Component<
         }
         type="text"
         bsStyle={validation.errors.sender ? 'error' : null}
-        help={get(
-          validation,
-          'errors.sender[0]',
-          'The email address that should be used as the notification sender. Leave it empty to use the default sender address.',
-        )}
+        help={
+          validation?.errors?.sender?.[0] ||
+          'The email address that should be used as the notification sender. Leave it empty to use the default sender address.'
+        }
         value={config.sender || ''}
         onChange={this.handleChange}
       />
@@ -470,11 +483,9 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.sender_lut_key ? 'error' : null}
-        help={get(
-          validation,
-          'errors.sender_lut_key[0]',
-          'Event Field name whose value will be used as Lookup Table Key.',
-        )}
+        help={
+          validation?.errors?.sender_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+        }
         value={config.sender_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -505,7 +516,7 @@ class EmailNotificationForm extends React.Component<
         label="Reply-To (Optional)"
         type="text"
         bsStyle={validation.errors.replyto ? 'error' : null}
-        help={get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
+        help={validation?.errors?.reply_to?.[0] || 'The email address that recipients should use for replies.'}
         value={config.reply_to || ''}
         onChange={this.handleChange}
       />
@@ -523,11 +534,9 @@ class EmailNotificationForm extends React.Component<
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.reply_to_lut_key ? 'error' : null}
-        help={get(
-          validation,
-          'errors.reply_to_lut_key[0]',
-          'Event Field name whose value will be used as Lookup Table Key.',
-        )}
+        help={
+          validation?.errors?.reply_to_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+        }
         value={config.reply_to_lut_key || ''}
         onChange={this.handleChange}
         required
@@ -559,7 +568,7 @@ class EmailNotificationForm extends React.Component<
           label="Subject"
           type="text"
           bsStyle={validation.errors.subject ? 'error' : null}
-          help={get(validation, 'errors.subject[0]', 'The subject that should be used for the email notification.')}
+          help={validation?.errors?.subject?.[0] || 'The subject that should be used for the email notification.'}
           value={config.subject || ''}
           onChange={this.handleChange}
           required
@@ -611,7 +620,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('user_recipients')}
             />
             <HelpBlock>
-              {get(validation, 'errors.recipients[0]', 'Select users that will receive this Notification.')}
+              {validation?.errors?.recipients?.[0] || 'Select users that will receive this Notification.'}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -637,7 +646,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('cc_users')}
             />
             <HelpBlock>
-              {get(validation, 'errors.cc_users[0]', 'Select users that will be on the CC line of this Notification.')}
+              {validation?.errors?.cc_users?.[0] || 'Select users that will be on the CC line of this Notification.'}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -663,11 +672,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('bcc_users')}
             />
             <HelpBlock>
-              {get(
-                validation,
-                'errors.bcc_users[0]',
-                'Select users that will be on the BCC line of this Notification.',
-              )}
+              {validation?.errors?.bcc_users?.[0] || 'Select users that will be on the BCC line of this Notification.'}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -708,7 +713,7 @@ class EmailNotificationForm extends React.Component<
             onChange={this.handleBodyTemplateChange}
           />
           <HelpBlock>
-            {get(validation, 'errors.body[0]', 'The template that will be used to generate the email body.')}
+            {validation?.errors?.body?.[0] || 'The template that will be used to generate the email body.'}
           </HelpBlock>
         </FormGroup>
         <FormGroup controlId="notification-body-template" validationState={validation.errors.body ? 'error' : null}>
@@ -721,9 +726,10 @@ class EmailNotificationForm extends React.Component<
             onChange={this.handleHtmlBodyTemplateChange}
           />
           <HelpBlock>
-            {get(validation, 'errors.body[0]', 'The template that will be used to generate the email HTML body.')}
+            {validation?.errors?.body?.[0] || 'The template that will be used to generate the email HTML body.'}
           </HelpBlock>
         </FormGroup>
+        <EventProcedureCheckbox checked={config.include_event_procedure} onChange={this.handleChange} />
       </>
     );
   }

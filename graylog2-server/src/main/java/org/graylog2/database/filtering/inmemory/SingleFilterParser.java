@@ -29,7 +29,7 @@ public class SingleFilterParser {
 
     public static final String FIELD_AND_VALUE_SEPARATOR = ":";
     public static final String RANGE_VALUES_SEPARATOR = "><";
-    static final String WRONG_FILTER_EXPR_FORMAT_ERROR_MSG =
+    public static final String WRONG_FILTER_EXPR_FORMAT_ERROR_MSG =
             "Wrong filter expression, <field_name>" + FIELD_AND_VALUE_SEPARATOR + "<field_value> format should be used";
 
     public Filter parseSingleExpression(final String filterExpression, final List<EntityAttribute> attributes) {

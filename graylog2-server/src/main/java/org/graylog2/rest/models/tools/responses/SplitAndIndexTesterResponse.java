@@ -20,18 +20,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SplitAndIndexTesterResponse {
-    @JsonProperty
+    @JsonProperty("successful")
     public abstract boolean successful();
 
-    @JsonProperty
+    @JsonProperty("cut")
     @Nullable
     public abstract String cut();
 
@@ -42,7 +40,7 @@ public abstract class SplitAndIndexTesterResponse {
     public abstract int endIndex();
 
     @JsonCreator
-    public static SplitAndIndexTesterResponse create(@JsonProperty("total") boolean successful,
+    public static SplitAndIndexTesterResponse create(@JsonProperty("successful") boolean successful,
                                                      @JsonProperty("cut") @Nullable String cut,
                                                      @JsonProperty("begin_index") int beginIndex,
                                                      @JsonProperty("end_index") int endIndex) {

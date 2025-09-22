@@ -19,13 +19,11 @@ package org.graylog.plugins.map.geoip;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class GeoIpDbFileChangedEvent {
-    
+
     @JsonCreator
     public static GeoIpDbFileChangedEvent create() {
         return new AutoValue_GeoIpDbFileChangedEvent();

@@ -45,6 +45,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ListConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
@@ -150,7 +151,6 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConvers
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
-import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
@@ -236,6 +236,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(ListConversion.NAME, new ListConversion());
         functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
@@ -1149,6 +1150,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_default_null")).isNull();
         assertThat(message.getField("map_default_null_set_single_field")).isNull();
+
+        assertThat(message.getField("list_1")).isEqualTo(List.of("foo"));
+        assertThat(message.getField("list_2")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_3")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_default_null_set_single_field")).isNull();
     }
 
     @Test
