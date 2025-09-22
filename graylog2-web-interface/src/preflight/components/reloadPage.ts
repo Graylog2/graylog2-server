@@ -14,13 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.lock;
+const reloadPage = () => window.location.reload();
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
-public class MongoLockServiceTest5 extends MongoLockServiceTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO5);
-}
+export default reloadPage;

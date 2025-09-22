@@ -31,7 +31,6 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
-import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.configuration.HttpConfiguration;
@@ -58,7 +57,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,9 +84,6 @@ public class SlackEventNotificationTest {
 
     @Mock
     EventProcedureProvider mockEventProcedureProvider;
-
-    @Mock
-    EventProcedure mockEventProcedure;
 
     private SlackEventNotificationConfig slackEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
@@ -346,8 +341,7 @@ public class SlackEventNotificationTest {
 
     @Test
     public void testAlertWithEventProcedure() throws EventNotificationException {
-        when(mockEventProcedure.toText(eventNotificationContext.event())).thenReturn("procedure_text");
-        when(mockEventProcedureProvider.getDecoratedForEvent(any(), eq(eventNotificationContext.event()))).thenReturn(Optional.ofNullable(mockEventProcedure));
+        when(mockEventProcedureProvider.getAsText(any(), eq(eventNotificationContext.event()))).thenReturn("procedure_text");
         SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
                 .customMessage("A custom message")
                 .iconEmoji("")

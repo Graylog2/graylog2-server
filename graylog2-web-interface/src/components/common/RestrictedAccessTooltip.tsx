@@ -14,20 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix;
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-public enum MongodbServer {
-    MONGO7("7.0");
+import { Icon, Tooltip } from 'components/common';
 
-    public static final MongodbServer DEFAULT_VERSION = MONGO7;
+type Props = {
+  entityName: string;
+  capabilityName: string;
+};
 
-    private final String version;
+const StyledIcon = styled(Icon)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xxs};
+  `,
+);
 
-    MongodbServer(String version) {
-        this.version = version;
-    }
+const RestrictedAccessTooltip = ({ entityName, capabilityName }: Props) => (
+  <Tooltip label={`You don't have permissions to ${capabilityName} this ${entityName}.`}>
+    <StyledIcon size="xs" name="lock" />
+  </Tooltip>
+);
 
-    public String getVersion() {
-        return version;
-    }
-}
+export default RestrictedAccessTooltip;

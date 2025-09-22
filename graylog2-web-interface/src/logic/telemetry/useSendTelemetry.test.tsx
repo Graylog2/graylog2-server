@@ -32,19 +32,9 @@ const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren
 );
 
 describe('useSendTelemetry', () => {
-  const setLocation = (pathname: string) =>
-    Object.defineProperty(window, 'location', {
-      value: {
-        pathname,
-      },
-      writable: true,
-    });
-
-  const oldLocation = window.location.pathname;
-
-  afterEach(() => {
-    window.location.pathname = oldLocation;
-  });
+  const setLocation = (pathname: string) => {
+    window.history.pushState({}, '', pathname);
+  };
 
   it('should return `sendTelemetry` that retrieves current route', () => {
     setLocation('/welcome');
