@@ -28,7 +28,14 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")})
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             searchVersions = SearchServer.DATANODE_DEV,
+                             onlyOnDataNode = true,
+                             additionalConfigurationParameters = {
+                                     @GraylogBackendConfiguration.ConfigurationParameter(
+                                             key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")
+                             }
+)
 public class DatanodeRestProxyIT {
 
     private GraylogApis apis;
@@ -62,7 +69,7 @@ public class DatanodeRestProxyIT {
         final List<String> datanodes = apis.system().datanodes().properJSONPath().read("elements.*.hostname");
         Assertions.assertThat(datanodes).isNotEmpty();
 
-        final String hostname = datanodes.iterator().next();
+        final String hostname = datanodes.getFirst();
         apis.get("/datanodes/" + hostname + "/rest/", 200)
                 .assertThat().body("opensearch.node.node_name", Matchers.equalTo("indexer"));
 

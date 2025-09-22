@@ -72,6 +72,7 @@ import java.time.ZoneId;
 import java.util.Collections;
 
 @GraylogBackendConfiguration(searchVersions = SearchServer.DATANODE_DEV,
+                             onlyOnDataNode = true,
                              additionalConfigurationParameters = {
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
