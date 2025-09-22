@@ -116,6 +116,11 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     }
 
     @Override
+    public String instanceId() {
+        return null;
+    }
+
+    @Override
     public void importFixtureResource(String resourcePath, Class<?> testClass) {
         boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
 
