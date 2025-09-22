@@ -51,10 +51,10 @@ export default class DataTableVisualizationConfig extends VisualizationConfig {
   }
 
   toBuilder() {
-    const { pinnedColumns } = this._value;
+    const { pinnedColumns, showRowNumbers } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ pinnedColumns }));
+    return new Builder(Immutable.Map({ pinnedColumns, showRowNumbers }));
   }
 
   static create(pinnedColumns: PinnedColumns, showRowNumbers: boolean = true) {
