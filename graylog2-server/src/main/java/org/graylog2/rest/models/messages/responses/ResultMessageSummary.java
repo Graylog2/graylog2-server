@@ -22,13 +22,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class ResultMessageSummary {
     private static final String FIELD_HIGHLIGHT_RANGES = "highlight_ranges";
@@ -62,21 +60,21 @@ public abstract class ResultMessageSummary {
                                               @JsonProperty(FIELD_INDEX) String index,
                                               @JsonProperty(FIELD_DECORATION_STATS) DecorationStats decorationStats) {
         return builder()
-            .decorationStats(decorationStats)
-            .highlightRanges(highlightRanges)
-            .index(index)
-            .message(message)
-            .build();
+                .decorationStats(decorationStats)
+                .highlightRanges(highlightRanges)
+                .index(index)
+                .message(message)
+                .build();
     }
 
     public static ResultMessageSummary create(@Nullable @JsonProperty(FIELD_HIGHLIGHT_RANGES) Multimap<String, Range<Integer>> highlightRanges,
                                               @JsonProperty(FIELD_MESSAGE) Map<String, Object> message,
                                               @JsonProperty(FIELD_INDEX) String index) {
         return builder()
-            .highlightRanges(highlightRanges)
-            .index(index)
-            .message(message)
-            .build();
+                .highlightRanges(highlightRanges)
+                .index(index)
+                .message(message)
+                .build();
     }
 
     @AutoValue.Builder

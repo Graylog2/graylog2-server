@@ -166,7 +166,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SYSTEM_JOB_ACKNOWLEDGE = PREFIX + "system_job:acknowledge";
     public static final String SYSTEM_NOTIFICATION_CREATE = PREFIX + "system_notification:create";
     public static final String SYSTEM_NOTIFICATION_DELETE = PREFIX + "system_notification:delete";
-    public static final String URL_WHITELIST_UPDATE = PREFIX + "url_whitelist:update";
+    public static final String URL_ALLOWLIST_UPDATE = PREFIX + "url_allowlist:update";
     public static final String USER_ACCESS_TOKEN_CREATE = PREFIX + "user_access_token:create";
     public static final String USER_ACCESS_TOKEN_DELETE = PREFIX + "user_access_token:delete";
     public static final String USER_CREATE = PREFIX + "user:create";
@@ -320,7 +320,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SYSTEM_JOB_ACKNOWLEDGE)
             .add(SYSTEM_NOTIFICATION_CREATE)
             .add(SYSTEM_NOTIFICATION_DELETE)
-            .add(URL_WHITELIST_UPDATE)
+            .add(URL_ALLOWLIST_UPDATE)
             .add(USER_ACCESS_TOKEN_CREATE)
             .add(USER_ACCESS_TOKEN_DELETE)
             .add(USER_CREATE)

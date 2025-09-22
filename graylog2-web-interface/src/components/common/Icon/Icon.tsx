@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
 import type { SizeProp, RotateProp, IconName, FlipProp, IconType } from './types';
@@ -98,24 +98,27 @@ type Props = {
  * Uses Material Symbols: https://fonts.google.com/icons
  * Have a look at the `BrandIcon` component for brand icons.
  */
-const Icon = ({
-  bsStyle = undefined,
-  name,
-  type = 'solid',
-  size = undefined,
-  className = undefined,
-  rotation = 0,
-  spin = false,
-  flip = undefined,
-  style = undefined,
-  'data-testid': testId = undefined,
-  onClick = undefined,
-  onMouseEnter = undefined,
-  onMouseLeave = undefined,
-  onFocus = undefined,
-  tabIndex = undefined,
-  title = undefined,
-}: Props) => (
+const Icon = (
+  {
+    bsStyle = undefined,
+    name,
+    type = 'solid',
+    size = undefined,
+    className = undefined,
+    rotation = 0,
+    spin = false,
+    flip = undefined,
+    style = undefined,
+    'data-testid': testId = undefined,
+    onClick = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    onFocus = undefined,
+    tabIndex = undefined,
+    title = undefined,
+  }: Props,
+  ref: React.ForwardedRef<HTMLSpanElement>,
+) => (
   <StyledSpan
     className={`material-symbols-rounded ${className ?? ''}`}
     data-testid={testId}
@@ -126,6 +129,7 @@ const Icon = ({
     onMouseEnter={onMouseEnter}
     onMouseLeave={onMouseLeave}
     tabIndex={tabIndex}
+    ref={ref}
     $bsStyle={bsStyle}
     $rotation={rotation}
     $flip={flip}
@@ -136,4 +140,4 @@ const Icon = ({
   </StyledSpan>
 );
 
-export default Icon;
+export default forwardRef(Icon);

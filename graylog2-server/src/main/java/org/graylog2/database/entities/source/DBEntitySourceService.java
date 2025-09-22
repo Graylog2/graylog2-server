@@ -20,17 +20,29 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.rest.resources.entities.FilterOption;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.set;
-import static org.graylog2.database.utils.MongoUtils.objectIdEq;
+import static org.graylog2.database.entities.source.EntitySource.SYSTEM;
+import static org.graylog2.database.entities.source.EntitySource.USER_DEFINED;
 
 public class DBEntitySourceService {
 
     public static final String COLLECTION_NAME = "entity_source";
     private final MongoCollection<EntitySource> collection;
+    public static final Set<FilterOption> FILTER_OPTIONS = Set.of(
+            FilterOption.create(USER_DEFINED, "User Defined"),
+            FilterOption.create(SYSTEM, "System"),
+            FilterOption.create("ILLUMINATE", "Illuminate"));
 
     @Inject
     public DBEntitySourceService(MongoCollections mongoCollections) {
@@ -49,8 +61,17 @@ public class DBEntitySourceService {
         collection.updateMany(filterByParentId, updateParentId);
     }
 
-
     public void deleteByEntityId(String entityId) {
-        collection.deleteMany(objectIdEq(EntitySource.FIELD_ENTITY_ID, entityId));
+        bulkDeleteByEntityId(Set.of(entityId));
+    }
+
+    public void bulkDeleteByEntityId(Set<String> entityIds) {
+        // Delete all EntitySource documents where entity_id or parent_id matches one of the given entity IDs
+        final Set<ObjectId> entityObjectIds = entityIds.stream().map(ObjectId::new).collect(Collectors.toSet());
+        final Bson filter = or(
+                in(EntitySource.FIELD_ENTITY_ID, entityObjectIds),
+                in(EntitySource.FIELD_PARENT_ID, entityObjectIds)
+        );
+        collection.deleteMany(filter);
     }
 }
