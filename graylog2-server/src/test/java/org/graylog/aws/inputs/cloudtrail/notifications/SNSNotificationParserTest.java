@@ -16,24 +16,26 @@
  */
 package org.graylog.aws.inputs.cloudtrail.notifications;
 
-import com.amazonaws.services.sqs.model.Message;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.aws.notifications.SNSNotification;
+import org.graylog.aws.notifications.SNSNotificationParser;
 import org.junit.Test;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CloudtrailSNSNotificationParserTest {
+public class SNSNotificationParserTest {
     private final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @Test
-    public void testParse() throws Exception {
-        final Message message = new Message()
-                .withBody("{\n" +
+    public void testParse() {
+        final Message message = Message.builder()
+                .body("{\n" +
                         "  \"Type\" : \"Notification\",\n" +
                         "  \"MessageId\" : \"55508fe9-870b-590c-960f-c34960b669f0\",\n" +
                         "  \"TopicArn\" : \"arn:aws:sns:eu-west-1:459220251735:cloudtrail-write\",\n" +
@@ -43,40 +45,40 @@ public class CloudtrailSNSNotificationParserTest {
                         "  \"Signature\" : \"O05joR97NvGHqMJQwsSNXzeSHrtbLqbRcqsXB7xmqARyaCGXjaVh2duwTUL93s4YvoNENnOEMzkILKI5PwmQQPha5/cmj6FSjblwRMMga6Xzf6cMnurT9TphQO7z35foHG49IejW05IkzIwD/DW0GvafJLah+fQI3EFySnShzXLFESGQuumdS8bxnM5r96ne8t+MEAHfBCVyQ/QrduO9tTtfXAz6OeWg1IEwV3TeZ5c5SS5vRxxhsD4hOJSmXAUM99CeQfcG9s7saBcvyyGPZrhPEh8S1uhiTmLvr6h1voM9vgiCbCCUujExvg+bnqsXWTZBmnatF1iOyxFfYcZ6kw==\",\n" +
                         "  \"SigningCertURL\" : \"https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem\",\n" +
                         "  \"UnsubscribeURL\" : \"https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:459220251735:cloudtrail-write:9a3a4e76-4173-4c8c-b488-0126315ba643\"\n" +
-                        "}");
+                        "}").build();
 
-        CloudtrailSNSNotificationParser parser = new CloudtrailSNSNotificationParser(objectMapper);
+        SNSNotificationParser parser = new SNSNotificationParser(objectMapper);
 
-        List<CloudtrailSNSNotification> notifications = parser.parse(message);
+        List<SNSNotification> notifications = parser.parse(message);
         assertEquals(1, notifications.size());
 
-        CloudtrailSNSNotification notification = notifications.get(0);
+        SNSNotification notification = notifications.get(0);
 
         assertEquals(notification.getS3Bucket(), "cloudtrailbucket");
         assertEquals(notification.getS3ObjectKey(), "example/AWSLogs/459220251735/CloudTrail/eu-west-1/2014/09/27/459220251735_CloudTrail_eu-west-1_20140927T1625Z_UPwzr7ft2mf0Q1SS.json.gz");
     }
 
     @Test
-    public void testParseWithUnknownProperty() throws Exception {
-        final Message message = new Message()
-                .withBody("{\"Message\" : \"{\\\"Foobar\\\" : \\\"Quux\\\",\\\"s3Bucket\\\":\\\"cloudtrailbucket\\\",\\\"s3ObjectKey\\\":[\\\"example/AWSLogs/459220251735/CloudTrail/eu-west-1/2014/09/27/459220251735_CloudTrail_eu-west-1_20140927T1625Z_UPwzr7ft2mf0Q1SS.json.gz\\\"]}\"}");
+    public void testParseWithUnknownProperty() {
+        final Message message = Message.builder()
+                .body("{\"Message\" : \"{\\\"Foobar\\\" : \\\"Quux\\\",\\\"s3Bucket\\\":\\\"cloudtrailbucket\\\",\\\"s3ObjectKey\\\":[\\\"example/AWSLogs/459220251735/CloudTrail/eu-west-1/2014/09/27/459220251735_CloudTrail_eu-west-1_20140927T1625Z_UPwzr7ft2mf0Q1SS.json.gz\\\"]}\"}").build();
 
-        CloudtrailSNSNotificationParser parser = new CloudtrailSNSNotificationParser(objectMapper);
+        SNSNotificationParser parser = new SNSNotificationParser(objectMapper);
 
-        List<CloudtrailSNSNotification> notifications = parser.parse(message);
+        List<SNSNotification> notifications = parser.parse(message);
         assertEquals(1, notifications.size());
 
-        CloudtrailSNSNotification notification = notifications.get(0);
+        SNSNotification notification = notifications.get(0);
 
         assertEquals(notification.getS3Bucket(), "cloudtrailbucket");
         assertEquals(notification.getS3ObjectKey(), "example/AWSLogs/459220251735/CloudTrail/eu-west-1/2014/09/27/459220251735_CloudTrail_eu-west-1_20140927T1625Z_UPwzr7ft2mf0Q1SS.json.gz");
     }
 
     @Test
-    public void issue_44() throws Exception {
+    public void issue_44() {
         // https://github.com/Graylog2/graylog-plugin-aws/issues/44
-        final Message message = new Message()
-                .withBody("{\n" +
+        final Message message = Message.builder()
+                .body("{\n" +
                         "  \"Type\" : \"Notification\",\n" +
                         "  \"MessageId\" : \"5b0a73e6-a4f8-11e7-8dfb-8f76310a10a8\",\n" +
                         "  \"TopicArn\" : \"arn:aws:sns:eu-west-1:123456789012:cloudtrail-log-write\",\n" +
@@ -87,18 +89,18 @@ public class CloudtrailSNSNotificationParserTest {
                         "  \"Signature\" : \"...\",\n" +
                         "  \"SigningCertURL\" : \"https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-....pem\",\n" +
                         "  \"UnsubscribeURL\" : \"https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:123456789012:cloudtrail-log-write:5b0a73e6-a4f8-11e7-8dfb-8f76310a10a8\"\n" +
-                        "}");
+                        "}").build();
 
-        CloudtrailSNSNotificationParser parser = new CloudtrailSNSNotificationParser(objectMapper);
+        SNSNotificationParser parser = new SNSNotificationParser(objectMapper);
 
-        List<CloudtrailSNSNotification> notifications = parser.parse(message);
+        List<SNSNotification> notifications = parser.parse(message);
         assertTrue(notifications.isEmpty());
     }
 
     @Test
-    public void testParseWithTwoS3Objects() throws Exception {
-        final Message doubleMessage = new Message()
-                .withBody("{\n" +
+    public void testParseWithTwoS3Objects() {
+        final Message doubleMessage = Message.builder()
+                .body("{\n" +
                         "  \"Type\" : \"Notification\",\n" +
                         "  \"MessageId\" : \"11a04c4a-094e-5395-b297-00eaefda2893\",\n" +
                         "  \"TopicArn\" : \"arn:aws:sns:eu-west-1:459220251735:cloudtrail-write\",\n" +
@@ -108,15 +110,15 @@ public class CloudtrailSNSNotificationParserTest {
                         "  \"Signature\" : \"q9xmJZ8nJR5iaAYMLN3M8v9HyLbUqbLjGGFlmmvIK9UDQiQO0wmvlYeo5/lQqvANW/v+NVXZxxOoWx06p6Rv5BwXIa2ASVh7RlXc2y+U2pQgLaQlJ671cA33iBi/iH1al/7lTLrlIkUb9m2gAdEyulbhZfBfAQOm7GN1PHR/nW+CtT61g4KvMSonNzj23jglLTb0r6pxxQ5EmXz6Jo5DOsbXvuFt0BSyVP/8xRXT1ap0S7BuUOstz8+FMqdUyOQSR9RA9r61yUsJ4nnq0KfK5/1gjTTDPmE4OkGvk6AuV9YTME7FWTY/wU4LPg5/+g/rUo2UDGrxnGoJ3OUW5yrtyQ==\",\n" +
                         "  \"SigningCertURL\" : \"https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem\",\n" +
                         "  \"UnsubscribeURL\" : \"https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:459220251735:cloudtrail-write:9a3a4e76-4173-4c8c-b488-0126315ba643\"\n" +
-                        "}");
+                        "}").build();
 
-        CloudtrailSNSNotificationParser parser = new CloudtrailSNSNotificationParser(objectMapper);
+        SNSNotificationParser parser = new SNSNotificationParser(objectMapper);
 
-        List<CloudtrailSNSNotification> notifications = parser.parse(doubleMessage);
+        List<SNSNotification> notifications = parser.parse(doubleMessage);
         assertEquals(2, notifications.size());
 
-        CloudtrailSNSNotification notification1 = notifications.get(0);
-        CloudtrailSNSNotification notification2 = notifications.get(1);
+        SNSNotification notification1 = notifications.get(0);
+        SNSNotification notification2 = notifications.get(1);
 
         assertEquals(notification1.getS3Bucket(), "cloudtrailbucket");
         assertEquals(notification1.getS3ObjectKey(), "example/AWSLogs/459220251735/CloudTrail/eu-west-1/2014/09/27/459220251735_CloudTrail_eu-west-1_20140927T1620Z_Nk2SdmlEzA0gDpPr.json.gz");

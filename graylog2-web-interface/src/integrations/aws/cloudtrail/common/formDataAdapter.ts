@@ -17,9 +17,11 @@
 import type { FormDataType } from 'integrations/types';
 
 import type { AWSCloudTrailGenericInputCreateRequest, AWSCloudTrailInputCreateRequest } from '../types';
+import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 
 export const toAWSCloudTrailInputCreateRequest = ({
   awsCloudTrailName,
+  awsAuthenticationType,
   awsCloudTrailThrottleEnabled,
   pollingInterval,
   awsAccessKey,
@@ -28,20 +30,30 @@ export const toAWSCloudTrailInputCreateRequest = ({
   awsCloudTrailRegion,
   assumeRoleArn,
   overrideSource,
+  key,
+  secret
 }: FormDataType): AWSCloudTrailInputCreateRequest => ({
-  name: awsCloudTrailName.value,
-  polling_interval: pollingInterval.value,
+  name: awsCloudTrailName?.value,
+  ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
+    ? {
+      aws_access_key: awsAccessKey?.value,
+      aws_secret_key: awsSecret?.value,
+    }
+    : {
+      aws_access_key: key,
+      aws_secret_key: secret,
+    }),
+  polling_interval: pollingInterval?.value,
   enable_throttling: !!awsCloudTrailThrottleEnabled?.value,
-  cloudtrail_queue_name: awsCloudTrailSqsQueueName.value,
-  aws_access_key: awsAccessKey.value,
-  aws_secret_key: awsSecret.value,
-  aws_region: awsCloudTrailRegion.value,
+  cloudtrail_queue_name: awsCloudTrailSqsQueueName?.value,
+  aws_region: awsCloudTrailRegion?.value,
   assume_role_arn: assumeRoleArn?.value,
   override_source: overrideSource?.value,
 });
 
 export const toGenericInputCreateRequest = ({
   awsCloudTrailName,
+  awsAuthenticationType,
   awsCloudTrailThrottleEnabled,
   awsAccessKey,
   awsSecret,
@@ -49,18 +61,27 @@ export const toGenericInputCreateRequest = ({
   awsCloudTrailSqsQueueName,
   awsCloudTrailRegion,
   assumeRoleArn,
+  key,
+  secret,
   overrideSource,
 }: FormDataType): AWSCloudTrailGenericInputCreateRequest => ({
   type: 'org.graylog.aws.inputs.cloudtrail.CloudTrailInput',
-  title: awsCloudTrailName.value,
+  title: awsCloudTrailName?.value,
   global: false,
   configuration: {
-    polling_interval: pollingInterval.value,
+    ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
+      ? {
+        aws_access_key: awsAccessKey?.value,
+        aws_secret_key: awsSecret?.value,
+      }
+      : {
+        aws_access_key: key,
+        aws_secret_key: secret,
+      }),
+    polling_interval: pollingInterval?.value,
     throttling_allowed: !!awsCloudTrailThrottleEnabled?.value,
-    cloudtrail_queue_name: awsCloudTrailSqsQueueName.value,
-    aws_access_key: awsAccessKey.value,
-    aws_secret_key: awsSecret.value,
-    aws_region: awsCloudTrailRegion.value,
+    cloudtrail_queue_name: awsCloudTrailSqsQueueName?.value,
+    aws_region: awsCloudTrailRegion?.value,
     assume_role_arn: assumeRoleArn?.value,
     override_source: overrideSource?.value,
   },

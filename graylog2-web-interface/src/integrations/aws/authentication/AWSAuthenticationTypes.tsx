@@ -34,14 +34,34 @@ const AuthWrapper = styled.div(
   `,
 );
 
-type AWSAuthenticationTypesProps = {
-  onChange: (...args: any[]) => void;
+type FieldConfig = {
+  keyField?: string;
+  secretField?: string;
+  arnField?: string;
+  clearFields?: string[];
 };
 
-const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
+type AWSAuthenticationTypesProps = {
+  onChange: (...args: any[]) => void;
+  fieldConfig?: FieldConfig;
+};
+
+const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
-  const { awsAuthenticationType, awsCloudWatchAwsSecret, awsCloudWatchAwsKey, awsCloudWatchAssumeARN } = formData;
+  // Default field configuration for CloudWatch (backward compatibility)
+  const config = {
+    keyField: 'awsCloudWatchAwsKey',
+    secretField: 'awsCloudWatchAwsSecret',
+    arnField: 'awsCloudWatchAssumeARN',
+    clearFields: ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'],
+    ...fieldConfig,
+  };
+
+  const { awsAuthenticationType } = formData;
+  const awsKey = formData[config.keyField];
+  const awsSecret = formData[config.secretField];
+  const awsARN = formData[config.arnField];
 
   let defaultAuthTypeValue;
 
@@ -65,15 +85,20 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
     onChange({ target: { name: 'awsAuthenticationType', value: e.target.value } });
 
     if (isType(AWS_AUTH_TYPES.automatic)) {
-      clearField('awsCloudWatchAwsKey');
-      clearField('awsCloudWatchAwsSecret');
+      config.clearFields.forEach((field) => clearField(field));
     }
   };
 
   return (
     <>
       {AppConfig.isCloud() ? (
-        <KeySecret awsKey={awsCloudWatchAwsKey} awsSecret={awsCloudWatchAwsSecret} onChange={onChange} />
+        <KeySecret 
+          awsKey={awsKey} 
+          awsSecret={awsSecret} 
+          onChange={onChange}
+          keyFieldId={config.keyField}
+          secretFieldId={config.secretField}
+        />
       ) : (
         <>
           <Input
@@ -94,12 +119,18 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret awsKey={awsCloudWatchAwsKey} awsSecret={awsCloudWatchAwsSecret} onChange={onChange} />
+              <KeySecret 
+                awsKey={awsKey} 
+                awsSecret={awsSecret} 
+                onChange={onChange}
+                keyFieldId={config.keyField}
+                secretFieldId={config.secretField}
+              />
             )}
           </AuthWrapper>
         </>
       )}
-      <ARN awsARN={awsCloudWatchAssumeARN} onChange={onChange} />
+      {config.arnField && <ARN awsARN={awsARN} onChange={onChange} arnFieldId={config.arnField} />}
     </>
   );
 };

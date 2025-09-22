@@ -11,7 +11,8 @@ import type { ErrorMessageType, HandleFieldUpdateType, HandleSubmitType } from '
 import { renderOptions } from '../common/Options';
 import FormWrap from '../common/FormWrap';
 import ValidatedInput from '../common/ValidatedInput';
-import AWSAuthenticationTypes from './AWSAuthenticationTypes';
+import AWSAuthenticationTypes from '../authentication/AWSAuthenticationTypes';
+import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 
 type StepAuthorizeProps = {
   onSubmit: HandleSubmitType;
@@ -67,8 +68,13 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       });
   };
 
+  const authType = formData.awsAuthenticationType && formData.awsAuthenticationType.value;
+
   const isFormValid = formValidation.isFormValid(
-    ['awsCloudTrailName', 'awsAccessKey', 'awsSecret', 'awsCloudTrailRegion'],
+    ['awsCloudTrailName',
+      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecret'] : []),
+      'awsCloudTrailRegion',
+      'awsCloudTrailSqsQueueName'],
     formData,
   );
 
@@ -95,7 +101,15 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         required
       />
 
-      <AWSAuthenticationTypes onChange={onChange} />
+      <AWSAuthenticationTypes
+        onChange={onChange}
+        fieldConfig={{
+          keyField: 'awsAccessKey',
+          secretField: 'awsSecret',
+          arnField: 'assumeRoleArn',
+          clearFields: ['awsAccessKey', 'awsSecret'],
+        }}
+      />
 
       <ValidatedInput
         type="select"
@@ -117,16 +131,6 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         help="SQS queue name created by the CloudTrail Subscriber"
         label="SQS Queue Name"
         required
-      />
-      <ValidatedInput
-        type="text"
-        id="assumeRoleArn"
-        fieldData={formData.assumeRoleArn}
-        label="AWS Assume Role (ARN)"
-        onChange={onChange}
-        help="Amazon Resource Name with required cross account permission"
-        placeholder="arn:aws:sts::123456789012:assumed-role/some-role"
-        maxLength={2048}
       />
     </FormWrap>
   );

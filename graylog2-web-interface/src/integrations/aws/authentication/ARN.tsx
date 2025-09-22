@@ -23,17 +23,18 @@ type ARNProps = {
     value?: string;
   };
   onChange: (...args: any[]) => void;
+  arnFieldId?: string;
 };
 
 const ARN = ({
   awsARN = {
     value: '',
   },
-
   onChange,
+  arnFieldId = 'awsCloudWatchAssumeARN',
 }: ARNProps) => (
   <Input
-    id="awsCloudWatchAssumeARN"
+    id={arnFieldId}
     type="text"
     value={awsARN.value}
     onChange={onChange}
