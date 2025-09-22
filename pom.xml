@@ -1065,6 +1065,7 @@
                             -Xep:FloggerLogVarargs:OFF
                             -Xep:FloggerLogWithCause:OFF
                             -Xep:FloggerMessageFormat:OFF
+                            -Xep:FloggerPerWithoutRateLimit:OFF
                             -Xep:FloggerRedundantIsEnabled:OFF
                             -Xep:FloggerRequiredModifiers:OFF
                             -Xep:FloggerSplitLogStatement:OFF
