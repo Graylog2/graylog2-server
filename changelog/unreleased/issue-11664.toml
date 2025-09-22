@@ -1,0 +1,4 @@
+type = "a"
+message = "Add automatic authentication for AWS Cloudtrail Input."
+
+issues = ["11664"]
