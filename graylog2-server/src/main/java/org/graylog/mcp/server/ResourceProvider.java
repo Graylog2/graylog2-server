@@ -56,8 +56,9 @@ public abstract class ResourceProvider {
      * Provide a list of available resources
      *
      * @param cursor a nullable cursor to provide pagination information
+     * @param pageSize number of items to return
      */
-    public abstract List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor);
+    public abstract List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize);
 
     /**
      * Templates are used to guide MCP clients, <a href="https://modelcontextprotocol.io/specification/2025-06-18/server/resources#resource-templates">see the spec.</a>

@@ -24,6 +24,8 @@ import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
 import com.github.victools.jsonschema.generator.SchemaVersion;
+import com.github.victools.jsonschema.module.jackson.JacksonModule;
+import com.github.victools.jsonschema.module.jackson.JacksonOption;
 import org.graylog.jsonschema.EmptyObjectAsObjectModule;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.plugin.security.Permission;
@@ -40,7 +42,8 @@ public abstract class Tool<P, O> {
 
     // MCP inexplicable uses Draft 7 of JSON Schema
     private static final SchemaGeneratorConfigBuilder CONFIG_BUILDER = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7, OptionPreset.PLAIN_JSON);
-    private static final SchemaGeneratorConfig CONFIG = CONFIG_BUILDER.with(new EmptyObjectAsObjectModule()).build();
+    private static final SchemaGeneratorConfig CONFIG = CONFIG_BUILDER.with(new EmptyObjectAsObjectModule())
+            .with(new JacksonModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED)).build();
     private static final SchemaGenerator GENERATOR = new SchemaGenerator(CONFIG);
 
     private final ObjectMapper objectMapper;

@@ -428,6 +428,11 @@
                 <artifactId>jsonschema-generator</artifactId>
                 <version>${json-schema-generator.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-module-jackson</artifactId>
+                <version>${jsonschema-module-jackson.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

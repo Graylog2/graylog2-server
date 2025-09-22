@@ -72,7 +72,7 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor) {
+    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
         try (var dtos = eventDefinitionService.streamAll()) {
             return dtos
                     .map(eventDefinition -> new McpSchema.Resource(

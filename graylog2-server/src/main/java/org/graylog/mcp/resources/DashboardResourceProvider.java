@@ -75,7 +75,7 @@ public class DashboardResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor) {
+    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
         final Stream<ViewDTO> resultStream = viewService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 new SearchQuery(""),

@@ -73,7 +73,7 @@ public class StreamResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor) {
+    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
         // TODO adapting pagination is a bit awkward right now, we'll simply skip it to make it work
         try (var dtos = streamService.streamAllDTOs()) {
             return dtos

@@ -83,7 +83,7 @@ public class McpService {
                 // currently, so we need to skip it at the moment. MCP doesn't have any way to scope it to resource types
                 // so we are a bit dead in the water in the way we need to adapt it.
                 final List<McpSchema.Resource> resourceList = this.resourceProviders.values().stream()
-                        .map(resourceProvider -> resourceProvider.list(null))
+                        .map(resourceProvider -> resourceProvider.list(null, null))
                         .flatMap(List::stream)
                         .toList();
                 return Optional.of(new McpSchema.ListResourcesResult(resourceList, null));
