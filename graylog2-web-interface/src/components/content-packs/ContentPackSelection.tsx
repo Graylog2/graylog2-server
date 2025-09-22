@@ -14,46 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import styled from 'styled-components';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
+import { Icon, SearchForm } from 'components/common';
 import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
+import ContentPackSelectionList from 'components/content-packs/ContentPackSelectionList';
 
 import style from './ContentPackSelection.css';
-
-const HeaderText = styled.span`
-  overflow-wrap: anywhere;
-`;
-
-const HeaderIcon = styled(Icon)(
-  ({ theme }) => `
-  padding-top: ${theme.spacings.xxs};
-  padding-right: ${theme.spacings.xxs};
-`,
-);
-
-const _entityItemHeader = (entity) => {
-  if (entity instanceof Entity) {
-    return (
-      <>
-        <HeaderIcon name="archive" className={style.contentPackEntity} /> <span>{entity.title}</span>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <HeaderIcon name="dns" /> <HeaderText>{entity.title}</HeaderText>
-    </>
-  );
-};
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -75,12 +46,6 @@ class ContentPackSelection extends React.Component<
     entities: {},
     selectedEntities: {},
   };
-
-  static _toDisplayTitle(title) {
-    const newTitle = title.split('_').join(' ');
-
-    return newTitle[0].toUpperCase() + newTitle.substr(1);
-  }
 
   constructor(props) {
     super(props);
@@ -189,7 +154,7 @@ class ContentPackSelection extends React.Component<
     onStateChange({ selectedEntities: newSelection });
   };
 
-  _updateSelectionGroup = (type) => {
+  _updateSelectionGroup = (type: string) => {
     const { selectedEntities, entities, onStateChange } = this.props;
     const { isFiltered, filteredEntities } = this.state;
 
@@ -210,27 +175,6 @@ class ContentPackSelection extends React.Component<
     this._handleTouched('selection');
     this._validate(newSelection);
     onStateChange({ selectedEntities: newSelection });
-  };
-
-  _isUndetermined = (type) => {
-    const { selectedEntities, entities } = this.props;
-
-    if (!selectedEntities[type]) {
-      return false;
-    }
-
-    return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
-  };
-
-  _isSelected = (entity) => {
-    const { selectedEntities } = this.props;
-    const typeName = entity.type.name;
-
-    if (!selectedEntities[typeName]) {
-      return false;
-    }
-
-    return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
   };
 
   _isGroupSelected = (type) => {
@@ -278,48 +222,7 @@ class ContentPackSelection extends React.Component<
 
   render() {
     const { filteredEntities = {}, errors, touched, isFiltered, contentPack } = this.state;
-    const { edit } = this.props;
-
-    const entitiesComponent = Object.keys(filteredEntities)
-      .sort((a, b) => naturalSort(a, b))
-      .map((entityType) => {
-        const group = filteredEntities[entityType];
-        const entities = group
-          .sort((a, b) => naturalSort(a.title, b.title))
-          .map((entity) => {
-            const checked = this._isSelected(entity);
-            const header = _entityItemHeader(entity);
-
-            return (
-              <ExpandableListItem
-                onChange={() => this._updateSelectionEntity(entity)}
-                key={entity.id}
-                checked={checked}
-                expandable={false}
-                padded={false}
-                header={header}
-              />
-            );
-          });
-
-        if (group.length <= 0) {
-          return null;
-        }
-
-        return (
-          <ExpandableListItem
-            key={entityType}
-            onChange={() => this._updateSelectionGroup(entityType)}
-            indetermined={this._isUndetermined(entityType)}
-            checked={this._isGroupSelected(entityType)}
-            stayExpanded={isFiltered}
-            expanded={isFiltered}
-            padded={false}
-            header={ContentPackSelection._toDisplayTitle(entityType)}>
-            <ExpandableList>{entities}</ExpandableList>
-          </ExpandableListItem>
-        );
-      });
+    const { edit, selectedEntities } = this.props;
 
     return (
       <div>
@@ -420,7 +323,14 @@ class ContentPackSelection extends React.Component<
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
             {touched.selection && errors.selection && <InputDescription error={errors.selection} />}
-            <ExpandableList>{entitiesComponent}</ExpandableList>
+            <ContentPackSelectionList
+              entities={filteredEntities}
+              selectedEntities={selectedEntities}
+              isFiltered={isFiltered}
+              isGroupSelected={this._isGroupSelected}
+              updateSelectionEntity={this._updateSelectionEntity}
+              updateSelectionGroup={this._updateSelectionGroup}
+            />
           </Col>
         </Row>
       </div>

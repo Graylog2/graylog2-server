@@ -16,6 +16,7 @@
  */
 package org.graylog.pipelines;
 
+import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
@@ -46,7 +48,7 @@ public class StreamsPipelinesIT {
     private static String pipeline2Id;
 
     @BeforeAll
-    static void beforeAll(GraylogApis graylogApis) {
+    static void beforeAll(GraylogApis graylogApis) throws ExecutionException, RetryException {
         api = graylogApis;
         indexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
         stream1Id = api.streams().createStream("New Stream 1", indexSetId);

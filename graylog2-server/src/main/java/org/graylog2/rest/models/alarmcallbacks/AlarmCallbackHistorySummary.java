@@ -20,11 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class AlarmCallbackHistorySummary {
     private static final String FIELD_ID = "id";
@@ -54,11 +52,11 @@ public abstract class AlarmCallbackHistorySummary {
 
     @JsonCreator
     public static AlarmCallbackHistorySummary create(@JsonProperty(FIELD_ID) String id,
-                                                  @JsonProperty(FIELD_ALARMCALLBACKCONFIGURATION) AlarmCallbackSummary alarmcallbackConfiguration,
-                                                  @JsonProperty(FIELD_ALERT_ID) String alertId,
-                                                  @JsonProperty(FIELD_ALERTCONDITION_ID) String alertConditionId,
-                                                  @JsonProperty(FIELD_RESULT) AlarmCallbackResult result,
-                                                  @JsonProperty(FIELD_CREATED_AT) DateTime createdAt) {
+                                                     @JsonProperty(FIELD_ALARMCALLBACKCONFIGURATION) AlarmCallbackSummary alarmcallbackConfiguration,
+                                                     @JsonProperty(FIELD_ALERT_ID) String alertId,
+                                                     @JsonProperty(FIELD_ALERTCONDITION_ID) String alertConditionId,
+                                                     @JsonProperty(FIELD_RESULT) AlarmCallbackResult result,
+                                                     @JsonProperty(FIELD_CREATED_AT) DateTime createdAt) {
         return new AutoValue_AlarmCallbackHistorySummary(id, alarmcallbackConfiguration, alertId, alertConditionId, result, createdAt);
     }
 }

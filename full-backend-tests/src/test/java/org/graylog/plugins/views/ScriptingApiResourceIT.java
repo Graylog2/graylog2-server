@@ -96,7 +96,7 @@ public class ScriptingApiResourceIT {
                         {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
                         """);
 
-        api.search().waitForMessagesCount(3);
+        api.search().waitForMessages("search-sync-test", "search-sync-test-2", "search-sync-test-3");
         api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level");
     }
 

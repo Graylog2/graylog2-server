@@ -18,7 +18,6 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.Sets;
 import jakarta.inject.Inject;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
 import java.util.Set;
@@ -44,7 +43,7 @@ public class EventStreamService {
             // to make sure only users that have access to all message streams can see the event.
             try (var stream = streamService.streamAllIds()) {
                 sourceStreams = stream
-                        .filter(streamId -> !Stream.NON_MESSAGE_STREAM_IDS.contains(streamId))
+                        .filter(streamId -> !streamService.getSystemStreamIds(false).contains(streamId))
                         .collect(Collectors.toSet());
             }
         } else if (searchStreams.isEmpty()) {

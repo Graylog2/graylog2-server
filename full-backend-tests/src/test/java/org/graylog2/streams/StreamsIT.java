@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams;
 
+import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog2.rest.models.tools.responses.PageListResponse.ELEMENTS_FIELD_NAME;
@@ -41,7 +43,7 @@ public class StreamsIT {
     private final List<String> createdIndexSetIds = new ArrayList<>();
 
     @BeforeAll
-    void beforeAll(GraylogApis graylogApis) {
+    void beforeAll(GraylogApis graylogApis) throws ExecutionException, RetryException {
         api = graylogApis;
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         final String newIndexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");

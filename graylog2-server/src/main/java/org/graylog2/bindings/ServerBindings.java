@@ -76,6 +76,9 @@ import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.models.system.indices.DefaultDataTieringStatusService;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
+import org.graylog2.rest.models.users.requests.SearchStartPage;
+import org.graylog2.rest.models.users.requests.StreamStartPage;
 import org.graylog2.rest.resources.entities.preferences.listeners.EntityListPreferencesCleanerOnUserDeletion;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
@@ -135,6 +138,7 @@ public class ServerBindings extends Graylog2Module {
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
+        registerJacksonSubtypes();
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         if (!isMigrationCommand) {
@@ -228,6 +232,12 @@ public class ServerBindings extends Graylog2Module {
         dynamicFeatures.addBinding().toInstance(RestrictToLeaderFeature.class);
         dynamicFeatures.addBinding().toInstance(SupportedSearchVersionDynamicFeature.class);
         dynamicFeatures.addBinding().toInstance(CSPDynamicFeature.class);
+    }
+
+    private void registerJacksonSubtypes() {
+        registerJacksonSubtype(DashboardStartPage.class, DashboardStartPage.TYPE);
+        registerJacksonSubtype(SearchStartPage.class, SearchStartPage.TYPE);
+        registerJacksonSubtype(StreamStartPage.class, StreamStartPage.TYPE);
     }
 
     private void bindExceptionMappers() {

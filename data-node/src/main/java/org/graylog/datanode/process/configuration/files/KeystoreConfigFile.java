@@ -22,6 +22,14 @@ import org.graylog.security.certutil.csr.KeystoreInformation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 public record KeystoreConfigFile(Path relativePath,
                                  KeystoreInformation keystoreInformation) implements DatanodeConfigFile {
@@ -32,7 +40,36 @@ public record KeystoreConfigFile(Path relativePath,
             if (keystoreInformation.password().length == 0) {
                 throw new IllegalArgumentException("Keystore password is empty!");
             }
-            keystoreInformation().loadKeystore().store(stream, keystoreInformation.password());
+            KeyStore keyStore = keystoreInformation().loadKeystore();
+
+            Enumeration<String> aliases = keyStore.aliases();
+            Set<String> invalidAliases = new HashSet<>();
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                if (keyStore.isKeyEntry(alias)) {
+                    Certificate[] certificateChain = keyStore.getCertificateChain(alias);
+                    for (Certificate certificate : certificateChain) {
+                        try {
+                            ((X509Certificate) certificate).checkValidity();
+                        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+                            invalidAliases.add(alias);
+                        }
+                    }
+                } else if (keyStore.isCertificateEntry(alias)) {
+                    Certificate certificate = keyStore.getCertificate(alias);
+                    try {
+                        ((X509Certificate) certificate).checkValidity();
+                    } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+                        invalidAliases.add(alias);
+                    }
+                }
+            }
+
+            for (String alias : invalidAliases) {
+                keyStore.deleteEntry(alias);
+            }
+
+            keyStore.store(stream, keystoreInformation.password());
         } catch (Exception e) {
             throw new OpensearchConfigurationException("Failed to persist opensearch keystore file " + relativePath, e);
         }

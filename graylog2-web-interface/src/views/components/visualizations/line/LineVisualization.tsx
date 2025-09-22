@@ -24,10 +24,9 @@ import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolatio
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import useMapKeys from 'views/components/visualizations/useMapKeys';
-import { keySeparator, humanSeparator } from 'views/Constants';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -38,33 +37,19 @@ const LineVisualization = makeVisualization(
       LineVisualizationConfig.empty()) as LineVisualizationConfig;
     const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
     const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
-    const mapKeys = useMapKeys();
-    const rowPivotFields = useMemo(
-      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
-      [config?.rowPivots],
-    );
-    const _mapKeys = useCallback(
-      (labels: string[]) =>
-        labels.map((label) =>
-          label
-            .split(keySeparator)
-            .map((l, i) => mapKeys(l, rowPivotFields[i]))
-            .join(humanSeparator),
-        ),
-      [mapKeys, rowPivotFields],
-    );
 
     const chartGenerator: Generator = useCallback(
       ({ type, name, labels, values, originalName, fullPath }) => ({
         type,
         name,
-        x: _mapKeys(labels),
+        x: labels,
         y: values,
+        originalLabels: labels,
         originalName,
         line: { shape: toPlotly(interpolation) },
         ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
       }),
-      [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation],
+      [getChartDataSettingsWithCustomUnits, interpolation],
     );
 
     const rows = useMemo(() => retrieveChartData(data), [data]);
@@ -85,21 +70,31 @@ const LineVisualization = makeVisualization(
       chartData: chartDataResult,
     });
     const layout = useMemo<Partial<Layout>>(() => {
-      const _layouts = shapes ? { shapes } : {};
+      const _layouts: Partial<Layout> = getChartLayoutSettingsWithCustomUnits();
+      if (shapes) {
+        _layouts.shapes = [...(_layouts.shapes ?? []), ...shapes];
+      }
 
-      return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
+      return _layouts;
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
+
     return (
-      <XYPlot
-        config={config}
-        plotLayout={layout}
-        axisType={axisType}
-        effectiveTimerange={effectiveTimerange}
-        height={height}
-        width={width}
-        chartData={chartDataResult}
-      />
+      <>
+        <XYPlot
+          config={config}
+          plotLayout={layout}
+          axisType={axisType}
+          effectiveTimerange={effectiveTimerange}
+          height={height}
+          width={width}
+          chartData={chartDataResult}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        {popover}
+      </>
     );
   },
   'line',

@@ -37,7 +37,7 @@ public class EventNotificationsResourceIT {
     static void setUp(GraylogApis graylogApis) {
         apis = graylogApis;
         webhookServerInstance = apis.backend().getWebhookServerInstance().orElseThrow();
-        graylogApis.system().urlWhitelist(webhookServerInstance.getContainerizedCollectorURI());
+        graylogApis.system().urlAllowlist(webhookServerInstance.getContainerizedCollectorURI());
     }
 
     @ContainerMatrixTest

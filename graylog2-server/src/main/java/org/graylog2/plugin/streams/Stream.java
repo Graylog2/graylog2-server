@@ -83,6 +83,10 @@ public interface Stream {
 
     String getId();
 
+    String getScope();
+
+    boolean isEditable();
+
     String getTitle();
 
     String getDescription();
@@ -122,12 +126,4 @@ public interface Stream {
      * @return hash code based on routing related fields
      */
     int getFingerprint();
-
-    static boolean isSystemStreamId(String id) {
-        return ALL_SYSTEM_STREAM_IDS.contains(id);
-    }
-
-    static boolean streamIsEditable(String streamId) {
-        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
-    }
 }

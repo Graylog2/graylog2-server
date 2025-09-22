@@ -17,6 +17,7 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -28,6 +29,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +56,7 @@ public class FieldTypeMappingsIT {
     }
 
     @ContainerMatrixTest
-    void changeFieldTypeFromStringToIp() {
+    void changeFieldTypeFromStringToIp() throws ExecutionException, RetryException {
         var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", INDEX_PREFIX);
         var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test-id", false));
         var gelfInput = api.gelf().createGelfHttpInput();

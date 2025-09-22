@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = ViewStateDTO.Builder.class)
-@WithBeanGetter
 public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
     static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useRef } from 'react';
-import $ from 'jquery';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
@@ -29,7 +28,7 @@ type Props = {
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   show: boolean;
   submitButtonText?: string;
-  onSubmitForm?: (event) => void;
+  onSubmitForm?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onCancel: () => void;
   title: string | React.ReactNode;
   children: React.ReactNode;
@@ -56,12 +55,8 @@ const BootstrapModalForm = ({
 
   const submit = (event) => {
     const formDOMNode = form.current;
-    const $formDOMNode = $(formDOMNode) as any;
 
-    if (
-      (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||
-      (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())
-    ) {
+    if (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) {
       event.preventDefault();
 
       return;

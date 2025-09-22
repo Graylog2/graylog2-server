@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed issue causing Event Notificaiton to be unusable after creation without global notifications permissions."
+
+pulls = ["23677"]
