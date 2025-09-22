@@ -50,7 +50,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-@GraylogBackendConfiguration(searchVersions = SearchServer.DATANODE_DEV)
+@GraylogBackendConfiguration(searchVersions = SearchServer.DATANODE_DEV, onlyOnDataNode = true)
 @Disabled("temporarily disabled")
 public class RemoteReindexingMigrationIT {
 
