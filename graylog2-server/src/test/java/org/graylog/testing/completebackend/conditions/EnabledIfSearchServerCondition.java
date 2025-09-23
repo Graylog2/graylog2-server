@@ -36,13 +36,15 @@ public record EnabledIfSearchServerCondition(SearchVersion searchVersion) implem
         final var annotation = optionalAnnotation.get();
         final var distribution = annotation.distribution();
 
-        if (isBlank(annotation.version()) && distribution != SearchVersion.Distribution.DATANODE) {
-            throw new IllegalArgumentException("@EnabledIfSearchServer must have a value for \"version\", unless distribution is \"DATANODE\"");
-        }
-
         if (searchVersion.distribution() != distribution) {
             return ConditionEvaluationResult.disabled(f("Disabled, because distribution is \"%s\", but required is \"%s\"",
                     searchVersion.distribution(), distribution));
+        }
+
+        if (distribution == SearchVersion.Distribution.DATANODE) {
+            return ConditionEvaluationResult.enabled(null);
+        } else if (isBlank(annotation.version())) {
+            throw new IllegalArgumentException("@EnabledIfSearchServer must have a value for \"version\", unless distribution is \"DATANODE\"");
         }
 
         final var versionRange = annotation.version();
