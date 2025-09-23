@@ -57,6 +57,8 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
     @Override
     public String apply(PermissionHelper permissionHelper, SystemInfoTool.Parameters unused) {
         try {
+            // TODO: find a better way to do this. This is all verbatim from org.graylog2.shared.rest.resources.system.SystemResource::system
+
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
             return new ObjectMapper().writeValueAsString(SystemOverviewResponse.create("graylog-server",

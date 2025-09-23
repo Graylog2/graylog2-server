@@ -52,7 +52,7 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
                 """
                         List all configured Graylog inputs. Returns detailed information about each input including type (syslog, GELF, etc.), current state (running/stopped),
                         configuration parameters, and throughput statistics. Use this to monitor input health, troubleshoot data ingestion issues, or understand what types of
-                        logs are being collected. No parameters required. Returns JSON-formatted input details..
+                        logs are being collected. No parameters required. Returns JSON-formatted input details.
                         """);
         this.inputService = inputService;
         this.availableInputs = messageInputFactory.getAvailableInputs();
@@ -66,6 +66,7 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
             return mapper.writeValueAsString(
                     inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
                             .map(input -> {
+                                // TODO: find a better way to do this. This is all verbatim from org.graylog2.rest.resources.system.inputs.AbstractInputsResource::getInputSummary
                                 final InputDescription inputDescription = this.availableInputs.get(input.getType());
                                 final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
                                 final Map<String, Object> configuration = permissionHelper.isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) && permissionHelper.isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.getType()) ?
@@ -90,6 +91,8 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
     }
 
     public static class Parameters {}
+
+    // TODO: find a better way to do this. These are all verbatim copies from org.graylog2.rest.resources.system.inputs.AbstractInputsResource
 
     protected Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
         if (configuration == null || configurationRequest == null) {
