@@ -115,6 +115,16 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             return;
         }
         final GraylogBackendConfiguration config = backendConfiguration.get();
+
+        if (config.serverLifecycle() == Lifecycle.VM) {
+            if (config.additionalConfigurationParameters().length > 0) {
+                throw new IllegalArgumentException("Additional configuration parameters cannot be used with VM lifecycle");
+            }
+            if (config.enabledFeatureFlags().length > 0) {
+                throw new IllegalArgumentException("Feature flags cannot be used with VM lifecycle");
+            }
+        }
+
         // remember the lifecycle, we need it when deciding which value to inject into parameters
         store.put(BACKEND_LIFECYCLE_KEY, config.serverLifecycle());
 
