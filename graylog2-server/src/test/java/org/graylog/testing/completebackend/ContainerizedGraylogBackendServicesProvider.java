@@ -36,7 +36,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
@@ -163,8 +162,6 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             parts.add(lifecycle.name());
             parts.add(searchVersion.toString());
             parts.add(mongodbVersion.toString());
-//            parts.add(withMailServerEnabled ? "mail" : "nomail");
-//            parts.add(webhookServerEnabled ? "webhooks" : "nowebhooks");
             parts.addAll(enabledFeatureFlags);
             parts.addAll(configParams.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
             parts.add(datanodePluginJarsProvider.getUniqueId());
