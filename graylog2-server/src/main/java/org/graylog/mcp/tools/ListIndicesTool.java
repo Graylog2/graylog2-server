@@ -35,6 +35,8 @@ import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.security.RestPermissions;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,16 +69,28 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListIndicesTool.Parameters unused) {
-        try {
-            // TODO: find a better way to do this. This comes verbatim from org.graylog2.rest.resources.system.indexer.IndicesResource::all
-            return new ObjectMapper().writeValueAsString(AllIndices.create(
-                    this.closed(permissionHelper),
-                    this.reopened(permissionHelper),
-                    this.open()
-            ));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        AllIndices all = AllIndices.create(this.closed(permissionHelper), this.reopened(permissionHelper), this.open());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        if (!all.closed().indices().isEmpty()) {
+            pw.println("Closed indices:");
+            all.closed().indices().forEach(index -> pw.printf("  - %s%n", index));
         }
+        if (!all.reopened().indices().isEmpty()) {
+            pw.println("\nReopened indices:");
+            all.reopened().indices().forEach(index -> pw.printf("  - %s%n", index));
+        }
+        if (!all.all().indices().isEmpty()) {
+            pw.println("\nActive indices:");
+            all.all().indices().forEach(index -> {
+                String name = index.indexName();
+                long size = index.allShards().storeSizeBytes();
+                long docsCount = index.allShards().documents().count();
+                pw.printf("  - %s (size: %d bytes, docs: %d%n)", name, size, docsCount);
+            });
+        }
+        String result = sw.toString();
+        return result.isEmpty() ? "No indices found" : result;
     }
 
     public static class Parameters {}

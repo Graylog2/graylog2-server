@@ -16,10 +16,8 @@
  */
 package org.graylog.mcp.tools;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
@@ -33,6 +31,8 @@ import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -60,34 +60,43 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListInputsTool.Parameters unused) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        pw.append("Graylog Inputs:");
         try (java.util.stream.Stream<Input> inputs = inputService.all().stream()) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JodaModule());
-            return mapper.writeValueAsString(
-                    inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
-                            .map(input -> {
-                                // TODO: find a better way to do this. This is all verbatim from org.graylog2.rest.resources.system.inputs.AbstractInputsResource::getInputSummary
-                                final InputDescription inputDescription = this.availableInputs.get(input.getType());
-                                final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
-                                final Map<String, Object> configuration = permissionHelper.isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) && permissionHelper.isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.getType()) ?
-                                        input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
-                                return InputSummary.create(input.getTitle(),
-                                        input.isGlobal(),
-                                        InputDescription.getInputDescriptionName(inputDescription, input.getType()),
-                                        input.getContentPack(),
-                                        input.getId(),
-                                        input.getCreatedAt(),
-                                        input.getType(),
-                                        input.getCreatorUserId(),
-                                        configuration,
-                                        input.getStaticFields(),
-                                        input.getNodeId());
-                            })
-                            .toList()
-            );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
+                    .map(input -> {
+                        // TODO: find a better way to do this. This is all verbatim from org.graylog2.rest.resources.system.inputs.AbstractInputsResource::getInputSummary
+                        final InputDescription inputDescription = this.availableInputs.get(input.getType());
+                        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
+                        final Map<String, Object> configuration = permissionHelper.isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) && permissionHelper.isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.getType()) ?
+                                input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
+                        return InputSummary.create(input.getTitle(),
+                                input.isGlobal(),
+                                InputDescription.getInputDescriptionName(inputDescription, input.getType()),
+                                input.getContentPack(),
+                                input.getId(),
+                                input.getCreatedAt(),
+                                input.getType(),
+                                input.getCreatorUserId(),
+                                configuration,
+                                input.getStaticFields(),
+                                input.getNodeId());
+                    })
+                    .forEach(inputSummary -> {
+                        pw.printf(Locale.US, "%n- Input ID: %s%n", inputSummary.inputId());
+                        pw.printf(Locale.US, "  Title: %s%n", inputSummary.title());
+                        pw.printf(Locale.US, "  Type: %s%n", inputSummary.type());
+//                        pw.printf(Locale.US, "  State: %s%n", inputSummary.state());
+                        pw.printf(Locale.US, "  Node: %s%n", inputSummary.node());
+                        pw.println("  Configuration:");
+                        inputSummary.attributes().forEach((key, value) -> {
+                            boolean isSensitive = key.toLowerCase(Locale.US).contains("password") || key.toLowerCase(Locale.US).contains("secret");
+                            pw.printf(Locale.US, "    %s: %s%n", key, isSensitive ? "********" : value);
+                        });
+                    });
         }
+        return sw.toString();
     }
 
     public static class Parameters {}
