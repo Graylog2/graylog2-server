@@ -83,7 +83,7 @@ const overridePages = (pages: Pages, overrides: Partial<Pages>) =>
 const isAbsolute = (url: string) => new URI(url).is('absolute');
 
 const docsHelper = {
-  PAGES: overridePages(defaultPages, AppConfig.branding()?.help_pages ?? {}),
+  PAGES: overridePages(defaultPages, AppConfig.branding?.()?.help_pages ?? {}),
 
   toString(path: string) {
     if (isAbsolute(path)) {
