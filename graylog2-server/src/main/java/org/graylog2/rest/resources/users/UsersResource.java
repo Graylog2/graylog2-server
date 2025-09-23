@@ -938,15 +938,13 @@ public class UsersResource extends RestResource {
         private final Map<String, Optional<SessionDTO>> sessions;
 
         public static AllUserSessions create(SessionService sessionService) {
-            return new AllUserSessions(sessionService.streamAll().toList());
+            try (var sessionDTOStream = sessionService.streamAll()) {
+                return new AllUserSessions(sessionDTOStream.toList());
+            }
         }
 
         private AllUserSessions(Collection<SessionDTO> sessions) {
             this.sessions = getLastSessionForUser(sessions);
-        }
-
-        public static AllUserSessions create(MongoDBSessionService sessionService) {
-            return new AllUserSessions(sessionService.loadAll());
         }
 
         public Optional<SessionDTO> forUser(User user) {

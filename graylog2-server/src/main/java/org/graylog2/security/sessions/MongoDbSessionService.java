@@ -16,11 +16,12 @@
  */
 package org.graylog2.security.sessions;
 
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
@@ -85,6 +86,7 @@ public class MongoDbSessionService implements SessionService {
     }
 
     @Override
+    @MustBeClosed
     public Stream<SessionDTO> streamAll() {
         return MongoUtils.stream(collection.find());
     }

@@ -41,14 +41,14 @@ import java.util.List;
  * to a rolling version upgrade. Rolling version upgrades are not supported but if performed nevertheless, legacy
  * sessions would be hard to get rid of.
  */
-public class V2025030409040000_RemoveLegacySessions extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V2025030409040000_RemoveLegacySessions.class);
+public class V20250304090400_RemoveLegacySessions extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20250304090400_RemoveLegacySessions.class);
 
     private final MongoCollection<Document> collection;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public V2025030409040000_RemoveLegacySessions(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
+    public V20250304090400_RemoveLegacySessions(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
         this.collection = mongoCollections.nonEntityCollection(MongoDbSessionService.COLLECTION_NAME, Document.class);
         this.clusterEventBus = clusterEventBus;
     }

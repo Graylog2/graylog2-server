@@ -182,10 +182,12 @@ public class UserSessionTerminationService extends AbstractIdleService {
     private Set<String> getSessionIDsForUser(User user) {
         final String userId = requireNonNull(user.getId(), "user ID cannot be null");
 
-        return sessionService.streamAll()
-                .filter(session -> userId.equals(session.userId().orElse(null)))
-                .map(SessionDTO::sessionId)
-                .collect(Collectors.toSet());
+        try (var sessionDTOStream = sessionService.streamAll()) {
+            return sessionDTOStream
+                    .filter(session -> userId.equals(session.userId().orElse(null)))
+                    .map(SessionDTO::sessionId)
+                    .collect(Collectors.toSet());
+        }
     }
 
     @AutoValue

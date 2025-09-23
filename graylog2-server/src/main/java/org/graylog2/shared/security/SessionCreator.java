@@ -17,6 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -36,9 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -147,6 +145,8 @@ public class SessionCreator {
         }
         session.touch();
 
+        // TODO: do we really need to do this? It looks as if at this point, the principals and auth state is already
+        //   saved in the session.
         // save subject in session, otherwise we can't get the username back in subsequent requests.
         ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 

@@ -136,6 +136,8 @@ public class SessionDAO extends CachingSessionDAO {
     public Collection<Session> getActiveSessions() {
         LOG.debug("Retrieving all active sessions.");
 
-        return sessionService.streamAll().<Session>map(SessionDTO::toSimpleSession).toList();
+        try (var sessionDTOStream = sessionService.streamAll()) {
+            return sessionDTOStream.<Session>map(SessionDTO::toSimpleSession).toList();
+        }
     }
 }
