@@ -45,12 +45,10 @@ public class CompoundFieldsAggregationIT {
                 env2.putDeflectorFieldMapping("my_ip", "keyword");
                 env1.ingestMessage(Map.of(
                         "short_message", "compound-field-test-a",
-                        "host", "example.org",
                         "_my_ip", "192.168.1.1"
                 ));
                 env2.ingestMessage(Map.of(
                         "short_message", "compound-field-test-a",
-                        "host", "example.org",
                         "_my_ip", "192.168.1.1"
                 ));
 
