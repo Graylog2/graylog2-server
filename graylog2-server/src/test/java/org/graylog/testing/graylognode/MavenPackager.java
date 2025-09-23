@@ -35,6 +35,7 @@ public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
     private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip -Dskip.artifact.assembly ";
     private static final String EXCLUDE_FE = " -Dskip.web.build ";
+    private static final String SKIP_FLAG = "GRAYLOG_IT_SKIP_PACKAGING";
 
     private static boolean jarHasBeenPackagedInThisRun = false;
 
@@ -43,8 +44,8 @@ public class MavenPackager {
     }
 
     public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
-        if (flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING")) {
-            LOG.info("Skipping packaging");
+        if (flagFromEnvVar(SKIP_FLAG)) {
+            LOG.info("Skipping packaging - {} is set", SKIP_FLAG);
             return;
         }
         if (isRunFromMaven()) {
