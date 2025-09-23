@@ -16,29 +16,33 @@
  */
 package org.graylog.storage.opensearch2.testing;
 
+import org.graylog.testing.completebackend.PluginJarsProvider;
+import org.graylog.testing.datanode.DatanodeDevContainerInstanceProvider;
 import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.PullPolicy;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 import java.util.Locale;
 
 public class DatanodeInstance extends OpenSearchInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
     private final String mongoDBUri;
     private final String passwordSecret;
-    private final String rootPasswordSha2;
+    private final PluginJarsProvider pluginJarsProvider;
 
-    public DatanodeInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+    public DatanodeInstance(final boolean cachedInstance,
+                            final SearchVersion version,
+                            final String hostname,
+                            final Network network,
+                            final String mongoDBUri,
+                            final String passwordSecret,
+                            final String heapSize,
+                            final List<String> featureFlags,
+                            final PluginJarsProvider pluginJarsProvider) {
         super(cachedInstance, version, hostname, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
-        this.rootPasswordSha2 = rootPasswordSha2;
+        this.pluginJarsProvider = pluginJarsProvider;
     }
 
     @Override
@@ -49,32 +53,24 @@ public class DatanodeInstance extends OpenSearchInstance {
 
     @Override
     protected String imageName() {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "latest");
+        return String.format(Locale.ROOT, "local/graylog-full-backend-test-datanode:%s", "latest");
     }
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new GenericContainer<>(DockerImageName.parse(image))
-                .withImagePullPolicy(PullPolicy.alwaysPull())
-                .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
-                //.withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)
-                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongoDBUri)
-                .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
-                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
-                .withExposedPorts(8999, 9200, 9300)
-                .withNetwork(network)
-                .withNetworkAliases(hostname)
-                .waitingFor(
-                        Wait.forHttp("/_cluster/health")
-                                .forPort(OPENSEARCH_PORT)
-                                .forStatusCode(200)
-                                .forResponsePredicate(s -> {
-                                    LOG.info("Response while waiting: {}", s);
-                                    // allow yellow for fixing indices later
-                                    return s.contains("\"status\":\"green\"") || s.contains("\"status\":\"yellow\"");
-                                })
-                                .withStartupTimeout(java.time.Duration.ofSeconds(180))
-                );
+        final var builder = DatanodeDevContainerInstanceProvider.getBuilderFor(version())
+                .orElseThrow(() -> new UnsupportedOperationException("Can not build container for search version " + version() + " - not supported."));
+
+        return builder
+                .nodeName(hostname)
+                .passwordSecret(passwordSecret)
+                .network(network)
+                .mongoDbUri(mongoDBUri)
+                .restPort(8999)
+                .openSearchHttpPort(9200)
+                .openSearchTransportPort(9300)
+                .env(getContainerEnv())
+                .pluginJarsProvider(pluginJarsProvider)
+                .build();
     }
 }
