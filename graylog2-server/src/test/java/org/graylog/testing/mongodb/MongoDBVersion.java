@@ -18,14 +18,11 @@ package org.graylog.testing.mongodb;
 
 import com.google.auto.value.AutoValue;
 
-import java.util.regex.Pattern;
-
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @AutoValue
 public abstract class MongoDBVersion {
     public static final MongoDBVersion DEFAULT = of("7.0");
-    private static final Pattern PATTERN = Pattern.compile("^(\\d+)\\.(\\d+)$");
 
     public abstract String version();
 
