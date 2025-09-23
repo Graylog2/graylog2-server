@@ -16,14 +16,16 @@
  */
 package org.graylog2.web.resources;
 
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
-@GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
                              additionalConfigurationParameters = {
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
-                                   })
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
+                             })
 public class WebInterfaceAssetsResourceWithPrefixIT extends WebInterfaceAssetsResourceBase {
 
     @FullBackendTest
