@@ -189,7 +189,7 @@ public class NodeContainerFactory {
                 List.of(
                         ".*Exception while running migrations.*",
                         ".*Graylog startup failed.*",
-                        ".*Guice/MissingImplementation.*",
+                        ".*\\[Guice/.+?\\].*",
                         ".*java.lang.NoClassDefFoundError.*"
                 )));
         if (indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
