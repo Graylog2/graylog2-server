@@ -17,7 +17,6 @@
 package org.graylog.testing.mongodb;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -40,11 +39,11 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
     public static final String NETWORK_ALIAS = "mongodb";
 
     public static MongoDBContainer create(Network network) {
-        return create(MongodbServer.DEFAULT_VERSION, network);
+        return create(MongoDBVersion.DEFAULT, network);
     }
 
-    public static MongoDBContainer create(MongodbServer version, Network network) {
-        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.getVersion(), network);
+    public static MongoDBContainer create(MongoDBVersion version, Network network) {
+        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.version(), network);
     }
 
     private MongoDBContainer(String dockerImageName, Network network) {
@@ -57,7 +56,7 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
 
     public String infoString() {
         final InspectContainerResponse info = getContainerInfo();
-        if(info != null) {
+        if (info != null) {
             return String.format(Locale.US, "%s%s/%s", info.getId(), info.getName(), info.getConfig().getImage());
         } else {
             LOG.warn("Could not get info from Docker container! getContainerInfo() returned null.");

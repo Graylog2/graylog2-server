@@ -18,9 +18,9 @@ package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.plugin.Tools;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         this.lifecycle = lifecycle;
     }
 
-    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+    public Services getServices(SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
         var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
         return SERVICES_CACHE.computeIfAbsent(lookupKey, (k) -> {
             LOG.debug("No cached services found for key \"{}\", creating new ones.", k);
@@ -93,7 +93,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private final WebhookServerContainer webhookServerInstance;
 
 
-        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
+        private static Services create(SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
 
             try (var executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
                     .setNameFormat("container-startup-thread-%d")
@@ -157,11 +157,11 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             this.webhookServerInstance = webhookServerInstance;
         }
 
-        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongodbServer mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
             List<String> parts = new LinkedList<>();
             parts.add(lifecycle.name());
             parts.add(searchVersion.toString());
-            parts.add(mongodbVersion.toString());
+            parts.add(mongodbVersion.version());
             parts.addAll(enabledFeatureFlags);
             parts.addAll(configParams.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
             parts.add(datanodePluginJarsProvider.getUniqueId());

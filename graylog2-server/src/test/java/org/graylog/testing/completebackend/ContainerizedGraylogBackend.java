@@ -20,12 +20,12 @@ import com.google.common.base.Stopwatch;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     public synchronized static ContainerizedGraylogBackend createStarted(ContainerizedGraylogBackendServicesProvider servicesProvider,
                                                                          final SearchVersion version,
-                                                                         final MongodbServer mongodbVersion,
+                                                                         final MongoDBVersion mongodbVersion,
                                                                          final List<URL> mongoDBFixtures,
                                                                          final PluginJarsProvider pluginJarsProvider,
                                                                          final MavenProjectDirProvider mavenProjectDirProvider,

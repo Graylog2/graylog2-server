@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -152,7 +152,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
 
     private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
         final SearchVersion searchVersion = getSearchVersion();
-        final MongodbServer mongoVersion = getMongoVersion();
+        final MongoDBVersion mongoVersion = getMongoVersion();
         final List<URL> mongoDBFixtures = resolveFixtures(config.mongoDBFixtures(), testClass);
         final List<String> enabledFeatureFlags = List.of(config.enabledFeatureFlags());
         PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
@@ -214,19 +214,17 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         return SearchServer.DEFAULT_VERSION.getSearchVersion();
     }
 
-    private static MongodbServer getMongoVersion() {
+    private static MongoDBVersion getMongoVersion() {
         String mongodbVersionProperty = System.getProperty(MONGODBVERSION_JVM_PROPERTY);
         if (mongodbVersionProperty != null) {
             try {
-                return MongodbServer.valueOf(mongodbVersionProperty);
+                return MongoDBVersion.of(mongodbVersionProperty);
             } catch (IllegalArgumentException e) {
-                LOG.error("Invalid mongodb version property: {}. Valid values are: {}",
-                        mongodbVersionProperty,
-                        Arrays.toString(MongodbServer.values()));
+                LOG.error("Invalid mongodb version property: {}", mongodbVersionProperty, e);
                 throw e;
             }
         }
-        return MongodbServer.DEFAULT_VERSION;
+        return MongoDBVersion.DEFAULT;
     }
 
     @Override

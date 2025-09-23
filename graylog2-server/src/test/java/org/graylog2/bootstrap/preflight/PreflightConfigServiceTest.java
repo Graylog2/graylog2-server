@@ -19,7 +19,6 @@ package org.graylog2.bootstrap.preflight;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.Configuration;
@@ -35,7 +34,7 @@ import java.util.Map;
 class PreflightConfigServiceTest {
 
     @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.DEFAULT_VERSION);
+    static MongoDBExtension mongodbExtension = MongoDBExtension.createWithDefaultVersion();
     private MongoConnection mongoConnection;
 
 

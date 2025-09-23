@@ -21,7 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.DatanodeRestApiWait;
@@ -78,7 +77,7 @@ public class DatanodeClusterIT {
         final FilesystemKeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
+        this.mongoDBTestService = MongoDBTestService.create(network);
         this.mongoDBTestService.start();
 
         nodeA = createDatanodeContainer(
