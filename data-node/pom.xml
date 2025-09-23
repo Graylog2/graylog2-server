@@ -548,7 +548,7 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/opensearch/opensearch-${opensearch.version}-linux-x64.tar.gz
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
                                 13c1df3bf6e8a46bff1e43d6ac664b82c3e839283b9a10c9fd549d1b44f9f039e24de91f51063d7d0a9945d6d6136e9d8a47588a7d9867405501274d4c943df3
@@ -572,7 +572,7 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/opensearch/opensearch-${opensearch.version}-linux-arm64.tar.gz
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
                                 64929d121359ca8fc4291a3398914b6212998f1be678a516056b72b614656c604e50ded47273d5f376265d15c43b2d0b1883e40faeebb84b04205d623c065a6b
@@ -596,7 +596,7 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/opensearch/plugins/repository-s3-${opensearch.version}.zip
+                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip
                             </url>
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
@@ -613,7 +613,7 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/opensearch/plugins/repository-gcs-${opensearch.version}.zip
+                                https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.version}/repository-gcs-${opensearch.version}.zip
                             </url>
                             <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
@@ -630,7 +630,7 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/opensearch/plugins/repository-hdfs-${opensearch.version}.zip
+                                https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.version}/repository-hdfs-${opensearch.version}.zip
                             </url>
                             <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
