@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.completebackend.conditions.EnableIfSearchServerCondition;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServerCondition;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.mongodb.MongoDBVersion;
@@ -212,7 +212,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             return ConditionEvaluationResult.enabled("No Graylog backend configuration found, enabling test");
         }
 
-        return Stream.of(new EnableIfSearchServerCondition(BackendServiceVersions.getSearchServerVersion()))
+        return Stream.of(new EnabledIfSearchServerCondition(BackendServiceVersions.getSearchServerVersion()))
                 .map(condition -> condition.evaluateExecutionCondition(context))
                 .filter(ConditionEvaluationResult::isDisabled)
                 .findFirst()

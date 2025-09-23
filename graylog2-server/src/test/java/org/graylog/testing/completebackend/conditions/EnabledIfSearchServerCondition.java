@@ -25,7 +25,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public record EnableIfSearchServerCondition(SearchVersion searchVersion) implements ExecutionCondition {
+public record EnabledIfSearchServerCondition(SearchVersion searchVersion) implements ExecutionCondition {
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
         final var optionalAnnotation = AnnotationSupport.findAnnotation(context.getElement(), EnabledIfSearchServer.class);
