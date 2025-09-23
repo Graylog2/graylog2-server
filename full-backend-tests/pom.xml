@@ -222,6 +222,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <executions>
+                    <execution>
+                        <id>forbidden-apis-full-backend-test</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCheck</goal>
+                        </goals>
+                        <configuration>
+                            <signatures>
+                                <![CDATA[
+                                    org.junit.jupiter.api.Test @ full-backend-tests must use the @FullBackendTest annotation instead of @Test
+                                ]]>
+                            </signatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
