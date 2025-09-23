@@ -123,8 +123,6 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_DATA_DIR", "data")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv(ENV_GRAYLOG_ELASTICSEARCH_HOSTS, config.elasticsearchUri)
-                // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
-                .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION_PROBE_DELAY", "500ms")
                 .withEnv("GRAYLOG_PASSWORD_SECRET", config.passwordSecret)
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
@@ -148,6 +146,11 @@ public class NodeContainerFactory {
 
         if (!includeFrontend) {
             container.withEnv("DEVELOPMENT", "true");
+        }
+
+        if (!config.elasticsearchVersion.isDataNode()) {
+            // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
+            container.withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode());
         }
 
         config.proxiedRequestsTimeout.ifPresent(proxiedRequestsTimeout -> container.withEnv("GRAYLOG_PROXIED_REQUESTS_DEFAULT_CALL_TIMEOUT", proxiedRequestsTimeout));
