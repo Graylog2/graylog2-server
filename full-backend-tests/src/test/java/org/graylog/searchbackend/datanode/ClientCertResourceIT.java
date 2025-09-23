@@ -39,6 +39,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
@@ -71,6 +72,7 @@ import java.time.ZoneId;
 import java.util.Collections;
 
 @GraylogBackendConfiguration(onlyOnDataNode = true,
+                             serverLifecycle = Lifecycle.CLASS,
                              additionalConfigurationParameters = {
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
