@@ -49,7 +49,7 @@ public class DatanodeInstance extends OpenSearchInstance {
 
     @Override
     protected String imageName() {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "5.2-dev");
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "latest");
     }
 
     @Override
