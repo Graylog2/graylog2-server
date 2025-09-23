@@ -20,7 +20,6 @@ import URI from 'urijs';
 import AppConfig from 'util/AppConfig';
 
 const defaultDocsUrl = 'https://go2docs.graylog.org/current';
-const docsUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
 
 const defaultPages = {
   ALERTS: 'interacting_with_your_log_data/alerts.html',
@@ -86,13 +85,11 @@ const isAbsolute = (url: string) => new URI(url).is('absolute');
 const docsHelper = {
   PAGES: overridePages(defaultPages, AppConfig.branding()?.help_pages ?? {}),
 
-  DOCS_URL: docsUrl,
-
   toString(path: string) {
     if (isAbsolute(path)) {
       return path;
     }
-    const baseUrl = this.DOCS_URL;
+    const baseUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
 
     return path === '' ? baseUrl : `${baseUrl}/${path}`;
   },
