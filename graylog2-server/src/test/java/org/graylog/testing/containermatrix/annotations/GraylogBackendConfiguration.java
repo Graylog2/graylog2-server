@@ -65,6 +65,7 @@ public @interface GraylogBackendConfiguration {
     /**
      * Set this to true to only run the test if we are running against data node.
      */
+    @Deprecated(forRemoval = true)
     boolean onlyOnDataNode() default false;
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.conditions.EnableIfSearchServerCondition;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.mongodb.MongoDBVersion;
@@ -47,6 +48,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GraylogBackendExtension implements BeforeAllCallback, ParameterResolver, ExecutionCondition {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
@@ -214,6 +216,11 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected",
                     actualSearchVersion.toString());
         }
-        return ConditionEvaluationResult.enabled(null);
+
+        return Stream.of(new EnableIfSearchServerCondition(actualSearchVersion))
+                .map(condition -> condition.evaluateExecutionCondition(context))
+                .filter(ConditionEvaluationResult::isDisabled)
+                .findFirst()
+                .orElse(ConditionEvaluationResult.enabled(null));
     }
 }
