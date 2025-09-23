@@ -42,9 +42,11 @@ import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.security.TruststoreCreator;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeAll;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -71,13 +73,13 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
 
-@GraylogBackendConfiguration(onlyOnDataNode = true,
-                             serverLifecycle = Lifecycle.CLASS,
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
                              additionalConfigurationParameters = {
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                                   })
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             })
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class ClientCertResourceIT {
 
     private static GraylogApis api;

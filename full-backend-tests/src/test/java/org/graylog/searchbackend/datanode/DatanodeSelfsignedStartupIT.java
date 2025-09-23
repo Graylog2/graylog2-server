@@ -23,6 +23,7 @@ import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
@@ -30,6 +31,7 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
@@ -39,12 +41,12 @@ import java.time.Clock;
 import java.util.concurrent.ExecutionException;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             onlyOnDataNode = true,
                              additionalConfigurationParameters = {
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                                   })
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             })
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeSelfsignedStartupIT {
 
 

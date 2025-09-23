@@ -37,6 +37,7 @@ import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
@@ -46,6 +47,7 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -78,11 +80,11 @@ import static org.hamcrest.Matchers.not;
 
 @SuppressWarnings("UnstableApiUsage")
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             onlyOnDataNode = true,
                              additionalConfigurationParameters = {
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                                   })
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             })
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeProvisioningIT {
 
     private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
@@ -180,23 +182,23 @@ public class DatanodeProvisioningIT {
 
     private void triggerDatanodeProvisioning() {
         given().spec(apis.requestSpecification())
-               .body("")
-               .auth()
-               .basic(basicAuth.username, basicAuth.password)
-               .post("/generate")
-               .then()
-               .statusCode(HttpStatus.SC_NO_CONTENT);
+                .body("")
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
+                .post("/generate")
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
     private String createSelfSignedCA() {
         String subject = "Graylog CA generated " + RandomStringUtils.randomAlphanumeric(10);
         given().spec(apis.requestSpecification())
-               .body("{\"organization\":\"" + subject + "\"}")
-               .auth()
-               .basic(basicAuth.username, basicAuth.password)
-               .post("/ca/create")
-               .then()
-               .statusCode(HttpStatus.SC_CREATED);
+                .body("{\"organization\":\"" + subject + "\"}")
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
+                .post("/ca/create")
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
         return subject;
     }
 
@@ -212,12 +214,12 @@ public class DatanodeProvisioningIT {
 
     private void configureAutomaticCertRenewalPolicy() {
         given().spec(apis.requestSpecification())
-               .body("{\"mode\":\"Automatic\",\"certificate_lifetime\":\"P30D\"}")
-               .auth()
-               .basic(basicAuth.username, basicAuth.password)
-               .post("/renewal_policy")
-               .then()
-               .statusCode(HttpStatus.SC_NO_CONTENT);
+                .body("{\"mode\":\"Automatic\",\"certificate_lifetime\":\"P30D\"}")
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
+                .post("/renewal_policy")
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
     @FullBackendTest
@@ -241,14 +243,14 @@ public class DatanodeProvisioningIT {
 
     private void uploadCA(Path caKeystore) {
         given().spec(apis.requestSpecification())
-               .auth()
-               .basic(basicAuth.username, basicAuth.password)
-               .contentType(MediaType.MULTIPART_FORM_DATA)
-               .multiPart("files", caKeystore.toFile())
-               .multiPart("password", "my-secret-password")
-               .post("/ca/upload")
-               .then()
-               .statusCode(HttpStatus.SC_OK);
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("files", caKeystore.toFile())
+                .multiPart("password", "my-secret-password")
+                .post("/ca/upload")
+                .then()
+                .statusCode(HttpStatus.SC_OK);
     }
 
     private Path createCA() {
