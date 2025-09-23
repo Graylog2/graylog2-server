@@ -211,13 +211,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         if (backendConfiguration.isEmpty()) {
             return ConditionEvaluationResult.enabled("No Graylog backend configuration found, enabling test");
         }
-        final SearchVersion actualSearchVersion = BackendServiceVersions.getSearchServerVersion();
-        if (!actualSearchVersion.isDataNode() && backendConfiguration.get().onlyOnDataNode()) {
-            return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected",
-                    actualSearchVersion.toString());
-        }
 
-        return Stream.of(new EnableIfSearchServerCondition(actualSearchVersion))
+        return Stream.of(new EnableIfSearchServerCondition(BackendServiceVersions.getSearchServerVersion()))
                 .map(condition -> condition.evaluateExecutionCondition(context))
                 .filter(ConditionEvaluationResult::isDisabled)
                 .findFirst()
