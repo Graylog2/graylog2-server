@@ -40,6 +40,7 @@ import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,11 +75,11 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
         PrintWriter pw = new PrintWriter(sw);
         if (!all.closed().indices().isEmpty()) {
             pw.println("Closed indices:");
-            all.closed().indices().forEach(index -> pw.printf("  - %s%n", index));
+            all.closed().indices().forEach(index -> pw.printf(Locale.US, "  - %s%n", index));
         }
         if (!all.reopened().indices().isEmpty()) {
             pw.println("\nReopened indices:");
-            all.reopened().indices().forEach(index -> pw.printf("  - %s%n", index));
+            all.reopened().indices().forEach(index -> pw.printf(Locale.US,"  - %s%n", index));
         }
         if (!all.all().indices().isEmpty()) {
             pw.println("\nActive indices:");
@@ -86,7 +87,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
                 String name = index.indexName();
                 long size = index.allShards().storeSizeBytes();
                 long docsCount = index.allShards().documents().count();
-                pw.printf("  - %s (size: %d bytes, docs: %d%n)", name, size, docsCount);
+                pw.printf(Locale.US,"  - %s (size: %d bytes, docs: %d)%n", name, size, docsCount);
             });
         }
         String result = sw.toString();
