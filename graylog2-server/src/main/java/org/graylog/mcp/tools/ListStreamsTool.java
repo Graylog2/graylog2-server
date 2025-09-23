@@ -16,7 +16,7 @@
  */
 package org.graylog.mcp.tools;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
@@ -25,7 +25,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
-import java.io.StringWriter;
+import java.util.Map;
 
 // TODO convert this into a resource, tools should not be simple "read operations" but perform actions
 public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
@@ -47,19 +47,24 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListStreamsTool.Parameters unused) {
-        final StringWriter writer = new StringWriter();
-        final CSVWriter csvWriter = new CSVWriter(writer);
-
-        csvWriter.writeNext(new String[]{"id", "name", "description", "index_set"});
         try (java.util.stream.Stream<Stream> dtos = streamService.streamAllDTOs()) {
-            dtos.filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
-                    .forEach(stream -> csvWriter.writeNext(new String[]{
-                    stream.getId(),
-                    stream.getTitle(),
-                    stream.getDescription(),
-                    stream.getIndexSet() == null ? "Unknown indexset" : stream.getIndexSet().getConfig().title()}));
+            return new ObjectMapper().writeValueAsString(
+                    dtos.filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                            .map(stream -> Map.of(
+                                    "id", stream.getId(),
+                                    "title", stream.getTitle(),
+                                    "description", stream.getDescription(),
+//                                    "indexset", stream.getIndexSet() == null ? "Unknown indexset" : stream.getIndexSet().getConfig().title(),
+                                    "disabled", stream.getDisabled(),
+                                    "matching_type", stream.getMatchingType(),
+                                    "created_at", stream.getCreatedAt().toString(),
+                                    "creator_user_id", stream.getCreatorUserId()
+                            ))
+                            .toList()
+            );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-        return writer.toString();
     }
 
     public static class Parameters {}
