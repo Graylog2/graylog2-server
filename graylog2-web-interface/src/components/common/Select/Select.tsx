@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance } from 'react-select';
+import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance, ActionMeta } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import isEqual from 'lodash/isEqual';
 import type { DefaultTheme } from 'styled-components';
@@ -34,7 +34,10 @@ type Option = { [key: string]: any };
 
 export type SelectRef = React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>;
 
-const MultiValueRemove = ({ children, ...props }: React.ComponentProps<typeof Components.MultiValueRemove>) => (
+const MultiValueRemove = ({
+  children = undefined,
+  ...props
+}: React.ComponentProps<typeof Components.MultiValueRemove>) => (
   <Components.MultiValueRemove {...props}>{children}</Components.MultiValueRemove>
 );
 
@@ -54,7 +57,7 @@ const DropdownIndicator = (props) => {
   );
 };
 
-const Control = ({ children, ...props }: React.ComponentProps<typeof Components.Control>) => (
+const Control = ({ children = undefined, ...props }: React.ComponentProps<typeof Components.Control>) => (
   <Components.Control {...props} className={CONTROL_CLASS}>
     {children}
   </Components.Control>
@@ -62,19 +65,19 @@ const Control = ({ children, ...props }: React.ComponentProps<typeof Components.
 
 const CustomOption =
   (optionRenderer: (option: Option, isSelected: boolean) => React.ReactElement) =>
-  (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
-    const { data, isSelected } = props;
-
-    return <Components.Option {...props}>{optionRenderer(data, isSelected)}</Components.Option>;
-  };
+  ({ data, isSelected, ...props }: React.ComponentProps<typeof Components.Option>): React.ReactElement => (
+    <Components.Option data={data} isSelected={isSelected} {...props}>
+      {optionRenderer(data, isSelected)}
+    </Components.Option>
+  );
 
 const CustomSingleValue =
   (valueRenderer: (option: Option) => React.ReactElement) =>
-  (props: React.ComponentProps<typeof Components.SingleValue>) => {
-    const { data } = props;
-
-    return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
-  };
+  ({ data, ...props }: React.ComponentProps<typeof Components.SingleValue>) => (
+    <Components.SingleValue data={data} {...props}>
+      {valueRenderer(data)}
+    </Components.SingleValue>
+  );
 
 const CustomInput = (inputProps: { [key: string]: any }) => (props) => <Components.Input {...props} {...inputProps} />;
 
@@ -93,17 +96,22 @@ const clearIndicator = (base) => ({
 
 const multiValue =
   ({ theme }) =>
-  (base) => ({
+  (base, state) => ({
     ...base,
-    border: `1px solid ${theme.colors.variant.lighter.info}`,
+    border: `1px solid ${state.option?.[state.data?.value]?.isFixed ? theme.colors.variant.lightest.default : theme.colors.variant.lighter.info}`,
+    background: state.option?.[state.data?.value]?.isFixed
+      ? theme.colors.input.background
+      : theme.colors.variant.lightest.info,
+    color: state.option?.[state.data?.value]?.isFixed ? theme.colors.input.colorDisabled : theme.colors.text.secondary,
   });
 
 const multiValueLabel =
   ({ theme }) =>
-  (base) => ({
+  (base, state) => ({
     ...base,
     padding: '2px 5px',
     fontSize: theme.fonts.size.small,
+    color: state.data?.isFixed ? theme.colors.text.secondary : theme.colors.text.primary,
   });
 
 const multiValueRemove =
@@ -132,7 +140,7 @@ const menu = (base) => ({
 
 const menuPortal = (base) => ({
   ...base,
-  zIndex: 'auto',
+  zIndex: 1061,
 });
 
 const singleValueAndPlaceholder =
@@ -218,6 +226,7 @@ const _styles = ({ size, theme }) => ({
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>;
   SelectContainer?: React.ComponentType<any>;
+  MultiValueRemove?: React.ComponentType<any>;
 };
 
 export type Props<OptionValue> = {
@@ -237,16 +246,15 @@ export type Props<OptionValue> = {
   ignoreAccents?: boolean;
   inputId?: string;
   inputProps?: { [key: string]: any };
-  matchProp?: 'any' | 'label' | 'value';
+  isLoading?: boolean;
   multi?: boolean;
   maxMenuHeight?: number;
   menuPlacement?: 'bottom' | 'auto' | 'top';
-  menuPortalTarget?: HTMLElement;
   menuIsOpen?: boolean;
   name?: string;
   openMenuOnFocus?: boolean;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
-  onChange: (value: OptionValue) => void;
+  onChange: (value: OptionValue, actionMeta?: ActionMeta<Option>) => void;
   onReactSelectChange?: (option: Option | Option[]) => void;
   onMenuClose?: () => void;
   optionRenderer?: (option: Option, isSelected?: boolean) => React.ReactElement;
@@ -256,6 +264,7 @@ export type Props<OptionValue> = {
   // eslint-disable-next-line react/require-default-props
   ref?: SelectRef;
   size?: 'normal' | 'small';
+  styles?: any;
   theme: DefaultTheme;
   required?: boolean;
   value?: OptionValue;
@@ -305,6 +314,7 @@ const getCustomComponents = (
 
 class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static defaultProps = {
+    'aria-label': undefined,
     addLabelText: undefined,
     allowCreate: false,
     autoFocus: false,
@@ -320,7 +330,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     inputId: undefined,
     onBlur: undefined,
     inputProps: undefined,
-    matchProp: 'any',
+    isLoading: undefined,
     multi: false,
     menuIsOpen: undefined,
     name: undefined,
@@ -331,6 +341,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     placeholder: undefined,
     required: false,
     size: 'normal',
+    styles: undefined,
     value: undefined,
     valueKey: 'value',
     valueRenderer: undefined,
@@ -340,7 +351,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     total: 0,
     onInputChange: undefined,
     loadOptions: undefined,
-    menuPortalTarget: undefined,
     forwardedRef: undefined,
   };
 
@@ -394,16 +404,23 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     return '';
   };
 
-  _onChange = (selectedOption: Option) => {
-    const value = this._extractOptionValue(selectedOption);
+  _onChange = (selectedOption: Option, actionMeta: ActionMeta<Option>) => {
+    let value = this._extractOptionValue(selectedOption);
+
+    if (['remove-value', 'pop-value'].includes(actionMeta.action)) {
+      const removed = actionMeta.removedValue;
+      if (removed?.isFixed) {
+        const fixed = (this.state.value || []).filter((o) => o.isFixed);
+        value = [...fixed, ...selectedOption.filter((o) => !o.isFixed)];
+      }
+    }
 
     if (this.props.persistSelection) {
       this.setState({ value: value });
     }
-
     const { onChange = () => {} } = this.props;
 
-    onChange(value);
+    onChange(value, actionMeta);
   };
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
@@ -462,11 +479,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     };
   };
 
-  createCustomFilter = (stringify: (any) => string) => {
-    const { matchProp, ignoreAccents } = this.props;
-    const options = { ignoreAccents };
+  createCustomFilter = () => {
+    const { ignoreAccents } = this.props;
 
-    return matchProp === 'any' ? createFilter(options) : createFilter({ ...options, stringify });
+    return createFilter({ ignoreAccents, stringify: (option: { label: unknown }) => String(option.label) });
   };
 
   render() {
@@ -481,23 +497,20 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       clearable: isClearable,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       inputProps, // Do not pass down prop
-      matchProp,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
-      menuPortalTarget,
       async,
       total,
       onInputChange,
       loadOptions,
       'aria-label': ariaLabel,
       placeholder,
+      styles,
       ...rest
     } = this.props;
-
-    const stringify = (option) => option[matchProp];
-    const customFilter = this.createCustomFilter(stringify);
+    const customFilter = this.createCustomFilter();
 
     const mergedComponents = {
       ..._components,
@@ -524,9 +537,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
-      menuPortalTarget: menuPortalTarget,
+      menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
-      styles: _styles({ size, theme }),
+      styles: { ..._styles({ size, theme }), ...styles },
       theme: this._selectTheme,
       total,
       value: formattedValue,

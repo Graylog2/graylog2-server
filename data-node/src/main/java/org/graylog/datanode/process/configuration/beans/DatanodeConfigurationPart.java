@@ -24,6 +24,7 @@ import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.security.KeyStore;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,15 @@ import java.util.Map;
 public abstract class DatanodeConfigurationPart {
     public abstract List<String> nodeRoles();
 
-    public abstract Map<String, String> keystoreItems();
+    public abstract Collection<OpensearchKeystoreItem> keystoreItems();
 
     public abstract Map<String, String> properties();
 
     public abstract List<String> javaOpts();
 
+    /**
+     * TODO: this is not used anywhere!
+     */
     public abstract Map<String, String> systemProperties();
 
     @Nullable
@@ -51,12 +55,14 @@ public abstract class DatanodeConfigurationPart {
     @Nullable
     public abstract KeyStore trustStore();
 
+    public abstract List<String> warnings();
+
     public abstract List<DatanodeConfigFile> configFiles();
 
     public static Builder builder() {
         return new AutoValue_DatanodeConfigurationPart.Builder()
                 .nodeRoles(Collections.emptyList())
-                .keystoreItems(Collections.emptyMap())
+                .keystoreItems(Collections.emptySet())
                 .properties(Collections.emptyMap())
                 .javaOpts(Collections.emptyList())
                 .configFiles(Collections.emptyList())
@@ -86,7 +92,12 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+        abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+
+        public Builder withConfigFiles(Collection<DatanodeConfigFile> configFiles) {
+            configFilesBuilder().addAll(configFiles);
+            return this;
+        }
 
         abstract ImmutableList.Builder<DatanodeConfigFile> configFilesBuilder();
 
@@ -95,7 +106,7 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder keystoreItems(Map<String, String> keystoreItems);
+        public abstract Builder keystoreItems(Collection<OpensearchKeystoreItem> keystoreItems);
 
         public abstract Builder properties(Map<String, String> properties);
 
@@ -115,18 +126,32 @@ public abstract class DatanodeConfigurationPart {
             return systemPropertiesBuilder;
         }
 
+        @Deprecated
         abstract Builder systemProperties(Map<String, String> systemProperties); // not public
 
         abstract DatanodeConfigurationPart autoBuild(); // not public
 
-        public DatanodeConfigurationPart build() {
-            systemProperties(systemPropertiesBuilder.buildKeepingLast());
-            return autoBuild();
-        }
-
+        @Deprecated
         public Builder systemProperty(String key, String value) {
             systemPropertiesBuilder().put(key, value);
             return this;
+        }
+
+        protected abstract ImmutableList.Builder<String> warningsBuilder();
+
+        public Builder withWarning(String warning) {
+            warningsBuilder().add(warning);
+            return this;
+        }
+
+        public Builder withWarnings(List<String> warnings) {
+            warningsBuilder().addAll(warnings);
+            return this;
+        }
+
+        public DatanodeConfigurationPart build() {
+            systemProperties(systemPropertiesBuilder.buildKeepingLast());
+            return autoBuild();
         }
     }
 }

@@ -133,6 +133,7 @@ interface InputConfiguration {
 }
 interface ProviderType {
   type: string;
+  title?: string;
   formComponent: React.ComponentType<{
     onErrorChange: (error?: string) => void;
     setLoginFormState: (loginFormState: string) => void;
@@ -145,7 +146,12 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string;
-  TiersConfigurationFields: React.ComponentType<{ valuesPrefix?: string }>;
+  TiersConfigurationFields: React.ComponentType<{
+    valuesPrefix?: string;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig;
   }>;
@@ -288,9 +294,10 @@ declare module 'graylog-web-plugin/plugin' {
     new (json: {}, exports: PluginExports): PluginManifest;
   }
 
+  type WrapWithArray<T> = T extends Array<any> ? T : Array<T>;
   interface PluginStore {
     register: (manifest: PluginRegistration) => void;
-    exports: <T extends keyof PluginExports>(key: T) => PluginExports[T];
+    exports: <T extends keyof PluginExports>(key: T) => WrapWithArray<PluginExports[T]>;
     unregister: (manifest: PluginRegistration) => void;
     get: () => Array<PluginRegistration>;
   }

@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -29,6 +28,7 @@ import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;
@@ -49,9 +49,9 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.database.utils.MongoUtils.idEq;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_CREATION_DATE;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_PROFILE_ID;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_CREATION_DATE;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.fields.FieldTypeProfileField.FIELD_PROFILE_ID;
 
 public class MongoIndexSetService implements IndexSetService {
     public static final String COLLECTION_NAME = "index_sets";

@@ -58,10 +58,8 @@ you want to use (class or a functional component with react hooks). When you don
 - Keep components simple, so they do not contain real logic. You need to transform the structure of an object when a user clicks on a button? Create a helper function for the logic which can be reused. Place the helper function in a place where it can be found easily.
 
 ### Testing
+- We use `testing-library` for tests, as it has been proven that it results in more reliable tests. Please follow their [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
 - When adding new functionality, try to write unit tests for every possible use case. If you are not sure where to start, try to test what is important for the user.
-- Currently, we have nearly only unit tests, but want to add more integration tests in the future. You can find examples for an integration test in `src/views/spec` 
-- There are still some tests which use `enzyme`, but we are only using `@testing-library/react` for new tests. 
-  We do favor `testing-library` for new tests, as it has been proven that it results in more reliable tests. You should not use both libraries in one file. In many cases, test quality can be improved by migrating a test suite from `enzyme` to `testing-library`.
 - A test should not rely on the knowledge of the inner workings of the system under test. Especially when testing React components, we prefer to test it like a user would use it.
 - Test files should be on the same level 
   - `ComponentA.jsx` 

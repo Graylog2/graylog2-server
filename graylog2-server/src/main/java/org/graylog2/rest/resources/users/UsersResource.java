@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.annotations.VisibleForTesting;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -79,6 +79,7 @@ import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.TokenSummary;
 import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
+import org.graylog2.rest.models.users.responses.UsernameAvailabilityResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -94,6 +95,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PasswordComplexityConfig;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserConfiguration;
@@ -101,10 +103,10 @@ import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -117,6 +119,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -126,10 +129,13 @@ import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
+import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS;
+import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_CODEPOINTS;
 
 @RequiresAuthentication
 @Path("/users")
@@ -163,8 +169,10 @@ public class UsersResource extends RestResource {
                          AccessTokenService accessTokenService,
                          RoleService roleService,
                          SessionService sessionService,
-                         UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager,
-                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService) {
+                         UserSessionTerminationService sessionTerminationService,
+                         DefaultSecurityManager securityManager,
+                         GlobalAuthServiceConfig globalAuthServiceConfig,
+                         ClusterConfigService clusterConfigService) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -257,12 +265,17 @@ public class UsersResource extends RestResource {
         final List<User> users = userManagementService.loadAll();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
-        userManagementService.getRootUser().ifPresent(adminUser ->
-                resultUsers.add(toUserResponse(adminUser, includePermissions, optSessions))
+        userManagementService.getRootUser().ifPresent(adminUser -> {
+                    if (isPermitted(USERS_READ, adminUser.getName())) {
+                        resultUsers.add(toUserResponse(adminUser, includePermissions, optSessions));
+                    }
+                }
         );
 
         for (User user : users) {
-            resultUsers.add(toUserResponse(user, includePermissions, optSessions));
+            if (isPermitted(USERS_READ, user.getName())) {
+                resultUsers.add(toUserResponse(user, includePermissions, optSessions));
+            }
         }
 
         return UserList.create(resultUsers);
@@ -272,15 +285,14 @@ public class UsersResource extends RestResource {
     @Timed
     @Path("/paginated")
     @ApiOperation(value = "Get paginated list of users")
-    @RequiresPermissions(RestPermissions.USERS_LIST)
     @Produces(MediaType.APPLICATION_JSON)
     public PaginatedResponse<UserOverviewDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @ApiParam(name = "sort",
-                                                                value = "The field to sort the result on",
-                                                                required = true,
-                                                                allowableValues = "title,description")
+                                                              value = "The field to sort the result on",
+                                                              required = true,
+                                                              allowableValues = "title,description")
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
@@ -293,8 +305,9 @@ public class UsersResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
+        final Predicate<String> userNamePermissionPredicate = username -> isPermitted(USERS_READ, username);
         final PaginatedList<UserOverviewDTO> result = paginatedUserService
-                .findPaginated(searchQuery, page, perPage, sort, order);
+                .findPaginated(userNamePermissionPredicate, searchQuery, page, perPage, sort, order);
         final Set<String> allRoleIds = result.stream().flatMap(userDTO -> {
             if (userDTO.roles() != null) {
                 return userDTO.roles().stream();
@@ -309,7 +322,8 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find roles: " + e.getMessage());
         }
 
-        final UserOverviewDTO adminUser = getAdminUserDTO(sessions);
+        final Map<String, Object> adminContextMap = new HashMap<>();
+        getAdminUserDTO(sessions).ifPresent(adminUserDTO -> adminContextMap.put("admin_user", adminUserDTO));
 
         final Optional<AuthServiceBackendDTO> activeAuthService = globalAuthServiceConfig.getActiveBackendConfig();
 
@@ -327,7 +341,7 @@ public class UsersResource extends RestResource {
 
         final PaginatedList<UserOverviewDTO> userOverviewDTOS = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("users", userOverviewDTOS, query, Collections.singletonMap("admin_user", adminUser));
+        return PaginatedResponse.create("users", userOverviewDTOS, query, adminContextMap);
     }
 
     @POST
@@ -339,7 +353,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
                            @Valid @NotNull CreateUserRequest cr) throws ValidationException {
-        if (userManagementService.load(cr.username()) != null) {
+        if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
             throw new BadRequestException(msg);
@@ -347,6 +361,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
+        validatePasswordComplexity(cr.password());
 
         // Create user.
         User user = userManagementService.create();
@@ -369,10 +384,10 @@ public class UsersResource extends RestResource {
 
         final Startpage startpage = cr.startpage();
         if (startpage != null) {
-            user.setStartpage(startpage.type(), startpage.id());
+            user.setStartpage(startpage);
         }
 
-        final String id = userManagementService.create(user);
+        final String id = userManagementService.create(user, getCurrentUser());
         LOG.debug("Saved user {} with id {}", user.getName(), id);
 
         final URI userUri = getUriBuilderToSelf().path(UsersResource.class)
@@ -382,12 +397,57 @@ public class UsersResource extends RestResource {
         return Response.created(userUri).build();
     }
 
+    @GET
+    @RequiresPermissions(RestPermissions.USERS_CREATE)
+    @Path("/username_availability")
+    @ApiOperation(value = "Check if a username is still available")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkUsernameAvailability(@ApiParam(name = "username") @QueryParam("username") String username) {
+        return Response.ok(new UsernameAvailabilityResponse(username, !isUserNameInUse(username))).build();
+    }
+
+    private boolean isUserNameInUse(String username) {
+        return userManagementService.load(username) != null;
+    }
+
+    private void validatePasswordComplexity(String password) {
+        PasswordComplexityConfig config = clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT);
+
+        StringBuilder errorMessages = new StringBuilder();
+        if (password == null || password.isBlank()) {
+            errorMessages.append("Password cannot be empty.");
+        } else {
+            if (password.length() < config.minLength()) {
+                errorMessages.append("Password must be at least ").append(config.minLength()).append(" characters long.\n");
+            }
+            if (config.requireUppercase() && password.chars().noneMatch(Character::isUpperCase)) {
+                errorMessages.append("Password must contain at least one uppercase letter.\n");
+            }
+            if (config.requireLowercase() && password.chars().noneMatch(Character::isLowerCase)) {
+                errorMessages.append("Password must contain at least one lowercase letter.\n");
+            }
+            if (config.requireNumbers() && password.chars().noneMatch(Character::isDigit)) {
+                errorMessages.append("Password must contain at least one number.\n");
+            }
+            if (config.requireSpecialCharacters() && password.chars().noneMatch(SPECIAL_CHARACTERS_CODEPOINTS::contains)) {
+                errorMessages.append("Password must contain at least one special character from: ").append(SPECIAL_CHARACTERS).append("\n");
+            }
+        }
+
+        if (!errorMessages.isEmpty()) {
+            String msg = errorMessages.toString();
+            LOG.error(msg);
+            throw new BadRequestException(msg);
+        }
+    }
+
     private void setUserRoles(@Nullable List<String> roles, User user) {
         if (roles != null) {
             try {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
                 List<String> unknownRoles = new ArrayList<>();
                 roles.forEach(roleName -> {
+                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
                     if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
                         unknownRoles.add(roleName);
                     }
@@ -459,11 +519,7 @@ public class UsersResource extends RestResource {
                 LOG.error("Invalid timezone '{}', ignoring it for user {}.", timezone, username);
             }
         }
-
-        final Startpage startpage = cr.startpage();
-        if (startpage != null) {
-            user.setStartpage(startpage.type(), startpage.id());
-        }
+        user.setStartpage(cr.startpage());
 
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
@@ -515,12 +571,13 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{username}")
-    @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
+        checkPermission(USERS_EDIT, username);
+
         if (userManagementService.delete(username) == 0) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -528,12 +585,14 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("id/{userId}")
-    @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
                                @PathParam("userId") String userId) {
+        final User user = loadUserById(userId);
+        checkPermission(USERS_EDIT, user.getName());
+
         if (userManagementService.deleteById(userId) == 0) {
             throw new NotFoundException("Couldn't find user " + userId);
         }
@@ -572,7 +631,7 @@ public class UsersResource extends RestResource {
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
         final User user = userManagementService.load(username);
-        checkPermission(RestPermissions.USERS_EDIT, username);
+        checkPermission(USERS_EDIT, username);
 
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
@@ -651,6 +710,7 @@ public class UsersResource extends RestResource {
         }
 
         if (changeAllowed) {
+            validatePasswordComplexity(cr.password());
             if (checkOldPassword) {
                 userManagementService.changePassword(user, cr.oldPassword(), cr.password());
             } else {
@@ -680,7 +740,7 @@ public class UsersResource extends RestResource {
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);
-        checkPermission(RestPermissions.USERS_EDIT, user.getName());
+        checkPermission(USERS_EDIT, user.getName());
         final User.AccountStatus oldStatus = user.getAccountStatus();
 
         if (oldStatus.equals(newStatus)) {
@@ -705,16 +765,10 @@ public class UsersResource extends RestResource {
 
         final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess()));
+            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess(), token.getCreatedAt(), token.getExpiresAt()));
         }
 
         return TokenList.create(tokenList.build());
-    }
-
-    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
-        public Duration getTTL(Supplier<Duration> defaultSupplier) {
-            return this.tokenTTL.orElseGet(defaultSupplier);
-        }
     }
 
     @POST
@@ -725,16 +779,16 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
-        final User user = loadUserById(userId);
-        final String username = user.getName();
+        final User futureOwner = loadUserById(userId);
 
-        if (!isTokenCreationAllowed(user)) {
-            throw new ForbiddenException("Not allowed to create tokens for user " + username);
+        if (!isPermitted(USERS_TOKENCREATE, futureOwner.getName())) {
+            throw new ForbiddenException("You are not allowed to create a token for user " + futureOwner.getName() + ".");
         }
+
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
         }
-        final AccessToken accessToken = accessTokenService.create(user.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
+        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
@@ -766,42 +820,12 @@ public class UsersResource extends RestResource {
         }
     }
 
-    @VisibleForTesting
-    boolean isTokenCreationAllowed(User user) {
-        final boolean allowed = isPermitted(USERS_TOKENCREATE, user.getName());
-        final boolean isAdmin = isAdmin(user);
-        if (isAdmin) {
-            return allowed;
-        }
-        final boolean externalAllowed = isExternalUserAllowed(user);
-        final boolean adminAllowed = isAllowedAsNoAdmin(user);
-
-        return allowed && externalAllowed && adminAllowed;
-    }
-
-    private boolean isAdmin(User user) {
-        final String adminRoleId = roleService.getAdminRoleObjectId();
-        return user.getRoleIds().contains(adminRoleId);
-    }
-
-    private boolean isAllowedAsNoAdmin(User user) {
-        return isAdmin(user) || !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).restrictAccessTokenToAdmins();
-    }
-
-    private boolean isExternalUserAllowed(User user) {
-        return !user.isExternalUser() || clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
-    }
-
     private User loadUserById(String userId) {
         final User user = userManagementService.loadById(userId);
         if (user == null) {
             throw new NotFoundException("Couldn't find user with ID <" + userId + ">");
         }
         return user;
-    }
-
-    private UserSummary toUserResponse(User user, AllUserSessions sessions) {
-        return toUserResponse(user, true, Optional.of(sessions));
     }
 
     private UserSummary toUserResponse(User user, boolean includePermissions, Optional<AllUserSessions> optSessions) {
@@ -884,24 +908,30 @@ public class UsersResource extends RestResource {
         return result;
     }
 
-    private UserOverviewDTO getAdminUserDTO(AllUserSessions sessions) {
-        final Optional<User> optionalAdmin = userManagementService.getRootUser();
-        if (optionalAdmin.isEmpty()) {
-            return null;
+    private Optional<UserOverviewDTO> getAdminUserDTO(AllUserSessions sessions) {
+        return userManagementService
+                .getRootUser()
+                .filter(rootUser -> isPermitted(USERS_READ, rootUser.getName()))
+                .map(rootUser -> {
+                    final Set<String> adminRoles = userManagementService.getRoleNames(rootUser);
+                    final Optional<SessionDTO> lastSession = sessions.forUser(rootUser);
+                    return UserOverviewDTO.builder()
+                            .username(rootUser.getName())
+                            .fullName(rootUser.getFullName())
+                            .email(rootUser.getEmail())
+                            .externalUser(rootUser.isExternalUser())
+                            .readOnly(rootUser.isReadOnly())
+                            .id(rootUser.getId())
+                            .fillSession(lastSession)
+                            .roles(adminRoles)
+                            .build();
+                });
+    }
+
+    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
+        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
+            return this.tokenTTL.orElseGet(defaultSupplier);
         }
-        final User admin = optionalAdmin.get();
-        final Set<String> adminRoles = userManagementService.getRoleNames(admin);
-        final Optional<SessionDTO> lastSession = sessions.forUser(admin);
-        return UserOverviewDTO.builder()
-                .username(admin.getName())
-                .fullName(admin.getFullName())
-                .email(admin.getEmail())
-                .externalUser(admin.isExternalUser())
-                .readOnly(admin.isReadOnly())
-                .id(admin.getId())
-                .fillSession(lastSession)
-                .roles(adminRoles)
-                .build();
     }
 
     private static class AllUserSessions {
@@ -913,6 +943,10 @@ public class UsersResource extends RestResource {
 
         private AllUserSessions(Collection<SessionDTO> sessions) {
             this.sessions = getLastSessionForUser(sessions);
+        }
+
+        public static AllUserSessions create(MongoDBSessionService sessionService) {
+            return new AllUserSessions(sessionService.loadAll());
         }
 
         public Optional<SessionDTO> forUser(User user) {

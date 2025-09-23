@@ -28,6 +28,7 @@ import RecentMessageLoader from './RecentMessageLoader';
 
 jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
+  gl2ServerUrl: () => `https://graylog`,
 }));
 
 jest.mock('graylog-web-plugin/plugin', () => ({
@@ -35,6 +36,8 @@ jest.mock('graylog-web-plugin/plugin', () => ({
     exports: jest.fn(),
   },
 }));
+
+jest.mock('components/inputs/useInputTypes', () => () => ({}));
 
 describe('<RecentMessageLoader>', () => {
   it('shows server input select when no forwarder plugin is installed', () => {

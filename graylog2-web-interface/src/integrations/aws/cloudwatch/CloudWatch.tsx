@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
-import { getValueFromInput } from 'util/FormsUtils.js';
+import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import StepAuthorize from 'integrations/aws/StepAuthorize';
 import { StepsContext } from 'integrations/aws/context/Steps';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
-// import useHistory from 'routing/useHistory';
 
 import StepKinesis from './StepKinesis';
 import StepHealthCheck from './StepHealthCheck';
@@ -38,14 +36,12 @@ type CloudWatchProps = {
   onSubmit?: (...args: any[]) => void;
 };
 
-const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) => {
+const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: CloudWatchProps) => {
   const { availableSteps, currentStep, isDisabledStep, setAvailableStep, setCurrentStep, setEnabledStep } =
     useContext(StepsContext);
   const { setFormData } = useContext(FormDataContext);
   const { availableStreams } = useContext(ApiContext);
   const { sidebar, clearSidebar } = useContext(SidebarContext);
-  const [dirty, setDirty] = useState(false);
-  const [lastStep, setLastStep] = useState(false);
   // const history = useHistory();
   const navigate = useNavigate();
 
@@ -67,10 +63,6 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) 
         value = value.trim();
       }
 
-      if (!dirty) {
-        setDirty(true);
-      }
-
       setFormData(id, { ...fieldData, value });
     };
 
@@ -83,15 +75,11 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) 
 
         setCurrentStep(key);
         setEnabledStep(key);
+      } else if (externalInputSubmit) {
+        onSubmit(maybeFormData);
       } else {
-        setLastStep(true);
-
-        if (externalInputSubmit) {
-          onSubmit(maybeFormData);
-        } else {
-          // history.push(Routes.SYSTEM.INPUTS);
-          navigate(Routes.SYSTEM.INPUTS);
-        }
+        // history.push(Routes.SYSTEM.INPUTS);
+        navigate(Routes.SYSTEM.INPUTS);
       }
     };
 
@@ -136,7 +124,6 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) 
     availableStreams.length,
     externalInputSubmit,
     setCurrentStep,
-    dirty,
     setFormData,
     clearSidebar,
     availableSteps,
@@ -153,18 +140,15 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) 
   }, [availableSteps, setAvailableStep, wizardSteps]);
 
   return (
-    <>
-      {dirty && !lastStep && <ConfirmLeaveDialog question="Are you sure? Your new Input will not be created." />}
-      <Wizard
-        steps={wizardSteps}
-        activeStep={currentStep}
-        onStepChange={handleStepChange}
-        horizontal
-        justified
-        hidePreviousNextButtons>
-        {sidebar}
-      </Wizard>
-    </>
+    <Wizard
+      steps={wizardSteps}
+      activeStep={currentStep}
+      onStepChange={handleStepChange}
+      horizontal
+      justified
+      hidePreviousNextButtons>
+      {sidebar}
+    </Wizard>
   );
 };
 

@@ -23,6 +23,7 @@ import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import withHistory from 'routing/withHistory';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -107,6 +108,7 @@ class EventNotificationFormContainer extends React.Component<
   handleSubmit = () => {
     const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
+    const currentUser = CurrentUserStore.getInitialState();
 
     this.setState({ isDirty: false });
 
@@ -115,21 +117,25 @@ class EventNotificationFormContainer extends React.Component<
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
 
-      promise.then(
-        () => {
-          if (!embedded) {
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
-        },
-        (errorResponse) => {
-          const { body } = errorResponse.additional;
+      promise
+        .then(() => {
+          CurrentUserStore.update(currentUser.currentUser.username);
+        })
+        .then(
+          () => {
+            if (!embedded) {
+              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+            }
+          },
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
 
-          if (errorResponse.status === 400 && body && body.failed) {
-            this.setState({ validation: body });
-            EventNotificationFormContainer.scrollToFirstError();
-          }
-        },
-      );
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+              EventNotificationFormContainer.scrollToFirstError();
+            }
+          },
+        );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
 
@@ -177,8 +183,7 @@ class EventNotificationFormContainer extends React.Component<
             testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
             this.setState({ validation: body });
           } else {
-            testResult.message =
-              errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
+            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your server logs.';
           }
         },
       )

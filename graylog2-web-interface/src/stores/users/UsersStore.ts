@@ -60,12 +60,16 @@ export type Token = {
   name: string;
   token: string;
   last_access: string;
+  expires_at: string;
 };
 
 export type TokenSummary = {
   id: string;
   name: string;
   last_access: string;
+  created_at: string;
+  expires_at: string;
+  tokenTtl: string;
 };
 
 export type ChangePasswordRequest = {
@@ -89,7 +93,7 @@ export type ActionsType = {
   update: (userId: string, request: UserUpdate, fullName: string) => Promise<void>;
   delete: (userId: string, fullName: string) => Promise<void>;
   changePassword: (userId: string, request: ChangePasswordRequest) => Promise<void>;
-  createToken: (userId: string, tokenName: string) => Promise<Token>;
+  createToken: (userId: string, tokenName: string, tokenTtl: string) => Promise<Token>;
   loadTokens: (userId: string) => Promise<TokenSummary[]>;
   deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>;
   loadUsers: (query?: Query) => Promise<Immutable.List<User>>;
@@ -177,11 +181,11 @@ export const UsersStore = singletonStore('core.Users', () =>
       return promise;
     },
 
-    createToken(userId: string, tokenName: string): Promise<Token> {
+    createToken(userId: string, tokenName: string, tokenTtl: string): Promise<Token> {
       const url = qualifyUrl(
         ApiRoutes.UsersApiController.create_token(encodeURIComponent(userId), encodeURIComponent(tokenName)).url,
       );
-      const promise = fetch('POST', url);
+      const promise = fetch('POST', url, { token_ttl: tokenTtl });
       UsersActions.createToken.promise(promise);
 
       return promise;
@@ -219,7 +223,7 @@ export const UsersStore = singletonStore('core.Users', () =>
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
-        adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
+        adminUser: response.context?.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
         list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
         pagination: {
           page: response.page,

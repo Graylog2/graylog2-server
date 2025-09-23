@@ -199,8 +199,27 @@ describe('XYPlot', () => {
     const onClick = jest.fn();
     render(<SimpleXYPlot onClickMarker={onClick} />);
     const { onClickMarker } = asMock(GenericPlot).mock.calls[0][0];
-    onClickMarker({ x: 'Foo', y: '23' });
+    onClickMarker({ x: 'x', y: 'y' }, { points: [], event: null });
 
-    expect(onClick).toHaveBeenCalledWith({ x: 'Foo', y: '23' });
+    expect(onClick).toHaveBeenCalledWith({ x: 'x', y: 'y' }, { points: [], event: null });
+  });
+
+  it('maps axis type correctly', async () => {
+    const plotLayout = {
+      yaxis: {
+        side: 'left' as const,
+      },
+    };
+
+    render(<SimpleXYPlot plotLayout={plotLayout} axisType="logarithmic" />);
+
+    expect(GenericPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'layout': expect.objectContaining({
+          yaxis: expect.objectContaining({ type: 'log', side: 'left' }), // ensure plotLayout is merged correctly
+        }),
+      }),
+      {},
+    );
   });
 });

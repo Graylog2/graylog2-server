@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -55,8 +56,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -103,6 +104,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final NotificationService notificationService;
     private final QueryStringDecorators queryStringDecorators;
     private final StreamService streamService;
+    private final SearchNormalization searchNormalization;
     private final boolean isCloud;
 
     @Inject
@@ -118,6 +120,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   NotificationService notificationService,
                                   QueryStringDecorators queryStringDecorators,
                                   StreamService streamService,
+                                  SearchNormalization searchNormalization,
                                   @Named("is_cloud") boolean isCloud) {
         this.config = config;
         this.parameters = parameters;
@@ -131,6 +134,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.notificationService = notificationService;
         this.queryStringDecorators = queryStringDecorators;
         this.streamService = streamService;
+        this.searchNormalization = searchNormalization;
         this.isCloud = isCloud;
     }
 
@@ -397,11 +401,14 @@ public class PivotAggregationSearch implements AggregationSearch {
         return permittedStreams.loadAllMessageStreams((streamId) -> true);
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
-                                   long searchWithinMs, long executeEveryMs) throws EventProcessorException {
+    protected SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
+                           long searchWithinMs, long executeEveryMs) throws EventProcessorException {
         final var username = user.name();
+        final Query queryWithSearchFilters = searchNormalization.postValidation(
+                getAggregationQuery(parameters, searchWithinMs, executeEveryMs),
+                ParameterProvider.of(config.queryParameters()));
         Search search = Search.builder()
-                .queries(ImmutableSet.of(getAggregationQuery(parameters, searchWithinMs, executeEveryMs), getSourceStreamsQuery(parameters)))
+                .queries(ImmutableSet.of(queryWithSearchFilters, getSourceStreamsQuery(parameters)))
                 .parameters(config.queryParameters())
                 .build();
         // This adds all streams if none were provided
@@ -521,7 +528,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .id(QUERY_ID)
                 .searchTypes(searchTypes)
                 .query(decorateQuery(config))
-                .timerange(parameters.timerange());
+                .timerange(parameters.timerange())
+                .filters(config.filters());
 
         final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
@@ -553,10 +561,10 @@ public class PivotAggregationSearch implements AggregationSearch {
             // TODO: How to take into consideration StreamPermissions here???
             streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), (streamId) -> true));
         }
-        final Set<String> existingStreams = streamService.loadByIds(streamIds)
-                .stream()
-                .map(Persisted::getId)
-                .collect(toSet());
+        final Set<String> existingStreams;
+        try (var stream = streamService.streamDTOByIds(streamIds)) {
+            existingStreams = stream.map(Stream::getId).collect(toSet());
+        }
         final Set<String> nonExistingStreams = streamIds.stream()
                 .filter(stream -> !existingStreams.contains(stream))
                 .collect(toSet());

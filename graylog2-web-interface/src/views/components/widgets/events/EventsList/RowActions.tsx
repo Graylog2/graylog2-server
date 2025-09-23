@@ -87,7 +87,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
       </ButtonToolbar>
       {showDetailsModal && (
         <Modal show={showDetailsModal} bsSize="large" onHide={toggleDetailsModal}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Event details</Modal.Title>
           </Modal.Header>
           <Modal.Body>

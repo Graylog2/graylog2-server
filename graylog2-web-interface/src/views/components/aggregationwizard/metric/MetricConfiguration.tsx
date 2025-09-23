@@ -15,25 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext, getIn } from 'formik';
+import { Field, useFormikContext, getIn, FieldArray } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
+import random from 'lodash/random';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Col, Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
+import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/common';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
-import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
+import { percentileOptions, percentageStrategyOptions, thresholdsSupportedVisualizations } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import ThresholdFormItem from 'views/components/aggregationwizard/metric/ThresholdFormItem';
+import { colors } from 'views/components/visualizations/Colors';
 
 import FieldSelect from '../FieldSelect';
 
@@ -42,6 +45,20 @@ type Props = {
 };
 
 const Wrapper = styled.div``;
+
+export const ActionWrapper = styled.div`
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ThresholdsContainer = styled.div(
+  ({ theme }) => `
+  padding-bottom: ${theme.spacings.sm};
+`,
+);
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
   defaultCompare(label1, label2);
@@ -69,7 +86,7 @@ const Metric = ({ index }: Props) => {
   );
 
   const {
-    values: { metrics },
+    values: { metrics, visualization },
     errors: { metrics: metricsError },
     setFieldValue,
   } = useFormikContext<WidgetConfigFormValues>();
@@ -115,6 +132,33 @@ const Metric = ({ index }: Props) => {
 
   const showUnitType = unitFeatureEnabled && isFunctionAllowsUnit(currentFunction);
 
+  const createThreshold = () => {
+    const palette = colors[random(0, colors.length - 1)];
+    const randomColor = palette[random(0, palette.length - 1)];
+
+    return {
+      color: randomColor,
+      name: '',
+      value: 0,
+    };
+  };
+
+  const addThresholds = () => {
+    setFieldValue(`metrics.${index}.thresholds`, [...currentMetric.thresholds, createThreshold()]);
+  };
+
+  const showThresholdSettings = thresholdsSupportedVisualizations.includes(visualization?.type);
+
+  const onRemoveThreshold = useCallback(
+    (thresholdIndex: number) => {
+      setFieldValue(
+        `metrics.${index}.thresholds`,
+        metrics[index].thresholds.filter((_, i) => i !== thresholdIndex),
+      );
+    },
+    [index, metrics, setFieldValue],
+  );
+
   return (
     <Wrapper data-testid={`metric-${index}`}>
       <Col sm={11}>
@@ -131,9 +175,8 @@ const Metric = ({ index }: Props) => {
                 clearable={false}
                 name={name}
                 value={value}
-                aria-label="Select a function"
+                placeholder="Select a function"
                 size="small"
-                menuPortalTarget={document.body}
                 onChange={onFunctionChange}
               />
             </Input>
@@ -154,7 +197,6 @@ const Metric = ({ index }: Props) => {
                   <FieldSelect
                     id="metric-field-select"
                     selectRef={metricFieldSelectRef}
-                    menuPortalTarget={document.body}
                     onChange={(fieldName) => {
                       onChange({ target: { name, value: fieldName } });
                     }}
@@ -192,7 +234,6 @@ const Metric = ({ index }: Props) => {
                   value={value}
                   aria-label="Select percentile"
                   size="small"
-                  menuPortalTarget={document.body}
                   onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                 />
               </Input>
@@ -218,7 +259,6 @@ const Metric = ({ index }: Props) => {
                     value={value ?? 'COUNT'}
                     aria-label="Select strategy"
                     size="small"
-                    menuPortalTarget={document.body}
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                   />
                 </Input>
@@ -242,7 +282,6 @@ const Metric = ({ index }: Props) => {
                     isFieldQualified={isFieldQualified}
                     name={name}
                     value={value}
-                    menuPortalTarget={document.body}
                     ariaLabel="Select a field"
                   />
                 </Input>
@@ -266,6 +305,54 @@ const Metric = ({ index }: Props) => {
           wrapperClassName="col-sm-9"
         />
       </Col>
+      {showThresholdSettings && (
+        <>
+          <Col sm={11}>
+            <Field name={`metrics.${index}.showThresholds`}>
+              {({ field: { name, value = false } }) => (
+                <FormikInput
+                  type="checkbox"
+                  wrapperClassName="col-sm-12"
+                  label="Show line thresholds"
+                  id={`${name}-input`}
+                  name={name}
+                  onChange={() => {
+                    const newVal = !value;
+                    setFieldValue(name, newVal);
+                    if (newVal && !currentMetric.thresholds?.length) {
+                      setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
+                    }
+                  }}
+                />
+              )}
+            </Field>
+          </Col>
+          {currentMetric.showThresholds && (
+            <Col sm={1}>
+              <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
+            </Col>
+          )}
+          {currentMetric.showThresholds && (
+            <FieldArray
+              name={`metrics.${index}.thresholds`}
+              validateOnChange={false}
+              render={() => (
+                <ThresholdsContainer>
+                  {metrics?.[index]?.thresholds?.map((_, tIndex) => (
+                    <ThresholdFormItem
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${index}-${tIndex}`}
+                      thresholdIndex={tIndex}
+                      metricIndex={index}
+                      onRemove={() => onRemoveThreshold(tIndex)}
+                    />
+                  ))}
+                </ThresholdsContainer>
+              )}
+            />
+          )}
+        </>
+      )}
     </Wrapper>
   );
 };

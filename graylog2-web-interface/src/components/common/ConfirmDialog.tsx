@@ -25,14 +25,17 @@ const StyledModal = styled(Modal)`
 `;
 
 type Props = {
-  show?: boolean;
-  onConfirm: (event) => void;
-  onCancel?: () => void;
-  title: string | React.ReactNode;
-  children: React.ReactNode;
   btnConfirmDisabled?: boolean;
   btnConfirmText?: React.ReactNode;
+  children: React.ReactNode;
   hideCancelButton?: boolean;
+  isAsyncSubmit?: boolean;
+  isSubmitting?: boolean;
+  onCancel?: () => void;
+  onConfirm: () => void;
+  show?: boolean;
+  submitLoadingText?: string;
+  title: string | React.ReactNode;
 };
 
 /**
@@ -40,35 +43,52 @@ type Props = {
  * cancel or confirm.
  */
 const ConfirmDialog = ({
-  show = false,
-  title,
-  children,
-  onCancel = () => {},
-  onConfirm,
   btnConfirmDisabled = false,
   btnConfirmText = 'Confirm',
+  children,
   hideCancelButton = false,
+  isAsyncSubmit = undefined,
+  isSubmitting = undefined,
+  onCancel = () => {},
+  onConfirm,
+  show = false,
+  submitLoadingText = undefined,
+  title,
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
+  const submit = hideCancelButton ? (
+    <ModalSubmit
+      autoFocus
+      onSubmit={onConfirm}
+      submitButtonType="button"
+      disabledSubmit={btnConfirmDisabled}
+      submitButtonText={btnConfirmText}
+    />
+  ) : (
+    <ModalSubmit
+      autoFocus
+      disabledSubmit={btnConfirmDisabled}
+      displayCancel
+      isAsyncSubmit={isAsyncSubmit}
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onSubmit={onConfirm}
+      submitButtonText={btnConfirmText}
+      submitButtonType="button"
+      submitLoadingText={submitLoadingText}
+    />
+  );
+
   return (
     <StyledModal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>{children}</Modal.Body>
 
-      <Modal.Footer>
-        <ModalSubmit
-          onCancel={onCancel}
-          onSubmit={onConfirm}
-          submitButtonType="button"
-          disabledSubmit={btnConfirmDisabled}
-          submitButtonText={btnConfirmText}
-          displayCancel={!hideCancelButton as any}
-        />
-      </Modal.Footer>
+      <Modal.Footer>{submit}</Modal.Footer>
     </StyledModal>
   );
 };

@@ -15,47 +15,55 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { LookupTableForm } from 'components/lookup-tables';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
-type LookupTableCreateProps = {
-  saved: (...args: any[]) => void;
-  validate?: (...args: any[]) => void;
-  validationErrors?: any;
+type LookupTableType = LookupTable & {
+  enable_single_value: boolean;
+  enable_multi_value: boolean;
 };
 
-class LookupTableCreate extends React.Component<
-  LookupTableCreateProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    validate: null,
-    validationErrors: {},
-  };
+type Props = {
+  create: boolean;
+  onClose: () => void;
+  onCacheCreateClick: () => void;
+  onDataAdapterCreateClick: () => void;
+  dataAdapter?: string;
+  cache?: string;
+  table?: LookupTableType;
+};
 
-  state = {
-    table: undefined,
-  };
+const StyledRow = styled(Row)`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
 
-  render() {
-    return (
-      <div>
-        <Row className="content">
-          <Col lg={8}>
-            <LookupTableForm
-              saved={this.props.saved}
-              create
-              validate={this.props.validate}
-              validationErrors={this.props.validationErrors}
-            />
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-}
+const LookupTableCreate = ({
+  create,
+  onClose,
+  onCacheCreateClick,
+  onDataAdapterCreateClick,
+  dataAdapter = '',
+  cache = '',
+  table = undefined,
+}: Props) => (
+  <StyledRow>
+    <Col lg={6}>
+      <LookupTableForm
+        onClose={onClose}
+        onCacheCreateClick={onCacheCreateClick}
+        onDataAdapterCreateClick={onDataAdapterCreateClick}
+        create={create}
+        dataAdapter={dataAdapter}
+        cache={cache}
+        table={table}
+      />
+    </Col>
+  </StyledRow>
+);
 
 export default LookupTableCreate;

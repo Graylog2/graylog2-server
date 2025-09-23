@@ -19,18 +19,40 @@ import styled from 'styled-components';
 
 import { Button, Modal, Panel } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
+import useFetch from 'integrations/hooks/useFetch';
 import FormWrap from 'integrations/aws/common/FormWrap';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { ApiRoutes, DocsRoutes } from 'integrations/aws/common/Routes';
 import { renderOptions } from 'integrations/aws/common/Options';
 import formValidation from 'integrations/aws/utils/formValidation';
 import Spinner from 'components/common/Spinner';
+import useProductName from 'brand-customization/useProductName';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
+
+const AutoSetupContent = styled.div`
+  margin-bottom: 9px;
+`;
+
+const LoadingContent = styled(Modal.Body)`
+  text-align: center;
+`;
+
+const StyledSpinner = styled(Spinner)`
+  font-size: 48px;
+  color: #702785;
+`;
+
+const LoadingMessage = styled.p`
+  font-size: 16px;
+  font-weight: bold;
+  padding-top: 15px;
+  color: #a6afbd;
+`;
 
 type KinesisStreamsProps = {
   onSubmit: (...args: any[]) => void;
@@ -38,16 +60,12 @@ type KinesisStreamsProps = {
   toggleSetup?: (...args: any[]) => void;
 };
 
-const KinesisStreams = ({
-  onChange,
-  onSubmit,
-
-  toggleSetup = () => {},
-}: KinesisStreamsProps) => {
+const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisStreamsProps) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
   const { availableStreams, setLogData } = useContext(ApiContext);
   const { clearSidebar, setSidebar } = useContext(SidebarContext);
+  const productName = useProductName();
   const [logDataStatus, setLogDataUrl] = useFetch(
     null,
     (response) => {
@@ -55,10 +73,10 @@ const KinesisStreams = ({
       onSubmit();
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream ? formData.awsCloudWatchKinesisStream.value : '',
-    },
+    }),
   );
 
   useEffect(() => {
@@ -71,8 +89,8 @@ const KinesisStreams = ({
           </p>
 
           <p>
-            Graylog also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log
-            group of your choice. Please be aware that this option will create additional resources in your AWS
+            {productName} also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch
+            log group of your choice. Please be aware that this option will create additional resources in your AWS
             environment that will incur billing charges.
           </p>
         </AutoSetupContent>
@@ -87,7 +105,7 @@ const KinesisStreams = ({
         </Button>
       </Panel>,
     );
-  }, []);
+  }, [clearSidebar, productName, setSidebar, toggleSetup]);
 
   useEffect(() => {
     if (logDataStatus.error) {
@@ -100,7 +118,7 @@ const KinesisStreams = ({
         ),
       });
     }
-  }, [logDataStatus.error]);
+  }, [logDataStatus.error, setLogDataUrl]);
 
   const handleSubmit = () => {
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
@@ -108,12 +126,12 @@ const KinesisStreams = ({
 
   return (
     <>
-      <LoadingModal show={logDataStatus.loading} backdrop="static" keyboard={false} onHide={() => {}} bsSize="small">
+      <Modal show={logDataStatus.loading} bsSize="small" onHide={() => {}} closable={false}>
         <LoadingContent>
           <StyledSpinner />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>
         </LoadingContent>
-      </LoadingModal>
+      </Modal>
 
       <FormWrap
         onSubmit={handleSubmit}
@@ -150,33 +168,5 @@ const KinesisStreams = ({
     </>
   );
 };
-
-const AutoSetupContent = styled.div`
-  margin-bottom: 9px;
-`;
-
-const LoadingModal = styled(Modal)`
-  > .modal-dialog {
-    width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-`;
-
-const LoadingContent = styled(Modal.Body)`
-  text-align: center;
-`;
-
-const StyledSpinner = styled(Spinner)`
-  font-size: 48px;
-  color: #702785;
-`;
-
-const LoadingMessage = styled.p`
-  font-size: 16px;
-  font-weight: bold;
-  padding-top: 15px;
-  color: #a6afbd;
-`;
 
 export default KinesisStreams;

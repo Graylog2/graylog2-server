@@ -45,8 +45,13 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Delete
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.bytes.BytesReference;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXContent;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentFactory;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentHelper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -209,7 +214,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public Map<String, Object> getFlattenIndexSettings(@Nonnull String index) {
+    public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
 
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(index)
@@ -217,10 +222,14 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            Settings settings = settingsResponse.getIndexToSettings().get(index);
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-            settings.keySet().forEach(k -> Optional.ofNullable(settings.get(k)).ifPresent(v -> builder.put(k, v)));
-            return builder.build();
+            final Settings settings = settingsResponse.getIndexToSettings().get(index);
+            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
+            xContentBuilder.startObject();
+            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
+            xContentBuilder.endObject();
+            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
+
+            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
         }, "Couldn't read settings of index " + index);
     }
 

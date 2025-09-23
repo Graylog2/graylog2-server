@@ -19,13 +19,14 @@ package org.graylog.datanode.rest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.plugin.Version;
 
 public record DataNodeStatus(@JsonIgnore Version appVersion, SystemInfo operatingSystem, StatusResponse opensearch,
-                             DatanodeDirectories datanodeDirectories) {
+                             DatanodeDirectories datanodeDirectories, DataNodeDto dto) {
 
-    DataNodeStatus(Version appVersion, StatusResponse opensearch, DatanodeDirectories datanodeDirectories) {
-        this(appVersion, new SystemInfo(), opensearch, datanodeDirectories);
+    DataNodeStatus(Version appVersion, StatusResponse opensearch, DatanodeDirectories datanodeDirectories, DataNodeDto dto) {
+        this(appVersion, new SystemInfo(), opensearch, datanodeDirectories, dto);
     }
 
     @JsonProperty

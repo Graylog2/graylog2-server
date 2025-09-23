@@ -16,6 +16,8 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -52,7 +54,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +78,7 @@ public class UserImpl extends PersistedImpl implements User {
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
     private final Permissions permissions;
     protected final ClusterConfigService clusterConfigService;
+    private ObjectMapper objectMapper;
 
     public interface Factory {
         UserImpl create(final Map<String, Object> fields);
@@ -122,23 +124,27 @@ public class UserImpl extends PersistedImpl implements User {
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
                     ClusterConfigService clusterConfigService,
+                    ObjectMapper objectMapper,
                     @Assisted final Map<String, Object> fields) {
         super(fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
         this.clusterConfigService = clusterConfigService;
+        this.objectMapper = objectMapper;
     }
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
                     ClusterConfigService clusterConfigService,
+                    ObjectMapper objectMapper,
                     @Assisted final ObjectId id,
                     @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
         this.clusterConfigService = clusterConfigService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -236,14 +242,16 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public List<String> getPermissions() {
-        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
+        final boolean isAllowedToCreateTokens = this.permissions.isAllowedToCreateTokens(isExternalUser(), this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES));
+        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName(), isAllowedToCreateTokens));
         @SuppressWarnings("unchecked")
-        final List<String> permissions = (List<String>) fields.get(PERMISSIONS);
-        if (permissions != null) {
-            permissionSet.addAll(permissions);
+        final List<String> permissionList = (List<String>) fields.get(PERMISSIONS);
+        if (permissionList != null) {
+            permissionSet.addAll(permissionList);
         }
         return new ArrayList<>(permissionSet);
     }
+
 
     @Override
     public Set<Permission> getObjectPermissions() {
@@ -260,8 +268,9 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public void setPermissions(final List<String> permissions) {
         final List<String> perms = Lists.newArrayList(permissions);
+        boolean isAllowedToCreateTokens = this.permissions.isAllowedToCreateTokens(isExternalUser(), this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES));
         // Do not store the dynamic user self edit permissions
-        perms.removeAll(this.permissions.userSelfEditPermissions(getName()));
+        perms.removeAll(this.permissions.userSelfEditPermissions(getName(), isAllowedToCreateTokens));
         fields.put(PERMISSIONS, perms);
     }
 
@@ -280,15 +289,9 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public Startpage getStartpage() {
-        if (fields.containsKey(STARTPAGE)) {
-            @SuppressWarnings("unchecked")
-            final Map<String, String> obj = (Map<String, String>) fields.get(STARTPAGE);
-            final String type = obj.get("type");
-            final String id = obj.get("id");
-
-            if (type != null && id != null) {
-                return Startpage.create(type, id);
-            }
+        final var rawStartpage = fields.get(STARTPAGE);
+        if (rawStartpage != null && rawStartpage instanceof Map dbObject && !dbObject.isEmpty()) {
+            return objectMapper.convertValue(fields.get(STARTPAGE), Startpage.class);
         }
 
         return null;
@@ -403,19 +406,13 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setStartpage(final String type, final String id) {
-        final Startpage nextStartpage = type != null && id != null ? Startpage.create(type, id) : null;
-        this.setStartpage(nextStartpage);
-    }
-
-    @Override
     public void setStartpage(Startpage startpage) {
-        final HashMap<String, String> startpageMap = new HashMap<>();
-        if (startpage != null) {
-            startpageMap.put("type", startpage.type());
-            startpageMap.put("id", startpage.id());
+        if (startpage == null) {
+            this.fields.remove(STARTPAGE);
+            return;
         }
-        this.fields.put(STARTPAGE, startpageMap);
+        Map<String, Object> map = objectMapper.convertValue(startpage, new TypeReference<>() {});
+        this.fields.put(STARTPAGE, map);
     }
 
     @Nullable
@@ -455,7 +452,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public boolean isServiceAccount()  {
+    public boolean isServiceAccount() {
         return Boolean.valueOf(String.valueOf(fields.get(SERVICE_ACCOUNT)));
     }
 
@@ -473,8 +470,9 @@ public class UserImpl extends PersistedImpl implements User {
         LocalAdminUser(PasswordAlgorithmFactory passwordAlgorithmFactory,
                        Configuration configuration,
                        ClusterConfigService clusterConfigService,
+                       ObjectMapper objectMapper,
                        @Assisted String adminRoleObjectId) {
-            super(passwordAlgorithmFactory, null, clusterConfigService, Collections.<String, Object>emptyMap());
+            super(passwordAlgorithmFactory, null, clusterConfigService, objectMapper, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
             this.roles = ImmutableSet.of(adminRoleObjectId);
         }

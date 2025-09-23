@@ -18,18 +18,12 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import { Button } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
-type Props = {
-  variant?: string;
-  compact?: boolean;
-  color?: string;
-};
-
-const ResumeStartupButton = ({ variant, compact = false, color }: Props) => {
+const ResumeConfigurationButton = () => {
   const [isRestartingConfiguration, setIsRestartingConfiguration] = useState(false);
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
@@ -48,10 +42,10 @@ const ResumeStartupButton = ({ variant, compact = false, color }: Props) => {
   }, [setIsRestartingConfiguration]);
 
   return (
-    <Button variant={variant} size={compact ? 'compact-xs' : 'xs'} color={color} onClick={onResumeStartup}>
+    <Button bsSize="xs" bsStyle="danger" onClick={onResumeStartup}>
       {isRestartingConfiguration ? 'restarting...' : 'restart'}
     </Button>
   );
 };
 
-export default ResumeStartupButton;
+export default ResumeConfigurationButton;

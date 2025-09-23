@@ -23,7 +23,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.exec.OS;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
@@ -31,20 +30,17 @@ import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -54,43 +50,8 @@ public class OpensearchCommandLineProcess implements Closeable {
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
 
-
-    /**
-     * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
-     * start the DataNode inside IntelliJ.
-     *
-     * @param config
-     */
-    private void fixJdkOnMac(final OpensearchConfiguration config) {
-        final var isMacOS = OS.isFamilyMac();
-        final var jdk = config.getOpensearchDistribution().directory().resolve("jdk.app");
-        final var jdkNotLinked = !Files.exists(jdk);
-        if (isMacOS && jdkNotLinked) {
-            // Link System jdk into startup folder, get path:
-            final ProcessBuilder builder = new ProcessBuilder("/usr/libexec/java_home");
-            builder.redirectErrorStream(true);
-            try {
-                final Process process = builder.start();
-                final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
-                var line = reader.readLine();
-                if (line != null && Files.exists(Path.of(line))) {
-                    final var target = Path.of(line);
-                    final var src = Files.createDirectories(jdk.resolve("Contents"));
-                    Files.createSymbolicLink(src.resolve("Home"), target);
-                } else {
-                    LOG.error("Output of '/usr/libexec/java_home' is not the jdk: {}", line);
-                }
-                // cleanup
-                process.destroy();
-                reader.close();
-            } catch (IOException e) {
-                LOG.error("Could not link jdk.app on macOS: {}", e.getMessage(), e);
-            }
-        }
-    }
-
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
-        final OpensearchConfigurationDir confDir = config.getOpensearchConfigurationDir();
+        final OpensearchConfigurationDir confDir = config.getOpensearchConfigTargetDir();
         config.configFiles().forEach(cf -> persistConfigFile(confDir, cf));
     }
 
@@ -106,12 +67,20 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
-        fixJdkOnMac(config);
         configureOpensearchKeystoreSecrets(config);
         final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
+        logWarnings(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
+    }
+
+    private void logWarnings(OpensearchConfiguration config) {
+        if (!config.warnings().isEmpty()) {
+            LOG.warn("Your system is overriding forbidden opensearch configuration properties. " +
+                    "This may cause unexpected results and may break in any future release!");
+        }
+        config.warnings().forEach(LOG::warn);
     }
 
     private void configureOpensearchKeystoreSecrets(OpensearchConfiguration config) {
@@ -119,8 +88,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         LOG.info("Creating opensearch keystore");
         final String createdMessage = opensearchCli.keystore().create();
         LOG.info(createdMessage);
-        final Map<String, String> keystoreItems = config.getKeystoreItems();
-        keystoreItems.forEach((key, value) -> opensearchCli.keystore().add(key, value));
+        final Collection<OpensearchKeystoreItem> keystoreItems = config.getKeystoreItems();
+        keystoreItems.forEach((item) -> item.persist(opensearchCli.keystore()));
         LOG.info("Added {} keystore items", keystoreItems.size());
     }
 

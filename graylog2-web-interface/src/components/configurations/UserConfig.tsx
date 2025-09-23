@@ -39,7 +39,7 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
     &&.deflist {
       dd {
         padding-left: ${theme.spacings.md};
-        margin-left: 200px;
+        margin-left: 400px;
       }
     }
   `,
@@ -66,18 +66,19 @@ const UserConfig = () => {
       const config = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
       setViewConfig(config);
-      setFormConfig(config);
+      setFormConfig({ ...config, restrict_access_token_to_admins: !config?.restrict_access_token_to_admins });
     });
   }, [configuration]);
 
-  const saveConfig = (values) => {
+  const saveConfig = (values: UserConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.USER_UPDATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'user',
       app_action_value: 'configuration-save',
     });
+    const newConfig = { ...values, restrict_access_token_to_admins: !values?.restrict_access_token_to_admins };
 
-    ConfigurationsActions.update(ConfigurationType.USER_CONFIG, values).then(() => {
+    ConfigurationsActions.update(ConfigurationType.USER_CONFIG, newConfig).then(() => {
       setShowModal(false);
     });
   };
@@ -88,6 +89,7 @@ const UserConfig = () => {
   };
 
   const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
+  const defaultTokenTtlValidator = (milliseconds: number) => milliseconds >= 86400000;
 
   const modalTitle = 'Update User Configuration';
 
@@ -105,8 +107,12 @@ const UserConfig = () => {
             <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
+            <dt>Allow users to create personal access tokens:&nbsp;</dt>
+            <dd>{!viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
             <dt>Allow access token for external users:&nbsp;</dt>
             <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
+            <dt>Default TTL for new tokens:</dt>
+            <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -123,12 +129,12 @@ const UserConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal && !!formConfig} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal && !!formConfig} onHide={resetConfig}>
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
-                  <Modal.Header closeButton>
-                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                  <Modal.Header>
+                    <Modal.Title>{modalTitle}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>
@@ -150,7 +156,7 @@ const UserConfig = () => {
                               duration={values.global_session_timeout_interval}
                               update={(value) => setFieldValue('global_session_timeout_interval', value)}
                               label="Global session timeout interval (as ISO8601 Duration)"
-                              help="Session automatically end after this amount of time, unless they are actively used."
+                              help="Session automatically end after this amount of time, unless they are actively used. Example, for 60 seconds: PT60S, for 60 minutes: PT60M"
                               validator={timeoutIntervalValidator}
                               errorText="invalid (min: 1 second)"
                               disabled={!values.enable_global_session_timeout}
@@ -161,11 +167,35 @@ const UserConfig = () => {
                         <Col sm={12}>
                           <FormikInput
                             type="checkbox"
+                            name="restrict_access_token_to_admins"
+                            id="restrict_access_token_to_admins"
+                            label={<LabelSpan>Allow users to create personal access tokens</LabelSpan>}
+                          />
+                          <InputDescription help="If enabled, it will allow users to create access tokens." />
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput
+                            type="checkbox"
                             name="allow_access_token_for_external_user"
                             id="allow_access_token_for_external_user"
                             label={<LabelSpan>Allow access token for external users</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, it will allow external users to use access tokens." />
+                          <InputDescription help="If enabled, it will allow external users to create access tokens." />
+                        </Col>
+                        <Col sm={12}>
+                          <fieldset>
+                            <ISODurationInput
+                              id="default_ttl_for_new_tokens"
+                              duration={values.default_ttl_for_new_tokens}
+                              update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
+                              label="Default TTL for new tokens (as ISO8601 Duration)"
+                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: PT30D"
+                              validator={defaultTokenTtlValidator}
+                              errorText="invalid (min: 1 day)"
+                              disabled={!values.default_ttl_for_new_tokens}
+                              required
+                            />
+                          </fieldset>
                         </Col>
                       </Row>
                     </div>

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -33,7 +33,7 @@ import type {
 import CheckBoxGroup from 'views/logic/valueactions/createEventDefinition/CheckBoxGroup';
 import { aggregationGroup, searchGroup, labels } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
-import { ExpandableList, ExpandableListItem, Icon } from 'components/common';
+import { ExpandableList, Icon, ExpandableCheckboxListItem } from 'components/common';
 import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
@@ -49,6 +49,11 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey; value: string | n
   </span>
 );
 
+const SECTION_LABELS = {
+  aggregation: 'Aggregation settings',
+  search: 'Search query',
+};
+
 const CreateEventDefinitionModal = ({
   modalData,
   mappedData,
@@ -60,6 +65,7 @@ const CreateEventDefinitionModal = ({
   show: boolean;
   onClose: () => void;
 }) => {
+  const [expandedSections, setExpandedSections] = useState<Array<string>>(Object.values(SECTION_LABELS));
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const localStorageConfig = useLocalStorageConfigData({ mappedData, checked });
   const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
@@ -125,7 +131,7 @@ const CreateEventDefinitionModal = ({
 
   return (
     <Modal onHide={onClose} show={show}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Configure new event definition</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -137,11 +143,13 @@ const CreateEventDefinitionModal = ({
         </Button>
         {showDetails && (
           <Container>
-            <ExpandableList>
+            <ExpandableList
+              value={expandedSections}
+              onChange={(newExpandedSections) => setExpandedSections(newExpandedSections)}>
               {!isEmpty(aggregationChecks) && (
                 <CheckBoxGroup
                   onChange={onCheckboxChange}
-                  groupLabel="Aggregation"
+                  groupLabel={SECTION_LABELS.aggregation}
                   checked={aggregationChecks}
                   labels={aggregationLabels}
                 />
@@ -149,18 +157,18 @@ const CreateEventDefinitionModal = ({
               {!isEmpty(searchChecks) && (
                 <CheckBoxGroup
                   onChange={onCheckboxChange}
-                  groupLabel="Search query"
+                  groupLabel={SECTION_LABELS.search}
                   checked={searchChecks}
                   labels={searchLabels}
                 />
               )}
               {Object.entries(restChecks).map(([key, isChecked]) => (
-                <ExpandableListItem
+                <ExpandableCheckboxListItem
                   key={key}
+                  value={key}
                   checked={isChecked}
                   onChange={() => onCheckboxChange({ [key]: !isChecked })}
                   header={restLabels[key]}
-                  padded={false}
                   expandable={false}
                 />
               ))}

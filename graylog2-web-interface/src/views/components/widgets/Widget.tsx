@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import isEqual from 'lodash/isEqual';
 
-import { getPathnameWithoutId } from 'util/URLUtils';
-import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
+import type { BackendWidgetPosition, WidgetResults } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -31,20 +31,23 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
-import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
-import { setTitle } from 'views/logic/slices/titlesActions';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { updateWidget, updateWidgetConfig, setWidgetTitle, updateDescription } from 'views/logic/slices/widgetActions';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 import type WidgetType from 'views/logic/widgets/Widget';
+import {
+  useSendWidgetEditTelemetry,
+  useSendWidgetEditCancelTelemetry,
+  useSendWidgetConfigUpdateTelemetry,
+} from 'views/components/widgets/telemety';
+import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -85,11 +88,16 @@ const useQueryFieldTypes = () => {
   return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
 };
 
-const WidgetFooter = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
+const WidgetFooter = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.tiny};
+    color: ${theme.colors.gray[30]};
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  `,
+);
 
 type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
   queryId: string;
@@ -210,66 +218,99 @@ export const EditWrapper = ({
   );
 };
 
-const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
-  const activeQuery = selectActiveQuery(getState());
+const WidgetDescription = ({ text }: { text: string }) => <TextOverflowEllipsis>{text}</TextOverflowEllipsis>;
 
-  return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
-};
-
-const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
-  const viewType = useViewType();
-  const fields = useQueryFieldTypes();
+type PreviousState =
+  | {
+      widget: WidgetType;
+      globalOverride: GlobalOverride;
+    }
+  | {
+      widget: undefined;
+      globalOverride: undefined;
+    };
+const useUndoChangesOnCancel = (id: string, editing: boolean, widget: WidgetType) => {
+  const globalOverride = useGlobalOverride();
+  const [previousState, setPreviousState] = useState<PreviousState>(editing ? { widget, globalOverride } : undefined);
+  const clearPreviousState = useCallback(() => setPreviousState(undefined), []);
   const { stopAutoRefresh } = useAutoRefresh();
-  const [loading, setLoading] = useState(false);
-  const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
-  const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-
-  const isDashboard = viewType === View.Type.Dashboard;
-
+  const { setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
+  const sendWidgetEditTelemetry = useSendWidgetEditTelemetry();
+  const sendWidgetEditCancelTelemetry = useSendWidgetEditCancelTelemetry();
   const onToggleEdit = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-button',
-    });
-
     if (editing) {
       unsetWidgetEditing();
-      setOldWidget(undefined);
+      clearPreviousState();
     } else {
+      sendWidgetEditTelemetry();
       stopAutoRefresh();
       setWidgetEditing(widget.id);
-      setOldWidget(widget);
+      setPreviousState({ widget, globalOverride });
     }
-  }, [editing, pathname, sendTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
+  }, [
+    clearPreviousState,
+    editing,
+    globalOverride,
+    sendWidgetEditTelemetry,
+    setWidgetEditing,
+    stopAutoRefresh,
+    unsetWidgetEditing,
+    widget,
+  ]);
   const onCancelEdit = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-cancel-button',
-    });
+    sendWidgetEditCancelTelemetry();
 
-    if (oldWidget) {
-      dispatch(updateWidget(id, oldWidget));
+    if (previousState) {
+      dispatch(updateWidget(id, previousState.widget));
+
+      if (!isEqual(previousState.globalOverride?.timerange, globalOverride?.timerange)) {
+        dispatch(setGlobalOverrideTimerange(previousState.globalOverride.timerange));
+      }
+
+      if (!isEqual(previousState.globalOverride?.query, globalOverride?.query)) {
+        dispatch(setGlobalOverrideQuery(previousState.globalOverride.query.query_string));
+      }
     }
 
     onToggleEdit();
-  }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
+  }, [
+    dispatch,
+    globalOverride?.query,
+    globalOverride?.timerange,
+    id,
+    onToggleEdit,
+    previousState,
+    sendWidgetEditCancelTelemetry,
+  ]);
+
+  return useMemo(() => ({ onCancelEdit, onToggleEdit }), [onCancelEdit, onToggleEdit]);
+};
+const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
+  const viewType = useViewType();
+  const fields = useQueryFieldTypes();
+  const [loading, setLoading] = useState(false);
+  const { focusedWidget } = useContext(WidgetFocusContext);
+  const dispatch = useViewsDispatch();
+  const sendWidgetConfigUpdateTelemetry = useSendWidgetConfigUpdateTelemetry();
+  const interactive = useContext(InteractiveContext);
+
+  const isDashboard = viewType === View.Type.Dashboard;
+
+  const { onCancelEdit, onToggleEdit } = useUndoChangesOnCancel(id, editing, widget);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
+  const onUpdateDescription = useCallback(
+    (newDescription: string) => dispatch(updateDescription(widget, newDescription)),
+    [dispatch, widget],
+  );
+
   const onWidgetConfigChange = useCallback(
     async (newWidgetConfig: WidgetConfig) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'search-widget',
-        app_action_value: 'widget-edit-update-button',
-      });
+      sendWidgetConfigUpdateTelemetry();
 
       return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {});
     },
-    [dispatch, id, pathname, sendTelemetry],
+    [dispatch, id, sendWidgetConfigUpdateTelemetry],
   );
   const activeQuery = useActiveQueryId();
 
@@ -282,27 +323,25 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        <InteractiveContext.Consumer>
-          {(interactive) => (
-            <WidgetHeader
+        <WidgetHeader
+          description={widget.description}
+          title={title}
+          titleIcon={titleIcon}
+          hideDragHandle={!interactive || isFocused}
+          loading={loading}
+          editing={editing}
+          onRename={onRenameWidget}
+          onUpdateDescription={onUpdateDescription}>
+          {!editing ? (
+            <WidgetActionsMenu
+              isFocused={isFocused}
+              toggleEdit={onToggleEdit}
               title={title}
-              titleIcon={titleIcon}
-              hideDragHandle={!interactive || isFocused}
-              loading={loading}
-              editing={editing}
-              onRename={onRenameWidget}>
-              {!editing ? (
-                <WidgetActionsMenu
-                  isFocused={isFocused}
-                  toggleEdit={onToggleEdit}
-                  title={title}
-                  position={position}
-                  onPositionsChange={onPositionsChange}
-                />
-              ) : null}
-            </WidgetHeader>
-          )}
-        </InteractiveContext.Consumer>
+              position={position}
+              onPositionsChange={onPositionsChange}
+            />
+          ) : null}
+        </WidgetHeader>
         <EditWrapper
           onToggleEdit={onToggleEdit}
           onCancelEdit={onCancelEdit}
@@ -328,6 +367,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
           </WidgetErrorBoundary>
         </EditWrapper>
         <WidgetFooter>
+          {interactive ? <span /> : <WidgetDescription text={widget.description} />}
           {(widget.returnsAllRecords || isDashboard) && !editing && (
             <TimerangeInfo
               widget={widget}

@@ -18,15 +18,14 @@ package org.graylog.events.processor;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
@@ -36,15 +35,19 @@ import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.entities.ScopedEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.SourcedScopedEntity;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.security.html.HTMLSanitizerConverter;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -58,8 +61,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
-@WithBeanGetter
-public abstract class EventDefinitionDto extends ScopedEntity implements EventDefinition, ContentPackable<EventDefinitionEntity> {
+public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity>, SourcedScopedEntity<EventDefinitionDto.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
@@ -96,6 +98,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Nullable
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_REMEDIATION_STEPS)
+    @JsonSerialize(converter = HTMLSanitizerConverter.class)
     public abstract String remediationSteps();
 
     @Override
@@ -160,9 +163,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
     public abstract Builder toBuilder();
 
-    @JsonIgnore
     public ValidationResult validate(@Nullable EventDefinitionDto oldEventDefinitionDto,
-                                     EventDefinitionConfiguration eventDefinitionConfiguration) {
+                                     EventDefinitionConfiguration eventDefinitionConfiguration,
+                                     UserContext userContext) {
         final ValidationResult validation = new ValidationResult();
 
         if (title().isEmpty()) {
@@ -170,7 +173,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         }
 
         try {
-            validation.addAll(config().validate());
+            validation.addAll(config().validate(userContext));
             validation.addAll(config().validate(
                     Optional.ofNullable(oldEventDefinitionDto).map(EventDefinitionDto::config).orElse(null),
                     eventDefinitionConfiguration));
@@ -195,10 +198,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     }
 
     @AutoValue.Builder
-    public static abstract class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public static abstract class Builder implements SourcedScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
                     .storage(ImmutableList.of())
@@ -210,6 +214,13 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @ObjectId
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
+
+        @Override
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
+
+        @JsonProperty(FIELD_ENTITY_SOURCE)
+        public abstract Builder entitySource(Optional<EntitySource> source);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);

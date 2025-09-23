@@ -16,13 +16,13 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { act, fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable, { bindings as dataTable } from 'views/components/datatable';
@@ -54,21 +54,14 @@ const fieldTypes = { all: fields, currentQuery: fields, queryFields: Immutable.M
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
-const selectEventConfig = { container: document.body };
-
 const addGrouping = async () => {
   await userEvent.click(await screen.findByRole('button', { name: /add a grouping/i }));
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
-  const grouoingContainer = await screen.findByTestId(`grouping-${groupingIndex}`);
-  const fieldSelection = within(grouoingContainer).getByLabelText(fieldSelectLabel);
+  const groupingContainer = await screen.findByTestId(`grouping-${groupingIndex}`);
 
-  await act(async () => {
-    await selectEvent.openMenu(fieldSelection);
-  });
-
-  await selectEvent.select(fieldSelection, fieldName, selectEventConfig);
+  await selectEvent.chooseOption(fieldSelectLabel, fieldName, { container: groupingContainer });
 };
 
 const submitWidgetConfigForm = async () => {

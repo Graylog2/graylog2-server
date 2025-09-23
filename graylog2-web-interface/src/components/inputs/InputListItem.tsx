@@ -19,9 +19,7 @@ import { useState } from 'react';
 
 import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 import { useStore } from 'stores/connect';
-import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
-import { isPermitted } from 'util/PermissionsMixin';
 import { DropdownButton, MenuItem, Col, Button, DeleteMenuItem } from 'components/bootstrap';
 import { ConfirmDialog, EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
@@ -46,6 +44,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
 import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 type Props = {
   input: Input;
@@ -61,10 +60,9 @@ type Props = {
       transport_address: string;
     };
   };
-  permissions: Array<string>;
 };
 
-const InputListItem = ({ input, currentNode, permissions }: Props) => {
+const InputListItem = ({ input, currentNode }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
@@ -150,15 +148,13 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
     </span>
   );
 
-  const actions = [];
-
   const queryField =
     input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput'
       ? 'gl2_forwarder_input'
       : 'gl2_source_input';
 
-  if (isPermitted(permissions, ['searches:relative'])) {
-    actions.push(
+  const actions = [
+    <IfPermitted permissions={['searches:relative']}>
       <LinkContainer
         key={`received-messages-${input.id}`}
         to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
@@ -171,22 +167,17 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
           }}>
           Show received messages
         </Button>
-      </LinkContainer>,
-    );
-  }
-
-  if (isPermitted(permissions, [`inputs:edit:${input.id}`])) {
-    if (!AppConfig.isCloud()) {
-      let extractorRoute;
-
-      if (input.global) {
-        extractorRoute = Routes.global_input_extractors(input.id);
-      } else {
-        extractorRoute = Routes.local_input_extractors(currentNode?.node?.node_id, input.id);
-      }
-
-      actions.push(
-        <LinkContainer key={`manage-extractors-${input.id}`} to={extractorRoute}>
+      </LinkContainer>
+    </IfPermitted>,
+    <HideOnCloud>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+        <LinkContainer
+          key={`manage-extractors-${input.id}`}
+          to={
+            input.global
+              ? Routes.global_input_extractors(input.id)
+              : Routes.local_input_extractors(currentNode?.node?.node_id, input.id)
+          }>
           <Button
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
@@ -196,20 +187,18 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
             }}>
             Manage extractors
           </Button>
-        </LinkContainer>,
-      );
-    }
-
-    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />);
-  }
-
-  actions.push(
+        </LinkContainer>
+      </IfPermitted>
+    </HideOnCloud>,
+    <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+      <InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />
+    </IfPermitted>,
     <DropdownButton
       key={`more-actions-${input.id}`}
       title="More actions"
       id={`more-actions-dropdown-${input.id}`}
       pullRight>
-      <IfPermitted permissions={`inputs:edit:${input.id}`}>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
         <MenuItem key={`edit-input-${input.id}`} onSelect={editInput} disabled={definition === undefined}>
           Edit input
         </MenuItem>
@@ -262,7 +251,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         </LinkContainer>
       )}
 
-      <IfPermitted permissions={`inputs:edit:${input.id}`}>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
         <MenuItem
           key={`add-static-field-${input.id}`}
           onSelect={() => {
@@ -272,16 +261,16 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         </MenuItem>
       </IfPermitted>
 
-      <IfPermitted permissions="inputs:terminate">
+      <IfPermitted permissions={['inputs:terminate', `input_types:create:${input.type}`]}>
         <MenuItem key={`divider-${input.id}`} divider />
       </IfPermitted>
-      <IfPermitted permissions="inputs:terminate">
+      <IfPermitted permissions={['inputs:terminate', `input_types:create:${input.type}`]}>
         <DeleteMenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>
           Delete input
         </DeleteMenuItem>
       </IfPermitted>
     </DropdownButton>,
-  );
+  ] as const;
 
   const subtitle = () => {
     if (input.global && !input.node) return null;
@@ -314,6 +303,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
           globalValue={input.global}
           nodeValue={input.node}
           configFields={definition.requested_configuration}
+          description={definition?.description}
           title={`Editing Input ${input.title}`}
           titleValue={input.title}
           typeName={input.type}

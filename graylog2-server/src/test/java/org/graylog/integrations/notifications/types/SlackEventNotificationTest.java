@@ -28,8 +28,10 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
@@ -41,6 +43,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -58,6 +61,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -78,9 +82,12 @@ public class SlackEventNotificationTest {
     @Mock
     EventNotificationService notificationCallbackService;
 
+    @Mock
+    EventProcedureProvider mockEventProcedureProvider;
+
     private SlackEventNotificationConfig slackEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
-    private MessageFactory messageFactory = new TestMessageFactory();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     private final String expectedAttachmentText = "a custom message";
     private final String expectedColor = "#FF2052";
@@ -96,13 +103,13 @@ public class SlackEventNotificationTest {
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
-        slackEventNotification = new SlackEventNotification(notificationCallbackService, new ObjectMapperProvider(),
+        slackEventNotification = new SlackEventNotification(notificationCallbackService,
                 Engine.createEngine(),
                 mockNotificationService,
                 nodeId,
                 mockSlackClient,
-                new HttpConfiguration());
-
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()),
+                mockEventProcedureProvider);
     }
 
     private void getDummySlackNotificationConfig() {
@@ -170,13 +177,15 @@ public class SlackEventNotificationTest {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
         Map<String, Object> customMessageModel = slackEventNotification.getCustomMessageModel(eventNotificationContext, slackEventNotificationConfig.type(), messageSummaries, DateTimeZone.UTC);
         //there are 9 keys and two asserts needs to be implemented (backlog,event)
-        assertThat(customMessageModel).isNotNull();
-        assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
-        assertThat(customMessageModel.get("event_definition_title")).isEqualTo("Event Definition Test Title");
-        assertThat(customMessageModel.get("event_definition_type")).isEqualTo("test-dummy-v1");
-        assertThat(customMessageModel.get("type")).isEqualTo("slack-notification-v1");
-        assertThat(customMessageModel.get("job_definition_id")).isEqualTo("<unknown>");
-        assertThat(customMessageModel.get("job_trigger_id")).isEqualTo("<unknown>");
+        assertThat(customMessageModel).containsAllEntriesOf(Map.of(
+                "event_definition_description", "Event Definition Test Description",
+                "event_definition_title", "Event Definition Test Title",
+                "event_definition_type", "test-dummy-v1",
+                "type", "slack-notification-v1",
+                "job_definition_id", "<unknown>",
+                "job_trigger_id", "<unknown>",
+                "product_name", "Graylog"
+        ));
     }
 
     @Test(expected = EventNotificationException.class)
@@ -329,6 +338,36 @@ public class SlackEventNotificationTest {
         assertThat(message.attachments().iterator().next().text()).doesNotStartWith("@channel");
         assertThat(message.text()).startsWith("@channel");
     }
+
+    @Test
+    public void testAlertWithEventProcedure() throws EventNotificationException {
+        when(mockEventProcedureProvider.getAsText(any(), eq(eventNotificationContext.event()))).thenReturn("procedure_text");
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .customMessage("A custom message")
+                .iconEmoji("")
+                .iconUrl("")
+                .userName("")
+                .includeEventProcedure(true)
+                .build();
+
+        SlackMessage message = slackEventNotification.createSlackMessage(eventNotificationContext, slackConfig);
+        assertThat(message.attachments().iterator().next().text()).contains("procedure_text");
+    }
+
+    @Test
+    public void testAlertWithoutEventProcedure() throws EventNotificationException {
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .customMessage("A custom message")
+                .iconEmoji("")
+                .iconUrl("")
+                .userName("")
+                .includeEventProcedure(false)
+                .build();
+
+        SlackMessage message = slackEventNotification.createSlackMessage(eventNotificationContext, slackConfig);
+        assertThat(message.attachments().iterator().next().text()).doesNotContain("procedure_text");
+    }
+
 
     ImmutableList<MessageSummary> generateMessageSummaries(int size) {
         List<MessageSummary> messageSummaries = new ArrayList<>();

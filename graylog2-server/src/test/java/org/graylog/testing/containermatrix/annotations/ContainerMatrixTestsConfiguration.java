@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.GraylogBackendExtension;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.NoPluginJarsProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -73,7 +74,7 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
      */
-    MongodbServer[] mongoVersions() default {MongodbServer.MONGO5};
+    MongodbServer[] mongoVersions() default {MongodbServer.MONGO7};
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
@@ -98,4 +99,6 @@ public @interface ContainerMatrixTestsConfiguration {
     ConfigurationParameter[] additionalConfigurationParameters() default {};
 
     boolean withWebhookServerEnabled() default false;
+
+    Class<? extends PluginJarsProvider> datanodePluginJarsProvider() default NoPluginJarsProvider.class;
 }

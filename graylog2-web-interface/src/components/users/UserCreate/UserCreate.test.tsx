@@ -16,15 +16,16 @@
  */
 import React from 'react';
 import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import { Users } from '@graylog/server-api';
+
+import selectEvent from 'helpers/selectEvent';
 import { alice as existingUser } from 'fixtures/users';
 import { rolesList } from 'fixtures/roles';
 import { UsersActions } from 'stores/users/UsersStore';
 import { asMock } from 'helpers/mocking';
-import FetchError from 'logic/errors/FetchError';
 
 import UserCreate from './UserCreate';
 
@@ -42,7 +43,12 @@ const mockLoadRolesPromise = Promise.resolve({
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
-    loadByUsername: jest.fn(),
+  },
+}));
+
+jest.mock('@graylog/server-api', () => ({
+  Users: {
+    checkUsernameAvailability: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -60,7 +66,7 @@ describe('<UserCreate />', () => {
   const findSubmitButton = () => screen.findByRole('button', { name: /create user/i });
 
   beforeEach(() => {
-    asMock(UsersActions.loadByUsername).mockImplementation(() => Promise.reject(new FetchError('', 404, {})));
+    asMock(Users.checkUsernameAvailability).mockImplementation(() => Promise.resolve({ available: true }));
   });
 
   it(
@@ -73,8 +79,6 @@ describe('<UserCreate />', () => {
       const lastNameInput = await screen.findByLabelText('Last Name');
       const emailInput = await screen.findByLabelText('E-Mail Address');
       const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
-      const timezoneSelect = await screen.findByLabelText('Time Zone');
-      const roleSelect = await screen.findByText(/search for roles/i);
       const passwordInput = await screen.findByPlaceholderText('Password');
       const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
       const submitButton = await findSubmitButton();
@@ -90,21 +94,9 @@ describe('<UserCreate />', () => {
       await userEvent.clear(timeoutAmountInput);
       await userEvent.type(timeoutAmountInput, '40');
 
-      await act(async () => {
-        await selectEvent.openMenu(timezoneSelect);
-      });
+      await selectEvent.chooseOption('Time Zone', 'Berlin');
 
-      await act(async () => {
-        await selectEvent.select(timezoneSelect, 'Berlin');
-      });
-
-      await act(async () => {
-        await selectEvent.openMenu(roleSelect);
-      });
-
-      await act(async () => {
-        await selectEvent.select(roleSelect, 'Manager');
-      });
+      await selectEvent.chooseOption('search for roles', 'Manager');
 
       await userEvent.type(passwordInput, 'thepassword');
       await userEvent.type(passwordRepeatInput, 'thepassword');
@@ -175,7 +167,7 @@ describe('<UserCreate />', () => {
   it(
     'should display warning if username is already taken',
     async () => {
-      asMock(UsersActions.loadByUsername).mockReturnValue(Promise.resolve(existingUser));
+      asMock(Users.checkUsernameAvailability).mockReturnValue(Promise.resolve({ available: false }));
 
       render(<UserCreate />);
 

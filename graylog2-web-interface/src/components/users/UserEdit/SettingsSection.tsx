@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { Formik, Form } from 'formik';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -50,7 +49,7 @@ const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
 
 type Props = {
   user: User;
-  onSubmit: (payload: { timezone: $PropertyType<User, 'timezone'> }) => Promise<void>;
+  onSubmit: (payload: { timezone: User['timezone'] }) => Promise<void>;
 };
 
 const _validate = async (values) => {
@@ -58,7 +57,7 @@ const _validate = async (values) => {
 
   const { type, id } = values.startpage ?? {};
 
-  if (type && !id) {
+  if (type && type !== 'graylog_security_welcome' && !id) {
     errors = { startpage: 'Please select an entity.' };
   }
 

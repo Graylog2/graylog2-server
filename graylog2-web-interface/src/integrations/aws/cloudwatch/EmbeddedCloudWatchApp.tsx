@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { SidebarProvider } from 'integrations/aws/context/Sidebar';
-import { FormDataProvider } from 'integrations/aws/context/FormData';
+import FormDataProvider from 'integrations/contexts/FormDataProvider';
 import { StepsProvider } from 'integrations/aws/context/Steps';
 import { ApiProvider } from 'integrations/aws/context/Api';
 import { AdvancedOptionsProvider } from 'integrations/aws/context/AdvancedOptions';
@@ -30,7 +30,7 @@ type EmbeddedCloudWatchAppProps = {
   onSubmit?: (...args: any[]) => void;
 };
 
-const EmbeddedCloudWatchApp = ({ onSubmit }: EmbeddedCloudWatchAppProps) => {
+const EmbeddedCloudWatchApp = ({ onSubmit = undefined }: EmbeddedCloudWatchAppProps) => {
   const handleSubmit = (formData) => {
     if (!onSubmit) {
       return;

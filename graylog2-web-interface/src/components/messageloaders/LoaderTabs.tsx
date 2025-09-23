@@ -23,27 +23,32 @@ import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import type { Message } from 'views/components/messagelist/Types';
+import type { Stream } from 'logic/streams/types';
 
 import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
 
+type TabType = 'raw' | 'recent' | 'messageId';
 type LoaderTabsProps = {
-  tabs?: 'recent' | 'messageId' | 'raw' | 'recent' | 'messageId' | 'raw'[];
+  tabs?: TabType[];
   messageId?: string;
   index?: string;
   onMessageLoaded?: (...args: any[]) => void;
   selectedInputId?: string;
-  customFieldActions?: React.ReactNode;
+  customFieldActions?: React.ReactElement;
   inputs?: any;
 };
 
 class LoaderTabs extends React.Component<
   LoaderTabsProps,
   {
-    [key: string]: any;
+    activeTab: TabType | undefined;
+    message: Message | undefined;
+    streams?: Immutable.Map<string, Stream>;
   }
 > {
-  static defaultProps = {
+  static defaultProps: Partial<LoaderTabsProps> = {
     tabs: ['recent', 'messageId'],
     index: undefined,
     messageId: undefined,
@@ -59,7 +64,7 @@ class LoaderTabs extends React.Component<
     raw: 3,
   };
 
-  constructor(props) {
+  constructor(props: LoaderTabsProps) {
     super(props);
 
     this.state = {
@@ -72,7 +77,7 @@ class LoaderTabs extends React.Component<
     this.loadData();
   }
 
-  onMessageLoaded = (message) => {
+  onMessageLoaded = (message: Message) => {
     this.setState({ message });
     const { onMessageLoaded } = this.props;
 
@@ -84,7 +89,7 @@ class LoaderTabs extends React.Component<
   loadData = () => {
     InputsActions.list();
 
-    StreamsStore.listStreams().then((response) => {
+    StreamsStore.listStreams().then((response: Array<Stream>) => {
       const streams = {};
 
       response.forEach((stream) => {

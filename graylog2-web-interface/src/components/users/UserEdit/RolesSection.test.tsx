@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import selectEvent from 'react-select-event';
 import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
 
+import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
 import { manager as assignedRole1, reader as assignedRole2, reportCreator as notAssignedRole } from 'fixtures/roles';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
@@ -57,9 +57,7 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const assignRoleButton = screen.getByRole('button', { name: 'Assign Role' });
-    const rolesSelector = screen.getByLabelText('Search for roles');
-    await selectEvent.openMenu(rolesSelector);
-    await selectEvent.select(rolesSelector, notAssignedRole.name);
+    await selectEvent.chooseOption('Search for roles', notAssignedRole.name);
     fireEvent.click(assignRoleButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));

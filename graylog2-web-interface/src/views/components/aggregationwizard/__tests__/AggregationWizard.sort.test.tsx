@@ -17,11 +17,11 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import type { Matcher } from 'wrappedTestingLibrary';
-import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -55,8 +55,6 @@ const widgetConfig = AggregationWidgetConfig.builder()
   .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
-const selectEventConfig = { container: document.body };
-
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: /add a sort/i }));
 };
@@ -70,20 +68,8 @@ const submitWidgetConfigForm = async () => {
 
 const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
   const httpMethodSortContainer = await screen.findByTestId(sortElementContainerId);
-  const sortFieldSelect = within(httpMethodSortContainer).getByLabelText('Select field for sorting');
-  const sortDirectionSelect = within(httpMethodSortContainer).getByLabelText('Select direction for sorting');
-
-  await act(async () => {
-    await selectEvent.openMenu(sortFieldSelect);
-  });
-
-  await selectEvent.select(sortFieldSelect, option, selectEventConfig);
-
-  await act(async () => {
-    await selectEvent.openMenu(sortDirectionSelect);
-  });
-
-  await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
+  await selectEvent.chooseOption('Select field for sorting', option, { container: httpMethodSortContainer });
+  await selectEvent.chooseOption('Select direction for sorting', 'Descending', { container: httpMethodSortContainer });
 
   await within(httpMethodSortContainer).findByText('Descending');
 };

@@ -34,13 +34,14 @@ import {
 } from 'components/bootstrap';
 import type { ContentPackInstallation } from 'components/content-packs/Types';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type Props = {
   pack: ContentPackInstallation;
   contentPackRevisions: ContentPackRevisions;
   onDeletePack?: (id: string, rev: number) => void;
   onChange?: (id: string) => void;
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
+  onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
 const ContentPackVersionItem = ({
@@ -78,6 +79,7 @@ const ContentPackVersionItem = ({
 
   return (
     <tr key={pack.id + pack.rev}>
+      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <td>
         <input type="radio" value={pack.rev} onChange={onChange} checked={selectedVersion === pack.rev} />
       </td>
@@ -104,7 +106,7 @@ const ContentPackVersionItem = ({
       </td>
       {showInstallModal && (
         <BootstrapModalWrapper showModal={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Install Content Pack</Modal.Title>
           </Modal.Header>
           <Modal.Body>

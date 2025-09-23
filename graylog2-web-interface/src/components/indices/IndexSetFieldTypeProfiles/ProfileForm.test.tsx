@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -41,12 +41,6 @@ const renderProfileForm = ({ initialValues }) =>
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
-
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
 
 describe('IndexSetFieldTypesList', () => {
   useViewsPlugin();
@@ -94,10 +88,9 @@ describe('IndexSetFieldTypesList', () => {
 
     fireEvent.click(addMappingButton);
 
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectItem(typeSecond, 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('String type')).toHaveLength(2);
@@ -120,12 +113,10 @@ describe('IndexSetFieldTypesList', () => {
 
     fireEvent.click(addMappingButton);
 
-    const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectItem(typeSecond, 'String type');
-    await selectItem(fieldSecond, 'http_method');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.field', 'http_method');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('http_method')).toHaveLength(2);

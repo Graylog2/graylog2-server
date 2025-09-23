@@ -20,7 +20,6 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.checkerframework.common.returnsreceiver.qual.This;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog.security.certutil.csr.CsrGenerator;

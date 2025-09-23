@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import StreamsContext from 'contexts/StreamsContext';
 
 type Props = {
-  value: string;
+  value: string | Array<string>;
 };
 
 const StreamsList = styled.span`

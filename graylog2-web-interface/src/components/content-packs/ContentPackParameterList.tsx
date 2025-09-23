@@ -17,8 +17,8 @@
 import React from 'react';
 import findIndex from 'lodash/findIndex';
 
-import { Badge, Button, Modal, ButtonToolbar } from 'components/bootstrap';
-import { DataTable, SearchForm, Icon, ModalSubmit } from 'components/common';
+import { Button, Modal, ButtonToolbar } from 'components/bootstrap';
+import { DataTable, SearchForm, ModalSubmit, StatusIcon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 import ObjectUtils from 'util/ObjectUtils';
@@ -84,8 +84,6 @@ class ContentPackParameterList extends React.Component<
     const { onDeleteParameter, readOnly } = this.props;
     const parameterApplied = this._parameterApplied(parameter.name);
     const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
-    const icon = parameterApplied ? 'check_circle' : 'cancel';
-    const bsStyle = parameterApplied ? 'success' : 'failure';
 
     return (
       <tr key={parameter.title}>
@@ -95,9 +93,7 @@ class ContentPackParameterList extends React.Component<
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
         <td>
-          <Badge className={bsStyle}>
-            <Icon name={icon} />
-          </Badge>
+          <StatusIcon active={parameterApplied} />
         </td>
         {!readOnly && (
           <td>
@@ -162,7 +158,7 @@ class ContentPackParameterList extends React.Component<
 
     const modal = (
       <BootstrapModalWrapper showModal={showModal} onHide={closeModal} bsSize="large">
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
         <Modal.Body>

@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import MockStore from 'helpers/mocking/StoreMock';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -36,6 +36,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import suppressConsole from 'helpers/suppressConsole';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -75,8 +76,6 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidget: jest.fn(() => async () => {}),
 }));
-
-const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
   useViewsPlugin();
@@ -168,30 +167,15 @@ describe('Aggregation Widget', () => {
         const nameInput = await screen.findByLabelText(/Name/);
         await userEvent.type(nameInput, 'Metric name');
 
-        const metricFieldSelect = await screen.findByLabelText('Select a function');
-
-        await act(async () => {
-          await selectEvent.openMenu(metricFieldSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
-        });
+        await selectEvent.chooseOption('Select a function', 'Count');
 
         await findWidgetConfigSubmitButton();
 
         // Change widget search controls
-        const streamsSelect = await screen.findByLabelText(
+        await selectEvent.chooseOption(
           'Select streams the search should include. Searches in all streams if empty.',
+          'Stream 1',
         );
-
-        await act(async () => {
-          await selectEvent.openMenu(streamsSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
-        });
 
         await screen.findByRole('button', {
           name: /perform search \(changes were made after last search execution\)/i,
@@ -221,7 +205,10 @@ describe('Aggregation Widget', () => {
 
         // Change widget time range
         const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
-        await userEvent.click(timeRangePickerButton);
+        // Suppressing nested form error for now, until usage of `NestedForms` is fixed
+        await suppressConsole(async () => {
+          await userEvent.click(timeRangePickerButton);
+        });
 
         const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
         jest.setSystemTime(mockedUnixTime);
@@ -263,15 +250,7 @@ describe('Aggregation Widget', () => {
         const nameInput = await screen.findByLabelText(/Name/);
         await userEvent.type(nameInput, 'Metric name');
 
-        const metricFieldSelect = await screen.findByLabelText('Select a function');
-
-        await act(async () => {
-          await selectEvent.openMenu(metricFieldSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
-        });
+        await selectEvent.chooseOption('Select a function', 'Count');
 
         await findWidgetConfigSubmitButton();
 

@@ -32,6 +32,7 @@ type Props = {
   hideFirstAndLastPageLinks?: boolean;
   disabled?: boolean;
   onChange?: (nextPage: number) => void;
+  warnIfPageOutOfBounds?: boolean;
 };
 
 const StyledBootstrapPagination = styled(BootstrapPagination)(
@@ -185,14 +186,17 @@ const Pagination = ({
   hideFirstAndLastPageLinks = false,
   disabled = false,
   onChange = () => {},
+  warnIfPageOutOfBounds = true,
 }: Props) => {
   if (totalPages <= 1) {
     return null;
   }
 
   if (currentPage > totalPages) {
-    // eslint-disable-next-line no-console
-    console.warn('Graylog Pagination: `currentPage` prop should not be larger than `totalPages` prop.');
+    if (warnIfPageOutOfBounds) {
+      // eslint-disable-next-line no-console
+      console.warn('Pagination: `currentPage` prop should not be larger than `totalPages` prop.');
+    }
 
     return null;
   }

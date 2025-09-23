@@ -16,6 +16,8 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
@@ -24,29 +26,42 @@ import org.apache.shiro.authz.permission.AllPermission;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.shared.security.RestPermissions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.threeten.extra.PeriodDuration;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
-public class UserImplTest {
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
+@ExtendWith(MockitoExtension.class)
+class UserImplTest {
+    private static final UserConfiguration CONFIG_ALL_ALLOWED = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), true, false, PeriodDuration.parse("P30D"));
+    private static final UserConfiguration CONFIG_ALL_FORBIDDEN = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, true, PeriodDuration.parse("P30D"));
+    private static final UserConfiguration CONFIG_EXTERNAL_FORBIDDEN = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.parse("P30D"));
 
     @Mock
     private PasswordAlgorithmFactory passwordAlgorithmFactory;
@@ -59,11 +74,14 @@ public class UserImplTest {
     private UserImpl createUserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                                     Permissions permissions,
                                     Map<String, Object> fields) {
-        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, fields);
+        // Copy to avoid modifying the global instance
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get().copy();
+        objectMapper.registerSubtypes(new NamedType(DashboardStartPage.class, DashboardStartPage.TYPE));
+        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, objectMapper, fields);
     }
 
     @Test
-    public void testFirstLastFullNames() {
+    void testFirstLastFullNames() {
         user = createUserImpl(null, null, null);
         user.setFirstLastFullNames("First", "Last");
         assertTrue(user.getFirstName().isPresent());
@@ -74,7 +92,7 @@ public class UserImplTest {
     }
 
     @Test
-    public void testSetFullName() {
+    void testSetFullName() {
         user = createUserImpl(null, null, null);
         user.setFullName("Full Name");
         assertEquals("Full Name", user.getFullName());
@@ -83,13 +101,13 @@ public class UserImplTest {
     }
 
     @Test
-    public void testNoFullNameEmptyString() {
+    void testNoFullNameEmptyString() {
         user = createUserImpl(null, null, null);
         assertEquals("", user.getFullName());
     }
 
     @Test
-    public void testFirstLastRequired() {
+    void testFirstLastRequired() {
         user = createUserImpl(null, null, null);
         assertThatThrownBy(() -> user.setFirstLastFullNames(null, "Last"))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
@@ -101,7 +119,7 @@ public class UserImplTest {
     }
 
     @Test
-    public void testFirstNameLengthValidation() {
+    void testFirstNameLengthValidation() {
         user = createUserImpl(null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.FIRST_NAME)
                                             .validate(StringUtils.repeat("*", 10));
@@ -112,7 +130,7 @@ public class UserImplTest {
     }
 
     @Test
-    public void testLastNameLengthValidation() {
+    void testLastNameLengthValidation() {
         user = createUserImpl(null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.LAST_NAME)
                                       .validate(StringUtils.repeat("*", 10));
@@ -123,52 +141,102 @@ public class UserImplTest {
     }
 
     @Test
-    public void getPermissionsWorksWithEmptyPermissions() throws Exception {
+    void getPermissionsWorksWithEmptyPermissions() {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
-        assertThat(user.getPermissions()).containsAll(permissions.userSelfEditPermissions("foobar"));
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
+
+        assertThat(user.getPermissions()).containsAll(permissions.userSelfEditPermissions("foobar", true));
+    }
+
+    public static Stream<Arguments> tokenPermissionParameters() {
+        return Stream.of(
+                Arguments.of(CONFIG_ALL_ALLOWED, false, true),
+                Arguments.of(CONFIG_ALL_ALLOWED, true, true),
+                Arguments.of(CONFIG_ALL_FORBIDDEN, false, false),
+                Arguments.of(CONFIG_ALL_FORBIDDEN, true, false),
+                Arguments.of(CONFIG_EXTERNAL_FORBIDDEN, true, false),
+                Arguments.of(CONFIG_EXTERNAL_FORBIDDEN, false, true)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("tokenPermissionParameters")
+    void testTokenCreatePermissionsParameterised(UserConfiguration config, boolean isExternal, boolean isAllowedToCreateTokens) {
+        final String username = "foobar";
+        final Permissions permissions = new Permissions(Collections.emptySet());
+        final Map<String, Object> fields = Map.of(UserImpl.USERNAME, username, UserImpl.EXTERNAL_USER, isExternal);
+        user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(config);
+
+        if (isAllowedToCreateTokens) {
+            assertThat(user.getPermissions()).contains(RestPermissions.USERS_TOKENCREATE + ":" + username);
+        } else {
+            assertThat(user.getPermissions()).doesNotContain(RestPermissions.USERS_TOKENCREATE + ":" + username);
+        }
     }
 
     @Test
-    public void getPermissionsReturnsListOfPermissions() throws Exception {
+    void getPermissionsReturnsListOfPermissions() {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final List<String> customPermissions = Collections.singletonList("subject:action");
         final Map<String, Object> fields = ImmutableMap.of(
             UserImpl.USERNAME, "foobar",
             UserImpl.PERMISSIONS, customPermissions);
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
+
         assertThat(user.getPermissions())
-            .containsAll(permissions.userSelfEditPermissions("foobar"))
+                .containsAll(permissions.userSelfEditPermissions("foobar", true))
             .contains("subject:action");
     }
 
     @Test
-    public void permissionsArentModified() {
+    void permissionsArentModified() {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
 
         final List<String> newPermissions = ImmutableList.<String>builder()
                 .addAll(user.getPermissions())
                 .add("perm:1")
                 .build();
         user.setPermissions(newPermissions);
+
+        assertThat(user.getPermissions()).hasSameElementsAs(newPermissions);
     }
 
     @Test
-    public void getObjectPermissions() {
+    void getObjectPermissions() {
         final Permissions permissions = new Permissions(Collections.emptySet());
-        final List<String> customPermissions = ImmutableList.of("subject:action", "*");
+        final List<String> customPermissions = List.of("subject:action", "*");
         final Map<String, Object> fields = ImmutableMap.of(
                 UserImpl.USERNAME, "foobar",
                 UserImpl.PERMISSIONS, customPermissions);
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
 
-        final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar").stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
+        final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar", true).stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
         assertThat(user.getObjectPermissions())
                 .containsAll(userSelfEditPermissions)
                 .contains(new CaseSensitiveWildcardPermission("subject:action"))
                 .extracting("class").containsOnlyOnce(AllPermission.class);
+    }
+
+    @Test
+    void testStartPage() {
+        user = createUserImpl(null, null, null);
+        user.setStartpage(new DashboardStartPage("id"));
+        assertEquals("dashboard", user.getStartpage().type());
+        assertEquals("id", ((DashboardStartPage)user.getStartpage()).id());
+    }
+
+    @Test
+    void testNullStartPage() {
+        user = createUserImpl(null, null, null);
+        user.setStartpage(null);
+        assertNull(user.getStartpage());
     }
 }

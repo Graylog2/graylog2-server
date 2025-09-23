@@ -36,7 +36,6 @@ describe('HotkeysModalContainer', () => {
 
     await screen.findByRole('heading', {
       name: /keyboard shortcuts/i,
-      hidden: true,
     });
   });
 });

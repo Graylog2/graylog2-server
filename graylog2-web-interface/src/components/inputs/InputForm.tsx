@@ -18,11 +18,12 @@ import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
+import type { ConfigurationField } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import AppConfig from 'util/AppConfig';
 import type { Input } from 'components/messageloaders/Types';
-import type { ConfigurationField } from 'components/configurationforms';
+import { Alert } from 'components/bootstrap';
 
 type FormValues = Input['attributes'];
 
@@ -34,24 +35,26 @@ type Props = {
   nodeValue?: string;
   titleValue?: string;
   typeName: string;
-  title: string;
-  includeTitleField: boolean;
+  title: React.ReactNode;
+  includeTitleField?: boolean;
   handleSubmit: (data: any) => void;
   values?: FormValues;
-  setShowModal: (boolean) => void;
+  setShowModal: (show: boolean) => void;
   submitButtonText: string;
+  description?: string;
 };
 
 const InputForm = ({
-  globalValue,
+  globalValue = false,
   configFields,
-  nodeValue,
-  titleValue,
+  nodeValue = undefined,
+  titleValue = undefined,
   title,
   typeName,
-  includeTitleField,
+  description = undefined,
+  includeTitleField = undefined,
   handleSubmit,
-  values,
+  values = undefined,
   setShowModal,
   submitButtonText,
 }: Props) => {
@@ -130,6 +133,7 @@ const InputForm = ({
       submitAction={onSubmit}
       typeName={typeName}
       cancelAction={onCancel}>
+      {description && <Alert bsStyle="info">{description}</Alert>}
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
       </HideOnCloud>
@@ -138,10 +142,3 @@ const InputForm = ({
 };
 
 export default InputForm;
-
-InputForm.defaultProps = {
-  globalValue: false,
-  nodeValue: undefined,
-  titleValue: undefined,
-  values: undefined,
-};

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.inject.Provider;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
@@ -51,7 +52,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -69,6 +70,8 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.source.EntitySourceService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -133,9 +136,13 @@ public class EventDefinitionFacadeTest {
     @Mock
     private UserService userService;
     @Mock
-    private EntityOwnershipService entityOwnershipService;
+    private EntityRegistrar entityRegistrar;
     @Mock
     private EventProcessorConfig mockEventProcessorConfig;
+    @Mock
+    private ClusterEventBus clusterEventBus;
+    @Mock
+    private EntitySourceService entitySourceService;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -153,11 +160,10 @@ public class EventDefinitionFacadeTest {
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
-        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(
-                eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
+        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityRegistrar, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock, clusterEventBus, entitySourceService);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService);
+        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar);
     }
 
     @Test
@@ -271,7 +277,7 @@ public class EventDefinitionFacadeTest {
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
         final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
 
@@ -288,7 +294,7 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto.remediationSteps()).isEqualTo(REMEDIATION_STEPS);
         assertThat(eventDefinitionDto.config().type()).isEqualTo("aggregation-v1");
         // verify that ownership was registered for this entity
-        verify(entityOwnershipService, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
+        verify(entityRegistrar, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
     }
 
     @Test
@@ -332,7 +338,7 @@ public class EventDefinitionFacadeTest {
     @Test
     public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
         EventDefinitionFacade testFacade = new EventDefinitionFacade(
-                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService, entityRegistrar);
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
         when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);

@@ -18,8 +18,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import { act } from 'react';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import mockEntityShareState, {
   failedEntityShareState,
@@ -77,7 +77,7 @@ describe('EntityShareModal', () => {
     />
   );
 
-  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i, hidden: true });
+  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i });
 
   it('fetches entity share state initially', async () => {
     render(<SimpleEntityShareModal />);
@@ -90,7 +90,7 @@ describe('EntityShareModal', () => {
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
+    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -105,7 +105,6 @@ describe('EntityShareModal', () => {
 
     const cancelButton = await screen.findByRole('button', {
       name: /cancel/i,
-      hidden: true,
     });
 
     fireEvent.click(cancelButton);
@@ -162,32 +161,12 @@ describe('EntityShareModal', () => {
       const addGrantee = async ({ newGrantee, capability }) => {
         render(<SimpleEntityShareModal />);
 
-        // Select a grantee
-        const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-        await act(async () => {
-          await selectEvent.openMenu(granteesSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(granteesSelect, newGrantee.title);
-        });
-
-        // Select a capability
-        const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-        await act(async () => {
-          await selectEvent.openMenu(capabilitySelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(capabilitySelect, capability.title);
-        });
+        await selectEvent.chooseOption('Search for users and teams', newGrantee.title);
+        await selectEvent.chooseOption('Select a capability', capability.title);
 
         // Submit form
         const submitButton = await screen.findByRole('button', {
           name: /add collaborator/i,
-          hidden: true,
         });
 
         fireEvent.click(submitButton);
@@ -218,14 +197,9 @@ describe('EntityShareModal', () => {
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
       render(<SimpleEntityShareModal />);
 
-      // Select a grantee
-      const granteesSelect = screen.getByLabelText('Search for users and teams');
+      await selectEvent.chooseOption('Search for users and teams', john.title);
 
-      await selectEvent.openMenu(granteesSelect);
-
-      await selectEvent.select(granteesSelect, john.title);
-
-      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
+      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith(
@@ -247,15 +221,7 @@ describe('EntityShareModal', () => {
       const ownerTitle = jane.title;
       render(<SimpleEntityShareModal />);
 
-      const capabilitySelect = await screen.findByLabelText(`Change the capability for ${ownerTitle}`);
-
-      await act(async () => {
-        await selectEvent.openMenu(capabilitySelect);
-      });
-
-      await act(async () => {
-        await selectEvent.select(capabilitySelect, viewer.title);
-      });
+      await selectEvent.chooseOption(`Change the capability for ${ownerTitle}`, viewer.title);
 
       await waitFor(() => {
         expect(screen.queryAllByText(viewer.title)).toHaveLength(2);

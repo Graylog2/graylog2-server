@@ -12,7 +12,8 @@
     <Loggers>
         <!-- Application Loggers -->
         <Logger name="org.graylog.datanode" level="info"/>
-        <Logger name="org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTransitionLogger" level="debug"/>
+        <!-- Hide warnings for enterprise cluster events -->
+        <Logger name="org.graylog2.events.ClusterEventPeriodical" level="error"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="datanode-internal-logs"/>

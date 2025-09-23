@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -33,9 +34,6 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.net.URI;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -50,7 +48,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
     private static final Pattern SLACK_PATTERN = Pattern.compile("https:\\/\\/hooks.slack.com\\/services\\/");
     private static final Pattern DISCORD_PATTERN = Pattern.compile("https:\\/\\/.*\\.?discord(app)?.com\\/api\\/webhooks.*\\/slack");
     private static final String DEFAULT_HEX_COLOR = "#ff0500";
-    private static final String DEFAULT_CUSTOM_MESSAGE = "Graylog Slack Notification";
+    private static final String DEFAULT_CUSTOM_MESSAGE = "${product_name} Slack Notification";
     private static final long DEFAULT_BACKLOG_SIZE = 0;
     private static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
@@ -77,6 +75,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
     static final String FIELD_BACKLOG_SIZE = "backlog_size";
     static final String FIELD_TIME_ZONE = "time_zone";
     static final String FIELD_INCLUDE_TITLE = "include_title";
+    static final String FIELD_INCLUDE_EVENT_PROCEDURE = "include_event_procedure";
 
     @JsonProperty(FIELD_BACKLOG_SIZE)
     public abstract long backlogSize();
@@ -122,6 +121,9 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 
     @JsonProperty(FIELD_NOTIFY_HERE)
     public abstract Boolean notifyHere();
+
+    @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+    public abstract boolean includeEventProcedure();
 
     @Override
     @JsonIgnore
@@ -191,7 +193,8 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
                     .backlogSize(DEFAULT_BACKLOG_SIZE)
                     .linkNames(false)
                     .timeZone(DEFAULT_TIME_ZONE)
-                    .includeTitle(true);
+                    .includeTitle(true)
+                    .includeEventProcedure(false);
         }
 
         @JsonProperty(FIELD_COLOR)
@@ -233,6 +236,9 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_NOTIFY_HERE)
         public abstract Builder notifyHere(Boolean notifyHere);
 
+        @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+        public abstract Builder includeEventProcedure(boolean includeEventProcedure);
+
         public abstract SlackEventNotificationConfig build();
     }
 
@@ -250,6 +256,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
                 .iconEmoji(ValueReference.of(iconEmoji()))
                 .timeZone(ValueReference.of(timeZone().getID()))
                 .notifyHere(ValueReference.of(notifyHere()))
+                .includeEventProcedure(ValueReference.of(includeEventProcedure()))
                 .build();
     }
 }

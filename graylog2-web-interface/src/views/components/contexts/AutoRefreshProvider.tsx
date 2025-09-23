@@ -30,8 +30,10 @@ const AutoRefreshProvider = ({
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(defaultRefreshConfig);
   const [animationId, setAnimationId] = useState<string | null>(defaultRefreshConfig?.enabled ? uuid() : null);
   const startAutoRefresh = useCallback((interval: number) => {
-    setRefreshConfig({ enabled: true, interval });
-    setAnimationId(uuid());
+    if (interval > 0) {
+      setRefreshConfig({ enabled: true, interval });
+      setAnimationId(uuid());
+    }
   }, []);
   const stopAutoRefresh = useCallback(() => {
     setRefreshConfig((cur) => ({ ...cur, enabled: false }));
@@ -41,7 +43,7 @@ const AutoRefreshProvider = ({
   useEffect(() => {
     let refreshInterval = null;
 
-    if (refreshConfig?.enabled) {
+    if (refreshConfig?.enabled && refreshConfig?.interval > 0) {
       refreshInterval = setInterval(() => {
         setAnimationId(uuid());
         onRefresh();

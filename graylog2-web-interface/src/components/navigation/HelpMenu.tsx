@@ -17,14 +17,14 @@
 import * as React from 'react';
 
 import { NavDropdown } from 'components/bootstrap';
-import { Icon } from 'components/common';
-import AppConfig from 'util/AppConfig';
+import { Icon, IfPermitted } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
+import NavIcon from 'components/navigation/NavIcon';
 
-const HelpMenuLinkItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
+const HelpMenuLinkItem = ({ href, children = undefined }: React.PropsWithChildren<{ href: string }>) => (
   <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="open_in_new" />}>
     {children}
   </Menu.Item>
@@ -34,14 +34,14 @@ const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
 
   return (
-    <NavDropdown title={<Icon name="help" size="lg" />} hoverTitle="Help" noCaret>
+    <NavDropdown title={<NavIcon type="help" />} hoverTitle="Help" noCaret>
       <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>Documentation</HelpMenuLinkItem>
 
       <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
 
-      {AppConfig.isCloud() && (
+      <IfPermitted permissions="api_browser:read">
         <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
-      )}
+      </IfPermitted>
     </NavDropdown>
   );
 };

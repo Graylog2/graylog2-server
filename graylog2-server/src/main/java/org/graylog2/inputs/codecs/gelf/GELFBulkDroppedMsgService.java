@@ -39,7 +39,7 @@ public class GELFBulkDroppedMsgService {
     }
 
     public void handleDroppedMsgOccurrence(RawMessage rawMessage) {
-        final String inputIdOnCurrentNode = InputDiagnosisMetrics.getInputIOnCurrentNode(rawMessage);
+        final String inputIdOnCurrentNode = rawMessage.getInputIdOnCurrentNode().orElse(null);
         inputDiagnosisMetrics.incCount(name(METRIC_PREFIX, inputIdOnCurrentNode, METRIC_SUFFIX));
         LOG.warn("Unexpected additional JSON content encountered after the initial valid JSON for GELF input id: {}. To ensure complete data processing, please enable bulk receiving.", inputIdOnCurrentNode);
     }

@@ -21,12 +21,21 @@ import com.jayway.jsonpath.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.operator.InputDecryptorProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
@@ -36,6 +45,7 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.security.TruststoreCreator;
+import org.junit.jupiter.api.BeforeAll;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -44,12 +54,14 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -67,6 +79,11 @@ import java.util.Collections;
                                    })
 public class ClientCertResourceIT {
 
+    @BeforeAll
+    static void beforeAll() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     private final GraylogApis api;
 
     public ClientCertResourceIT(GraylogApis api) {
@@ -75,19 +92,22 @@ public class ClientCertResourceIT {
 
     @ContainerMatrixTest
     void generateClientCert() throws Exception {
+
+        final String privateKeyPassword = RandomStringUtils.secure().nextAlphabetic(10);
+
         // these roles are supported: all_access,security_rest_api_access,readall
         final ValidatableResponse clientCertResponse = api.post("/ca/clientcert", """
                 {
                     "principal": "admin",
-                    "role": "all_access",
-                    "password": "asdfgh",
+                    "roles": ["all_access"],
+                    "password": "%s",
                     "certificate_lifetime": "P6M"
                 }
-                """, Response.Status.OK.getStatusCode());
+                """.formatted(privateKeyPassword), Response.Status.OK.getStatusCode());
 
         final GraylogApiResponse parsedResponse = new GraylogApiResponse(clientCertResponse);
         final X509Certificate caCertificate = decodeCert(parsedResponse.properJSONPath().read("ca_certificate"));
-        final PrivateKey privateKey = decodePrivateKey(parsedResponse.properJSONPath().read("private_key"));
+        final PrivateKey privateKey = decodePrivateKey(parsedResponse.properJSONPath().read("private_key"), privateKeyPassword);
         final X509Certificate certificate = decodeCert(parsedResponse.properJSONPath().read("certificate"));
 
         Assertions.assertThat(certificate.getIssuerX500Principal().getName()).isEqualTo("CN=Graylog CA");
@@ -103,7 +123,7 @@ public class ClientCertResourceIT {
                 createKeystore(privateKey, certificate, caCertificate),
                 createTruststore(caCertificate));
 
-        final URL url = new URL("https://" + this.api.backend().searchServerInstance().getHttpHostAddress());
+        final URL url = new URI("https://" + this.api.backend().searchServerInstance().getHttpHostAddress()).toURL();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (connection instanceof HttpsURLConnection) {
@@ -157,18 +177,26 @@ public class ClientCertResourceIT {
         }
     }
 
-    private static PrivateKey decodePrivateKey(String pemEncodedCert) {
+    private static PrivateKey decodePrivateKey(String pemEncodedCert, String privateKeyPassword) {
         final PEMParser pemParser = new PEMParser(new StringReader(pemEncodedCert));
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         try {
             Object parsed = pemParser.readObject();
             if (parsed instanceof PEMKeyPair keyPair) {
                 return converter.getPrivateKey(keyPair.getPrivateKeyInfo());
+            } else if (parsed instanceof PKCS8EncryptedPrivateKeyInfo keyPair) {
+                return decryptPrivateKey(privateKeyPassword, keyPair, converter);
             } else {
                 throw new IllegalArgumentException("Couldn't parse private key from provided string, unknown type");
             }
-        } catch (IOException e) {
+        } catch (IOException | OperatorCreationException | PKCSException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static PrivateKey decryptPrivateKey(String privateKeyPassword, PKCS8EncryptedPrivateKeyInfo keyPair, JcaPEMKeyConverter converter) throws OperatorCreationException, PKCSException, PEMException {
+        InputDecryptorProvider decryptorProviderBuilder = new JceOpenSSLPKCS8DecryptorProviderBuilder().setProvider("BC").build(privateKeyPassword.toCharArray());
+        final PrivateKeyInfo privateKeyInfo = keyPair.decryptPrivateKeyInfo(decryptorProviderBuilder);
+        return converter.getPrivateKey(privateKeyInfo);
     }
 }

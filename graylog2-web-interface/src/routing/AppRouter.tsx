@@ -33,10 +33,9 @@ import {
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
-  DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
-  DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
@@ -72,7 +71,6 @@ import {
   LUTDataAdaptersPage,
   LUTTablesPage,
   NodeInputsPage,
-  NodesPage,
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
@@ -114,6 +112,7 @@ import {
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
+  ClusterCertificateManagementPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -123,6 +122,8 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import TokenManagementPage from 'pages/TokenManagementPage';
+import { withLUTModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -218,7 +219,7 @@ const AppRouter = () => {
             },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
+            { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
@@ -256,34 +257,13 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesPage action="create" /> },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName'),
-              element: <LUTCachesPage action="show" />,
-            },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName'),
-              element: <LUTCachesPage action="edit" />,
-            },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW, element: <LUTDataAdaptersPage /> },
             {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE,
-              element: <LUTDataAdaptersPage action="create" />,
-            },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName'),
-              element: <LUTDataAdaptersPage action="show" />,
-            },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName'),
-              element: <LUTDataAdaptersPage action="edit" />,
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW,
+              element: withLUTModalProvider(LUTDataAdaptersPage),
             },
 
             { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },
@@ -298,31 +278,21 @@ const AppRouter = () => {
               element: <DataNodesClusterManagementPage />,
             },
             !isCloud && {
-              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
-              element: <DataNodesClusterConfigurationPage />,
+              path: RoutePaths.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
+              element: <ClusterCertificateManagementPage />,
             },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&
               enableDataNodeMigration && {
                 path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
                 element: <DataNodesMigrationPage />,
               },
 
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
+
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
-            !isCloud && {
-              path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION,
-              element: <DataNodesClusterConfigurationPage />,
-            },
-            !isCloud &&
-              enableDataNodeMigration && {
-                path: RoutePaths.SYSTEM.DATANODES.MIGRATION,
-                element: <DataNodesMigrationPage />,
-              },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
@@ -359,6 +329,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
             { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
             { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS_TOKEN_MANAGEMENT.overview, element: <TokenManagementPage /> },
 
             { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
             { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },

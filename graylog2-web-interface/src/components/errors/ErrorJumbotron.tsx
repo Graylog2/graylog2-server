@@ -18,7 +18,9 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
+import artiSvg from 'assets/arti.svg';
 import { Col, Jumbotron, Row } from 'components/bootstrap';
+import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
 const H1 = styled.h1(
   ({ theme }) => css`
@@ -43,15 +45,27 @@ type ErrorJumbotronProps = {
   title: string;
 };
 
-const ErrorJumbotron = ({ children, title }: ErrorJumbotronProps) => (
-  <ContainerRow>
-    <Col mdOffset={2} md={8}>
-      <StyledErrorJumbotron>
-        <H1>{title}</H1>
-        {children}
-      </StyledErrorJumbotron>
-    </Col>
-  </ContainerRow>
-);
+const StyledArti = styled.img`
+  height: 10rem;
+  float: right;
+`;
+const Arti = () => <StyledArti src={artiSvg} />;
+
+const ErrorJumbotron = ({ children, title }: ErrorJumbotronProps) => {
+  const productName = useProductName();
+  const isDefaultProduct = productName === DEFAULT_PRODUCT_NAME;
+
+  return (
+    <ContainerRow>
+      <Col mdOffset={2} md={8}>
+        <StyledErrorJumbotron>
+          {isDefaultProduct && <Arti />}
+          <H1>{title}</H1>
+          {children}
+        </StyledErrorJumbotron>
+      </Col>
+    </ContainerRow>
+  );
+};
 
 export default ErrorJumbotron;

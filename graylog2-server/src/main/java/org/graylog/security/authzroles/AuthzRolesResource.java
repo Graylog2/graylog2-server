@@ -37,8 +37,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import java.util.function.Predicate;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -106,7 +106,6 @@ public class AuthzRolesResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get a paginated list of all roles")
-    @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getList(
             @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -125,9 +124,8 @@ public class AuthzRolesResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-
-        final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(
-                searchQuery, page, perPage, sort, order);
+        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
+        final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(roleNamePermissionPredicate, searchQuery, page, perPage, sort, order);
         final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
 
         return PaginatedResponse.create("roles", result, query, ImmutableMap.of("users", userRoleMap));
@@ -137,7 +135,6 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation(value = "Get a paginated list of users for a role")
     @Path("/{roleId}/assignees")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions(RestPermissions.USERS_LIST)
     public PaginatedResponse<UserOverviewDTO> getUsersForRole(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotEmpty String roleId,
             @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
@@ -158,10 +155,12 @@ public class AuthzRolesResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
-        final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(
-                searchQuery, page, perPage, sort, order, ImmutableSet.of(roleId));
+        final Predicate<String> userNamePermissionPredicate = roleName -> isPermitted(RestPermissions.USERS_READ, roleName);
+        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
+
+        final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(userNamePermissionPredicate, searchQuery, page, perPage, sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
-        final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(
+        final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(roleNamePermissionPredicate,
                         new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, SortOrder.ASCENDING, roleIds)
                 .stream().collect(Collectors.toMap(AuthzRoleDTO::id, AuthzRoleDTO::name));
         final List<UserOverviewDTO> users = result.stream().map(u -> {
@@ -172,6 +171,10 @@ public class AuthzRolesResource extends RestResource {
         final PaginatedList<UserOverviewDTO> enrichedResult = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
         return PaginatedResponse.create("users", enrichedResult, query);
+    }
+
+    private Predicate<String> getRoleNamePermissionPredicate() {
+        return roleName -> isPermitted(RestPermissions.ROLES_READ, roleName);
     }
 
     @GET
@@ -187,7 +190,6 @@ public class AuthzRolesResource extends RestResource {
     @GET
     @ApiOperation(value = "Get a paginated list roles for a user")
     @Path("/user/{username}")
-    @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
             @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
             @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
@@ -208,10 +210,11 @@ public class AuthzRolesResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
+        checkPermission(RestPermissions.USERS_READ, username);
         final User user = Optional.ofNullable(userService.load(username))
                 .orElseThrow(() -> new NotFoundException("Couldn't find user: " + username));
-
-        final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(
+        final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
+        final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(roleNamePermissionPredicate,
                 searchQuery, page, perPage, sort, order, user.getRoleIds());
         return PaginatedResponse.create("roles", result, query);
     }
@@ -249,9 +252,12 @@ public class AuthzRolesResource extends RestResource {
             if (user == null) {
                 throw new NotFoundException("Cannot find user with name: " + username);
             }
-            if (authzRolesService.get(roleId).isEmpty()) {
-                throw new NotFoundException("Cannot find role with id: " + roleId);
-            }
+            authzRolesService.get(roleId)
+                    .ifPresentOrElse(role -> {
+                        checkPermission(RestPermissions.ROLES_EDIT, role.name());
+                    }, () -> {
+                        throw new NotFoundException("Cannot find role with id: " + roleId);
+                    });
             Set<String> roles = user.getRoleIds();
             rolesUpdater.update(roles, roleId);
             user.setRoleIds(roles);
@@ -280,7 +286,8 @@ public class AuthzRolesResource extends RestResource {
 
 
     private Map<String, Set<Map<String, String>>> userRoleContext(PaginatedList<AuthzRoleDTO> roles) {
-        final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(new SearchQuery(""),
+        final Predicate<String> userNamePermissionPredicate = roleName -> isPermitted(RestPermissions.USERS_READ, roleName);
+        final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(userNamePermissionPredicate, new SearchQuery(""),
                 1, 0, UserOverviewDTO.FIELD_USERNAME, SortOrder.ASCENDING,
                 roles.stream().map(AuthzRoleDTO::id).collect(Collectors.toSet()));
         final Map<String, Set<Map<String, String>>> userRoleMap = new HashMap<>(roles.size());

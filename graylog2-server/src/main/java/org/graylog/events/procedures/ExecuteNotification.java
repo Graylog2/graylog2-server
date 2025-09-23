@@ -18,12 +18,15 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
+import org.graylog.events.event.EventDto;
 
 /**
  * Executes an existing notification with the event.
@@ -56,6 +59,16 @@ public class ExecuteNotification extends Action {
 
         public static Builder builder() {
             return Builder.create();
+        }
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(EventDto event) {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("security/security-events/alerts");
+            uriBuilder.addParameter("query", "id:" + event.id());
+            uriBuilder.addParameter("query", "id:${event.id}");
+            return uriBuilder.build().getLinkPath();
         }
 
         @AutoValue.Builder

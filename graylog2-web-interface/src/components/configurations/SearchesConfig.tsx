@@ -27,7 +27,7 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
-import type { SearchConfig } from 'components/search';
+import type { SearchesConfig as SearchConfig } from 'components/search/SearchConfig';
 import Select from 'components/common/Select/Select';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import 'moment-duration-format';
@@ -81,7 +81,7 @@ const mapQuickAccessBEData = (
 
 const SearchesConfig = () => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const isLimitEnabled = (config: { query_time_range_limit: number }) =>
+  const isLimitEnabled = (config: { query_time_range_limit: string }) =>
     moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumRefreshInterval } =
     useMinimumRefreshInterval();
@@ -159,7 +159,7 @@ const SearchesConfig = () => {
   };
 
   const onCancelAfterSecondsChanged = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-    setFormConfig({ ...formConfig, cancel_after_seconds: value });
+    setFormConfig({ ...formConfig, cancel_after_seconds: Number(value) });
   };
 
   const onCheckedCancelAfterSeconds = () => {
@@ -485,7 +485,6 @@ const SearchesConfig = () => {
                 options={autoRefreshOptions(formConfig)}
                 displayKey="description"
                 valueKey="period"
-                matchProp="label"
                 onChange={onAutoRefreshDefaultOptionsUpdate}
                 value={defaultAutoRefreshOption(formConfig)}
               />
@@ -493,8 +492,8 @@ const SearchesConfig = () => {
             {!isLoadingMinimumRefreshInterval && (
               <Alert bsStyle="warning">
                 Please note, a minimum refresh interval of <ReadableDuration duration={minimumRefreshInterval} /> (
-                {minimumRefreshInterval}) has been configured in the graylog.conf. Only intervals which are equal or
-                above the minimum can be used.
+                {minimumRefreshInterval}) has been configured in the server configuration file. Only intervals which are
+                equal or above the minimum can be used.
               </Alert>
             )}
           </fieldset>

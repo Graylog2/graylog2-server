@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import get from 'lodash/get';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { WidgetComponentProps } from 'views/types';
@@ -117,6 +116,11 @@ import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
 import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
+import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
+import AddTextWidget, { CreateTextWidget } from 'views/logic/creatoractions/AddTextWidget';
+import TextWidget from 'views/logic/widgets/TextWidget';
+import TextVisualization from 'views/components/widgets/text/TextVisualization';
+import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -205,7 +209,7 @@ const exports: PluginExports = {
       editComponent: AggregationWizard,
       hasEditSubmitButton: true,
       needsControlledHeight: (widget: Widget) => {
-        const widgetVisualization = get(widget, 'config.visualization');
+        const widgetVisualization = widget?.config?.visualization;
         const flexibleHeightWidgets = [DataTable.type];
 
         return !flexibleHeightWidgets.find((visualization) => visualization === widgetVisualization);
@@ -236,6 +240,19 @@ const exports: PluginExports = {
       titleGenerator: () => EventsWidget.defaultTitle,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data?.[0],
+    },
+    {
+      type: 'TEXT',
+      displayName: 'Text (Markdown) Widget',
+      defaultHeight: 3,
+      defaultWidth: 3,
+      hasEditSubmitButton: false,
+      visualizationComponent: TextVisualization,
+      editComponent: TextWidgetEdit,
+      searchTypes: () => [],
+      titleGenerator: () => TextWidget.defaultTitle,
+      needsControlledHeight: () => false,
+      searchResultTransformer: () => ({}),
     },
     {
       type: 'default',
@@ -392,6 +409,7 @@ const exports: PluginExports = {
     ],
     ['create-extractor'],
   ),
+  fieldTypeValueRenderer: FieldTypeValueRenderer,
   visualizationTypes: visualizationBindings,
   widgetCreators: [
     {
@@ -414,6 +432,11 @@ const exports: PluginExports = {
       func: CreateEventsWidget,
       icon: () => <Icon name="report" type="regular" />,
     },
+    {
+      title: 'Text (Markdown) Widget',
+      func: CreateTextWidget,
+      icon: () => <Icon name="description" />,
+    },
   ],
   creators: [
     {
@@ -435,6 +458,11 @@ const exports: PluginExports = {
       type: 'events' as const,
       title: 'Events Overview',
       func: AddEventsWidgetActionHandler,
+    },
+    {
+      type: 'generic',
+      title: 'Text (Markdown) Widget',
+      func: AddTextWidget,
     },
   ],
   'views.completers': [new FieldNameCompletion(), new FieldValueCompletion(), new OperatorCompletion()],

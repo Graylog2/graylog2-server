@@ -43,7 +43,7 @@ export type SearchJobResult = {
   owner: string;
   results: { [id: string]: any };
   search_id: SearchId;
-  errors: Array<SearchErrorResponse>;
+  errors: Array<SearchErrorResponse | ResultWindowLimitErrorResponse>;
 };
 
 class SearchResult {
@@ -85,7 +85,11 @@ class SearchResult {
     return this._results.get(queryId);
   }
 
-  updateSearchTypes(searchTypeResults) {
+  withErrors(errors: Array<SearchErrorResponse> | undefined) {
+    return new SearchResult({ ...this.result, errors });
+  }
+
+  updateSearchTypes(searchTypeResults: SearchJobResult['results']) {
     const updatedResult = this.result;
 
     searchTypeResults.forEach((searchTypeResult: { id: string }) => {

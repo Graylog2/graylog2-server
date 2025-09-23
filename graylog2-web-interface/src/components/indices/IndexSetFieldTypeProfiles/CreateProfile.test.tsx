@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -33,12 +33,6 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutation
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
-
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
 
 describe('CreateProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
@@ -78,28 +72,24 @@ describe('CreateProfile', () => {
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
-      hidden: true,
     });
     const description = await screen.findByRole('textbox', {
       name: /description/i,
-      hidden: true,
     });
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
     await userEvent.click(addMappingButton);
 
-    const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);
-    const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
-    const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByTitle(/create profile/i);
 
     fireEvent.change(name, { target: { value: 'Profile new' } });
     fireEvent.change(description, { target: { value: 'Profile description' } });
-    await selectItem(fieldFirst, 'date');
-    await selectItem(typeFirst, 'String type');
-    await selectItem(fieldSecond, 'http_method');
-    await selectItem(typeSecond, 'String type');
+
+    await selectEvent.chooseOption('select customFieldMappings.0.field', 'date');
+    await selectEvent.chooseOption('select customFieldMappings.0.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.field', 'http_method');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
+
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);
 

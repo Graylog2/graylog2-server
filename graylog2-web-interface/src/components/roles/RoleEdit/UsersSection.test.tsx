@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob, charlie } from 'fixtures/userOverviews';
 import mockAction from 'helpers/mocking/MockAction';
@@ -69,8 +69,7 @@ describe('UsersSection', () => {
     render(<UsersSection role={exampleRole} />);
 
     const assignUserButton = await screen.findByRole('button', { name: 'Assign User' });
-    const usersSelector = screen.getByLabelText('Search for users');
-    await selectEvent.select(usersSelector, bob.username);
+    await selectEvent.chooseOption('Search for users', bob.username);
 
     fireEvent.click(assignUserButton);
 

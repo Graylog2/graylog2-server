@@ -36,7 +36,7 @@ import { Icon } from 'components/common';
 type Props = {
   stream: Stream;
   getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
-  availableOutputTypes: AvailableOutputTypes['types'];
+  availableOutputTypes: AvailableOutputTypes;
   assignableOutputs: Array<Output>;
 };
 
@@ -79,7 +79,9 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
 
     OutputsStore.save(data, (result: Output) => {
       addStreamOutput({ streamId: stream.id, outputs: { outputs: [result.id] } }).then(() => {
-        queryClient.invalidateQueries(['outputs', 'overview']);
+        queryClient.invalidateQueries({
+          queryKey: ['outputs', 'overview'],
+        });
 
         onCancel();
       });
@@ -90,7 +92,9 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
 
   const handleAssignOutput = (outputId: string) => {
     addStreamOutput({ streamId: stream.id, outputs: { outputs: [outputId] } }).then(() => {
-      queryClient.invalidateQueries(['outputs', 'overview']);
+      queryClient.invalidateQueries({
+        queryKey: ['outputs', 'overview'],
+      });
       onCancel();
     });
   };
@@ -109,8 +113,8 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
         <Icon name="add" size="sm" /> Add output
       </Button>
       {showAddOutput && (
-        <BootstrapModalWrapper showModal role="alertdialog" onHide={() => setShowAddOutput(false)}>
-          <Modal.Header closeButton>
+        <BootstrapModalWrapper showModal onHide={() => setShowAddOutput(false)}>
+          <Modal.Header>
             <Modal.Title>Add output to stream</Modal.Title>
           </Modal.Header>
           <Modal.Body>

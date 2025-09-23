@@ -77,8 +77,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -88,14 +88,14 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineResource extends RestResource implements PluginRestResource {
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineResource.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineResource.class);
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(PipelineDao.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
-    public static final String GL_INPUT_ROUTING_PIPELINE = "All Messages Routing";
+    public static final String GL_INPUT_ROUTING_PIPELINE = "Default Routing";
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
@@ -307,7 +307,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
         final PipelineSource pipelineSource = PipelineSource.builder()
                 .title(GL_INPUT_ROUTING_PIPELINE)
-                .description("GL generated pipeline")
+                .description("System generated pipeline")
                 .source("pipeline \"" + GL_INPUT_ROUTING_PIPELINE + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
                 .stages(stages)
                 .build();

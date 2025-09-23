@@ -17,12 +17,14 @@
 const path = require('path');
 
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
+
+const disableTsc = process.env.disable_tsc === 'true';
 
 const getCssLoaderOptions = (target) => {
   // Development
@@ -160,11 +162,15 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         new webpack.DefinePlugin({
           DEVELOPMENT: true,
         }),
-        new ForkTsCheckerWebpackPlugin({
-          typescript: {
-            memoryLimit: 4096,
-          },
-        }),
+        ...(disableTsc
+          ? []
+          : [
+              new ForkTsCheckerWebpackPlugin({
+                typescript: {
+                  memoryLimit: 4096,
+                },
+              }),
+            ]),
       ],
     });
   }
@@ -196,9 +202,11 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
           },
         },
         moduleIds: 'deterministic',
-        minimizer: [new EsbuildPlugin({
-          target: supportedBrowsers,
-        })],
+        minimizer: [
+          new EsbuildPlugin({
+            target: supportedBrowsers,
+          }),
+        ],
       },
       plugins: [
         new webpack.DefinePlugin({

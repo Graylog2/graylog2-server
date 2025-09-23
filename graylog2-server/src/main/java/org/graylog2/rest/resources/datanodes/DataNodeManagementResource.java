@@ -36,7 +36,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.UserContext;
-import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -67,7 +66,6 @@ public class DataNodeManagementResource extends RestResource {
 
     private final DataNodeCommandService dataNodeCommandService;
     private final NodeService<DataNodeDto> nodeService;
-    private final CertRenewalService certRenewalService;
     private final Boolean runsWithDataNode;
     private final BulkExecutor<DataNodeDto, UserContext> bulkRemovalExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStopExecutor;
@@ -76,12 +74,10 @@ public class DataNodeManagementResource extends RestResource {
     @Inject
     protected DataNodeManagementResource(DataNodeCommandService dataNodeCommandService,
                                          NodeService<DataNodeDto> nodeService,
-                                         CertRenewalService certRenewalService,
                                          @RunsWithDataNode Boolean runsWithDataNode,
                                          AuditEventSender auditEventSender, ObjectMapper objectMapper) {
         this.dataNodeCommandService = dataNodeCommandService;
         this.nodeService = nodeService;
-        this.certRenewalService = certRenewalService;
         this.runsWithDataNode = runsWithDataNode;
         bulkRemovalExecutor = new SequentialBulkExecutor<>(this::removeNode, auditEventSender, objectMapper);
         bulkStopExecutor = new SequentialBulkExecutor<>(this::stopNode, auditEventSender, objectMapper);

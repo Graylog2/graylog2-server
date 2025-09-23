@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
@@ -25,12 +25,6 @@ import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileMod
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
-
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
 
 const renderModal = (currentProfile = 'profile-id-111') =>
   render(
@@ -75,9 +69,8 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run setIndexSetFieldTypeProfile on submit with rotation', async () => {
     renderModal();
-    const select = await screen.findByLabelText(/Select profile/i);
-    await selectItem(select, 'Profile-2');
-    const submit = await screen.findByRole('button', { name: /Set Profile/i, hidden: true });
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
+    const submit = await screen.findByRole('button', { name: /Set Profile/i });
     fireEvent.click(submit);
 
     expect(setIndexSetFieldTypeProfileMock).toHaveBeenCalledWith({
@@ -89,12 +82,10 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run setIndexSetFieldTypeProfile on submit without rotation', async () => {
     renderModal();
-    const select = await screen.findByLabelText(/Select profile/i);
-    await selectItem(select, 'Profile-2');
-    const submit = await screen.findByRole('button', { name: /Set Profile/i, hidden: true });
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
+    const submit = await screen.findByRole('button', { name: /Set Profile/i });
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,
-      hidden: true,
     });
     fireEvent.click(checkBox);
     fireEvent.click(submit);
@@ -108,10 +99,9 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run removeProfileFromIndex on submit without rotation', async () => {
     renderModal();
-    const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
+    const removeButton = await screen.findByRole('button', { name: /Remove profile/i });
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,
-      hidden: true,
     });
     fireEvent.click(checkBox);
     fireEvent.click(removeButton);
@@ -124,7 +114,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run removeProfileFromIndex on submit with rotation', async () => {
     renderModal();
-    const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
+    const removeButton = await screen.findByRole('button', { name: /Remove profile/i });
     fireEvent.click(removeButton);
 
     expect(removeProfileFromIndexMock).toHaveBeenCalledWith({
@@ -135,7 +125,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('render modal without removal button when profile is not set', async () => {
     renderModal(null);
-    const removeButton = screen.queryByRole('button', { name: /Remove profile/i, hidden: true });
+    const removeButton = screen.queryByRole('button', { name: /Remove profile/i });
 
     expect(removeButton).not.toBeInTheDocument();
   });

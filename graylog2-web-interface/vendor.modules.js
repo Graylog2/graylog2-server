@@ -17,11 +17,11 @@
 module.exports = [
   '@emotion/react',
   '@mantine/core',
+  '@mantine/notifications',
   '@reduxjs/toolkit',
   '@tanstack/react-query',
   'chroma-js',
   'formik',
-  'jquery',
   'leaflet',
   'moment',
   'moment-timezone',

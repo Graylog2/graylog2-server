@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { act } from 'react';
-import { mount } from 'wrappedEnzyme';
+import React from 'react';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
+import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 
 import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
@@ -27,14 +28,14 @@ jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 jest.useFakeTimers();
 
 describe('<ContentPackSelection />', () => {
-  it('should render with empty content pack', () => {
-    const contentPack = new ContentPack.builder().build();
-    const wrapper = mount(<ContentPackSelection contentPack={contentPack} />);
+  it('renders with empty content pack', () => {
+    const contentPack = ContentPack.builder().build();
+    render(<ContentPackSelection contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
   });
 
-  it('should render with filled content pack', () => {
+  it('renders with filled content pack', () => {
     const contentPack = ContentPack.builder()
       .name('name')
       .summary('summary')
@@ -47,54 +48,46 @@ describe('<ContentPackSelection />', () => {
       .v('1')
       .type({ name: 'spaceship', version: '1' })
       .id('beef123')
-      .data({
-        title: { value: 'breq', type: 'string' },
-      })
+      .data({ title: { '@value': 'breq', '@type': 'string' } })
       .build();
-    const entities = {
-      spaceship: [entity],
-    };
 
-    const wrapper = mount(
-      <ContentPackSelection contentPack={contentPack} edit entities={entities} selectedEntities={{}} />,
-    );
+    const entities = { spaceship: [entity] };
 
-    expect(wrapper).toExist();
+    render(<ContentPackSelection contentPack={contentPack} edit entities={entities} selectedEntities={{}} />);
+
+    expect(screen.getByLabelText(/name/i)).toHaveValue('name');
   });
 
-  it('should update the state when filling out the form', () => {
+  it('updates state when filling out the form', async () => {
     let resultedState;
     const changeFn = jest.fn((state) => {
       resultedState = state;
     });
+
     const contentPack = ContentPack.builder().build();
+    render(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
 
-    const wrapper = mount(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
+    await userEvent.paste(screen.getByLabelText(/name/i), 'name');
+    await userEvent.paste(screen.getByLabelText(/summary/i), 'summary');
+    await userEvent.paste(screen.getByLabelText(/description/i), 'descr');
+    await userEvent.paste(screen.getByLabelText(/vendor/i), 'vendor');
+    await userEvent.paste(screen.getByLabelText(/url/i), 'http://url');
 
-    wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
-    wrapper.find('input#summary').simulate('change', { target: { name: 'summary', value: 'summary' } });
-    wrapper.find('textarea#description').simulate('change', { target: { name: 'description', value: 'descr' } });
-    wrapper.find('input#vendor').simulate('change', { target: { name: 'vendor', value: 'vendor' } });
-    wrapper.find('input#url').simulate('change', { target: { name: 'url', value: 'http://url' } });
-
-    expect(changeFn.mock.calls.length).toBe(5);
-    expect(resultedState.contentPack.name).toEqual('name');
-    expect(resultedState.contentPack.summary).toEqual('summary');
-    expect(resultedState.contentPack.description).toEqual('descr');
-    expect(resultedState.contentPack.vendor).toEqual('vendor');
-    expect(resultedState.contentPack.url).toEqual('http://url');
+    expect(changeFn).toHaveBeenCalledTimes(5);
+    expect(resultedState.contentPack.name).toBe('name');
+    expect(resultedState.contentPack.summary).toBe('summary');
+    expect(resultedState.contentPack.description).toBe('descr');
+    expect(resultedState.contentPack.vendor).toBe('vendor');
+    expect(resultedState.contentPack.url).toBe('http://url');
   });
 
-  it('should add a entity if content selection was checked', () => {
+  it('adds an entity when content selection is checked', async () => {
     const contentPack = {};
     const entities = {
       spaceship: [
         {
           title: 'breq',
-          type: {
-            name: 'spaceship',
-            version: '1',
-          },
+          type: { name: 'spaceship', version: '1' },
           id: 'beef123',
         },
       ],
@@ -104,7 +97,7 @@ describe('<ContentPackSelection />', () => {
       expect(newState.selectedEntities).toEqual(entities);
     });
 
-    const wrapper = mount(
+    render(
       <ContentPackSelection
         contentPack={contentPack}
         selectedEntities={{}}
@@ -113,42 +106,32 @@ describe('<ContentPackSelection />', () => {
       />,
     );
 
-    wrapper
-      .find('input[type="checkbox"]')
-      .at(0)
-      .simulate('change', { target: { checked: true } });
+    const checkbox = screen.getByRole('checkbox');
+    await userEvent.click(checkbox);
 
-    expect(changeFn.mock.calls.length).toBe(1);
+    expect(changeFn).toHaveBeenCalledTimes(1);
   });
 
   describe('with several entities', () => {
     const breq = {
       title: 'breq',
-      type: {
-        name: 'spaceship',
-        version: '1',
-      },
+      type: { name: 'spaceship', version: '1' },
       id: 'beef123',
     };
     const falcon = {
       title: 'falcon',
-      type: {
-        name: 'spaceship',
-        version: '1',
-      },
+      type: { name: 'spaceship', version: '1' },
       id: 'beef124',
     };
     const entities = { spaceship: [breq, falcon] };
 
-    it('should remove a entity if content selection was unchecked', () => {
+    it('removes an entity when content selection is unchecked', async () => {
       const contentPack = {};
       const selectedEntities = { spaceship: [breq, falcon] };
 
-      const changeFn = jest.fn((newState) => {
-        expect(newState.selectedEntities).toEqual({ spaceship: [falcon] });
-      });
+      const changeFn = jest.fn();
 
-      const wrapper = mount(
+      render(
         <ContentPackSelection
           contentPack={contentPack}
           selectedEntities={selectedEntities}
@@ -157,131 +140,105 @@ describe('<ContentPackSelection />', () => {
         />,
       );
 
-      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
-      wrapper
-        .find('input[type="checkbox"]')
-        .at(1)
-        .simulate('change', { target: { checked: false } });
+      const checkboxes = screen.getAllByRole('checkbox', { hidden: true });
+      await userEvent.click(checkboxes[1]);
 
-      expect(changeFn.mock.calls.length).toBe(1);
+      expect(changeFn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          selectedEntities: { spaceship: [falcon] },
+        }),
+      );
     });
 
-    it('should filter expandableList of content selection', () => {
+    it('filters expandable list of content selection', async () => {
       const contentPack = {};
-      const wrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
+      render(<ContentPackSelection contentPack={contentPack} entities={entities} />);
 
-      /*
-       * Search for falcon
-       *
-      /* Open menu to show all checkboxes */
-      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
-
-      expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
-
-      wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'falcon' } });
+      const searchInput = await screen.findByPlaceholderText(/search/i);
+      await userEvent.type(searchInput, 'falcon');
 
       act(() => {
         jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
       });
 
-      wrapper.update();
+      await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
 
-      expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
+      expect(screen.queryByRole('button', { name: /breq/i })).not.toBeInTheDocument();
 
-      /*
-       * reset the search
-       */
-      wrapper.find("button[title='Reset search']").simulate('click');
-      /* Open menu to show all checkboxes */
-      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
+      const resetButton = screen.getByRole('button', { name: /reset search/i, hidden: true });
+      await userEvent.click(resetButton);
 
-      expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
+      await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
+      await screen.findByRole('checkbox', { name: /breq/i, hidden: true });
     });
 
-    it('should validate that all fields are filled out', () => {
-      const touchAllFields = (_wrapper) => {
-        _wrapper.instance()._handleTouched('name');
-        _wrapper.instance()._handleTouched('summary');
-        _wrapper.instance()._handleTouched('vendor');
+    it('validates that all fields are filled out', async () => {
+      const touchAllFields = async () => {
+        const nameInput = await screen.findByLabelText(/name/i);
+        const summaryInput = await screen.findByLabelText(/summary/i);
+        const vendorInput = await screen.findByLabelText(/vendor/i);
+
+        await userEvent.click(nameInput);
+        await userEvent.click(summaryInput);
+        await userEvent.click(vendorInput);
+        await userEvent.click(await screen.findByLabelText(/description/i));
       };
 
-      const wrapper = mount(<ContentPackSelection contentPack={{}} entities={entities} />);
+      const { rerender } = render(<ContentPackSelection contentPack={{}} entities={entities} />);
+      await touchAllFields();
 
-      act(() => {
-        touchAllFields(wrapper);
-        (wrapper.instance() as ContentPackSelection)._validate();
+      await waitFor(async () => {
+        expect(await screen.findAllByText('Must be filled out.')).toHaveLength(3);
       });
 
-      wrapper.update();
+      rerender(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
+      await touchAllFields();
 
-      expect(wrapper.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(3);
+      const errors2 = await screen.findAllByText('Must be filled out.');
 
-      const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
+      expect(errors2.length).toBe(2);
 
-      act(() => {
-        touchAllFields(wrapper2);
-        (wrapper2.instance() as ContentPackSelection)._validate();
-      });
+      rerender(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} entities={entities} />);
+      await touchAllFields();
 
-      wrapper2.update();
+      const errors3 = await screen.findAllByText('Must be filled out.');
 
-      expect(wrapper2.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(2);
+      expect(errors3.length).toBe(1);
 
-      const wrapper1 = mount(
-        <ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} entities={entities} />,
-      );
-
-      act(() => {
-        touchAllFields(wrapper1);
-        (wrapper1.instance() as ContentPackSelection)._validate();
-      });
-
-      wrapper1.update();
-
-      expect(wrapper1.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(1);
-
-      const wrapper0 = mount(
+      rerender(
         <ContentPackSelection
           contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
           entities={entities}
         />,
       );
+      await touchAllFields();
 
-      act(() => {
-        touchAllFields(wrapper0);
-        (wrapper0.instance() as ContentPackSelection)._validate();
-      });
+      const errors4 = screen.queryAllByText('Must be filled out.');
 
-      wrapper0.update();
-
-      expect(wrapper0.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(0);
+      expect(errors4.length).toBe(0);
     });
 
-    it('should validate that URLs only have http or https protocols', () => {
-      const contentPack: Record<string, string> = { name: 'name', summary: 'summary', vendor: 'vendor' };
-      const protocols = [
-        // eslint-disable-next-line no-script-url
-        { protocol: 'javascript:', errors: 1 },
-        { protocol: 'ftp:', errors: 1 },
-        { protocol: 'http:', errors: 0 },
-        { protocol: 'https:', errors: 0 },
-      ];
+    it.each`
+      protocol        | hasError
+      ${'javascript'} | ${true}
+      ${'ftp'}        | ${true}
+      ${'http'}       | ${false}
+      ${'https'}      | ${false}
+    `('validates that URLs only have http or https protocols', async ({ protocol, hasError }) => {
+      const contentPack = { name: 'name', summary: 'summary', vendor: 'vendor' };
+      const url = `${protocol}://example.org`;
+      render(<ContentPackSelection contentPack={{ ...contentPack, url }} entities={entities} />);
 
-      protocols.forEach(({ protocol, errors }) => {
-        contentPack.url = `${protocol}//example.org`;
-        const invalidWrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
+      const urlInput = await screen.findByLabelText(/url/i);
+      await userEvent.click(urlInput);
+      await userEvent.click(await screen.findByLabelText(/name/i));
 
-        act(() => {
-          (invalidWrapper.instance() as ContentPackSelection)._handleTouched('url');
-          (invalidWrapper.instance() as ContentPackSelection)._validate();
-        });
-
-        invalidWrapper.update();
-
-        expect(
-          invalidWrapper.find({ error: 'Must use a URL starting with http or https.' }).find('InputDescription'),
-        ).toHaveLength(errors);
-      });
+      if (hasError) {
+        await screen.findByText('Must use a URL starting with http or https.');
+      } else {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(screen.queryByText('Must use a URL starting with http or https.')).not.toBeInTheDocument();
+      }
     });
   });
 });

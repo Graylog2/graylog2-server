@@ -66,10 +66,14 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.DBEntitySourceService;
+import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -97,6 +101,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -114,6 +119,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
+            .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
             .build();
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
@@ -121,7 +127,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build()
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
+            EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
+                    .type(SearchQueryField.Type.STRING)
+                    .sortable(false)
+                    .filterable(true)
+                    .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
+                    .build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -138,6 +150,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -148,7 +161,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     AuditEventSender auditEventSender,
                                     ObjectMapper objectMapper,
                                     EventResolver eventResolver,
-                                    EventDefinitionConfiguration eventDefinitionConfiguration
+                                    EventDefinitionConfiguration eventDefinitionConfiguration,
+                                    EntitySharesService entitySharesService
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -161,8 +175,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
         this.eventResolver = eventResolver;
+        this.entitySharesService = entitySharesService;
     }
-
 
     @GET
     @Timed
@@ -172,6 +186,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                         @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                        @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                         @ApiParam(name = "sort",
                                                                   value = "The field to sort the result on",
                                                                   required = true,
@@ -189,9 +204,17 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if ("status".equals(sort)) {
             sort = "alert";
         }
+        Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
+
+        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
+        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
+        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
+        final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
+        predicate = filterPredicate.predicate();
+
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,
-                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                predicate,
                 order.toBsonSort(sort),
                 page,
                 perPage);
@@ -210,7 +233,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),
-                result.grandTotal().orElse(0L), sort, order, eventDefinitionDtos, attributes, settings);
+                definitionDtos.pagination().total(), sort, order, eventDefinitionDtos, attributes, settings);
     }
 
     @GET
@@ -247,6 +270,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public record EventDefinitionWithContext(@JsonProperty("event_definition") EventDefinitionDto eventDefinition,
                                              @JsonProperty("context") Map<String, Object> context,
                                              @JsonProperty("is_mutable") boolean isMutable) {}
+
     @GET
     @Path("{definitionId}/with-context")
     @ApiOperation("Get an event definition")
@@ -264,11 +288,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Get multiple event definitions by id")
     @NoAuditEvent("Bulk retrieval, no data is changed.")
     public List<EventDefinitionDto> getById(@ApiParam(name = "JSON body") @Valid GetByIdRequest request) {
-        for (String id : request.eventDefinitionIds()) {
-            checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, id);
-        }
+        final Set<String> permittedIds = request.eventDefinitionIds().stream()
+                .filter(id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id))
+                .collect(Collectors.toSet());
 
-        return dbService.getByIds(request.eventDefinitionIds());
+        return dbService.getByIds(permittedIds);
     }
 
     @POST
@@ -277,10 +301,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") EventDefinitionDto dto, @Context UserContext userContext) {
+                           @ApiParam(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
+        final EventDefinitionDto dto = createEntityRequest.entity();
         checkEventDefinitionPermissions(dto, "create");
 
-        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -288,6 +313,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
                 eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
+        createEntityRequest.shareRequest().ifPresent(shareRequest -> {
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, entity.id(), shareRequest, userContext.getUser());
+        });
+
         return Response.ok().entity(entity).build();
     }
 
@@ -305,7 +334,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
-        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration);
+        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -355,7 +384,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Delete multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
-                               @Context UserContext userContext) {
+                                            @Context UserContext userContext) {
         return bulkDeletionExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_DELETE, "definitionId", EventDefinitionDto.class));
@@ -383,7 +412,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Enable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkSchedule(@ApiParam(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
-                                 @Context UserContext userContext) {
+                                              @Context UserContext userContext) {
         return bulkScheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
@@ -410,7 +439,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Disable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkUnschedule(@ApiParam(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
-                                   @Context UserContext userContext) {
+                                                @Context UserContext userContext) {
         return bulkUnscheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
@@ -455,7 +484,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
 
-        return eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
+        return eventDefinitionHandler.duplicate(eventDefinitionDto, userContext.getUser());
     }
 
     @POST
@@ -464,9 +493,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull EventDefinitionDto toValidate) {
-        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(eventDefinitionDto -> eventDefinitionDto.config()).orElse(null);
-        ValidationResult validationResult = toValidate.config().validate();
+                                         @Valid @NotNull EventDefinitionDto toValidate,
+                                     @Context UserContext userContext) {
+        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
+        ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }

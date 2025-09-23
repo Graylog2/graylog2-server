@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+
+import selectEvent from 'helpers/selectEvent';
 
 import RuleBlockForm from './RuleBlockForm';
 import { buildRuleBlock, actionsBlockDict } from './fixtures';
@@ -60,20 +61,16 @@ describe('RuleBlockForm', () => {
   it('renders a select with all functions as options', async () => {
     render(comp());
 
-    const select = await screen.findByRole('combobox');
-
-    await selectEvent.openMenu(select);
-
-    options.forEach((option) => expect(screen.getByText(option.label)).toBeInTheDocument());
+    await selectEvent.assertOptionExists(
+      'Add action',
+      options.map(({ label }) => label),
+    );
   });
 
   it('calls onSelect handler when selecting an option', async () => {
     render(comp());
 
-    const select = await screen.findByRole('combobox');
-
-    await selectEvent.openMenu(select);
-    await selectEvent.select(select, 'set_field');
+    await selectEvent.chooseOption('Add action', 'set_field');
 
     expect(mockSelect).toHaveBeenCalledWith('set_field');
   });

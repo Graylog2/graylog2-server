@@ -15,31 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 
+import { IfPermitted } from 'components/common';
 import { LinkContainer } from 'components/common/router';
 import type User from 'logic/users/User';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 
 type Props = {
-  userId: $PropertyType<User, 'id'>;
+  userId: User['id'];
   userIsReadOnly: boolean;
+  username: User['username'];
 };
 
-const UserActionLinks = ({ userId, userIsReadOnly }: Props) => (
+const UserActionLinks = ({ userId, userIsReadOnly, username }: Props) => (
   <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.USERS.show(userId)}>
-      <Button bsStyle="success">View Details</Button>
-    </LinkContainer>
-    {!userIsReadOnly && (
-      <LinkContainer to={Routes.SYSTEM.USERS.edit(userId)}>
-        <Button bsStyle="success">Edit User</Button>
+    <IfPermitted permissions={`users:edit:${username}`}>
+      <LinkContainer to={Routes.SYSTEM.USERS.show(userId)}>
+        <Button bsStyle="success">View Details</Button>
       </LinkContainer>
+    </IfPermitted>
+    {!userIsReadOnly && (
+      <IfPermitted permissions={`users:edit:${username}`}>
+        <LinkContainer to={Routes.SYSTEM.USERS.edit(userId)}>
+          <Button bsStyle="success">Edit User</Button>
+        </LinkContainer>
+      </IfPermitted>
     )}
-    <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
-      <Button bsStyle="success">Edit Tokens</Button>
-    </LinkContainer>
+    <IfPermitted permissions={[`users:tokenlist:${username}`]}>
+      <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
+        <Button bsStyle="success">Edit Tokens</Button>
+      </LinkContainer>
+    </IfPermitted>
   </ButtonToolbar>
 );
 

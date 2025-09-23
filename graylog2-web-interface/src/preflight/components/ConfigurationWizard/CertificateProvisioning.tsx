@@ -19,11 +19,12 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button, Title, Group, Space } from 'preflight/components/common';
+import { Title, Group, Space } from 'preflight/components/common';
 import Alert from 'components/bootstrap/Alert';
 import URLUtils from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
+import Button from 'components/bootstrap/Button';
 
 const onProvisionCertificate = () => fetch('POST', URLUtils.qualifyUrl('api/generate'), undefined, false);
 
@@ -36,14 +37,17 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
   const { data: dataNodes, isInitialLoading } = useDataNodes();
   const [isProvisioning, setIsProvisioning] = useState(false);
 
-  const { mutate: provisionCertificate } = useMutation(onProvisionCertificate, {
+  const { mutate: provisionCertificate } = useMutation({
+    mutationFn: onProvisionCertificate,
+
     onSuccess: () => {
       UserNotification.success('Started certificate provisioning successfully');
-      queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_OVERVIEW_QUERY_KEY });
     },
+
     onError: (error) => {
       UserNotification.error(`Starting certificate provisioning failed with error: ${error}`);
-      queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_OVERVIEW_QUERY_KEY });
       setIsProvisioning(false);
     },
   });
@@ -69,10 +73,10 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
         <Space h="sm" />
       )}
       <Group>
-        <Button onClick={() => onSubmit()} disabled={!dataNodes.length || isProvisioning}>
+        <Button bsStyle="info" onClick={() => onSubmit()} disabled={!dataNodes.length || isProvisioning}>
           {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
         </Button>
-        <Button onClick={() => onSkipProvisioning()} variant="light" disabled={isProvisioning}>
+        <Button onClick={() => onSkipProvisioning()} disabled={isProvisioning}>
           Skip provisioning
         </Button>
       </Group>

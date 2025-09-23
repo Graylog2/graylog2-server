@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import { List } from 'immutable';
 
+import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import Grantee from 'logic/permissions/Grantee';
@@ -65,8 +65,6 @@ describe('<SettingsSection />', () => {
     render(<SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
     const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
-    const timeoutUnitSelect = screen.getByLabelText('Timeout unit');
-    const timezoneSelect = screen.getByLabelText('Time Zone');
     const submitButton = screen.getByText('Update Settings');
 
     expect(timeoutAmountInput).toHaveValue(10);
@@ -75,9 +73,8 @@ describe('<SettingsSection />', () => {
 
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
 
-    await selectEvent.select(timeoutUnitSelect, 'Days');
-
-    await selectEvent.select(timezoneSelect, 'Vancouver');
+    await selectEvent.chooseOption('Timeout unit', 'Days');
+    await selectEvent.chooseOption('Time Zone', 'Vancouver');
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));

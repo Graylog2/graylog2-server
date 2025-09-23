@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import upperCase from 'lodash/upperCase';
 
@@ -30,6 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const modalTitle = 'Create new widget';
 
@@ -54,7 +55,7 @@ const ButtonInner = styled.div`
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   white-space: break-spaces;
   text-align: center;
   gap: 0.3rem;
@@ -77,6 +78,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const dispatch = useViewsDispatch();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const { setWidgetEditing } = useContext(WidgetFocusContext);
 
   const widgetButtons = useMemo(
     () =>
@@ -90,7 +92,10 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           const newId = generateId();
           const newWidget = func({ view }).toBuilder().id(newId).build();
 
-          return dispatch(addWidget(newWidget, position));
+          const result = await dispatch(addWidget(newWidget, position));
+          await setWidgetEditing(newId);
+
+          return result;
         };
 
         return (
@@ -104,12 +109,12 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           </CreateWidgetButton>
         );
       }),
-    [creators, dispatch, location.pathname, position, sendTelemetry, view],
+    [creators, dispatch, location.pathname, position, sendTelemetry, setWidgetEditing, view],
   );
 
   return (
     <Modal onHide={onCancel} show>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>

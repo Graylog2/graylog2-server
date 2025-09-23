@@ -17,6 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -28,9 +29,10 @@ import static org.graylog2.plugin.security.Permission.create;
 
 public class RestPermissions implements PluginPermissions {
     /**
-     * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
+     * These should all be in the form of "domain:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
+    public static final String API_BROWSER_READ = "api_browser:read";
     public static final String AUTH_HTTP_HEADER_CONFIG_EDIT = "authhttpheaderconfig:edit";
     public static final String AUTH_HTTP_HEADER_CONFIG_READ = "authhttpheaderconfig:read";
     public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
@@ -49,6 +51,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
     public static final String CLUSTER_CONFIG_ENTRY_EDIT = "clusterconfigentry:edit";
     public static final String CLUSTER_CONFIG_ENTRY_READ = "clusterconfigentry:read";
+    public static final String CAPABILITIES_READ = "capabilities:read";
+    public static final String CLUSTER_CONFIGURATION_READ = "clusterconfiguration:read";
     public static final String CONTENT_PACK_CREATE = "contentpack:create";
     public static final String CONTENT_PACK_DELETE = "contentpack:delete";
     public static final String CONTENT_PACK_READ = "contentpack:read";
@@ -91,6 +95,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEXSETS_DELETE = "indexsets:delete";
     public static final String INDEXSETS_EDIT = "indexsets:edit";
     public static final String INDEXSETS_READ = "indexsets:read";
+    public static final String INDEXSETS_FIELD_RESTRICTIONS_EDIT = "indexsets_field_restrictions:edit";
     public static final String INDICES_CHANGESTATE = "indices:changestate";
     public static final String INDICES_DELETE = "indices:delete";
     public static final String INDICES_FAILURES = "indices:failures";
@@ -100,6 +105,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INPUTS_EDIT = "inputs:edit";
     public static final String INPUTS_READ = "inputs:read";
     public static final String INPUTS_TERMINATE = "inputs:terminate";
+    public static final String INPUT_TYPES_CREATE = "input_types:create";
     public static final String JOURNAL_EDIT = "journal:edit";
     public static final String JOURNAL_READ = "journal:read";
     public static final String JVMSTATS_READ = "jvmstats:read";
@@ -175,8 +181,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEX_SET_TEMPLATES_DELETE = "indexset_templates:delete";
     public static final String INDEX_SET_TEMPLATES_EDIT = "indexset_templates:edit";
     public static final String INDEX_SET_TEMPLATES_READ = "indexset_templates:read";
-    public static final String URL_WHITELIST_READ = "urlwhitelist:read";
-    public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
+    public static final String URL_ALLOWLIST_READ = "urlallowlist:read";
+    public static final String URL_ALLOWLIST_WRITE = "urlallowlist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
     public static final String USERS_READ = "users:read";
@@ -188,11 +194,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
-    // This is a special permission that ONLY works with GRNs as ID/target
-    // TODO does this belong here?
-    public static final String ENTITY_OWN = "entity:own";
-
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
+            .add(create(API_BROWSER_READ, ""))
             .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
             .add(create(AUTH_HTTP_HEADER_CONFIG_READ, ""))
             .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
@@ -203,6 +206,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(AUTH_SERVICE_GLOBAL_CONFIG_EDIT, ""))
             .add(create(AUTH_SERVICE_TEST_BACKEND_EXECUTE, ""))
             .add(create(BUFFERS_READ, ""))
+            .add(create(CAPABILITIES_READ, ""))
             .add(create(CONTENT_PACK_CREATE, ""))
             .add(create(CONTENT_PACK_DELETE, ""))
             .add(create(CONTENT_PACK_READ, ""))
@@ -212,9 +216,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(CLUSTER_CONFIG_ENTRY_DELETE, ""))
             .add(create(CLUSTER_CONFIG_ENTRY_EDIT, ""))
             .add(create(CLUSTER_CONFIG_ENTRY_READ, ""))
+            .add(create(CLUSTER_CONFIGURATION_READ, ""))
             .add(create(DASHBOARDS_CREATE, ""))
-            .add(create(DASHBOARDS_EDIT, ""))
-            .add(create(DASHBOARDS_READ, ""))
+            .add(create(DASHBOARDS_EDIT, "").withManageCapabilityFor(GRNTypes.DASHBOARD))
+            .add(create(DASHBOARDS_READ, "").withViewCapabilityFor(GRNTypes.DASHBOARD))
             .add(create(DATANODE_READ, ""))
             .add(create(DATANODE_REMOVE, ""))
             .add(create(DATANODE_RESET, ""))
@@ -234,14 +239,14 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DEFLECTOR_READ, ""))
             .add(create(LICENSEINFOS_READ, ""))
             .add(create(EVENT_DEFINITIONS_CREATE, ""))
-            .add(create(EVENT_DEFINITIONS_DELETE, ""))
-            .add(create(EVENT_DEFINITIONS_EDIT, ""))
-            .add(create(EVENT_DEFINITIONS_EXECUTE, ""))
-            .add(create(EVENT_DEFINITIONS_READ, ""))
+            .add(create(EVENT_DEFINITIONS_DELETE, "").withOwnCapabilityFor(GRNTypes.EVENT_DEFINITION))
+            .add(create(EVENT_DEFINITIONS_EDIT, "").withManageCapabilityFor(GRNTypes.EVENT_DEFINITION))
+            .add(create(EVENT_DEFINITIONS_EXECUTE, "").withManageCapabilityFor(GRNTypes.EVENT_DEFINITION))
+            .add(create(EVENT_DEFINITIONS_READ, "").withViewCapabilityFor(GRNTypes.EVENT_DEFINITION))
             .add(create(EVENT_NOTIFICATIONS_CREATE, ""))
-            .add(create(EVENT_NOTIFICATIONS_DELETE, ""))
-            .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
-            .add(create(EVENT_NOTIFICATIONS_READ, ""))
+            .add(create(EVENT_NOTIFICATIONS_DELETE, "").withOwnCapabilityFor(GRNTypes.EVENT_NOTIFICATION))
+            .add(create(EVENT_NOTIFICATIONS_EDIT, "").withManageCapabilityFor(GRNTypes.EVENT_NOTIFICATION))
+            .add(create(EVENT_NOTIFICATIONS_READ, "").withViewCapabilityFor(GRNTypes.EVENT_NOTIFICATION))
             .add(create(FIELDNAMES_READ, ""))
             .add(create(GRANTS_OVERVIEW_READ, ""))
             .add(create(INDEXERCLUSTER_READ, ""))
@@ -264,6 +269,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INPUTS_EDIT, ""))
             .add(create(INPUTS_READ, ""))
             .add(create(INPUTS_TERMINATE, ""))
+            .add(create(INPUT_TYPES_CREATE, ""))
             .add(create(JOURNAL_EDIT, ""))
             .add(create(JOURNAL_READ, ""))
             .add(create(JVMSTATS_READ, ""))
@@ -288,9 +294,9 @@ public class RestPermissions implements PluginPermissions {
             .add(create(NOTIFICATIONS_DELETE, ""))
             .add(create(NOTIFICATIONS_READ, ""))
             .add(create(OUTPUTS_CREATE, ""))
-            .add(create(OUTPUTS_EDIT, ""))
-            .add(create(OUTPUTS_READ, ""))
-            .add(create(OUTPUTS_TERMINATE, ""))
+            .add(create(OUTPUTS_EDIT, "").withManageCapabilityFor(GRNTypes.OUTPUT))
+            .add(create(OUTPUTS_READ, "").withViewCapabilityFor(GRNTypes.OUTPUT))
+            .add(create(OUTPUTS_TERMINATE, "").withOwnCapabilityFor(GRNTypes.OUTPUT))
             .add(create(PROCESSING_CHANGESTATE, ""))
             .add(create(ROLES_CREATE, ""))
             .add(create(ROLES_DELETE, ""))
@@ -303,10 +309,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(STREAM_OUTPUTS_CREATE, ""))
             .add(create(STREAM_OUTPUTS_DELETE, ""))
             .add(create(STREAM_OUTPUTS_READ, ""))
-            .add(create(STREAMS_CHANGESTATE, ""))
+            .add(create(STREAMS_CHANGESTATE, "").withManageCapabilityFor(GRNTypes.STREAM))
             .add(create(STREAMS_CREATE, ""))
-            .add(create(STREAMS_EDIT, ""))
-            .add(create(STREAMS_READ, ""))
+            .add(create(STREAMS_EDIT, "").withManageCapabilityFor(GRNTypes.STREAM))
+            .add(create(STREAMS_READ, "").withViewCapabilityFor(GRNTypes.STREAM))
             .add(create(SYSTEM_READ, ""))
             .add(create(SYSTEMJOBS_CREATE, ""))
             .add(create(SYSTEMJOBS_DELETE, ""))
@@ -317,11 +323,11 @@ public class RestPermissions implements PluginPermissions {
             .add(create(THREADS_DUMP, ""))
             .add(create(PROCESSBUFFER_DUMP, ""))
             .add(create(THROUGHPUT_READ, ""))
-            .add(create(URL_WHITELIST_READ, ""))
-            .add(create(URL_WHITELIST_WRITE, ""))
+            .add(create(URL_ALLOWLIST_READ, ""))
+            .add(create(URL_ALLOWLIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
-            .add(create(USERS_EDIT, ""))
-            .add(create(USERS_READ, ""))
+            .add(create(USERS_EDIT, "").withManageCapabilityFor(GRNTypes.USER))
+            .add(create(USERS_READ, "").withViewCapabilityFor(GRNTypes.USER))
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
@@ -329,9 +335,9 @@ public class RestPermissions implements PluginPermissions {
             .add(create(USERS_TOKENCREATE, ""))
             .add(create(USERS_TOKENLIST, ""))
             .add(create(USERS_TOKENREMOVE, ""))
-            .add(create(SEARCH_FILTERS_READ, ""))
-            .add(create(SEARCH_FILTERS_EDIT, ""))
-            .add(create(SEARCH_FILTERS_DELETE, ""))
+            .add(create(SEARCH_FILTERS_READ, "").withViewCapabilityFor(GRNTypes.SEARCH_FILTER))
+            .add(create(SEARCH_FILTERS_EDIT, "").withManageCapabilityFor(GRNTypes.SEARCH_FILTER))
+            .add(create(SEARCH_FILTERS_DELETE, "").withOwnCapabilityFor(GRNTypes.SEARCH_FILTER))
             .add(create(TYPE_MAPPINGS_CREATE, ""))
             .add(create(TYPE_MAPPINGS_DELETE, ""))
             .add(create(TYPE_MAPPINGS_EDIT, ""))
@@ -357,7 +363,8 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_READ,
             METRICS_READ,
             SYSTEM_READ,
-            THROUGHPUT_READ
+            THROUGHPUT_READ,
+            DATANODE_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
@@ -369,13 +376,19 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.DASHBOARDS_CREATE
             )),
             BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
-                    RestPermissions.EVENT_DEFINITIONS_CREATE
+                    RestPermissions.EVENT_DEFINITIONS_CREATE, RestPermissions.LOOKUP_TABLES_READ
             )),
             BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE
             )),
             BuiltinRole.create("User Inspector", "Allows listing all user accounts (built-in)", ImmutableSet.of(
                     RestPermissions.USERS_READ, RestPermissions.USERS_LIST
+            )),
+            BuiltinRole.create("Cluster Configuration Reader", "Allows viewing the Cluster Configuration page", ImmutableSet.of(
+                    RestPermissions.CLUSTER_CONFIGURATION_READ
+            )),
+            BuiltinRole.create("API Browser Reader", "Allows viewing the API browser page", ImmutableSet.of(
+                    RestPermissions.API_BROWSER_READ
             ))
     ).build();
 

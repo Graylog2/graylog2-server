@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Row, Col } from 'components/bootstrap';
 import CreateStreamButton from 'components/streams/CreateStreamButton';
@@ -24,23 +25,28 @@ import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
+import useStreamMutations from 'hooks/useStreamMutations';
+import { KEY_PREFIX } from 'components/streams/hooks/useStreams';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const sendTelemetry = useSendTelemetry();
+  const { createStream } = useStreamMutations();
+  const queryClient = useQueryClient();
 
-  const onSave = (stream: Stream) => {
+  const onSave = (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });
 
-    return StreamsStore.save(stream, () => {
+    return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
     });
   };
 

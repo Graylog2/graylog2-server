@@ -26,31 +26,39 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
 import usePluginList from 'hooks/usePluginList';
+import useProductName from 'brand-customization/useProductName';
 
 const ShowNodePage = () => {
+  const productName = useProductName();
   const { nodeId } = useParams<{ nodeId: string }>();
   const { inputDescriptions } = useStore(InputTypesStore);
   const { nodes } = useStore(NodesStore);
   const { clusterOverview } = useStore(ClusterOverviewStore);
   const { pluginList, isLoading: isLoadingPlugins } = usePluginList(nodeId);
-  const { data: jvmInformation } = useQuery(['jvm', nodeId], () => ClusterOverviewStore.jvm(nodeId));
-  const { data: inputStates } = useQuery(['inputs', 'states', nodeId], () =>
-    InputStatesStore.list().then((inputStates) => {
-      // We only want the input states for the current node
-      const inputIds = Object.keys(inputStates);
-      const filteredInputStates = [];
+  const { data: jvmInformation } = useQuery({
+    queryKey: ['jvm', nodeId],
+    queryFn: () => ClusterOverviewStore.jvm(nodeId),
+  });
+  const { data: inputStates } = useQuery({
+    queryKey: ['inputs', 'states', nodeId],
 
-      inputIds.forEach((inputId) => {
-        const inputObject = inputStates[inputId][nodeId];
+    queryFn: () =>
+      InputStatesStore.list().then((newInputStates) => {
+        // We only want the input states for the current node
+        const inputIds = Object.keys(newInputStates);
+        const filteredInputStates = [];
 
-        if (inputObject) {
-          filteredInputStates.push(inputObject);
-        }
-      });
+        inputIds.forEach((inputId) => {
+          const inputObject = newInputStates[inputId][nodeId];
 
-      return filteredInputStates;
-    }),
-  );
+          if (inputObject) {
+            filteredInputStates.push(inputObject);
+          }
+        });
+
+        return filteredInputStates;
+      }),
+  });
 
   const systemOverview = clusterOverview?.[nodeId];
   const node = nodes?.[nodeId];
@@ -71,7 +79,7 @@ const ShowNodePage = () => {
       <div>
         <PageHeader title={title} actions={<NodeMaintenanceDropdown node={node} />}>
           <span>
-            This page shows details of a Graylog server node that is active and reachable in your cluster.
+            This page shows details of a {productName} server node that is active and reachable in your cluster.
             <br />
             {node.is_leader ? (
               <span>This is the leader node.</span>

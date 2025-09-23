@@ -16,10 +16,9 @@
  */
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { creatableListField, listField } from 'fixtures/configurationforms';
-import customSelectEvent from 'helpers/selectEvent';
 
 import ListField from './ListField';
 
@@ -43,7 +42,7 @@ describe('<ListField>', () => {
     render(<SUT />);
 
     const fieldLabel = await screen.findByText(`${listField.human_name} (optional)`);
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
+    const select = await selectEvent.findSelectInput(listField.human_name);
 
     expect(fieldLabel).toBeInTheDocument();
     expect(select).toBeInTheDocument();
@@ -52,14 +51,11 @@ describe('<ListField>', () => {
   it('should display options from attributes', async () => {
     render(<SUT />);
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
-
     expect(screen.queryByText('uno')).not.toBeInTheDocument();
     expect(screen.queryByText('dos')).not.toBeInTheDocument();
 
-    await selectEvent.openMenu(select);
+    await selectEvent.assertOptionExists(listField.human_name, 'uno');
 
-    expect(await screen.findByText('uno')).toBeInTheDocument();
     expect(screen.getByText('dos')).toBeInTheDocument();
   });
 
@@ -75,9 +71,7 @@ describe('<ListField>', () => {
 
     render(<SUT onChange={updateFunction} />);
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
-
-    await selectEvent.select(select, ['uno', 'dos']);
+    await selectEvent.chooseOption(listField.human_name, ['uno', 'dos']);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['one', 'two']));
   });
 
@@ -86,7 +80,7 @@ describe('<ListField>', () => {
 
     const { container } = render(<SUT onChange={updateFunction} value={['one']} />);
 
-    customSelectEvent.clearAll(container, 'list-field-select');
+    selectEvent.clearAll(container, 'list-field-select');
 
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', []));
   });
@@ -96,8 +90,7 @@ describe('<ListField>', () => {
 
     render(<SUT field={creatableListField} onChange={updateFunction} />);
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
-
+    const select = await selectEvent.findSelectInput(listField.human_name);
     await selectEvent.create(select, 'three');
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['three']));
   });

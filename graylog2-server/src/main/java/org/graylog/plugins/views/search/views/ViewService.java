@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
@@ -25,10 +25,11 @@ import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.indices.MongoDbIndexTools;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -55,8 +56,9 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
-    private final EntityOwnershipService entityOwnerShipService;
+    private final EntityRegistrar entityRegistrar;
     private final ViewSummaryService viewSummaryService;
+    private final EntitySourceService entitySourceService;
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
     private final MongoUtils<ViewDTO> mongoUtils;
@@ -64,18 +66,20 @@ public class ViewService implements ViewUtils<ViewDTO> {
     @Inject
     protected ViewService(ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
-                          EntityOwnershipService entityOwnerShipService,
+                          EntityRegistrar entityRegistrar,
                           ViewSummaryService viewSummaryService,
+                          EntitySourceService entitySourceService,
                           MongoCollections mongoCollections) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
-        this.entityOwnerShipService = entityOwnerShipService;
+        this.entityRegistrar = entityRegistrar;
         this.viewSummaryService = viewSummaryService;
+        this.entitySourceService = entitySourceService;
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
 
-        new MongoDbIndexTools<>(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
+        mongoCollections.indexUtils(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
 
     private PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
@@ -195,19 +199,23 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public Collection<ViewDTO> forSearch(String searchId) {
-        return MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))
-                .map(this::requirementsForView)
-                .collect(Collectors.toSet());
+        try (final var stream = MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))) {
+            return stream
+                    .map(this::requirementsForView)
+                    .collect(Collectors.toSet());
+        }
     }
 
     public Optional<ViewDTO> get(String id) {
         return mongoUtils.getById(id).map(this::requirementsForView);
     }
 
+    @MustBeClosed
     public Stream<ViewDTO> streamAll() {
         return MongoUtils.stream(collection.find()).map(this::requirementsForView);
     }
 
+    @MustBeClosed
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
         return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet))).map(this::requirementsForView);
     }
@@ -215,9 +223,9 @@ public class ViewService implements ViewUtils<ViewDTO> {
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
         final ViewDTO savedObject = save(viewDTO);
         if (viewDTO.type().equals(ViewDTO.Type.DASHBOARD)) {
-            entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
+            entityRegistrar.registerNewDashboard(savedObject.id(), user);
         } else {
-            entityOwnerShipService.registerNewSearch(savedObject.id(), user);
+            entityRegistrar.registerNewSearch(savedObject.id(), user);
         }
         return savedObject;
     }
@@ -237,12 +245,13 @@ public class ViewService implements ViewUtils<ViewDTO> {
     public void delete(String id) {
         get(id).ifPresent(view -> {
             if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
-                entityOwnerShipService.unregisterDashboard(id);
+                entityRegistrar.unregisterDashboard(id);
             } else {
-                entityOwnerShipService.unregisterSearch(id);
+                entityRegistrar.unregisterSearch(id);
             }
         });
         mongoUtils.deleteById(id);
+        entitySourceService.deleteByEntityId(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {

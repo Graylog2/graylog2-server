@@ -20,12 +20,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class KinesisLogEntry {
 
     private static final String KINESIS_STREAM = "kinesis_stream";
@@ -33,6 +34,9 @@ public abstract class KinesisLogEntry {
     private static final String LOG_STREAM = "log_stream";
     private static final String TIMESTAMP = "timestamp";
     private static final String MESSAGE = "message";
+    private static final String OWNER = "owner";
+    private static final String MESSAGE_TYPE = "message_type";
+    private static final String SUBSCRIPTION_FILTERS = "subscription_filters";
 
     @JsonProperty(KINESIS_STREAM)
     public abstract String kinesisStream();
@@ -54,12 +58,27 @@ public abstract class KinesisLogEntry {
     @JsonProperty(MESSAGE)
     public abstract String message();
 
+    @JsonProperty(OWNER)
+    public abstract String owner();
+
+    @Nullable
+    @JsonProperty(MESSAGE_TYPE)
+    public abstract String messageType();
+
+    @Nullable
+    @JsonProperty(SUBSCRIPTION_FILTERS)
+    public abstract List<String> subscriptionFilters();
+
     @JsonCreator
     public static KinesisLogEntry create(@JsonProperty(KINESIS_STREAM) String kinesisStream,
                                          @JsonProperty(LOG_GROUP) String logGroup,
                                          @JsonProperty(LOG_STREAM) String logStream,
                                          @JsonProperty(TIMESTAMP) DateTime timestamp,
-                                         @JsonProperty(MESSAGE) String message) {
-        return new AutoValue_KinesisLogEntry(kinesisStream, logGroup, logStream, timestamp, message);
+                                         @JsonProperty(MESSAGE) String message,
+                                         @JsonProperty(OWNER) String owner,
+                                         @JsonProperty(MESSAGE_TYPE) String messageType,
+                                         @JsonProperty(SUBSCRIPTION_FILTERS) List<String> subscriptionFilters) {
+        return new AutoValue_KinesisLogEntry(kinesisStream, logGroup, logStream, timestamp, message,
+                owner, messageType, subscriptionFilters);
     }
 }

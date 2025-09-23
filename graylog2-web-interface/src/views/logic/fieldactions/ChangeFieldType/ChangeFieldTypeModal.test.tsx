@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
@@ -28,7 +28,6 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
-import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
@@ -191,12 +190,7 @@ describe('ChangeFieldTypeModal', () => {
   it('Shows type options', async () => {
     renderChangeFieldTypeModal({});
 
-    await suppressConsole(async () => {
-      const typeSelect = await screen.findByLabelText(/select field type for field/i);
-      selectEvent.openMenu(typeSelect);
-    });
-
-    await screen.findByText('Boolean');
+    await selectEvent.assertOptionExists('select field type for field', 'Boolean');
   });
 
   it('Shows index sets data', async () => {
@@ -213,9 +207,7 @@ describe('ChangeFieldTypeModal', () => {
   it('run putFieldTypeMutationMock with selected type and indexes', async () => {
     renderChangeFieldTypeModal({});
 
-    const typeSelect = await screen.findByLabelText(/select field type for field/i);
-    selectEvent.openMenu(typeSelect);
-    await selectEvent.select(typeSelect, 'Number(int)');
+    await selectEvent.chooseOption('select field type for field', 'Number(int)');
 
     const submit = await screen.findByTitle(/change field type/i);
 
@@ -236,9 +228,7 @@ describe('ChangeFieldTypeModal', () => {
   it('run putFieldTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
     renderChangeFieldTypeModal({ initialSelectedIndexSets: ['id-2'] });
 
-    const typeSelect = await screen.findByLabelText(/select field type for field/i);
-    selectEvent.openMenu(typeSelect);
-    await selectEvent.select(typeSelect, 'Number(int)');
+    await selectEvent.chooseOption('select field type for field', 'Number(int)');
 
     const submit = await screen.findByTitle(/change field type/i);
 

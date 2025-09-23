@@ -18,7 +18,8 @@ import React, { useCallback, useMemo } from 'react';
 import mapValues from 'lodash/mapValues';
 
 import type { Checked } from 'views/logic/valueactions/createEventDefinition/types';
-import { ExpandableList, ExpandableListItem } from 'components/common';
+import { ExpandableCheckboxListItem } from 'components/common';
+import { Input } from 'components/bootstrap';
 
 const CHECKBOX_STATES = {
   Checked: 'Checked',
@@ -30,7 +31,7 @@ type Props = {
   groupLabel: string;
   checked: Checked;
   labels: { [name: string]: JSX.Element };
-  onChange: (Checked) => void;
+  onChange: (newChecked: Checked) => void;
 };
 
 const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
@@ -70,26 +71,23 @@ const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
   );
 
   return (
-    <ExpandableListItem
+    <ExpandableCheckboxListItem
       header={groupLabel}
-      expanded
-      padded={false}
+      value={groupLabel}
       checked={value === CHECKBOX_STATES.Checked}
-      indetermined={value === CHECKBOX_STATES.Indeterminate}
+      indeterminate={value === CHECKBOX_STATES.Indeterminate}
       onChange={groupOnChange}>
-      <ExpandableList>
-        {Object.entries(checked).map(([key, isChecked]) => (
-          <ExpandableListItem
-            expandable={false}
-            header={labels[key]}
-            padded={false}
-            key={key}
-            checked={isChecked}
-            onChange={(e) => itemOnChange(key, e)}
-          />
-        ))}
-      </ExpandableList>
-    </ExpandableListItem>
+      {Object.entries(checked).map(([key, isChecked]) => (
+        <Input
+          type="checkbox"
+          label={labels[key]}
+          formGroupClassName="no-bm"
+          key={key}
+          checked={isChecked}
+          onChange={(e) => itemOnChange(key, e)}
+        />
+      ))}
+    </ExpandableCheckboxListItem>
   );
 };
 

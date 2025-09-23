@@ -24,6 +24,7 @@ import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackListItem from 'components/content-packs/components/ContentPackListItem';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import type { ContentPackInstallation, ContentPackMetadata } from './Types';
 
@@ -31,7 +32,7 @@ type Props = {
   contentPacks?: Array<ContentPackInstallation>;
   contentPackMetadata?: ContentPackMetadata;
   onDeletePack?: (id: string) => void;
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
+  onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
 const StyledPageSizeSelect = styled(PageSizeSelect)(
@@ -120,10 +121,8 @@ const ContentPacksList = ({
             id="content-packs-filter"
             label="Filter"
             data={contentPacks}
-            displayKey="name"
             onDataFiltered={filterContentPacks}
             searchInKeys={['name', 'summary']}
-            filterSuggestions={[]}
           />
         </Col>
         <Col md={5}>{pagination}</Col>
