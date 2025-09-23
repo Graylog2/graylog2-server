@@ -97,7 +97,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          PluginJarsProvider datanodePluginJarsProvider) {
 
         final Stopwatch sw = Stopwatch.createStarted();
-        LOG.debug("Creating Backend services {} {} flags <{}>", version, mongodbVersion, enabledFeatureFlags);
+        LOG.debug("Creating Backend services {} MongoDB:{} flags <{}>", version, mongodbVersion.version(), enabledFeatureFlags);
         final Services services = servicesProvider.getServices(version, mongodbVersion, enabledFeatureFlags, env, datanodePluginJarsProvider);
         LOG.debug(" creating backend services took " + sw.elapsed());
 
