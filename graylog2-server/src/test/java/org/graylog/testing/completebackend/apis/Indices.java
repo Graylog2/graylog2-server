@@ -68,6 +68,7 @@ public class Indices implements GraylogRestApi {
                 .assertThat().body("id", notNullValue())
                 .extract().body().jsonPath().getString("id");
         waitForIndexNames(id);
+        waitForDeflector(id);
         return id;
     }
 
@@ -137,6 +138,28 @@ public class Indices implements GraylogRestApi {
                 .retryIfResult(List::isEmpty)
                 .build()
                 .call(() -> listOpenIndicesWithEmptyResultOnError(indexSetId));
+    }
+
+    private boolean isDeflectorUp(String indexSetId) {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/overview/" + indexSetId);
+        if (response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("deflector.is_up", Boolean.class);
+        } else {
+            return false;
+        }
+    }
+
+    private void waitForDeflector(String indexSetId) throws ExecutionException, RetryException {
+        RetryerBuilder.<Boolean>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(result -> result == null || result.equals(false))
+                .build()
+                .call(() -> isDeflectorUp(indexSetId));
     }
 
     public void rotateIndexSet(String indexSetId) {
