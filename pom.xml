@@ -158,7 +158,7 @@
         <jsoup.version>1.21.2</jsoup.version>
         <kafka.version>4.1.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.25.1</log4j.version>
+        <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.2</lucene.version>
         <metrics.version>4.2.37</metrics.version>
         <mongodb-driver.version>5.6.0</mongodb-driver.version>
