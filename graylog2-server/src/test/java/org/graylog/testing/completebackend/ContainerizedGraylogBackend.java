@@ -54,6 +54,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     private final Services services;
     private final NodeInstance node;
+    private final boolean stopServicesOnClose;
 
     private ContainerizedGraylogBackend(Services services,
                                         final List<URL> mongoDBFixtures,
@@ -63,6 +64,9 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                         final boolean preImportLicense,
                                         Map<String, String> configParams) {
         this.services = services;
+        // We don't want services for tests with custom flags or config params to be re-used, so we stop them
+        // when the backend is closed.
+        this.stopServicesOnClose = !enabledFeatureFlags.isEmpty() || !configParams.isEmpty();
 
         var mongoDB = services.getMongoDBInstance();
         LOG.info("Running backend with MongoDB version {} (instance: {})", mongoDB.version(), mongoDB.instanceId());
@@ -181,8 +185,17 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public void close() {
         node.close();
-        // Wipe SearchDB and MongoDB for next test run
-        services.cleanUp();
+        if (stopServicesOnClose) {
+            try {
+                services.close();
+            } catch (Exception e) {
+                LOG.error("Error closing backend services", e);
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Wipe SearchDB and MongoDB for next test run
+            services.cleanUp();
+        }
     }
 
     @Override
