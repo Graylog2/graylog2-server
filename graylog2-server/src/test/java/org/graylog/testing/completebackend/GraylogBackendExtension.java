@@ -108,7 +108,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     public void beforeAll(ExtensionContext context) throws Exception {
         final Optional<GraylogBackendConfiguration> backendConfiguration =
                 AnnotationSupport.findAnnotation(context.getRequiredTestClass(), GraylogBackendConfiguration.class);
-        LOG.info("Before test: {} backend config: {}", context.getRequiredTestClass().getName(), backendConfiguration);
+        LOG.debug("Before test: {} backend config: {}", context.getRequiredTestClass().getName(), backendConfiguration);
 
         final var store = context.getStore(NAMESPACE);
         final var rootStore = context.getRoot().getStore(NAMESPACE);
