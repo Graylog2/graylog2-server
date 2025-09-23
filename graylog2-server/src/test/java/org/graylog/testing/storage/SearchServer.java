@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix;
+package org.graylog.testing.storage;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.storage.SearchVersion;

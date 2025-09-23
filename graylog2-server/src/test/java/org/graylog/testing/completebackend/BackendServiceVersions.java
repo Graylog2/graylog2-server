@@ -18,8 +18,8 @@ package org.graylog.testing.completebackend;
 
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.mongodb.MongoDBVersion;
+import org.graylog.testing.storage.SearchServer;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.SearchVersion.Distribution;
 import org.slf4j.Logger;

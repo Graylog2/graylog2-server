@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch2.testing;
 
 import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.storage.SearchServer;
 import org.graylog2.storage.SearchVersion;
 
 public class OpenSearchInstanceBuilder extends SearchServerBuilder<OpenSearchInstance> {
