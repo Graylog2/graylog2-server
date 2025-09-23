@@ -179,6 +179,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         node.close();
         if (stopServicesOnClose) {
             try {
+                LOG.info("Closing services");
                 services.close();
             } catch (Exception e) {
                 LOG.error("Error closing backend services", e);
