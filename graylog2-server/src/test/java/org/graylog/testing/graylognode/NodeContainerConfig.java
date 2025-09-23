@@ -41,7 +41,6 @@ public class NodeContainerConfig {
     public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
     public final boolean enableDebugging;
-    public final boolean skipPackaging;
     public final PluginJarsProvider pluginJarsProvider;
     public final MavenProjectDirProvider mavenProjectDirProvider;
     private final List<String> enabledFeatureFlags;
@@ -65,7 +64,6 @@ public class NodeContainerConfig {
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
-        this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
         this.pluginJarsProvider = pluginJarsProvider;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
@@ -83,7 +81,7 @@ public class NodeContainerConfig {
     }
 
     public Integer[] portsToExpose() {
-        int[] allPorts = new int[] {GELF_HTTP_PORT};
+        int[] allPorts = new int[]{GELF_HTTP_PORT};
         allPorts = ArrayUtils.add(allPorts, 0, API_PORT);
 
         if (enableDebugging) {

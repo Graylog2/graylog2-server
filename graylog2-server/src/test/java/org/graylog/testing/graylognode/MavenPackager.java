@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog.testing.graylognode.NodeContainerConfig.flagFromEnvVar;
+
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
     private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip -Dskip.artifact.assembly ";
@@ -41,6 +43,10 @@ public class MavenPackager {
     }
 
     public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
+        if (flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING")) {
+            LOG.info("Skipping packaging");
+            return;
+        }
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else if (jarHasBeenPackagedInThisRun) {

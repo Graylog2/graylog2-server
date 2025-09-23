@@ -21,7 +21,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -39,8 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
-
-import static org.graylog.testing.graylognode.NodeContainerConfig.flagFromEnvVar;
 
 /**
  * This backend implements {@link ExtensionContext.Store.CloseableResource} because then we can rely on junit's extension
@@ -71,11 +68,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         var mongoDB = services.getMongoDBInstance();
         LOG.info("Running backend with MongoDB version {} (instance: {})", mongoDB.version(), mongoDB.instanceId());
         mongoDB.importFixtures(mongoDBFixtures);
-
-        var skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
-        if (!skipPackaging) {
-            MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
-        }
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");

@@ -59,11 +59,7 @@ public class NodeContainerFactory {
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         checkBinaries(config);
-        if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(config.mavenProjectDirProvider);
-        } else {
-            LOG.info("Skipping packaging");
-        }
+        MavenPackager.packageJarIfNecessary(config.mavenProjectDirProvider);
         ImageFromDockerfile image = createImage(config);
 
         return createRunningContainer(config, image);

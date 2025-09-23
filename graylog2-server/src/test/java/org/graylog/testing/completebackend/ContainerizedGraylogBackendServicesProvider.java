@@ -19,6 +19,7 @@ package org.graylog.testing.completebackend;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.plugin.Tools;
@@ -94,6 +95,8 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
 
 
         private static Services create(SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
+            // Ensure that Data Node is built before trying to start the search service.
+            MavenPackager.packageJarIfNecessary(new DefaultMavenProjectDirProvider());
 
             try (var executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
                     .setNameFormat("container-startup-thread-%d")
