@@ -56,7 +56,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -335,8 +334,7 @@ public class TeamsEventNotificationTest {
     @Test
     public void testProductNameInDefaultMessage() throws EventNotificationException {
         final var productName = "SuperDuperLog";
-        final var config = new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        final var config = Config.forProductName(productName);
         final var customizationConfig = new CustomizationConfig(config);
 
         final var teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
