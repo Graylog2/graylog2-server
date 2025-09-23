@@ -50,7 +50,12 @@ public class BackendServiceVersions {
         final var version = requireNonNullElse(System.getProperty(SEARCH_SERVER_VERSION_PROPERTY), DEFAULT_SEARCH_SERVER_VERSION);
 
         try {
-            return SearchVersion.create(Distribution.valueOf(distribution.toUpperCase(Locale.US)), Version.parse(version));
+            final var dist = Distribution.valueOf(distribution.toUpperCase(Locale.US));
+            final var parsedVersion = switch (dist) {
+                case ELASTICSEARCH, OPENSEARCH -> Version.parse(version);
+                case DATANODE -> org.graylog2.plugin.Version.CURRENT_CLASSPATH.getVersion();
+            };
+            return SearchVersion.create(dist, parsedVersion);
         } catch (IllegalArgumentException e) {
             final var msg = f("Invalid search server distribution property: \"%s\". Valid values are: %s",
                     SEARCH_SERVER_DISTRIBUTION_PROPERTY, SEARCH_SERVER_DISTRIBUTION_VALUES);
