@@ -44,8 +44,11 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
         super(objectMapper,
                 new TypeReference<>() {},
                 NAME,
-                "Graylog System Information",
-                "Return a summary of the current Graylog system");
+                "Get Graylog System Information",
+                """
+                        Returns system information about the Graylog installation, including
+                        cluster ID, installed version, hostname, timezone, and operating system.
+                        """);
         this.serverStatus = serverStatus;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.leaderElectionService = leaderElectionService;

@@ -19,6 +19,7 @@ package org.graylog.mcp.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.plugin.streams.Stream;
@@ -38,9 +39,9 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
         super(objectMapper,
                 new TypeReference<>() {},
                 NAME,
-                "List all streams available in Graylog",
+                "List all Graylog Streams",
                 """
-                        The streams list.
+                        List all available streams in the Graylog instance..
                         """);
         this.streamService = streamService;
     }
@@ -48,7 +49,9 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     @Override
     public String apply(PermissionHelper permissionHelper, ListStreamsTool.Parameters unused) {
         try (java.util.stream.Stream<Stream> dtos = streamService.streamAllDTOs()) {
-            return new ObjectMapper().writeValueAsString(
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JodaModule());
+            return mapper.writeValueAsString(
                     dtos.filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                             .map(stream -> Map.of(
                                     "id", stream.getId(),
@@ -57,7 +60,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
 //                                    "indexset", stream.getIndexSet() == null ? "Unknown indexset" : stream.getIndexSet().getConfig().title(),
                                     "disabled", stream.getDisabled(),
                                     "matching_type", stream.getMatchingType(),
-                                    "created_at", stream.getCreatedAt().toString(),
+                                    "created_at", stream.getCreatedAt(),
                                     "creator_user_id", stream.getCreatorUserId()
                             ))
                             .toList()
