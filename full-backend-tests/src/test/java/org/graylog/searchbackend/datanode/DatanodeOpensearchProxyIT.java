@@ -22,8 +22,10 @@ import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -35,9 +37,9 @@ import static java.time.Duration.ofSeconds;
 import static org.awaitility.Awaitility.waitAtMost;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             onlyOnDataNode = true,
                              additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")}
 )
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeOpensearchProxyIT {
 
     private GraylogApis apis;
