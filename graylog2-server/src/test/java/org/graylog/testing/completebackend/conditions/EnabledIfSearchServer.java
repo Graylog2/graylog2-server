@@ -24,11 +24,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The annotated test class only runs if the given search server requirements apply.
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface EnabledIfSearchServer {
+    /**
+     * Required search server distribution.
+     */
     SearchVersion.Distribution distribution() default SearchVersion.Distribution.OPENSEARCH;
 
+    /**
+     * Required search server version. Can be a semantic versioning range. (e.g., ">=6.0")
+     */
     String version() default "";
 }
