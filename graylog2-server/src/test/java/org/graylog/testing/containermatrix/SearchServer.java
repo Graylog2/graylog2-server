@@ -19,32 +19,11 @@ package org.graylog.testing.containermatrix;
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.storage.SearchVersion;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
-import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
-
-public enum SearchServer {
-    ES7(ELASTICSEARCH, "7.10.2"),
-    OS1(OPENSEARCH, "1.3.12"),
-    OS2(OPENSEARCH, "2.0.1"),
-    OS2_4(OPENSEARCH, "2.4.1"),
-    OS2_LATEST(OPENSEARCH, "2.19.3"),
-    DATANODE_PRE_52(DATANODE, "5.1.0"),
-    DATANODE_DEV(DATANODE, "5.2.0");
-
+public class SearchServer {
     private static final String DEFAULT_VERSION_STRING = "2.19.3";
 
     public static final SearchVersion DEFAULT_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse(DEFAULT_VERSION_STRING));
 
-    public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2_LATEST;
-
-    private final SearchVersion searchVersion;
-
-    SearchServer(final SearchVersion.Distribution distribution, final String version) {
-        this.searchVersion = SearchVersion.create(distribution, Version.parse(version));
-    }
-
-    public SearchVersion getSearchVersion() {
-        return searchVersion;
+    private SearchServer() {
     }
 }

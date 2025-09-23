@@ -22,7 +22,6 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -67,11 +66,6 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
         this.adapters = new AdaptersES7(elasticsearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         return this;
-    }
-
-    @Override
-    public SearchServer searchServer() {
-        return SearchServer.OS1;
     }
 
     @Override

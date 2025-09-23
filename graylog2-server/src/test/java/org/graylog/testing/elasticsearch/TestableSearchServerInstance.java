@@ -116,7 +116,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
             try {
                 client().cleanUp();
             } catch (Exception e) {
-                LOG.warn("Failed to run cleanup of " + searchServer(), e);
+                LOG.warn("Failed to run cleanup of {} (ID: {})", version, container.getContainerId(), e);
             }
         } else {
             LOG.debug("Cleanup skipped, client already closed");

@@ -22,7 +22,6 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -70,11 +69,6 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     @Override
     protected String imageName() {
         return "docker.elastic.co/elasticsearch/elasticsearch-oss:" + version().version();
-    }
-
-    @Override
-    public SearchServer searchServer() {
-        return SearchServer.ES7;
     }
 
     private RestHighLevelClient buildRestClient() {

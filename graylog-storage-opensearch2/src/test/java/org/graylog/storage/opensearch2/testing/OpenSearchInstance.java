@@ -35,7 +35,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequ
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestClientProvider;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -64,8 +63,6 @@ import java.util.concurrent.TimeUnit;
 
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
-
-    public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private OpenSearchClient openSearchClient;
     private Client client;
@@ -194,11 +191,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     protected String imageName() {
         return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
-    }
-
-    @Override
-    public SearchServer searchServer() {
-        return OPENSEARCH_VERSION;
     }
 
     @Override

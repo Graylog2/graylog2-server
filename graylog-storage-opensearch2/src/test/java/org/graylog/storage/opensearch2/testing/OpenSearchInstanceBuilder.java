@@ -17,9 +17,8 @@
 package org.graylog.storage.opensearch2.testing;
 
 import org.graylog.testing.completebackend.SearchServerBuilder;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog2.storage.SearchVersion;
-
-import static org.graylog.storage.opensearch2.testing.OpenSearchInstance.OPENSEARCH_VERSION;
 
 public class OpenSearchInstanceBuilder extends SearchServerBuilder<OpenSearchInstance> {
     public OpenSearchInstanceBuilder(SearchVersion version) {
@@ -27,7 +26,7 @@ public class OpenSearchInstanceBuilder extends SearchServerBuilder<OpenSearchIns
     }
 
     public static OpenSearchInstanceBuilder builder() {
-        return new OpenSearchInstanceBuilder(OPENSEARCH_VERSION.getSearchVersion());
+        return new OpenSearchInstanceBuilder(SearchServer.DEFAULT_VERSION);
     }
 
     @Override
