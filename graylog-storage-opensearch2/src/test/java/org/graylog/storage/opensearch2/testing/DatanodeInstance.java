@@ -24,6 +24,7 @@ import org.testcontainers.containers.Network;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DatanodeInstance extends OpenSearchInstance {
     private final String mongoDBUri;
@@ -38,8 +39,9 @@ public class DatanodeInstance extends OpenSearchInstance {
                             final String passwordSecret,
                             final String heapSize,
                             final List<String> featureFlags,
+                            final Map<String, String> env,
                             final PluginJarsProvider pluginJarsProvider) {
-        super(cachedInstance, version, hostname, network, heapSize, featureFlags);
+        super(cachedInstance, version, hostname, network, heapSize, featureFlags, env);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.pluginJarsProvider = pluginJarsProvider;

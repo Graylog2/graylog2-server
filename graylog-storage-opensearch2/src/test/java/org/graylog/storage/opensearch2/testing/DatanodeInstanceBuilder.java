@@ -35,6 +35,7 @@ public class DatanodeInstanceBuilder extends SearchServerBuilder<DatanodeInstanc
                 getPasswordSecret(),
                 getHeapSize(),
                 getFeatureFlags(),
+                getEnv(),
                 getDatanodePluginJarsProvider()
         ).init();
     }
