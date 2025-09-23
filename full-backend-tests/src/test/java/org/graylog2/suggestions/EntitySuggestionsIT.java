@@ -19,8 +19,7 @@ package org.graylog2.suggestions;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -28,7 +27,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
-@GraylogBackendConfiguration(searchVersions = SearchServer.OS2_LATEST)
+@GraylogBackendConfiguration
 public class EntitySuggestionsIT {
     private static GraylogApis api;
 
@@ -37,7 +36,7 @@ public class EntitySuggestionsIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsTitlesForDashboards() {
         final var randomIdentifier = RandomStringUtils.secure().nextAlphanumeric(8);
         final var dashboard1 = api.dashboards().createDashboard("First " + randomIdentifier);

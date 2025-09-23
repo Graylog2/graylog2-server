@@ -22,8 +22,7 @@ import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -36,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
 
-@GraylogBackendConfiguration(searchVersions = {SearchServer.OS1})
+@GraylogBackendConfiguration
 public class SessionsResourceIT {
     private static final String SESSIONS_RESOURCE = "/system/sessions";
     private static final String AUTHENTICATION_COOKIE = "authentication";
@@ -66,7 +65,7 @@ public class SessionsResourceIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void failingLoginShouldNotReturnCookieOrToken() {
         given()
                 .spec(makeRequestSpec(api))
@@ -86,7 +85,7 @@ public class SessionsResourceIT {
                 .cookies(Collections.emptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void successfulLoginShouldReturnCookieAndToken() {
         final Response response = given()
                 .spec(makeRequestSpec(api))

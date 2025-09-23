@@ -32,7 +32,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -42,16 +42,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.containermatrix.SearchServer.ES7;
-import static org.graylog.testing.containermatrix.SearchServer.OS1;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-@GraylogBackendConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
+@GraylogBackendConfiguration
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
@@ -64,7 +61,7 @@ public class SearchAggregationsIT {
         api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testZeroPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -83,7 +80,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testZeroPivotsWithLatestMetric() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -102,7 +99,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("latest(http_method)")), equalTo("GET"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -126,7 +123,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUnknownFieldsPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -149,7 +146,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("PUT", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(43));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUnknownFieldsAroundUnknownPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -172,7 +169,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("(Empty Value)", "PUT", "(Empty Value)"), List.of("count()")), equalTo(43));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUnknownFieldFirstPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -196,7 +193,7 @@ public class SearchAggregationsIT {
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAllUnknownFieldsPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -216,7 +213,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("(Empty Value)", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testFindTopPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -237,7 +234,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("GET", "max(took_ms)"), equalTo(5300.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testFindBottomPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -258,7 +255,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("DELETE", "max(took_ms)"), equalTo(104.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowPivotWithDateField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -295,7 +292,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("avg(took_ms)")), equalTo(78.74f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowPivotWithDateFieldAsColumnPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -331,7 +328,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("GET", "avg(took_ms)"), equalTo(63.14883720930233f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleColumnPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -355,7 +352,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testDoesNotReturnRollupWhenDisabled() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -379,7 +376,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), is(nullValue()));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowAndColumnPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -427,7 +424,7 @@ public class SearchAggregationsIT {
                 .body(pathToValue(List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRowAndColumnPivotsWithMissingFields() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -449,7 +446,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("(Empty Value)"), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -496,7 +493,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupleRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -542,7 +539,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedRowPivotsWithSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -597,7 +594,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupleRowPivotsWithSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -635,7 +632,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupleRowPivotsWithMetricsSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -671,7 +668,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedRowPivotsWithMetricsSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -708,7 +705,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTopLevelSeries() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -734,7 +731,7 @@ public class SearchAggregationsIT {
         assertThat(rows).containsExactly(List.of(5300.0f, 36.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoIdenticalSeries() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -763,7 +760,7 @@ public class SearchAggregationsIT {
         assertThat(rows).containsExactly(List.of(5300.0f, 5300.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoIdenticalSeriesOneWithCustomId() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -802,7 +799,7 @@ public class SearchAggregationsIT {
     }
 
     // Percentage Metric tests
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSimplestPercentageMetricWithCount() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -824,7 +821,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(,COUNT)"), equalTo(0.043f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithCountOnField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -846,7 +843,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(http_method,COUNT)"), equalTo(0.043f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithCountOnFieldForColumnPivotOnly() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -868,7 +865,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of(), List.of("PUT", "percentage(http_method,COUNT)")), equalTo(0.043f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithSumOnField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -891,7 +888,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(took_ms,SUM)"), equalTo(0.11320802641605283f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testBooleanFieldsAreReturnedAsTrueOrFalse() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)

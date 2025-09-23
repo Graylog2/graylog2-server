@@ -67,11 +67,11 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         this.lifecycle = lifecycle;
     }
 
-    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, final boolean withMailServerEnabled, final boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
-        var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
+    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+        var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
         return SERVICES_CACHE.computeIfAbsent(lookupKey, (k) -> {
             LOG.debug("No cached services found for key \"{}\", creating new ones.", k);
-            return Services.create(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
+            return Services.create(searchVersion, mongodbVersion, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
         });
     }
 
@@ -94,20 +94,21 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private final WebhookServerContainer webhookServerInstance;
 
 
-        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
-            final Network network = Network.newNetwork();
+        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> envProperties, PluginJarsProvider datanodePluginJarsProvider) {
 
-            final ExecutorService executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
+            try (var executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
                     .setNameFormat("container-startup-thread-%d")
                     .setDaemon(true)
                     .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
-                    .build());
+                    .build())) {
+                final Network network = Network.newNetwork();
 
-            final Future<MongoDBInstance> mongodbFuture = executorService.submit(withStopwatch(() -> MongoDBInstance.createUncachedStarted(network, mongodbVersion), "MongoDB"));
-            final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(withStopwatch(() -> withMailServerEnabled ? MailServerContainer.createStarted(network) : null, "Mailserver"));
-            final Future<WebhookServerContainer> webhookServerContainerFuture = executorService.submit(withStopwatch(() -> withWebhookServerEnabled ? WebhookServerContainer.createStarted(network) : null, "WebhookTester"));
-
-            try {
+                final Future<MongoDBInstance> mongodbFuture = executorService.submit(
+                        withStopwatch(() -> MongoDBInstance.createUncachedStarted(network, mongodbVersion), "MongoDB"));
+                final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(
+                        withStopwatch(() -> MailServerContainer.createStarted(network), "Mailserver"));
+                final Future<WebhookServerContainer> webhookServerContainerFuture = executorService.submit(
+                        withStopwatch(() -> WebhookServerContainer.createStarted(network), "WebhookTester"));
                 final MongoDBInstance mongoDB = mongodbFuture.get();
                 final MailServerContainer emailServerInstance = mailServerContainerFuture.get();
                 final WebhookServerContainer webhookServerInstance = webhookServerContainerFuture.get();
@@ -115,24 +116,25 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                 executorService.shutdownNow();
 
                 final Stopwatch searchServerSw = Stopwatch.createStarted();
-                final var builder = SearchServerInstanceProvider.getBuilderFor(searchVersion).orElseThrow(() -> new UnsupportedOperationException("Search version " + searchVersion + " not supported."));
+                final var builder = SearchServerInstanceProvider.getBuilderFor(searchVersion)
+                        .orElseThrow(() -> new UnsupportedOperationException(
+                                "Search version " + searchVersion + " not supported."));
                 LOG.debug("Starting search server: {}", searchVersion);
                 SearchServerInstance searchServer = builder
                         .cachedInstance(false) // This service layer caches OpenSearch instances itself
                         .network(network)
-                        .mongoDbUri(mongoDB.internalUri())
+                        .mongoDbUri(MongoDBInstance.internalUri())
                         .passwordSecret(PASSWORD_SECRET)
                         .rootPasswordSha2(ROOT_PASSWORD_SHA_2)
                         .featureFlags(enabledFeatureFlags)
                         .env(envProperties)
                         .datanodePluginJarsProvider(datanodePluginJarsProvider)
                         .build();
-                LOG.debug("Startup of the search server {} took {} (instance: {})", searchVersion, searchServerSw.elapsed(), searchServer.instanceId());
+                LOG.debug("Startup of the search server {} took {} (instance: {})", searchVersion,
+                        searchServerSw.elapsed(), searchServer.instanceId());
                 return new Services(network, searchServer, mongoDB, emailServerInstance, webhookServerInstance);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } finally {
-                executorService.close();
             }
 
         }
@@ -156,13 +158,13 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             this.webhookServerInstance = webhookServerInstance;
         }
 
-        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongodbServer mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
             List<String> parts = new LinkedList<>();
             parts.add(lifecycle.name());
             parts.add(searchVersion.toString());
             parts.add(mongodbVersion.toString());
-            parts.add(withMailServerEnabled ? "mail" : "nomail");
-            parts.add(webhookServerEnabled ? "webhooks" : "nowebhooks");
+//            parts.add(withMailServerEnabled ? "mail" : "nomail");
+//            parts.add(webhookServerEnabled ? "webhooks" : "nowebhooks");
             parts.addAll(enabledFeatureFlags);
             parts.addAll(configParams.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
             parts.add(datanodePluginJarsProvider.getUniqueId());

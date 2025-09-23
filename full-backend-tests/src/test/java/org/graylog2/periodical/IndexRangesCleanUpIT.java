@@ -23,7 +23,7 @@ import com.github.rholder.retry.WaitStrategies;
 import org.assertj.core.api.ListAssert;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -46,7 +46,7 @@ public class IndexRangesCleanUpIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCleanUp() throws ExecutionException, RetryException {
         String indexSetId = api.indices().createIndexSet("Range clean up", "test index range clean up", RANGE_CLEANUP_PREFIX);
 

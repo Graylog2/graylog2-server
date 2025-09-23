@@ -33,13 +33,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.IndexState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Disabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +48,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-@GraylogBackendConfiguration(searchVersions = SearchServer.DATANODE_DEV, onlyOnDataNode = true)
+@GraylogBackendConfiguration(onlyOnDataNode = true)
 @Disabled("temporarily disabled")
 public class RemoteReindexingMigrationIT {
 
@@ -74,7 +72,7 @@ public class RemoteReindexingMigrationIT {
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRemoteAsyncReindexing() throws ExecutionException, RetryException {
 
         final String indexName = createRandomSourceIndex();

@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.junit.jupiter.engine.descriptor;
+package org.graylog.testing.containermatrix.annotations;
 
-import org.junit.platform.engine.TestDescriptor;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 
-import java.net.URL;
-import java.util.List;
-import java.util.Set;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class ContainerMatrixTestWithRunningESMongoTestsDescriptor extends ContainerMatrixTestsDescriptor {
-    public ContainerMatrixTestWithRunningESMongoTestsDescriptor(TestDescriptor parent,
-                                                                List<URL> mongoDBFixtures) {
-        super(parent, "Testing with running ES and MongoDB instances.", mongoDBFixtures);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Testable
+@Tag("full-backend-test")
+@Test
+public @interface FullBackendTest {
 }
-
-

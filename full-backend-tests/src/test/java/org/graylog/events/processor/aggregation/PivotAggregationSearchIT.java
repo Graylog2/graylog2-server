@@ -24,8 +24,7 @@ import org.graylog.testing.completebackend.WebhookServerInstance;
 import org.graylog.testing.completebackend.apis.DefaultStreamMatches;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -38,9 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV},
-                             withWebhookServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class PivotAggregationSearchIT {
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearchIT.class);
     private static final String indexSetPrefix = "pivot-search-test";
@@ -87,7 +84,7 @@ public class PivotAggregationSearchIT {
                 "Timed out waiting for index/deflector to be deleted.");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPivotAggregationSearchAllKnownFields() throws ExecutionException, RetryException {
         apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
@@ -106,7 +103,7 @@ public class PivotAggregationSearchIT {
         apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPivotAggregationSearchOneUnknownField() throws ExecutionException, RetryException {
         apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
@@ -126,7 +123,7 @@ public class PivotAggregationSearchIT {
         apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPivotAggregationSearchAllUnknownFields() throws ExecutionException, RetryException {
         apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
@@ -146,7 +143,7 @@ public class PivotAggregationSearchIT {
         apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPivotAggregationIsolatedToStream() throws ExecutionException, RetryException {
         apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
@@ -171,7 +168,7 @@ public class PivotAggregationSearchIT {
         apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPivotAggregationWithGroupingIsIsolatedToStream() throws ExecutionException, RetryException {
         apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 

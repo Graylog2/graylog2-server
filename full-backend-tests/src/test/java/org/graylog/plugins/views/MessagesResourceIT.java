@@ -18,8 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,7 +28,7 @@ import java.util.Arrays;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@GraylogBackendConfiguration(searchVersions = SearchServer.OS2)
+@GraylogBackendConfiguration
 public class MessagesResourceIT {
     private static GraylogApis api;
 
@@ -43,7 +42,7 @@ public class MessagesResourceIT {
         api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidQuery() {
         String allMessagesTimeRange = "{\"query_string\":\"foo:\", \"timerange\": {\"type\": \"absolute\", \"from\": \"2015-01-01T00:00:00\", \"to\": \"2015-01-01T23:59:59\"}}";
         given()
@@ -56,7 +55,7 @@ public class MessagesResourceIT {
                 .assertThat().body("message", Matchers.startsWith("Request validation failed"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidQueryResponse() {
         api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 
@@ -87,7 +86,7 @@ public class MessagesResourceIT {
     /**
      * Tests, if setting a time zone on the request results in a response containing results in the timezone
      */
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTimeZone() {
         api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 

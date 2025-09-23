@@ -19,7 +19,7 @@ package org.graylog.testing.fullbackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MailServerInstance;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.utils.SearchUtils;
 import org.hamcrest.Matchers;
@@ -30,7 +30,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 class BackendStartupIT {
     private static GraylogApis api;
 
@@ -39,7 +39,7 @@ class BackendStartupIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void canReachApi() {
         given()
                 .config(api.withGraylogBackendFailureConfig())
@@ -50,7 +50,7 @@ class BackendStartupIT {
                 .statusCode(200);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void loadsDefaultPlugins() {
         List<Object> pluginNames =
                 given()
@@ -69,13 +69,13 @@ class BackendStartupIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void importsElasticsearchFixtures() {
         api.backend().importElasticsearchFixture("one-message.json", getClass());
         assertThat(SearchUtils.waitForMessage(api.requestSpecificationSupplier(), "hello from es fixture")).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void startsMailServer() {
         final MailServerInstance mailServer = api.backend().getEmailServerInstance().orElseThrow(() -> new IllegalStateException("Mail server should be accessible"));
         given()

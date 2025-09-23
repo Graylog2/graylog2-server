@@ -22,8 +22,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.AfterAll;
@@ -36,7 +35,7 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.VM, searchVersions = SearchServer.DATANODE_DEV)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.VM)
 public class InputPermissionsIT {
 
     private static GraylogApis apis;
@@ -112,7 +111,7 @@ public class InputPermissionsIT {
         apis.roles().delete(roleRestrictedInputsCreator.properJSONPath().read("name", String.class));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPermittedInputCreationAndReading() {
         String inputId = apis.forUser(inputsCreator).inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.random.FakeHttpMessageInput",
@@ -145,7 +144,7 @@ public class InputPermissionsIT {
         apis.inputs().deleteInput(inputId2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRestrictedInputCreationAndReading() {
         String inputId = apis.forUser(inputsCreator).inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
@@ -176,7 +175,7 @@ public class InputPermissionsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInputTypesRead() {
         final GraylogApiResponse inputTypesForReader = apis.forUser(inputsReader).inputs().getInputTypes();
         final Map<String, String> typesReader = inputTypesForReader.properJSONPath().read("types");

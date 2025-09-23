@@ -18,8 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -29,7 +28,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@GraylogBackendConfiguration(serverLifecycle = CLASS, searchVersions = SearchServer.OS1)
+@GraylogBackendConfiguration(serverLifecycle = CLASS)
 public class QueryValidationResourceIT {
 
     private static GraylogApis api;
@@ -60,7 +59,7 @@ public class QueryValidationResourceIT {
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalisticRequest() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -72,7 +71,7 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("status", equalTo("WARNING"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidQuery() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -85,7 +84,7 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Cannot parse query, cause: incomplete query, query ended unexpectedly"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testOrQuery() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -100,12 +99,12 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains unknown field: unknown_field"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRegexWithoutFieldName() {
         verifyQueryIsValidatedSuccessfully("/ethernet[0-9]+/");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testLowercaseNotOperator() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -119,7 +118,7 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("explanations.error_message[0]", containsString("Query contains invalid operator \"not\". All AND / OR / NOT operators have to be written uppercase"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidValueType() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -133,20 +132,20 @@ public class QueryValidationResourceIT {
         validatableResponse.assertThat().body("explanations.error_type[0]", equalTo("INVALID_VALUE_TYPE"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSuccessfullyValidatesExistsTerms() {
         verifyQueryIsValidatedSuccessfully("_exists_:timestamp");
         verifyQueryIsValidatedSuccessfully("_exists_:level");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testQuotedDefaultField() {
         // if the validation correctly recognizes the quoted text, it should not warn about lowercase or
         verifyQueryIsValidatedSuccessfully("\\\"A or B\\\"");
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testQueriesFromDocumentationAreValidatedSuccessfully() {
         //Uses https://docs.graylog.org/docs/query-language as a source of documented queries (accessed 27.06.2022)
         verifyQueryIsValidatedSuccessfully("ssh");

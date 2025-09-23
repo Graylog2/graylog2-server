@@ -19,12 +19,16 @@ package org.graylog.searchbackend.datanode;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")})
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             onlyOnDataNode = true,
+                             additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(
+                                     key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST",
+                                     value = "false")})
 public class DatanodeOpensearchProxyDisabledAllowlistIT {
     private GraylogApis apis;
 
@@ -33,11 +37,12 @@ public class DatanodeOpensearchProxyDisabledAllowlistIT {
         this.apis = apis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testProtectedPath() {
         // this requests the /_search of the underlying opensearch. By default, it's disabled and should return HTTP 400
         // only if we disable the allowlist it should be accessible
         apis.get("/datanodes/any/opensearch/_search", 200)
-                .assertThat().body("_shards.successful", Matchers.greaterThanOrEqualTo(1));
+                .assertThat()
+                .body("_shards.successful", Matchers.greaterThanOrEqualTo(1));
     }
 }

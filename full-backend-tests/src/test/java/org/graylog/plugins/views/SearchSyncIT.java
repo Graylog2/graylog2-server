@@ -23,7 +23,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -54,7 +54,7 @@ public class SearchSyncIT {
         api.search().waitForMessage("search-sync-test");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testEmptyBody() {
         given()
                 .spec(api.requestSpecification())
@@ -65,7 +65,7 @@ public class SearchSyncIT {
                 .assertThat().body("message[0]", equalTo("Search body is mandatory"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalisticRequest() {
         given()
                 .spec(api.requestSpecification())
@@ -79,7 +79,7 @@ public class SearchSyncIT {
                 .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("search-sync-test"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalisticRequestv2() {
         given()
                 .spec(api.requestSpecification())
@@ -95,7 +95,7 @@ public class SearchSyncIT {
                 .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("search-sync-test"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRequestWithStreamsv2() {
         given()
                 .spec(api.requestSpecification())
@@ -111,7 +111,7 @@ public class SearchSyncIT {
                 .body("results*.value.search_types[0]*.value.messages.message.message[0]", hasItem("search-sync-test"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRequestStoredSearch() throws ExecutionException, RetryException {
         final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0b");
 
@@ -120,7 +120,7 @@ public class SearchSyncIT {
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c96.search_types.8306779b-933f-473f-837d-b7a7d83a9a40.name", equalTo("chart"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRequestStoredSearchWithGlobalOverrideKeepingOnlySingleSearchType() throws ExecutionException, RetryException {
         final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0b", Collections.singletonMap(
                 "global_override", Collections.singletonMap(
@@ -134,7 +134,7 @@ public class SearchSyncIT {
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c97.search_types", hasKey("01c76680-377b-4930-86e2-a55fdb867b58"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRequestStoredSearchWithGlobalOverrideKeepingOnlySingleQuery() throws ExecutionException, RetryException {
         final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0b", Collections.singletonMap(
                 "global_override", Collections.singletonMap(
@@ -148,7 +148,7 @@ public class SearchSyncIT {
                 .body("results.f1446410-a082-4871-b3bf-d69aa42d0c97.search_types", hasKey("01c76680-377b-4930-86e2-a55fdb867b58"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testThatQueryOrderStaysConsistentInV1() {
         given()
                 .config(api.withGraylogBackendFailureConfig())
@@ -167,7 +167,7 @@ public class SearchSyncIT {
                         "3eec6f5c-0f1b-41dc-bb95-3ebc6bb905f3"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testThatQueryOrderStaysConsistentInV2() {
         given()
                 .config(api.withGraylogBackendFailureConfig())

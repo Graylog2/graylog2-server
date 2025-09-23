@@ -18,7 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -40,7 +40,7 @@ public class SearchMetadataIT {
         api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testEmptyRequest() {
         given()
                 .spec(api.requestSpecification())
@@ -51,7 +51,7 @@ public class SearchMetadataIT {
                 .assertThat().body("message[0]", equalTo("Search body is mandatory"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequestWithoutParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -65,7 +65,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequestWithSingleParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -79,7 +79,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRetrievingMetadataForStoredSearchWithoutParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -92,7 +92,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRetrievingMetadataForStoredSearchWithParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())

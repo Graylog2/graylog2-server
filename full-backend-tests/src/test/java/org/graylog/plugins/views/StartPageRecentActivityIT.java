@@ -20,7 +20,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -38,7 +38,7 @@ public class StartPageRecentActivityIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateRecentActivity() {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));

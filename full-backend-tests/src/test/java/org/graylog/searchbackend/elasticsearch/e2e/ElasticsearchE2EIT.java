@@ -17,7 +17,7 @@
 package org.graylog.searchbackend.elasticsearch.e2e;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.SearchUtils;
@@ -37,7 +37,7 @@ public class ElasticsearchE2EIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void inputMessageCanBeSearched() {
         int mappedPort = api.backend().mappedPortFor(GELF_HTTP_PORT);
 

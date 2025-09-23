@@ -17,11 +17,10 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -141,7 +140,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         when(indexSet3.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_3});
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     @Order(1)
     public void totalReturnsZeroWithEmptyIndex() {
         assertThat(counts.total()).isEqualTo(0L);
@@ -150,7 +149,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(counts.total(indexSet3)).isEqualTo(0L);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     @Order(2)
     public void totalReturnsZeroWithNoIndices() {
         final BulkIndexRequest bulkIndexRequest = new BulkIndexRequest();
@@ -176,7 +175,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(counts.total()).isEqualTo(0L);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void totalReturnsNumberOfMessages() {
         final BulkIndexRequest bulkIndexRequest = new BulkIndexRequest();
 
@@ -203,7 +202,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(counts.total(indexSet2)).isEqualTo(count2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
@@ -221,7 +220,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         }
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void totalSucceedsWithListOfIndicesLargerThan4Kilobytes() {
         final int numberOfIndices = 100;
         final String[] indexNames = new String[numberOfIndices];

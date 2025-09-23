@@ -18,7 +18,7 @@ package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPResources;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class FiltersIT {
     private static final String DEFAULT_CONNECT_SRC = "connect-src 'self' https://graylog.org/post/tag/ https://telemetry.graylog.cloud;";
     private static GraylogApis api;
@@ -45,7 +45,7 @@ public class FiltersIT {
                 .replaceAll("\\{nonce}", "\\\\E[a-zA-Z0-9-]+\\\\Q"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void cspDocumentationBrowser() {
         String expected = cspResources.cspString(CSP.SWAGGER);
         given()
@@ -58,7 +58,7 @@ public class FiltersIT {
                         Matchers.containsString(expected));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void cspWebInterfaceAssets() {
         given()
                 .spec(api.requestSpecification())
@@ -71,7 +71,7 @@ public class FiltersIT {
                         Matchers.matchesPattern(defaultCSPPattern));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void cspWebAppNotFound() {
         given()
                 .spec(api.requestSpecification())

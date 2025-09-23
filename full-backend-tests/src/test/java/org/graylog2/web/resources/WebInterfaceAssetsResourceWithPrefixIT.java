@@ -17,18 +17,16 @@
 package org.graylog2.web.resources;
 
 import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 @GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
-                             searchVersions = {SearchServer.DATANODE_DEV},
                              additionalConfigurationParameters = {
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
                                    })
 public class WebInterfaceAssetsResourceWithPrefixIT extends WebInterfaceAssetsResourceBase {
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testIndexHtml() {
         testFrontend("/graylog/");
     }

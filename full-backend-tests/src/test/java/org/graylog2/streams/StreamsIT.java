@@ -20,7 +20,7 @@ import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.junit.jupiter.api.AfterAll;
@@ -65,7 +65,7 @@ public class StreamsIT {
         createdIndexSetIds.forEach(indexSetId -> api.indices().deleteIndexSet(indexSetId, true));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkPauseAndResumeWorksCorrectly() {
         //Testing pause and resume in the same test, as other test checks sorting by status, so I want to bring back original situation
 
@@ -110,7 +110,7 @@ public class StreamsIT {
         api.streams().getStream(createdStreamsIds.get(3)).body("disabled", equalTo(false));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortByIndexSetTitle() {
         paginatedByFieldWithOrder("New", "title", "asc")
                 .assertThat()
@@ -126,7 +126,7 @@ public class StreamsIT {
                 .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("New Stream", "New Stream 3", "New Stream 2")));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortByTitleCaseInsensitive() {
         paginatedByFieldWithOrder("sorttest", "title", "asc")
                 .assertThat()
@@ -136,7 +136,7 @@ public class StreamsIT {
                 .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: aaaaa", "sorttest: 12345")));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortByStatus() {
         paginatedByFieldWithOrder("sorttest", "disabled", "asc")
                 .assertThat()

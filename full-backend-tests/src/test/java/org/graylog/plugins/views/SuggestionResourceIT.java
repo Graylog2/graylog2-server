@@ -19,8 +19,7 @@ package org.graylog.plugins.views;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -36,7 +35,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@GraylogBackendConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
+@GraylogBackendConfiguration(serverLifecycle = CLASS)
 public class SuggestionResourceIT {
     private static GraylogApis api;
 
@@ -117,7 +116,7 @@ public class SuggestionResourceIT {
         api.fieldTypes().waitForFieldTypeDefinitions("gl2_source_node", "gl2_source_input", "streams");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequest() {
         given()
                 .spec(api.requestSpecification())
@@ -131,7 +130,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testNumericalValueSuggestion() {
         given()
                 .spec(api.requestSpecification())
@@ -145,7 +144,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAugmentedSuggestionTitlesForStreams() {
         given()
                 .spec(api.requestSpecification())
@@ -158,7 +157,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.title", hasItems("Default Stream", "Stream #1", "Stream #2"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAugmentedSuggestionTitlesForNodes() {
         given()
                 .spec(api.requestSpecification())
@@ -171,7 +170,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.title", not(empty()));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAugmentedSuggestionTitlesForInputs() {
         given()
                 .spec(api.requestSpecification())
@@ -184,7 +183,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.title", hasItems("Integration test GELF input"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSuggestionsAreLimitedToStream() {
         given()
                 .spec(api.requestSpecification())
@@ -209,7 +208,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.occurrence[0]", equalTo(1));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidField() {
         given()
                 .spec(api.requestSpecification())
@@ -223,7 +222,7 @@ public class SuggestionResourceIT {
                 .body("error", notNullValue());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSizeOtherDocsCount() {
         given()
                 .spec(api.requestSpecification())
@@ -238,7 +237,7 @@ public class SuggestionResourceIT {
                 .body("sum_other_docs_count", greaterThanOrEqualTo(1));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTypoCorrection() {
         given()
                 .spec(api.requestSpecification())

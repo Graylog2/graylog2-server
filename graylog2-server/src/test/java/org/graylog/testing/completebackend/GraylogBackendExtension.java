@@ -150,8 +150,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 .create();
         MavenProjectDirProvider mavenProjectDirProvider = FactoryUtils.instantiateFactory(config.mavenProjectDirProvider())
                 .create();
-        boolean withEnabledMailServer = config.withMailServerEnabled();
-        boolean withEnabledWebhookServer = config.withWebhookServerEnabled();
         final Map<String, String> configParams = Arrays.stream(config.additionalConfigurationParameters())
                 .collect(Collectors.toMap(
                         GraylogBackendConfiguration.ConfigurationParameter::key,
@@ -167,8 +165,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 mavenProjectDirProvider,
                 enabledFeatureFlags,
                 config.importLicenses(),
-                withEnabledMailServer,
-                withEnabledWebhookServer,
                 configParams,
                 datanodePluginJarsProvider
         );

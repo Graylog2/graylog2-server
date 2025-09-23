@@ -37,7 +37,7 @@ import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
@@ -108,7 +108,7 @@ public class DatanodeProvisioningIT {
         resetPreflight();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final String caSubjectName = createSelfSignedCA();
 
@@ -220,7 +220,7 @@ public class DatanodeProvisioningIT {
                .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void provisionDatanodeUploadCA() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
         final Path caKeystore = createCA();
 

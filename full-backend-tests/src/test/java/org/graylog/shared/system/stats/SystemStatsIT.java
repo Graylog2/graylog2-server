@@ -17,7 +17,7 @@
 package org.graylog.shared.system.stats;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
@@ -40,7 +40,7 @@ public class SystemStatsIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     @DisabledOnOs(OS.MAC)
     void filesystemStats() {
         final Map<Object, Object> filesystems = given()

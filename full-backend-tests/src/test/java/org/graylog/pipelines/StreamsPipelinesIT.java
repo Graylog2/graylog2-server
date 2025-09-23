@@ -18,7 +18,7 @@ package org.graylog.pipelines;
 
 import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -70,7 +70,7 @@ public class StreamsPipelinesIT {
 
     private record BulkPipelinesRequest(Collection<String> streamIds) {}
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkRetrievalOfPipelineConnections() throws Exception {
         final var result = api.post("/streams/pipelines",
                                     new BulkPipelinesRequest(Set.of(stream1Id, stream2Id, stream3Id)),
@@ -84,7 +84,7 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(stream3Id)).containsExactlyInAnyOrder(pipeline2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkRetrievalOfPipelineConnectionsForBuiltinStreams() throws Exception {
         final var result = api.post("/streams/pipelines",
                                     new BulkPipelinesRequest(Set.of(DEFAULT_STREAM_ID,
@@ -98,7 +98,7 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(DEFAULT_SYSTEM_EVENTS_STREAM_ID)).isEmpty();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkRetrievalOfPipelineConnectionsForDanglingReferences() throws Exception {
         final var defaultIndexSet = api.indices().defaultIndexSetId();
         final var streamId = api.streams().createStream("Stream with dangling pipeline reference", defaultIndexSet);
@@ -111,7 +111,7 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(streamId)).isEmpty();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void retrievePipelineConnectionsForASingleStream() {
         var result = api.get("/streams/" + stream1Id + "/pipelines", 200)
                         .extract().body().jsonPath();

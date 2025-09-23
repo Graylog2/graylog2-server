@@ -17,16 +17,13 @@
 package org.graylog2.web.resources;
 
 import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
-import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
-@GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
-                             searchVersions = {SearchServer.DATANODE_DEV})
+@GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class)
 public class WebInterfaceAssetsResourceIT extends WebInterfaceAssetsResourceBase {
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testIndexHtml() {
         testFrontend("/");
     }

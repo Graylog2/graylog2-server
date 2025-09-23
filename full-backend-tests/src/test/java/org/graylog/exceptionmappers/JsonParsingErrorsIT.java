@@ -19,8 +19,7 @@ package org.graylog.exceptionmappers;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -28,7 +27,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.OS2_LATEST)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class JsonParsingErrorsIT {
     private static final String SYNC_SEARCH = "/views/search/sync";
     private static final String STREAMS = "/streams";
@@ -40,7 +39,7 @@ public class JsonParsingErrorsIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsSpecificErrorWhenTypeMismatches() {
         assertErrorResponse(SYNC_SEARCH, """
                         {
@@ -70,7 +69,7 @@ public class JsonParsingErrorsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsSpecificErrorForJsonParsingError() {
         assertErrorResponse(SYNC_SEARCH, """
                         {
@@ -100,7 +99,7 @@ public class JsonParsingErrorsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void extractsReferencePathFromMissingProperty() {
         assertErrorResponse(STREAMS, "{}")
                 .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
@@ -114,7 +113,7 @@ public class JsonParsingErrorsIT {
                 .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void handlesGenericJSONErrorsOnRootLevel() {
         assertErrorResponse(STREAMS, """
                 {
@@ -135,7 +134,7 @@ public class JsonParsingErrorsIT {
                 .body("column", equalTo(13));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void handleInvalidPropertiesOnRootLevel() {
         assertErrorResponse(SYNC_SEARCH, """
                 {

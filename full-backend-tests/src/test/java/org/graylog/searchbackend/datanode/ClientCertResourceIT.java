@@ -41,8 +41,7 @@ import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.security.TruststoreCreator;
 import org.junit.jupiter.api.BeforeAll;
@@ -71,8 +70,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
 
-@GraylogBackendConfiguration(searchVersions = SearchServer.DATANODE_DEV,
-                             onlyOnDataNode = true,
+@GraylogBackendConfiguration(onlyOnDataNode = true,
                              additionalConfigurationParameters = {
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
                                            @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
@@ -88,7 +86,7 @@ public class ClientCertResourceIT {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void generateClientCert() throws Exception {
 
         final String privateKeyPassword = RandomStringUtils.secure().nextAlphabetic(10);

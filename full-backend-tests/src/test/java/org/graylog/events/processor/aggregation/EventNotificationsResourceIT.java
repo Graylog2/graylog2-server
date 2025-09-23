@@ -20,14 +20,13 @@ import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.WebhookServerInstance;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.concurrent.ExecutionException;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class EventNotificationsResourceIT {
     private static GraylogApis apis;
     private static WebhookServerInstance webhookServerInstance;
@@ -40,7 +39,7 @@ public class EventNotificationsResourceIT {
         graylogApis.system().urlAllowlist(webhookServerInstance.getContainerizedCollectorURI());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testNotificationTestTrigger() throws ExecutionException, RetryException {
 
         final String httpNotificationID = apis.eventsNotifications().createHttpNotification(webhookServerInstance.getContainerizedCollectorURI());

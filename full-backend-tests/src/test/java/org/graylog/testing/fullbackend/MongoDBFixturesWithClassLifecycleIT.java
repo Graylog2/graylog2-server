@@ -17,7 +17,7 @@
 package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -37,12 +37,12 @@ class MongoDBFixturesWithClassLifecycleIT {
         api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithClassLifecycleIT.class);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void tokensPresentWithTestMethodA() {
         assertTokenPresent();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void tokensPresentWithTestMethodB() {
         assertTokenPresent();
     }

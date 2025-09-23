@@ -18,7 +18,7 @@ package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.utils.IndexSetUtils;
 import org.graylog.testing.utils.StreamUtils;
@@ -52,7 +52,7 @@ public class AssignStreamsToIndexSetIT {
         this.newIndexSetId = IndexSetUtils.createIndexSet(api.requestSpecificationSupplier(), "Test Indices", "Some test indices", "test");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void assignStreamsToIndexSet() {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), newIndexSetId)
                 .statusCode(200);
@@ -75,7 +75,7 @@ public class AssignStreamsToIndexSetIT {
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void assignStreamsToMissingIndexSet() {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), "doesnotexist")
                 .statusCode(404);
@@ -88,7 +88,7 @@ public class AssignStreamsToIndexSetIT {
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void assignMissingStreamToIndexSet() {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id, "6389c6a9205a90634f992bce"), newIndexSetId)
                 .statusCode(404);

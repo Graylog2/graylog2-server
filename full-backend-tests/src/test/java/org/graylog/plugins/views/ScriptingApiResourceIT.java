@@ -27,8 +27,7 @@ import org.graylog.testing.completebackend.apis.Sharing;
 import org.graylog.testing.completebackend.apis.SharingRequest;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
@@ -54,8 +53,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
-@GraylogBackendConfiguration(serverLifecycle = CLASS,
-                             searchVersions = {SearchServer.ES7, SearchServer.OS2})
+@GraylogBackendConfiguration(serverLifecycle = CLASS)
 public class ScriptingApiResourceIT {
 
     public static final String DEFAULT_STREAM = "000000000000000000000001";
@@ -100,7 +98,7 @@ public class ScriptingApiResourceIT {
         api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAggregationByStream() {
         final ValidatableResponse validatableResponse =
                 api.post("/search/aggregate", """
@@ -126,7 +124,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, stream1Id, 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testStdDevSorting() {
         final GraylogApiResponse responseDesc =
                 new GraylogApiResponse(api.post("/search/aggregate", """
@@ -178,7 +176,7 @@ public class ScriptingApiResourceIT {
                 .containsExactly(0.0, 0.5);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAggregationByStreamTitle() {
         final ValidatableResponse validatableResponse =
                 api.post("/search/aggregate", """
@@ -204,7 +202,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "Stream #1", 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUserWithLimitedPermissionRequest() {
 
         final ValidatableResponse validatableResponse = given()
@@ -235,7 +233,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "another-test", 2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSchema() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -264,7 +262,7 @@ public class ScriptingApiResourceIT {
         validateSchema(validatableResponse, "metric: count(facility)", "numeric", "facility");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequest() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -293,7 +291,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAsciiRender() {
         final String response = given()
                 .spec(api.requestSpecification())
@@ -332,7 +330,7 @@ public class ScriptingApiResourceIT {
         assertThat(response).isEqualTo(expected.trim());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testGetRequestAcii() {
         final String response = given()
                 .spec(api.requestSpecification())
@@ -355,7 +353,7 @@ public class ScriptingApiResourceIT {
         assertThat(response).isEqualTo(expected.trim());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCsvRender() throws Exception {
         final InputStream response = given()
                 .spec(api.requestSpecification())
@@ -405,7 +403,7 @@ public class ScriptingApiResourceIT {
         return lines;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testGetRequestCsv() throws Exception {
 
         final InputStream response = given()
@@ -429,7 +427,7 @@ public class ScriptingApiResourceIT {
         Assertions.assertArrayEquals(new String[]{"test", "1"}, lines.get(2));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testGetRequestJson() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -444,7 +442,7 @@ public class ScriptingApiResourceIT {
         validateRow(response, "test", 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoAggregations() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -477,7 +475,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1, 1.0f);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testDuplicatedMetrics() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -508,7 +506,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1, 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAggregationWithoutMatchingField() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -537,7 +535,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "(Empty Value)", 2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMissingDataInRow() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -574,7 +572,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1, "-", 1.0f);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testStreamFiltering() {
         final String req = """
                 {
@@ -605,7 +603,7 @@ public class ScriptingApiResourceIT {
         validatableResponse.assertThat().body("datarows", Matchers.hasSize(1));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSorting() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -637,7 +635,7 @@ public class ScriptingApiResourceIT {
         Assertions.assertEquals(Arrays.asList("another-test", (Object) 2), rows.get(1));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMetadata() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -676,7 +674,7 @@ public class ScriptingApiResourceIT {
         assertThat(diff).isCloseTo(300_000, within(10_000f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testErrorHandling() {
         final ValidatableResponse ignored = given()
                 .spec(api.requestSpecification())
@@ -704,7 +702,7 @@ public class ScriptingApiResourceIT {
                 .body("message", Matchers.containsString("Failed to obtain results"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMessages() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -729,7 +727,7 @@ public class ScriptingApiResourceIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMessagesWithSorting() {
         ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -775,7 +773,7 @@ public class ScriptingApiResourceIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMessagesGetRequestAscii() {
         final List<String> response = given()
                 .spec(api.requestSpecification())
@@ -800,7 +798,7 @@ public class ScriptingApiResourceIT {
         assertThat(expected.containsAll(response)).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetric() {
         final String req = """
                 {
@@ -840,7 +838,7 @@ public class ScriptingApiResourceIT {
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithFieldName() {
         final String req = """
                 {
@@ -882,7 +880,7 @@ public class ScriptingApiResourceIT {
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithConfig() {
         final String req = """
                 {

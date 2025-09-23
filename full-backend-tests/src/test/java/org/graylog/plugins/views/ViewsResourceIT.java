@@ -17,7 +17,7 @@
 package org.graylog.plugins.views;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -32,24 +32,24 @@ public class ViewsResourceIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testEmptyBody() {
         api.post("/views", 400)
                  .assertThat().body("message[0]", equalTo("View is mandatory"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateViewRequestWithoutPersistedSearch() {
         api.postWithResource("/views", "org/graylog/plugins/views/views-request.json", 400);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateSearchPersistView() {
         api.postWithResource("/views/search", "org/graylog/plugins/views/save-search-request.json", 201);
         api.postWithResource("/views", "org/graylog/plugins/views/views-request.json", 200);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidSearchType() {
         api.postWithResource("/views/search", "org/graylog/plugins/views/save-search-request-invalid.json", 201);
         api.postWithResource("/views", "org/graylog/plugins/views/views-request-invalid-search-type.json", 400)

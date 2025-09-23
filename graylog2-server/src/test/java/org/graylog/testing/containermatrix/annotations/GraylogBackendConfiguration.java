@@ -24,8 +24,6 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.NoPluginJarsProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +47,6 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @Testable
 public @interface GraylogBackendConfiguration {
 
-
     @interface ConfigurationParameter {
         String key();
 
@@ -66,23 +63,9 @@ public @interface GraylogBackendConfiguration {
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
 
     /**
-     * matrix rule
-     * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
-     */
-    @Deprecated(forRemoval = true)
-    SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST};
-
-    /**
      * Set this to true to only run the test if we are running against data node.
      */
     boolean onlyOnDataNode() default false;
-
-    /**
-     * matrix rule
-     * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
-     */
-    @Deprecated(forRemoval = true)
-    MongodbServer[] mongoVersions() default {MongodbServer.MONGO7};
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
@@ -99,14 +82,9 @@ public @interface GraylogBackendConfiguration {
      * that occured if the licenses where imported via REST
      * Disabling only works with Lifecycle.CLASS because a new container is spun up.
      */
-    boolean defaultImportLicenses = true;
-    boolean importLicenses() default defaultImportLicenses;
-
-    boolean withMailServerEnabled() default false;
+    boolean importLicenses() default true;
 
     ConfigurationParameter[] additionalConfigurationParameters() default {};
-
-    boolean withWebhookServerEnabled() default false;
 
     Class<? extends PluginJarsProvider> datanodePluginJarsProvider() default NoPluginJarsProvider.class;
 }

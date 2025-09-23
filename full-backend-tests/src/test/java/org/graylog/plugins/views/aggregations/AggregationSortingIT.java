@@ -26,7 +26,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -37,12 +37,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.containermatrix.SearchServer.ES7;
-import static org.graylog.testing.containermatrix.SearchServer.OS1;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 import static org.hamcrest.Matchers.is;
 
-@GraylogBackendConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
+@GraylogBackendConfiguration
 public class AggregationSortingIT {
     private static final String numericField = "numeric_field";
     private static final String nonNumericField = "non_numeric_field";
@@ -56,7 +53,7 @@ public class AggregationSortingIT {
         gelfInput = api.gelf().createGelfHttpInput();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortingOnNumericPivotFieldSortsNumerically() throws ExecutionException, RetryException {
         final var values = Set.of(9, 8, 4, 25, 2, 15, 1);
         final var messagePrefix = "sorting on numeric pivot test ";
@@ -99,7 +96,7 @@ public class AggregationSortingIT {
         }
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortingOnNonNumericPivotFieldSortsLexicographically() throws ExecutionException, RetryException {
         final var values = Set.of("B", "C", "D", "A", "E");
         final var messagePrefix = "sorting on non-numeric pivot test ";
@@ -142,7 +139,7 @@ public class AggregationSortingIT {
         }
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortingOnBothNumericFieldAndMetric() throws ExecutionException, RetryException {
         final var values = List.of(2, 4, 9, 1, 25, 2, 9, 4, 15);
         final var messagePrefix = "Ingesting value ";

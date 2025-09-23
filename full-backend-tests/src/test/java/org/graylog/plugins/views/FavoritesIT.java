@@ -19,7 +19,7 @@ package org.graylog.plugins.views;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -53,7 +53,7 @@ public class FavoritesIT {
         ));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateDeleteFavorite() {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         final String temporaryStream = api.streams().createStream("Temporary", defaultIndexSetId);

@@ -18,7 +18,7 @@ package org.graylog2.inputs;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class InputCreationIT {
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testHttpRandomInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.random.FakeHttpMessageInput",
@@ -48,7 +48,7 @@ public class InputCreationIT {
     /**
      * Test to make sure configuration encryption serialization/deserialization works
      */
-    @ContainerMatrixTest
+    @FullBackendTest
     void testFailingAwsCloudTrailInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog.aws.inputs.cloudtrail.CloudTrailInput",

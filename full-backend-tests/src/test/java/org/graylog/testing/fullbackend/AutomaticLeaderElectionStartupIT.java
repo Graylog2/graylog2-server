@@ -18,7 +18,7 @@ package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -37,7 +37,7 @@ class AutomaticLeaderElectionStartupIT {
         api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void canReachApi() {
         given().config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())

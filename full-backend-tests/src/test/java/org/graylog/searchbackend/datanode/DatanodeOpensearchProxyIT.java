@@ -23,7 +23,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,6 @@ import static java.time.Duration.ofSeconds;
 import static org.awaitility.Awaitility.waitAtMost;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             searchVersions = SearchServer.DATANODE_DEV,
                              onlyOnDataNode = true,
                              additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")}
 )
@@ -49,7 +48,7 @@ public class DatanodeOpensearchProxyIT {
         this.apis = apis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testProxyPlaintextGet() throws ExecutionException, RetryException {
         waitAtMost(ofSeconds(30)).untilAsserted(() -> {
             final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
@@ -58,7 +57,7 @@ public class DatanodeOpensearchProxyIT {
         });
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testProxyJsonGet() {
         waitAtMost(ofSeconds(30)).untilAsserted(() -> {
             final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
@@ -66,20 +65,20 @@ public class DatanodeOpensearchProxyIT {
         });
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testForbiddenUrl() {
         final String message = apis.get("/datanodes/any/opensearch/_search", 400).extract().body().asString();
         Assertions.assertThat(message).contains("This request is not allowed");
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testNonAdminUser() {
         //HTTP 401/unauthorized for any non-admin user
         apis.get("/datanodes/any/opensearch/_search", Users.JOHN_DOE, Collections.emptyMap(),401);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTargetSpecificDatanodeInstance() {
         final List<String> datanodes = apis.system().datanodes().properJSONPath().read("elements.*.hostname");
         Assertions.assertThat(datanodes).isNotEmpty();
@@ -88,7 +87,7 @@ public class DatanodeOpensearchProxyIT {
         apis.get("/datanodes/" + hostname + "/opensearch/_mapping", 200).assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testQueryParameters() {
         final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cluster/settings?include_defaults=true", 200);
         response.assertThat().body("defaults.cluster.name", Matchers.equalTo("datanode-cluster"));

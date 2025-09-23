@@ -22,7 +22,7 @@ import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,13 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.graylog.testing.containermatrix.SearchServer.ES7;
-import static org.graylog.testing.containermatrix.SearchServer.OS1;
-import static org.graylog.testing.containermatrix.SearchServer.OS2;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_4;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
-
-@GraylogBackendConfiguration(searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
+@GraylogBackendConfiguration
 public class CompoundFieldsAggregationIT {
 
     private static GraylogApis api;
@@ -75,7 +69,7 @@ public class CompoundFieldsAggregationIT {
         api.search().waitForMessages("compound-field-test-a", "compound-field-test-b");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void aggregate() {
         final GraylogApiResponse responseAsc =
                 new GraylogApiResponse(api.post("/search/aggregate","""

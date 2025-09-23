@@ -18,7 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +47,7 @@ public class TimeLimitIT {
                 .statusCode(202);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testQueryTimeRangeLimit() {
         given()
                 .spec(api.requestSpecification())
