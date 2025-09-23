@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.mongodb.MongoDBVersion;
@@ -44,7 +43,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -58,8 +56,12 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     public static final String VM_LIFECYCLE_BACKEND_KEY = "vm_lifecycle_backend";
     public static final String CLASS_LIFECYCLE_BACKEND_KEY = "class_lifecycle_backend";
     public static final String BACKEND_LIFECYCLE_KEY = "backend_lifecycle";
-    public static final String SEARCHVERSION_JVM_PROPERTY = "test.integration.searchversion";
-    public static final String MONGODBVERSION_JVM_PROPERTY = "test.integration.mongodbversion";
+
+    public static final String SEARCH_SERVER_IMAGE_PROPERTY = "test.integration.search-server.image";
+    public static final String SEARCH_SERVER_DISTRIBUTION_PROPERTY = "test.integration.search-server.distribution";
+    public static final String SEARCH_SERVER_VERSION_PROPERTY = "test.integration.search-server.version";
+    public static final String MONGODB_IMAGE_PROPERTY = "test.integration.mongodb.image";
+    public static final String MONGODB_VERSION_PROPERTY = "test.integration.mongodb.version";
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext,
@@ -107,6 +109,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         final Optional<GraylogBackendConfiguration> backendConfiguration =
                 AnnotationSupport.findAnnotation(context.getRequiredTestClass(), GraylogBackendConfiguration.class);
         LOG.info("Before test: {} backend config: {}", context.getRequiredTestClass().getName(), backendConfiguration);
+
         final var store = context.getStore(NAMESPACE);
         final var rootStore = context.getRoot().getStore(NAMESPACE);
 
@@ -151,8 +154,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     }
 
     private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
-        final SearchVersion searchVersion = getSearchVersion();
-        final MongoDBVersion mongoVersion = getMongoVersion();
+        final SearchVersion searchVersion = BackendServiceVersions.getSearchServerVersion();
+        final MongoDBVersion mongoVersion = BackendServiceVersions.getMongoDBVersion();
         final List<URL> mongoDBFixtures = resolveFixtures(config.mongoDBFixtures(), testClass);
         final List<String> enabledFeatureFlags = List.of(config.enabledFeatureFlags());
         PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
@@ -199,34 +202,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 .toList();
     }
 
-    private static SearchVersion getSearchVersion() {
-        String searchVersionProperty = System.getProperty(SEARCHVERSION_JVM_PROPERTY);
-        if (searchVersionProperty != null) {
-            try {
-                return SearchServer.valueOf(searchVersionProperty.toUpperCase(Locale.ENGLISH)).getSearchVersion();
-            } catch (IllegalArgumentException e) {
-                LOG.error("Invalid search version property: {}. Valid values are: {}",
-                        searchVersionProperty,
-                        Arrays.toString(SearchServer.values()));
-                throw e;
-            }
-        }
-        return SearchServer.DEFAULT_VERSION.getSearchVersion();
-    }
-
-    private static MongoDBVersion getMongoVersion() {
-        String mongodbVersionProperty = System.getProperty(MONGODBVERSION_JVM_PROPERTY);
-        if (mongodbVersionProperty != null) {
-            try {
-                return MongoDBVersion.of(mongodbVersionProperty);
-            } catch (IllegalArgumentException e) {
-                LOG.error("Invalid mongodb version property: {}", mongodbVersionProperty, e);
-                throw e;
-            }
-        }
-        return MongoDBVersion.DEFAULT;
-    }
-
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
         final Optional<GraylogBackendConfiguration> backendConfiguration =
@@ -234,7 +209,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         if (backendConfiguration.isEmpty()) {
             return ConditionEvaluationResult.enabled("No Graylog backend configuration found, enabling test");
         }
-        final SearchVersion actualSearchVersion = getSearchVersion();
+        final SearchVersion actualSearchVersion = BackendServiceVersions.getSearchServerVersion();
         if (!actualSearchVersion.isDataNode() && backendConfiguration.get().onlyOnDataNode()) {
             return ConditionEvaluationResult.disabled("Skipped when not running against data node, we detected",
                     actualSearchVersion.toString());

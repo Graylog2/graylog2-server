@@ -32,7 +32,10 @@ public enum SearchServer {
     DATANODE_PRE_52(DATANODE, "5.1.0"),
     DATANODE_DEV(DATANODE, "5.2.0");
 
-    public static final SearchServer DEFAULT_VERSION = DATANODE_DEV;
+    private static final String DEFAULT_VERSION_STRING = "2.19.3";
+
+    public static final SearchVersion DEFAULT_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse(DEFAULT_VERSION_STRING));
+
     public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2_LATEST;
 
     private final SearchVersion searchVersion;
