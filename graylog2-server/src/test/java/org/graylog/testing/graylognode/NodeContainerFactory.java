@@ -21,7 +21,6 @@ import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
@@ -81,18 +80,6 @@ public class NodeContainerFactory {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
         }
         return image;
-    }
-
-    private static boolean containerFileExists(final GenericContainer container, String path) {
-        try {
-            Container.ExecResult r = container.execInContainer("/bin/sh", "-c",
-                    "if [ -f " + path + " ] ; then echo '0' ; else (>&2 echo '1') ; fi");
-
-            return !r.getStderr().contains("1");
-        } catch (IOException | InterruptedException e) {
-            LOG.error("Could not check for file existence: " + path, e);
-            return false;
-        }
     }
 
     private static void checkBinaries(NodeContainerConfig config) {
