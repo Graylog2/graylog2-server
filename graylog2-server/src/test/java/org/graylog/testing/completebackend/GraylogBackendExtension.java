@@ -18,7 +18,6 @@ package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Resources;
 import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.conditions.EnabledIfSearchServerCondition;
@@ -39,10 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -181,25 +177,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 configParams,
                 datanodePluginJarsProvider
         );
-    }
-
-    private static List<URL> resolveFixtures(final String[] fixtures, final Class<?> testClass) {
-        if (fixtures == null || fixtures.length == 0) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(fixtures)
-                .map(resourceName -> {
-                    if (!Paths.get(resourceName).isAbsolute()) {
-                        try {
-                            return Resources.getResource(testClass, resourceName);
-                        } catch (IllegalArgumentException iae) {
-                            return Resources.getResource(resourceName);
-                        }
-                    } else {
-                        return Resources.getResource(resourceName);
-                    }
-                })
-                .toList();
     }
 
     @Override
