@@ -113,20 +113,20 @@ class EventNotificationFormContainer extends React.Component {
           CurrentUserStore.update(currentUser.currentUser.username);
         })
         .then(
-        () => {
-          if (!embedded) {
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
-        },
-        (errorResponse) => {
-          const { body } = errorResponse.additional;
+          () => {
+            if (!embedded) {
+              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+            }
+          },
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
 
-          if (errorResponse.status === 400 && body && body.failed) {
-            this.setState({ validation: body });
-            EventNotificationFormContainer.scrollToFirstError();
-          }
-        },
-      );
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+              EventNotificationFormContainer.scrollToFirstError();
+            }
+          },
+        );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
 
