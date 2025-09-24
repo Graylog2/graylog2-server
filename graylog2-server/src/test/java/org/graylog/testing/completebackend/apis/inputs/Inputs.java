@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.GraylogRestApi;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -72,6 +73,23 @@ public class Inputs implements GraylogRestApi {
                 .then()
                 .log().ifError()
                 .statusCode(200);
+    }
+
+    public void waitForInputState(final String inputId, final String state) {
+        this.waitForInputState(inputId, state, GraylogRestApi.TIMEOUT);
+    }
+
+    public void waitForInputState(final String inputId, final String state, final Duration timeout) {
+        api.waitFor(() -> {
+                    try {
+                        return api.inputs().getInputState(inputId)
+                                .extract().body().jsonPath().get("state")
+                                .equals(state);
+                    } catch (AssertionError error) {
+                        return false;
+                    }
+                },
+                "Timed out waiting for HTTP Random Message Input to become available", timeout);
     }
 
     public ValidatableResponse deleteInput(String inputId) {

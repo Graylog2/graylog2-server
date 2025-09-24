@@ -42,11 +42,7 @@ public class InputCreationIT {
                         "source", "example.org"));
         apis.inputs().getInput(inputId)
                 .assertThat().body("title", equalTo("testInput"));
-        apis.waitFor(() ->
-                        apis.inputs().getInputState(inputId)
-                                .extract().body().jsonPath().get("state")
-                                .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available");
+        apis.inputs().waitForInputState(inputId, "RUNNING");
         apis.inputs().deleteInput(inputId);
     }
 
@@ -64,11 +60,7 @@ public class InputCreationIT {
                         "aws_secret_key", "invalid-secret-key"));
         apis.inputs().getInput(inputId)
                 .assertThat().body("attributes.aws_access_key", equalTo("invalid-access-key"));
-        apis.waitFor(() ->
-                        apis.inputs().getInputState(inputId)
-                                .extract().body().jsonPath().get("state")
-                                .equals("FAILING"),
-                "Timed out waiting for AWS CloudTrail Input to reach failing state");
+        apis.inputs().waitForInputState(inputId, "FAILING");
         apis.inputs().deleteInput(inputId);
     }
 }

@@ -124,11 +124,7 @@ public class InputPermissionsIT {
                 Map.of("sleep", 30,
                         "sleep_deviation", 30,
                         "source", "example.org"));
-        apis.waitFor(() ->
-                        apis.inputs().getInputState(inputId)
-                                .extract().body().jsonPath().get("state")
-                                .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available", TIMEOUT);
+        apis.inputs().waitForInputState(inputId, "RUNNING", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 
@@ -139,11 +135,7 @@ public class InputPermissionsIT {
                 Map.of("sleep", 30,
                         "sleep_deviation", 30,
                         "source", "example.org"));
-        apis.waitFor(() ->
-                        apis.inputs().getInputState(inputId2)
-                                .extract().body().jsonPath().get("state")
-                                .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available", TIMEOUT);
+        apis.inputs().waitForInputState(inputId, "RUNNING", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId2).assertThat().body("id", equalTo(inputId2));
 
@@ -159,11 +151,7 @@ public class InputPermissionsIT {
                         "timeunit", "MINUTES",
                         "path", "$.data",
                         "source", "messagesource"));
-        apis.waitFor(() ->
-                        apis.inputs().getInputState(inputId)
-                                .extract().body().jsonPath().get("state")
-                                .equals("RUNNING"),
-                "Timed out waiting for Json Input to become available", TIMEOUT);
+        apis.inputs().waitForInputState(inputId, "RUNNING", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 
