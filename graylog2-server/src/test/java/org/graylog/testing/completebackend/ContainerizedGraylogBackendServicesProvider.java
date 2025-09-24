@@ -68,12 +68,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         this.lifecycle = lifecycle;
     }
 
-    public Services getServices(SearchVersion searchVersion,
-                                MongoDBVersion mongodbVersion,
-                                List<String> enabledFeatureFlags,
-                                Map<String, String> configParams,
-                                PluginJarsProvider datanodePluginJarsProvider,
-                                MavenProjectDirProvider mavenProjectDirProvider) {
+    public Services getServices(SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
         var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
         return SERVICES_CACHE.computeIfAbsent(lookupKey, (k) -> {
             LOG.info("No cached services found for key \"{}\", creating new ones.", k);
@@ -84,7 +79,6 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                     enabledFeatureFlags,
                     configParams,
                     datanodePluginJarsProvider,
-                    mavenProjectDirProvider,
                     () -> SERVICES_CACHE.remove(k)
             );
         });
@@ -115,10 +109,9 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                                        List<String> enabledFeatureFlags,
                                        Map<String, String> envProperties,
                                        PluginJarsProvider datanodePluginJarsProvider,
-                                       MavenProjectDirProvider mavenProjectDirProvider,
                                        Runnable closeCallback) {
             // Ensure that Data Node is built before trying to start the search service.
-            MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+            MavenPackager.packageJarIfNecessary(new DefaultMavenProjectDirProvider());
 
             try (var executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
                     .setNameFormat("container-startup-thread-%d")

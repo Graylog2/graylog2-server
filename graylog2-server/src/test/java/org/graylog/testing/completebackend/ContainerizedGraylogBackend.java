@@ -96,7 +96,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
         final Stopwatch sw = Stopwatch.createStarted();
         LOG.debug("Creating Backend services {} MongoDB:{} flags <{}>", version, mongodbVersion.version(), enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, enabledFeatureFlags, env, datanodePluginJarsProvider, mavenProjectDirProvider);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, enabledFeatureFlags, env, datanodePluginJarsProvider);
         LOG.debug(" creating backend services took " + sw.elapsed());
 
         final Stopwatch backendSw = Stopwatch.createStarted();
@@ -118,7 +118,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             for (TestLicenseImporter importer : loader) {
                 final Optional<String> licenseClusterId = importer.importLicenses(mongoDBInstance, licenses);
                 if (licenseClusterId.isPresent() && clusterId == null) {
-                    clusterId = licenseClusterId.get();
+                    clusterId =  licenseClusterId.get();
                 }
             }
             if (clusterId == null) {
