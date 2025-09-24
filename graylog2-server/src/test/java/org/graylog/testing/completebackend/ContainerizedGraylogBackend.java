@@ -21,6 +21,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBFixtureImporter;
@@ -93,6 +94,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final boolean preImportLicense,
                                                                          Map<String, String> env,
                                                                          PluginJarsProvider datanodePluginJarsProvider) {
+        // Ensure that the server and Data Node are built before trying to start the containers.
+        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
 
         final Stopwatch sw = Stopwatch.createStarted();
         LOG.debug("Creating Backend services {} MongoDB:{} flags <{}>", version, mongodbVersion.version(), enabledFeatureFlags);
@@ -118,7 +121,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             for (TestLicenseImporter importer : loader) {
                 final Optional<String> licenseClusterId = importer.importLicenses(mongoDBInstance, licenses);
                 if (licenseClusterId.isPresent() && clusterId == null) {
-                    clusterId =  licenseClusterId.get();
+                    clusterId = licenseClusterId.get();
                 }
             }
             if (clusterId == null) {

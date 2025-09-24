@@ -52,7 +52,7 @@ public class MavenPackager {
         } else if (jarHasBeenPackagedInThisRun) {
             LOG.info("Assuming jars are current.");
         } else {
-            LOG.info("Running from outside Maven. Packaging server jar now...");
+            LOG.info("Running from outside Maven. Packaging JARs now...");
             packageJar(mavenProjectDirProvider);
         }
     }
