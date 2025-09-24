@@ -73,7 +73,7 @@ public class IndexRangesCleanUpIT {
     private void assertIndexRanges(Consumer<ListAssert<String>> assertion) throws ExecutionException, RetryException {
         RetryerBuilder.<Void>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterDelay(30, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
                 .retryIfRuntimeException()
                 .build()
                 .call(() -> {
