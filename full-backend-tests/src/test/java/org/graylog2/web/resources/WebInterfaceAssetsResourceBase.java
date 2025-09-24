@@ -43,6 +43,7 @@ public abstract class WebInterfaceAssetsResourceBase {
         final var scriptSrcs = backend()
                 .get(prefix)
                 .then()
+                .log().ifError()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK)
                 .contentType(ContentType.HTML)
