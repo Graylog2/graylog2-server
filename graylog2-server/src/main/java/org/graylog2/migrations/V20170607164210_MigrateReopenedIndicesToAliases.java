@@ -19,7 +19,6 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
-import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
@@ -38,7 +37,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
@@ -126,7 +124,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
             settings = indexSettings;
         } else if (searchVersion.satisfies(ELASTICSEARCH, "^5.0.0 | ^6.0.0 | ^7.0.0")
                 || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
-                || searchVersion.satisfies(DATANODE, SearchVersionRange.DATANODE_VERSION_RANGE)
+                || searchVersion.isDataNode()
         ) {
             settings = indexSettings.path("archived");
         } else {
