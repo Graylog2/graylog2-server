@@ -23,6 +23,7 @@ import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesPr
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
+import org.graylog.testing.mongodb.MongoDBFixtureImporter;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.storage.SearchVersion;
@@ -31,8 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
-import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,7 +55,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private final boolean stopServicesOnClose;
 
     private ContainerizedGraylogBackend(Services services,
-                                        final List<URL> mongoDBFixtures,
                                         final PluginJarsProvider pluginJarsProvider,
                                         final MavenProjectDirProvider mavenProjectDirProvider,
                                         final List<String> enabledFeatureFlags,
@@ -67,7 +67,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
         var mongoDB = services.getMongoDBInstance();
         LOG.info("Running backend with MongoDB version {} (instance: {})", mongoDB.version(), mongoDB.instanceId());
-        mongoDB.importFixtures(mongoDBFixtures);
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
@@ -88,7 +87,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     public synchronized static ContainerizedGraylogBackend createStarted(ContainerizedGraylogBackendServicesProvider servicesProvider,
                                                                          final SearchVersion version,
                                                                          final MongoDBVersion mongodbVersion,
-                                                                         final List<URL> mongoDBFixtures,
                                                                          final PluginJarsProvider pluginJarsProvider,
                                                                          final MavenProjectDirProvider mavenProjectDirProvider,
                                                                          final List<String> enabledFeatureFlags,
@@ -102,8 +100,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         LOG.debug(" creating backend services took " + sw.elapsed());
 
         final Stopwatch backendSw = Stopwatch.createStarted();
-        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend(services, mongoDBFixtures,
-                pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, env);
+        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend(services, pluginJarsProvider,
+                mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, env);
         LOG.debug("Creating dockerized graylog server took {}", backendSw.elapsed());
         return backend;
     }
@@ -116,7 +114,38 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                 .collect(Collectors.toList());
         if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
-            loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
+            String clusterId = null;
+            for (TestLicenseImporter importer : loader) {
+                final Optional<String> licenseClusterId = importer.importLicenses(mongoDBInstance, licenses);
+                if (licenseClusterId.isPresent() && clusterId == null) {
+                    clusterId =  licenseClusterId.get();
+                }
+            }
+            if (clusterId == null) {
+                LOG.warn("Unable to find the correct cluster id for the given licenses, tests might fail. Check your license strings.");
+            } else {
+                LOG.debug("Setting cluster id to {} from imported licenses", clusterId);
+                new MongoDBFixtureImporter(Collections.emptyList()).importData(
+                        mongoDBInstance.mongoConnection().getMongoDatabase(), """
+                                  {
+                                  "cluster_config": [
+                                    {
+                                      "_id": {
+                                        "$oid": "6026a844d20e3a2e1ed57419"
+                                      },
+                                      "type": "org.graylog2.plugin.cluster.ClusterId",
+                                      "payload": {
+                                        "cluster_id": "%s"
+                                      },
+                                      "last_updated": {
+                                        "$date": "2021-02-12T16:09:40.421Z"
+                                      },
+                                      "last_updated_by": "2d4cff7a-b9c4-440c-9c62-89ba1fb06211"
+                                    }
+                                  ]
+                                }
+                                """.formatted(clusterId));
+            }
         }
     }
 

@@ -158,7 +158,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
         final SearchVersion searchVersion = BackendServiceVersions.getSearchServerVersion();
         final MongoDBVersion mongoVersion = BackendServiceVersions.getMongoDBVersion();
-        final List<URL> mongoDBFixtures = resolveFixtures(config.mongoDBFixtures(), testClass);
         final List<String> enabledFeatureFlags = List.of(config.enabledFeatureFlags());
         PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
         PluginJarsProvider datanodePluginJarsProvider = FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider())
@@ -175,7 +174,6 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 new ContainerizedGraylogBackendServicesProvider(config.serverLifecycle()),
                 searchVersion,
                 mongoVersion,
-                mongoDBFixtures,
                 pluginJarsProvider,
                 mavenProjectDirProvider,
                 enabledFeatureFlags,
