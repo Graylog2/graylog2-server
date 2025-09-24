@@ -16,8 +16,6 @@
  */
 package org.graylog.testing.completebackend.conditions;
 
-import org.graylog2.storage.SearchVersion;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,19 +23,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotated test method or class only runs if the given search server requirements apply.
+ * The annotated test method or class only runs if the given MongoDB requirements apply.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface EnabledIfSearchServer {
+public @interface EnabledIfMongoDB {
     /**
-     * Required search server distribution.
+     * Required MongoDB version. Can be a semantic versioning range. (e.g., ">=6.0")
      */
-    SearchVersion.Distribution distribution() default SearchVersion.Distribution.OPENSEARCH;
-
-    /**
-     * Required search server version. Can be a semantic versioning range. (e.g., ">=6.0")
-     */
-    String version() default "";
+    String version();
 }
