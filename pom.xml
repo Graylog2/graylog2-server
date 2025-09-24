@@ -107,7 +107,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.0</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.33.13</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.34.0</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -124,7 +124,7 @@
         <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.20.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.41.0</error-prone.version>
+        <error-prone.version>2.42.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.57.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -158,7 +158,7 @@
         <jsoup.version>1.21.2</jsoup.version>
         <kafka.version>4.1.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.25.1</log4j.version>
+        <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.2</lucene.version>
         <metrics.version>4.2.37</metrics.version>
         <mongodb-driver.version>5.6.0</mongodb-driver.version>
@@ -169,7 +169,7 @@
         <okhttp.version>5.1.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.54.1</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.20.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.20.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -180,7 +180,7 @@
         <shiro.version>2.0.5</shiro.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>6.8.3</oshi.version>
+        <oshi.version>6.9.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
@@ -200,14 +200,14 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
-        <assertj-core.version>3.27.5</assertj-core.version>
+        <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.1</equalsverifier.version>
+        <equalsverifier.version>4.1.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
@@ -599,7 +599,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
+                    <version>3.14.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -614,7 +614,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.3</version>
+                    <version>3.12.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -664,7 +664,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.19.0</version>
+                    <version>2.19.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
@@ -1065,6 +1065,7 @@
                             -Xep:FloggerLogVarargs:OFF
                             -Xep:FloggerLogWithCause:OFF
                             -Xep:FloggerMessageFormat:OFF
+                            -Xep:FloggerPerWithoutRateLimit:OFF
                             -Xep:FloggerRedundantIsEnabled:OFF
                             -Xep:FloggerRequiredModifiers:OFF
                             -Xep:FloggerSplitLogStatement:OFF
