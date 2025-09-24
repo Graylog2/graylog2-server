@@ -16,11 +16,10 @@
  */
 package org.graylog2.web.resources;
 
-import org.graylog.testing.completebackend.MavenProjectDirProviderWithFrontend;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
-@GraylogBackendConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class)
+@GraylogBackendConfiguration
 public class WebInterfaceAssetsResourceIT extends WebInterfaceAssetsResourceBase {
 
     @FullBackendTest

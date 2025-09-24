@@ -115,7 +115,6 @@ public class NodeContainerFactory {
     private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
         Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
         List<Path> pluginJars = config.pluginJarsProvider.getJars();
-        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
@@ -143,10 +142,6 @@ public class NodeContainerFactory {
                 .withExposedPorts(config.portsToExpose());
 
         container.waitingFor(getWaitStrategy(container.getEnvMap())).withStartupTimeout(Duration.of(600, SECONDS));
-
-        if (!includeFrontend) {
-            container.withEnv("DEVELOPMENT", "true");
-        }
 
         if (!config.elasticsearchVersion.isDataNode()) {
             // TODO: should we set this override search version or let graylog server to detect it from the search server itself?

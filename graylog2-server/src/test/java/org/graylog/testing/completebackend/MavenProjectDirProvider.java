@@ -30,9 +30,4 @@ public interface MavenProjectDirProvider {
     }
 
     String getUniqueId();
-
-    default boolean includeFrontend() {
-        return false;
-    }
-
 }
