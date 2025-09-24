@@ -24,26 +24,27 @@ import java.util.Optional;
 
 public interface GraylogRestApi {
     int TIMEOUT_MS = 10000;
+    Duration TIMEOUT = Duration.of(TIMEOUT_MS, ChronoUnit.MILLIS);
     int SLEEP_MS = 500;
 
     default void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
-        waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage);
+        waitFor(predicate, timeoutErrorMessage, TIMEOUT);
     }
 
     default void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage, Duration timeout) {
-        waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage, timeout);
-    }
-
-    default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
-        return waitForObject(predicate, timeoutErrorMessage, Duration.of(TIMEOUT_MS, ChronoUnit.MILLIS));
+        waitForObject(() -> Optional.ofNullable(predicate.call()).filter(result -> result), timeoutErrorMessage, timeout);
     }
 
     default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
         int msPassed = 0;
         while (msPassed <= timeout.toMillis()) {
-            final Optional<T> result = predicate.call();
-            if (result != null && result.isPresent()) {
-                return result.get();
+            try {
+                final Optional<T> result = predicate.call();
+                if (result != null && result.isPresent()) {
+                    return result.get();
+                }
+            } catch (Exception e) {
+                // ignore and retry
             }
             msPassed += SLEEP_MS;
             sleep();

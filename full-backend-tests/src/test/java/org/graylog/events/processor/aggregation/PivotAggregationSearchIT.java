@@ -53,7 +53,7 @@ public class PivotAggregationSearchIT {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ExecutionException, RetryException {
         this.indexSetId = apis.indices().createIndexSet("Pivot Aggregation Search Test", "", indexSetPrefix);
         apis.indices().waitFor(() -> apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0", indexSetPrefix + "_deflector"),
                 "Timed out waiting for index/deflector to be created.");
