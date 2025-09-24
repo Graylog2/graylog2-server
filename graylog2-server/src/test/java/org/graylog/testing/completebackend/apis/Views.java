@@ -16,11 +16,16 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import io.restassured.response.ValidatableResponse;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 
+import java.time.Duration;
 import java.util.Locale;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.iterableWithSize;
 
 public class Views implements GraylogRestApi {
     private final GraylogApis api;
@@ -36,11 +41,18 @@ public class Views implements GraylogRestApi {
         final String path = String.format(Locale.ROOT,
                 "/views?page=%d&per_page=%d&sort=%s&order=%s",
                 page, size, sort, order.name().toLowerCase(Locale.ROOT));
-        return new GraylogApiResponse(given()
-                .spec(api.requestSpecification())
-                .when()
-                .get(path)
-                .then());
+        // We've seen this call fail with the "views" field not present in the response.
+        final ValidatableResponse response = api.waitForObject(() -> Optional.of(
+                        given()
+                                .spec(api.requestSpecification())
+                                .when()
+                                .get(path)
+                                .then()
+                                .assertThat().statusCode(200)
+                                .body("views", iterableWithSize(greaterThanOrEqualTo(0)))
+                ), "Couldn't get views list", Duration.ofSeconds(10)
+        );
+        return new GraylogApiResponse(response);
     }
 
     public GraylogApiResponse getOne(String id) {
