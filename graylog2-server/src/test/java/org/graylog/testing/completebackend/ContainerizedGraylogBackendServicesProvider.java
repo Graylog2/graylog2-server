@@ -74,7 +74,15 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                                 Map<String, String> configParams,
                                 PluginJarsProvider datanodePluginJarsProvider,
                                 MavenProjectDirProvider mavenProjectDirProvider) {
-        var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
+        final var lookupKey = Services.buildLookupKey(
+                lifecycle,
+                searchVersion,
+                mongodbVersion,
+                enabledFeatureFlags,
+                configParams,
+                datanodePluginJarsProvider,
+                mavenProjectDirProvider
+        );
         return SERVICES_CACHE.computeIfAbsent(lookupKey, (k) -> {
             LOG.info("No cached services found for key \"{}\", creating new ones.", k);
             //noinspection resource
@@ -188,7 +196,13 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             this.closeCallback = requireNonNull(closeCallback, "closeCallback can't be null");
         }
 
-        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+        private static String buildLookupKey(Lifecycle lifecycle,
+                                             SearchVersion searchVersion,
+                                             MongoDBVersion mongodbVersion,
+                                             List<String> enabledFeatureFlags,
+                                             Map<String, String> configParams,
+                                             PluginJarsProvider datanodePluginJarsProvider,
+                                             MavenProjectDirProvider mavenProjectDirProvider) {
             List<String> parts = new LinkedList<>();
             parts.add(lifecycle.name());
             parts.add(searchVersion.toString());
@@ -196,6 +210,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             parts.addAll(enabledFeatureFlags);
             parts.addAll(configParams.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
             parts.add(datanodePluginJarsProvider.getUniqueId());
+            parts.add("include-frontend:" + mavenProjectDirProvider.includeFrontend());
             return String.join("-", parts);
         }
 
