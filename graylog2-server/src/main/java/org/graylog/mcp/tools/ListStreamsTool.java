@@ -19,7 +19,6 @@ package org.graylog.mcp.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.plugin.streams.Stream;
@@ -41,7 +40,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
                 NAME,
                 "List all Graylog Streams",
                 """
-                        List all available streams in the Graylog instance..
+                        List all available streams in the Graylog instance.
                         """);
         this.streamService = streamService;
     }
@@ -49,9 +48,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     @Override
     public String apply(PermissionHelper permissionHelper, ListStreamsTool.Parameters unused) {
         try (java.util.stream.Stream<Stream> dtos = streamService.streamAllDTOs()) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JodaModule());
-            return mapper.writeValueAsString(
+            return getObjectMapper().writeValueAsString(
                     dtos.filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                             .map(stream -> Map.of(
                                     "id", stream.getId(),

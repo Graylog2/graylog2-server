@@ -19,6 +19,7 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.github.victools.jsonschema.generator.OptionPreset;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
@@ -55,6 +56,7 @@ public abstract class Tool<P, O> {
 
     protected Tool(ObjectMapper objectMapper, TypeReference<P> parameterType, String name, String title, String description) {
         this.objectMapper = objectMapper;
+        this.objectMapper.registerModule(new JodaModule());
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
@@ -62,6 +64,10 @@ public abstract class Tool<P, O> {
 
         // we can precompute the schema for our parameters, it's statically known
         this.inputSchema = GENERATOR.generateSchema(parameterType.getType()).toString();
+    }
+
+    protected ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     @JsonProperty

@@ -61,7 +61,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
 
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            return new ObjectMapper().writeValueAsString(SystemOverviewResponse.create("graylog-server",
+            return getObjectMapper().writeValueAsString(SystemOverviewResponse.create("graylog-server",
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     clusterId.clusterId(),

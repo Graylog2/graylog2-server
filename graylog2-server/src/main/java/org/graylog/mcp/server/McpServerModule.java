@@ -23,6 +23,7 @@ import org.graylog.mcp.tools.ListIndicesTool;
 import org.graylog.mcp.tools.ListIndexSetsTool;
 import org.graylog.mcp.tools.ListInputsTool;
 import org.graylog.mcp.tools.ListStreamsTool;
+import org.graylog.mcp.tools.SearchTool;
 import org.graylog.mcp.tools.SystemInfoTool;
 import org.graylog.mcp.tools.ListResourceTool;
 import org.graylog.mcp.tools.ReadResourceTool;
@@ -37,6 +38,7 @@ public class McpServerModule extends PluginModule {
         addMcpTool(ListInputsTool.NAME, ListInputsTool.class);
         addMcpTool(ListIndicesTool.NAME, ListIndicesTool.class);
         addMcpTool(ListIndexSetsTool.NAME, ListIndexSetsTool.class);
+        addMcpTool(SearchTool.NAME, SearchTool.class);
         addMcpTool(SystemInfoTool.NAME, SystemInfoTool.class);
         addMcpTool(ListResourceTool.NAME, ListResourceTool.class);
         addMcpTool(ReadResourceTool.NAME, ReadResourceTool.class);

@@ -78,7 +78,7 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
                     pageItems.stream().map(resource -> List.of(resource.uri(), resource.name())).toList(),
                     next == null ? null : new PaginatedList.Cursor(PaginatedList.encodeCursor(next))
             );
-            return new ObjectMapper().writeValueAsString(payload);
+            return getObjectMapper().writeValueAsString(payload);
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize response", e);
         }
