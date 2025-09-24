@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
-import org.graylog2.datatiering.DataTieringConfig;
+//import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
@@ -29,14 +29,14 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyC
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.OpenIndexSetFilterFactory;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Period;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Comparator;
-import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -85,12 +85,12 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
         PrintWriter pw = new PrintWriter(sw);
         pw.println("Graylog Index Sets:");
 
-        List<IndexSetConfig> allowedConfigurations = indexSetConfigStream.toList();
-        allowedConfigurations.stream()
+        indexSetConfigStream = indexSetConfigStream
                 .sorted(Comparator.comparing(IndexSetConfig::title, String.CASE_INSENSITIVE_ORDER))
-                .skip(skip)
-                .limit(limit > 0 ? limit : allowedConfigurations.size())
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .skip(skip);
+        if (limit > 0) indexSetConfigStream = indexSetConfigStream.limit(limit);
+        indexSetConfigStream
+                .map(config -> IndexSetResponse.fromIndexSetConfig(config, config.equals(defaultIndexSet), null))
                 .map(this::formatSingleIndexSet)
                 .forEach(pw::println);
 
@@ -102,16 +102,16 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
 
     // TODO: use jackson-dataformat-yaml/SnakeYAML to format output instead of building string manually
 
-    private String formatSingleIndexSet(IndexSetSummary indexSetSummary) {
+    private String formatSingleIndexSet(IndexSetResponse indexSetResponse) {
         return String.join("\n",
-                formatIndexSetBasicInfo(indexSetSummary),
-                formatIndexSetStrategies(indexSetSummary),
+                formatIndexSetBasicInfo(indexSetResponse),
+                formatIndexSetStrategies(indexSetResponse),
 //                formatDataTieringInfo(indexSetSummary.dataTieringConfig()),
-                formatIndexSetTechnicalInfo(indexSetSummary)
+                formatIndexSetTechnicalInfo(indexSetResponse)
         );
     }
 
-    private String formatIndexSetBasicInfo(IndexSetSummary indexSetSummary) {
+    private String formatIndexSetBasicInfo(IndexSetResponse indexSetResponse) {
         return String.format(Locale.US, """
             - Index Set: %s %s
               ID: %s
@@ -120,23 +120,23 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
               Index Prefix: %s
               Created: %d
             """,
-            indexSetSummary.title(),
-            indexSetSummary.isDefault() ? "(DEFAULT)" : "",
-            indexSetSummary.id(),
-            indexSetSummary.description(),
-            indexSetSummary.isWritable() ? "Yes" : "No",
-            indexSetSummary.indexPrefix(),
-            indexSetSummary.creationDate().toEpochSecond()
+            indexSetResponse.title(),
+            indexSetResponse.isDefault() ? "(DEFAULT)" : "",
+            indexSetResponse.id(),
+            indexSetResponse.description(),
+            indexSetResponse.isWritable() ? "Yes" : "No",
+            indexSetResponse.indexPrefix(),
+            indexSetResponse.creationDate().toEpochSecond()
         );
     }
 
-    private String formatIndexSetStrategies(IndexSetSummary indexSetSummary) {
+    private String formatIndexSetStrategies(IndexSetResponse indexSetResponse) {
         // Rotation strategy
-        String rotationStrategy = indexSetSummary.rotationStrategyClass();
-        RotationStrategyConfig rotationConfig = indexSetSummary.rotationStrategyConfig();
+        String rotationStrategy = indexSetResponse.rotationStrategyClass();
+        RotationStrategyConfig rotationConfig = indexSetResponse.rotationStrategyConfig();
         // Retention strategy
-        String retentionStrategy = indexSetSummary.retentionStrategyClass();
-        RetentionStrategyConfig retentionConfig = indexSetSummary.retentionStrategyConfig();
+        String retentionStrategy = indexSetResponse.retentionStrategyClass();
+        RetentionStrategyConfig retentionConfig = indexSetResponse.retentionStrategyConfig();
 
         return String.format(Locale.US, """
                   Rotation Strategy: %s
@@ -190,7 +190,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
 //        return builder.toString();
 //    }
 
-    private String formatIndexSetTechnicalInfo(IndexSetSummary indexSetSummary) {
+    private String formatIndexSetTechnicalInfo(IndexSetResponse indexSetResponse) {
         return String.format(Locale.US, """
           Shards: %d
           Replicas: %d
@@ -198,11 +198,11 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
           Field Type Refresh Interval: %d ms
           Index Optimization Disabled: %s
         """,
-                Math.max(indexSetSummary.shards(), 4),
-                Math.max(indexSetSummary.replicas(), 0),
-                indexSetSummary.indexAnalyzer(),
-                indexSetSummary.fieldTypeRefreshInterval().getStandardSeconds(),
-                indexSetSummary.indexOptimizationDisabled() ? "Yes" : "No"
+                Math.max(indexSetResponse.shards(), 4),
+                Math.max(indexSetResponse.replicas(), 0),
+                indexSetResponse.indexAnalyzer(),
+                indexSetResponse.fieldTypeRefreshInterval().getStandardSeconds(),
+                indexSetResponse.indexOptimizationDisabled() ? "Yes" : "No"
         );
     }
 }
