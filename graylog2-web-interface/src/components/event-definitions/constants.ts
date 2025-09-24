@@ -40,6 +40,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
     'title',
     'description',
     'priority',
+    '_entity_source.source',
     'matched_at',
     'status',
     'scheduling',

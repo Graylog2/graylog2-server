@@ -22,6 +22,7 @@ export interface IndexRotationConfigComponentProps<Config = {}> extends SystemCo
   config: Config;
   jsonSchema: RotationJsonSchema;
   updateConfig: (update: Partial<Config>) => void;
+  disabled?: boolean;
 }
 
 type IndexRotationSummaryComponentProps<Config = {}> = {

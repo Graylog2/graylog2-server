@@ -18,7 +18,6 @@ package org.graylog.testing.completebackend.apis;
 
 import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,18 +40,18 @@ public class FieldTypes implements GraylogRestApi {
         this.api = api;
     }
 
-    public List<MappedFieldTypeDTO> getFieldTypes() {
-        final MappedFieldTypeDTO[] as = given()
-                .spec(api.requestSpecification())
-                .get("/views/fields")
-                .as(MappedFieldTypeDTO[].class);
-        return Arrays.asList(as);
+    public List<MappedFieldTypeDTO> getFieldTypes(TimeRange timeRange, Set<String> streams) {
+        return getFieldTypes(FieldTypesForStreamsRequest.Builder.builder().streams(streams).timerange(timeRange).build());
     }
 
-    public List<MappedFieldTypeDTO> getFieldTypes(TimeRange timeRange, Set<String> streams) {
+    public List<MappedFieldTypeDTO> getFieldTypes(Set<String> streams) {
+        return getFieldTypes(FieldTypesForStreamsRequest.Builder.builder().streams(streams).build());
+    }
+
+    private List<MappedFieldTypeDTO> getFieldTypes(FieldTypesForStreamsRequest request) {
         final MappedFieldTypeDTO[] as = given()
                 .spec(api.requestSpecification())
-                .body(FieldTypesForStreamsRequest.Builder.builder().streams(streams).timerange(timeRange).build())
+                .body(request)
                 .post("/views/fields")
                 .as(MappedFieldTypeDTO[].class);
         return Arrays.asList(as);
@@ -62,32 +61,24 @@ public class FieldTypes implements GraylogRestApi {
         final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
         try {
             return waitForObject(() -> {
-                final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(RelativeRange.allTime(), streams);
+                final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(streams);
                 final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
                 if (filtered.size() == expectedFields.size()) {
                     return Optional.of(filtered);
                 } else {
                     return Optional.empty();
                 }
-            }, "Timed out waiting for field definition", Duration.ofSeconds(30));
+            }, "Timed out waiting for field definition", Duration.ofSeconds(60));
         } catch (AssertionError error) {
             LOG.error("FieldTypes we're waiting for: {}", String.join(", ", expectedFields));
-            final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(RelativeRange.allTime(), streams);
+            final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(streams);
             LOG.error("FieldTypes we found: {}", String.join(", ", knownTypes.stream().map(MappedFieldTypeDTO::name).collect(Collectors.toSet())));
+            api.log();
             throw error;
         }
     }
 
-    public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(String... fieldName) {
-        final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
-        return waitForObject(() -> {
-            final List<MappedFieldTypeDTO> knownTypes = getFieldTypes();
-            final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
-            if (filtered.size() == expectedFields.size()) {
-                return Optional.of(filtered);
-            } else {
-                return Optional.empty();
-            }
-        }, "Timed out waiting for field definition");
+    public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(String... fieldNames) {
+        return waitForFieldTypeDefinitions(Set.of(), fieldNames);
     }
 }

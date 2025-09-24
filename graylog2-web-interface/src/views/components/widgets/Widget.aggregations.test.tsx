@@ -86,7 +86,7 @@ describe('Aggregation Widget', () => {
     .config(
       AggregationWidgetConfig.builder()
         .visualization(DataTable.type)
-        .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build())
+        .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().showRowNumbers(false).build())
         .build(),
     )
     .query(createElasticsearchQueryString(''))

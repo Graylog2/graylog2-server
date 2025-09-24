@@ -26,13 +26,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.fallback.PlaceholderDataTieringConfig;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_DATA_TIERING;
 
 /**
  * In-database configuration (via ClusterConfigService) for index set
@@ -92,7 +93,7 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
 
     /**
      * The property names of rotation/retention settings must match those specified on
-     * {@link org.graylog2.indexer.indexset.IndexSetConfig}, since shared UI components are used.
+     * {@link IndexSetConfig}, since shared UI components are used.
      */
     @NotBlank
     @JsonProperty(ROTATION_STRATEGY_CLASS)
