@@ -112,7 +112,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
     }
 
     private String formatIndexSetBasicInfo(IndexSetSummary indexSetSummary) {
-        return String.format("""
+        return String.format(Locale.US, """
             - Index Set: %s %s
               ID: %s
               Description: %s
@@ -138,7 +138,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
         String retentionStrategy = indexSetSummary.retentionStrategyClass();
         RetentionStrategyConfig retentionConfig = indexSetSummary.retentionStrategyConfig();
 
-        return String.format("""
+        return String.format(Locale.US, """
                   Rotation Strategy: %s
                 %s
                   Retention Strategy: {%s"
@@ -156,19 +156,19 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
         StringBuilder builder = new StringBuilder();
         String prefix = " ".repeat(indentation);
         if (rotationStrategyConfig instanceof TimeBasedRotationStrategyConfig) {
-            builder.append(String.format("%sPeriod: %s", prefix, ((TimeBasedRotationStrategyConfig) rotationStrategyConfig).rotationPeriod())).append("\n");
+            builder.append(String.format(Locale.US, "%sPeriod: %s", prefix, ((TimeBasedRotationStrategyConfig) rotationStrategyConfig).rotationPeriod())).append("\n");
         }
 //        if (rotationStrategyConfig instanceof SizeBasedRotationStrategyConfig) {
 //            double sizeGB = (double) ((SizeBasedRotationStrategyConfig) rotationStrategyConfig).maxSizeBytes() / (1024 * 1024 * 1024);
-//            builder.append(String.format("Max Size: %.1f GB", sizeGB));
+//            builder.append(String.format(Locale.US, "Max Size: %.1f GB", sizeGB));
 //        }
         if (rotationStrategyConfig instanceof SizeBasedRotationStrategyConfig) {
-            builder.append(String.format("%sMax Size: %d", prefix, ((SizeBasedRotationStrategyConfig) rotationStrategyConfig).maxSize())).append("\n");
+            builder.append(String.format(Locale.US, "%sMax Size: %d", prefix, ((SizeBasedRotationStrategyConfig) rotationStrategyConfig).maxSize())).append("\n");
         }
         if (rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig) {
             Period lifetimeMin = ((TimeBasedSizeOptimizingStrategyConfig) rotationStrategyConfig).indexLifetimeMin();
             Period lifetimeMax = ((TimeBasedSizeOptimizingStrategyConfig) rotationStrategyConfig).indexLifetimeMax();
-            builder.append(String.format("%sLifetime: %s to %s", prefix, lifetimeMin, lifetimeMax)).append("\n");
+            builder.append(String.format(Locale.US, "%sLifetime: %s to %s", prefix, lifetimeMin, lifetimeMax)).append("\n");
         }
 
         return builder.toString();
@@ -178,20 +178,20 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
 //        if  (dataTieringConfig == null) return "";
 //        StringBuilder builder = new StringBuilder();
 //        String tieringType = dataTieringConfig.type();
-//        builder.append(String.format("  Data Tiering: %s", tieringType)).append("\n");
+//        builder.append(String.format(Locale.US, "  Data Tiering: %s", tieringType)).append("\n");
 //        if (dataTieringConfig instanceof HotWarmDataTieringConfig) {
 //            HotWarmDataTieringConfig config = (HotWarmDataTieringConfig) dataTieringConfig;
-//            builder.append(String.format("    Warm Tier Enabled: %s", (config.warmTierEnabled() ? "Yes" : "No"))).append("\n");
-//            builder.append(String.format("    Index Lifetime: %s to %s", dataTieringConfig.indexLifetimeMin(), dataTieringConfig.indexLifetimeMax())).append("\n");
-//            builder.append(String.format("    Hot Phase Duration: %s", config.indexHotLifetimeMin())).append("\n");
-//            builder.append(String.format("    Warm Tier Repository: %s", config.warmTierRepositoryName())).append("\n");
-//            builder.append(String.format("    Archive Before Deletion: %s", (config.archiveBeforeDeletion() ? "Yes" : "No"))).append("\n");
+//            builder.append(String.format(Locale.US, "    Warm Tier Enabled: %s", (config.warmTierEnabled() ? "Yes" : "No"))).append("\n");
+//            builder.append(String.format(Locale.US, "    Index Lifetime: %s to %s", dataTieringConfig.indexLifetimeMin(), dataTieringConfig.indexLifetimeMax())).append("\n");
+//            builder.append(String.format(Locale.US, "    Hot Phase Duration: %s", config.indexHotLifetimeMin())).append("\n");
+//            builder.append(String.format(Locale.US, "    Warm Tier Repository: %s", config.warmTierRepositoryName())).append("\n");
+//            builder.append(String.format(Locale.US, "    Archive Before Deletion: %s", (config.archiveBeforeDeletion() ? "Yes" : "No"))).append("\n");
 //        }
 //        return builder.toString();
 //    }
 
     private String formatIndexSetTechnicalInfo(IndexSetSummary indexSetSummary) {
-        return String.format("""
+        return String.format(Locale.US, """
           Shards: %d
           Replicas: %d
           Index Analyzer: %s
