@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
-import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
 @GraylogBackendConfiguration
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
+public class CountsIT extends SearchServerBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     private static final String INDEX_NAME_3 = "index_set_3_counts_test_0";

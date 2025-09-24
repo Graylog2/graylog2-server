@@ -25,25 +25,25 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * This class can be used as base class for Elasticsearch integration tests.
+ * This class can be used as base class for search server integration tests.
  * <p>
  * Check the {@link #importFixture(String)} method if you need to load fixture data from JSON files.
  */
-public abstract class ContainerMatrixElasticsearchBaseTest {
-    private static SearchServerInstance elasticsearch;
+public abstract class SearchServerBaseTest {
+    private static SearchServerInstance searchServer;
 
     protected SearchServerInstance searchServer() {
-        return elasticsearch;
+        return searchServer;
     }
 
     @BeforeAll
     public static void before(SearchServerInstance searchServerInstance) {
-        elasticsearch = searchServerInstance;
+        searchServer = searchServerInstance;
         addGraylogDefaultIndexTemplate();
     }
 
     private static void addGraylogDefaultIndexTemplate() {
-        addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch.version()));
+        addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer.version()));
     }
 
     private static Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
@@ -57,17 +57,17 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
         for (var template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            elasticsearch.client().putTemplate(templateName, template.getValue());
+            searchServer.client().putTemplate(templateName, template.getValue());
         }
     }
 
     /**
-     * Returns a custom Elasticsearch client with a bunch of utility methods.
+     * Returns a custom search server client with a bunch of utility methods.
      *
      * @return the client
      */
     protected Client client() {
-        return elasticsearch.client();
+        return searchServer.client();
     }
 
     /**
@@ -79,6 +79,6 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
      * @param resourcePath the fixture resource path
      */
     protected void importFixture(String resourcePath) {
-        elasticsearch.importFixtureResource(resourcePath, getClass());
+        searchServer.importFixtureResource(resourcePath, getClass());
     }
 }

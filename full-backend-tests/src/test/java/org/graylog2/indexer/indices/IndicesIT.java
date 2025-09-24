@@ -25,7 +25,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
-import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -80,7 +80,7 @@ import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
-public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
+public class IndicesIT extends SearchServerBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
