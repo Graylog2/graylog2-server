@@ -28,6 +28,7 @@ import org.graylog2.rest.resources.entities.FilterOption;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.or;
@@ -73,5 +74,14 @@ public class DBEntitySourceService {
                 in(EntitySource.FIELD_PARENT_ID, entityObjectIds)
         );
         collection.deleteMany(filter);
+    }
+
+    public boolean existsForTypeAndSource(String entityType, String source) {
+        final Bson filter = and(
+                eq(EntitySource.FIELD_ENTITY_TYPE, entityType),
+                eq(EntitySource.FIELD_SOURCE, source)
+        );
+
+        return collection.countDocuments(filter) > 0L;
     }
 }
