@@ -16,9 +16,10 @@
  */
 package org.graylog2.indexer;
 
+import jakarta.annotation.Nonnull;
+import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.storage.SearchVersion;
-import jakarta.annotation.Nonnull;
 
 import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
@@ -29,7 +30,7 @@ public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate>
     @Nonnull
     @Override
     public T create(@Nonnull SearchVersion searchVersion,
-                                       IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+                    @Nonnull IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         if (isProperSearchVersion(searchVersion)) {
             return createTemplateInstance();
         } else {
@@ -40,7 +41,7 @@ public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate>
     private boolean isProperSearchVersion(@Nonnull SearchVersion searchVersion) {
         return searchVersion.satisfies(ELASTICSEARCH, "^7.0.0")
                 || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
-                || searchVersion.satisfies(DATANODE, "^5.2.0");
+                || searchVersion.satisfies(DATANODE, SearchVersionRange.DATANODE_VERSION_RANGE);
     }
 
     protected abstract T createTemplateInstance();

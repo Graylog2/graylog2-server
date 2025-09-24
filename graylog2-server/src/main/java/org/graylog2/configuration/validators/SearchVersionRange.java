@@ -17,10 +17,15 @@
 package org.graylog2.configuration.validators;
 
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.Version;
 import org.graylog2.storage.SearchVersion;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 public abstract class SearchVersionRange {
+    public static final String DATANODE_VERSION_RANGE = f(">=%d.0.0", Version.CURRENT_CLASSPATH.getVersion().majorVersion());
+
     public abstract SearchVersion.Distribution distribution();
 
     /**
