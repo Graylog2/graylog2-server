@@ -26,6 +26,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import {CurrentUserStore} from 'stores/users/CurrentUserStore';
+import type {SearchParams} from 'stores/PaginationTypes';
+import type {PaginatedResponse} from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
@@ -49,6 +52,7 @@ const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventN
 });
 
 const EventNotificationsContainer = () => {
+  const currentUser = CurrentUserStore.getInitialState();
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -76,6 +80,12 @@ const EventNotificationsContainer = () => {
     [handleTest, isLoadingTest],
   );
 
+  const fetchEntities = async (searchParams: SearchParams): Promise<PaginatedResponse<EventNotification>> => {
+    CurrentUserStore.update(currentUser.currentUser.username);
+
+    return fetchEventNotifications(searchParams);
+  };
+
   return (
     <PaginatedEntityTable<EventNotification>
       humanName="event notifications"
@@ -83,7 +93,7 @@ const EventNotificationsContainer = () => {
       queryHelpComponent={<QueryHelper entityName="notification" />}
       entityActions={renderEvenNotificationActions}
       tableLayout={DEFAULT_LAYOUT}
-      fetchEntities={fetchEventNotifications}
+      fetchEntities={fetchEntities}
       keyFn={keyFn}
       bulkSelection={{ actions: <BulkActions /> }}
       entityAttributesAreCamelCase
