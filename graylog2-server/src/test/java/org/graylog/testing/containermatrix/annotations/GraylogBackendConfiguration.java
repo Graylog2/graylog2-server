@@ -46,35 +46,41 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestInstance(PER_CLASS)
 @Testable
 public @interface GraylogBackendConfiguration {
-
     @interface Env {
+        /**
+         * The upper-case key of the environment variable to set.
+         */
         String key();
 
+        /**
+         * The value to set the environment variable to.
+         */
         String value();
     }
 
+    /**
+     * Defines environment variables to set in the Graylog and Data Node containers. Note: can't be used with
+     * Lifecycle.VM, as the container is reused between tests.
+     */
     Env[] env() default {};
 
-    // combination rule
+    /**
+     * Defines the lifecycle of the Graylog server container.
+     */
     Lifecycle serverLifecycle() default Lifecycle.VM;
 
-    // combination rule
     Class<? extends MavenProjectDirProvider> mavenProjectDirProvider() default DefaultMavenProjectDirProvider.class;
 
-    // combination rule
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
 
     /**
-     * A list of Graylog Feature Flags that should be enabled for this test.
-     *
-     * @return enabled feature flags
+     * A list of Graylog Feature Flags that should be enabled for this test. Note: can't be used with
+     * Lifecycle.VM, as the container is reused between tests.
      */
     String[] enabledFeatureFlags() default {};
 
     /**
-     * Import existing GL licenses directly into Mongo to avoid possible race conditions during tests,
-     * that occured if the licenses where imported via REST
-     * Disabling only works with Lifecycle.CLASS because a new container is spun up.
+     * Automatically import licenses on server startup. Note: can't be used with Lifecycle.VM.
      */
     boolean importLicenses() default GraylogBackendExtension.IMPORT_LICENSES_DEFAULT;
 
