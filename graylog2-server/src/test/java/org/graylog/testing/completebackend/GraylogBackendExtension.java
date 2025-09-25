@@ -24,8 +24,6 @@ import org.graylog.testing.completebackend.conditions.EnabledIfMongoDBCondition;
 import org.graylog.testing.completebackend.conditions.EnabledIfSearchServerCondition;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog.testing.mongodb.MongoDBVersion;
-import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
@@ -51,19 +49,23 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
 
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
-    private static final Set<Class<?>> SUPPORTED_TYPES = ImmutableSet.of(SearchServerInstance.class, GraylogApis.class);
-    public static final String VM_LIFECYCLE_BACKEND_KEY = "vm_lifecycle_backend";
-    public static final String CLASS_LIFECYCLE_BACKEND_KEY = "class_lifecycle_backend";
-    public static final String BACKEND_LIFECYCLE_KEY = "backend_lifecycle";
+    private static final String VM_LIFECYCLE_BACKEND_KEY = "vm_lifecycle_backend";
+    private static final String CLASS_LIFECYCLE_BACKEND_KEY = "class_lifecycle_backend";
+    private static final String BACKEND_LIFECYCLE_KEY = "backend_lifecycle";
 
-    public static final String SEARCH_SERVER_DISTRIBUTION_PROPERTY = "test.integration.search-server.distribution";
-    public static final String SEARCH_SERVER_VERSION_PROPERTY = "test.integration.search-server.version";
-    public static final String MONGODB_VERSION_PROPERTY = "test.integration.mongodb.version";
+    private static final Set<Class<?>> SUPPORTED_PARAMETER_TYPES = ImmutableSet.of(
+            SearchServerInstance.class,
+            GraylogApis.class
+    );
+
+    static final String SEARCH_SERVER_DISTRIBUTION_PROPERTY = "test.integration.search-server.distribution";
+    static final String SEARCH_SERVER_VERSION_PROPERTY = "test.integration.search-server.version";
+    static final String MONGODB_VERSION_PROPERTY = "test.integration.mongodb.version";
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext,
                                      ExtensionContext extensionContext) throws ParameterResolutionException {
-        if (SUPPORTED_TYPES.contains(parameterContext.getParameter().getType())) {
+        if (SUPPORTED_PARAMETER_TYPES.contains(parameterContext.getParameter().getType())) {
             if (parameterContext.getDeclaringExecutable() instanceof Constructor) {
                 LOG.error(
                         "Do not use constructor injection for SearchServerInstance or GraylogApis, instead use static lifecycle methods");
@@ -128,37 +130,34 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         // remember the lifecycle, we need it when deciding which value to inject into parameters
         store.put(BACKEND_LIFECYCLE_KEY, config.serverLifecycle());
 
-        // TODO check if we have to run fixture imports on the new backend somehow
-        // we should push all of them out of the annotation and into the test lifecycle
-
         // check if we have to create the VM lifecycle backend
         // note that ContainerizedGraylogBackend implements CloseableResource so junit will properly close the instances
         // as their contexts go out of scope.
-        if (config.serverLifecycle() == Lifecycle.VM && rootStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
-            // this backend will be re-used and only shut down at the very end
-            LOG.info("Creating VM-lifecycle backend");
-            final ContainerizedGraylogBackend graylogBackend = createBackend(config, context.getRequiredTestClass());
-            LOG.info("Created VM-lifecycle Graylog backend: {}", graylogBackend);
-            rootStore.put(VM_LIFECYCLE_BACKEND_KEY, graylogBackend);
+        if (config.serverLifecycle() == Lifecycle.VM) {
+            if (rootStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
+                // this backend will be re-used and only shut down at the very end
+                LOG.info("Creating VM-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
+                final var sw = Stopwatch.createStarted();
+                final var backend = createBackend(config, context.getRequiredTestClass());
+                LOG.info("Created VM-lifecycle server backend for class {} in {}",
+                        context.getRequiredTestClass().getName(), sw.stop().elapsed());
+                rootStore.put(VM_LIFECYCLE_BACKEND_KEY, backend);
+            } else {
+                LOG.info("Re-using existing VM-lifecycle server backend for class {}",
+                        context.getRequiredTestClass().getName());
+            }
         } else if (config.serverLifecycle() == Lifecycle.CLASS) {
             // class lifecycle means we have to create a new backend
             LOG.info("Creating class-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
             final var sw = Stopwatch.createStarted();
-            var graylogBackend = createBackend(config, context.getRequiredTestClass());
-            LOG.info("Created class-lifecycle server backend for class {} in {}", context.getRequiredTestClass().getName(), sw.stop().elapsed());
-            store.put(CLASS_LIFECYCLE_BACKEND_KEY, graylogBackend);
+            final var backend = createBackend(config, context.getRequiredTestClass());
+            LOG.info("Created class-lifecycle server backend for class {} in {}",
+                    context.getRequiredTestClass().getName(), sw.stop().elapsed());
+            store.put(CLASS_LIFECYCLE_BACKEND_KEY, backend);
         }
     }
 
     private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
-        final SearchVersion searchVersion = BackendServiceVersions.getSearchServerVersion();
-        final MongoDBVersion mongoVersion = BackendServiceVersions.getMongoDBVersion();
-        final List<String> enabledFeatureFlags = List.of(config.enabledFeatureFlags());
-        PluginJarsProvider pluginJarsProvider = FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create();
-        PluginJarsProvider datanodePluginJarsProvider = FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider())
-                .create();
-        MavenProjectDirProvider mavenProjectDirProvider = FactoryUtils.instantiateFactory(config.mavenProjectDirProvider())
-                .create();
         final Map<String, String> configParams = Arrays.stream(config.additionalConfigurationParameters())
                 .collect(Collectors.toMap(
                         GraylogBackendConfiguration.ConfigurationParameter::key,
@@ -167,14 +166,14 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
 
         return ContainerizedGraylogBackend.createStarted(
                 new ContainerizedGraylogBackendServicesProvider(config.serverLifecycle()),
-                searchVersion,
-                mongoVersion,
-                pluginJarsProvider,
-                mavenProjectDirProvider,
-                enabledFeatureFlags,
+                BackendServiceVersions.getSearchServerVersion(),
+                BackendServiceVersions.getMongoDBVersion(),
+                FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create(),
+                FactoryUtils.instantiateFactory(config.mavenProjectDirProvider()).create(),
+                List.of(config.enabledFeatureFlags()),
                 config.importLicenses(),
                 configParams,
-                datanodePluginJarsProvider
+                FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider()).create()
         );
     }
 
