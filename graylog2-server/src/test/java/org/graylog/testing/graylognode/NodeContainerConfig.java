@@ -45,7 +45,7 @@ public class NodeContainerConfig {
     public final MavenProjectDirProvider mavenProjectDirProvider;
     private final List<String> enabledFeatureFlags;
     public final Optional<String> proxiedRequestsTimeout;
-    public final Map<String, String> configParams;
+    public final Map<String, String> env;
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
@@ -56,7 +56,7 @@ public class NodeContainerConfig {
                                PluginJarsProvider pluginJarsProvider,
                                MavenProjectDirProvider mavenProjectDirProvider,
                                List<String> enabledFeatureFlags,
-                               Map<String, String> configParams) {
+                               Map<String, String> env) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.passwordSecret = passwordSecret;
@@ -68,7 +68,7 @@ public class NodeContainerConfig {
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
         this.proxiedRequestsTimeout = stringFromEnvVar("GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT");
-        this.configParams = configParams;
+        this.env = env;
     }
 
     public static boolean flagFromEnvVar(String flagName) {

@@ -47,11 +47,13 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @Testable
 public @interface GraylogBackendConfiguration {
 
-    @interface ConfigurationParameter {
+    @interface Env {
         String key();
 
         String value();
     }
+
+    Env[] env() default {};
 
     // combination rule
     Lifecycle serverLifecycle() default Lifecycle.VM;
@@ -75,8 +77,6 @@ public @interface GraylogBackendConfiguration {
      * Disabling only works with Lifecycle.CLASS because a new container is spun up.
      */
     boolean importLicenses() default true;
-
-    ConfigurationParameter[] additionalConfigurationParameters() default {};
 
     Class<? extends PluginJarsProvider> datanodePluginJarsProvider() default NoPluginJarsProvider.class;
 }

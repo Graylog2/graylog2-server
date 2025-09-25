@@ -24,11 +24,10 @@ import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {
-                                     @GraylogBackendConfiguration.ConfigurationParameter(
-                                             key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
-                             })
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
+)
 class AutomaticLeaderElectionStartupIT {
     private static GraylogApis api;
 

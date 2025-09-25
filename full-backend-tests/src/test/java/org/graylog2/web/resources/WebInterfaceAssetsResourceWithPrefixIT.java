@@ -20,10 +20,10 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.annotations.FullBackendTest;
 import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {
-                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
-                             })
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
+)
 public class WebInterfaceAssetsResourceWithPrefixIT extends WebInterfaceAssetsResourceBase {
 
     @FullBackendTest

@@ -37,7 +37,7 @@ import static java.time.Duration.ofSeconds;
 import static org.awaitility.Awaitility.waitAtMost;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")}
+                             env = {@GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")}
 )
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeOpensearchProxyIT {

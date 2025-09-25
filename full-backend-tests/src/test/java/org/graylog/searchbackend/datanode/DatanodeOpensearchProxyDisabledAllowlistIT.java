@@ -25,10 +25,9 @@ import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {@GraylogBackendConfiguration.ConfigurationParameter(
-                                     key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST",
-                                     value = "false")})
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false"))
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeOpensearchProxyDisabledAllowlistIT {
     private GraylogApis apis;

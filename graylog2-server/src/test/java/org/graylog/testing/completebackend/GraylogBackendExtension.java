@@ -119,7 +119,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         final GraylogBackendConfiguration config = backendConfiguration.get();
 
         if (config.serverLifecycle() == Lifecycle.VM) {
-            if (config.additionalConfigurationParameters().length > 0) {
+            if (config.env().length > 0) {
                 throw new IllegalArgumentException("Additional configuration parameters cannot be used with VM lifecycle");
             }
             if (config.enabledFeatureFlags().length > 0) {
@@ -158,10 +158,10 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     }
 
     private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
-        final Map<String, String> configParams = Arrays.stream(config.additionalConfigurationParameters())
+        final Map<String, String> env = Arrays.stream(config.env())
                 .collect(Collectors.toMap(
-                        GraylogBackendConfiguration.ConfigurationParameter::key,
-                        GraylogBackendConfiguration.ConfigurationParameter::value
+                        GraylogBackendConfiguration.Env::key,
+                        GraylogBackendConfiguration.Env::value
                 ));
 
         return ContainerizedGraylogBackend.createStarted(
@@ -172,7 +172,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 FactoryUtils.instantiateFactory(config.mavenProjectDirProvider()).create(),
                 List.of(config.enabledFeatureFlags()),
                 config.importLicenses(),
-                configParams,
+                env,
                 FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider()).create()
         );
     }

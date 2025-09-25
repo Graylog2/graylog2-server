@@ -80,9 +80,9 @@ import static org.hamcrest.Matchers.not;
 
 @SuppressWarnings("UnstableApiUsage")
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {
-                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             env = {
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
                              })
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeProvisioningIT {

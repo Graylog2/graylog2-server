@@ -55,28 +55,39 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private final NodeInstance node;
     private final boolean stopServicesOnClose;
 
-    private ContainerizedGraylogBackend(Services services,
+    private ContainerizedGraylogBackend(final Services services,
                                         final PluginJarsProvider pluginJarsProvider,
                                         final MavenProjectDirProvider mavenProjectDirProvider,
                                         final List<String> enabledFeatureFlags,
                                         final boolean preImportLicense,
-                                        Map<String, String> configParams) {
+                                        final Map<String, String> env) {
         this.services = services;
         // We don't want services for tests with custom flags or config params to be re-used, so we stop them
         // when the backend is closed.
-        this.stopServicesOnClose = !enabledFeatureFlags.isEmpty() || !configParams.isEmpty();
+        this.stopServicesOnClose = !enabledFeatureFlags.isEmpty() || !env.isEmpty();
 
-        var mongoDB = services.getMongoDBInstance();
+        final var mongoDB = services.getMongoDBInstance();
         LOG.info("Running backend with MongoDB version {} (instance: {})", mongoDB.version(), mongoDB.instanceId());
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
-        var searchServer = services.getSearchServerInstance();
+        final var searchServer = services.getSearchServerInstance();
         LOG.info("Running backend with SearchServer version {} (instance: {})", searchServer.version(), searchServer.instanceId());
         try {
-            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), MongoDBInstance.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
+            final var nodeContainerConfig = new NodeContainerConfig(
+                    services.getNetwork(),
+                    MongoDBInstance.internalUri(),
+                    PASSWORD_SECRET,
+                    ROOT_PASSWORD_SHA_2,
+                    searchServer.internalUri(),
+                    searchServer.version(),
+                    pluginJarsProvider,
+                    mavenProjectDirProvider,
+                    enabledFeatureFlags,
+                    env
+            );
             this.node = NodeInstance.createStarted(nodeContainerConfig);
         } catch (Exception ex) {
             // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
@@ -85,15 +96,15 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         }
     }
 
-    public synchronized static ContainerizedGraylogBackend createStarted(ContainerizedGraylogBackendServicesProvider servicesProvider,
+    public synchronized static ContainerizedGraylogBackend createStarted(final ContainerizedGraylogBackendServicesProvider servicesProvider,
                                                                          final SearchVersion version,
                                                                          final MongoDBVersion mongodbVersion,
                                                                          final PluginJarsProvider pluginJarsProvider,
                                                                          final MavenProjectDirProvider mavenProjectDirProvider,
                                                                          final List<String> enabledFeatureFlags,
                                                                          final boolean preImportLicense,
-                                                                         Map<String, String> env,
-                                                                         PluginJarsProvider datanodePluginJarsProvider) {
+                                                                         final Map<String, String> env,
+                                                                         final PluginJarsProvider datanodePluginJarsProvider) {
         // Ensure that the server and Data Node are built before trying to start the containers.
         MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
 

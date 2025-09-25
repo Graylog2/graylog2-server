@@ -67,8 +67,12 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         this.lifecycle = lifecycle;
     }
 
-    public Services getServices(SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
-        var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, enabledFeatureFlags, configParams, datanodePluginJarsProvider);
+    public Services getServices(SearchVersion searchVersion,
+                                MongoDBVersion mongodbVersion,
+                                List<String> enabledFeatureFlags,
+                                Map<String, String> env,
+                                PluginJarsProvider datanodePluginJarsProvider) {
+        var lookupKey = Services.buildLookupKey(lifecycle, searchVersion, mongodbVersion, enabledFeatureFlags, env, datanodePluginJarsProvider);
         return SERVICES_CACHE.computeIfAbsent(lookupKey, (k) -> {
             LOG.info("No cached services found for key \"{}\", creating new ones.", k);
             //noinspection resource
@@ -76,7 +80,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                     searchVersion,
                     mongodbVersion,
                     enabledFeatureFlags,
-                    configParams,
+                    env,
                     datanodePluginJarsProvider,
                     () -> SERVICES_CACHE.remove(k)
             );
@@ -106,7 +110,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private static Services create(SearchVersion searchVersion,
                                        MongoDBVersion mongodbVersion,
                                        List<String> enabledFeatureFlags,
-                                       Map<String, String> envProperties,
+                                       Map<String, String> env,
                                        PluginJarsProvider datanodePluginJarsProvider,
                                        Runnable closeCallback) {
             try (var executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
@@ -133,14 +137,14 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                         .orElseThrow(() -> new UnsupportedOperationException(
                                 "Search version " + searchVersion + " not supported."));
                 LOG.debug("Starting search server: {}", searchVersion);
-                SearchServerInstance searchServer = builder
+                final SearchServerInstance searchServer = builder
                         .cachedInstance(false) // This service layer caches OpenSearch instances itself
                         .network(network)
                         .mongoDbUri(MongoDBInstance.internalUri())
                         .passwordSecret(PASSWORD_SECRET)
                         .rootPasswordSha2(ROOT_PASSWORD_SHA_2)
                         .featureFlags(enabledFeatureFlags)
-                        .env(envProperties)
+                        .env(env)
                         .datanodePluginJarsProvider(datanodePluginJarsProvider)
                         .build();
                 LOG.debug("Startup of the search server {} took {} (instance: {})", searchVersion,
@@ -177,13 +181,18 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             this.closeCallback = requireNonNull(closeCallback, "closeCallback can't be null");
         }
 
-        private static String buildLookupKey(Lifecycle lifecycle, SearchVersion searchVersion, MongoDBVersion mongodbVersion, List<String> enabledFeatureFlags, Map<String, String> configParams, PluginJarsProvider datanodePluginJarsProvider) {
+        private static String buildLookupKey(Lifecycle lifecycle,
+                                             SearchVersion searchVersion,
+                                             MongoDBVersion mongodbVersion,
+                                             List<String> enabledFeatureFlags,
+                                             Map<String, String> env,
+                                             PluginJarsProvider datanodePluginJarsProvider) {
             List<String> parts = new LinkedList<>();
             parts.add(lifecycle.name());
             parts.add(searchVersion.toString());
             parts.add("MongoDB:" + mongodbVersion.version());
             parts.addAll(enabledFeatureFlags);
-            parts.addAll(configParams.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
+            parts.addAll(env.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
             parts.add(datanodePluginJarsProvider.getUniqueId());
             return String.join("-", parts);
         }

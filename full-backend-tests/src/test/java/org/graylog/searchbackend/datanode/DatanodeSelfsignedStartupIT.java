@@ -40,12 +40,14 @@ import org.slf4j.LoggerFactory;
 import java.time.Clock;
 import java.util.concurrent.ExecutionException;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {
-                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
-                                     @GraylogBackendConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                             })
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = {
+                @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                @GraylogBackendConfiguration.Env(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+                @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+        }
+)
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeSelfsignedStartupIT {
 

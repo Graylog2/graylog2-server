@@ -29,11 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
-                             additionalConfigurationParameters = {
-                                     @GraylogBackendConfiguration.ConfigurationParameter(
-                                             key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")
-                             }
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")
 )
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeRestProxyIT {
