@@ -56,10 +56,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     public static final String CLASS_LIFECYCLE_BACKEND_KEY = "class_lifecycle_backend";
     public static final String BACKEND_LIFECYCLE_KEY = "backend_lifecycle";
 
-    public static final String SEARCH_SERVER_IMAGE_PROPERTY = "test.integration.search-server.image";
     public static final String SEARCH_SERVER_DISTRIBUTION_PROPERTY = "test.integration.search-server.distribution";
     public static final String SEARCH_SERVER_VERSION_PROPERTY = "test.integration.search-server.version";
-    public static final String MONGODB_IMAGE_PROPERTY = "test.integration.mongodb.image";
     public static final String MONGODB_VERSION_PROPERTY = "test.integration.mongodb.version";
 
     @Override
