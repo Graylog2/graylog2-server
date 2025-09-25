@@ -93,15 +93,15 @@ public class SessionDAO extends CachingSessionDAO {
     }
 
     private void doUpdate(SimpleSession session) {
-        final var databaseId = sessionService.getBySessionId(session.getId().toString()).map(SessionDTO::id)
-                .orElseThrow(() -> new RuntimeException("Couldn't load session"));
-
         LOG.debug("Updating session");
 
-        final var sessionDTO = SessionDTO.fromSimpleSession(session, databaseId);
+        final var sessionDTO = sessionService.getBySessionId(session.getId().toString())
+                .map(SessionDTO::id)
+                .map(id -> SessionDTO.fromSimpleSession(session).toBuilder().id(id).build())
+                .orElseThrow(() -> new RuntimeException("Couldn't load session"));
 
         // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
-        // We need to retry the update, and stagger them a bit, so no all of the retries attempt it at the same time again.
+        // We need to retry the update, and stagger them a bit, so no all of them retries attempt it at the same time again.
         // Usually this should succeed the first time, though
         final var retryer = RetryerBuilder.<Void>newBuilder()
                 .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))

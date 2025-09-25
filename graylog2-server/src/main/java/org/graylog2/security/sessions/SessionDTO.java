@@ -21,31 +21,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.Iterables;
 import jakarta.annotation.Nullable;
 import org.apache.shiro.session.mgt.SimpleSession;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.graylog2.database.BuildableMongoEntity;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @AutoValue
 @JsonSerialize(as = SessionDTO.class)
 @JsonDeserialize(builder = SessionDTO.Builder.class)
 public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, SessionDTO.Builder> {
-
     public static final String FIELD_SESSION_ID = "session_id";
     public static final String FIELD_TIMEOUT = "timeout";
     public static final String FIELD_START_TIMESTAMP = "start_timestamp";
     public static final String FIELD_LAST_ACCESS_TIME = "last_access_time";
     public static final String FIELD_EXPIRED = "expired";
     public static final String FIELD_HOST = "host";
-    public static final String FIELD_ATTRIBUTES = "attributes";
+    public static final String FIELD_AUTHENTICATION_REALM = "authentication_realm";
+    public static final String FIELD_USER_ID = "user_id";
+    public static final String FIELD_USER_NAME = "user_name";
+    public static final String FIELD_AUTHENTICATED = "authenticated";
+    public static final String FIELD_AUTH_CONTEXT = "auth_context";
 
     @JsonProperty(FIELD_SESSION_ID)
     public abstract String sessionId();
@@ -65,8 +62,20 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
     @JsonProperty(FIELD_HOST)
     public abstract String host();
 
-    @JsonProperty(FIELD_ATTRIBUTES)
-    public abstract Map<String, Object> attributes();
+    @JsonProperty(FIELD_AUTHENTICATION_REALM)
+    public abstract Optional<String> authenticationRealm();
+
+    @JsonProperty(FIELD_USER_ID)
+    public abstract Optional<String> userId();
+
+    @JsonProperty(FIELD_USER_NAME)
+    public abstract Optional<String> userName();
+
+    @JsonProperty(FIELD_AUTHENTICATED)
+    abstract Optional<Boolean> authenticated();
+
+    @JsonProperty(FIELD_AUTH_CONTEXT)
+    public abstract Optional<AuthContext> authContext();
 
     public static Builder builder() {
         return Builder.create();
@@ -94,8 +103,20 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
         @JsonProperty(FIELD_HOST)
         public abstract Builder host(String host);
 
-        @JsonProperty(FIELD_ATTRIBUTES)
-        public abstract Builder attributes(Map<String, Object> attributes);
+        @JsonProperty(FIELD_AUTHENTICATION_REALM)
+        public abstract Builder authenticationRealm(@Nullable String authenticationRealm);
+
+        @JsonProperty(FIELD_USER_ID)
+        public abstract Builder userId(@Nullable String userId);
+
+        @JsonProperty(FIELD_USER_NAME)
+        public abstract Builder userName(@Nullable String userName);
+
+        @JsonProperty(FIELD_AUTHENTICATED)
+        public abstract Builder authenticated(@Nullable Boolean authenticated);
+
+        @JsonProperty(FIELD_AUTH_CONTEXT)
+        public abstract Builder authContext(@Nullable AuthContext authContext);
 
         public abstract SessionDTO build();
 
@@ -105,43 +126,12 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
         }
     }
 
-    public static SessionDTO fromSimpleSession(SimpleSession session) {
-        return fromSimpleSession(session, null);
-    }
-
-    public static SessionDTO fromSimpleSession(SimpleSession session, @Nullable String databaseId) {
-        var builder = SessionDTO.builder()
-                .expired(session.isExpired())
-                .sessionId(session.getId().toString())
-                .host(session.getHost())
-                .timeout(session.getTimeout())
-                .startTimestamp(session.getStartTimestamp().toInstant())
-                .lastAccessTime(session.getLastAccessTime().toInstant())
-                .attributes(session.getAttributeKeys().stream()
-                        .collect(Collectors.toMap(Object::toString, session::getAttribute)));
-        if (databaseId != null) {
-            builder = builder.id(databaseId);
-        }
-        return builder.build();
+    public static SessionDTO fromSimpleSession(SimpleSession simpleSession) {
+        return SessionConverter.simpleSessionToSessionDTO(simpleSession);
     }
 
     public SimpleSession toSimpleSession() {
-        final SimpleSession session = new SimpleSession();
-        session.setId(sessionId());
-        session.setHost(host());
-        session.setTimeout(timeout());
-        session.setStartTimestamp(Date.from(startTimestamp()));
-        session.setLastAccessTime(Date.from(lastAccessTime()));
-        session.setExpired(expired());
-        session.setAttributes(Map.copyOf(attributes()));
-        return session;
-    }
-
-    public Optional<String> userId() {
-        // A subject can have more than one principal. If that's the case, the user ID is required to be the first one.
-        return Optional.ofNullable(attributes().get(DefaultSubjectContext.PRINCIPALS_SESSION_KEY))
-                .map(principals -> principals instanceof Iterable<?> iterable ? iterable : List.of(principals))
-                .map(principals -> Iterables.getFirst(principals, null))
-                .map(Object::toString);
+        return SessionConverter.sessionDTOToSimpleSession(this);
     }
 }
+
