@@ -44,6 +44,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * JUnit extension that provides a Graylog backend for full-backend-tests.
+ * <p>
+ * Use the {@link GraylogBackendConfiguration} annotation to configure the backend.
+ */
 public class GraylogBackendExtension implements BeforeAllCallback, ParameterResolver, ExecutionCondition {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
 
@@ -62,6 +67,24 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     static final String MONGODB_VERSION_PROPERTY = "test.integration.mongodb.version";
 
     public static final boolean IMPORT_LICENSES_DEFAULT = true;
+
+    @Override
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        final Optional<GraylogBackendConfiguration> backendConfiguration =
+                AnnotationSupport.findAnnotation(context.getRequiredTestClass(), GraylogBackendConfiguration.class);
+        if (backendConfiguration.isEmpty()) {
+            return ConditionEvaluationResult.enabled("No Graylog backend configuration found, enabling test");
+        }
+
+        return Stream.of(
+                        new EnabledIfSearchServerCondition(BackendServiceVersions.getSearchServerVersion()),
+                        new EnabledIfMongoDBCondition(BackendServiceVersions.getMongoDBVersion())
+                )
+                .map(condition -> condition.evaluateExecutionCondition(context))
+                .filter(ConditionEvaluationResult::isDisabled)
+                .findFirst()
+                .orElse(ConditionEvaluationResult.enabled(null));
+    }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext,
@@ -179,23 +202,5 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 env,
                 FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider()).create()
         );
-    }
-
-    @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-        final Optional<GraylogBackendConfiguration> backendConfiguration =
-                AnnotationSupport.findAnnotation(context.getRequiredTestClass(), GraylogBackendConfiguration.class);
-        if (backendConfiguration.isEmpty()) {
-            return ConditionEvaluationResult.enabled("No Graylog backend configuration found, enabling test");
-        }
-
-        return Stream.of(
-                        new EnabledIfSearchServerCondition(BackendServiceVersions.getSearchServerVersion()),
-                        new EnabledIfMongoDBCondition(BackendServiceVersions.getMongoDBVersion())
-                )
-                .map(condition -> condition.evaluateExecutionCondition(context))
-                .filter(ConditionEvaluationResult::isDisabled)
-                .findFirst()
-                .orElse(ConditionEvaluationResult.enabled(null));
     }
 }
