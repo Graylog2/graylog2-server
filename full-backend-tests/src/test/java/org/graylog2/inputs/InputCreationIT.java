@@ -18,8 +18,8 @@ package org.graylog2.inputs;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 
 import java.util.Map;
 

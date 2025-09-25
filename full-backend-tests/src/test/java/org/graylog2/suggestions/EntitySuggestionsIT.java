@@ -19,8 +19,8 @@ package org.graylog2.suggestions;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;

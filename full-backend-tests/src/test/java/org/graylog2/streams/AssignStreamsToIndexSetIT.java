@@ -18,8 +18,8 @@ package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.utils.IndexSetUtils;
 import org.graylog.testing.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeAll;

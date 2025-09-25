@@ -22,7 +22,6 @@ import org.apache.commons.collections4.FactoryUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.conditions.EnabledIfMongoDBCondition;
 import org.graylog.testing.completebackend.conditions.EnabledIfSearchServerCondition;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;

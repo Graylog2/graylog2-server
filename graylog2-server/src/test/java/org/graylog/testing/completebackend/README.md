@@ -18,7 +18,7 @@ The following environment variables can be set to configure local execution:
 
 To control which versions of the search server and MongoDB containers are used the following JVM system properties are available:
 
-- `test.integration.search-server.distribution` - Its value corresponds to the values of the `org.graylog.testing.containermatrix.SearchVersion.Distribution` enum. The default is `OPENSEARCH`.
+- `test.integration.search-server.distribution` - Its value corresponds to the values of the `org.graylog2.storage.SearchVersion` enum. The default is `OPENSEARCH`.
 - `test.integration.search-server.version` - The search server version. Only relevant for the `OPENSEARCH` and `ELASTICSEARCH` distributions. The default is `org.graylog.testing.storage.SearchServer.DEFAULT_VERSION`.
 - `test.integration.mongodb.version` - The MongoDB version. The default is `org.graylog.testing.mongodb.MongoDBVersion.DEFAULT`.
 

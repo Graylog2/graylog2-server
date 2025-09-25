@@ -18,8 +18,8 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 

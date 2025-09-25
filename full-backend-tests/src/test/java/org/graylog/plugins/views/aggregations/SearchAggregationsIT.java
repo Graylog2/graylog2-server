@@ -32,8 +32,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collection;

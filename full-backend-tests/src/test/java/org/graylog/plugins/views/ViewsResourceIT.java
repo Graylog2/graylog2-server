@@ -17,8 +17,8 @@
 package org.graylog.plugins.views;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,7 +35,7 @@ public class ViewsResourceIT {
     @FullBackendTest
     void testEmptyBody() {
         api.post("/views", 400)
-                 .assertThat().body("message[0]", equalTo("View is mandatory"));
+                .assertThat().body("message[0]", equalTo("View is mandatory"));
     }
 
     @FullBackendTest

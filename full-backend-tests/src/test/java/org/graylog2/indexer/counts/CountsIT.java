@@ -17,8 +17,8 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.indexer.IndexNotFoundException;

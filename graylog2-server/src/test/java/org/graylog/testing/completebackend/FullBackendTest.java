@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix.annotations;
+package org.graylog.testing.completebackend;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

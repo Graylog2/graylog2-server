@@ -15,15 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-package org.graylog.testing.containermatrix.annotations;
+package org.graylog.testing.completebackend;
 
-import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
-import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
-import org.graylog.testing.completebackend.GraylogBackendExtension;
-import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.MavenProjectDirProvider;
-import org.graylog.testing.completebackend.NoPluginJarsProvider;
-import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;

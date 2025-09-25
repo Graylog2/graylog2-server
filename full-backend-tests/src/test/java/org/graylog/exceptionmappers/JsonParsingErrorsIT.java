@@ -19,8 +19,8 @@ package org.graylog.exceptionmappers;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
@@ -42,22 +42,22 @@ public class JsonParsingErrorsIT {
     @FullBackendTest
     void returnsSpecificErrorWhenTypeMismatches() {
         assertErrorResponse(SYNC_SEARCH, """
-                        {
-                         	"queries": [
-                         		{
-                         			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
-                         			"query": {
-                         				"type": "elasticsearch",
-                         				"query_string": ""
-                         			},
-                         			"timerange": {
-                         				"type": "relative",
-                         				"from": "foo"
-                         			}
-                         		}
-                         	]
-                         }
-                        """)
+                {
+                 	"queries": [
+                 		{
+                 			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
+                 			"query": {
+                 				"type": "elasticsearch",
+                 				"query_string": ""
+                 			},
+                 			"timerange": {
+                 				"type": "relative",
+                 				"from": "foo"
+                 			}
+                 		}
+                 	]
+                 }
+                """)
                 .body("path", equalTo("queries.[0].timerange.from"))
                 .body("line", equalTo(11))
                 .body("column", equalTo(14))
@@ -72,22 +72,22 @@ public class JsonParsingErrorsIT {
     @FullBackendTest
     void returnsSpecificErrorForJsonParsingError() {
         assertErrorResponse(SYNC_SEARCH, """
-                        {
-                         	"queries": [
-                         		{
-                         			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
-                         			"query": {
-                         				"type": "elasticsearch",
-                         				"query_string": ""
-                         			},
-                         			"timerange": {
-                         				"type": "relative",
-                         				"from": 23,
-                         			}
-                         		}
-                         	]
-                         }
-                        """)
+                {
+                 	"queries": [
+                 		{
+                 			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
+                 			"query": {
+                 				"type": "elasticsearch",
+                 				"query_string": ""
+                 			},
+                 			"timerange": {
+                 				"type": "relative",
+                 				"from": 23,
+                 			}
+                 		}
+                 	]
+                 }
+                """)
                 .body("path", equalTo("queries.[0].timerange"))
                 .body("line", equalTo(12))
                 .body("column", equalTo(5))

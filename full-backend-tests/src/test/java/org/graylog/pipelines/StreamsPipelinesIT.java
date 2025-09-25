@@ -18,8 +18,8 @@ package org.graylog.pipelines;
 
 import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -73,9 +73,9 @@ public class StreamsPipelinesIT {
     @FullBackendTest
     void bulkRetrievalOfPipelineConnections() throws Exception {
         final var result = api.post("/streams/pipelines",
-                                    new BulkPipelinesRequest(Set.of(stream1Id, stream2Id, stream3Id)),
-                                    200)
-                              .extract().body().jsonPath();
+                        new BulkPipelinesRequest(Set.of(stream1Id, stream2Id, stream3Id)),
+                        200)
+                .extract().body().jsonPath();
         final var pipeline1 = pipelineSummary(pipeline1Id, pipeline1Title);
         final var pipeline2 = pipelineSummary(pipeline2Id, pipeline2Title);
 
@@ -87,11 +87,11 @@ public class StreamsPipelinesIT {
     @FullBackendTest
     void bulkRetrievalOfPipelineConnectionsForBuiltinStreams() throws Exception {
         final var result = api.post("/streams/pipelines",
-                                    new BulkPipelinesRequest(Set.of(DEFAULT_STREAM_ID,
-                                                                    DEFAULT_EVENTS_STREAM_ID,
-                                                                    DEFAULT_SYSTEM_EVENTS_STREAM_ID)),
-                                    200)
-                              .extract().body().jsonPath();
+                        new BulkPipelinesRequest(Set.of(DEFAULT_STREAM_ID,
+                                DEFAULT_EVENTS_STREAM_ID,
+                                DEFAULT_SYSTEM_EVENTS_STREAM_ID)),
+                        200)
+                .extract().body().jsonPath();
 
         assertThat(result.getList(DEFAULT_STREAM_ID)).isEmpty();
         assertThat(result.getList(DEFAULT_EVENTS_STREAM_ID)).isEmpty();
@@ -106,7 +106,7 @@ public class StreamsPipelinesIT {
         api.pipelines().delete(pipelineId);
 
         final var result = api.post("/streams/pipelines", new BulkPipelinesRequest(Set.of(streamId)), 200)
-                              .extract().body().jsonPath();
+                .extract().body().jsonPath();
 
         assertThat(result.getList(streamId)).isEmpty();
     }
@@ -114,7 +114,7 @@ public class StreamsPipelinesIT {
     @FullBackendTest
     void retrievePipelineConnectionsForASingleStream() {
         var result = api.get("/streams/" + stream1Id + "/pipelines", 200)
-                        .extract().body().jsonPath();
+                .extract().body().jsonPath();
 
         final var pipeline1 = pipelineSummary(pipeline1Id, pipeline1Title);
         final var pipeline2 = pipelineSummary(pipeline2Id, pipeline2Title);

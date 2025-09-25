@@ -22,8 +22,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;

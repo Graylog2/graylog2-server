@@ -25,7 +25,15 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.List;
 
 // TODO:fix the test
-//@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),})
+//@GraylogBackendConfiguration(
+//        serverLifecycle = Lifecycle.CLASS,
+//        env = {
+//                @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+//                @GraylogBackendConfiguration.Env(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+//                @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = "")
+//        }
+//)
+//@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeRollingUpgradeIT {
 
     private static GraylogApis apis;
@@ -35,7 +43,7 @@ public class DatanodeRollingUpgradeIT {
         apis = graylogApis;
     }
 
-   //@ContainerMatrixTest
+    //@FullBackendTest
     public void testClusterStatus() {
         final GraylogApiResponse response = getDatanodeClusterStatus();
 

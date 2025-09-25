@@ -22,8 +22,8 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -84,6 +84,7 @@ public class InputPermissionsIT {
     /**
      * Roles are stored in mongodb, but the auth backend is refreshing those only once every second. If we trigger a call
      * before the role is refreshed, we may get weird results.
+     *
      * @see org.graylog2.security.InMemoryRolePermissionResolver
      */
     private static void waitForRolesCacheRefresh() {

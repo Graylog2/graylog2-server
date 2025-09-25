@@ -18,11 +18,9 @@ package org.graylog.plugins.views.aggregations;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog.testing.containermatrix.annotations.FullBackendTest;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
-import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Map;
 

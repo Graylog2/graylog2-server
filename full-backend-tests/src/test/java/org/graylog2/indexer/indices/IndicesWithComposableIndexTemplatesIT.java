@@ -17,8 +17,7 @@
 package org.graylog2.indexer.indices;
 
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.containermatrix.annotations.GraylogBackendConfiguration;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
