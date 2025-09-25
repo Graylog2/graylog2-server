@@ -52,7 +52,7 @@ public class RateLimitedLogFactory {
 
     /**
      * @return Rate limited log that only prints once per 60 seconds. Use for frequently occurring code paths
-     * that you don't want to generate a lot of noise in the logs.
+     * that you don't want to generate a lot of log noise.
      */
     public static RateLimitedLog createQuietDefaultRateLimitedLog(final Class<?> clazz) {
         return createRateLimitedLog(LoggerFactory.getLogger(clazz), MAX_QUIET_RATE, MAX_QUIET_DURATION);
