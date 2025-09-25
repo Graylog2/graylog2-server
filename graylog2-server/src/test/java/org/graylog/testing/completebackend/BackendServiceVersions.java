@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import static java.util.Objects.requireNonNullElse;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.graylog.testing.completebackend.GraylogBackendExtension.MONGODB_VERSION_PROPERTY;
 import static org.graylog.testing.completebackend.GraylogBackendExtension.SEARCH_SERVER_DISTRIBUTION_PROPERTY;
 import static org.graylog.testing.completebackend.GraylogBackendExtension.SEARCH_SERVER_VERSION_PROPERTY;
@@ -46,8 +47,8 @@ public class BackendServiceVersions {
     }
 
     public static SearchVersion getSearchServerVersion() {
-        final var distribution = requireNonNullElse(System.getProperty(SEARCH_SERVER_DISTRIBUTION_PROPERTY), DEFAULT_SEARCH_SERVER_DISTRIBUTION);
-        final var version = requireNonNullElse(System.getProperty(SEARCH_SERVER_VERSION_PROPERTY), DEFAULT_SEARCH_SERVER_VERSION);
+        final var distribution = defaultIfBlank(System.getProperty(SEARCH_SERVER_DISTRIBUTION_PROPERTY), DEFAULT_SEARCH_SERVER_DISTRIBUTION);
+        final var version = defaultIfBlank(System.getProperty(SEARCH_SERVER_VERSION_PROPERTY), DEFAULT_SEARCH_SERVER_VERSION);
 
         try {
             final var dist = Distribution.valueOf(distribution.toUpperCase(Locale.US));
