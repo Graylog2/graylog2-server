@@ -34,34 +34,14 @@ const AuthWrapper = styled.div(
   `,
 );
 
-type FieldConfig = {
-  keyField?: string;
-  secretField?: string;
-  arnField?: string;
-  clearFields?: string[];
-};
-
 type AWSAuthenticationTypesProps = {
   onChange: (...args: any[]) => void;
-  fieldConfig?: FieldConfig;
 };
 
-const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationTypesProps) => {
+const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
-  // Default to CloudWatch field names for backward compatibility
-  const config = {
-    keyField: 'awsCloudWatchAwsKey',
-    secretField: 'awsCloudWatchAwsSecret',
-    arnField: 'awsCloudWatchAssumeARN',
-    clearFields: ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'],
-    ...fieldConfig,
-  };
-
-  const { awsAuthenticationType } = formData;
-  const awsKey = formData[config.keyField];
-  const awsSecret = formData[config.secretField];
-  const awsARN = formData[config.arnField];
+  const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN } = formData;
 
   let defaultAuthTypeValue;
 
@@ -85,7 +65,8 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationType
     onChange({ target: { name: 'awsAuthenticationType', value: e.target.value } });
 
     if (e.target.value === AWS_AUTH_TYPES.automatic) {
-      config.clearFields.forEach((field) => clearField(field));
+      clearField('awsAccessKey');
+      clearField('awsSecretKey');
     }
   };
 
@@ -95,11 +76,9 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationType
     <>
       {isCloud ? (
         <KeySecret 
-          awsKey={awsKey} 
-          awsSecret={awsSecret} 
+          awsKey={awsAccessKey} 
+          awsSecret={awsSecretKey} 
           onChange={onChange}
-          keyFieldId={config.keyField}
-          secretFieldId={config.secretField}
         />
       ) : (
         <>
@@ -122,23 +101,18 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig }: AWSAuthenticationType
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
               <KeySecret 
-                awsKey={awsKey} 
-                awsSecret={awsSecret} 
+                awsKey={awsAccessKey} 
+                awsSecret={awsSecretKey} 
                 onChange={onChange}
-                keyFieldId={config.keyField}
-                secretFieldId={config.secretField}
               />
             )}
           </AuthWrapper>
         </>
       )}
-      {config.arnField && (
-        <ARN 
-          awsARN={awsARN} 
-          onChange={onChange}
-          arnFieldId={config.arnField}
-        />
-      )}
+      <ARN 
+        awsARN={awsAssumeRoleARN} 
+        onChange={onChange}
+      />
     </>
   );
 };
