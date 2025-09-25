@@ -25,10 +25,10 @@ export const toAWSCloudTrailInputCreateRequest = ({
   awsCloudTrailThrottleEnabled,
   pollingInterval,
   awsAccessKey,
-  awsSecret,
+  awsSecretKey,
   awsCloudTrailSqsQueueName,
   awsCloudTrailRegion,
-  assumeRoleArn,
+  awsAssumeRoleArn,
   overrideSource,
   key,
   secret
@@ -37,7 +37,7 @@ export const toAWSCloudTrailInputCreateRequest = ({
   ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
     ? {
       aws_access_key: awsAccessKey?.value,
-      aws_secret_key: awsSecret?.value,
+      aws_secret_key: awsSecretKey?.value,
     }
     : {
       aws_access_key: key,
@@ -47,7 +47,7 @@ export const toAWSCloudTrailInputCreateRequest = ({
   enable_throttling: !!awsCloudTrailThrottleEnabled?.value,
   cloudtrail_queue_name: awsCloudTrailSqsQueueName?.value,
   aws_region: awsCloudTrailRegion?.value,
-  assume_role_arn: assumeRoleArn?.value,
+  assume_role_arn: awsAssumeRoleArn?.value,
   override_source: overrideSource?.value,
 });
 
@@ -56,11 +56,11 @@ export const toGenericInputCreateRequest = ({
   awsAuthenticationType,
   awsCloudTrailThrottleEnabled,
   awsAccessKey,
-  awsSecret,
+  awsSecretKey,
   pollingInterval,
   awsCloudTrailSqsQueueName,
   awsCloudTrailRegion,
-  assumeRoleArn,
+  awsAssumeRoleArn,
   key,
   secret,
   overrideSource,
@@ -72,7 +72,7 @@ export const toGenericInputCreateRequest = ({
     ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
       ? {
         aws_access_key: awsAccessKey?.value,
-        aws_secret_key: awsSecret?.value,
+        aws_secret_key: awsSecretKey?.value,
       }
       : {
         aws_access_key: key,
@@ -82,7 +82,7 @@ export const toGenericInputCreateRequest = ({
     throttling_allowed: !!awsCloudTrailThrottleEnabled?.value,
     cloudtrail_queue_name: awsCloudTrailSqsQueueName?.value,
     aws_region: awsCloudTrailRegion?.value,
-    assume_role_arn: assumeRoleArn?.value,
+    assume_role_arn: awsAssumeRoleArn?.value,
     override_source: overrideSource?.value,
   },
 });

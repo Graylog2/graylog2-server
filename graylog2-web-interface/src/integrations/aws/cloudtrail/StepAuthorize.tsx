@@ -49,7 +49,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState<ErrorMessageType>(null);
 
-  const { awsSecret } = formData;
+  const { awsSecretKey } = formData;
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
@@ -57,10 +57,10 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
 
     fetch('POST', qualifyUrl(ApiRoutes.INTEGRATIONS.AWSCloudTrail.CHECK_CREDENTIALS), {
       aws_access_key: formData?.awsAccessKey?.value || '',
-      aws_secret_key: formData?.awsSecret?.value || '',
+      aws_secret_key: formData?.awsSecretKey?.value || '',
       cloudtrail_queue_name: formData?.awsCloudTrailSqsQueueName?.value || '',
       aws_region: formData?.awsCloudTrailRegion?.value || '',
-      assume_role_arn: formData?.assumeRoleArn?.value || '',
+      assume_role_arn: formData?.awsAssumeRoleARN?.value || '',
     })
       .then((result: any) => {
         if (result.result === 'valid') {
@@ -89,7 +89,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
 
   const isFormValid = formValidation.isFormValid(
     ['awsCloudTrailName',
-      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecret'] : []),
+      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecretKey'] : []),
       'awsCloudTrailRegion',
       'awsCloudTrailSqsQueueName'],
     formData,
@@ -114,19 +114,11 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         label="Input Name"
         autoComplete="off"
         help="Select a name of your new input that describes it."
-        defaultValue={awsSecret?.value}
+        defaultValue={awsSecretKey?.value}
         required
       />
 
-      <AWSAuthenticationTypes
-        onChange={onChange}
-        fieldConfig={{
-          keyField: 'awsAccessKey',
-          secretField: 'awsSecret',
-          arnField: 'assumeRoleArn',
-          clearFields: ['awsAccessKey', 'awsSecret'],
-        }}
-      />
+      <AWSAuthenticationTypes onChange={onChange} />
 
       <ValidatedInput
         type="select"

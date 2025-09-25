@@ -34,34 +34,14 @@ const AuthWrapper = styled.div(
   `,
 );
 
-type FieldConfig = {
-  keyField?: string;
-  secretField?: string;
-  arnField?: string;
-  clearFields?: string[];
-};
-
 type AWSAuthenticationTypesProps = {
   onChange: (...args: any[]) => void;
-  fieldConfig?: FieldConfig;
 };
 
-const AWSAuthenticationTypes = ({ onChange, fieldConfig = {} }: AWSAuthenticationTypesProps) => {
+const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
-  // Default field configuration for CloudWatch (backward compatibility)
-  const config = {
-    keyField: 'awsCloudWatchAwsKey',
-    secretField: 'awsCloudWatchAwsSecret',
-    arnField: 'awsCloudWatchAssumeARN',
-    clearFields: ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'],
-    ...fieldConfig,
-  };
-
-  const { awsAuthenticationType } = formData;
-  const awsKey = formData[config.keyField];
-  const awsSecret = formData[config.secretField];
-  const awsARN = formData[config.arnField];
+  const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN } = formData;
 
   let defaultAuthTypeValue;
 
@@ -85,20 +65,15 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig = {} }: AWSAuthenticatio
     onChange({ target: { name: 'awsAuthenticationType', value: e.target.value } });
 
     if (isType(AWS_AUTH_TYPES.automatic)) {
-      config.clearFields.forEach((field) => clearField(field));
+      clearField('awsAccessKey');
+      clearField('awsSecretKey');
     }
   };
 
   return (
     <>
       {AppConfig.isCloud() ? (
-        <KeySecret
-          awsKey={awsKey}
-          awsSecret={awsSecret}
-          onChange={onChange}
-          keyFieldId={config.keyField}
-          secretFieldId={config.secretField}
-        />
+        <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
       ) : (
         <>
           <Input
@@ -119,18 +94,12 @@ const AWSAuthenticationTypes = ({ onChange, fieldConfig = {} }: AWSAuthenticatio
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret
-                awsKey={awsKey}
-                awsSecret={awsSecret}
-                onChange={onChange}
-                keyFieldId={config.keyField}
-                secretFieldId={config.secretField}
-              />
+              <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
             )}
           </AuthWrapper>
         </>
       )}
-      {config.arnField && <ARN awsARN={awsARN} onChange={onChange} arnFieldId={config.arnField} />}
+      <ARN awsARN={awsAssumeRoleARN} onChange={onChange} />
     </>
   );
 };

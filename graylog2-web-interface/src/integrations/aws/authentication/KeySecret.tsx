@@ -28,20 +28,12 @@ type KeySecretProps = {
   onChange: (...args: any[]) => void;
   awsKey?: any;
   awsSecret?: any;
-  keyFieldId?: string;
-  secretFieldId?: string;
 };
 
-const KeySecret = ({ 
-  onChange, 
-  awsKey = undefined, 
-  awsSecret = undefined,
-  keyFieldId = 'awsCloudWatchAwsKey',
-  secretFieldId = 'awsCloudWatchAwsSecret'
-}: KeySecretProps) => (
+const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeySecretProps) => (
   <>
     <ValidatedInput
-      id={keyFieldId}
+      id="awsAccessKey"
       type="text"
       label="AWS Access Key"
       placeholder="AK****************"
@@ -54,7 +46,7 @@ const KeySecret = ({
     />
 
     <StyledMaskedInput
-      id={secretFieldId}
+      id="awsSecretKey"
       label="AWS Secret Key"
       placeholder="***********"
       onChange={onChange}

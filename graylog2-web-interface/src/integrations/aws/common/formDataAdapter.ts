@@ -20,9 +20,9 @@ import { AWS_AUTH_TYPES, DEFAULT_KINESIS_LOG_TYPE } from './constants';
 export const toAWSRequest = (formData, options) => {
   const {
     awsAuthenticationType,
-    awsCloudWatchAssumeARN,
-    awsCloudWatchAwsKey,
-    awsCloudWatchAwsSecret,
+    awsAssumeRoleARN,
+    awsAccessKey,
+    awsSecretKey,
     awsEndpointCloudWatch,
     awsEndpointIAM,
     awsEndpointDynamoDB,
@@ -34,14 +34,14 @@ export const toAWSRequest = (formData, options) => {
   return {
     ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
       ? {
-          aws_access_key_id: awsCloudWatchAwsKey?.value,
-          aws_secret_access_key: awsCloudWatchAwsSecret?.value,
-        }
+        aws_access_key_id: awsAccessKey?.value,
+        aws_secret_access_key: awsSecretKey?.value,
+      }
       : {
-          aws_access_key_id: key,
-          aws_secret_access_key: secret,
-        }),
-    assume_role_arn: awsCloudWatchAssumeARN?.value,
+        aws_access_key_id: key,
+        aws_secret_access_key: secret,
+      }),
+    assume_role_arn: awsAssumeRoleARN?.value,
     cloudwatch_endpoint: awsEndpointCloudWatch?.value,
     dynamodb_endpoint: awsEndpointDynamoDB?.value,
     iam_endpoint: awsEndpointIAM?.value,
@@ -53,8 +53,8 @@ export const toAWSRequest = (formData, options) => {
 export const toGenericInputCreateRequest = ({
   awsAuthenticationType,
   awsCloudWatchAddFlowLogPrefix = { value: undefined },
-  awsCloudWatchAssumeARN = { value: undefined },
-  awsCloudWatchAwsKey = { value: undefined },
+  awsAssumeRoleARN = { value: undefined },
+  awsAccessKey = { value: undefined },
   awsCloudWatchAwsRegion,
   awsCloudWatchBatchSize,
   awsEndpointCloudWatch = { value: undefined },
@@ -65,7 +65,7 @@ export const toGenericInputCreateRequest = ({
   awsEndpointDynamoDB = { value: undefined },
   awsEndpointIAM = { value: undefined },
   awsEndpointKinesis = { value: undefined },
-  awsCloudWatchAwsSecret,
+  awsSecretKey,
   key,
   secret,
   overrideSource,
@@ -75,18 +75,18 @@ export const toGenericInputCreateRequest = ({
   configuration: {
     ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
       ? {
-          aws_access_key: awsCloudWatchAwsKey?.value,
-          aws_secret_key: awsCloudWatchAwsSecret?.value,
-        }
+        aws_access_key: awsAccessKey?.value,
+        aws_secret_key: awsSecretKey?.value,
+      }
       : {
-          aws_access_key: key,
-          aws_secret_key: secret,
-        }),
+        aws_access_key: key,
+        aws_secret_key: secret,
+      }),
     aws_message_type: awsCloudWatchKinesisInputType.value,
     throttling_allowed: !!awsCloudWatchThrottleEnabled.value,
     aws_flow_log_prefix: !!awsCloudWatchAddFlowLogPrefix.value,
     aws_region: awsCloudWatchAwsRegion.value,
-    aws_assume_role_arn: awsCloudWatchAssumeARN?.value,
+    aws_assume_role_arn: awsAssumeRoleARN?.value,
     cloudwatch_endpoint: awsEndpointCloudWatch?.value,
     dynamodb_endpoint: awsEndpointDynamoDB?.value,
     iam_endpoint: awsEndpointIAM?.value,
