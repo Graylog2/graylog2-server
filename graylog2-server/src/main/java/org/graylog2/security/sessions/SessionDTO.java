@@ -32,6 +32,9 @@ import java.util.Optional;
 @JsonSerialize(as = SessionDTO.class)
 @JsonDeserialize(builder = SessionDTO.Builder.class)
 public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, SessionDTO.Builder> {
+    public static final String USERNAME_SESSION_KEY = "username";
+    public static final String AUTH_CONTEXT_SESSION_KEY = "auth_context";
+
     public static final String FIELD_SESSION_ID = "session_id";
     public static final String FIELD_TIMEOUT = "timeout";
     public static final String FIELD_START_TIMESTAMP = "start_timestamp";
@@ -75,7 +78,7 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
     abstract Optional<Boolean> authenticated();
 
     @JsonProperty(FIELD_AUTH_CONTEXT)
-    public abstract Optional<AuthContext> authContext();
+    public abstract Optional<SessionAuthContext> authContext();
 
     public static Builder builder() {
         return Builder.create();
@@ -116,7 +119,7 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
         public abstract Builder authenticated(@Nullable Boolean authenticated);
 
         @JsonProperty(FIELD_AUTH_CONTEXT)
-        public abstract Builder authContext(@Nullable AuthContext authContext);
+        public abstract Builder authContext(@Nullable SessionAuthContext authContext);
 
         public abstract SessionDTO build();
 

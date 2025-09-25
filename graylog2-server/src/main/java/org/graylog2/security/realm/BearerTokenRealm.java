@@ -16,7 +16,7 @@
  */
 package org.graylog2.security.realm;
 
-import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -24,17 +24,15 @@ import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
 import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
 import org.graylog.security.authservice.AuthServiceToken;
+import org.graylog2.security.sessions.AuthenticationInfoWithSessionAuthContext;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.TypedBearerToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 public class BearerTokenRealm extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(BearerTokenRealm.class);
@@ -92,10 +90,11 @@ public class BearerTokenRealm extends AuthenticatingRealm {
     private AuthenticationInfo toAuthenticationInfo(AuthServiceResult result) {
         String realmName = NAME + "/" + result.backendType();
 
-        @SuppressWarnings("ConstantConditions")
-        final SimplePrincipalCollection principals = new SimplePrincipalCollection(
-                ImmutableList.of(result.userProfileId(), result.sessionAttributes()), realmName);
-
-        return new SimpleAccount(principals, null, realmName);
+        final var account = new SimpleAccount(result.userProfileId(), null, realmName);
+        final var sessionAuthContext = result.sessionAuthContext();
+        if (sessionAuthContext.isPresent()) {
+            return new AuthenticationInfoWithSessionAuthContext(account, sessionAuthContext.get());
+        }
+        return account;
     }
 }

@@ -19,10 +19,10 @@ package org.graylog2.security.sessions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import static org.graylog2.security.sessions.AuthContext.FIELD_TYPE;
+import static org.graylog2.security.sessions.SessionAuthContext.FIELD_TYPE;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = FIELD_TYPE)
-public interface AuthContext {
+public interface SessionAuthContext {
     String FIELD_TYPE = "type";
 
     @JsonProperty(FIELD_TYPE)

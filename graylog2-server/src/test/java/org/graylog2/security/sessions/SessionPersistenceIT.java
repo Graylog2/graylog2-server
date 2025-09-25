@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog2.security.sessions;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -26,8 +42,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(MongoDBExtension.class)
 class SessionPersistenceIT {
 
-    record TestAuthContext(String someField) implements AuthContext {
-        static final String TYPE_NAME = "TestAuthContext";
+    record TestSessionAuthContext(String someField) implements SessionAuthContext {
+        static final String TYPE_NAME = "TestSessionAuthContext";
 
         @Override
         public String type() {
@@ -42,7 +58,7 @@ class SessionPersistenceIT {
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
         final var objectMapper = new ObjectMapperProvider().get();
-        objectMapper.registerSubtypes(new NamedType(TestAuthContext.class, TestAuthContext.TYPE_NAME));
+        objectMapper.registerSubtypes(new NamedType(TestSessionAuthContext.class, TestSessionAuthContext.TYPE_NAME));
         final var mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
                 mongoDBTestService.mongoConnection());
 
@@ -55,13 +71,13 @@ class SessionPersistenceIT {
     void createSession() {
         final var principals =
                 new SimpleAccount("test-user-id", null, "TestRealm").getPrincipals();
-        final var testAuthContext = new TestAuthContext("some-value");
+        final var testAuthContext = new TestSessionAuthContext("some-value");
 
         final var session = new SimpleSession("localhost");
         session.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, principals);
         session.setAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY, Boolean.TRUE);
-        session.setAttribute(SessionConverter.USERNAME_SESSION_KEY, "test-user-name");
-        session.setAttribute(SessionConverter.AUTH_CONTEXT_SESSION_KEY, testAuthContext);
+        session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, "test-user-name");
+        session.setAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY, testAuthContext);
 
         final var sessionId = sessionDAO().create(session);
         final var loadedSession = sessionDAO().readSession(sessionId);
@@ -86,8 +102,8 @@ class SessionPersistenceIT {
                     assertThat(loadedSession.getTimeout()).isEqualTo(session.getTimeout());
                     assertThat(loadedSession.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY)).isNull();
                     assertThat(loadedSession.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY)).isNull();
-                    assertThat(loadedSession.getAttribute(SessionConverter.USERNAME_SESSION_KEY)).isNull();
-                    assertThat(loadedSession.getAttribute(SessionConverter.AUTH_CONTEXT_SESSION_KEY)).isNull();
+            assertThat(loadedSession.getAttribute(SessionDTO.USERNAME_SESSION_KEY)).isNull();
+            assertThat(loadedSession.getAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY)).isNull();
                 }
         );
         assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO -> {
@@ -101,13 +117,13 @@ class SessionPersistenceIT {
 
         final var principals =
                 new SimpleAccount("test-user-id", null, "TestRealm").getPrincipals();
-        final var testAuthContext = new TestAuthContext("some-value");
+        final var testAuthContext = new TestSessionAuthContext("some-value");
 
         session.setTimeout(12345L);
         session.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, principals);
         session.setAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY, Boolean.TRUE);
-        session.setAttribute(SessionConverter.USERNAME_SESSION_KEY, "test-user-name");
-        session.setAttribute(SessionConverter.AUTH_CONTEXT_SESSION_KEY, testAuthContext);
+        session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, "test-user-name");
+        session.setAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY, testAuthContext);
 
         sessionDAO().update(session);
 
@@ -117,9 +133,9 @@ class SessionPersistenceIT {
                             .isEqualTo(principals);
                     assertThat(loadedSession.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY))
                             .isEqualTo(Boolean.TRUE);
-                    assertThat(loadedSession.getAttribute(SessionConverter.USERNAME_SESSION_KEY))
+            assertThat(loadedSession.getAttribute(SessionDTO.USERNAME_SESSION_KEY))
                             .isEqualTo("test-user-name");
-                    assertThat(loadedSession.getAttribute(SessionConverter.AUTH_CONTEXT_SESSION_KEY))
+            assertThat(loadedSession.getAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY))
                             .isEqualTo(testAuthContext);
                 }
         );
@@ -155,12 +171,12 @@ class SessionPersistenceIT {
     @Test
     void ignoresUnknownSessionAttributes() {
         final var session = new SimpleSession("localhost");
-        session.setAttribute(SessionConverter.USERNAME_SESSION_KEY, "test-user-name");
+        session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, "test-user-name");
         session.setAttribute("some-unknown-key", "some-value");
 
         final var sessionId = (String) sessionDAO().create(session);
         assertThat(sessionDAO().readSession(sessionId)).satisfies(loadedSession ->
-                assertThat(loadedSession.getAttributeKeys()).isEqualTo(Set.of(SessionConverter.USERNAME_SESSION_KEY)));
+                assertThat(loadedSession.getAttributeKeys()).isEqualTo(Set.of(SessionDTO.USERNAME_SESSION_KEY)));
     }
 
     @Test

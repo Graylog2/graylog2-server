@@ -35,6 +35,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.OrderedAuthenticatingRealms;
 import org.graylog2.security.sessions.SessionDAO;
+import org.graylog2.shared.security.PersistSessionDataListener;
 import org.graylog2.shared.security.ThrowingFirstSuccessfulStrategy;
 
 import java.util.ArrayList;
@@ -53,10 +54,11 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
                                           OrderedAuthenticatingRealms orderedAuthenticatingRealms) {
         sm = new DefaultSecurityManager(orderedAuthenticatingRealms);
         final Authenticator authenticator = sm.getAuthenticator();
-        if (authenticator instanceof ModularRealmAuthenticator) {
+        if (authenticator instanceof ModularRealmAuthenticator modularAuthenticator) {
             FirstSuccessfulStrategy strategy = new ThrowingFirstSuccessfulStrategy();
             strategy.setStopAfterFirstSuccess(true);
-            ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(strategy);
+            modularAuthenticator.setAuthenticationStrategy(strategy);
+            modularAuthenticator.setAuthenticationListeners(List.of(new PersistSessionDataListener()));
         }
 
         List<Realm> authorizingRealms = new ArrayList<>();
