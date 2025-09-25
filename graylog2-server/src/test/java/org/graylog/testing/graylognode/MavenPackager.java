@@ -48,9 +48,9 @@ public class MavenPackager {
             return;
         }
         if (isRunFromMaven()) {
-            LOG.info("Running from Maven - assuming JAR files have been built.");
+            LOG.debug("Running from Maven - assuming JAR files have been built.");
         } else if (jarHasBeenPackagedInThisRun) {
-            LOG.info("Assuming JAR files have been built.");
+            LOG.debug("Assuming JAR files have been built.");
         } else {
             LOG.info("Running from outside Maven - packaging JAR files now...");
             packageJar(mavenProjectDirProvider);
