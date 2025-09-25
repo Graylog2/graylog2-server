@@ -50,6 +50,8 @@ public class Views implements GraylogRestApi {
                                 .then()
                                 .assertThat().statusCode(200)
                                 .body("views", iterableWithSize(greaterThanOrEqualTo(0)))
+                                .log().ifValidationFails()
+                                .log().ifError()
                 ), "Couldn't get views list", Duration.ofSeconds(10)
         );
         return new GraylogApiResponse(response);
