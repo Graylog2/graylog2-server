@@ -19,10 +19,10 @@ package org.graylog2.security.sessions;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.authc.SimpleAccount;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -33,11 +33,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
+import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.graylog2.security.sessions.SessionDTO.AUTH_CONTEXT_SESSION_KEY;
+import static org.graylog2.security.sessions.SessionDTO.USERNAME_SESSION_KEY;
 
 @ExtendWith(MongoDBExtension.class)
 class SessionPersistenceIT {
@@ -69,22 +77,41 @@ class SessionPersistenceIT {
 
     @Test
     void createSession() {
+        final var referenceTime = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(1, ChronoUnit.HOURS);
         final var principals =
                 new SimpleAccount("test-user-id", null, "TestRealm").getPrincipals();
         final var testAuthContext = new TestSessionAuthContext("some-value");
 
         final var session = new SimpleSession("localhost");
-        session.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, principals);
-        session.setAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY, Boolean.TRUE);
-        session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, "test-user-name");
-        session.setAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY, testAuthContext);
+        session.setStartTimestamp(Date.from(referenceTime));
+        session.setTimeout(10_000L);
+        session.setExpired(false);
+        session.setLastAccessTime(Date.from(referenceTime.plusSeconds(1)));
+        session.setAttributes(Map.of(
+                PRINCIPALS_SESSION_KEY, principals,
+                AUTHENTICATED_SESSION_KEY, Boolean.TRUE,
+                USERNAME_SESSION_KEY, "test-user-name",
+                AUTH_CONTEXT_SESSION_KEY, testAuthContext));
 
-        final var sessionId = sessionDAO().create(session);
-        final var loadedSession = sessionDAO().readSession(sessionId);
-        assertThat(loadedSession).isEqualTo(session);
+        final var sessionId = (String) sessionDAO().create(session);
 
-        final var persistedDto = sessionService.getBySessionId((String) sessionId);
-        assertThat(persistedDto).hasValueSatisfying(sessionDTO -> {
+        assertThat(sessionDAO().readSession(sessionId)).isInstanceOfSatisfying(SimpleSession.class, simpleSession -> {
+            assertThat(simpleSession.getStartTimestamp()).isEqualTo(Date.from(referenceTime));
+            assertThat(simpleSession.getTimeout()).isEqualTo(10_000L);
+            assertThat(simpleSession.isExpired()).isEqualTo(false);
+            assertThat(simpleSession.getLastAccessTime()).isEqualTo(Date.from(referenceTime.plusSeconds(1)));
+            assertThat(simpleSession.getAttributes()).isEqualTo(Map.of(
+                    PRINCIPALS_SESSION_KEY, principals,
+                    AUTHENTICATED_SESSION_KEY, Boolean.TRUE,
+                    USERNAME_SESSION_KEY, "test-user-name",
+                    AUTH_CONTEXT_SESSION_KEY, testAuthContext));
+        });
+
+        assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO -> {
+            assertThat(sessionDTO.startTimestamp()).isEqualTo(referenceTime);
+            assertThat(sessionDTO.timeout()).isEqualTo(10_000L);
+            assertThat(sessionDTO.expired()).isEqualTo(false);
+            assertThat(sessionDTO.lastAccessTime()).isEqualTo(referenceTime.plusSeconds(1));
             assertThat(sessionDTO.userId()).contains("test-user-id");
             assertThat(sessionDTO.userName()).contains("test-user-name");
             assertThat(sessionDTO.authenticationRealm()).contains("TestRealm");
@@ -95,52 +122,43 @@ class SessionPersistenceIT {
 
     @Test
     void updateSession() {
-        final var session = new SimpleSession("localhost");
-        final String sessionId = (String) sessionDAO().create(session);
-
-        assertThat(sessionDAO().readSession(sessionId)).isEqualTo(session).satisfies(loadedSession -> {
-                    assertThat(loadedSession.getTimeout()).isEqualTo(session.getTimeout());
-                    assertThat(loadedSession.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY)).isNull();
-                    assertThat(loadedSession.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY)).isNull();
-            assertThat(loadedSession.getAttribute(SessionDTO.USERNAME_SESSION_KEY)).isNull();
-            assertThat(loadedSession.getAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY)).isNull();
-                }
-        );
-        assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO -> {
-            assertThat(sessionDTO.timeout()).isEqualTo(session.getTimeout());
-            assertThat(sessionDTO.userId()).isEmpty();
-            assertThat(sessionDTO.userName()).isEmpty();
-            assertThat(sessionDTO.authenticationRealm()).isEmpty();
-            assertThat(sessionDTO.authenticated()).isEmpty();
-            assertThat(sessionDTO.authContext()).isEmpty();
-        });
-
+        final var referenceTime = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(1, ChronoUnit.HOURS);
         final var principals =
                 new SimpleAccount("test-user-id", null, "TestRealm").getPrincipals();
         final var testAuthContext = new TestSessionAuthContext("some-value");
 
-        session.setTimeout(12345L);
-        session.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, principals);
-        session.setAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY, Boolean.TRUE);
-        session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, "test-user-name");
-        session.setAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY, testAuthContext);
+        final String sessionId = (String) sessionDAO().create(new SimpleSession("example.com"));
+
+        final var session = (SimpleSession) sessionDAO().readSession(sessionId);
+        session.setStartTimestamp(Date.from(referenceTime));
+        session.setTimeout(10_000L);
+        session.setExpired(false);
+        session.setLastAccessTime(Date.from(referenceTime.plusSeconds(1)));
+        session.setAttributes(Map.of(
+                PRINCIPALS_SESSION_KEY, principals,
+                AUTHENTICATED_SESSION_KEY, Boolean.TRUE,
+                USERNAME_SESSION_KEY, "test-user-name",
+                AUTH_CONTEXT_SESSION_KEY, testAuthContext));
 
         sessionDAO().update(session);
 
-        assertThat(sessionDAO().readSession(sessionId)).isEqualTo(session).satisfies(loadedSession -> {
-                    assertThat(loadedSession.getTimeout()).isEqualTo(12345L);
-                    assertThat(loadedSession.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY))
-                            .isEqualTo(principals);
-                    assertThat(loadedSession.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY))
-                            .isEqualTo(Boolean.TRUE);
-            assertThat(loadedSession.getAttribute(SessionDTO.USERNAME_SESSION_KEY))
-                            .isEqualTo("test-user-name");
-            assertThat(loadedSession.getAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY))
-                            .isEqualTo(testAuthContext);
-                }
-        );
+        assertThat(sessionDAO().readSession(sessionId)).isInstanceOfSatisfying(SimpleSession.class, simpleSession -> {
+            assertThat(simpleSession.getStartTimestamp()).isEqualTo(Date.from(referenceTime));
+            assertThat(simpleSession.getTimeout()).isEqualTo(10_000L);
+            assertThat(simpleSession.isExpired()).isEqualTo(false);
+            assertThat(simpleSession.getLastAccessTime()).isEqualTo(Date.from(referenceTime.plusSeconds(1)));
+            assertThat(simpleSession.getAttributes()).isEqualTo(Map.of(
+                    PRINCIPALS_SESSION_KEY, principals,
+                    AUTHENTICATED_SESSION_KEY, Boolean.TRUE,
+                    USERNAME_SESSION_KEY, "test-user-name",
+                    AUTH_CONTEXT_SESSION_KEY, testAuthContext));
+        });
+
         assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO -> {
-            assertThat(sessionDTO.timeout()).isEqualTo(12345L);
+            assertThat(sessionDTO.startTimestamp()).isEqualTo(referenceTime);
+            assertThat(sessionDTO.timeout()).isEqualTo(10_000L);
+            assertThat(sessionDTO.expired()).isEqualTo(false);
+            assertThat(sessionDTO.lastAccessTime()).isEqualTo(referenceTime.plusSeconds(1));
             assertThat(sessionDTO.userId()).contains("test-user-id");
             assertThat(sessionDTO.userName()).contains("test-user-name");
             assertThat(sessionDTO.authenticationRealm()).contains("TestRealm");
@@ -169,14 +187,38 @@ class SessionPersistenceIT {
     }
 
     @Test
+    void expireSession() {
+        final var referenceTime = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(1, ChronoUnit.HOURS);
+
+        final var session = new SimpleSession("localhost");
+        session.setStartTimestamp(Date.from(referenceTime));
+        session.setTimeout(10_000L);
+        session.setExpired(false);
+        session.setLastAccessTime(Date.from(referenceTime.plusSeconds(1)));
+
+        final var sessionId = (String) sessionDAO().create(session);
+
+        assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO ->
+                assertThat(sessionDTO.expired()).isFalse());
+
+        // this will expire the session
+        assertThatThrownBy(session::validate).isInstanceOf(InvalidSessionException.class);
+
+        sessionDAO().update(session);
+
+        assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO ->
+                assertThat(sessionDTO.expired()).isTrue());
+    }
+
+    @Test
     void ignoresUnknownSessionAttributes() {
         final var session = new SimpleSession("localhost");
-        session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, "test-user-name");
+        session.setAttribute(USERNAME_SESSION_KEY, "test-user-name");
         session.setAttribute("some-unknown-key", "some-value");
 
         final var sessionId = (String) sessionDAO().create(session);
         assertThat(sessionDAO().readSession(sessionId)).satisfies(loadedSession ->
-                assertThat(loadedSession.getAttributeKeys()).isEqualTo(Set.of(SessionDTO.USERNAME_SESSION_KEY)));
+                assertThat(loadedSession.getAttributeKeys()).isEqualTo(Set.of(USERNAME_SESSION_KEY)));
     }
 
     @Test
@@ -187,11 +229,11 @@ class SessionPersistenceIT {
         principals.add("test-user-3", "test-realm-2");
 
         final var session = new SimpleSession("localhost");
-        session.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, principals);
+        session.setAttribute(PRINCIPALS_SESSION_KEY, principals);
 
         final var sessionId = (String) sessionDAO().create(session);
         assertThat(sessionDAO().readSession(sessionId)).satisfies(loadedSession ->
-                assertThat(loadedSession.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY))
+                assertThat(loadedSession.getAttribute(PRINCIPALS_SESSION_KEY))
                         .isEqualTo(new SimplePrincipalCollection("test-user-1", "test-realm-1")));
     }
 
