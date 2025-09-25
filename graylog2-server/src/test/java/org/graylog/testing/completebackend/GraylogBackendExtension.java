@@ -62,6 +62,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
     static final String SEARCH_SERVER_VERSION_PROPERTY = "test.integration.search-server.version";
     static final String MONGODB_VERSION_PROPERTY = "test.integration.mongodb.version";
 
+    public static final boolean IMPORT_LICENSES_DEFAULT = true;
+
     @Override
     public boolean supportsParameter(ParameterContext parameterContext,
                                      ExtensionContext extensionContext) throws ParameterResolutionException {
@@ -119,6 +121,9 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         final GraylogBackendConfiguration config = backendConfiguration.get();
 
         if (config.serverLifecycle() == Lifecycle.VM) {
+            if (config.importLicenses() != IMPORT_LICENSES_DEFAULT) {
+                throw new IllegalArgumentException("Changing the license import setting is not supported with VM lifecycle");
+            }
             if (config.env().length > 0) {
                 throw new IllegalArgumentException("Additional configuration parameters cannot be used with VM lifecycle");
             }

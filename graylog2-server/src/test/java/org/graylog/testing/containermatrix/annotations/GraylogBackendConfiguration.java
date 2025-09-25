@@ -76,7 +76,7 @@ public @interface GraylogBackendConfiguration {
      * that occured if the licenses where imported via REST
      * Disabling only works with Lifecycle.CLASS because a new container is spun up.
      */
-    boolean importLicenses() default true;
+    boolean importLicenses() default GraylogBackendExtension.IMPORT_LICENSES_DEFAULT;
 
     Class<? extends PluginJarsProvider> datanodePluginJarsProvider() default NoPluginJarsProvider.class;
 }
