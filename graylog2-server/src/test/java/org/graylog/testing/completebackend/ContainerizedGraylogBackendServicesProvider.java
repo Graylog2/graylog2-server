@@ -104,7 +104,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private final MailServerContainer mailServerContainer;
 
         private final WebhookServerContainer webhookServerInstance;
-        private final Runnable closeCallback;
+        private final Runnable cacheRemovalCallback;
 
 
         private static Services create(SearchVersion searchVersion,
@@ -172,13 +172,13 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                          MongoDBInstance mongoDBInstance,
                          @Nullable MailServerContainer mailServerContainer,
                          @Nullable WebhookServerContainer webhookServerInstance,
-                         Runnable closeCallback) {
+                         Runnable cacheRemovalCallback) {
             this.network = network;
             this.searchServerInstance = searchServer;
             this.mongoDBInstance = mongoDBInstance;
             this.mailServerContainer = mailServerContainer;
             this.webhookServerInstance = webhookServerInstance;
-            this.closeCallback = requireNonNull(closeCallback, "closeCallback can't be null");
+            this.cacheRemovalCallback = requireNonNull(cacheRemovalCallback, "cacheRemovalCallback can't be null");
         }
 
         private static String buildLookupKey(Lifecycle lifecycle,
@@ -193,7 +193,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             parts.add("MongoDB:" + mongodbVersion.version());
             parts.addAll(enabledFeatureFlags);
             parts.addAll(env.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
-            parts.add(datanodePluginJarsProvider.getUniqueId());
+            parts.add("DataNode-plugins:" + datanodePluginJarsProvider.getUniqueId());
             return String.join("-", parts);
         }
 
@@ -215,14 +215,17 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
 
         @Override
         public void close() throws Exception {
-            Stream<AutoCloseable> closeables = Stream.of(mailServerContainer, mongoDBInstance, searchServerInstance, network);
-            closeables.filter(Objects::nonNull).forEach(autoCloseable -> {
-                try {
-                    autoCloseable.close();
-                } catch (Exception ignore) {
-                }
-            });
-            closeCallback.run();
+            // Call this first, so the services are removed from the cache before we actually close them.
+            cacheRemovalCallback.run();
+
+            Stream.of(mailServerContainer, mongoDBInstance, searchServerInstance, network)
+                    .filter(Objects::nonNull)
+                    .forEach(autoCloseable -> {
+                        try {
+                            autoCloseable.close();
+                        } catch (Exception ignore) {
+                        }
+                    });
         }
 
         public void cleanUp() {
