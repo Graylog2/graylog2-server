@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.graylog.testing.completebackend.GraylogBackendExtension.MONGODB_VERSION_PROPERTY;
 import static org.graylog.testing.completebackend.GraylogBackendExtension.SEARCH_SERVER_DISTRIBUTION_PROPERTY;
@@ -71,6 +70,6 @@ public class BackendServiceVersions {
     }
 
     public static MongoDBVersion getMongoDBVersion() {
-        return MongoDBVersion.of(requireNonNullElse(System.getProperty(MONGODB_VERSION_PROPERTY), DEFAULT_MONGODB_VERSION));
+        return MongoDBVersion.of(defaultIfBlank(System.getProperty(MONGODB_VERSION_PROPERTY), DEFAULT_MONGODB_VERSION));
     }
 }
