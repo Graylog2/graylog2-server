@@ -91,7 +91,7 @@ export default [
       'func-names': 'error',
       'global-require': 'error',
       'guard-for-in': 'error',
-      'no-param-reassign': 'error',
+      'no-param-reassign': ['error', { props: true }],
       'no-plusplus': 'error',
       'no-promise-executor-return': 'error',
       'no-restricted-globals': 'error',
@@ -239,10 +239,11 @@ export default [
     },
   },
   {
+    files: ['**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', noUnusedVarsOptions],
       'no-use-before-define': 'off',
-      '@typescript-eslint/no-use-before-define': ['error'],
+      '@typescript-eslint/no-use-before-define': 'error',
       'no-redeclare': 'off',
       '@typescript-eslint/no-redeclare': ['error'],
       'no-shadow': 'off',
