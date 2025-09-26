@@ -19,7 +19,6 @@ package org.graylog2.security.sessions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.apache.shiro.session.mgt.SimpleSession;
@@ -29,7 +28,6 @@ import java.time.Instant;
 import java.util.Optional;
 
 @AutoValue
-@JsonSerialize(as = SessionDTO.class)
 @JsonDeserialize(builder = SessionDTO.Builder.class)
 public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, SessionDTO.Builder> {
     public static final String USERNAME_SESSION_KEY = "username";
