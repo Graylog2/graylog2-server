@@ -38,7 +38,7 @@ public class BackendServiceVersions {
     private static final Logger LOG = LoggerFactory.getLogger(BackendServiceVersions.class);
 
     private static final String DEFAULT_MONGODB_VERSION = MongoDBVersion.DEFAULT.version();
-    private static final String DEFAULT_SEARCH_SERVER_DISTRIBUTION = Distribution.OPENSEARCH.toString();
+    private static final String DEFAULT_SEARCH_SERVER_DISTRIBUTION = SearchServer.DEFAULT_VERSION.distribution().toString();
     private static final String DEFAULT_SEARCH_SERVER_VERSION = SearchServer.DEFAULT_VERSION.version().toString();
     private static final String SEARCH_SERVER_DISTRIBUTION_VALUES = Arrays.toString(Distribution.values());
 
