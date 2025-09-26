@@ -16,7 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { type IndexSetStats } from 'stores/indices/IndexSetsStore';
+import type { IndexSetStats } from 'stores/indices/IndexSetsStore';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
