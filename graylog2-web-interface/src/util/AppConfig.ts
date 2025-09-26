@@ -51,6 +51,7 @@ export type Branding = {
     help?: { icon: string };
   };
   help_url?: string;
+  help_pages?: { [key: string]: string };
   footer?: { enabled: boolean };
   resources?: BrandingResources;
   features?: {

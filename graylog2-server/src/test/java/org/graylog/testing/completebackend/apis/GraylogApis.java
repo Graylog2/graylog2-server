@@ -283,9 +283,21 @@ public class GraylogApis implements GraylogRestApi {
                 .statusCode(expectedResult);
     }
 
-    private boolean errorRunningIndexer(final String logs) {
+    public static boolean errorRunningIndexer(final String logs) {
         return logs.contains("Elasticsearch cluster not available")
                 || logs.contains("Elasticsearch cluster is unreachable or unhealthy");
+    }
+
+    public void log() {
+        final var backendLogs = this.backend.getLogs();
+        LOG.error("------------------------ Output from graylog docker container start ------------------------\n"
+                + backendLogs
+                + "\n------------------------ Output from graylog docker container ends  ------------------------");
+        if(errorRunningIndexer(backendLogs)) {
+            LOG.error("------------------------ Output from indexer docker container start ------------------------\n"
+                    + this.backend.getSearchLogs()
+                    + "\n------------------------ Output from indexer docker container ends  ------------------------");
+        }
     }
 
     public RestAssuredConfig withGraylogBackendFailureConfig() {
@@ -300,15 +312,7 @@ public class GraylogApis implements GraylogRestApi {
                 .failureConfig(FailureConfig.failureConfig().with().failureListeners(
                         (reqSpec, respSpec, resp) -> {
                             if (resp.statusCode() >= minError) {
-                                final var backendLogs = this.backend.getLogs();
-                                LOG.error("------------------------ Output from graylog docker container start ------------------------\n"
-                                        + backendLogs
-                                        + "\n------------------------ Output from graylog docker container ends  ------------------------");
-                                if(errorRunningIndexer(backendLogs)) {
-                                    LOG.error("------------------------ Output from indexer docker container start ------------------------\n"
-                                            + this.backend.getSearchLogs()
-                                            + "\n------------------------ Output from indexer docker container ends  ------------------------");
-                                }
+                                log();
                             }
                         })
                 );
@@ -357,6 +361,11 @@ public class GraylogApis implements GraylogRestApi {
 
         public void waitForMessages(Collection<String> messages) {
             search().waitForMessages(messages);
+        }
+
+        public void putDeflectorFieldMapping(final String field, final String type) {
+            final var deflectorIndex = indices().getDeflectorIndex(this.indexSetId);
+            backend().searchServerInstance().client().putFieldMapping(deflectorIndex, field, type);
         }
 
         @Override
