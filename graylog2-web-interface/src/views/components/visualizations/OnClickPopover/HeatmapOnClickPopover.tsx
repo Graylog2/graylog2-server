@@ -27,6 +27,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopo
     const splitXValues: Array<string | number> = (clickPoint.x as string).split(keySeparator);
     const traceColor = null;
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitXValues.pop() as string);
+    const columnValues = splitXValues.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
@@ -40,7 +41,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopo
         text: String(value),
         traceColor,
       })),
-      columnPivotValues: splitXValues.map((value, i) => ({
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),

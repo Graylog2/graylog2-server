@@ -39,6 +39,7 @@ const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: O
       keySeparator,
     );
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
+    const columnValues = splitNames.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
@@ -52,7 +53,7 @@ const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: O
         text: String(value),
         traceColor,
       })),
-      columnPivotValues: splitNames.map((value, i) => ({
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),
