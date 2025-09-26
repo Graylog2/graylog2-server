@@ -1,8 +1,8 @@
 Upgrading to Graylog 7.0.x
 ==========================
 
-All user sessions will be terminated by upgrading to Graylog 6.2.x because the internal storage format for sessions has
-been changed. Users will have to log in again.
+All user sessions will be terminated when upgrading because the internal storage format for sessions has been changed.
+Users will have to log in again.
 
 ## Breaking Changes
 
