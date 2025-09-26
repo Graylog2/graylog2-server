@@ -101,7 +101,7 @@ public class SessionDAO extends CachingSessionDAO {
                 .orElseThrow(() -> new RuntimeException("Couldn't load session"));
 
         // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
-        // We need to retry the update, and stagger them a bit, so no all of them retries attempt it at the same time again.
+        // We need to retry the update, and stagger them a bit, so not all the retries attempt it at the same time again.
         // Usually this should succeed the first time, though
         final var retryer = RetryerBuilder.<Void>newBuilder()
                 .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
