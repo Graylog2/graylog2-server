@@ -14,12 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Datum } from 'plotly.js';
+import uniq from 'lodash/uniq';
+
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
   const predicateValue = type.type === 'date' ? formatTimestamp(value) : escape(value);
@@ -32,13 +37,21 @@ type Arguments = {
   field: string;
   value?: string | number;
   type: FieldType;
+  contexts: { valuePath: Array<{ [key: string]: Datum }>; filedTypes: FieldTypeMappingsList } | null;
 };
 
 const AddToQueryHandler =
-  ({ queryId, field, value = '', type }: Arguments) =>
+  ({ queryId, field, value = '', type, contexts }: Arguments) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const newQuery = formatNewQuery(oldQuery, field, value, type);
+    const valuesToAdd = uniq(contexts?.valuePath?.length ? contexts.valuePath : [{ [field]: value }]);
+
+    const newQuery = valuesToAdd.reduce((prev, cur) => {
+      const [curField, curValue] = Object.entries(cur)[0];
+      const curType = fieldTypeFor(curField, contexts.filedTypes) ?? type;
+
+      return formatNewQuery(prev, curField, curValue as string | number, curType);
+    }, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));
   };
