@@ -62,6 +62,10 @@ public @interface GraylogBackendConfiguration {
      */
     Lifecycle serverLifecycle() default Lifecycle.VM;
 
+    Class<? extends GraylogServerProduct> serverProduct() default OpenServerProduct.class;
+
+    Class<? extends GraylogDataNodeProduct> datanodeProduct() default OpenDataNodeProduct.class;
+
     Class<? extends MavenProjectDirProvider> mavenProjectDirProvider() default DefaultMavenProjectDirProvider.class;
 
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;

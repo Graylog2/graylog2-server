@@ -26,8 +26,6 @@ import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBFixtureImporter;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog.testing.mongodb.MongoDBVersion;
-import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +34,6 @@ import org.testcontainers.containers.Network;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -55,26 +52,26 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private final NodeInstance node;
     private final boolean stopServicesOnClose;
 
-    private ContainerizedGraylogBackend(final Services services,
-                                        final PluginJarsProvider pluginJarsProvider,
-                                        final MavenProjectDirProvider mavenProjectDirProvider,
-                                        final List<String> enabledFeatureFlags,
-                                        final boolean preImportLicense,
-                                        final Map<String, String> env) {
-        this.services = services;
+    private ContainerizedGraylogBackend(final ContainerizedGraylogBackendConfig config) {
         // We don't want services for tests with custom flags or config params to be re-used, so we stop them
         // when the backend is closed.
-        this.stopServicesOnClose = !enabledFeatureFlags.isEmpty() || !env.isEmpty();
+        this.stopServicesOnClose = !config.enabledFeatureFlags().isEmpty() || !config.env().isEmpty();
+
+        // Create services. These are usually cached and re-used between tests.
+        this.services = createServices(config);
 
         final var mongoDB = services.getMongoDBInstance();
         LOG.info("Running backend with MongoDB version {} (instance: {})", mongoDB.version(), mongoDB.instanceId());
 
-        if (preImportLicense) {
+        final var searchServer = services.getSearchServerInstance();
+        LOG.info("Running backend with SearchServer version {} (instance: {})", searchServer.version(), searchServer.instanceId());
+
+        if (config.importLicenses()) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
-        final var searchServer = services.getSearchServerInstance();
-        LOG.info("Running backend with SearchServer version {} (instance: {})", searchServer.version(), searchServer.instanceId());
+        LOG.info("Creating server instance \"{}\"", config.serverProduct().name());
+        final Stopwatch sw = Stopwatch.createStarted();
         try {
             final var nodeContainerConfig = new NodeContainerConfig(
                     services.getNetwork(),
@@ -83,10 +80,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                     ROOT_PASSWORD_SHA_2,
                     searchServer.internalUri(),
                     searchServer.version(),
-                    pluginJarsProvider,
-                    mavenProjectDirProvider,
-                    enabledFeatureFlags,
-                    env
+                    config.serverProduct().pluginJarsProvider(),
+                    config.serverProduct().mavenProjectDirProvider(),
+                    config.enabledFeatureFlags(),
+                    config.env()
             );
             this.node = NodeInstance.createStarted(nodeContainerConfig);
         } catch (Exception ex) {
@@ -94,30 +91,32 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
             throw ex;
         }
+        LOG.info("Creating the server instance took {}", sw.stop().elapsed());
     }
 
-    public synchronized static ContainerizedGraylogBackend createStarted(final ContainerizedGraylogBackendServicesProvider servicesProvider,
-                                                                         final SearchVersion version,
-                                                                         final MongoDBVersion mongodbVersion,
-                                                                         final PluginJarsProvider pluginJarsProvider,
-                                                                         final MavenProjectDirProvider mavenProjectDirProvider,
-                                                                         final List<String> enabledFeatureFlags,
-                                                                         final boolean preImportLicense,
-                                                                         final Map<String, String> env,
-                                                                         final PluginJarsProvider datanodePluginJarsProvider) {
-        // Ensure that the server and Data Node are built before trying to start the containers.
-        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
-
+    private Services createServices(ContainerizedGraylogBackendConfig config) {
+        LOG.debug("Creating Backend services: Search Server {}, MongoDB {}, feature-flags <{}>", config.searchServerVersion(), config.mongoDBVersion().version(), config.enabledFeatureFlags());
         final Stopwatch sw = Stopwatch.createStarted();
-        LOG.debug("Creating Backend services {} MongoDB:{} flags <{}>", version, mongodbVersion.version(), enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, enabledFeatureFlags, env, datanodePluginJarsProvider);
-        LOG.debug(" creating backend services took " + sw.elapsed());
+        final var services = config.serviceProvider().getServices(
+                config.searchServerVersion(),
+                config.mongoDBVersion(),
+                config.enabledFeatureFlags(),
+                config.env(),
+                config.datanodeProduct().pluginJarsProvider()
+        );
+        LOG.debug("Creating Backend services took {}", sw.stop().elapsed());
+        return services;
+    }
 
-        final Stopwatch backendSw = Stopwatch.createStarted();
-        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend(services, pluginJarsProvider,
-                mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, env);
-        LOG.debug("Creating dockerized graylog server took {}", backendSw.elapsed());
-        return backend;
+    public synchronized static ContainerizedGraylogBackend createStarted(final ContainerizedGraylogBackendConfig config) {
+        // Ensure that the server and Data Node are built before trying to start the containers.
+        // TODO: The Maven packager only runs once per JVM. That means the first test that runs will build the JAR files.
+        //       If that happens to be a test that uses the open server product, then only an open server will be built.
+        //       Later Enterprise tests will then fail because the enterprise JAR files don't exist. This is only
+        //       an issue when running multiple tests at once from an IDE.
+        MavenPackager.packageJarIfNecessary(config.serverProduct().mavenProjectDirProvider());
+
+        return new ContainerizedGraylogBackend(config);
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {

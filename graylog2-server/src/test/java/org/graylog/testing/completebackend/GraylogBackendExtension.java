@@ -191,16 +191,17 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                         GraylogBackendConfiguration.Env::value
                 ));
 
-        return ContainerizedGraylogBackend.createStarted(
-                new ContainerizedGraylogBackendServicesProvider(config.serverLifecycle()),
-                BackendServiceVersions.getSearchServerVersion(),
-                BackendServiceVersions.getMongoDBVersion(),
-                FactoryUtils.instantiateFactory(config.pluginJarsProvider()).create(),
-                FactoryUtils.instantiateFactory(config.mavenProjectDirProvider()).create(),
-                List.of(config.enabledFeatureFlags()),
-                config.importLicenses(),
-                env,
-                FactoryUtils.instantiateFactory(config.datanodePluginJarsProvider()).create()
-        );
+        final var backendConfig = ContainerizedGraylogBackendConfig.builder()
+                .lifecycle(config.serverLifecycle())
+                .serverProduct(FactoryUtils.instantiateFactory(config.serverProduct()).create())
+                .datanodeProduct(FactoryUtils.instantiateFactory(config.datanodeProduct()).create())
+                .searchServerVersion(BackendServiceVersions.getSearchServerVersion())
+                .mongoDBVersion(BackendServiceVersions.getMongoDBVersion())
+                .enabledFeatureFlags(List.of(config.enabledFeatureFlags()))
+                .env(env)
+                .importLicenses(config.importLicenses())
+                .build();
+
+        return ContainerizedGraylogBackend.createStarted(backendConfig);
     }
 }
