@@ -14,15 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.aws.json;
+package org.graylog.aws.notifications;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class SNSNotification {
+    private final String s3Bucket;
+    private final String s3ObjectKey;
+    private final String receiptHandle;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SQSMessage {
-    @JsonProperty("Message")
-    public String message;
-    @JsonProperty("MessageId")
-    public String messageId;
+    protected SNSNotification(String receiptHandle, String s3Bucket, String s3ObjectKey) {
+        this.receiptHandle = receiptHandle;
+        this.s3Bucket = s3Bucket;
+        this.s3ObjectKey = s3ObjectKey;
+    }
+
+    public String getReceiptHandle() {
+        return receiptHandle;
+    }
+
+    public String getS3Bucket() {
+        return s3Bucket;
+    }
+
+    public String getS3ObjectKey() {
+        return s3ObjectKey;
+    }
+
 }

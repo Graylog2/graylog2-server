@@ -41,7 +41,7 @@ type AWSAuthenticationTypesProps = {
 const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
-  const { awsAuthenticationType, awsCloudWatchAwsSecret, awsCloudWatchAwsKey, awsCloudWatchAssumeARN } = formData;
+  const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN } = formData;
 
   let defaultAuthTypeValue;
 
@@ -65,15 +65,15 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
     onChange({ target: { name: 'awsAuthenticationType', value: e.target.value } });
 
     if (isType(AWS_AUTH_TYPES.automatic)) {
-      clearField('awsCloudWatchAwsKey');
-      clearField('awsCloudWatchAwsSecret');
+      clearField('awsAccessKey');
+      clearField('awsSecretKey');
     }
   };
 
   return (
     <>
       {AppConfig.isCloud() ? (
-        <KeySecret awsKey={awsCloudWatchAwsKey} awsSecret={awsCloudWatchAwsSecret} onChange={onChange} />
+        <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
       ) : (
         <>
           <Input
@@ -94,12 +94,12 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret awsKey={awsCloudWatchAwsKey} awsSecret={awsCloudWatchAwsSecret} onChange={onChange} />
+              <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
             )}
           </AuthWrapper>
         </>
       )}
-      <ARN awsARN={awsCloudWatchAssumeARN} onChange={onChange} />
+      <ARN awsARN={awsAssumeRoleARN} onChange={onChange} />
     </>
   );
 };

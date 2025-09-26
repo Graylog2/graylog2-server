@@ -33,7 +33,7 @@ const ARN = ({
   onChange,
 }: ARNProps) => (
   <Input
-    id="awsCloudWatchAssumeARN"
+    id="awsAssumeRoleARN"
     type="text"
     value={awsARN.value}
     onChange={onChange}

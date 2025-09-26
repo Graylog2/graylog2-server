@@ -565,9 +565,9 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-epoll</artifactId>
-          <classifier>linux-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <classifier>linux-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -579,9 +579,9 @@
             <classifier>osx-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <classifier>osx-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -589,9 +589,9 @@
             <classifier>osx-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-tcnative-boringssl-static</artifactId>
-          <classifier>osx-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -599,9 +599,9 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-tcnative-boringssl-static</artifactId>
-          <classifier>linux-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <classifier>linux-aarch_64</classifier>
         </dependency>
 
         <dependency>
@@ -703,7 +703,20 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- additional integrations dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -1155,9 +1168,11 @@
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}
+                    </protocArtifact>
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
+                    </pluginArtifact>
                 </configuration>
                 <executions>
                     <execution>
@@ -1251,7 +1266,8 @@
                             <workingDirectory>${webInterface.path}</workingDirectory>
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
-                            <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
+                            <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/
+                            </nodeDownloadRoot>
                         </configuration>
 
                         <executions>
@@ -1394,13 +1410,15 @@
                                             <fileset dir="${webInterface.path}/target/web/cyclonedx-core">
                                                 <include name="**/bom.*"/>
                                             </fileset>
-                                            <mapper type="glob" from="bom.*" to="graylog-server-${project.version}-frontend-sbom.*" />
+                                            <mapper type="glob" from="bom.*"
+                                                    to="graylog-server-${project.version}-frontend-sbom.*"/>
                                         </move>
                                         <move todir="${project.build.directory}/sbom" includeemptydirs="false">
                                             <fileset dir="${webInterface.path}/target/web/cyclonedx-vendor">
                                                 <include name="**/bom.*"/>
                                             </fileset>
-                                            <mapper type="glob" from="bom.*" to="graylog-server-${project.version}-frontend-vendor-sbom.*" />
+                                            <mapper type="glob" from="bom.*"
+                                                    to="graylog-server-${project.version}-frontend-vendor-sbom.*"/>
                                         </move>
                                     </target>
                                 </configuration>
