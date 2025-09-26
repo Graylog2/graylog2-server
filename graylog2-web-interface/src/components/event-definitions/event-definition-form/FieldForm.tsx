@@ -40,7 +40,7 @@ import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
-const requiredFields = ['fieldName', 'config.providers[0].type'];
+const requiredFields = ['fieldName'];
 
 const getProviderPlugin = (type) => {
   if (type === undefined) {
@@ -104,10 +104,14 @@ class FieldForm extends React.Component<
     }
 
     requiredFields.forEach((requiredField) => {
-      if (!this.state.requiredField) {
+      if (!this.state[requiredField]) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
+
+    if (!config.providers[0]?.type) {
+      errors['config.providers[0].type'] = 'Field cannot be empty.';
+    }
 
     if (isKey && (!isNumber(keyPosition) || Number(keyPosition) < 1)) {
       errors.key_position = 'Field must be a positive number.';
