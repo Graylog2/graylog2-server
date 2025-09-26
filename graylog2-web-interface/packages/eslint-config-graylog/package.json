@@ -15,11 +15,9 @@
   "license": "SSPL-1.0",
   "dependencies": {
     "@babel/eslint-parser": "7.16.5",
+    "@eslint/js": "^9.36.0",
     "@tanstack/eslint-plugin-query": "5.74.7",
-    "@typescript-eslint/eslint-plugin": "8.44.0",
-    "@typescript-eslint/parser": "8.44.0",
     "eslint": "9.36.0",
-    "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "10.1.5",
     "eslint-import-resolver-webpack": "0.13.10",
     "eslint-plugin-compat": "6.0.2",
@@ -31,6 +29,7 @@
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.2.0",
-    "eslint-plugin-testing-library": "7.10.0"
+    "eslint-plugin-testing-library": "7.10.0",
+    "typescript-eslint": "^8.44.1"
   }
 }
