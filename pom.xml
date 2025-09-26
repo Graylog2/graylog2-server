@@ -119,7 +119,7 @@
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.5.0</commons-exec.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-net.version>3.12.0</commons-net.version>
         <commons-validator.version>1.10.0</commons-validator.version>
         <commons-io.version>2.20.0</commons-io.version>
@@ -679,7 +679,7 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.15.1</version>
+                    <version>1.15.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.antlr</groupId>
