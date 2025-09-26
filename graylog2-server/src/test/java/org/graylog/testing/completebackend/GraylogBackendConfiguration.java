@@ -62,13 +62,15 @@ public @interface GraylogBackendConfiguration {
      */
     Lifecycle serverLifecycle() default Lifecycle.VM;
 
+    /**
+     * The product variant of Graylog Server to use for the test class.
+     */
     Class<? extends GraylogServerProduct> serverProduct() default OpenServerProduct.class;
 
+    /**
+     * The product variant of Graylog Data Node to use for the test class.
+     */
     Class<? extends GraylogDataNodeProduct> datanodeProduct() default OpenDataNodeProduct.class;
-
-    Class<? extends MavenProjectDirProvider> mavenProjectDirProvider() default DefaultMavenProjectDirProvider.class;
-
-    Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
 
     /**
      * A list of Graylog Feature Flags that should be enabled for this test. Note: can't be used with
@@ -80,6 +82,4 @@ public @interface GraylogBackendConfiguration {
      * Automatically import licenses on server startup. Note: can't be used with Lifecycle.VM.
      */
     boolean importLicenses() default GraylogBackendExtension.IMPORT_LICENSES_DEFAULT;
-
-    Class<? extends PluginJarsProvider> datanodePluginJarsProvider() default NoPluginJarsProvider.class;
 }
