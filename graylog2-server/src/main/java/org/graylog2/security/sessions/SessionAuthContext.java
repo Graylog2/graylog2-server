@@ -21,6 +21,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import static org.graylog2.security.sessions.SessionAuthContext.FIELD_TYPE;
 
+/**
+ * A session auth context represents any additional information that is supposed to be persisted to a user's session
+ * after successful authentication. E.g. an OIDC authentication backend might need to store the ID token in the session
+ * to access it later for populating the id_token_hint parameter during logout. Or a SAML authentication backend might
+ * have to store the IdPs session index to establish the relationship between Graylog and IdP sessions.
+ */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = FIELD_TYPE)
 public interface SessionAuthContext {
     String FIELD_TYPE = "type";

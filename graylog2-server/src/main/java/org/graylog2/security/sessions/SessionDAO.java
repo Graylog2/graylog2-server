@@ -38,6 +38,13 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A Shiro SessionDAO that persists sessions to MongoDB. Although its methods accept and return sessions that
+ * implement the generic {@link Session} interface, they are restricted to {@link SimpleSession} instances and
+ * are only allowed to hold a single principal and a limited set of attributes.
+ * <p>
+ * For the list of allowed attributes see {@link SessionConverter#KNOWN_SESSION_KEYS}.
+ */
 @Singleton
 public class SessionDAO extends CachingSessionDAO {
     private static final Logger LOG = LoggerFactory.getLogger(SessionDAO.class);

@@ -20,6 +20,13 @@ import com.google.common.base.Preconditions;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.subject.PrincipalCollection;
 
+/**
+ * Extends an existing {@link AuthenticationInfo} with a {@link SessionAuthContext} as a means to transport session
+ * attributes from a shiro authentication realm to the session store for persistence.
+ * <p>
+ * See {@link org.graylog2.shared.security.PersistSessionDataListener} for the listener implementation that picks up
+ * this information after a successful login and persists it to the session store.
+ */
 public record AuthenticationInfoWithSessionAuthContext(AuthenticationInfo authenticationInfo,
                                                        SessionAuthContext sessionAuthContext) implements AuthenticationInfo {
 

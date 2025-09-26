@@ -26,6 +26,11 @@ import org.graylog2.security.sessions.AuthenticationInfoWithSessionAuthContext;
 import org.graylog2.security.sessions.SessionAuthContext;
 import org.graylog2.security.sessions.SessionDTO;
 
+/**
+ * A listener that is invoked by shiro after an authentication attempt
+ * (e.g. within {@link org.apache.shiro.subject.Subject#login(AuthenticationToken)}). The listener checks if the
+ * authentication info contains a {@link SessionAuthContext} and if so, persists it to the current session.
+ */
 public class PersistSessionDataListener implements AuthenticationListener {
     @Override
     public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
