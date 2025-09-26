@@ -17,9 +17,9 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
-import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -35,10 +35,6 @@ public class MessagesResourceIT {
     @BeforeAll
     static void beforeAll(GraylogApis graylogApis) {
         api = graylogApis;
-    }
-
-    @BeforeAll
-    public void importMessages() {
         api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
     }
 
