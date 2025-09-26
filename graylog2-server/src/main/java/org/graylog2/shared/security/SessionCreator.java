@@ -27,9 +27,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.security.sessions.SessionDTO;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
@@ -47,13 +45,11 @@ public class SessionCreator {
 
     private final UserService userService;
     private final AuditEventSender auditEventSender;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SessionCreator(UserService userService, AuditEventSender auditEventSender, ClusterConfigService clusterConfigService) {
+    public SessionCreator(UserService userService, AuditEventSender auditEventSender) {
         this.userService = userService;
         this.auditEventSender = auditEventSender;
-        this.clusterConfigService = clusterConfigService;
     }
 
     /**
@@ -146,9 +142,5 @@ public class SessionCreator {
         auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
         return Optional.of(session);
-    }
-
-    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
-        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
     }
 }
