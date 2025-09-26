@@ -32,6 +32,7 @@ import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.grn.GRNTypesModule;
+import org.graylog.mcp.server.McpServerModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
@@ -214,7 +215,8 @@ public class Server extends ServerBootstrap {
                 new DatanodeMigrationBindings(),
                 new CaModule(),
                 new TelemetryModule(),
-                new DataNodeModule()
+                new DataNodeModule(),
+                new McpServerModule()
         );
 
         modules.add(new FieldTypeManagementModule());
