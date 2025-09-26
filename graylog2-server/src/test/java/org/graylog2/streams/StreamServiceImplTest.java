@@ -30,9 +30,11 @@ import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,9 +48,12 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class StreamServiceImplTest {
+    protected static final String STREAM_ID = "5628f4503b0c5756a8eebc4d";
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -65,6 +70,8 @@ public class StreamServiceImplTest {
     private MongoIndexSet.Factory factory;
     @Mock
     private EntityRegistrar entityRegistrar;
+    @Mock
+    ClusterEventBus eventBus;
 
     private StreamService streamService;
 
@@ -72,7 +79,7 @@ public class StreamServiceImplTest {
     public void setUp() throws Exception {
         final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
         this.streamService = new StreamServiceImpl(mc, streamRuleService,
-                outputService, indexSetService, factory, entityRegistrar, new ClusterEventBus(), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
     }
 
     @Test
@@ -113,7 +120,7 @@ public class StreamServiceImplTest {
     @Test
     @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
     public void addOutputs() throws NotFoundException {
-        final ObjectId streamId = new ObjectId("5628f4503b0c5756a8eebc4d");
+        final ObjectId streamId = new ObjectId(STREAM_ID);
         final ObjectId output1Id = new ObjectId("5628f4503b00deadbeef0001");
         final ObjectId output2Id = new ObjectId("5628f4503b00deadbeef0002");
 
@@ -131,5 +138,13 @@ public class StreamServiceImplTest {
         assertThat(stream.getOutputs())
                 .anySatisfy(output -> assertThat(output.getId()).isEqualTo(output1Id.toHexString()))
                 .anySatisfy(output -> assertThat(output.getId()).isEqualTo(output2Id.toHexString()));
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
+    public void testSaveStream_streamsChangedEventSent() throws ValidationException, NotFoundException {
+        final Stream stream = streamService.load(new ObjectId(STREAM_ID).toHexString());
+        streamService.save(stream);
+        verify(eventBus, times(1)).post(StreamsChangedEvent.create(STREAM_ID));
     }
 }
