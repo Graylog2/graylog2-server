@@ -19,7 +19,9 @@ package org.graylog2.shared.security;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -28,7 +30,6 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.security.sessions.SessionDTO;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
@@ -118,13 +119,6 @@ public class SessionCreator {
 
         final Session session = subject.getSession();
 
-        final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
-        final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
-        if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
-            // TODO: fix this
-            session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
-        }
-
         return createSession(subject, session, host);
     }
 
@@ -141,6 +135,9 @@ public class SessionCreator {
             session.setTimeout(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
         }
         session.touch();
+
+        // save subject in session, otherwise we can't get the user ID back in subsequent requests.
+        ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         final Map<String, Object> auditEventContext = ImmutableMap.of(
                 "session_id", session.getId(),
