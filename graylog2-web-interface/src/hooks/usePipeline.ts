@@ -18,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { PipelinesPipelines } from '@graylog/server-api';
 
-import { type PipelineType } from 'components/pipelines/types';
+import type { PipelineType } from 'components/pipelines/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 export const PIPELINE_QUERY_KEY = ['pipeline'];
