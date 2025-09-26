@@ -7,5 +7,6 @@ window.appConfig = {
   featureFlags: ${featureFlags},
   telemetry: ${telemetry},
   contentStream: ${contentStream},
-  branding: ${branding}
+  branding: ${branding},
+  globalInputsOnly: ${globalInputsOnly}
 };
