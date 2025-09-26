@@ -107,7 +107,7 @@ public class SessionConverter {
                         "ignoring the others.", principalCollection.asList().size());
             }
             final var realm = principalCollection.getRealmNames().stream().findFirst().orElseThrow(() ->
-                    new IllegalStateException(f("Principal in session has no associated realm.")));
+                    new IllegalStateException("Principal in session has no associated realm."));
             final var principal = principalCollection.fromRealm(realm).iterator().next();
             if (principal instanceof String userId) {
                 return Optional.of(new PrincipalInfo(userId, realm));
