@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import uniq from 'lodash/uniq';
+import type { Datum } from 'plotly.js';
+
 import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
@@ -30,13 +33,21 @@ type Args = {
   queryId: string;
   field: string;
   value?: string;
+  contexts: { valuePath: Array<{ [key: string]: Datum }> } | null;
 };
 
 const ExcludeFromQueryHandler =
-  ({ queryId, field, value }: Args) =>
+  ({ queryId, field, value, contexts }: Args) =>
   (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const newQuery = formatNewQuery(oldQuery, field, value);
+
+    const valuesToAdd = uniq(contexts?.valuePath?.length ? contexts.valuePath : [{ [field]: value }]);
+
+    const newQuery = valuesToAdd.reduce((prev: string, cur) => {
+      const [curField, curValue] = Object.entries(cur)[0];
+
+      return formatNewQuery(prev, curField, curValue as string | number);
+    }, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));
   };
