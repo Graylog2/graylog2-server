@@ -211,7 +211,7 @@ public class UserSessionTerminationService extends AbstractIdleService {
 
         @JsonCreator
         public static GlobalTerminationRevisionConfig create(@JsonProperty("applied_revision") long appliedRevision) {
-            return new org.graylog2.security.AutoValue_UserSessionTerminationService_GlobalTerminationRevisionConfig(appliedRevision);
+            return new AutoValue_UserSessionTerminationService_GlobalTerminationRevisionConfig(appliedRevision);
         }
     }
 }
