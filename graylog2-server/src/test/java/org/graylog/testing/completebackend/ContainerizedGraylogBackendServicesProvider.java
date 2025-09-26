@@ -51,7 +51,7 @@ import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.RO
  * The {@link ContainerizedGraylogBackend} using these services must run a {@link Services#cleanUp()}}
  * after it shuts down.
  */
-public class ContainerizedGraylogBackendServicesProvider implements AutoCloseable {
+public class ContainerizedGraylogBackendServicesProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackendServicesProvider.class);
 
@@ -87,8 +87,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         });
     }
 
-    @Override
-    public void close() throws Exception {
+    public static void clearServicesCache() {
         SERVICES_CACHE.values().forEach(s -> {
             try {
                 s.close();
