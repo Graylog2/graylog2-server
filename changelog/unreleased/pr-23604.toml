@@ -1,5 +1,0 @@
-type = "added"
-message = "Added the ability to include Event Procedures in Slack notifications."
-
-issues = ["11542"]
-pulls = ["23604"]

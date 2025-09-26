@@ -43,7 +43,7 @@ public interface GraylogRestApi {
                 if (result != null && result.isPresent()) {
                     return result.get();
                 }
-            } catch (Exception e) {
+            } catch (Exception | AssertionError e) {
                 // ignore and retry
             }
             msPassed += SLEEP_MS;
