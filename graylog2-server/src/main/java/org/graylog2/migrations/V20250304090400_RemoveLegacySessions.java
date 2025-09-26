@@ -69,7 +69,7 @@ public class V20250304090400_RemoveLegacySessions extends Migration {
 
         Lists.partition(sessionIds, 100).forEach(partition -> {
             LOG.debug("Removing {} legacy sessions from MongoDB.", partition.size());
-            collection.deleteMany(Filters.in("session_id", sessionIds));
+            collection.deleteMany(Filters.in("session_id", partition));
         });
 
         LOG.debug("Posting {} SessionDeletedEvents to the cluster event bus.", sessionIds.size());
