@@ -71,7 +71,14 @@ const DropdownSwitcher = ({
   };
 
   if (fieldData)
-    return <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />;
+    return (
+      <ValueActionsDropdown
+        contexts={fieldData.contexts}
+        field={fieldData.field}
+        value={fieldData.value}
+        onActionRun={onActionRun}
+      />
+    );
 
   return showValuesComponent ? (
     <Component clickPoint={selectedClickPoint} config={config} setFieldData={setFieldData} />

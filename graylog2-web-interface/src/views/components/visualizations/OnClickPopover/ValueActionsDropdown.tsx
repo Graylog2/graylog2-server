@@ -33,7 +33,7 @@ const useQueryFieldTypes = () => {
   return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
 };
 
-const ValueActionsDropdown = ({ value, field, onActionRun }: FieldData & { onActionRun: () => void }) => {
+const ValueActionsDropdown = ({ value, field, contexts, onActionRun }: FieldData & { onActionRun: () => void }) => {
   const queryId = useCurrentQueryId();
   const actionContext = useContext(ActionContext);
   const types = useQueryFieldTypes();
@@ -42,8 +42,8 @@ const ValueActionsDropdown = ({ value, field, onActionRun }: FieldData & { onAct
   const handlerArgs = useMemo(() => {
     const type = fieldTypeFor(field, types);
 
-    return { queryId, field, type, value, contexts: actionContext };
-  }, [actionContext, field, queryId, types, value]);
+    return { queryId, field, type, value, contexts: { ...actionContext, ...(contexts ?? {}), filedTypes: types } };
+  }, [actionContext, contexts, field, queryId, types, value]);
 
   return (
     <Popover.Dropdown>
