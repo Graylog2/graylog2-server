@@ -22,7 +22,6 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCreden
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -39,8 +38,6 @@ import org.testcontainers.utility.DockerImageName;
 import java.net.URI;
 import java.util.List;
 
-import static java.util.Objects.isNull;
-
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private RestHighLevelClient restHighLevelClient;
     private ElasticsearchClient elasticsearchClient;
@@ -49,8 +46,8 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public ElasticsearchInstanceES7(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, hostname, network, heapSize);
+    public ElasticsearchInstanceES7(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(cachedInstance, version, hostname, network, heapSize);
         this.featureFlags = featureFlags;
     }
 
@@ -72,11 +69,6 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     @Override
     protected String imageName() {
         return "docker.elastic.co/elasticsearch/elasticsearch-oss:" + version().version();
-    }
-
-    @Override
-    public SearchServer searchServer() {
-        return SearchServer.ES7;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -131,8 +123,6 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")

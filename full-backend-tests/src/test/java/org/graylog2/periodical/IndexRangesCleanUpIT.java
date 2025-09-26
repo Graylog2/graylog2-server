@@ -23,8 +23,9 @@ import com.github.rholder.retry.WaitStrategies;
 import org.assertj.core.api.ListAssert;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,18 +34,19 @@ import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class IndexRangesCleanUpIT {
     public static final String RANGE_CLEANUP_PREFIX = "range-cleanup";
     public static final String INDEX_TWO = RANGE_CLEANUP_PREFIX + "_1";
     public static final String INDEX_ONE = RANGE_CLEANUP_PREFIX + "_0";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public IndexRangesCleanUpIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCleanUp() throws ExecutionException, RetryException {
         String indexSetId = api.indices().createIndexSet("Range clean up", "test index range clean up", RANGE_CLEANUP_PREFIX);
 
