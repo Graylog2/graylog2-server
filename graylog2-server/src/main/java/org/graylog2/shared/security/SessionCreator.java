@@ -19,9 +19,7 @@ package org.graylog2.shared.security;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -31,14 +29,13 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
+import org.graylog2.security.sessions.SessionDTO;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -124,6 +121,7 @@ public class SessionCreator {
         final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
         final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
         if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
+            // TODO: fix this
             session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
         }
 
@@ -137,18 +135,12 @@ public class SessionCreator {
         if (user != null) {
             long timeoutInMillis = user.getSessionTimeoutMs();
             session.setTimeout(timeoutInMillis);
-            session.setAttribute("username", user.getName());
-            getSessionAttributes(subject).forEach(session::setAttribute);
+            session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, user.getName());
         } else {
             // set a sane default. really we should be able to load the user from above.
             session.setTimeout(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
         }
         session.touch();
-
-        // TODO: do we really need to do this? It looks as if at this point, the principals and auth state is already
-        //   saved in the session.
-        // save subject in session, otherwise we can't get the username back in subsequent requests.
-        ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         final Map<String, Object> auditEventContext = ImmutableMap.of(
                 "session_id", session.getId(),
@@ -157,24 +149,6 @@ public class SessionCreator {
         auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
         return Optional.of(session);
-    }
-
-    /**
-     * Extract additional session attributes out of a subject's principal collection. We assume that if there is a
-     * second principal, that this would be a map of session attributes.
-     */
-    private Map<?, ?> getSessionAttributes(Subject subject) {
-        final List<?> principals = subject.getPrincipals().asList();
-        if (principals.size() < 2) {
-            return Collections.emptyMap();
-        }
-        Object sessionAttributes = principals.get(1);
-        if (sessionAttributes instanceof Map) {
-            return (Map<?, ?>) sessionAttributes;
-        }
-        log.error("Unable to extract session attributes from subject. Expected <Map.class> but got <{}>.",
-                sessionAttributes.getClass().getSimpleName());
-        return Collections.emptyMap();
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
