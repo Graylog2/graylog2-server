@@ -102,7 +102,10 @@ export default [
       'no-use-before-define': 'error',
       'no-alert': 'warn',
       'no-console': 'warn',
-      'class-methods-use-this': 'warn',
+      'class-methods-use-this': [
+        'warn',
+        { exceptMethods: ['componentDidMount', 'componentDidUpdate', 'componentWillUnmount'] },
+      ],
       'no-await-in-loop': 'error',
       'no-loop-func': 'error',
 
