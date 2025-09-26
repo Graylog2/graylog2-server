@@ -67,7 +67,6 @@ public class ExecuteNotification extends Action {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("security/security-events/alerts");
             uriBuilder.addParameter("query", "id:" + event.id());
-            uriBuilder.addParameter("query", "id:${event.id}");
             return uriBuilder.build().getLinkPath();
         }
 
