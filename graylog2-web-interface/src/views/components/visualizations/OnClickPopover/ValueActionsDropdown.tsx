@@ -25,6 +25,8 @@ import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
 import { Menu } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import { humanSeparator } from 'views/Constants';
 
 type Props = { onActionRun: () => void; value: FieldData['value']; field: FieldData['field'] };
 
@@ -39,6 +41,8 @@ const ValueActionsDropdown = ({ value, field, onActionRun }: Props) => {
     return { queryId, field, type, value, contexts: actionContext };
   }, [actionContext, field, queryId, value]);
 
+  const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
+
   return (
     <Popover.Dropdown>
       <Menu opened>
@@ -48,7 +52,13 @@ const ValueActionsDropdown = ({ value, field, onActionRun }: Props) => {
           onMenuToggle={onActionRun}
           overflowingComponents={overflowingComponents}
           setOverflowingComponents={setOverflowingComponents}>
-          {field} = <TypeSpecificValue field={field} value={value} type={handlerArgs?.type} truncate />
+          {showMultipleValueHeader ? (
+            actionContext?.valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)
+          ) : (
+            <>
+              {field} = <TypeSpecificValue field={field} value={value} type={handlerArgs?.type} truncate />
+            </>
+          )}
         </ActionDropdown>
       </Menu>
     </Popover.Dropdown>
