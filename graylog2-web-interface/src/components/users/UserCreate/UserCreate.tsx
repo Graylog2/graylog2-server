@@ -185,12 +185,12 @@ const UserCreate = () => {
   };
 
   const onSubmit = (data) => {
-    handleFormSubmit(data, user.roles);
-
     sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_CREATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-create-form',
     });
+
+    return handleFormSubmit(data, user.roles);
   };
 
   return (
