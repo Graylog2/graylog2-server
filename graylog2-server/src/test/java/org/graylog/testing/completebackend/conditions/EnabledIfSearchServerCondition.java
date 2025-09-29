@@ -65,10 +65,10 @@ public record EnabledIfSearchServerCondition(SearchVersion searchVersion) implem
         }
 
         if (searchVersion.version().satisfies(versionRange)) {
-            return ConditionEvaluationResult.enabled("Version range satisfied: " + versionRange);
+            return ConditionEvaluationResult.enabled(f("Version range satisfied: %s:%s", distribution, versionRange));
         } else {
-            return ConditionEvaluationResult.disabled(f("Disabled, because version \"%s\" does not satisfy \"%s\"",
-                    searchVersion.version(), versionRange));
+            return ConditionEvaluationResult.disabled(f("Disabled, because \"%s:%s\" does not satisfy \"%s:%s\"",
+                    searchVersion.distribution(), searchVersion.version(), distribution, versionRange));
         }
     }
 
