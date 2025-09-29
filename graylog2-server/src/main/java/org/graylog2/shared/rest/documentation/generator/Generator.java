@@ -495,11 +495,12 @@ public class Generator {
                             final Map<String, Object> property = (Map<String, Object>) entry.getValue();
                             final TypeSchema propertySchema = extractInlineModels(property);
                             models.putAll(propertySchema.models());
+                            final Map<String, Object> type = reuseTypeRef(propertySchema.type());
                             if (propertySchema.name() == null) {
-                                return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), propertySchema.type());
+                                return new AbstractMap.SimpleEntry<>(entry.getKey(), type);
                             }
                             if (propertySchema.type() != null) {
-                                models.put(propertySchema.name(), propertySchema.type());
+                                models.put(propertySchema.name(), type);
                             }
                             return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap("$ref", propertySchema.name()));
                         })
@@ -517,6 +518,7 @@ public class Generator {
                     newGenericTypeSchema.put("additional_properties", Collections.singletonMap("$ref", itemsSchema.name()));
                 } else {
                     if (itemsSchema.type() != null) {
+                        final Map<String, Object> type = reuseTypeRef(itemsSchema.type());
                         newGenericTypeSchema.put("additional_properties", itemsSchema.type());
                     }
                 }
@@ -525,8 +527,7 @@ public class Generator {
             if (!genericTypeSchema.containsKey("properties")) {
                 newGenericTypeSchema.put("properties", Collections.emptyMap());
             }
-            final var genericParts = splitIfGeneric((String) genericTypeSchema.get("id"));
-            final String id = genericParts != null ? genericParts.stream().map(this::shortenJsonSchemaURN).collect(Collectors.joining("_")) : null;
+            final String id = shortenJsonSchemaURNs((String) genericTypeSchema.get("id"));
             return createTypeSchema(id, newGenericTypeSchema, models);
         }
 
@@ -542,11 +543,22 @@ public class Generator {
                         models.put(itemsSchema.name(), itemsSchema.type());
                     }
                     newGenericTypeSchema.put("items", Collections.singletonMap("$ref", itemsSchema.name()));
+                } else {
+                    final Map<String, Object> type = reuseTypeRef(itemsSchema.type());
+                    newGenericTypeSchema.put("items", type);
                 }
             }
             return createTypeSchema(null, newGenericTypeSchema, models);
         }
         return createTypeSchema(null, genericTypeSchema, Collections.emptyMap());
+    }
+
+    private Map<String, Object> reuseTypeRef(Map<String, Object> type) {
+        if (type.get("$ref") != null) {
+            type.put("$ref", shortenJsonSchemaURNs((String) type.get("$ref")));
+        }
+
+        return type;
     }
 
     private static final Pattern IDENT =
@@ -570,6 +582,10 @@ public class Generator {
         return result;
     }
 
+    private String shortenJsonSchemaURNs(@Nullable String id) {
+        final var genericParts = splitIfGeneric(id);
+        return genericParts != null ? genericParts.stream().map(this::shortenJsonSchemaURN).collect(Collectors.joining("_")) : null;
+    }
     private String shortenJsonSchemaURN(@Nullable String id) {
         if (id == null) {
             return null;
