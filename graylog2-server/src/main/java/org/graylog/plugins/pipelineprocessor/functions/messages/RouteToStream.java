@@ -16,6 +16,9 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
+import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -26,9 +29,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import java.util.Collection;
 import java.util.Collections;
 
@@ -36,9 +36,10 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createQuietDefaultRateLimitedLog;
 
 public class RouteToStream extends AbstractFunction<Void> {
-
+    private static final RateLimitedLog RATE_LIMITED_LOG = createQuietDefaultRateLimitedLog(RouteToStream.class);
     public static final String NAME = "route_to_stream";
     private static final String ID_ARG = "id";
     private static final String NAME_ARG = "name";
@@ -73,12 +74,13 @@ public class RouteToStream extends AbstractFunction<Void> {
             }
             streams = streamCacheService.getByName(name);
             if (streams.isEmpty()) {
-                // TODO signal error somehow
+                RATE_LIMITED_LOG.warn("Couldn't find a stream in cache with name [{}] to route the message to.", name);
                 return null;
             }
         } else {
             final Stream stream = streamCacheService.getById(id);
             if (stream == null) {
+                RATE_LIMITED_LOG.warn("Couldn't find a stream in cache with id [{}] to route the message to.", id);
                 return null;
             }
             streams = Collections.singleton(stream);
