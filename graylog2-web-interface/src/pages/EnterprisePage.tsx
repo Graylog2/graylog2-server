@@ -32,25 +32,22 @@ const EnterprisePage = () => {
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
 
-  const title = (
-    <>
-      <UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise
-    </>
-  );
-
   if (!nodes) {
     return <Spinner />;
   }
 
   return (
-    <DocumentTitle title={title}>
+    <DocumentTitle title={`${productName} Enterprise`}>
       <div>
-        <PageHeader title={title}>
+        <PageHeader
+          title={
+            <>
+              <UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise
+            </>
+          }>
           <span>
-            {productName} Enterprise adds commercial functionality to the Open Source {productName} core.{' '}
             <UpsellWrapper>
-              You can learn more about {productName} Enterprise on the{' '}
-              <EnterpriseProductLink>product page</EnterpriseProductLink>.
+              <EnterpriseProductLink>Learn More</EnterpriseProductLink> about {productName} Enterprise features.
             </UpsellWrapper>
           </span>
         </PageHeader>
