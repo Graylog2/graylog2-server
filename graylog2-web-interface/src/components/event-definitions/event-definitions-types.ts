@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { type SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
