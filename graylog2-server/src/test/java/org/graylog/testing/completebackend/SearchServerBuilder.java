@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class SearchServerBuilder<T extends SearchServerInstance> {
-    public static final String DEFAULT_HEAP_SIZE = "512m";
+    public static final String DEFAULT_HEAP_SIZE = "1g";
     private final SearchVersion version;
     private String hostname = "indexer";
     private Network network;
