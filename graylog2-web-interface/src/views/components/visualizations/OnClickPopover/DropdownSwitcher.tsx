@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 
 import type {
   ClickPoint,
@@ -24,6 +24,8 @@ import type {
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
 import ValueActionsDropdown from 'views/components/visualizations/OnClickPopover/ValueActionsDropdown';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 type Props = {
   component: OnClickPopoverDropdown;
@@ -39,6 +41,12 @@ const defaultMetricMapper = (clickPoint: ClickPoint) => ({
   metric: clickPoint.data.originalName ?? clickPoint.data.name,
 });
 
+const useQueryFieldTypes = () => {
+  const fieldTypes = useContext(FieldTypesContext);
+
+  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
+};
+
 const DropdownSwitcher = ({
   component: Component,
   clickPoint,
@@ -50,6 +58,7 @@ const DropdownSwitcher = ({
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
   const [showValuesComponent, setShowValuesComponent] = useState<boolean>();
   const [fieldData, setFieldData] = useState<FieldData>(null);
+  const types = useQueryFieldTypes();
 
   const onSelect = (pt: ClickPoint) => {
     setShowValuesComponent(true);
@@ -63,6 +72,14 @@ const DropdownSwitcher = ({
     setFieldData(null);
   }, [clickPoint, clickPointsInRadius]);
 
+  const additionalContextValue = useMemo(
+    () => ({
+      valuePath: fieldData?.contexts?.valuePath,
+      fieldTypes: types,
+    }),
+    [fieldData?.contexts?.valuePath, types],
+  );
+
   if (!selectedClickPoint) return null;
 
   const onActionRun = () => {
@@ -72,12 +89,9 @@ const DropdownSwitcher = ({
 
   if (fieldData)
     return (
-      <ValueActionsDropdown
-        contexts={fieldData.contexts}
-        field={fieldData.field}
-        value={fieldData.value}
-        onActionRun={onActionRun}
-      />
+      <AdditionalContext.Provider value={additionalContextValue}>
+        <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />
+      </AdditionalContext.Provider>
     );
 
   return showValuesComponent ? (

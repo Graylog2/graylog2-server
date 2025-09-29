@@ -65,6 +65,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -248,6 +249,7 @@ export interface ActionContexts {
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
+  fieldTypes?: FieldTypeMappingsList;
 }
 
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];

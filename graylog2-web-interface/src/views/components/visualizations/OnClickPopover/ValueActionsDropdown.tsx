@@ -20,30 +20,24 @@ import type { FieldData } from 'views/components/visualizations/OnClickPopover/T
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import { ActionContext } from 'views/logic/ActionContext';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import ActionDropdown from 'views/components/actions/ActionDropdown';
 import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
 import { Menu } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
 
-const useQueryFieldTypes = () => {
-  const fieldTypes = useContext(FieldTypesContext);
+type Props = { onActionRun: () => void; value: FieldData['value']; field: FieldData['field'] };
 
-  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
-};
-
-const ValueActionsDropdown = ({ value, field, contexts, onActionRun }: FieldData & { onActionRun: () => void }) => {
+const ValueActionsDropdown = ({ value, field, onActionRun }: Props) => {
   const queryId = useCurrentQueryId();
   const actionContext = useContext(ActionContext);
-  const types = useQueryFieldTypes();
   const { overflowingComponents, setOverflowingComponents } = useOverflowingComponents();
 
   const handlerArgs = useMemo(() => {
-    const type = fieldTypeFor(field, types);
+    const type = fieldTypeFor(field, actionContext.fieldTypes);
 
-    return { queryId, field, type, value, contexts: { ...actionContext, ...(contexts ?? {}), filedTypes: types } };
-  }, [actionContext, contexts, field, queryId, types, value]);
+    return { queryId, field, type, value, contexts: actionContext };
+  }, [actionContext, field, queryId, value]);
 
   return (
     <Popover.Dropdown>

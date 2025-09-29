@@ -72,18 +72,25 @@ type GroupingActionsProps = {
   columnPivotValues: Array<ValueGroupItem>;
   rowPivotValues: Array<ValueGroupItem>;
   setFieldData: Props['setFieldData'];
-  traceColor: string | number;
+  metricValue: ValueGroupItem;
 };
 
-const GroupingActions = ({ columnPivotValues, rowPivotValues, setFieldData, traceColor }: GroupingActionsProps) => {
+const GroupingActions = ({ columnPivotValues, rowPivotValues, setFieldData, metricValue }: GroupingActionsProps) => {
   const valuePath = [...columnPivotValues, ...rowPivotValues].map(({ value, field }) => ({ [field]: value }));
 
   return (
-    <ListGroupItem onClick={() => setFieldData({ value: null, field: null, contexts: { valuePath } })}>
+    <ListGroupItem
+      onClick={() =>
+        setFieldData({
+          value: metricValue.value,
+          field: metricValue.field,
+          contexts: { valuePath },
+        })
+      }>
       <ValueRenderer
         label=""
         value={valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)}
-        traceColor={traceColor}
+        traceColor={metricValue.traceColor}
       />
     </ListGroupItem>
   );
@@ -102,7 +109,7 @@ const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotVal
           columnPivotValues={columnPivotValues}
           rowPivotValues={rowPivotValues}
           setFieldData={setFieldData}
-          traceColor={metricValue.traceColor}
+          metricValue={metricValue}
         />
       )}
       <GroupingsContainer $withMargin={showMultipleAction}>

@@ -396,7 +396,7 @@ const exports: PluginExports = {
         type: 'copy-value-to-clipboard',
         title: 'Copy value to clipboard',
         handler: CopyValueToClipboard,
-        isEnabled: () => true,
+        isEnabled: CopyValueToClipboard.isEnabled,
         resetFocus: false,
       },
       {

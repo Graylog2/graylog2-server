@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Datum } from 'plotly.js';
 import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
@@ -22,8 +21,7 @@ import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/quer
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import type { RootState } from 'views/types';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import type { RootState, ActionContexts } from 'views/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
@@ -37,7 +35,7 @@ type Arguments = {
   field: string;
   value?: string | number;
   type: FieldType;
-  contexts: { valuePath: Array<{ [key: string]: Datum }>; filedTypes: FieldTypeMappingsList } | null;
+  contexts: ActionContexts;
 };
 
 const AddToQueryHandler =
@@ -48,7 +46,7 @@ const AddToQueryHandler =
 
     const newQuery = valuesToAdd.reduce((prev, cur) => {
       const [curField, curValue] = Object.entries(cur)[0];
-      const curType = fieldTypeFor(curField, contexts.filedTypes) ?? type;
+      const curType = fieldTypeFor(curField, contexts.fieldTypes) ?? type;
 
       return formatNewQuery(prev, curField, curValue as string | number, curType);
     }, oldQuery);
