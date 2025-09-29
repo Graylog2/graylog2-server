@@ -16,31 +16,18 @@
  */
 package org.graylog.testing.completebackend.conditions;
 
-import org.graylog2.storage.SearchVersion;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotated test method or class only runs if the given search server requirements apply. This annotation can
- * be repeated to allow multiple search server versions.
+ * Container annotation for {@link EnabledIfSearchServer}. Do not use directly.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Repeatable(RepeatedEnabledIfSearchServerContainer.class)
-public @interface EnabledIfSearchServer {
-    /**
-     * Required search server distribution.
-     */
-    SearchVersion.Distribution distribution() default SearchVersion.Distribution.OPENSEARCH;
-
-    /**
-     * Required search server version. Can be a semantic versioning range. (e.g., ">=6.0")
-     */
-    String version() default "";
+public @interface RepeatedEnabledIfSearchServerContainer {
+    EnabledIfSearchServer[] value();
 }

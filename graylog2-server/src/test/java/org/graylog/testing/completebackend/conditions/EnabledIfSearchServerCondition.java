@@ -22,19 +22,35 @@ import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
 
+import java.util.List;
+
+import static java.util.function.Predicate.not;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public record EnabledIfSearchServerCondition(SearchVersion searchVersion) implements ExecutionCondition {
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-        final var optionalAnnotation = AnnotationSupport.findAnnotation(context.getElement(), EnabledIfSearchServer.class);
-        if (optionalAnnotation.isEmpty()) {
+        final var annotations = AnnotationSupport.findRepeatableAnnotations(context.getElement(), EnabledIfSearchServer.class);
+
+        if (annotations.isEmpty()) {
             return ConditionEvaluationResult.enabled("No @EnabledIfSearchServer present");
         }
 
-        final var annotation = optionalAnnotation.get();
+        return annotations.stream()
+                .map(this::evaluateAnnotation)
+                .filter(not(ConditionEvaluationResult::isDisabled))
+                .findFirst()
+                .orElse(ConditionEvaluationResult.disabled(f(
+                        "Disabled, because version \"%s\" does not satisfy any of the allowed search servers: %s",
+                        searchVersion.version(),
+                        candidateToString(annotations)
+                )));
+    }
+
+    private ConditionEvaluationResult evaluateAnnotation(EnabledIfSearchServer annotation) {
         final var distribution = annotation.distribution();
+        final var versionRange = annotation.version();
 
         if (searchVersion.distribution() != distribution) {
             return ConditionEvaluationResult.disabled(f("Disabled, because distribution is \"%s\", but required is \"%s\"",
@@ -42,17 +58,27 @@ public record EnabledIfSearchServerCondition(SearchVersion searchVersion) implem
         }
 
         if (distribution == SearchVersion.Distribution.DATANODE) {
-            return ConditionEvaluationResult.enabled(null);
-        } else if (isBlank(annotation.version())) {
+            // We don't check versions for Data Node, as it's supposed to be compatible.
+            return ConditionEvaluationResult.enabled("Enabled for Data Node distribution");
+        } else if (isBlank(versionRange)) {
             throw new IllegalArgumentException("@EnabledIfSearchServer must have a value for \"version\", unless distribution is \"DATANODE\"");
         }
 
-        final var versionRange = annotation.version();
         if (searchVersion.version().satisfies(versionRange)) {
             return ConditionEvaluationResult.enabled("Version range satisfied: " + versionRange);
         } else {
             return ConditionEvaluationResult.disabled(f("Disabled, because version \"%s\" does not satisfy \"%s\"",
                     searchVersion.version(), versionRange));
         }
+    }
+
+    private List<String> candidateToString(List<EnabledIfSearchServer> annotations) {
+        return annotations.stream().map(annotation -> {
+            if (isBlank(annotation.version())) {
+                return annotation.distribution().toString() + " (any version)";
+            } else {
+                return annotation.distribution() + " " + annotation.version();
+            }
+        }).toList();
     }
 }
