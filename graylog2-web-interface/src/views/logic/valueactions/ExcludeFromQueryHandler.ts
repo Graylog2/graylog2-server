@@ -33,7 +33,7 @@ type Args = {
   queryId: string;
   field: string;
   value?: string;
-  contexts: { valuePath: Array<{ [key: string]: Datum }> } | null;
+  contexts?: { valuePath: Array<{ [key: string]: Datum }> } | null;
 };
 
 const ExcludeFromQueryHandler =
