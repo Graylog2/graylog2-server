@@ -75,6 +75,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
         columnPivotValues={columnPivotValues}
         metricValue={metricValue}
         setFieldData={setFieldData}
+        config={config}
       />
     </Popover.Dropdown>
   );

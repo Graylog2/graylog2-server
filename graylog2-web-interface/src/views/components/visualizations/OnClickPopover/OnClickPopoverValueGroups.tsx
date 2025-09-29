@@ -20,9 +20,13 @@ import styled, { css } from 'styled-components';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import type { ValueGroupItem, ValueGroups, FieldData } from 'views/components/visualizations/OnClickPopover/Types';
 import ValueRenderer from 'views/components/visualizations/OnClickPopover/ValueRenderer';
-import { humanSeparator } from 'views/Constants';
+import { humanSeparator, multipleValuesActionsSupportedVisualizations } from 'views/Constants';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-type Props = ValueGroups & { setFieldData: React.Dispatch<React.SetStateAction<FieldData>> };
+type Props = ValueGroups & {
+  setFieldData: React.Dispatch<React.SetStateAction<FieldData>>;
+  config: AggregationWidgetConfig;
+};
 
 const StyledListGroup = styled(ListGroup)`
   max-height: 300px;
@@ -96,8 +100,10 @@ const GroupingActions = ({ columnPivotValues, rowPivotValues, setFieldData, metr
   );
 };
 
-const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotValues, setFieldData }: Props) => {
-  const showMultipleAction = (rowPivotValues.length ?? 0) + (columnPivotValues.length ?? 0) > 1;
+const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotValues, setFieldData, config }: Props) => {
+  const showMultipleAction =
+    (rowPivotValues.length ?? 0) + (columnPivotValues.length ?? 0) > 1 &&
+    multipleValuesActionsSupportedVisualizations.includes(config.visualization);
 
   return (
     <StyledListGroup>

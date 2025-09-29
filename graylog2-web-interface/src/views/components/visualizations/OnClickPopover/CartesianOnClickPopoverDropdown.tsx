@@ -93,6 +93,7 @@ const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: O
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
           setFieldData={setFieldData}
+          config={config}
         />
       </DivContainer>
     </Popover.Dropdown>
