@@ -65,6 +65,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,6 +75,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -523,7 +525,8 @@ public class Generator {
             if (!genericTypeSchema.containsKey("properties")) {
                 newGenericTypeSchema.put("properties", Collections.emptyMap());
             }
-            final String id = shortenJsonSchemaURN((String) genericTypeSchema.get("id"));
+            final var genericParts = splitIfGeneric((String) genericTypeSchema.get("id"));
+            final String id = genericParts != null ? genericParts.stream().map(this::shortenJsonSchemaURN).collect(Collectors.joining("_")) : null;
             return createTypeSchema(id, newGenericTypeSchema, models);
         }
 
@@ -546,15 +549,39 @@ public class Generator {
         return createTypeSchema(null, genericTypeSchema, Collections.emptyMap());
     }
 
+    private static final Pattern IDENT =
+            Pattern.compile("[A-Za-z_][A-Za-z0-9_$:]*");
+
+    private static final Set<String> KEYWORDS =
+            Set.of("extends", "super");
+
+    private List<String> splitIfGeneric(String genericFqcn) {
+        if (genericFqcn == null) {
+            return null;
+        }
+        final List<String> result = new ArrayList<>();
+        final var m = IDENT.matcher(genericFqcn);
+        while (m.find()) {
+            final var token = m.group();
+            if (!KEYWORDS.contains(token) && !token.equals("?")) {
+                result.add(token);
+            }
+        }
+        return result;
+    }
+
     private String shortenJsonSchemaURN(@Nullable String id) {
         if (id == null) {
             return null;
         }
         final Splitter splitter = Splitter.on(":");
         final List<String> segments = splitter.splitToList(id);
-        return segments.size() > 0
-                ? segments.get(segments.size() - 1)
-                : id;
+        if (segments.isEmpty()) {
+            return id;
+        }
+        return segments.stream()
+                .dropWhile(segment -> Character.isLowerCase(segment.codePointAt(0)))
+                .collect(Collectors.joining("__"));
     }
 
     private static Optional<String> typeOfSchema(@Nullable Map<String, Object> typeSchema) {
