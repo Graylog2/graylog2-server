@@ -29,6 +29,7 @@ import ContentPackUploadControls from 'components/content-packs/ContentPackUploa
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useContentPacks from 'components/content-packs/hooks/useContentPacks';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 const ConfigurationBundles = styled.div(
   ({ theme }) => css`
@@ -67,8 +68,8 @@ const ContentPacksPage = () => {
   );
 
   const _installContentPack = useCallback(
-    (contentPackId: string, contentPackRev: string, parameters: unknown) => {
-      ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(
+    (contentPackId: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => {
+      ContentPacksActions.install(contentPackId, contentPackRev, parameters, shareRequest).then(
         () => {
           UserNotification.success('Content Pack installed successfully.', 'Success');
           refetch();

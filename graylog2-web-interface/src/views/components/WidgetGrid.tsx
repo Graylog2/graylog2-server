@@ -40,6 +40,9 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
 import { setIsDirty } from 'views/logic/slices/viewSlice';
+import { widgetDragHandleClass } from 'views/components/widgets/Constants';
+import { selectNewWidget } from 'views/logic/slices/widgetsSlice';
+import ScrollToHint from 'views/components/common/ScrollToHint';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -57,7 +60,7 @@ const COLUMNS = {
 
 const DashboardWrap = styled(ElementDimensions)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     margin: 0;
     width: 100%;
     height: 100%;
@@ -84,19 +87,28 @@ type WidgetsProps = {
   focusedWidget: FocusContextState | undefined;
   onPositionsChange: (position: BackendWidgetPosition) => void;
   positions: WidgetPositions;
+  isNewWidget: boolean;
 };
 
-const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget }: WidgetsProps) => {
+const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget, isNewWidget }: WidgetsProps) => {
   const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
   const widgetPosition = positions[widgetId];
 
   return (
-    <WidgetComponent
-      editing={editing}
-      onPositionsChange={onPositionsChange}
-      position={widgetPosition}
-      widgetId={widgetId}
-    />
+    <>
+      <ScrollToHint
+        autoScroll
+        scrollContainer={{ current: document.body }}
+        title="Scroll to new widget"
+        ifTrue={isNewWidget}
+      />
+      <WidgetComponent
+        editing={editing}
+        onPositionsChange={onPositionsChange}
+        position={widgetPosition}
+        widgetId={widgetId}
+      />
+    </>
   );
 };
 
@@ -141,7 +153,7 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout = undefined, p
       onPositionsChange={onPositionsChange}
       onSyncLayout={onSyncLayout}
       width={width}
-      draggableHandle=".widget-drag-handle">
+      draggableHandle={`.${widgetDragHandleClass}`}>
       {children}
     </StyledReactGridContainer>
   );
@@ -209,6 +221,7 @@ const WidgetGrid = () => {
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
   const dispatch = useViewsDispatch();
+  const newWidget = useViewsSelector(selectNewWidget);
 
   const [widgets, positions] = useWidgetsAndPositions();
 
@@ -244,6 +257,7 @@ const WidgetGrid = () => {
           data-widget-id={widgetId}
           isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
           <WidgetGridItem
+            isNewWidget={newWidget === widgetId}
             positions={positions}
             widgetId={widgetId}
             focusedWidget={focusedWidget}

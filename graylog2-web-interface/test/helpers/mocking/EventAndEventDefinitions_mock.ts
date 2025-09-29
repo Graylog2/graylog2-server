@@ -69,6 +69,10 @@ export const mockEventData = {
 
 export const mockEventDefinitionTwoAggregations: EventDefinition = {
   _scope: 'DEFAULT',
+  _entity_source: {
+    source: 'USER_DEFINED',
+    entity_type: 'event_definition',
+  },
   id: 'event-definition-id-1',
   title: 'Event Definition Title',
   description: 'Test description',
@@ -135,6 +139,7 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
   },
   notifications: [
     {
+      type: null,
       notification_id: 'email_notification_id',
       notification_parameters: null,
     },
@@ -145,6 +150,22 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
       streams: ['0002'],
     },
   ],
+  state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
+  matched_at: '',
+  scheduler: {
+    data: {
+      type: '',
+      timerange_from: 0,
+      timerange_to: 0,
+    },
+    next_time: '',
+    triggered_at: '',
+    queued_notifications: 0,
+    is_scheduled: false,
+    status: 'runnable',
+  },
 };
 
 export const mockEventDefinitionOneAggregation = {

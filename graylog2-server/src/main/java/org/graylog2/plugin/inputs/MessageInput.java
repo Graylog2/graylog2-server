@@ -482,6 +482,10 @@ public abstract class MessageInput implements Stoppable {
         public boolean isForwarderCompatible() {
             return true;
         }
+
+        public String getDescription() {
+            return null;
+        }
     }
 
     @Override

@@ -17,6 +17,7 @@
 
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
+import type Plotly from 'plotly.js/lib/core';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -46,6 +47,7 @@ export type Props = {
   plotLayout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string, userTimezone: string) => boolean;
   onClickMarker?: GenericPlotProps['onClickMarker'];
+  onInitialized?: (figure: unknown, graphDiv: Plotly.PlotlyHTMLElement) => void;
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -86,6 +88,7 @@ const XYPlot = ({
   plotLayout = {},
   onZoom = undefined,
   onClickMarker = undefined,
+  onInitialized = undefined,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
@@ -97,8 +100,7 @@ const XYPlot = ({
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
-
-  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = merge({}, defaultLayout, plotLayout);
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
@@ -133,6 +135,7 @@ const XYPlot = ({
         onZoom={_onZoom}
         setChartColor={setChartColor}
         onClickMarker={onClickMarker}
+        onInitialized={onInitialized}
       />
     </PlotLegend>
   );

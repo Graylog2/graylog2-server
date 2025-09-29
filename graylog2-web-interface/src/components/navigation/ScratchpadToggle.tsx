@@ -30,7 +30,7 @@ const Toggle = styled(Button)(
     background: none;
     border: 0;
     min-height: ${NAV_ITEM_HEIGHT};
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
 
     &:hover,
     &:focus-visible {

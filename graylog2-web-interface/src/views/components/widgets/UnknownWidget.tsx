@@ -50,10 +50,8 @@ const OrderedList = styled.ol`
   list-style: decimal inside none;
 `;
 
-const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({
-  config,
-  type,
-}: WidgetComponentProps & EditWidgetComponentProps) => {
+type Props = WidgetComponentProps & EditWidgetComponentProps;
+const UnknownWidget = ({ config, type }: Props) => {
   const productName = useProductName();
 
   return (

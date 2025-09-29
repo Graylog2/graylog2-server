@@ -17,7 +17,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
@@ -25,10 +25,11 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { renderOptions } from 'integrations/aws/common/Options';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
+import useFetch from 'integrations/hooks/useFetch';
 import formValidation from 'integrations/aws/utils/formValidation';
 import AWSAuthenticationTypes from 'integrations/aws/authentication/AWSAuthenticationTypes';
 import AWSCustomEndpoints from 'integrations/aws/authentication/AWSCustomEndpoints';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 const DisappearingInput = styled.input`
   position: fixed;
@@ -55,7 +56,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
       onSubmit();
     },
     'POST',
-    { region: formData.awsCloudWatchAwsRegion ? formData.awsCloudWatchAwsRegion.value : '' },
+    toAWSRequest(formData, { region: formData.awsCloudWatchAwsRegion ? formData.awsCloudWatchAwsRegion.value : '' }),
   );
 
   useEffect(() => {

@@ -20,6 +20,7 @@ import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import type { RotationStrategyConfig, RetentionStrategyConfig } from 'components/indices/Types';
 import type { IndexRotationConfig } from 'components/indices/rotation/types';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
   config: {
@@ -38,17 +39,27 @@ const IndexMaintenanceStrategiesSummary = ({ config, pluginExports, rotationStra
   const activeStrategy = config.strategy;
   const strategy = pluginExports.filter((exportedStrategy) => exportedStrategy.type === activeStrategy)[0];
 
-  if (!strategy || !strategy.summaryComponent) {
+  if (!strategy?.summaryComponent) {
     return <Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>;
   }
+
+  const { summaryComponent: SummaryComponent } = strategy;
 
   const componentProps = rotationStrategyClass
     ? { config: config.config, rotationStrategyClass }
     : { config: config.config };
 
-  const element = React.createElement(strategy.summaryComponent, componentProps);
-
-  return <span key={strategy.type}>{element}</span>;
+  return <SummaryComponent {...componentProps} />;
 };
 
-export default IndexMaintenanceStrategiesSummary;
+export const RotationStrategySummary = (props: Omit<Props, 'pluginExports' | 'rotationStrategyClass'>) => {
+  const pluginExports = usePluginEntities('indexRotationConfig');
+
+  return <IndexMaintenanceStrategiesSummary pluginExports={pluginExports} {...props} />;
+};
+
+export const RetentionStrategySummary = (props: Omit<Props, 'pluginExports'> & { rotationStrategyClass: string }) => {
+  const pluginExports = usePluginEntities('indexRetentionConfig');
+
+  return <IndexMaintenanceStrategiesSummary pluginExports={pluginExports} {...props} />;
+};

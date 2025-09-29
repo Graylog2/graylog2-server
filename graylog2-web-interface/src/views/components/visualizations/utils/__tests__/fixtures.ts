@@ -314,7 +314,7 @@ export const unitTypeMapper4Charts: UnitTypeMapper = {
 export const theme = {
   colors: {
     variant: { lightest: { default: '#000' } },
-    global: { textDefault: '#fff' },
+    text: { primary: '#fff' },
   },
   fonts: {
     family: { body: 'defaultFont' },

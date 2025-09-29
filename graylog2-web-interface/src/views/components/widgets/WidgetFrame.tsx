@@ -17,6 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { widgetActionsMenuClass, widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
+
 const WidgetWrap = styled.div(
   ({ theme }) => css`
     height: inherit;
@@ -98,6 +100,26 @@ const WidgetWrap = styled.div(
       button {
         padding: 0 5px;
       }
+    }
+
+    .${widgetActionsMenuClass} {
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.2s;
+      transition-delay: 0.5s;
+      top: 0;
+      right: 0;
+    }
+
+    &:hover
+      .${widgetActionsMenuClass},
+      &:focus-within
+      .${widgetActionsMenuClass},
+      &:has(.${widgetActionsDropdownOpenClass})
+      .${widgetActionsMenuClass} {
+      position: relative;
+      opacity: 1;
+      transition-delay: 0s;
     }
   `,
 );

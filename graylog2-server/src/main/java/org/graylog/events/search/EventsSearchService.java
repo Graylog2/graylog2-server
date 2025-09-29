@@ -25,8 +25,8 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -97,8 +97,8 @@ public class EventsSearchService {
                 }).collect(Collectors.toList());
 
         final EventsSearchResult.Context context = EventsSearchResult.Context.create(
-                lookupEventDefinitions(eventDefinitionIdsBuilder.build()),
-                lookupStreams(streamIdsBuilder.build())
+                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
+                lookupStreams(streamIdsBuilder.build(), subject)
         );
 
         return EventsSearchResult.builder()
@@ -150,21 +150,26 @@ public class EventsSearchService {
             return Collections.emptySet();
         }
 
-        return streamService.loadAll().stream()
-                .map(Persisted::getId)
-                // Select all streams the user is NOT permitted to access
-                .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                .collect(Collectors.toSet());
+        try (var stream = streamService.streamAllIds()) {
+            return stream
+                    // Select all streams the user is NOT permitted to access
+                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                    .collect(Collectors.toSet());
+        }
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
-        return streamService.loadByIds(streams)
+    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams, final Subject subject) {
+        final var allowedStreams = streams.stream().filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId))).collect(Collectors.toSet());
+
+        return streamService.loadByIds(allowedStreams)
                 .stream()
-                .collect(Collectors.toMap(Persisted::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
+                .collect(Collectors.toMap(Stream::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions) {
-        return eventDefinitionService.getByIds(eventDefinitions)
+    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions, final Subject subject) {
+        final var allowedEventDefinitions = eventDefinitions.stream().filter(eventDefinitionId -> subject.isPermitted(String.join(":", RestPermissions.EVENT_DEFINITIONS_READ, eventDefinitionId))).collect(Collectors.toSet());
+
+        return eventDefinitionService.getByIds(allowedEventDefinitions)
                 .stream()
                 .collect(Collectors.toMap(EventDefinitionDto::id,
                         d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));

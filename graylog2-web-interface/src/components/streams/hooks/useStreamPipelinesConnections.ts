@@ -37,15 +37,20 @@ const useStreamPipelinesConnectionMutation = (): {
 } => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: onSaveStreamPipelinesConnection } = useMutation(saveStreamPipelinesConnection, {
+  const { mutateAsync: onSaveStreamPipelinesConnection } = useMutation({
+    mutationFn: saveStreamPipelinesConnection,
+
     onSuccess: () => {
-      queryClient.invalidateQueries(['stream', 'pipelines', 'connections']);
+      queryClient.invalidateQueries({
+        queryKey: ['stream', 'pipelines', 'connections'],
+      });
 
       UserNotification.success(
         'Saving stream pipelines connection was successful.',
         'Saving stream pipeline connection.',
       );
     },
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Saving stream pipelines connection failed with status: ${errorThrown}`,

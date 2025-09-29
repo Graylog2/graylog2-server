@@ -17,8 +17,8 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 
+import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
-import { Alert } from 'components/bootstrap';
 
 const csvFile1 = `"ipaddr","hostname"
 "127.0.0.1","localhost"
@@ -35,87 +35,135 @@ const csvFile3 = `"cidr","subnet"
 "192.168.101.0/24","IT Department subnet"
 "192.168.102.0/24","HR Department subnet"`;
 
+const multiValueCsvFile = `"user_id","first_name","last_name","username","email"
+"000001","User","One","user1","user.one@company.net"
+"000002","User","Two","user2","u2@company.net"
+"000003","Admin","One","admin1","admin@company.net"`;
+
 const CSVFileAdapterDocumentation = () => {
   const productName = useProductName();
+
+  const accordionItems = [
+    {
+      value: 'example_1',
+      label: 'Example 1',
+      content: (
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>,</code>
+            <br />
+            Quote character: <code>"</code>
+            <br />
+            Key column: <code>ipaddr</code>
+            <br />
+            Value column: <code>hostname</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{csvFile1}</pre>
+        </div>
+      ),
+    },
+    {
+      value: 'example_2',
+      label: 'Example 2',
+      content: (
+        <div>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>;</code>
+            <br />
+            Quote character: <code>'</code>
+            <br />
+            Key column: <code>ipaddr</code>
+            <br />
+            Value column: <code>hostname</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{csvFile2}</pre>
+        </div>
+      ),
+    },
+    {
+      value: 'multi_value_example',
+      label: 'Multi Value Example',
+      content: (
+        <div>
+          <h3 style={{ marginBottom: 10 }}>Multi-Value Example</h3>
+
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>,</code>
+            <br />
+            Quote character: <code>"</code>
+            <br />
+            Key column: <code>user_id</code>
+            <br />
+            Value columns: <code>first_name,last_name,username</code>
+            <br />
+            Multi-value lookup: <code>true</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{multiValueCsvFile}</pre>
+        </div>
+      ),
+    },
+    {
+      value: 'cidr_lookups',
+      label: 'CIDR Lookups',
+      content: (
+        <div>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            If this data adapter will be used to lookup IP address keys against CIDR addresses
+            <br />
+            then it should be marked as a CIDR lookup. For example:
+            <br />
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Separator: <code>,</code>
+            <br />
+            Quote character: <code>"</code>
+            <br />
+            Key column: <code>cidr</code>
+            <br />
+            Value column: <code>subnet</code>
+            <br />
+            CIDR lookup: <code>true</code>
+          </p>
+
+          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <pre>{csvFile3}</pre>
+
+          <p>
+            Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.
+          </p>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
       <p>The CSV data adapter can read key value pairs from a CSV file.</p>
       <p>Please make sure your CSV file is formatted according to your configuration settings.</p>
 
-      <Alert style={{ marginBottom: 10 }} bsStyle="info" title="CSV file requirements">
-        <ul className="no-padding">
-          <li>The first line in the CSV file needs to be a list of field/column names</li>
-          <li>
-            The file uses <strong>utf-8</strong> encoding
-          </li>
-          <li>
-            The file is readable by <strong>every</strong> {productName} server node
-          </li>
-        </ul>
-      </Alert>
+      <h4>CSV file requirements</h4>
+      <p>The first line in the CSV file needs to be a list of field/column names</p>
+      <p>
+        The file uses <strong>utf-8</strong> encoding
+      </p>
+      <p>
+        The file is readable by <strong>every</strong> {productName} server node
+      </p>
 
       <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Example 1</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code>
-        <br />
-        Quote character: <code>"</code>
-        <br />
-        Key column: <code>ipaddr</code>
-        <br />
-        Value column: <code>hostname</code>
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile1}</pre>
-
-      <h3 style={{ marginBottom: 10 }}>Example 2</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code>
-        <br />
-        Quote character: <code>'</code>
-        <br />
-        Key column: <code>ipaddr</code>
-        <br />
-        Value column: <code>hostname</code>
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile2}</pre>
-
-      <h3 style={{ marginBottom: 10 }}>CIDR Lookups</h3>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        If this data adapter will be used to lookup IP address keys against CIDR addresses
-        <br />
-        then it should be marked as a CIDR lookup. For example:
-        <br />
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code>
-        <br />
-        Quote character: <code>"</code>
-        <br />
-        Key column: <code>cidr</code>
-        <br />
-        Value column: <code>subnet</code>
-        <br />
-        CIDR lookup: <code>true</code>
-      </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile3}</pre>
-
-      <p>
-        Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.
-      </p>
+      <MantineAccordion defaultValue="example_1" accordionItems={accordionItems} />
     </div>
   );
 };

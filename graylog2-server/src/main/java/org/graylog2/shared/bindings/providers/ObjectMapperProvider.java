@@ -66,6 +66,15 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     }
 
     // WARNING: This constructor should ONLY be used for tests!
+    public ObjectMapperProvider(GRNRegistry grnRegistry) {
+        this(ObjectMapperProvider.class.getClassLoader(),
+                Collections.emptySet(),
+                new EncryptedValueService(UUID.randomUUID().toString()),
+                grnRegistry,
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
+    }
+
+    // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider(ClassLoader classLoader, Set<NamedType> subtypes) {
         this(classLoader,
                 subtypes,

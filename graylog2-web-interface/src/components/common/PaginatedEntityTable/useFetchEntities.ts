@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { SearchParams } from 'stores/PaginationTypes';
-import { type Attribute } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {
@@ -53,20 +52,19 @@ const useFetchEntities = <T, M = unknown>({
   data: PaginatedResponse<T, M>;
   refetch: () => void;
 } => {
-  const { data, isInitialLoading, refetch } = useQuery(
-    fetchKey,
-    () =>
+  const { data, isInitialLoading, refetch } = useQuery({
+    queryKey: fetchKey,
+
+    queryFn: () =>
       defaultOnError(
         fetchEntities(searchParams),
         `Fetching ${humanName} failed with status`,
         `Could not retrieve ${humanName}`,
       ),
-    {
-      enabled,
-      keepPreviousData: true,
-      ...fetchOptions,
-    },
-  );
+    enabled,
+    placeholderData: keepPreviousData,
+    ...fetchOptions,
+  });
 
   return {
     data,

@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ListConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
@@ -161,6 +162,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LongConversion.NAME, LongConversion.class);
         addMessageProcessorFunction(StringConversion.NAME, StringConversion.class);
         addMessageProcessorFunction(MapConversion.NAME, MapConversion.class);
+        addMessageProcessorFunction(ListConversion.NAME, ListConversion.class);
         addMessageProcessorFunction(CsvMapConversion.NAME, CsvMapConversion.class);
         addMessageProcessorFunction(HexToDecimalConversion.NAME, HexToDecimalConversion.class);
 

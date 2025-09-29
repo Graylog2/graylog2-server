@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed issue causing Event Notificaiton to be uneditable after creation or sharing without global notifications permissions."
+
+pulls = ["23677", "23753"]
+issues = ["23677", "graylog-plugin-enterprise#11987"]

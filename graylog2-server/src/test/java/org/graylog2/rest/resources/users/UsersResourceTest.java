@@ -16,7 +16,9 @@
  */
 package org.graylog2.rest.resources.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -32,7 +34,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
-import org.graylog2.rest.models.users.requests.Startpage;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.security.AccessToken;
@@ -42,12 +44,14 @@ import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PasswordComplexityConfig;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
@@ -75,7 +79,9 @@ import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -93,7 +99,6 @@ public class UsersResourceTest {
     private static final String TOKEN_NAME = "tokenName";
 
     private static final String ADMIN_OBJECT_ID = new ObjectId().toHexString();
-    private static final PeriodDuration PD_30_DAYS = PeriodDuration.parse("P30D");
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -113,8 +118,6 @@ public class UsersResourceTest {
     private RoleService roleService;
     @Mock
     private MongoDBSessionService sessionService;
-    @Mock
-    private Startpage startPage;
     @Mock
     private Subject subject;
     @Mock
@@ -137,6 +140,7 @@ public class UsersResourceTest {
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
                 sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
+        lenient().when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
     }
 
     /**
@@ -148,19 +152,45 @@ public class UsersResourceTest {
         Role role = mock(Role.class);
         when(role.getId()).thenReturn(new ObjectId().toHexString());
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
-        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE)));
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        when(userService.loadById("creator")).thenReturn(creator);
+        when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD));
         Assert.assertEquals(201, response.getStatus());
-        verify(userManagementService).create(isA(UserImpl.class));
+        verify(userManagementService).create(isA(UserImpl.class), eq(creator));
     }
 
     @Test
-    public void createFailureOnMissingRoleAssignPermission() throws ValidationException {
+    public void createFailureOnMissingRoleAssignPermission() {
         String testRole = "forbiddenRole";
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole))));
+        assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
+    }
+
+    @Test
+    public void createFailurePasswordLength() {
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "pW1&")));
+    }
+
+    @Test
+    public void createFailurePasswordCasing() {
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
+                6, true, false, false, false
+        ));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "lowercase1&")));
+    }
+
+    @Test
+    public void createFailurePasswordSpecialChars() {
+        when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
+                6, false, false, false, true
+        ));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "passWORD123")));
     }
 
     @Test
@@ -212,7 +242,6 @@ public class UsersResourceTest {
             final UsersResource.GenerateTokenTTL ttl = new UsersResource.GenerateTokenTTL(Optional.of(PeriodDuration.of(Duration.ofDays(30))));
             assertThrows(ForbiddenException.class, () -> usersResource.generateNewToken(USERNAME, TOKEN_NAME, ttl));
         } finally {
-            verify(subject).getPrincipal();
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
@@ -227,7 +256,6 @@ public class UsersResourceTest {
             final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, null);
             assertEquals(expected, actual);
         } finally {
-            verify(subject).getPrincipal();
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verify(accessTokenService).create(USERNAME, TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)));
@@ -246,8 +274,7 @@ public class UsersResourceTest {
             final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, null);
             assertEquals(expected, actual);
         } finally {
-            verify(subject).getPrincipal();
-            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + adminUserName);
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verify(accessTokenService).create(USERNAME, TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)));
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
@@ -264,17 +291,16 @@ public class UsersResourceTest {
         try {
             assertThrows(ForbiddenException.class, () -> usersResource.generateNewToken(USERNAME, TOKEN_NAME, null));
         } finally {
-            verify(subject).getPrincipal();
-            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + otherUserName);
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
     }
 
-    private CreateUserRequest buildCreateUserRequest(List<String> roles) {
-        return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
+    private CreateUserRequest buildCreateUserRequest(List<String> roles, String password) {
+        return CreateUserRequest.create(USERNAME, password, EMAIL,
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                 TIMEZONE, SESSION_TIMEOUT,
-                startPage, roles, false);
+                new DashboardStartPage("dashboard-id"), roles, false);
     }
 
     private Token createTokenAndPrepareMocks(Map<String, Object> owningUser, Map<String, Object> callingUser, boolean isAdmin) {
@@ -290,14 +316,14 @@ public class UsersResourceTest {
             user.setRoleIds(Set.of(ADMIN_OBJECT_ID));
         }
 
-        when(subject.getPrincipal()).thenReturn(callingUserName);
-        when(userService.loadById(callingUserName)).thenReturn(user);
-        when(roleService.getAdminRoleObjectId()).thenReturn(ADMIN_OBJECT_ID);
+        final boolean allowedToCreateToken = callingUserName.equals(owningUserName) || isAdmin;
         when(userManagementService.loadById(USERNAME)).thenReturn(userImplFactory.create(owningUser));
-        when(subject.isPermitted(USERS_TOKENCREATE + ":" + callingUserName)).thenReturn(callingUserName.equals(owningUserName) || isAdmin);
-        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.of(Duration.ofDays(30))));
-        when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
+        when(subject.isPermitted(USERS_TOKENCREATE + ":" + owningUserName)).thenReturn(allowedToCreateToken);
+        if (allowedToCreateToken) {
+            when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
+                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.of(Duration.ofDays(30))));
+            when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
+        }
 
         return Token.create(tokenId.toHexString(), TOKEN_NAME, token, lastAccess);
 
@@ -308,7 +334,7 @@ public class UsersResourceTest {
         final DateTime lastAccess = Tools.nowUTC();
         final Map<String, Object> tokenProps = Map.of(AccessTokenImpl.NAME, TOKEN_NAME, AccessTokenImpl.TOKEN, token, AccessTokenImpl.LAST_ACCESS, lastAccess);
         final ObjectId tokenId = new ObjectId();
-        final AccessToken accessToken = new AccessTokenImpl(tokenId, tokenProps);
+        final AccessToken accessToken = allowCreateToken ? new AccessTokenImpl(tokenId, tokenProps) : null;
 
         prepareMocks(userProps, accessToken, allowCreateToken);
 
@@ -317,11 +343,11 @@ public class UsersResourceTest {
 
     private void prepareMocks(Map<String, Object> userProps, AccessToken accessToken, boolean allow) {
         final User user = userImplFactory.create(userProps);
-        when(subject.getPrincipal()).thenReturn(USERNAME);
-        when(userService.loadById(USERNAME)).thenReturn(user);
         when(userManagementService.loadById(USERNAME)).thenReturn(user);
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(allow);
-        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        if (allow) {
+            when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        }
         if (accessToken != null) {
             when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
         }
@@ -367,22 +393,24 @@ public class UsersResourceTest {
         private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
         private final ClusterConfigService configService;
+        private final ObjectMapper objectMapper;
 
         public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
             this.permissions = permissions;
             this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
+            this.objectMapper = new ObjectMapperProvider().get();
         }
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, id, fields);
         }
 
         // Not used.

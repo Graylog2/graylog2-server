@@ -26,7 +26,7 @@ type Props = {
 const GlobalStyles = createGlobalStyle`
   body {
     background-color: ${(props) => props.theme.colors.global.background};
-    color: ${(props) => props.theme.colors.global.textDefault};
+    color: ${(props) => props.theme.colors.text.primary};
   },
 `;
 

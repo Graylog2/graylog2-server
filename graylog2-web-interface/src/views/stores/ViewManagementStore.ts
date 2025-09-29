@@ -52,7 +52,7 @@ export type ViewSummary = {
 export type ViewSummaries = Array<ViewSummary>;
 
 type ViewManagementActionsType = RefluxActions<{
-  create: (view: View, entityShare?: EntitySharePayload) => Promise<View>;
+  create: (view: View, entityShare?: EntitySharePayload, clonedFrom?: string) => Promise<View>;
   delete: (view: View) => Promise<View>;
   forValue: () => Promise<ViewSummaries>;
   get: (viewId: string) => Promise<ViewJson>;
@@ -113,8 +113,9 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
       return promise;
     },
 
-    create(view: View, entityShare?: EntitySharePayload): Promise<View> {
-      const promise = fetch('POST', viewsUrl, JSON.stringify({ ...view.toJSON(), share_request: entityShare }));
+    create(view: View, entityShare?: EntitySharePayload, clonedFrom?: string): Promise<View> {
+      const url = clonedFrom ? viewsIdUrl(clonedFrom) : viewsUrl;
+      const promise = fetch('POST', url, JSON.stringify({ entity: view.toJSON(), share_request: entityShare }));
 
       ViewManagementActions.create.promise(promise);
 
@@ -129,7 +130,7 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
       const promise = fetch(
         'PUT',
         viewsIdUrl(view.id),
-        JSON.stringify({ ...view.toJSON(), share_request: entityShare }),
+        JSON.stringify({ entity: view.toJSON(), share_request: entityShare }),
       );
 
       ViewManagementActions.update.promise(promise);
