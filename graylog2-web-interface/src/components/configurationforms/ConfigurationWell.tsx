@@ -115,18 +115,18 @@ const Configuration = ({
       const requestedConfiguration = typeDefinition?.requested_configuration?.[key];
 
       if (requestedConfiguration && 'is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
-        return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
+        return <EncryptedField key={key} id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
       }
 
       if (isPasswordField(requestedConfiguration)) {
-        return <PasswordField id={_id} name={key} />;
+        return <PasswordField key={key} id={_id} name={key} />;
       }
 
       if (requestedConfiguration?.type === 'inline_binary') {
-        return <InlineBinaryField id={_id} value={value} name={key} />;
+        return <InlineBinaryField key={key} id={_id} value={value} name={key} />;
       }
 
-      return <RegularField id={_id} value={value} name={key} />;
+      return <RegularField key={key} id={_id} value={value} name={key} />;
     });
 
   if (formattedItems.length < 1) {
@@ -142,7 +142,7 @@ const StyledWell = styled(Well)(
     margin-bottom: 0;
     padding: 9px;
     font-family: ${theme.fonts.family.monospace};
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     ul {
       padding: 0;

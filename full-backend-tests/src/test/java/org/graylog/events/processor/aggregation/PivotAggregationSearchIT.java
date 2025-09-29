@@ -53,7 +53,7 @@ public class PivotAggregationSearchIT {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ExecutionException, RetryException {
         this.indexSetId = apis.indices().createIndexSet("Pivot Aggregation Search Test", "", indexSetPrefix);
         apis.indices().waitFor(() -> apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0", indexSetPrefix + "_deflector"),
                 "Timed out waiting for index/deflector to be created.");
@@ -81,7 +81,7 @@ public class PivotAggregationSearchIT {
 
     @ContainerMatrixTest
     void testPivotAggregationSearchAllKnownFields() throws ExecutionException, RetryException {
-        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
         final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
@@ -100,7 +100,7 @@ public class PivotAggregationSearchIT {
 
     @ContainerMatrixTest
     void testPivotAggregationSearchOneUnknownField() throws ExecutionException, RetryException {
-        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
         final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
@@ -120,7 +120,7 @@ public class PivotAggregationSearchIT {
 
     @ContainerMatrixTest
     void testPivotAggregationSearchAllUnknownFields() throws ExecutionException, RetryException {
-        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
         final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
@@ -140,7 +140,7 @@ public class PivotAggregationSearchIT {
 
     @ContainerMatrixTest
     void testPivotAggregationIsolatedToStream() throws ExecutionException, RetryException {
-        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
         final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
@@ -165,7 +165,7 @@ public class PivotAggregationSearchIT {
 
     @ContainerMatrixTest
     void testPivotAggregationWithGroupingIsIsolatedToStream() throws ExecutionException, RetryException {
-        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
 
         final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 

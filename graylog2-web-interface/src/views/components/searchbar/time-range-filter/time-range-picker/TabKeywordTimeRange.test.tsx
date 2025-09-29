@@ -71,7 +71,6 @@ describe('TabKeywordTimeRange', () => {
   };
 
   const changeInput = async (input, value) =>
-    // eslint-disable-next-line testing-library/no-unnecessary-act
     act(async () => {
       const { name } = asElement(input, HTMLInputElement);
 
@@ -81,7 +80,6 @@ describe('TabKeywordTimeRange', () => {
   const asyncRender = async (element) => {
     let wrapper;
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
       wrapper = render(element);
     });

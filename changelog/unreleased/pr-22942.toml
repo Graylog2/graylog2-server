@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding pluggable 'aside' element (`views.elements.aside`) which can be used to show right sidebar on search/dashboard pages."
+
+pulls = ["22942"]

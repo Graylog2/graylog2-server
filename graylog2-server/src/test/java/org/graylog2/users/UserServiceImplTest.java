@@ -16,6 +16,7 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -28,7 +29,6 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
-import org.graylog.security.permissions.GRNPermission;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
@@ -36,10 +36,12 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -100,6 +102,8 @@ public class UserServiceImplTest {
                 userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
 
         lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
+        lenient().when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
+                .thenReturn(UserConfiguration.DEFAULT_VALUES);
     }
 
     @Test
@@ -198,6 +202,26 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testLoadByAuthServiceUid() throws Exception {
+        final var user1 = createDummyUser("user1", "uid1");
+        final var user2 = createDummyUser("user2", "uid2");
+
+        userService.save(user1);
+        userService.save(user2);
+
+        assertThat(userService.loadByAuthServiceUid("uid1"))
+                .hasValueSatisfying(user -> assertThat(user.getName()).isEqualTo("user1"));
+        assertThat(userService.loadByAuthServiceUid("uid2"))
+                .hasValueSatisfying(user -> assertThat(user.getName()).isEqualTo("user2"));
+        assertThat(userService.loadByAuthServiceUid("uid3")).isEmpty();
+
+        userService.save(createDummyUser("user3", "uid1"));
+        assertThatThrownBy(() -> userService.loadByAuthServiceUid("uid1"))
+                .isInstanceOf(UserServiceImpl.DuplicateUserException.class)
+                .hasMessageContaining("more than one matching user");
+    }
+
+    @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testDeleteByName() {
         assertThat(userService.delete("user1")).isEqualTo(1);
@@ -222,7 +246,6 @@ public class UserServiceImplTest {
     @Test
     public void testSave() throws Exception {
         final UserImpl user = (UserImpl) userService.create();
-        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         user.setName("TEST");
         user.setFullName("TEST");
@@ -245,7 +268,6 @@ public class UserServiceImplTest {
     @Test
     public void testSaveNoFullNameSuccess() throws Exception {
         final UserImpl user = (UserImpl) userService.create();
-        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         user.setName("TEST");
         user.setEmail("test@example.com");
@@ -274,6 +296,7 @@ public class UserServiceImplTest {
         private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
         private final ClusterConfigService configService;
+        private final ObjectMapper objectMapper;
 
         public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
             this.configuration = configuration;
@@ -281,21 +304,22 @@ public class UserServiceImplTest {
             this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
+            this.objectMapper = new ObjectMapperProvider().get();
         }
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, id, fields);
         }
 
         @Override
         public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
-            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, configService, adminRoleObjectId);
+            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, configService, objectMapper, adminRoleObjectId);
         }
     }
 
@@ -341,13 +365,11 @@ public class UserServiceImplTest {
         user.setName("user");
         final Role role = createRole("Foo");
 
-        when(user.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-
         user.setRoleIds(Collections.singleton(role.getId()));
         user.setPermissions(Collections.singletonList("hello:world"));
 
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
-        final GRNPermission ownerShipPermission = GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
+        final var ownerShipPermission = Permission.ENTITY_OWN.toShiroPermission(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
         final GRN userGRN = grnRegistry.ofUser(user);
         when(permissionAndRoleResolver.resolvePermissionsForPrincipal(userGRN))
                 .thenReturn(ImmutableSet.of(
@@ -359,7 +381,18 @@ public class UserServiceImplTest {
         when(permissionResolver.resolveStringPermission(roleId)).thenReturn(ImmutableSet.of("perm:from:role"));
 
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof CaseSensitiveWildcardPermission ? p.toString() : p).collect(Collectors.toSet()))
-                .containsExactlyInAnyOrder("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
+                .containsExactlyInAnyOrder("users:passwordchange:user", "users:read:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
                         "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
     }
+
+    private UserImpl createDummyUser(String username, String authServiceUid) {
+        final var user = (UserImpl) userService.create();
+        user.setEmail(username + "@graylog.local");
+        user.setName(username);
+        user.setPassword("password");
+        user.setPermissions(List.of());
+        user.setAuthServiceUid(authServiceUid);
+        return user;
+    }
+
 }

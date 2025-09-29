@@ -31,14 +31,17 @@ import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
 import { hasAdminPermission } from 'util/PermissionsMixin';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const Container = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const TypeSelect = styled(Select)`
-  width: 200px;
+  flex: 1;
+  min-width: 200px;
   margin-right: 3px;
 `;
 
@@ -127,6 +130,8 @@ const useStartPageOptions = (userId, permissions) => {
   }, [selectedUserIsAdmin, userId]);
 
   const prepareOptions = () => {
+    if (!startpage) return [];
+
     switch (startpage?.type) {
       case 'dashboard':
         return [...userDashboards, ...allDashboardsOptions];
@@ -146,7 +151,11 @@ const useStartPageOptions = (userId, permissions) => {
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
   const { options, isLoading } = useStartPageOptions(userId, permissions);
+  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Security Overview' };
 
   if (isLoading) {
     return <Spinner />;
@@ -155,7 +164,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
   return (
     <Field name="startpage">
       {({ field: { name, value, onChange }, meta }) => {
-        const type = value?.type ?? 'dashboard';
+        const type = value?.type;
 
         const error =
           value?.id && options.findIndex(({ value: v }) => v === value.id) < 0 ? (
@@ -163,7 +172,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
           ) : null;
 
         const resetBtn = value?.type ? (
-          <ResetBtn onClick={() => onChange({ target: { name, value: {} } })}>Reset</ResetBtn>
+          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>Reset</ResetBtn>
         ) : null;
 
         return (
@@ -177,17 +186,25 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
             <>
               <Container>
                 <TypeSelect
-                  options={typeOptions}
+                  options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
                   placeholder="Select type"
-                  onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
+                  onChange={(newType) => {
+                    if (!newType) {
+                      onChange({ target: { name, value: null } });
+                    } else {
+                      onChange({ target: { name, value: { type: newType, id: undefined } } });
+                    }
+                  }}
                   value={value?.type}
                 />
-                <ValueSelect
-                  options={options}
-                  placeholder={`Select ${value?.type ?? 'entity'}`}
-                  onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
-                  value={value?.id}
-                />
+                {value?.type !== 'graylog_security_welcome' && (
+                  <ValueSelect
+                    options={options}
+                    placeholder={`Select ${value?.type ?? 'entity'}`}
+                    onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
+                    value={value?.id}
+                  />
+                )}
                 {resetBtn}
               </Container>
               {error}

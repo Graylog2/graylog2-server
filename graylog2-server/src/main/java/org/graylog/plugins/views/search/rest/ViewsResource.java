@@ -63,13 +63,15 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -118,6 +120,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
     private final EntitySharesService entitySharesService;
+    private final EntitySourceService entitySourceService;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -129,7 +132,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
                          AuditEventSender auditEventSender,
                          ObjectMapper objectMapper,
-                         EntitySharesService entitySharesService) {
+                         EntitySharesService entitySharesService,
+                         EntitySourceService entitySourceService) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -141,6 +145,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.entitySharesService = entitySharesService;
+        this.entitySourceService = entitySourceService;
     }
 
     @GET
@@ -229,10 +234,33 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
+    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) {
-        final ViewDTO dto = unwrappedCreateEntityRequest.getEntity();
+        return createView(createEntityRequest, userContext, searchUser);
+    }
+
+    @POST
+    @ApiOperation("Duplicate an existing view")
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    @Path("{id}")
+    public ViewDTO duplicate(@ApiParam(name = "id") @PathParam("id") @NotEmpty String existingViewId,
+                             @ApiParam @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
+                             @Context UserContext userContext,
+                             @Context SearchUser searchUser) {
+        final ViewDTO dto = createView(createEntityRequest, userContext, searchUser);
+        // Save a link to the original view this one was cloned from
+        entitySourceService.create(EntitySource.builder()
+                .entityId(dto.id())
+                .parentId(existingViewId)
+                .entityType(EntitySource.VIEW_TYPE)
+                .build()
+        );
+        return dto;
+    }
+
+    private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
+        final ViewDTO dto = createEntityRequest.entity();
         if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
@@ -242,13 +270,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
         recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
-        updateViewSharing(unwrappedCreateEntityRequest, searchUser, result);
+        updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
     }
 
-    private void updateViewSharing(UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest, SearchUser searchUser, ViewDTO dto) {
-        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest -> {
+    private void updateViewSharing(CreateEntityRequest<ViewDTO> createEntityRequest, SearchUser searchUser, ViewDTO dto) {
+        createEntityRequest.shareRequest().ifPresent(shareRequest -> {
             final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
             entitySharesService.updateEntityShares(grnType, dto.id(), shareRequest, searchUser.getUser());
         });
@@ -354,15 +382,15 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
     public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
-                          @ApiParam @Valid UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
+                          @ApiParam @Valid CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context SearchUser searchUser) {
-        final ViewDTO dto = unwrappedCreateEntityRequest.getEntity();
+        final ViewDTO dto = createEntityRequest.entity();
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
-        updateViewSharing(unwrappedCreateEntityRequest, searchUser, result);
+        updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
     }

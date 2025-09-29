@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import defaultTo from 'lodash/defaultTo';
-import isEqual from 'lodash/isEqual';
+import React, { useState, useEffect, useCallback } from 'react';
 import last from 'lodash/last';
 import isInteger from 'lodash/isInteger';
 import moment from 'moment';
@@ -24,39 +22,15 @@ import styled from 'styled-components';
 
 import {
   ControlLabel,
-  DropdownButton,
-  FormControl,
-  FormGroup,
-  HelpBlock,
-  InputGroup,
   InputWrapper,
+  FormControl,
+  DropdownButton,
+  HelpBlock,
+  FormGroup,
   MenuItem,
+  InputGroup,
 } from 'components/bootstrap';
-import * as FormsUtils from 'util/FormsUtils';
-
-const unitValues = [
-  'NANOSECONDS',
-  'MICROSECONDS',
-  'MILLISECONDS',
-  'SECONDS',
-  'MINUTES',
-  'HOURS',
-  'DAYS',
-  'MONTHS',
-  'YEARS',
-] as const;
-type UnitValue = (typeof unitValues)[number];
-const defaultUnits = ['NANOSECONDS', 'MICROSECONDS', 'MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS'];
-
-const StyledInputGroup = styled(InputGroup)`
-  display: flex;
-`;
-
-const InputGroupAddon = styled(InputGroup.Addon)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+import { getValueFromInput } from 'util/FormsUtils';
 
 /**
  * Returns a duration and unit compatible with `TimeUnitInput` from a duration accepted by `moment.duration()`
@@ -87,204 +61,164 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
   };
 };
 
-/**
- * Component that renders a form field for a time unit value. The field has
- * a checkbox that enables/disables the input, a input for the time value,
- * and a select that let the user choose the unit used for the given time
- * value.
- */
+const StyledInputGroup = styled(InputGroup)`
+  display: flex;
+`;
+
+const InputGroupAddon = styled(InputGroup.Addon)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const unitValues = [
+  'NANOSECONDS',
+  'MICROSECONDS',
+  'MILLISECONDS',
+  'SECONDS',
+  'MINUTES',
+  'HOURS',
+  'DAYS',
+  'MONTHS',
+  'YEARS',
+] as const;
+
+type UnitValue = (typeof unitValues)[number];
+
+const defaultUnits: UnitValue[] = [
+  'NANOSECONDS',
+  'MICROSECONDS',
+  'MILLISECONDS',
+  'SECONDS',
+  'MINUTES',
+  'HOURS',
+  'DAYS',
+];
+
+type UnitOption = {
+  value: UnitValue;
+  label: string;
+};
+
 type Props = {
-  /**
-   * Function that will be called when the input changes, that is,
-   * when the field is enabled/disabled, the value or the unit change.
-   * The function will receive the value, unit, and checked boolean as
-   * arguments.
-   */
   update: (value: number, unit: string, checked: boolean) => void;
-  /** Label to use for the field. */
-  label?: string;
-  /** Help message to use for the field. */
-  help?: React.ReactNode;
-  /** Specifies if this is a required field or not. */
-  required?: boolean;
-  /** Specifies if the input is enabled or disabled. */
-  enabled?: boolean;
-  /** Indicates the default enabled state, in case the consumer does not want to handle the enabled state. */
-  defaultEnabled?: boolean;
-  /** Specifies the value of the input. */
   value?: number | string;
-  /** Indicates the default value to use, in case value is not provided or set. */
-  defaultValue?: number;
-  /** Indicates which unit is used for the value. */
-  unit?: string;
-  /** Specifies which units should be available in the form. */
-  units?: Array<string>;
-  /** Add an additional class to the label. */
-  labelClassName?: string;
-  /** Add an additional class to the input wrapper. */
-  wrapperClassName?: string;
-  /** Specifies if the input should render a checkbox. Use this if the enabled state is controlled by another input */
-  hideCheckbox?: boolean;
-  /** Align unit dropdown menu to the right. */
-  pullRight?: boolean;
-  /** Lets the user clear the numeric input. */
-  clearable?: boolean;
-
+  enabled?: boolean;
+  defaultEnabled?: boolean;
+  disabled?: boolean;
+  label?: string;
   name?: string;
+  help?: React.ReactNode;
+  required?: boolean;
+  clearable?: boolean;
+  defaultValue?: number;
+  pullRight?: boolean;
+  hideCheckbox?: boolean;
+  unit?: string;
+  units?: string[];
   unitName?: string;
-  // TODO: Added to avoid messing with existing code, should be considered for removal
-  id?: string;
-  // TODO: Added to avoid messing with existing code, should be considered for removal
-  type?: string;
+  labelClassName?: string;
+  wrapperClassName?: string;
 };
 
-type State = {
-  enabled: boolean;
-  unitOptions: Array<{ label: string; value: UnitValue }>;
-};
+const TimeUnitInput = ({
+  update,
+  value = undefined,
+  unit = 'SECONDS',
+  enabled = undefined,
+  defaultEnabled = false,
+  disabled = false,
+  label = '',
+  help = '',
+  name = null,
+  required = false,
+  clearable = false,
+  defaultValue = 1,
+  pullRight = false,
+  hideCheckbox = false,
+  units = defaultUnits,
+  unitName = null,
+  wrapperClassName = '',
+  labelClassName = '',
+}: Props) => {
+  const [unitOptions, setUnitOptions] = useState<UnitOption[]>([]);
+  const [checked, setChecked] = useState<boolean>(enabled ?? defaultEnabled);
 
-class TimeUnitInput extends React.Component<Props, State> {
-  static defaultProps = {
-    defaultValue: 1,
-    value: undefined,
-    unit: 'SECONDS',
-    units: defaultUnits,
-    id: undefined,
-    label: '',
-    help: '',
-    name: null,
-    unitName: null,
-    required: false,
-    enabled: undefined,
-    defaultEnabled: false,
-    labelClassName: undefined,
-    wrapperClassName: undefined,
-    hideCheckbox: false,
-    pullRight: false,
-    clearable: false,
-    type: undefined,
-  };
+  const getEffectiveValue = () => (clearable ? value : (value ?? defaultValue));
 
-  constructor(props) {
-    super(props);
+  const getCheckedValue = () => required || checked;
 
-    const { defaultEnabled, enabled, units } = props;
-
-    this.state = {
-      enabled: defaultTo(enabled, defaultEnabled),
-      unitOptions: this._getUnitOptions(units),
-    };
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { units } = this.props;
-
-    if (!isEqual(units, nextProps.units)) {
-      this.setState({ unitOptions: this._getUnitOptions(nextProps.units) });
-    }
-  }
-
-  _getEffectiveValue = () => {
-    const { defaultValue, value, clearable } = this.props;
-
-    return clearable ? value : defaultTo(value, defaultValue);
-  };
-
-  _getUnitOptions = (units) =>
-    unitValues.filter((value) => units.includes(value)).map((value) => ({ value: value, label: value.toLowerCase() }));
-
-  _isChecked = () => {
-    const { required, enabled } = this.props;
-
-    if (required) {
-      return required;
-    }
-
-    const { enabled: enabledState } = this.state;
-
-    return defaultTo(enabled, enabledState);
-  };
-
-  _propagateInput = (update) => {
-    const { update: onUpdate, unit } = this.props;
-    const previousInput = {
-      value: this._getEffectiveValue(),
+  const propagateChange = (change) => {
+    const prevValue = {
+      value: getEffectiveValue(),
       unit: unit,
-      checked: this._isChecked(),
+      checked: getCheckedValue(),
     };
-    const nextInput = { ...previousInput, ...update };
-
-    onUpdate(nextInput.value, nextInput.unit, nextInput.checked);
+    const nextValue = {
+      ...prevValue,
+      ...change,
+    };
+    update(nextValue.value, nextValue.unit, nextValue.checked);
   };
 
-  _onToggleEnable = (e) => {
-    const isChecked = e.target.checked;
-
-    this.setState({ enabled: isChecked });
-    this._propagateInput({ checked: isChecked });
+  const handleValueChange = (e) => {
+    if (clearable) propagateChange({ value: getValueFromInput(e.target) });
+    else propagateChange({ value: getValueFromInput(e.target) ?? defaultValue });
   };
 
-  _onUpdate = (e) => {
-    const { defaultValue, clearable } = this.props;
-    let value;
-
-    if (clearable) {
-      value = FormsUtils.getValueFromInput(e.target);
-    } else {
-      value = defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
-    }
-
-    this._propagateInput({ value: value });
+  const handleCheckedChange = (e) => {
+    setChecked(e.target.checked);
+    propagateChange({ checked: e.target.checked });
   };
 
-  _onUnitSelect = (unit) => {
-    this._propagateInput({ unit: unit });
-  };
-
-  render() {
-    const { unitOptions } = this.state;
-    const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox, pullRight } = this.props;
-
-    const options = unitOptions.map((o) => (
-      <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)} active={unit === o.value}>
-        {o.label}
-      </MenuItem>
-    ));
-
-    const checkbox = (
-      <InputGroupAddon>
-        <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} title="Toggle time" />
-      </InputGroupAddon>
+  const parseUnitOptions = useCallback(() => {
+    setUnitOptions(
+      unitValues
+        .filter((option) => units.includes(option))
+        .map((option) => ({ value: option, label: option.toLowerCase() })),
     );
+  }, [units]);
 
-    return (
-      <FormGroup>
-        {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
-        <InputWrapper className={wrapperClassName}>
-          <StyledInputGroup>
-            {!required && !hideCheckbox && checkbox}
-            <FormControl
-              type="number"
-              name={this.props.name}
-              disabled={!this._isChecked()}
-              aria-label={label || 'Time unit input'}
-              onChange={this._onUpdate}
-              value={defaultTo(this._getEffectiveValue(), '')}
-            />
-            <DropdownButton
-              id="input-dropdown-addon"
-              name={this.props.unitName}
-              pullRight={pullRight}
-              title={unitOptions.filter((o) => o.value === unit)[0].label}
-              disabled={!this._isChecked()}>
-              {options}
-            </DropdownButton>
-          </StyledInputGroup>
-          {help && <HelpBlock>{help}</HelpBlock>}
-        </InputWrapper>
-      </FormGroup>
-    );
-  }
-}
+  useEffect(() => parseUnitOptions(), [parseUnitOptions]);
+
+  return (
+    <FormGroup>
+      {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
+      <InputWrapper className={wrapperClassName}>
+        <StyledInputGroup>
+          {!required && !hideCheckbox && !disabled && (
+            <InputGroupAddon>
+              <input type="checkbox" checked={getCheckedValue()} onChange={handleCheckedChange} title="Toggle time" />
+            </InputGroupAddon>
+          )}
+          <FormControl
+            type={typeof value === 'string' ? 'string' : 'number'}
+            name={name}
+            disabled={!getCheckedValue() || disabled}
+            aria-label={label || 'Time unit input'}
+            onChange={(e) => handleValueChange(e)}
+            value={getEffectiveValue() ?? ''}
+          />
+          <DropdownButton
+            id="input-dropdown-addon"
+            name={unitName}
+            pullRight={pullRight}
+            title={unitOptions.filter((option: UnitOption) => option.value === unit)[0]?.label}
+            disabled={!getCheckedValue() || disabled}>
+            {unitOptions.map((option: UnitOption) => (
+              <MenuItem
+                key={option.value}
+                onSelect={() => propagateChange({ unit: option.value })}
+                active={unit === option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </DropdownButton>
+        </StyledInputGroup>
+        {help && <HelpBlock>{help}</HelpBlock>}
+      </InputWrapper>
+    </FormGroup>
+  );
+};
 
 export default TimeUnitInput;

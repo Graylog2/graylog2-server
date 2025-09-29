@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix editing a existing Event Definition not showing update button."
+
+issues = ["22916"]
+pulls = ["22918"]

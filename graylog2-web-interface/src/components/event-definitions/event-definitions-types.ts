@@ -36,6 +36,7 @@ type FieldSpec = {
 };
 
 type Notification = {
+  type: string;
   notification_id: string;
   notification_parameters: string;
 };
@@ -63,35 +64,36 @@ export type SearchFilter = {
   frontendId?: string;
   description?: string;
 };
-
+export type EventProcessorConfig = {
+  type: string;
+  query?: string;
+  query_parameters?: LookupTableParameterJson[];
+  filters?: SearchFilter[];
+  streams?: string[];
+  stream_categories?: string[];
+  group_by: string[];
+  _is_scheduled?: boolean;
+  series?: Array<{ field: string; id: string; type: string }>;
+  conditions?: {
+    expression: string | null | {};
+  };
+  search_within_ms?: number;
+  execute_every_ms?: number;
+  use_cron_scheduling?: boolean;
+  cron_expression?: string;
+  cron_timezone?: string;
+  event_limit?: number;
+};
 export type EventDefinition = {
   _scope: string;
+  _entity_source: any;
   id: string;
   title: string;
   description: string;
   priority: number;
   alert: boolean;
-  state?: 'ENABLED' | 'DISABLED';
-  config: {
-    type: string;
-    query: string;
-    query_parameters: LookupTableParameterJson[];
-    filters: SearchFilter[];
-    streams: string[];
-    stream_categories?: string[];
-    group_by: string[];
-    _is_scheduled: boolean;
-    series: Array<{ field: string; id: string; type: string }>;
-    conditions: {
-      expression: string | null | {};
-    };
-    search_within_ms: number;
-    execute_every_ms: number;
-    use_cron_scheduling?: boolean;
-    cron_expression?: string;
-    cron_timezone?: string;
-    event_limit: number;
-  };
+  state: 'ENABLED' | 'DISABLED';
+  config: EventProcessorConfig;
   field_spec: FieldSpec;
   key_spec: string[];
   notification_settings: {
@@ -99,15 +101,15 @@ export type EventDefinition = {
     backlog_size: number;
   };
   notifications: Array<Notification>;
-  remediation_steps?: string;
-  event_procedure?: string;
+  remediation_steps: string;
+  event_procedure: string;
   storage: Array<{
     type: string;
     streams: number[] | string[];
   }>;
   updated_at: string | null;
-  matched_at?: string;
-  scheduler?: Scheduler;
+  matched_at: string;
+  scheduler: Scheduler;
 };
 
 export type EventDefinitionFormControlsProps = {

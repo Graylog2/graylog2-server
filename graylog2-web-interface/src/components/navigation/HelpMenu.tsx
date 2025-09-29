@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { NavDropdown } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, IfPermitted } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import useHotkeysContext from 'hooks/useHotkeysContext';
@@ -39,7 +39,9 @@ const HelpMenu = () => {
 
       <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
 
-      <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
+      <IfPermitted permissions="api_browser:read">
+        <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
+      </IfPermitted>
     </NavDropdown>
   );
 };

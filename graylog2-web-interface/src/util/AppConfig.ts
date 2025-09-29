@@ -38,6 +38,7 @@ export type Branding = {
   };
   login?: {
     background?: string;
+    show_logo?: boolean;
   };
   welcome?: {
     news?: { enabled: boolean; feed?: string };
@@ -50,6 +51,7 @@ export type Branding = {
     help?: { icon: string };
   };
   help_url?: string;
+  help_pages?: { [key: string]: string };
   footer?: { enabled: boolean };
   resources?: BrandingResources;
   features?: {

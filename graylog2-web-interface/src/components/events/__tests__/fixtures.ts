@@ -19,6 +19,10 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 // eslint-disable-next-line import/prefer-default-export
 export const eventDefinition: EventDefinition = {
   _scope: 'DEFAULT',
+  _entity_source: {
+    source: 'USER_DEFINED',
+    entity_type: 'event_definition',
+  },
   id: '66d719128a7ffa68df52fd7f',
   title: 'Issue 20294',
   description: '',
@@ -87,4 +91,6 @@ export const eventDefinition: EventDefinition = {
   ],
   scheduler: null,
   state: 'ENABLED',
+  remediation_steps: '',
+  event_procedure: '',
 };

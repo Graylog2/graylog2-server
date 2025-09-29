@@ -29,6 +29,7 @@ import RolesSection from './RolesSection';
 import SettingsSection from './SettingsSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
 import TeamsSection from './TeamsSection';
+import CollectionsSection from './CollectionsSection';
 
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 
@@ -60,7 +61,7 @@ const UserDetails = ({ user }: Props) => {
             <IfPermitted permissions={`users:rolesedit:${user.username}`}>
               <RolesSection user={user} />
             </IfPermitted>
-            <IfPermitted permissions={`teams:edit:${user.username}`}>
+            <IfPermitted permissions={`team:edit:${user.username}`}>
               <TeamsSection user={user} />
             </IfPermitted>
             {currentUser.id === user.id && !isLocalAdmin && (
@@ -68,6 +69,9 @@ const UserDetails = ({ user }: Props) => {
                 <TelemetrySettingsDetails />
               </IfPermitted>
             )}
+            <IfPermitted permissions={`users:edit:${user.username}`}>
+              <CollectionsSection user={user} />
+            </IfPermitted>
             {currentUser.id === user.id && isLocalAdmin && (
               <IfPermitted permissions={`users:edit:${user.username}`}>
                 <TelemetrySettingsConfig />

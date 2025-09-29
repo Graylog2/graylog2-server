@@ -22,12 +22,16 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.apache.http.client.utils.URIBuilder;
+import org.graylog.events.event.EventDto;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
+import org.mongojack.Id;
 
 @AutoValue
 @JsonDeserialize(builder = EventProcedureStep.Builder.class)
-public abstract class EventProcedureStep extends ScopedEntity {
+public abstract class EventProcedureStep implements ScopedEntity<EventProcedureStep.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_ACTION = "action";
@@ -51,8 +55,21 @@ public abstract class EventProcedureStep extends ScopedEntity {
 
     public abstract Builder toBuilder();
 
+    public URIBuilder getLink(EventDto event) {
+        return action() != null ? action().config().getLink(event) : null;
+    }
+
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
+
+        @Override
+        @Id
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
+        @Override
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
@@ -65,7 +82,7 @@ public abstract class EventProcedureStep extends ScopedEntity {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventProcedureStep.Builder();
+            return new AutoValue_EventProcedureStep.Builder().scope(DefaultEntityScope.NAME);
         }
 
         public abstract EventProcedureStep build();

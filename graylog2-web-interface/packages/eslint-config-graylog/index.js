@@ -57,7 +57,10 @@ module.exports = {
         'plugin:@tanstack/eslint-plugin-query/recommended',
       ],
       rules: {
-        'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'jest/expect-expect': [
+          'error',
+          { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*', 'selectEvent.assertOptionExists*'] },
+        ],
         'react/jsx-no-constructed-context-values': 'off',
         'testing-library/await-async-events': 'off',
         'testing-library/no-debugging-utils': 'warn',
@@ -197,5 +200,6 @@ module.exports = {
     'import/internal-regex':
       '^(actions|components|contexts|domainActions|fixtures|helpers|hooks|logic|routing|stores|util|theme|views)/',
     polyfills: ['fetch', 'IntersectionObserver', 'Promise'],
+    'testing-library/utils-module': 'wrappedTestingLibrary',
   },
 };

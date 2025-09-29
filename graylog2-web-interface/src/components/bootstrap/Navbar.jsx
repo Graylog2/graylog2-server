@@ -29,7 +29,7 @@ const Navbar = styled(BootstrapNavbar)(
     margin-bottom: 0;
 
     .navbar-text {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
 
     @media (max-width: ${theme.breakpoints.max.md}) {
@@ -43,7 +43,7 @@ const Navbar = styled(BootstrapNavbar)(
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${theme.colors.global.textDefault};
+        color: ${theme.colors.text.primary};
 
         &:hover,
         &:focus {
@@ -54,7 +54,7 @@ const Navbar = styled(BootstrapNavbar)(
 
       > .active > a,
       > .active > .btn-link {
-        color: ${theme.colors.global.textDefault};
+        color: ${theme.colors.text.primary};
         background-color: transparent;
 
         &:hover,
@@ -164,7 +164,7 @@ const Navbar = styled(BootstrapNavbar)(
       }
 
       .icon-bar {
-        background-color: ${theme.colors.global.textDefault};
+        background-color: ${theme.colors.text.primary};
         transition:
           background-color 150ms ease-in-out,
           transform 150ms ease-in 0s,
@@ -181,7 +181,7 @@ const Navbar = styled(BootstrapNavbar)(
         border-color: ${theme.colors.variant.default};
 
         .icon-bar {
-          background-color: ${theme.colors.global.textDefault};
+          background-color: ${theme.colors.text.primary};
         }
       }
     }

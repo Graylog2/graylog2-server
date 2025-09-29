@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { GraylogClusterOverview } from 'components/cluster';
+import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import PluginList from 'components/enterprise/PluginList';
 import EnterpriseProductLink from 'components/enterprise/EnterpriseProductLink';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -29,7 +29,11 @@ const EnterprisePage = () => {
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
 
-  const title = (<><UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise</>);
+  const title = (
+    <>
+      <UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise
+    </>
+  );
 
   return (
     <DocumentTitle title={title}>

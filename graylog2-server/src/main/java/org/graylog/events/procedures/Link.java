@@ -18,12 +18,17 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
+import org.graylog.events.event.EventDto;
+
+import java.net.URISyntaxException;
 
 /**
  * Redirects the frontend to a link.
@@ -59,6 +64,16 @@ public class Link extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(EventDto event) {
+            try {
+                return new URIBuilder(link());
+            } catch (URISyntaxException e) {
+                return null;
+            }
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {

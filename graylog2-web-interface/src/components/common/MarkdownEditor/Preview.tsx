@@ -17,11 +17,17 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import NumberUtils from 'util/NumberUtils';
 import { Markdown, IconButton } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBorder?: boolean }>`
+const Container = styled.div<{
+  $height?: number | string;
+  $noBackground?: boolean;
+  $noBorder?: boolean;
+  $maxHeight?: number | string;
+}>`
   position: relative;
   padding: 8px 0;
   background-color: ${({ theme, $noBackground }) =>
@@ -33,11 +39,16 @@ const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBor
     `}
   border-radius: 4px;
   flex-grow: 1;
-  overflow: hidden;
+  overflow: hidden auto;
 
-  height: ${({ $height }) => ($height ? `${$height}px` : 'auto')};
-  min-height: 100px;
+  height: ${({ $height, $maxHeight }) =>
+    // eslint-disable-next-line no-nested-ternary
+    $height && !$maxHeight ? (NumberUtils.isNumber($height) ? `${$height}px` : $height) : 'auto'};
+  min-height: 50px;
   width: 100%;
+  max-height: ${({ $maxHeight }) =>
+    // eslint-disable-next-line no-nested-ternary
+    $maxHeight ? (NumberUtils.isNumber($maxHeight) ? `${$maxHeight}px` : $maxHeight) : 'auto'};
 `;
 
 const ExpandIconButton = styled(IconButton)`
@@ -52,73 +63,73 @@ const ExpandIconButton = styled(IconButton)`
 const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
   overflow: hidden auto;
   height: 100%;
-  padding: 0 ${({ $noPadding }) => ($noPadding ? '0' : '8px')};
+  padding: ${({ $noPadding }) => ($noPadding ? '4px 0' : '0 8px')};
 
   container-type: inline-size;
 
-  & > div {
-    & > h1,
-    & > h2,
-    & > h3,
-    & > h4,
-    & > h5,
-    & > h6 {
-      margin-bottom: 8px;
-      font-family: ${({ theme }) => theme.fonts.family.body};
+  & > h1,
+  & > h2,
+  & > h3,
+  & > h4,
+  & > h5,
+  & > h6 {
+    margin-bottom: 8px;
+    font-family: ${({ theme }) => theme.fonts.family.body};
+  }
+
+  & > hr {
+    margin: 16px 0;
+    border: none;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
+  }
+
+  & ul,
+  & ol {
+    padding-left: 1.5rem;
+    margin: 8px 0;
+
+    & > li {
+      padding: 4px 0;
     }
+  }
 
-    & > hr {
-      margin: 16px 0;
-      border: none;
-      border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
-    }
+  & ul {
+    list-style-type: disc;
+  }
 
-    & ul,
-    & ol {
-      padding-left: 1.5rem;
-      margin: 8px 0;
+  & p {
+    white-space: pre;
+    margin: 8px 0;
+  }
 
-      & > li {
-        padding: 4px 0;
-      }
-    }
+  & table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 8px 0;
 
-    & ul {
-      list-style-type: disc;
-    }
-
-    & p {
-      white-space: pre-wrap;
-      margin: 8px 0;
-    }
-
-    & table {
-      border-collapse: collapse;
-      border-spacing: 0;
-      margin: 8px 0;
-
-      & th,
-      & td {
-        border: 1px solid ${({ theme }) => theme.colors.input.border};
-        padding: 4px 8px;
-      }
+    & th,
+    & td {
+      border: 1px solid ${({ theme }) => theme.colors.input.border};
+      padding: 4px 8px;
     }
   }
 `;
 
 type Props = {
   value: string;
-  height?: number;
+  height?: number | string;
   show: boolean;
   withFullView?: boolean;
   noBackground?: boolean;
   noBorder?: boolean;
   noPadding?: boolean;
+  maxHeight?: number | string;
 };
 
 function Preview({
   value,
-  height = 100,
+  height = undefined,
+  maxHeight = undefined,
   show,
   withFullView = false,
   noBackground = false,
@@ -129,9 +140,9 @@ function Preview({
 
   return (
     show && (
-      <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
+      <Container $height={height} $maxHeight={maxHeight} $noBackground={noBackground} $noBorder={noBorder}>
         <MarkdownStyles $noPadding={noPadding}>
-          <Markdown text={value} />
+          <Markdown text={value} augment />
         </MarkdownStyles>
         {withFullView && (
           <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />

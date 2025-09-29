@@ -16,39 +16,44 @@
  */
 package org.graylog.datanode.rest;
 
+import com.google.common.eventbus.EventBus;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.OpensearchKeystoreProvider;
 import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateDto;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.KeyStoreDto;
+import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog.security.certutil.csr.CsrSigner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.security.KeyStore;
-import java.security.cert.Certificate;
+import java.nio.file.Path;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.security.certutil.CertConstants.PKCS12;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CertificatesControllerTest {
-
-    @Mock
-    private DatanodeKeystore datanodeKeystore;
 
 
     private CertificatesController certificatesController;
 
     @BeforeEach
-    public void setup() {
-        certificatesController = new CertificatesController(datanodeKeystore, Map.of(
+    public void setup(@TempDir Path tempDir) throws Exception {
+
+        certificatesController = new CertificatesController(testKeyStore(tempDir), Map.of(
                 OpensearchKeystoreProvider.Store.TRUSTSTORE, KeyStoreDto.empty(),
                 OpensearchKeystoreProvider.Store.HTTP, KeyStoreDto.empty(),
                 OpensearchKeystoreProvider.Store.TRANSPORT, KeyStoreDto.empty())
@@ -56,34 +61,47 @@ public class CertificatesControllerTest {
     }
 
     @Test
-    public void testOptionalSecurityConfiguration() throws Exception {
-        when(datanodeKeystore.loadKeystore()).thenReturn(testKeyStore());
+    public void testOptionalSecurityConfiguration() {
         Map<OpensearchKeystoreProvider.Store, KeyStoreDto> certificates = certificatesController.getCertificates();
         assertThat(certificates).hasSize(4);
-        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates()).hasSize(3);
-        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates().get("ca")).hasSize(1);
-        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates().get("host")).hasSize(2);
-        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates().get("cert")).hasSize(1);
+        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates())
+                .hasSize(1)
+                .hasEntrySatisfying("datanode", datanodeCerts -> {
+                    Assertions.assertThat(datanodeCerts)
+                            .hasSize(4)
+                            .map(CertificateDto::subject)
+                            .contains("CN=my-hostname", "CN=server", "CN=intermediate", "CN=root");
+                });
+
+
         assertThat(certificates.get(OpensearchKeystoreProvider.Store.TRUSTSTORE).certificates()).hasSize(0);
     }
 
-    private KeyStore testKeyStore() throws Exception {
-        char[] pass = "dummy".toCharArray();
-        KeyStore keystore = KeyStore.getInstance(PKCS12);
-        keystore.load(null, null);
-        final CertRequest certRequest = CertRequest.selfSigned("ca")
-                .isCA(true)
-                .validity(Duration.ofDays(1));
-        KeyPair ca = CertificateGenerator.generate(certRequest);
-        final CertRequest certRequest2 = CertRequest.signed("host", ca)
-                .isCA(false)
-                .withSubjectAlternativeName("altname")
-                .validity(Duration.ofDays(1));
-        KeyPair host = CertificateGenerator.generate(certRequest2);
-        keystore.setKeyEntry("ca", ca.privateKey(), pass, new Certificate[]{ca.certificate()});
-        keystore.setKeyEntry("host", host.privateKey(), pass, new Certificate[]{host.certificate(), ca.certificate()});
-        keystore.setCertificateEntry("cert", ca.certificate());
-        return keystore;
-    }
+    private DatanodeKeystore testKeyStore(Path tempDir) throws Exception {
+        final String keystorePass = RandomStringUtils.secure().next(96);
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), keystorePass, new EventBus());
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(31)));
 
+
+        final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final KeyPair intermediate = CertificateGenerator.generate(CertRequest.signed("intermediate", rootCa)
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final KeyPair server = CertificateGenerator.generate(CertRequest.signed("server", intermediate)
+                .isCA(false)
+                .validity(Duration.ofDays(365)));
+
+        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of("second-hostname"));
+
+        final CsrSigner signer = new CsrSigner();
+        final X509Certificate datanodeCert = signer.sign(server.privateKey(), server.certificate(), csr, 30);
+        final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(server.certificate(), intermediate.certificate(), rootCa.certificate()));
+
+        datanodeKeystore.replaceCertificatesInKeystore(certChain);
+        return datanodeKeystore;
+    }
 }

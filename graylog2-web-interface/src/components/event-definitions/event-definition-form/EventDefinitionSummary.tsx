@@ -27,6 +27,7 @@ import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
@@ -61,11 +62,9 @@ const EventDefinitionSummary = ({
 }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
-  const pluggableLicenseCheck = usePluginEntities('licenseCheck');
-
   const {
     data: { valid: validSecurityLicense },
-  } = pluggableLicenseCheck[0]('/license/security');
+  } = usePluggableLicenseCheck('/license/security');
 
   useEffect(() => {
     const flipShowValidation = () => {
@@ -94,10 +93,7 @@ const EventDefinitionSummary = ({
                 <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
                 <dd>
                   {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
-                    <PluggableEventProcedureSummary
-                      eventDefinitionEventProcedure={eventDefinition?.event_procedure}
-                      key={key}
-                    />
+                    <PluggableEventProcedureSummary eventProcedureId={eventDefinition?.event_procedure} key={key} />
                   ))}
                 </dd>
               </>

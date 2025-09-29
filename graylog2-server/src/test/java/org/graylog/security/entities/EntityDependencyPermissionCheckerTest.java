@@ -20,9 +20,9 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.security.BuiltinCapabilities;
-import org.graylog.security.DefaultBuiltinCapabilities;
+import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.GranteeAuthorizer;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,11 +49,11 @@ public class EntityDependencyPermissionCheckerTest {
     private GranteeAuthorizer.Factory userAuthorizerFactory;
 
     private EntityDependencyPermissionChecker resolver;
-    private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
     @Before
     public void setUp() throws Exception {
-        this.resolver = new EntityDependencyPermissionChecker(userAuthorizerFactory,new BuiltinCapabilities(Set.of(new DefaultBuiltinCapabilities())));
+        this.resolver = new EntityDependencyPermissionChecker(userAuthorizerFactory, new CapabilityRegistry(grnRegistry, Set.of(new RestPermissions())));
     }
 
     @Test

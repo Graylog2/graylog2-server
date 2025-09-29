@@ -48,6 +48,7 @@ export type OverrideItemComponentProps = {
 };
 
 type Props = {
+  disableSearchFilter?: boolean;
   noDataText?: string;
   onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType>;
   overrideList?: PaginatedListType;
@@ -61,6 +62,7 @@ const pageSizes = [5, 10, 30];
 export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
 const PaginatedItemOverview = ({
+  disableSearchFilter = false,
   onLoad,
   overrideList = undefined,
   onDeleteItem = undefined,
@@ -112,14 +114,16 @@ const PaginatedItemOverview = ({
       pageSizes={pageSizes}
       activePage={pagination.page}
       useQueryParameter={false}>
-      <SearchForm
-        onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
-        label="Filter"
-        queryWidth={300}
-        wrapperClass="has-bm"
-        placeholder="Enter query to filter"
-        queryHelpComponent={queryHelper}
-      />
+      {!disableSearchFilter && (
+        <SearchForm
+          onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
+          label="Filter"
+          queryWidth={300}
+          wrapperClass="has-bm"
+          placeholder="Enter query to filter"
+          queryHelpComponent={queryHelper}
+        />
+      )}
       <ResultsWrapperComponent isEmptyResult={!itemList}>{itemList ?? emptyResult}</ResultsWrapperComponent>
     </PaginatedList>
   );

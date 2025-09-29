@@ -61,7 +61,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
+import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
@@ -273,7 +273,7 @@ public class MongoIndexSetServiceTest {
                                 1,
                                 false,
                                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL,
-                                null, null, null
+                                null, null, null, null
                         )
                 );
     }
@@ -380,8 +380,6 @@ public class MongoIndexSetServiceTest {
         final FakeStream stream1 = new FakeStream("Test stream 1");
 
         final String streamId = "57f3d721a43c2d59cb750001";
-        stream1.setIndexSetId(streamId);
-
         when(streamService.loadAllWithIndexSet(streamId)).thenReturn(Collections.singletonList(stream1));
 
         final int deletedEntries = indexSetService.delete(streamId);

@@ -55,10 +55,16 @@ const useShowRouteForEntity = (id: string, type: string) => {
       return Routes.SYSTEM.USERS.show(id);
     case 'team':
       return Routes.getPluginRoute('SYSTEM_TEAMS_TEAMID')(id);
+    case 'team_users':
+      return Routes.getPluginRoute('SYSTEM_TEAMS_TEAMID')(id);
     case 'dashboard':
       return Routes.dashboard_show(id);
     case 'event_definition':
       return Routes.ALERTS.DEFINITIONS.show(id);
+    case 'event_procedure':
+      return Routes.getPluginRoute('ALERTS_EVENT-PROCEDURES_PROCEDURES');
+    case 'event_procedure_step':
+      return Routes.getPluginRoute('ALERTS_EVENT-PROCEDURES_STEPS');
     case 'notification':
       return Routes.ALERTS.NOTIFICATIONS.show(id);
     case 'search':
@@ -75,6 +81,10 @@ const useShowRouteForEntity = (id: string, type: string) => {
       return Routes.SYSTEM.AUTHZROLES.show(id);
     case 'output':
       return Routes.SYSTEM.OUTPUTS;
+    case 'collection':
+      return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
+    case 'collection_entities':
+      return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
     default:
       return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }

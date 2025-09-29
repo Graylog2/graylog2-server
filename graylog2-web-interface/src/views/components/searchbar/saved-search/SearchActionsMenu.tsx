@@ -51,7 +51,7 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
 import { createGRN } from 'logic/permissions/GRN';
-import useSelectedStreamsGRN from "views/hooks/useSelectedStreamsGRN";
+import useSelectedStreamsGRN from 'views/hooks/useSelectedStreamsGRN';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -173,7 +173,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView, entityShare)
+      ViewManagementActions.create(newView, entityShare, view.id)
         .then((createdView) => {
           toggleFormModal();
 

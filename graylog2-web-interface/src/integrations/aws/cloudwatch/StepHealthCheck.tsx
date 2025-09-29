@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useContext, useEffect, useState, useCallback} from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 
-import {Button, Panel, Input} from 'components/bootstrap';
+import { Button, Panel, Input } from 'components/bootstrap';
 import FormWrap from 'integrations/aws/common/FormWrap';
 import SkipHealthCheck from 'integrations/aws/common/SkipHealthCheck';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
-import {ApiRoutes} from 'integrations/aws/common/Routes';
+import useFetch from 'integrations/hooks/useFetch';
+import { ApiRoutes } from 'integrations/aws/common/Routes';
 import Countdown from 'integrations/aws/common/Countdown';
-import {KINESIS_LOG_TYPES} from 'integrations/aws/common/constants';
-import {ApiContext} from 'integrations/aws/context/Api';
-import {FormDataContext} from 'integrations/aws/context/FormData';
+import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
+import { ApiContext } from 'integrations/aws/context/Api';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import Icon from 'components/common/Icon';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 const Notice = styled.span`
   display: flex;
@@ -51,21 +52,21 @@ type StepHealthCheckProps = {
   onChange: (...args: any[]) => void;
 };
 
-const StepHealthCheck = ({onChange, onSubmit}: StepHealthCheckProps) => {
-  const {logData, setLogData} = useContext(ApiContext);
-  const {formData} = useContext(FormDataContext);
+const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
+  const { logData, setLogData } = useContext(ApiContext);
+  const { formData } = useContext(FormDataContext);
   const [pauseCountdown, setPauseCountdown] = useState(false);
 
   const [fetchStreamArnStatus, setStreamArnFetch] = useFetch(
     null,
     (response) => {
-      onChange({target: {name: 'awsCloudwatchKinesisStreamArn', value: response.result}});
+      onChange({ target: { name: 'awsCloudwatchKinesisStreamArn', value: response.result } });
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream.value,
-    },
+    }),
   );
 
   useEffect(() => {
@@ -82,13 +83,13 @@ const StepHealthCheck = ({onChange, onSubmit}: StepHealthCheckProps) => {
     null,
     (response) => {
       setLogData(response);
-      onChange({target: {name: 'awsCloudWatchKinesisInputType', value: response.type}});
+      onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: response.type } });
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream.value,
-    },
+    }),
   );
 
   const checkForLogs = useCallback(() => {
@@ -149,7 +150,7 @@ const StepHealthCheck = ({onChange, onSubmit}: StepHealthCheckProps) => {
   }
   const handleSubmit = () => {
     onSubmit();
-    onChange({target: {name: 'awsCloudWatchKinesisInputType', value: logData.type}});
+    onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: logData.type } });
   };
   const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
 
@@ -159,10 +160,7 @@ const StepHealthCheck = ({onChange, onSubmit}: StepHealthCheckProps) => {
       buttonContent="Review &amp; Finalize"
       disabled={false}
       title="Create Kinesis Stream"
-      description={
-        <p>If available, a parsed sample {logTypeLabel} message from the stream will be shown below.</p>
-      }>
-
+      description={<p>If available, a parsed sample {logTypeLabel} message from the stream will be shown below.</p>}>
       <Input
         id="awsCloudWatchLog"
         type="textarea"
