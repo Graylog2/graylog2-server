@@ -38,7 +38,7 @@ type FieldSpec = {
 type Notification = {
   type: string;
   notification_id: string;
-  notification_parameters: string;
+  notification_parameters: { type: string };
 };
 
 export type Scheduler = {
