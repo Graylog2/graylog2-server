@@ -1,5 +1,0 @@
-type = "f"
-
-message = "Removed Automatic authentication for cloud enabled AWS inputs."
-
-issues = ["12013"]
