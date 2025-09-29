@@ -55,7 +55,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
-        adapters = new AdaptersES7(elasticsearchClient);
+        adapters = new AdaptersES7(elasticsearchClient, featureFlags);
     }
 
     private RestHighLevelClient buildRestClient() {

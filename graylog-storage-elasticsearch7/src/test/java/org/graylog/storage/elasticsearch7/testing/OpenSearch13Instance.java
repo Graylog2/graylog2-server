@@ -50,7 +50,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
-    private List<String> featureFlags;
+    private final List<String> featureFlags;
 
     public OpenSearch13Instance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
         super(cachedInstance, version, hostname, network, heapSize);
@@ -63,7 +63,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
-        this.adapters = new AdaptersES7(elasticsearchClient);
+        this.adapters = new AdaptersES7(elasticsearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         return this;
     }
