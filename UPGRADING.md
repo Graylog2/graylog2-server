@@ -131,11 +131,12 @@ names of data lake related metrics change accordingly.
 
 The following REST API changes have been made.
 
-| Endpoint                                                      | Description                                                                                                                                        |
-|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/urlallowlist`                                    | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                  |
-| `PUT /system/urlallowlist`                                    | Renamed from `PUT /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:write`                                  |
-| `POST /system/urlallowlist/check`                             | Renamed from `POST /system/urlwhitelist/check`                                                                                                     |
-| `POST /system/urlallowlist/generate_regex`                    | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                            |
-| All `/api/plugins/org.graylog.plugins.datalake/data_lake/...` | Renamed from `/api/plugins/org.graylog.plugins.datawarehouse/data_warehouse/...`. The corresponding permissions are also renamed to `data_lake...` |
-| `GET /<endpoint>`                                             | description                                                                                                                                        |
+| Endpoint                                                                    | Description                                                                                                                                        |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/urlallowlist`                                                  | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                  |
+| `PUT /system/urlallowlist`                                                  | Renamed from `PUT /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:write`                                  |
+| `POST /system/urlallowlist/check`                                           | Renamed from `POST /system/urlwhitelist/check`                                                                                                     |
+| `POST /system/urlallowlist/generate_regex`                                  | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                            |
+| All `/api/plugins/org.graylog.plugins.datalake/data_lake/...`               | Renamed from `/api/plugins/org.graylog.plugins.datawarehouse/data_warehouse/...`. The corresponding permissions are also renamed to `data_lake...` |
+| All `/api/plugins/org.graylog.plugins.securityapp.asset/assets/history/...` | Removed all endpoints and contents of underlying `asset_history` MongoDB collection migrated to `Asset History` Index set and Stream               |
+| `GET /<endpoint>`                                                           | description                                                                                                                                        |
