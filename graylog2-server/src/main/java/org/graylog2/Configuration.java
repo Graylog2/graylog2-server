@@ -295,6 +295,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
     private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
 
+    @Parameter(value = "global_inputs_only")
+    private boolean globalInputsOnly = false;
+
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
@@ -713,5 +716,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Override
     public boolean withInputs() {
         return true;
+    }
+
+    public boolean isGlobalInputsOnly() {
+        return globalInputsOnly;
     }
 }
