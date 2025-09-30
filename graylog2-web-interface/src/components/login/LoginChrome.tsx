@@ -96,21 +96,6 @@ const WelcomeMessage = styled.strong(
   `,
 );
 
-const Claim = styled.h1(
-  ({ theme }) => css`
-    color: #fcfcfc;
-    text-transform: uppercase;
-    font-size: ${theme.fonts.size.huge};
-    line-height: 1;
-    font-weight: 600;
-  `,
-);
-const Highlight = styled.span(
-  ({ theme }) => css`
-    color: ${theme.colors.brand.primary};
-  `,
-);
-
 const CustomLogo = styled.div`
   svg {
     width: 100%;
@@ -125,14 +110,9 @@ const CustomizableLogo = () => {
   return customLogo ? (
     <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
   ) : (
-    <>
-      <LogoContainer>
-        <Logo color="#ffffff" />
-      </LogoContainer>
-      <Claim>
-        Data. Insights. <Highlight>Answers.</Highlight>
-      </Claim>
-    </>
+    <LogoContainer>
+      <Logo color="#ffffff" />
+    </LogoContainer>
   );
 };
 
