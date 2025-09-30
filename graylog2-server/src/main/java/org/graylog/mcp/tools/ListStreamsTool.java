@@ -39,9 +39,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
                 new TypeReference<>() {},
                 NAME,
                 "List all Graylog Streams",
-                """
-                        List all available streams in the Graylog instance.
-                        """);
+                "List all available streams in the Graylog instance.");
         this.streamService = streamService;
     }
 

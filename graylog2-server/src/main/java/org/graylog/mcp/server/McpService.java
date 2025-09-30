@@ -67,7 +67,7 @@ public class McpService {
                                 null,
                                 null,
                                 null,
-                                null,
+                                new McpSchema.ServerCapabilities.PromptCapabilities(false),
                                 new McpSchema.ServerCapabilities.ResourceCapabilities(false, false),
                                 new McpSchema.ServerCapabilities.ToolCapabilities(false)
                         ),
@@ -98,7 +98,7 @@ public class McpService {
                     final McpSchema.Resource resource = this.resourceProviders
                             .get(GRNRegistry.createWithBuiltinTypes().parse(readResourceRequest.uri()).grnType())
                             .read(new URI(readResourceRequest.uri())
-                    );
+                            );
                     contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
                 } catch (Exception e) {
                     throw new McpException("Failed to read resource: " + e.getMessage());
@@ -128,7 +128,36 @@ public class McpService {
             }
             case McpSchema.METHOD_PROMPT_LIST -> {
                 LOG.info("Listing available prompts");
-                return Optional.of(new McpSchema.ListPromptsResult(List.of(), null));
+                return Optional.of(new McpSchema.ListPromptsResult(List.of(
+                        new McpSchema.Prompt(
+                                "log_sources_analysis",
+                                "Analyze current log source state",
+                                """
+                                        Asks the LLM to look at the log sources currently ingested over a certain
+                                        period of time, and how those have changed in characteristics, in order to
+                                        understand if something important has changed or needs attention
+                                        """,
+                                null
+                        )
+
+                ), null));
+            }
+            case McpSchema.METHOD_PROMPT_GET -> {
+                final McpSchema.GetPromptRequest promptRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                LOG.info("Getting prompt {}", promptRequest.name());
+                var result = switch (promptRequest.name()) {
+                    case "log_sources_analysis" -> new McpSchema.PromptMessage(
+                            McpSchema.Role.ASSISTANT,
+                            new McpSchema.TextContent("""
+                                    You are an administrator for the log management system Graylog and are tasked with
+                                     understanding how the log sources sending data into Graylog are behaving over the
+                                     last two days. Use the current day and compare the situation of the log sources to
+                                     the previous 24 hours, with special attention to sources that have stopped sending
+                                     or are now sending extraordinary amounts of data.""")
+                    );
+                    default -> throw new McpException("Unknown prompt name: " + promptRequest.name());
+                };
+                return Optional.of(new McpSchema.GetPromptResult("", List.of(result)));
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());
 
