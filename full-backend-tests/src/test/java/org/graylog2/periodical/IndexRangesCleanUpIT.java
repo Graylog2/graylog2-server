@@ -21,10 +21,10 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.assertj.core.api.ListAssert;
-import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
@@ -75,6 +75,7 @@ public class IndexRangesCleanUpIT {
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
                 .retryIfRuntimeException()
+                .retryIfExceptionOfType(AssertionError.class)
                 .build()
                 .call(() -> {
                     final List<String> ranges = api.indices().listIndexRanges().properJSONPath().read("ranges.*.index_name");
