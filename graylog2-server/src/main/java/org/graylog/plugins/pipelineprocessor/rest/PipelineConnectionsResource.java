@@ -84,8 +84,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
 
-        // verify the stream exists and is editable
-        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        // verify the stream exists and is readable
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
         final Stream stream = streamService.load(streamId);
         checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
 
@@ -115,10 +115,10 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
-        // verify the streams exist and the user has permission to edit them
+        // verify the streams exist and the user has permission to read them
         final Set<Stream> connectedStreams = streamService.loadByIds(connection.streamIds());
         connectedStreams.forEach(stream -> {
-            checkPermission(RestPermissions.STREAMS_EDIT, stream.getId());
+            checkPermission(RestPermissions.STREAMS_READ, stream.getId());
             checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
         });
 
