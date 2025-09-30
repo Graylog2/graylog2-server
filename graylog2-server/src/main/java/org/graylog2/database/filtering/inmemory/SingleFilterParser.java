@@ -51,7 +51,10 @@ public class SingleFilterParser {
 
         final SearchQueryField.Type fieldType = attributeMetaData.type();
         if (isRangeValueExpression(valuePart, fieldType)) {
-            if (valuePart.startsWith(RANGE_VALUES_SEPARATOR)) {
+            if (valuePart.equals(RANGE_VALUES_SEPARATOR)) {
+                // could probably also return an empty BSON here, but just for consistency:
+                return new RangeFilter(attributeMetaData.id(), null, null);
+            } else if (valuePart.startsWith(RANGE_VALUES_SEPARATOR)) {
                 return new RangeFilter(attributeMetaData.id(),
                         null,
                         extractValue(fieldType, valuePart.substring(RANGE_VALUES_SEPARATOR.length()))
