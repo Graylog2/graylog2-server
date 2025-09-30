@@ -100,7 +100,7 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
                     "",
                     "",
                     false,
-                    new SearchUser(getUser(subject), subject::isPermitted, permissionHelper::isPermitted, new PermittedStreams(streamService), Collections.emptyMap())
+                    new SearchUser(permissionHelper.getUser(userService), subject::isPermitted, permissionHelper::isPermitted, new PermittedStreams(streamService), Collections.emptyMap())
             );
             return getObjectMapper().writeValueAsString(res.messages().stream().map(ResultMessageSummary::message).toList());
         } catch (JsonProcessingException | NoSuchElementException e) {
@@ -127,23 +127,6 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
         public void setLimit(String limit) { this.limit = Integer.parseInt(limit); }
         public void setOffset(String offset) { this.offset = Integer.parseInt(offset); }
         public void setRangeSeconds(String rangeSeconds) { this.rangeSeconds = Integer.parseInt(rangeSeconds); }
-    }
-
-    private User getUser(Subject subject) {
-        if (subject == null) throw new IllegalArgumentException("Subject is null");
-        switch (subject.getPrincipal()) {
-            case null -> { throw new IllegalArgumentException("Principal is null"); }
-            case User user -> { return user; }
-            case String s -> { return userService.load(s.substring(s.indexOf(':') + 1)); }
-            default -> {}
-        }
-        try {
-            UserContext ctx = (UserContext) subject.getPrincipals().oneByType(Class.forName("org.graylog.security.UserContext"));
-            if (ctx != null && ctx.getUser() != null) { return ctx.getUser(); }
-        } catch (ClassNotFoundException | ClassCastException ignored) {}
-        User user = subject.getPrincipals().oneByType(User.class);
-        if (user != null) return user;
-        return userService.getRootUser().orElseThrow();
     }
 
     // TODO: find a better way to do this
