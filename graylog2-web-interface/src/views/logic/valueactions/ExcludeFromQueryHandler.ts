@@ -22,6 +22,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
 const formatNewQuery = (oldQuery: string, field: string, value: any) => {
   const fieldPredicate = not(predicate(field, escape(value)));
@@ -41,12 +42,12 @@ const ExcludeFromQueryHandler =
   (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
 
-    const valuesToAdd = uniq(contexts?.valuePath?.length ? contexts.valuePath : [{ [field]: value }]);
+    const valuesToAdd = uniq(
+      hasMultipleValueForActions(contexts) ? contexts.valuePath.map(() => ({ field, value })) : [{ field, value }],
+    );
 
-    const newQuery = valuesToAdd.reduce((prev: string, cur) => {
-      const [curField, curValue] = Object.entries(cur)[0];
-
-      return formatNewQuery(prev, curField, curValue as string | number);
+    const newQuery = valuesToAdd.reduce((prev, { field, value }) => {
+      return formatNewQuery(prev, field, value as string | number);
     }, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));

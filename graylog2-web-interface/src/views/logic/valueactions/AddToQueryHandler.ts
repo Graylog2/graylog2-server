@@ -23,6 +23,7 @@ import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState, ActionContexts } from 'views/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
   const predicateValue = type.type === 'date' ? formatTimestamp(value) : escape(value);
@@ -42,13 +43,14 @@ const AddToQueryHandler =
   ({ queryId, field, value = '', type, contexts }: Arguments) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const valuesToAdd = uniq(contexts?.valuePath?.length ? contexts.valuePath : [{ [field]: value }]);
+    const valuesToAdd = uniq(
+      hasMultipleValueForActions(contexts)
+        ? contexts.valuePath.map(() => ({ field, value, type: fieldTypeFor(field, contexts?.fieldTypes) }))
+        : [{ field, value, type }],
+    );
 
-    const newQuery = valuesToAdd.reduce((prev, cur) => {
-      const [curField, curValue] = Object.entries(cur)[0];
-      const curType = fieldTypeFor(curField, contexts.fieldTypes) ?? type;
-
-      return formatNewQuery(prev, curField, curValue as string | number, curType);
+    const newQuery = valuesToAdd.reduce((prev, { field, value, type }) => {
+      return formatNewQuery(prev, field, value as string | number, type);
     }, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));
