@@ -35,6 +35,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -43,6 +45,7 @@ import java.util.UUID;
 @RequiresAuthentication
 @Path("/mcp")
 public class McpResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(McpResource.class);
 
     @Inject
     ObjectMapper objectMapper;
@@ -88,6 +91,7 @@ public class McpResource extends RestResource {
         if (!stream) {
             // Simple one-shot JSON reply
             final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
+            LOG.info("Received JSONRPCrequest {}", request);
             try {
                 final Optional<McpSchema.Result> result = mcpService.handle(securityContext, request, sessionId);
 
@@ -119,10 +123,10 @@ public class McpResource extends RestResource {
                         .header("Mcp-Session-Id", sessionId)
                         .build();
             }
-
         }
 
         // TODO we should support SSE as well
+        LOG.info("SSE is not supported at the moment, returning 405 Method Not Allowed");
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
     }
 

@@ -79,6 +79,7 @@ public class McpService {
                 return Optional.empty();
             }
             case McpSchema.METHOD_RESOURCES_LIST -> {
+                LOG.info("Listing available resources");
                 // TODO pagination needs to hold a cursor across _all_ resource types, which we don't have support for
                 // currently, so we need to skip it at the moment. MCP doesn't have any way to scope it to resource types
                 // so we are a bit dead in the water in the way we need to adapt it.
@@ -86,7 +87,9 @@ public class McpService {
                         .map(resourceProvider -> resourceProvider.list(null, null))
                         .flatMap(List::stream)
                         .toList();
-                return Optional.of(new McpSchema.ListResourcesResult(resourceList, null));
+                final McpSchema.ListResourcesResult result = new McpSchema.ListResourcesResult(resourceList, null);
+                LOG.info("Returning available resources {}", result);
+                return Optional.of(result);
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
                 final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
@@ -122,6 +125,10 @@ public class McpService {
                 } else {
                     throw new McpException("Unknown tool named: " + callToolRequest.name());
                 }
+            }
+            case McpSchema.METHOD_PROMPT_LIST -> {
+                LOG.info("Listing available prompts");
+                return Optional.of(new McpSchema.ListPromptsResult(List.of(), null));
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());
 
