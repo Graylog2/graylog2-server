@@ -35,11 +35,11 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
-import org.graylog.testing.completebackend.FullBackendTest;
-import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.cluster.nodes.DataNodeStatus;
@@ -78,7 +78,6 @@ import java.util.regex.Pattern;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.not;
 
-@SuppressWarnings("UnstableApiUsage")
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
                              env = {
                                      @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
