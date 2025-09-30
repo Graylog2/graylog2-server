@@ -104,7 +104,8 @@ names of data lake related metrics change accordingly.
     - Event procedure
     - Event step
     - Content Pack installation
-  - Teams
+    - Teams
+    - Illuminate Pack installation
 
   <br> For example, the request payload to create a stream might now look like this:
 
