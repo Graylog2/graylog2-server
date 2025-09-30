@@ -165,7 +165,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 // this backend will be re-used and only shut down at the very end
                 LOG.info("Creating VM-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
                 final var sw = Stopwatch.createStarted();
-                final var backend = createBackend(config, context.getRequiredTestClass());
+                final var backend = createBackend(config);
                 LOG.info("Created VM-lifecycle server backend for class {} in {}",
                         context.getRequiredTestClass().getName(), sw.stop().elapsed());
                 rootStore.put(VM_LIFECYCLE_BACKEND_KEY, backend);
@@ -177,14 +177,14 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             // class lifecycle means we have to create a new backend
             LOG.info("Creating class-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
             final var sw = Stopwatch.createStarted();
-            final var backend = createBackend(config, context.getRequiredTestClass());
+            final var backend = createBackend(config);
             LOG.info("Created class-lifecycle server backend for class {} in {}",
                     context.getRequiredTestClass().getName(), sw.stop().elapsed());
             store.put(CLASS_LIFECYCLE_BACKEND_KEY, backend);
         }
     }
 
-    private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, final Class<?> testClass) {
+    private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config) {
         final Map<String, String> env = Arrays.stream(config.env())
                 .collect(Collectors.toMap(
                         GraylogBackendConfiguration.Env::key,
