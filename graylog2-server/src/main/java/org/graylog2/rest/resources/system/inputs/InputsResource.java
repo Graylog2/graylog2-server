@@ -306,8 +306,8 @@ public class InputsResource extends AbstractInputsResource {
     }
 
     private void throwBadRequestIfNotGlobal(InputCreateRequest lr) {
-        if (config.isCloud() && !lr.global()) {
-            throw new BadRequestException("Only global inputs are allowed in the cloud environment!");
+        if ((config.isCloud() || config.isGlobalInputsOnly()) && !lr.global()) {
+            throw new BadRequestException("Only global inputs are allowed!");
         }
     }
 }
