@@ -130,11 +130,6 @@ public class NodeContainerFactory {
 
         container.waitingFor(getWaitStrategy(container.getEnvMap())).withStartupTimeout(Duration.of(600, SECONDS));
 
-        if (!config.elasticsearchVersion.isDataNode()) {
-            // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
-            container.withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode());
-        }
-
         config.proxiedRequestsTimeout.ifPresent(proxiedRequestsTimeout -> container.withEnv("GRAYLOG_PROXIED_REQUESTS_DEFAULT_CALL_TIMEOUT", proxiedRequestsTimeout));
 
         pluginJars.forEach(hostPath -> {
