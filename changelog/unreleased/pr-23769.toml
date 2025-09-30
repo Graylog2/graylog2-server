@@ -1,4 +1,4 @@
 type = "a"
 message = "Introduce global_inputs_only config to enforce global inputs."
 
-pulls = ["23769"]
+pulls = ["23769", "23788"]
