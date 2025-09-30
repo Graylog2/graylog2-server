@@ -77,6 +77,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Strings.nullToEmpty;
@@ -475,7 +476,7 @@ public class Generator {
     }
 
     private String uniqueModelName(Type genericType, Class<?> returnType) {
-        final var simpleName = returnType.getSimpleName();
+        final var simpleName = nestedNames(returnType).collect(Collectors.joining("__"));
         if (genericType instanceof ParameterizedType parameterizedType) {
             final var classNames = Arrays.stream(parameterizedType.getActualTypeArguments())
                     .map(type -> uniqueModelName(type, classForType(type)))
@@ -483,6 +484,13 @@ public class Generator {
             return simpleName + "_" + Joiner.on("_").join(classNames);
         }
         return simpleName;
+    }
+
+    private Stream<String> nestedNames(Class<?> returnType) {
+        if (returnType.getEnclosingClass() == null) {
+            return Stream.of(returnType.getSimpleName());
+        }
+        return Stream.concat(nestedNames(returnType.getEnclosingClass()), Stream.of(returnType.getSimpleName()));
     }
 
     private TypeSchema extractInlineModels(Map<String, Object> genericTypeSchema) {
