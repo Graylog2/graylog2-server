@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import URI from 'urijs';
+
 import AppConfig from 'util/AppConfig';
 
 const defaultDocsUrl = 'https://go2docs.graylog.org/current';
-const docsUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
 
-const docsHelper = {
-  PAGES: {
+const defaultPages = {
     ALERTS: 'interacting_with_your_log_data/alerts.html',
     AUDIT_LOG: 'interacting_with_your_log_data/audit_log.html',
     AUTHENTICATORS: 'setting_up_graylog/user_authentication.htm',
@@ -71,12 +71,25 @@ const docsHelper = {
     WELCOME: '', // Welcome page to the documentation
     DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
     DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
-  },
+} as const;
 
-  DOCS_URL: docsUrl,
+type Pages = Record<keyof typeof defaultPages, string>;
+
+const overridePages = (pages: Pages, overrides: Partial<Pages>) =>
+  new Proxy(pages, {
+    get: (target: Pages, prop: keyof Pages) => overrides[prop] ?? target[prop],
+  });
+
+const isAbsolute = (url: string) => new URI(url).is('absolute');
+
+const docsHelper = {
+  PAGES: overridePages(defaultPages, AppConfig.branding?.()?.help_pages ?? {}),
 
   toString(path: string) {
-    const baseUrl = this.DOCS_URL;
+    if (isAbsolute(path)) {
+      return path;
+    }
+    const baseUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
 
     return path === '' ? baseUrl : `${baseUrl}/${path}`;
   },
