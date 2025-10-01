@@ -103,6 +103,14 @@ class InputsResourceTest {
     }
 
     @Test
+    void testCreateNotGlobalInputWhenIsGlobalInputOnly() {
+        when(configuration.isGlobalInputsOnly()).thenReturn(true);
+
+        assertThatThrownBy(() -> inputsResource.create(false, getCR(false))).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Only global inputs");
+    }
+
+    @Test
     void testCreateNotCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(false);

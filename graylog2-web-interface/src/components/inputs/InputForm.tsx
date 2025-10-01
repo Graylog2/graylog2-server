@@ -80,7 +80,7 @@ const InputForm = ({
     const newData = {
       ...data,
       ...{
-        global: AppConfig.isCloud() || global,
+        global: AppConfig.isCloud() || AppConfig.globalInputsOnly() || global,
         node: node,
       },
     };
@@ -135,7 +135,7 @@ const InputForm = ({
       cancelAction={onCancel}>
       {description && <Alert bsStyle="info">{description}</Alert>}
       <HideOnCloud>
-        <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
+        {!AppConfig.globalInputsOnly() && (<NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />)}
       </HideOnCloud>
     </ConfigurationForm>
   );
