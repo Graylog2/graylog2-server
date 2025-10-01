@@ -18,10 +18,8 @@ package org.graylog2.rest.models.system.sessions.responses;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.sessions.SessionDTO;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Years;
 
 import java.util.Date;
 
@@ -32,7 +30,7 @@ public class DefaultSessionResponseFactory implements SessionResponseFactory {
 
     @Override
     public SessionResponse forSession(Session session) {
-        final Date validUntil = getValidUntil(session);
+        final Date validUntil = SessionUtils.getValidUntil(session);
         final String id = session.getId().toString();
         final String userId = getSubjectFromSession(session).getPrincipal().toString();
         final String username = String.valueOf(session.getAttribute(SessionDTO.USERNAME_SESSION_KEY));
@@ -40,11 +38,7 @@ public class DefaultSessionResponseFactory implements SessionResponseFactory {
     }
 
     protected Date getValidUntil(Session session) {
-        if (session.getTimeout() < 0) { // means "session never expires", which is not possible in cookie-based auth
-            return new DateTime(DateTimeZone.UTC).plus(Years.years(10)).toDate(); // careful, later we convert the date to seconds as int and it may overflow for too big values
-        } else {
-            return new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate();
-        }
+        return SessionUtils.getValidUntil(session);
     }
 
     protected Subject getSubjectFromSession(Session session) {
