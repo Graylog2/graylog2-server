@@ -136,7 +136,7 @@ public class SessionsResource extends RestResource {
                 final SessionResponse response = sessionResponseFactory.forSession(session.get());
                 return Response.ok()
                         .entity(response)
-                        .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
+                        .cookie(cookieFactory.createAuthenticationCookie(session.get(), requestContext))
                         .build();
             } else {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
@@ -187,7 +187,7 @@ public class SessionsResource extends RestResource {
                                     String.valueOf(session.getId()),
                                     String.valueOf(user.getName())
                             ))
-                    .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
+                    .cookie(cookieFactory.createAuthenticationCookie(session, requestContext))
                     .build();
         }).orElseGet(() -> Response.ok(SessionValidationResponse.authenticatedWithNoSession(user.getName()))
                 .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
