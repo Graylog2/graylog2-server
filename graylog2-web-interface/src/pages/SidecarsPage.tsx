@@ -32,7 +32,7 @@ import type User from 'logic/users/User';
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState<User | undefined>();
   const currentUser = useCurrentUser();
-  const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokenlist:graylog-sidecar']);
+  const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokencreate:graylog-sidecar']);
 
   useEffect(() => {
     if (canCreateSidecarUserTokens) {

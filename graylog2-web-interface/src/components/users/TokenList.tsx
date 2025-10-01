@@ -145,6 +145,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
                   </td>
                   <td>
                     <TokenActions
+                      username={user.username}
                       userId={currentUser.id}
                       tokenId={token.id}
                       tokenName={token.name}
