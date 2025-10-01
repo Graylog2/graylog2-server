@@ -228,7 +228,9 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem href={Routes.stream_alerts(stream.id)}>Manage Alerts</MenuItem>
         </IfPermitted>
-        {moreActions}
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          {moreActions}
+        </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem divider />
         </IfPermitted>
