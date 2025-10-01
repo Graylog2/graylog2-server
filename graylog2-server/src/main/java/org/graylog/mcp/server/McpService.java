@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -107,12 +108,18 @@ public class McpService {
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.info("Listing available tools");
-                final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> McpSchema.Tool.builder()
-                        .name(tool.name())
-                        .title(tool.title())
-                        .description(tool.description())
-                        .inputSchema(tool.inputSchema())
-                        .build()).toList();
+                final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> {
+                    var builder = McpSchema.Tool.builder()
+                            .name(tool.name())
+                            .title(tool.title())
+                            .description(tool.description())
+                            .inputSchema(tool.inputSchema());
+                    if (tool.outputSchema().isPresent()) {
+                        builder.outputSchema(tool.outputSchema().get());
+                    }
+                    return builder.build();
+                }).toList();
+
                 return Optional.of(new McpSchema.ListToolsResult(toolList, null));
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
@@ -121,7 +128,22 @@ public class McpService {
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
                     final Object result = tool.apply(new PermissionHelper(securityContext), callToolRequest.arguments());
-                    return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                    if (tool.outputSchema().isPresent()) {
+                        // if we have an output schema we want to return structured content
+                        try {
+                            var structuredContent = objectMapper.convertValue(result,
+                                                                              new TypeReference<Map<String, Object>>() {
+                                                                              });
+                            return Optional.of(new McpSchema.CallToolResult(
+                                    List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))), false,
+                                    structuredContent));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        // no schema, just return the string representation directly
+                        return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                    }
                 } else {
                     throw new McpException("Unknown tool named: " + callToolRequest.name());
                 }

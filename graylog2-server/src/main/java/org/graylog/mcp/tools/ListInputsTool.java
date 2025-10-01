@@ -47,6 +47,7 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
     public ListInputsTool(ObjectMapper objectMapper, InputService inputService, MessageInputFactory messageInputFactory) {
         super(objectMapper,
                 new TypeReference<>() {},
+                new TypeReference<>() {},
                 NAME,
                 "List Graylog Inputs",
                 """

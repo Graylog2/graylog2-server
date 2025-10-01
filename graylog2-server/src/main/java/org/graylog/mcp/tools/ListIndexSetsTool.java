@@ -52,6 +52,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
                              Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         super(objectMapper,
                 new TypeReference<>() {},
+                new TypeReference<>() {},
                 NAME,
                 "List Graylog Index Sets",
                 """

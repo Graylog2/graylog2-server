@@ -37,6 +37,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     public ListStreamsTool(ObjectMapper objectMapper, StreamService streamService) {
         super(objectMapper,
                 new TypeReference<>() {},
+                new TypeReference<>() {},
                 NAME,
                 "List all Graylog Streams",
                 "List all available streams in the Graylog instance.");

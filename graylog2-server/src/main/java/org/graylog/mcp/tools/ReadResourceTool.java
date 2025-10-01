@@ -40,6 +40,7 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     public ReadResourceTool(ObjectMapper objectMapper, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
                 new TypeReference<>() {},
+                new TypeReference<>() {},
                 NAME,
                 "Describe a specific Graylog Resource with a given GRN",
                 "A brief description of the Graylog Resource.");

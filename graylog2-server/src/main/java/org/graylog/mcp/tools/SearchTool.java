@@ -28,11 +28,9 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.security.UserContext;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -68,6 +66,7 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
     @Inject
     public SearchTool(ObjectMapper objectMapper, InternalRelativeSearchResource searchResource, UserService userService, StreamService streamService) {
         super(objectMapper,
+                new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 "Run Lucene query",

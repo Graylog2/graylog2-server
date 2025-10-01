@@ -40,6 +40,7 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
     public ListResourceTool(ObjectMapper objectMapper, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
                 new TypeReference<>() {},
+                new TypeReference<>() {},
                 NAME,
                 "List Graylog Resources",
                 """

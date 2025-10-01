@@ -55,6 +55,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     public ListIndicesTool(ObjectMapper objectMapper, Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry) {
         super(objectMapper,
                 new TypeReference<>() {},
+                new TypeReference<>() {},
                 NAME,
                 "List Graylog Indices",
                 """

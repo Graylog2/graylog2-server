@@ -32,7 +32,7 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Locale;
 
-public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
+public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOverviewResponse> {
     public static String NAME = "get_system_status";
 
     private final ServerStatus serverStatus;
@@ -42,6 +42,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
     @Inject
     public SystemInfoTool(ObjectMapper objectMapper, ServerStatus serverStatus, ClusterConfigService clusterConfigService, LeaderElectionService leaderElectionService) {
         super(objectMapper,
+                new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 "Get Graylog System Information",
@@ -55,13 +56,13 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
     }
 
     @Override
-    public String apply(PermissionHelper permissionHelper, SystemInfoTool.Parameters unused) {
+    public SystemOverviewResponse apply(PermissionHelper permissionHelper, SystemInfoTool.Parameters unused) {
         try {
             // TODO: find a better way to do this. This is all verbatim from org.graylog2.shared.rest.resources.system.SystemResource::system
 
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            return getObjectMapper().writeValueAsString(SystemOverviewResponse.create("graylog-server",
+            return SystemOverviewResponse.create("graylog-server",
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     clusterId.clusterId(),
@@ -74,10 +75,9 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, String> {
                     serverStatus.getTimezone().getID(),
                     System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"),
                     leaderElectionService.isLeader()
-            ));
-        }
-        catch (Exception e) {
-            return e.getMessage();
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
