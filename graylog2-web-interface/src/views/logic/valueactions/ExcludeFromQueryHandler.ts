@@ -46,9 +46,10 @@ const ExcludeFromQueryHandler =
       hasMultipleValueForActions(contexts) ? contexts.valuePath.map(() => ({ field, value })) : [{ field, value }],
     );
 
-    const newQuery = valuesToAdd.reduce((prev, valueToAdd) => {
-      return formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number);
-    }, oldQuery);
+    const newQuery = valuesToAdd.reduce(
+      (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number),
+      oldQuery,
+    );
 
     return dispatch(updateQueryString(queryId, newQuery));
   };

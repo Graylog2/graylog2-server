@@ -49,9 +49,11 @@ const AddToQueryHandler =
         : [{ field, value, type }],
     );
 
-    const newQuery = valuesToAdd.reduce((prev, valueToAdd) => {
-      return formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number, valueToAdd.type);
-    }, oldQuery);
+    const newQuery = valuesToAdd.reduce(
+      (prev, valueToAdd) =>
+        formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number, valueToAdd.type),
+      oldQuery,
+    );
 
     return dispatch(updateQueryString(queryId, newQuery));
   };
