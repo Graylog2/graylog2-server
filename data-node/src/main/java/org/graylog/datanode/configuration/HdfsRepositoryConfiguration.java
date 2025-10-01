@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration;
+package org.graylog.datanode.configuration;
 
+import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.configuration.Documentation;
 
-import org.graylog.datanode.process.configuration.beans.ConfigurationBuildParams;
+public class HdfsRepositoryConfiguration {
 
-import java.nio.file.Path;
-import java.security.cert.X509Certificate;
-import java.util.List;
+    @Documentation("Should HDFS repository be enabled? This will also add the search role and activate search cache.")
+    @Parameter(value = "hdfs_repository_enabled")
+    private boolean enabled = false;
 
-public record OpensearchConfigurationParams(List<X509Certificate> trustedCertificates,
-                                            java.util.Map<String, String> transientConfiguration,
-                                            Path targetConfigDir) implements ConfigurationBuildParams {
+    public boolean isRepositoryEnabled() {
+        return enabled;
+    }
 }

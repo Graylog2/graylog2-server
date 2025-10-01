@@ -46,7 +46,7 @@ class OpensearchConfigurationOverridesBeanTest {
 
 
         final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(datanodeDirectories, opensearchOverridesFile, Collections::emptyMap);
-        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .hasSize(2)
@@ -70,7 +70,7 @@ class OpensearchConfigurationOverridesBeanTest {
         final Supplier<Map<String, String>> env = () -> Map.of("opensearch.cluster.max_shards_per_node", "500");
 
         final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(datanodeDirectories, opensearchOverridesFile, env);
-        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .hasSize(2)
@@ -91,7 +91,7 @@ class OpensearchConfigurationOverridesBeanTest {
         }
     }
 
-    private OpensearchConfigurationParams emptyBuildParams() {
-        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap());
+    private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
+        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap(), tempDir);
     }
 }
