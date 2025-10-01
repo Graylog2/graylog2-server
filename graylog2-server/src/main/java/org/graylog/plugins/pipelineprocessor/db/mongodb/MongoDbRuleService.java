@@ -80,13 +80,31 @@ public class MongoDbRuleService implements RuleService {
             if (checkMutability) {
                 scopedEntityMongoUtils.ensureMutability(rule);
             }
+            // Check if this is a rename operation
+            String oldTitle = null;
+            try {
+                RuleDao existingRule = load(ruleId);
+                if (!existingRule.title().equals(rule.title())) {
+                    oldTitle = existingRule.title();
+                }
+            } catch (NotFoundException e) {
+                // Rule doesn't exist yet, not a rename
+            }
+
             collection.replaceOne(MongoUtils.idEq(ruleId), rule, new ReplaceOptions().upsert(true));
             savedRule = rule;
+
+            // Post event with oldTitle if this was a rename
+            if (oldTitle != null) {
+                clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title(), oldTitle));
+            } else {
+                clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
+            }
         } else {
             final var insertedId = insertedIdAsString(collection.insertOne(rule));
             savedRule = rule.toBuilder().id(insertedId).build();
+            clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
         }
-        clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
         return savedRule;
     }
 
