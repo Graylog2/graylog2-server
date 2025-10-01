@@ -15,40 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import Value from 'views/components/Value';
-import type { ValueGroupItem, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
+import type { ValueGroupItem, ValueGroups, FieldData } from 'views/components/visualizations/OnClickPopover/Types';
 import ValueRenderer from 'views/components/visualizations/OnClickPopover/ValueRenderer';
 
-type Props = ValueGroups;
+type Props = ValueGroups & { setFieldData: React.Dispatch<React.SetStateAction<FieldData>> };
 
-const DivContainer = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacings.xxs};
-  `,
-);
+const StyledListGroup = styled(ListGroup)`
+  max-height: 300px;
+  overflow-y: auto;
+`;
 
-const Group = ({ group, keyPrefix }: { group: Array<ValueGroupItem>; keyPrefix: string }) => {
+const Group = ({
+  group,
+  keyPrefix,
+  setFieldData,
+}: {
+  group: Array<ValueGroupItem>;
+  keyPrefix: string;
+  setFieldData: Props['setFieldData'];
+}) => {
   if (!group?.length) return null;
 
-  return group.map(({ text, value, field, traceColor }) => (
-    <Value
-      key={`${keyPrefix}-${value}-${field}`}
-      field={field}
-      value={value}
-      render={() => <ValueRenderer value={text} label={field} traceColor={traceColor} />}
-    />
-  ));
+  return (
+    <>
+      {group.map(({ text, value, field, traceColor }) => (
+        <ListGroupItem onClick={() => setFieldData({ value, field })} key={`${keyPrefix}-${value}-${field}`}>
+          <ValueRenderer value={text} label={field} traceColor={traceColor} />
+        </ListGroupItem>
+      ))}
+    </>
+  );
 };
-const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotValues }: Props) => (
-  <DivContainer>
-    {metricValue && <Group group={[metricValue]} keyPrefix="metricValue" />}
-    <Group group={rowPivotValues} keyPrefix="rowPivotValues" />
-    <Group group={columnPivotValues} keyPrefix="columnPivotValues" />
-  </DivContainer>
+const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotValues, setFieldData }: Props) => (
+  <StyledListGroup>
+    {metricValue && <Group group={[metricValue]} keyPrefix="metricValue" setFieldData={setFieldData} />}
+    <Group group={rowPivotValues} keyPrefix="rowPivotValues" setFieldData={setFieldData} />
+    <Group group={columnPivotValues} keyPrefix="columnPivotValues" setFieldData={setFieldData} />
+  </StyledListGroup>
 );
 
 export default OnClickPopoverValueGroups;

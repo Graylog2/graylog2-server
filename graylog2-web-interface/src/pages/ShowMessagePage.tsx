@@ -38,6 +38,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { Message } from 'views/components/messagelist/Types';
 import ErrorPage from 'components/errors/ErrorPage';
+import type { Stream } from 'logic/streams/types';
 
 type Props = {
   params: {
@@ -78,10 +79,14 @@ type ShowMessagePageProps = {
   messageId: string;
   index: string;
 };
+const emptyStreams: Stream[] = [];
 const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) => {
-  const streams = useContext(StreamsContext);
-  const streamsMap = Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream])));
-  const streamsList = Immutable.List(streams);
+  const streams = useContext(StreamsContext) ?? emptyStreams;
+  const streamsMap = useMemo(
+    () => Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream]))),
+    [streams],
+  );
+  const streamsList = useMemo(() => Immutable.List(streams), [streams]);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => {

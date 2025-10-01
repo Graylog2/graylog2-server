@@ -95,6 +95,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEXSETS_DELETE = "indexsets:delete";
     public static final String INDEXSETS_EDIT = "indexsets:edit";
     public static final String INDEXSETS_READ = "indexsets:read";
+    public static final String INDEXSETS_FIELD_RESTRICTIONS_EDIT = "indexsets_field_restrictions:edit";
     public static final String INDICES_CHANGESTATE = "indices:changestate";
     public static final String INDICES_DELETE = "indices:delete";
     public static final String INDICES_FAILURES = "indices:failures";

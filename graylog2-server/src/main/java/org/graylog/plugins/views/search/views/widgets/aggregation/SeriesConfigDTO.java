@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,7 +28,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonDeserialize(builder = SeriesConfigDTO.Builder.class)
-@WithBeanGetter
 public abstract class SeriesConfigDTO {
     static final String FIELD_NAME = "name";
     static final String FIELD_THRESHOLDS = "thresholds";

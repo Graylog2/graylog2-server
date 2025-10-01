@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.permission.WildcardPermission;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.Startpage;
@@ -36,61 +35,60 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class UserSummary {
 
-    @JsonProperty
+    @JsonProperty("id")
     @Nullable
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("username")
     public abstract String username();
 
-    @JsonProperty
+    @JsonProperty("email")
     public abstract String email();
 
-    @JsonProperty
+    @JsonProperty("first_name")
     @Nullable
     public abstract String firstName();
 
-    @JsonProperty
+    @JsonProperty("last_name")
     @Nullable
     public abstract String lastName();
 
-    @JsonProperty
+    @JsonProperty("full_name")
     @Nullable
     public abstract String fullName();
 
-    @JsonProperty
+    @JsonProperty("permissions")
     @JsonSerialize(contentUsing = ToStringSerializer.class)
     public abstract List<WildcardPermission> permissions();
 
-    @JsonProperty
+    @JsonProperty("grn_permissions")
     public abstract List<GRNPermission> grnPermissions();
 
-    @JsonProperty
+    @JsonProperty("preferences")
     @Nullable
     public abstract Map<String, Object> preferences();
 
-    @JsonProperty
+    @JsonProperty("timezone")
     @Nullable
     public abstract String timezone();
 
-    @JsonProperty
+    @JsonProperty("session_timeout_ms")
     @Nullable
     public abstract Long sessionTimeoutMs();
 
     @JsonProperty("read_only")
     public abstract boolean readOnly();
 
-    @JsonProperty
+    @JsonProperty("external")
     public abstract boolean external();
 
-    @JsonProperty
+    @JsonProperty("startpage")
     @Nullable
     public abstract Startpage startpage();
 
-    @JsonProperty
+    @JsonProperty("roles")
     @Nullable
     public abstract Set<String> roles();
 

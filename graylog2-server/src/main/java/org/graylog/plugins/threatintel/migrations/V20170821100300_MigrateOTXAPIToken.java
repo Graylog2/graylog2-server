@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration;
 import org.graylog.plugins.threatintel.adapters.otx.OTXDataAdapter;
 import org.graylog2.events.ClusterEventBus;
@@ -117,7 +116,6 @@ public class V20170821100300_MigrateOTXAPIToken extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("converted_otx_api_key")
         public abstract boolean convertedOTXAPIKey();

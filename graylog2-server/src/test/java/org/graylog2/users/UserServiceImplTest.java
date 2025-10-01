@@ -381,7 +381,7 @@ public class UserServiceImplTest {
         when(permissionResolver.resolveStringPermission(roleId)).thenReturn(ImmutableSet.of("perm:from:role"));
 
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof CaseSensitiveWildcardPermission ? p.toString() : p).collect(Collectors.toSet()))
-                .containsExactlyInAnyOrder("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
+                .containsExactlyInAnyOrder("users:passwordchange:user", "users:read:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
                         "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
     }
 

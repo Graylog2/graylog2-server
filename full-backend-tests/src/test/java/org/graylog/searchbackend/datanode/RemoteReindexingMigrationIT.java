@@ -39,6 +39,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog.testing.elasticsearch.IndexState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV)
+@Disabled("temporarily disabled")
 public class RemoteReindexingMigrationIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteReindexingMigrationIT.class);

@@ -19,7 +19,6 @@ package org.graylog2.system.stats.mongo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,43 +28,42 @@ import java.util.List;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class BuildInfo {
-    @JsonProperty
+    @JsonProperty("version")
     public abstract String version();
 
-    @JsonProperty
+    @JsonProperty("git_version")
     public abstract String gitVersion();
 
-    @JsonProperty
+    @JsonProperty("sys_info")
     public abstract String sysInfo();
 
-    @JsonProperty
+    @JsonProperty("loader_flags")
     @Nullable
     public abstract String loaderFlags();
 
-    @JsonProperty
+    @JsonProperty("compiler_flags")
     @Nullable
     public abstract String compilerFlags();
 
-    @JsonProperty
+    @JsonProperty("allocator")
     @Nullable
     public abstract String allocator();
 
-    @JsonProperty
+    @JsonProperty("version_array")
     public abstract List<Integer> versionArray();
 
-    @JsonProperty
+    @JsonProperty("javascript_engine")
     @Nullable
     public abstract String javascriptEngine();
 
-    @JsonProperty
+    @JsonProperty("bits")
     public abstract int bits();
 
-    @JsonProperty
+    @JsonProperty("debug")
     public abstract boolean debug();
 
-    @JsonProperty
+    @JsonProperty("max_bson_object_size")
     public abstract long maxBsonObjectSize();
 
     public static BuildInfo create(String version,

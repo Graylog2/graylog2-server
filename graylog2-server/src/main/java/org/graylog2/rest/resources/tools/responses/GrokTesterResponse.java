@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -29,7 +28,6 @@ import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class GrokTesterResponse {
     @JsonProperty("matched")
@@ -73,12 +71,11 @@ public abstract class GrokTesterResponse {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class Match {
-        @JsonProperty
+        @JsonProperty("name")
         public abstract String name();
 
-        @JsonProperty
+        @JsonProperty("match")
         public abstract String match();
 
         @JsonCreator

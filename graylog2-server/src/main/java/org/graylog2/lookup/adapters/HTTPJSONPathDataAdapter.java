@@ -45,7 +45,6 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -312,7 +311,6 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_HTTPJSONPathDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

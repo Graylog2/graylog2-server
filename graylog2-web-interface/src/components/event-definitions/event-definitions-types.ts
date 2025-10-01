@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { type SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
@@ -38,7 +38,7 @@ type FieldSpec = {
 type Notification = {
   type: string;
   notification_id: string;
-  notification_parameters: string;
+  notification_parameters: { type: string };
 };
 
 export type Scheduler = {
@@ -86,6 +86,7 @@ export type EventProcessorConfig = {
 };
 export type EventDefinition = {
   _scope: string;
+  _entity_source: any;
   id: string;
   title: string;
   description: string;

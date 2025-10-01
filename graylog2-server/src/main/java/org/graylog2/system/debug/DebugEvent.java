@@ -20,21 +20,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class DebugEvent {
-    @JsonProperty
+    @JsonProperty("node_id")
     public abstract String nodeId();
 
-    @JsonProperty
+    @JsonProperty("date")
     public abstract DateTime date();
 
-    @JsonProperty
+    @JsonProperty("text")
     public abstract String text();
 
     @JsonCreator

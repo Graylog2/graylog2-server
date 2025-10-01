@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import jakarta.validation.constraints.NotBlank;
 
 @AutoValue
 @JsonDeserialize(builder = ViewClusterConfig.Builder.class)
-@WithBeanGetter
 public abstract class ViewClusterConfig {
     private static final String FIELD_DEFAULT_VIEW_ID = "default_view_id";
 
