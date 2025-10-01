@@ -19,6 +19,7 @@ import { useRef } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EntitySharedAction, ModalHandler } from 'components/permissions/types';
+import { HasOwnership } from 'components/common';
 
 function usePluggableEntitySharedActions<T>(entity: T, entityType: string) {
   const modalRefs = useRef({});
@@ -30,7 +31,9 @@ function usePluggableEntitySharedActions<T>(entity: T, entityType: string) {
     const { key, component: PluggableEntityAction } = action;
 
     return (
-      <PluggableEntityAction key={`entity-action-${key}`} entity={entity} modalRef={() => modalRefs.current[key]} />
+      <HasOwnership id={(entity as T & { id: string })?.id} type={entityType}>
+        <PluggableEntityAction key={`entity-action-${key}`} entity={entity} modalRef={() => modalRefs.current[key]} />
+      </HasOwnership>
     );
   });
 
