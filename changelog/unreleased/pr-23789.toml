@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix search filters for 'Created At' and 'All time' in paginated searcheds."
+
+issues = ["23634"]
+pulls = ["23789"]

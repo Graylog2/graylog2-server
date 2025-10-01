@@ -69,6 +69,7 @@ export type AppConfigs = {
   telemetry: { api_key: string; host: string; enabled: boolean };
   contentStream: { refresh_interval: string; rss_url: string };
   branding: Branding | undefined;
+  globalInputsOnly: boolean;
 };
 
 declare global {
@@ -141,6 +142,10 @@ const AppConfig = {
 
   branding(): Branding | undefined {
     return appConfig()?.branding;
+  },
+
+  globalInputsOnly():boolean {
+    return appConfig().globalInputsOnly;
   },
 };
 
