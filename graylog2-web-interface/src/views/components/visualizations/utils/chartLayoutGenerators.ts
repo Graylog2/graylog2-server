@@ -48,7 +48,7 @@ import formatValueWithUnitLabel from 'views/components/visualizations/utils/form
 
 type DefaultAxisKey = 'withoutUnit';
 
-const getYAxisPosition = (axisCount: number) => {
+export const getYAxisPosition = (axisCount: number) => {
   const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {

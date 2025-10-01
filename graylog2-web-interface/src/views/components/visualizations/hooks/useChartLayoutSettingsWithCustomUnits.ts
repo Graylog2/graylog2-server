@@ -43,11 +43,24 @@ const useChartLayoutSettingsWithCustomUnits = ({
   const ticksConfig = useXAxisTicks(config, chartData);
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { unitTypeMapper, fieldNameToAxisNameMapper } = useMemo(
+  const { unitTypeMapper, fieldNameToAxisNameMapper, mapperAxisNumber, ...rest } = useMemo(
     () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
     [config.series, widgetUnits],
   );
-  const thresholdShapes = getThresholdShapes(config.series, widgetUnits, fieldNameToAxisNameMapper);
+
+  console.log({
+    unitTypeMapper,
+    fieldNameToAxisNameMapper,
+    rest,
+  });
+
+  const { shapes: thresholdShapes, annotations: thresholdaAnnotations } = getThresholdShapes({
+    series: config.series,
+    widgetUnits,
+    fieldNameToAxisNameMapper,
+    mapperAxisNumber,
+    theme,
+  });
 
   return useCallback(() => {
     if (!unitFeatureEnabled)
@@ -69,6 +82,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
       shapes: thresholdShapes,
+      annotations: thresholdaAnnotations,
       hovermode: 'x',
       xaxis: {
         domain: generateDomain(Object.keys(unitTypeMapper)?.length),
