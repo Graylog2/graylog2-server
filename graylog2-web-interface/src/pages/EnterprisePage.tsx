@@ -28,9 +28,6 @@ import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 const EnterprisePage = () => {
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
-  if (!nodes) {
-    return <Spinner />;
-  }
 
   return (
     <DocumentTitle title={`${productName} Enterprise`}>
