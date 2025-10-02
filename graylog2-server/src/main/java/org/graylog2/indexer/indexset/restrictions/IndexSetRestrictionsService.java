@@ -71,18 +71,19 @@ public class IndexSetRestrictionsService {
                 .map(IndexSetTemplate::indexSetConfig)
                 .orElse(indexSetDefaultTemplateService.getOrCreateDefaultConfig());
 
+        final IndexSetConfig newConfig = creationRequest.toIndexSetConfig(true, indexSetTemplateConfig.fieldRestrictions());
         if(!skipRestrictionCheck) {
-            checkRestrictions(indexSetTemplateConfig.fieldRestrictions(), doc(creationRequest), doc(indexSetTemplateConfig));
+            checkRestrictions(indexSetTemplateConfig.fieldRestrictions(), doc(newConfig), doc(indexSetTemplateConfig));
         }
-
-        return creationRequest.toIndexSetConfig(true, indexSetTemplateConfig.fieldRestrictions());
+        return newConfig;
     }
 
     public IndexSetConfig updateIndexSetConfig(IndexSetUpdateRequest updateRequest,
                                                IndexSetConfig oldConfig,
                                                boolean skipRestrictionCheck) {
+        final IndexSetConfig newConfig = updateRequest.toIndexSetConfig(oldConfig);
         if (!skipRestrictionCheck) {
-            DocumentContext doc1 = doc(updateRequest);
+            DocumentContext doc1 = doc(newConfig);
             DocumentContext doc2 = doc(oldConfig);
             if (!Objects.equals(doc1.read(FIELD_RESTRICTIONS_PATH), doc2.read(FIELD_RESTRICTIONS_PATH))) {
                 throw new ForbiddenException("Missing permission %s to change field %s!".formatted(
@@ -90,7 +91,7 @@ public class IndexSetRestrictionsService {
             }
             checkRestrictions(oldConfig.fieldRestrictions(), doc1, doc2);
         }
-        return updateRequest.toIndexSetConfig(oldConfig);
+        return newConfig;
     }
 
     private void checkRestrictions(Map<String, Set<IndexSetFieldRestriction>> indexSetFieldRestrictions,
