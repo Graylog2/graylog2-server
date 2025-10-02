@@ -46,6 +46,8 @@ const getThresholdShapes = ({
   mapperAxisNumber,
   theme,
 }: Props): Result => {
+  console.log({ mapperAxisNumber });
+
   const thresholds = series?.map((curSeries) => {
     const { field } = parseSeries(curSeries.function) ?? {};
     const seriesUnit = widgetUnits.getFieldUnit(field);
