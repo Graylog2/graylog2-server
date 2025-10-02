@@ -30,6 +30,8 @@ type Props = {
 };
 
 const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: Props) => {
+  const currentUser = useCurrentUser();
+
   if (typeof children !== 'function') {
     throw new Error('Invalid prop: "children" must be a function.');
   }
@@ -37,8 +39,6 @@ const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: 
   if (hideChildren) {
     return null
   }
-
-  const currentUser = useCurrentUser();
 
   if (currentUser) {
     const { grnPermissions = [], permissions } = currentUser;
