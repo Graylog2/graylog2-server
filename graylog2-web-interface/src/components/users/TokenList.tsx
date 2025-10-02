@@ -85,7 +85,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
 
   return (
     <>
-      <IfPermitted permissions={['users:tokencreate', `users:tokencreate:${currentUser.username}`]} anyPermissions>
+      <IfPermitted permissions={[`users:tokencreate:${user.username}`]} anyPermissions>
         <Headline>Create And Edit Tokens</Headline>
         <CreateTokenForm
           onCreate={handleTokenCreation}
