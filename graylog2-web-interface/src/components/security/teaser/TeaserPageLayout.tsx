@@ -71,7 +71,7 @@ const Row = styled.div<{ $justify?: string; $fullWidth?: boolean }>`
 `;
 
 const StyledIcon = styled(Icon)`
-  color: ${({ theme }) => theme.colors.brand.primary};
+  color: ${({ theme }) => theme.colors.variant.danger};
 `;
 
 const LEFT_COLUMN_ITEM_LIST = [
