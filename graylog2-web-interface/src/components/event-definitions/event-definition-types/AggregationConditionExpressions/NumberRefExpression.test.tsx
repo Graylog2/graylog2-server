@@ -18,6 +18,9 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+
 import NumberRefExpression from './NumberRefExpression';
 
 describe('NumberRefExpression', () => {
@@ -28,9 +31,9 @@ describe('NumberRefExpression', () => {
   });
 
   const aggregationFunctions = ['avg', 'card'];
-  const formattedFields = [
-    { label: 'source - string', value: 'source' },
-    { label: 'took_ms - long', value: 'took_ms' },
+  const formattedFields: FieldTypeMapping[] = [
+    new FieldTypeMapping('source', FieldTypes.STRING()),
+    new FieldTypeMapping('took_ms', FieldTypes.LONG()),
   ];
 
   it('should have no selected function and field with an undefined ref', async () => {
