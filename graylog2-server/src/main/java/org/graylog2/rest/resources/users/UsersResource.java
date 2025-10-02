@@ -957,7 +957,6 @@ public class UsersResource extends RestResource {
 
         // Among all active sessions, find the last recently used for each user
         private Map<String, Optional<SessionDTO>> getLastSessionForUser(Collection<SessionDTO> sessions) {
-            //noinspection OptionalGetWithoutIsPresent
             return sessions.stream()
                     .filter(s -> s.userId().isPresent())
                     .collect(groupingBy(s -> s.userId().get(),
