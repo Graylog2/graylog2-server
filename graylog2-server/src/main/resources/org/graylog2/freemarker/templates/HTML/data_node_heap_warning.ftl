@@ -12,7 +12,7 @@
     </p>
     <p>
         The Data Node service is a wrapper for an Opensearch service, and its the Opensearch service which requires the configuration change.<br/>
-        The configuration that should be updated is the value of <b>opensearch_heap</b> property, can be found in the (<em>datanode.conf</em>) file on each Data Node.
+        The configuration that should be updated is the <b>opensearch_heap</b> property, <#if recommendedMemorySetting?has_content> set to <b>${recommendedMemorySetting}</b> value,</#if> which can be found in the (<em>datanode.conf</em>) file on each Data Node.
     </p>
     <p>
         Note that the Data Node service will need to be restarted for configuration changes to take effect.
