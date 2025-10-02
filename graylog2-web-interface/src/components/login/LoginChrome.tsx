@@ -30,14 +30,13 @@ import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
-  height: 5rem;
   width: auto;
   margin: auto;
-  margin-bottom: 1.5rem;
 
   svg {
     width: 100%;
-    height: 75px;
+    min-height: 120px;
+    height: 8vh;
   }
 `;
 
