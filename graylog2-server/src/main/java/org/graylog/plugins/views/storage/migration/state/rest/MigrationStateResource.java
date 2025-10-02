@@ -62,7 +62,7 @@ public class MigrationStateResource {
     @Path("/trigger")
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "trigger migration step")
+    @ApiOperation(value = "trigger migration step", response = CurrentStateInformation.class)
     public Response trigger(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
         Response.ResponseBuilder response = newState.hasErrors() ? Response.serverError() : Response.ok();
