@@ -104,7 +104,7 @@ const getThresholdShapes = ({
     });
   });
 
-  const res = flatten(thresholds).filter(({ shape }) => !!shape);
+  const res = flatten(thresholds).filter((threshold) => !!threshold?.shape);
 
   return {
     shapes: res.map(({ shape }) => shape),
