@@ -151,12 +151,4 @@ public class McpResource extends RestResource {
         return false;
     }
 
-    private String toJson(Object o) {
-        try {
-            if (o instanceof String s) return s;
-            return objectMapper.writeValueAsString(o);
-        } catch (Exception e) {
-            return "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32603,\"message\":\"" + e.getMessage() + "\"}}";
-        }
-    }
 }
