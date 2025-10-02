@@ -16,6 +16,7 @@
  */
 package org.graylog2.security.sessions;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -42,17 +43,19 @@ public class SessionConverter {
     );
 
     public static SessionDTO simpleSessionToSessionDTO(SimpleSession simpleSession) {
+
         final var unknownKeys = unknownSessionKeys(simpleSession);
         if (!unknownKeys.isEmpty()) {
-            LOG.warn("Session contains unknown attribute keys: {}. Known keys are: {}",
-                    unknownKeys, KNOWN_SESSION_KEYS);
+            throw new IllegalArgumentException(f("Session contains unknown attribute keys: %s. Known keys are: %s",
+                    unknownKeys, KNOWN_SESSION_KEYS));
         }
 
         final var principalInfo = extractPrincipalInfoFromSimpleSession(simpleSession);
+        final var sessionId = Preconditions.checkNotNull(simpleSession.getId()).toString();
 
         return SessionDTO.builder()
                 .expired(simpleSession.isExpired())
-                .sessionId(simpleSession.getId().toString())
+                .sessionId(sessionId)
                 .host(simpleSession.getHost())
                 .timeout(simpleSession.getTimeout())
                 .startTimestamp(simpleSession.getStartTimestamp().toInstant())
@@ -104,18 +107,17 @@ public class SessionConverter {
                 return Optional.empty();
             }
             if (principalCollection.asList().size() > 1) {
-                LOG.error("Expected exactly one principal in session, but got {}. Taking the first one as user ID and " +
-                        "ignoring the others.", principalCollection.asList().size());
+                throw new IllegalArgumentException(f("Expected a single principal in session, but got %s.",
+                        principalCollection.asList().size()));
             }
             final var realm = principalCollection.getRealmNames().stream().findFirst().orElseThrow(() ->
                     new IllegalStateException("Principal in session has no associated realm."));
-            final var principal = principalCollection.fromRealm(realm).iterator().next();
+            final var principal = principalCollection.getPrimaryPrincipal();
             if (principal instanceof String userId) {
                 return Optional.of(new PrincipalInfo(userId, realm));
             } else {
-                LOG.error("Expected principal in session to be of type String, but got \"{}\".",
-                        principalCollection.getPrimaryPrincipal().getClass().getSimpleName());
-                return Optional.empty();
+                throw new IllegalArgumentException(f("Unexpected type of principal in session. Expected \"String\", " +
+                        "but got \"%s\".", principal.getClass().getSimpleName()));
             }
         } else {
             throw new IllegalArgumentException(f("Unexpected type of principals in session." +

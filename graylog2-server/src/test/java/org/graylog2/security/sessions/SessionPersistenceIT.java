@@ -22,7 +22,6 @@ import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SimpleSession;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -38,7 +37,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
@@ -208,33 +206,6 @@ class SessionPersistenceIT {
 
         assertThat(sessionService.getBySessionId(sessionId)).hasValueSatisfying(sessionDTO ->
                 assertThat(sessionDTO.expired()).isTrue());
-    }
-
-    @Test
-    void ignoresUnknownSessionAttributes() {
-        final var session = new SimpleSession("localhost");
-        session.setAttribute(USERNAME_SESSION_KEY, "test-user-name");
-        session.setAttribute("some-unknown-key", "some-value");
-
-        final var sessionId = (String) sessionDAO().create(session);
-        assertThat(sessionDAO().readSession(sessionId)).satisfies(loadedSession ->
-                assertThat(loadedSession.getAttributeKeys()).isEqualTo(Set.of(USERNAME_SESSION_KEY)));
-    }
-
-    @Test
-    void ignoresAdditionalPrincipals() {
-        final var principals = new SimplePrincipalCollection();
-        principals.add("test-user-1", "test-realm-1");
-        principals.add("test-user-2", "test-realm-1");
-        principals.add("test-user-3", "test-realm-2");
-
-        final var session = new SimpleSession("localhost");
-        session.setAttribute(PRINCIPALS_SESSION_KEY, principals);
-
-        final var sessionId = (String) sessionDAO().create(session);
-        assertThat(sessionDAO().readSession(sessionId)).satisfies(loadedSession ->
-                assertThat(loadedSession.getAttribute(PRINCIPALS_SESSION_KEY))
-                        .isEqualTo(new SimplePrincipalCollection("test-user-1", "test-realm-1")));
     }
 
     // The session DAO is caching sessions, but we want to make sure that every operation is hitting the database,
